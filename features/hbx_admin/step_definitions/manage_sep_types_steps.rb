@@ -317,10 +317,32 @@ And(/clicks on Draft filter of (.*) market filter$/) do |market_kind|
   end
 end
 
-Then("Admin should see newly SEP created title on Datatable") do
+Then("Admin should see newly created SEP Type title on Datatable") do
   expect(page).to have_content('Entered into a legal domestic partnership')
 end
 
 And("Admin should see SEP Type failure reason") do
   expect(page).to have_content('Active SEP type exists with same reason')
+end
+
+When("Admin clicks on newly created SEP Type") do
+  find_link('Entered into a legal domestic partnership').click
+end
+
+Then("Admin should navigate to update SEP Type page") do
+  sleep 1
+  expect(page).to have_content('Update SEP Type')
+end
+
+When("Admin changes start and end dates of draft SEP Type") do
+  fill_in "Start Date", with: TimeKeeper.date_of_record.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+  fill_in "End Date", with: TimeKeeper.date_of_record.next_year.end_of_month.strftime('%m/%d/%Y').to_s
+end
+
+And("Admin clicks on Update SEP Type button") do
+  find_button('Update SEP Type').click
+end
+
+Then("Admin should see Successfully updated message") do
+  expect(page).to have_content('SEP Type Updated Successfully')
 end
