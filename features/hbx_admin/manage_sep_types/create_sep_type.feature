@@ -17,19 +17,19 @@ Feature: Admin has ability to create a new SEP type for users
     And Admin fills Create SEP Type form with Event label
     And Admin fills Create SEP Type form with Tool Tip
     And Admin selects <market_kind> market radio button and their reason
-    And Admin selects effective on kinds events for Create SEP Type
-    And Admin selects termination on kinds events for Create SEP Type
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin <action> select termination on kinds for <market_kind> SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin clicks on Create Draft button
     Then Admin should see SEP Type Created Successfully message
     When Admin navigates to SEP Types List page
     When Admin clicks <market_kind> filter on SEP Types datatable
-    And Admin clicks Draft filter under <market_kind> filter on SEP Types datatable
+    And clicks on Draft filter of <market_kind> market filter
     Then Admin should see newly SEP created title on Datatable
     And Hbx Admin logs out
 
   Examples:
-    | market_kind |
-    | Individual  |
-    | Shop        |
-    | Congress    |
+    | market_kind | action |
+    | individual  | cannot |
+    | shop        |  can   |
+    | fehb        |  can   |
