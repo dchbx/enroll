@@ -13,8 +13,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   end
 
   let(:contract_params) do
-    { :start_on => TimeKeeper.date_of_record,
-      :end_on => (TimeKeeper.date_of_record + 25.days),
+    { :start_on => "#{TimeKeeper.date_of_record.year}-07-09",
+      :end_on => "#{TimeKeeper.date_of_record.year}-07-29",
       :title => 'A new SEP Type',
       :tool_tip => 'test tool tip',
       :pre_event_sep_in_days => '4',
@@ -143,7 +143,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   context 'failure case' do
     context 'end on date is less than start on date' do
       before  do
-        contract_params.merge!({start_on: "#{TimeKeeper.date_of_record.year}-08-19"})
+        contract_params.merge!({start_on: "#{TimeKeeper.date_of_record.year}-08-29"})
         @result = subject.call(contract_params)
       end
 
