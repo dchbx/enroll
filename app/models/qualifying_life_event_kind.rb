@@ -217,16 +217,16 @@ class QualifyingLifeEventKind
     state :expire_pending
     state :expired
 
-    event :publish, :after => [:record_transition, :update_qle_reason_types] do   #activate QLE  concept
-      transitions from: :draft, to: :active, :after => [:activate_qle]  #TODO qle guards  # title should be uniq
+    event :publish, :after => [:record_transition, :update_qle_reason_types] do
+      transitions from: :draft, to: :active, :guard => [:has_valid_reason?, :has_valid_title?], :after => [:activate_qle]
     end
 
-    event :schedule_expiration, :after => :record_transition do  # TODO end date should be future
-      transitions from: [:active, :expire_pending], to: :expire_pending, :after => [:set_end_date]
+    event :schedule_expiration, :after => :record_transition do
+      transitions from: [:active, :expire_pending], to: :expire_pending, :guard => :can_be_expire_pending?, :after => :set_end_date
     end
 
-    event :expire, :after => [:record_transition, :update_qle_reason_types] do #TODO: end date should past
-      transitions from: [:active, :expire_pending], to: :expired, :after => [:set_end_date, :deactivate_qle]
+    event :expire, :after => [:record_transition, :update_qle_reason_types] do
+      transitions from: [:active, :expire_pending], to: :expired, :guard => :can_be_expired?, :after => [:set_end_date, :deactivate_qle]
     end
 
     event :advance_date, :after => [:record_transition, :update_qle_reason_types] do
@@ -316,23 +316,23 @@ class QualifyingLifeEventKind
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
 
-  def can_be_expire_pending?
-    if end_on.present?
-      [:active, :expire_pending].include?(aasm_state) && self.end_on >= TimeKeeper.date_of_record
-    else
-      [:active, :expire_pending].include?(aasm_state)
-    end
+  def can_be_expire_pending?(end_date = TimeKeeper.date_of_record)
+    [:active, :expire_pending].include?(aasm_state) && end_date >= TimeKeeper.date_of_record
   end
 
-  def can_be_expired?
-    if end_on.present?
-      [:active, :expire_pending].include?(aasm_state) && (end_on.present? && TimeKeeper.date_of_record > self.end_on)
-    else
-      [:active, :expire_pending].include?(aasm_state)
-    end
+  def can_be_expired?(end_date = TimeKeeper.date_of_record)
+    [:active, :expire_pending].include?(aasm_state) && TimeKeeper.date_of_record > end_date
   end
   
   private
+
+  def has_valid_reason?
+    self.class.by_market_kind(market_kind).active_by_state.pluck(:reason).uniq.exclude?(reason)
+  end
+
+  def has_valid_title?
+    self.class.by_market_kind(market_kind).active_by_state.pluck(:title).uniq.exclude?(title)
+  end
 
   def update_qle_reason_types
     const_name = "#{market_kind.humanize}QleReasons"
