@@ -226,20 +226,33 @@ And("Admin fills Create SEP Type form with Tool Tip") do
   fill_in "Tool Tip", with: "Enroll or add a family member due to a new domestic partnership"
 end
 
-And(/Admin selects (.*) market radio button and their reason$/) do |market_kind|
+And(/Admin selects (.*) market radio button$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
     find(:xpath, '//input[@value="individual"]', :wait => 2).click
-    find(:xpath, '//select[@id="reason"]', :wait => 10).click
-    find("option[value='domestic partnership']").click
   elsif market_kind == 'shop' 
     find(:xpath, '//input[@value="shop"]', :wait => 2).click
-    find(:xpath, '//select[@id="reason"]', :wait => 10).click
-    find("option[value='domestic partnership']").click
   else
     find(:xpath, '//input[@value="fehb"]', :wait => 2).click
-    find(:xpath, '//select[@id="reason"]', :wait => 10).click
+  end
+end
+
+And("Admin clicks reason drop down on Create SEP type form") do
+  find(:xpath, '//select[@id="reason"]', :wait => 10).click
+end
+
+And("Admin selects expired reason from drop down on Create SEP type form") do
     find("option[value='domestic partnership']").click
+end
+
+And(/Admin selects active reason from drop down for (.*) SEP type form$/) do |market_kind|
+  sleep(2)
+  if market_kind == 'individual'
+    find("option[value='birth']").click
+  elsif market_kind == 'shop'
+    find("option[value='marriage']").click
+  else
+    find("option[value='adoption']").click
   end
 end
 
@@ -306,4 +319,8 @@ end
 
 Then("Admin should see newly SEP created title on Datatable") do
   expect(page).to have_content('Entered into a legal domestic partnership')
+end
+
+And("Admin should see SEP Type failure reason") do
+  expect(page).to have_content('Active SEP type exists with same reason')
 end
