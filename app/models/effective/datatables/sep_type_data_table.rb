@@ -35,7 +35,7 @@ module Effective
 
       def expire_sep_type(qle, allow)
         return 'disabled' unless allow
-        (qle.can_be_expire_pending? || qle.can_be_expired?) ? 'ajax' : 'disabled'
+        [:active, :expire_pending].include?(qle.aasm_state) ? 'ajax' : 'disabled'
       end
 
       def nested_filter_definition
