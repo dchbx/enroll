@@ -98,7 +98,7 @@ class QualifyingLifeEventKind
   field :coverage_end_on, type: Date
 
   index({action_kind: 1})
-  index({market: 1, ordinal_position: 1 })
+  index({market_kind: 1, ordinal_position: 1 })
   index({start_on: 1, end_on: 1})
 
   # validates :effective_on_kinds,
