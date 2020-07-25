@@ -199,11 +199,20 @@ Then("Admin navigates to Create SEP Type page") do
   expect(page).to have_content('Create SEP Type')
 end
 
-When("Admin fills the Create SEP Type form page for Shop market") do
+When("Admin fills Create SEP Type form with start and end dates") do
   fill_in "Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
+end
+
+And("Admin fills Create SEP Type form with Title") do
   fill_in "Title", with: "Entered into a legal domestic partnership"
+end
+
+And("Admin fills Create SEP Type form with Event label") do
   fill_in "Event Label", with: "Date of domestic partnership"
+end
+
+And("Admin fills Create SEP Type form with Tool Tip") do
   fill_in "Tool Tip", with: "Enroll or add a family member due to a new domestic partnership"
 end
 
@@ -214,9 +223,15 @@ And("Admin selects Shop market radio button and their reason") do
   find("option[value='domestic partnership']").click
 end
 
-And("Admin fills rest of the form on create page") do
+And("Admin selects effective on kinds events for Create SEP Type") do
   find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']").set(true)
+end
+
+And("Admin selects termination on kinds events for Create SEP Type") do
   find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='date_of_event']").set(true)
+end
+
+And("Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates") do
   fill_in "Pre Event SEP( In Days )", with: "0"
   fill_in "Post Event SEP( In Days )", with: "30"
 end
