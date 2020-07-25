@@ -9,6 +9,11 @@ module Queries
       @custom_attributes = attributes
     end
 
+    def datatable_search(string)
+      @search_string = string
+      self
+    end
+
     def build_scope
       qles = QualifyingLifeEventKind.all
       qles = qles.by_market_kind('individual') if @custom_attributes['manage_qles'] == 'ivl_qles'
@@ -23,7 +28,8 @@ module Queries
       qles = qles.where(market_kind: 'fehb', :aasm_state.in => [:active, :expired_pending]).order(ordinal_position: :asc) if @custom_attributes['congress_options'] == 'fehb_active_qles'
       qles = qles.where(market_kind: 'fehb', aasm_state: :expired).order(ordinal_position: :asc) if @custom_attributes['congress_options'] == 'fehb_inactive_qles'
       qles = qles.where(market_kind: 'fehb', aasm_state: :draft).order(ordinal_position: :asc) if @custom_attributes['congress_options'] == 'fehb_draft_qles'
-      qles
+      return qles if @search_string.blank? || @search_string.length < 2
+      qles.where({"$or" => ([{"title" => ::Regexp.compile(::Regexp.escape(@search_string), true)}])})
     end
 
     def skip(num)

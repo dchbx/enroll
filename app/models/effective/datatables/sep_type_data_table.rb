@@ -21,7 +21,10 @@ module Effective
       end
 
       def collection
-        @qles = Queries::SepTypeDatatableQuery.new(attributes)
+        unless (defined? @qles) && @qles.present?
+          @qles = Queries::SepTypeDatatableQuery.new(attributes)
+        end
+        @qles
       end
 
       def global_search?
