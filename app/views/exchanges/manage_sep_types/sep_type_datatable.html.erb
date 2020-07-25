@@ -1,13 +1,15 @@
-<%= render "ui-components/v1/navs/primary_nav.html.slim" %>
+<% if EnrollRegistry.feature_enabled?(:sep_types) %>
+  <%= render "ui-components/v1/navs/primary_nav.html.slim" %>
 
-<div class='container'>
-	<h2> <%= l10n("exchange.manage_sep_types.manage_sep_types")%> </h2>
+  <div class='container'>
+    <h2> <%= l10n("exchange.manage_sep_types.manage_sep_types")%> </h2>
     <div data-turbolinks="false">
       <%= link_to l10n("exchange.manage_sep_types.sorting_sep_types"), sorting_sep_types_exchanges_manage_sep_types_path, class: "btn btn-default" %>
       <%= link_to l10n("exchange.manage_sep_types.create_sep_types"), new_exchanges_manage_sep_type_path, class: 'btn btn-default' %>
     </div>
-	<%= raw render_datatable(@datatable) %>
-</div>
+    <%= raw render_datatable(@datatable) %>
+  </div>
+<% end %>
 
 <script>
 	initializeDataTables();
