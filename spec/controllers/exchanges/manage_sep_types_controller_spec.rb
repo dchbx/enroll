@@ -29,6 +29,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for new' do
       before do
         q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+        allow(q1).to receive(:has_valid_reason?).and_return(true)
+        allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
         get :new
@@ -136,6 +138,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for edit' do
       before do
         q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
+        allow(q1).to receive(:has_valid_reason?).and_return(true)
+        allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
         get :edit, params: {id: q1.id}
