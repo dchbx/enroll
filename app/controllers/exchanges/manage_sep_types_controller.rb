@@ -102,7 +102,7 @@ module Exchanges
     def sep_types_dt
       @datatable = Effective::Datatables::SepTypeDataTable.new
       respond_to do |format|
-        format.html { render "/exchanges/manage_sep_types/sep_type_datatable.html.erb" }
+        format.html {  render '/exchanges/manage_sep_types/sep_type_datatable.html.erb', :layout => 'single_column'}
       end
     end
 
