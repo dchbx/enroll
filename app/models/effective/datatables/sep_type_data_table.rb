@@ -11,8 +11,6 @@ module Effective
         table_column :state, :label => l10n("datatables.sep_type_data_table.state"), :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
-              [l10n("datatables.sep_type_data_table.publish"), sep_type_to_publish_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
-               publish_sep_type(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?)) ],
               [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
                expire_sep_type(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?)) ]
           ]
@@ -29,11 +27,6 @@ module Effective
 
       def global_search?
         true
-      end
-
-      def publish_sep_type(qle, allow)
-        return 'disabled' unless allow
-        qle.draft? ? 'ajax' : 'disabled'
       end
 
       def expire_sep_type(qle, allow)

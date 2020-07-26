@@ -55,15 +55,7 @@ module Exchanges
       end
     end
 
-    def sep_type_to_publish #pending specs
-      @qle = QualifyingLifeEventKind.find(params[:qle_id])
-      @row = params[:qle_action_id]
-      respond_to do |format|
-        format.js { render "sep_type_to_publish"}
-      end
-    end
-
-    def sep_type_to_expire #pending specs
+    def sep_type_to_expire
       params.permit!
       @qle = ::QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
@@ -72,23 +64,7 @@ module Exchanges
       end
     end
 
-    def publish_sep_type #pending specs
-      begin
-        @qle = QualifyingLifeEventKind.find(params[:qle_id])
-        if @qle.present? && @qle.may_publish?
-          if @qle.publish!
-            message = {notice: l10n("controller.manage_sep_type.publish_success")}
-          else
-            message = {notice: l10n("controller.manage_sep_type.publish_failure")}
-          end
-        end
-      rescue Exception => e
-      message = {error: e.to_s}
-      end
-      redirect_to exchanges_manage_sep_types_root_path, flash: message
-    end
-
-    def expire_sep_type  #pending specs
+    def expire_sep_type
       begin
         result = ::Operations::QualifyingLifeEventKind::Transform.new.call(params)
         @qle = result.success.first
