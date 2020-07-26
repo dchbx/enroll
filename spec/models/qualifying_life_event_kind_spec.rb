@@ -325,6 +325,8 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
         end
 
         before do
+          allow(qlek).to receive(:has_valid_reason?).and_return(true)
+          allow(qlek).to receive(:has_valid_title?).and_return(true)
           qlek.publish!
         end
 
@@ -343,7 +345,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model do
         end
 
         before do
-          qlek.expire!
+          qlek.expire!(qlek.end_on)
         end
 
         it 'should remove reason from the ShopQleReasons type' do
