@@ -73,7 +73,7 @@ registry:
           - key: :market_kind
             item: <%= ENV[':market_kind'] %>
             meta:
-              label: Market Kind
+              label: Market
               content_type: :radio_select
               enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Congress"}]
               default: :individual
@@ -112,7 +112,7 @@ registry:
           - key: :effective_on_kinds
             item: <%= ENV['effective_on_kinds'] %>
             meta:
-              label: Effective On Kinds
+              label: Effective On
               enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
@@ -122,7 +122,7 @@ registry:
           - key: :termination_on_kinds
             item: <%= ENV['termination_on_kinds'] %>
             meta:
-              label: Termination On Kinds
+              label: Termination On
               enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
