@@ -9,22 +9,14 @@ module Operations
     include Dry::Monads[:result, :do, :try]
 
     # Invoke the operation.
-    # @param opts [Hash] the invocation options
-    # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-    #   was made against
-    # @option opts [Family] :family the family involved in the selection
-    # @option opts [BenefitMarkets::Product] :product the selected product
+    # @param opts [Entities::ProductSelection] the invocation options
     def self.call(opts = {})
       self.new.call(opts)
     end
 
     # Invoke the operation.
-    # @param opts [Hash] the invocation options
-    # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-    #   was made against
-    # @option opts [Family] :family the family involved in the selection
-    # @option opts [BenefitMarkets::Product] :product the selected product
-    def call(opts = {})
+    # @param opts [Entities::ProductSelection] the invocation options
+    def call(opts)
       setting_value = yield lookup_setting
       selected_operation = yield create_operation_instance(setting_value.value!)
       selected_operation.value!.call(opts)

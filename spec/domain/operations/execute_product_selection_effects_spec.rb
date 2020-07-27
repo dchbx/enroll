@@ -7,16 +7,20 @@ describe Operations::ExecuteProductSelectionEffects, "invoked with:
 - a selected Product
 - a Family
 " do
-  let(:family) { double }
-  let(:selected_product) { double }
-  let(:enrollment) { double }
+  let(:family) { instance_double(Family) }
+  let(:selected_product) do
+    instance_double(
+      BenefitMarkets::Products::Product
+    )
+  end
+  let(:enrollment) { instance_double(HbxEnrollment) }
 
   let(:operation_options) do
-    {
-      hbx_enrollment: enrollment,
+    Entities::ProductSelection.new({
+      enrollment: enrollment,
       product: selected_product,
       family: family
-    }
+    })
   end
 
   let(:success) do

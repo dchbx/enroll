@@ -7,22 +7,16 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # Invoke the operation.
-      # @param opts [Hash] the invocation options
-      # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-      #   was made against
-      # @option opts [BenefitMarkets::Products::Product] :product the selected product
+      # @param opts [Entities::ProductSelection] the invocation options
       def self.call(opts = {})
         self.new.call(opts)
       end
 
       # Invoke the operation.
-      # @param opts [Hash] the invocation options
-      # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-      #   was made against
-      # @option opts [BenefitMarkets::Products::Product] :product the selected product
+      # @param opts [Entities::ProductSelection] the invocation options
       def call(opts = {})
-        enrollment = opts[:enrollment]
-        product = opts[:product]
+        enrollment = opts.enrollment
+        product = opts.product
         cancel_previous(enrollment, product.active_year)
       end
 

@@ -2445,10 +2445,13 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
 
       it "should cancel the previous enrollment if the effective_on date of the previous and the current are the same." do
-        ::Operations::ProductSelectionEffects::TerminatePreviousSelections.call({
-          enrollment: new_ivl_enrollment,
-          product: product
-        })
+        ::Operations::ProductSelectionEffects::TerminatePreviousSelections.call(
+          ::Entities::ProductSelection.new({
+            enrollment: new_ivl_enrollment,
+            product: product,
+            family: family
+          })
+        )
         existing_ivl_enrollment.reload
         expect(existing_ivl_enrollment.aasm_state).to eq "coverage_canceled"
       end
