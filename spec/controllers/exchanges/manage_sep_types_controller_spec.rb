@@ -51,6 +51,24 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       it 'should load ivl_reasons on to the form object' do
         expect(assigns(:qle).ivl_reasons).to include(['Marriage', 'marriage'])
       end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          get :new
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
     end
 
     context 'for create' do
@@ -133,6 +151,24 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           expect(response.body).to have_content(("End on must be after start on date"))
         end
       end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          post :create, params: post_params
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
     end
 
     context 'for edit' do
@@ -175,6 +211,24 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       it 'should load qlek effective_on_kinds data on to the form object' do
         expect(assigns(:qle).effective_on_kinds).to eq(q1.effective_on_kinds)
+      end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          get :edit, params: {id: q1.id}
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
       end
     end
 
@@ -421,6 +475,24 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(response.body).to match(/Shop/i)
         expect(response.body).to match(/Congress/i)
       end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          get :sorting_sep_types
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
     end
 
     context 'for sort' do
@@ -454,12 +526,29 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           expect(response).to have_http_status(:internal_server_error)
         end
       end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          patch :sort, params: params
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
     end
 
     context 'for sep_types_dt' do
 
       before do
-        person.hbx_staff_role.permission.update_attributes!(can_complete_resident_application: true)
         sign_in(current_user)
         get :sep_types_dt
       end
@@ -474,6 +563,24 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       it 'should update the position' do
         expect(response.body).to match(/Sorting Sep Types/i)
+      end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          get :sep_types_dt
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
       end
     end
 
