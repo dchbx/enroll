@@ -1,3 +1,4 @@
+@wip
 Feature: User is not applying for financial assistance
   Background:
     Given the user is applying for a CONSUMER role
