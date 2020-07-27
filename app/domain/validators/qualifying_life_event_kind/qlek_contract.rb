@@ -54,6 +54,11 @@ module Validators
         key.failure(l10n("validators.qualifying_life_event_kind.reason")) if reasons.include?(value)
       end
 
+      rule(:title) do
+        reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
+        key.failure(l10n("validators.qualifying_life_event_kind.title")) if reasons.include?(value.parameterize)
+      end
+
       rule(:post_event_sep_in_days) do
         key.failure(l10n("validators.qualifying_life_event_kind.post_event_sep_in_days")) unless value >= 0
       end
