@@ -60,4 +60,10 @@ describe Queries::SepTypeDatatableQuery, "Filter Scopes for sep type Index", dbc
     fdq = Queries::SepTypeDatatableQuery.new({"congress_options" => "fehb_draft_qles"})
     expect(fdq.build_scope.selector).to eq ({"market_kind"=>"fehb", "aasm_state"=>:draft})
   end
+
+  it "search scope selector" do
+    search_title = Queries::SepTypeDatatableQuery.new({})
+    search_title.instance_variable_set(:@search_string, "test_title")
+    expect(search_title.build_scope.selector).to eq ({"$or"=>[{"title"=>/test_title/i}]})
+  end
 end
