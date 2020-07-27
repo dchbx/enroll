@@ -56,19 +56,20 @@ module Exchanges
     end
 
     def sep_type_to_expire
-      params.permit!
+      params.permit(:qle_id, :qle_action_id)
       @qle = ::QualifyingLifeEventKind.find(params[:qle_id])
       @row = params[:qle_action_id]
-      respond_to do |format|
-        format.js { render "sep_type_to_expire"}
-      end
     end
 
     def expire_sep_type
       begin
+        params.permit(:qle_id, :end_on)
         result = ::Operations::QualifyingLifeEventKind::Transform.new.call(params)
-        @qle = result.success.first
-        message = {notice: l10n("controller.manage_sep_type.#{result.success[1]}")}
+        if result.failure?
+          message = {notice: l10n("controller.manage_sep_type.expire_failure")}
+        else
+          message = {notice: l10n("controller.manage_sep_type.#{result.success[1]}")}
+        end
       rescue Exception => e
         message = {error: e.to_s}
       end
