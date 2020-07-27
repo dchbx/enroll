@@ -1,4 +1,4 @@
-Feature: Admin has ability to update a Draft SEP Type
+Feature: Admin has ability to update a draft SEP Type
   Background:
     Given a Hbx admin with hbx_tier3 permissions exists
     When Hbx Admin logs on to the Hbx Portal
@@ -30,9 +30,8 @@ Feature: Admin has ability to update a Draft SEP Type
     Then Admin should see newly created SEP Type title on Datatable
     When Admin clicks on newly created SEP Type
     Then Admin should navigate to update SEP Type page
-    When Admin changes start and end dates of draft SEP Type
-    And Admin clicks on Update SEP Type button
-    Then Admin should see Successfully updated message
+    When Admin clicks on Publish button
+    Then Admin should see Successfully publish message
     And Hbx Admin logs out
 
   Examples:

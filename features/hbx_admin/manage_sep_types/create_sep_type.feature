@@ -1,4 +1,4 @@
-Feature: Admin has ability to create a new SEP type for users
+Feature: Admin has ability to create a new SEP Type
   Background:
     Given a Hbx admin with hbx_tier3 permissions exists
     When Hbx Admin logs on to the Hbx Portal
