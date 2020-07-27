@@ -28,7 +28,7 @@ class QualifyingLifeEventKind
   SHOP_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
   FEHB_EFFECTIVE_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
-  TERMINATION_ON_KINDS = %w[date_of_event first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+  TERMINATION_ON_KINDS = %w[end_of_event_month date_before_event end_of_reporting_month end_of_last_month_of_reporting exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
