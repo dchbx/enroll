@@ -74,7 +74,6 @@ class QualifyingLifeEventKind
   field :action_kind, type: String
 
   field :title, type: String
-  field :action_kind, type: String
   field :effective_on_kinds, type: Array, default: []
   field :reason, type: String
   field :edi_code, type: String
@@ -218,7 +217,7 @@ class QualifyingLifeEventKind
     state :expired
 
     event :publish, :after => [:record_transition, :update_qle_reason_types] do
-      transitions from: :draft, to: :active, :guard => [:has_valid_reason?, :has_valid_title?], :after => [:activate_qle]
+      transitions from: :draft, to: :active, :guard => [:has_valid_reason?, :has_valid_title?], :after => [:activate_qle, :set_ordinal_position]
     end
 
     event :schedule_expiration, :after => :record_transition do
@@ -245,7 +244,7 @@ class QualifyingLifeEventKind
   class << self
 
     def advance_day(new_date)
-      QualifyingLifeEventKind.where(:end_on.gt => new_date ).each do |qle|
+      QualifyingLifeEventKind.where(:end_on.lt => new_date, aasm_state: :expire_pending).each do |qle|
         qle.advance_date! if qle.may_advance_date?
       end
     end
@@ -316,6 +315,8 @@ class QualifyingLifeEventKind
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
 
+  private
+
   def can_be_expire_pending?(end_date = TimeKeeper.date_of_record)
     [:active, :expire_pending].include?(aasm_state) && end_date >= TimeKeeper.date_of_record
   end
@@ -323,18 +324,16 @@ class QualifyingLifeEventKind
   def can_be_expired?(end_date = TimeKeeper.date_of_record)
     [:active, :expire_pending].include?(aasm_state) && TimeKeeper.date_of_record > end_date
   end
-  
-  private
 
   def has_valid_reason?
     self.class.by_market_kind(market_kind).active_by_state.pluck(:reason).uniq.exclude?(reason)
   end
 
   def has_valid_title?
-    self.class.by_market_kind(market_kind).active_by_state.pluck(:title).uniq.exclude?(title)
+    self.class.by_market_kind(market_kind).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
   end
 
-  def update_qle_reason_types
+  def update_qle_reason_types  #check...
     const_name = "#{market_kind.humanize}QleReasons"
     reasons = self.class.by_market_kind(market_kind).active_by_state.pluck(:reason).uniq
     Types.send(:remove_const, const_name)
@@ -343,6 +342,11 @@ class QualifyingLifeEventKind
 
   def set_end_date(end_date = TimeKeeper.date_of_record)
     self.update_attributes({ end_on: end_date })
+  end
+
+  def set_ordinal_position
+    qlek = self.class.by_market_kind(market_kind).active_by_state.order(ordinal_position: :asc).last
+    self.update_attributes(ordinal_position: qlek.ordinal_position + 1) if qlek
   end
 
   def activate_qle
