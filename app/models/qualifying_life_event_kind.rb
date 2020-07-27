@@ -333,9 +333,9 @@ class QualifyingLifeEventKind
     self.class.by_market_kind(market_kind).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
   end
 
-  def update_qle_reason_types  #check...
+  def update_qle_reason_types
     const_name = "#{market_kind.humanize}QleReasons"
-    reasons = self.class.by_market_kind(market_kind).active_by_state.pluck(:reason).uniq
+    reasons = self.class.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.send(:remove_const, const_name)
     Types.const_set(const_name, Types::Coercible::String.enum(*reasons))
   end
