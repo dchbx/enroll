@@ -46,13 +46,13 @@ module Exchanges
           if result.failure?
             @qle = Forms::QualifyingLifeEventKindForm.for_update(result.failure[0].to_h)
             @failure = result.failure
-            render :edit
+            return render :edit
           else
-            flash[:success] = l10n("controller.manage_sep_type.update_success")
-            redirect_to sep_types_dt_exchanges_manage_sep_types_path
+            flash[:success] = l10n("controller.manage_sep_type.#{formatted_params["publish"] ? 'publish_success' : 'update_success'}")
           end
         end
       end
+      redirect_to sep_types_dt_exchanges_manage_sep_types_path
     end
 
     def sep_type_to_expire

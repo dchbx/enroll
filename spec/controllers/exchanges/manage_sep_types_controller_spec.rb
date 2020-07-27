@@ -4,7 +4,7 @@ require 'rails_helper'
 require 'factory_bot_rails'
 
 if EnrollRegistry.feature_enabled?(:sep_types)
-  RSpec.describe ::Exchanges::ManageSepTypesController do
+  RSpec.describe ::Exchanges::ManageSepTypesController, type: :controller, dbclean: :after_each do
     render_views
     before :all do
       DatabaseCleaner.clean
@@ -23,8 +23,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     end
 
     let!(:current_user){FactoryBot.create(:user, person: person)}
-    let(:q1){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
-    let(:q2){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
+    let!(:q1){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
+    let!(:q2){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
 
     context 'for new' do
       before do
@@ -178,13 +178,13 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       end
     end
 
-    context 'for update' do
+    context 'for update', :dbclean => :after_each do
       let(:post_params) do
         { id: q1.id.to_s,
           :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
                                                       end_on: '2020-07-31',
-                                                      title: 'test title',
-                                                      tool_tip: 'jhsdjhs',
+                                                      title: 'test_title',
+                                                      tool_tip: 'test_tooltip',
                                                       pre_event_sep_in_days: '10',
                                                       is_self_attested: 'true',
                                                       reason: 'birth',
@@ -240,6 +240,89 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           expect(response.body).to have_content(("End on must be after start on date"))
         end
       end
+
+      context "publish", :dbclean => :after_each do
+        let(:post_params) do
+          { id: q1.id.to_s,
+            :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
+                                                        end_on: '2020-07-31',
+                                                        title: 'title_new',
+                                                        tool_tip: 'tooltip_new',
+                                                        pre_event_sep_in_days: '10',
+                                                        is_self_attested: 'true',
+                                                        reason: 'birth_new',
+                                                        post_event_sep_in_days: '88',
+                                                        market_kind: 'individual',
+                                                        effective_on_kinds: ['date_of_event'],
+                                                        coverage_effective_on: '2020-07-01',
+                                                        coverage_end_on: '2020-07-31',
+                                                        event_kind_label: 'event kind label',
+                                                        is_visible: true,
+                                                        publish: "Publish",
+                                                        date_options_available: true }}
+        end
+
+        context 'success case', :dbclean => :after_each do
+          before do
+            q1.update_attributes!(market_kind: 'individual', aasm_state: :draft)
+            sign_in(current_user)
+            post :update, params: post_params
+          end
+
+          it 'should return http redirect' do
+            expect(response).to have_http_status(:redirect)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:success]).to eq 'SEP Type Published Successfully.'
+          end
+
+          it 'should redirect to sep types dt action' do
+            expect(response).to redirect_to(sep_types_dt_exchanges_manage_sep_types_path)
+          end
+        end
+
+        context 'failure case', :dbclean => :after_each do
+          before :each do
+            q1.update_attributes!(market_kind: 'individual', title: 'title_new', reason: 'birth_new')
+            sign_in(current_user)
+            post :update, params: post_params
+          end
+
+          it 'should return http redirect' do
+            expect(response).to have_http_status(:success)
+          end
+
+          it 'should render the edit template' do
+            expect(response).to render_template('edit')
+          end
+
+          it 'should have error message' do
+            expect(response.body).to have_content(("Active SEP type exists with same reason"))
+            expect(response.body).to have_content(("Active SEP type exists with same title"))
+          end
+        end
+      end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          post :update, params: post_params
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
+    end
+
     context "for expire", :dbclean => :after_each do
 
       before :each do
