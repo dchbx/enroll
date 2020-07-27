@@ -14,14 +14,11 @@ module Helpers
       .extend(ActionView::Context)
   end
 
-  def construct_binding(*modules)
-    construct_template(*modules).instance_eval { binding }
-  end
+  class StringRenderer < ActionView::Template::Handlers::ERB::Erubi
+    include Helpers
 
-  #class StringRenderer < ::Erubis
-  #  include Helpers
-  #  def with(*modules)
-  #    Capybara::Node::Simple.new result(construct_binding(*modules))
-  #  end
-  #end
+    def with(*modules)
+      Capybara::Node::Simple.new evaluate(construct_template(*modules))
+    end
+  end
 end
