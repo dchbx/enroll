@@ -15,7 +15,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   let(:contract_params) do
     { :start_on => "#{TimeKeeper.date_of_record.year}-07-09",
       :end_on => "#{TimeKeeper.date_of_record.year}-07-29",
-      :title => 'A new SEP Type',
+      :title => 'Married',
       :tool_tip => 'test tool tip',
       :pre_event_sep_in_days => '4',
       :is_self_attested => true,
@@ -45,7 +45,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       expect(@result.errors.empty?).to be_truthy
     end
 
-    it 'should set dehumanized form for title' do
+    it 'should set dehumanized form for reason' do
       expect(@result.to_h[:reason]).to eq('lost_access_to_mec')
     end
 
@@ -198,6 +198,28 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
       it 'should return error message if reason already exists' do
         expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same reason')
+      end
+    end
+
+    context 'duplicate title' do
+      let!(:qlek) do
+        FactoryBot.create(:qualifying_life_event_kind, reason: 'lost_access_to_mec', market_kind: 'individual')
+      end
+
+      before  do
+        contract_params.merge!({reason: "test_reason"})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+      it 'should have any errors' do
+        expect(@result.errors.empty?).to be_falsy
+      end
+
+      it 'should return error message if title already exists' do
+        expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same title')
       end
     end
 
