@@ -222,6 +222,11 @@ When("Admin fills Create SEP Type form with start and end dates") do
   fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
 end
 
+When("Admin fills Create SEP Type form with start on date greater than end on date") do
+  fill_in "Start Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
+  fill_in "End Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
+end
+
 And("Admin fills Create SEP Type form with Title") do
   fill_in "Title", with: "Entered into a legal domestic partnership"
 end
@@ -349,7 +354,11 @@ Then("Admin should see newly created SEP Type title on Datatable") do
   expect(page).to have_content('Entered into a legal domestic partnership')
 end
 
-And("Admin should see SEP Type failure reason") do
+Then("Admin should see failure reason while creating a new SEP Type") do
+  expect(page).to have_content('End on must be after start on date')
+end
+
+Then("Admin should see failure reason while publishing a new SEP Type") do
   expect(page).to have_content('Active SEP type exists with same reason')
 end
 
