@@ -123,7 +123,7 @@ registry:
             item: <%= ENV['termination_on_kinds'] %>
             meta:
               label: Termination On
-              enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
+              enum: [{end_of_event_month: Last Day of Event Month}, {date_before_event: Day before Event}, {end_of_last_month_of_reporting: Last Day of Month before Reporting}, {end_of_reporting_month: Last Day of Reporting Month}, {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
               description: Select Termination Effective Type
