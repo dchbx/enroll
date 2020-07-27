@@ -2,11 +2,14 @@ require "rails_helper"
 
 describe 'workflow/_dropdown' do
   let(:line) do
-    UIHelpers::Workflow::Line.new text: 'Are you cool?', 'values' => ['Very!', 'A Little', 'None']
+    UIHelpers::Workflow::Line.new "cells" => [{"name" => "test", "attribute" => "is_required_to_file_taxes", "text" => 'Are you cool?', 'values' => ['Very!', 'A Little', 'None']}]
   end
 
+  let(:model) {double(FinancialAssistance::Applicant, is_required_to_file_taxes: nil)}
+
   before do
-    render partial: 'workflow/dropdown', locals: { line: line }
+    assign(:model, model)
+    render partial: 'workflow/dropdown', locals: { cell: line.cells[0] }
   end
 
   it 'renders' do
