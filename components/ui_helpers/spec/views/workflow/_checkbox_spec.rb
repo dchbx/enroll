@@ -2,11 +2,11 @@ require "rails_helper"
 
 describe 'workflow/_checkbox' do
   let(:line) do
-    UIHelpers::Workflow::Line.new text: 'I am a DC resident who is homeless or have no permanent home address', 'identifier' => 'resident'
+    UIHelpers::Workflow::Line.new "cells" => [{"text" => 'I am a DC resident who is homeless or have no permanent home address', 'identifier' => 'resident'}]
   end
 
   before do
-    render partial: 'workflow/checkbox', locals: { line: line }
+    render partial: 'workflow/checkbox', locals: { cell: line.cells[0] }
   end
 
   it 'renders' do
