@@ -43,17 +43,25 @@ Then("Admin navigates to SEP Type List page") do
   step "the Admin is navigated to the Manage SEP Types screen"
 end
 
+def sep_type_start_on
+  TimeKeeper.date_of_record.prev_month.at_beginning_of_month
+end
+
+def sep_type_end_on
+  TimeKeeper.date_of_record.next_year.prev_month.end_of_month
+end
+
 def ivl_qualifying_life_events
-  {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position)}
+  {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)}
 end
 
 def  shop_qualifying_life_events
-  @shop_qles ||= [FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 1,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 1, qle_event_date_kind: :submitted_at),
-    FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2)]
+  @shop_qles ||= [FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 1,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 1, qle_event_date_kind: :submitted_at,  start_on: sep_type_start_on, end_on: sep_type_end_on),
+    FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)]
 end
 
 def fehb_qualifying_life_events
-  {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position)}
+  {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)}
 end
 
 And(/^Qualifying life events of all markets are present$/) do
@@ -210,8 +218,8 @@ Then("Admin navigates to Create SEP Type page") do
 end
 
 When("Admin fills Create SEP Type form with start and end dates") do
-  fill_in "Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
-  fill_in "End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
+  fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
+  fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
 end
 
 And("Admin fills Create SEP Type form with Title") do
@@ -230,7 +238,7 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
     find(:xpath, '//input[@value="individual"]', :wait => 2).click
-  elsif market_kind == 'shop' 
+  elsif market_kind == 'shop'
     find(:xpath, '//input[@value="shop"]', :wait => 2).click
   else
     find(:xpath, '//input[@value="fehb"]', :wait => 2).click
@@ -290,7 +298,7 @@ When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
     divs = page.all('div')
     ivl_filter = divs.detect { |div| div.text == 'Individual' && div[:id] == 'Tab:ivl_qles' }
     ivl_filter.click
-  elsif market_kind == 'shop' 
+  elsif market_kind == 'shop'
     divs = page.all('div')
     shop_filter = divs.detect { |div| div.text == 'Shop' && div[:id] == 'Tab:shop_qles' }
     shop_filter.click
@@ -301,19 +309,38 @@ When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
   end
 end
 
-And(/clicks on Draft filter of (.*) market filter$/) do |market_kind|
-  if market_kind == 'individual'
-    filter_divs = page.all('div')
-    ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
-    ivl_draft_filter.click
-  elsif market_kind == 'shop' 
-    filter_divs = page.all('div')
-    shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
-    shop_draft_filter.click
-  else
-    filter_divs = page.all('div')
-    fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
-    fehb_draft_filter.click
+And(/clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
+  if state == 'Draft'
+    if market_kind == 'individual'
+      filter_divs = page.all('div')
+      ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
+      ivl_draft_filter.click
+    elsif market_kind == 'shop'
+      filter_divs = page.all('div')
+      shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
+      shop_draft_filter.click
+    else
+      filter_divs = page.all('div')
+      fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
+      fehb_draft_filter.click
+    end
+  elsif state == 'Active'
+       if market_kind == 'individual'
+      filter_divs = page.all('div')
+      ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
+      ivl_active_filter.click
+      sleep 2
+    elsif market_kind == 'shop'
+      filter_divs = page.all('div')
+      shop_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:shop_qles-shop_active_qles' }
+      shop_active_filter.click
+      sleep 2
+    else
+      filter_divs = page.all('div')
+      fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
+      fehb_active_filter.click
+      sleep 2
+    end
   end
 end
 
@@ -345,4 +372,32 @@ end
 
 Then("Admin should see Successfully updated message") do
   expect(page).to have_content('SEP Type Updated Successfully')
+end
+
+When("Admin clicks on Publish button") do
+  find_button('Publish').click
+end
+
+Then("Admin should see Successfully publish message") do
+  expect(page).to have_content('SEP Type Published Successfully')
+end
+
+Then("Admin should see Expire dropdown button") do
+  expect(page).to have_content('Expire')
+end
+
+When("Admin clicks on Expire button of an Active SEP Type") do
+  find_link('Expire').click
+end
+
+When("Admin changes the end on date of an Active SEP Type to expire") do
+  fill_in "end_on", with: TimeKeeper.date_of_record.end_of_month.to_s
+end
+
+When("Admin clicks on Expire button") do
+  find_button("Expire").click
+end
+
+Then("Admin Should see a successful flash message of an Expire") do
+  expect(page).to have_content('Expiration Date Set On Sep Type Successfully')
 end

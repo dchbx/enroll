@@ -1,4 +1,6 @@
-Feature: Admin has ability to sort SEP Types and the positions of SEPs will reflect on the user and hbx portal home page qle carousel to plan shop
+Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save their positions in DB
+         User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
+         User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
   Background:
     Given a Hbx admin with hbx_tier3 permissions exists
     When Hbx Admin logs on to the Hbx Portal
