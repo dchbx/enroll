@@ -8,7 +8,7 @@ module Operations
     class Create
       include Dry::Monads[:result, :do]
 
-      def call(params)
+      def call(params:)
         values = yield validate(params)
         entity = yield initialize_entity(values)
         qle    = yield persist_data(entity, params)
