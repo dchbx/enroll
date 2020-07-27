@@ -25,35 +25,6 @@ AllCops:
     - './components/transport_profiles/spec/dummy/**/*'
     - './eyes/enroll.eye.rb'
 
-Rails:
-  Enabled: true
-
-Rails/ActiveRecordAliases:
-  Enabled: false
-
-Rails/FilePath:
-  Enabled: false
-
-Rails/FindBy:
-  Enabled: false
-
-Rails/DynamicFindBy:
-  Enabled: false
-
-# Re-enable for upgrade of rails
-Rails/ActionFilter:
-  Enabled: false
-
-Rails/HasManyOrHasOneDependent:
-  Enabled: false
-
-Rails/Output:
-  Enabled: false
-
-# Re-enable for upgrade of rails
-Rails/Validation:
-  Enabled: false
-
 # TODO: RWC
 Layout/CommentIndentation:
   Enabled: false
@@ -76,7 +47,7 @@ Layout/EmptyLineAfterGuardClause:
 Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
-Layout/IndentFirstArrayElement:
+Layout/FirstArrayElementIndentation:
   Enabled: false
 
 # Re-enable once other problems are solved
@@ -92,7 +63,7 @@ Layout/SpaceInsideHashLiteralBraces:
 Layout/SpaceInsideBlockBraces:
   Enabled: false
 
-Layout/TrailingBlankLines:
+Layout/TrailingEmptyLines:
   Enabled: false
 
 Layout/IndentationWidth:
@@ -135,9 +106,6 @@ Style/AndOr:
   Enabled: true
 
 Style/BlockComments:
-  Enabled: false
-
-Style/BracesAroundHashParameters:
   Enabled: false
 
 # We will want to turn this back on or customize it more fully

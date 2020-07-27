@@ -880,20 +880,6 @@ class HbxEnrollment
     family.enrollments.where({:predecessor_enrollment_id => id, :aasm_state.in => WAIVED_STATUSES}).present?
   end
 
-  def cancel_previous(year)
-    #Perform cancel/terms of previous enrollments for the same plan year
-    previous_enrollments(year).each do |previous_enrollment|
-      generate_signature(previous_enrollment)
-      if same_signatures(previous_enrollment) && !previous_enrollment.is_shop?
-        if self.effective_on > previous_enrollment.effective_on && previous_enrollment.may_terminate_coverage?
-          previous_enrollment.terminate_coverage!(effective_on - 1.day)
-        else
-          previous_enrollment.cancel_coverage! if previous_enrollment.may_cancel_coverage?
-        end
-      end
-    end
-  end
-
   def terminate_coverage_with(termination_date)
     # IVL enrollments go automatically to coverage_terminated
     if termination_date >= TimeKeeper.datetime_of_record && is_shop?
@@ -918,17 +904,11 @@ class HbxEnrollment
   end
 
   def propagate_selection
-    if is_shop?
-      update_existing_shop_coverage
-    else
-      cancel_previous(product.active_year)
-    end
-
-    if benefit_group_assignment
-      benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
-      benefit_group_assignment.hbx_enrollment = self
-      benefit_group_assignment.save
-    end
+    Operations::ExecuteProductSelectionEffects.call({
+      :enrollment => self,
+      :product => self.product,
+      :family => self.family
+    })
   end
 
   def handle_coverage_selection
@@ -2163,6 +2143,18 @@ class HbxEnrollment
     CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include?(aasm_state.to_s)
   end
 
+  def previous_enrollments(year)
+    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
+  end
+
+  def generate_signature(previous_enrollment)
+    previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
+  end
+
+  def same_signatures(previous_enrollment)
+    previous_enrollment.enrollment_signature == self.enrollment_signature
+  end
+
   private
 
   def set_is_any_enrollment_member_outstanding
@@ -2176,18 +2168,6 @@ class HbxEnrollment
   # NOTE - Mongoid::Timestamps does not generate created_at time stamps.
   def check_created_at
     self.update_attribute(:created_at, TimeKeeper.datetime_of_record) unless self.created_at.present?
-  end
-
-  def previous_enrollments(year)
-    household.hbx_enrollments.ne(id: id).by_coverage_kind(self.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(self.kind)
-  end
-
-  def generate_signature(previous_enrollment)
-    previous_enrollment.update_attributes(enrollment_signature: previous_enrollment.generate_hbx_signature) unless previous_enrollment.enrollment_signature.present?
-  end
-
-  def same_signatures(previous_enrollment)
-    previous_enrollment.enrollment_signature == self.enrollment_signature
   end
 
   def benefit_group_assignment_valid?(coverage_effective_date)
