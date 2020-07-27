@@ -9,23 +9,15 @@ module Operations
       include Dry::Monads[:result, :do]
 
       # Invoke the operation.
-      # @param opts [Hash] the invocation options
-      # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-      #   was made against
-      # @option opts [Family] :family the family involved in the selection
-      # @option opts [BenefitMarkets::Products::Product] :product the selected product
+      # @param opts [Entities::ProductSelection] the invocation options
       def self.call(opts = {})
         self.new.call(opts)
       end
 
       # Invoke the operation.
-      # @param opts [Hash] the invocation options
-      # @option opts [HbxEnrollment] :enrollment the enrollment the selection
-      #   was made against
-      # @option opts [Family] :family the family involved in the selection
-      # @option opts [BenefitMarkets::Products::Product] :product the selected product
+      # @param opts [Entities::ProductSelection] the invocation options
       def call(opts = {})
-        enrollment = opts[:enrollment]
+        enrollment = opts.enrollment
         if enrollment.is_shop?
           enrollment.update_existing_shop_coverage
         else

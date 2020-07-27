@@ -925,11 +925,13 @@ class HbxEnrollment
   end
 
   def propagate_selection
-    Operations::ExecuteProductSelectionEffects.call({
-      :enrollment => self,
-      :product => self.product,
-      :family => self.family
-    })
+    Operations::ExecuteProductSelectionEffects.call(
+      Entities::ProductSelection.new({
+        :enrollment => self,
+        :product => self.product,
+        :family => self.family
+      })
+    )
   end
 
   def handle_coverage_selection
