@@ -25,6 +25,7 @@ module Validators
         required(:is_visible).filled(:bool)
         optional(:termination_on_kinds).maybe(:array)
         required(:date_options_available).filled(:bool)
+        optional(:publish).maybe(:string)
 
         before(:value_coercer) do |result|
           result_hash = result.to_h
@@ -50,13 +51,17 @@ module Validators
       end
 
       rule(:reason) do
-        reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:reason).uniq
-        key.failure(l10n("validators.qualifying_life_event_kind.reason")) if reasons.include?(value)
+        if values[:publish].present? && values[:publish] == 'Publish'
+          reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:reason).uniq
+          key.failure(l10n("validators.qualifying_life_event_kind.reason")) if reasons.include?(value)
+        end
       end
 
       rule(:title) do
-        reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
-        key.failure(l10n("validators.qualifying_life_event_kind.title")) if reasons.include?(value.parameterize)
+        if values[:publish].present? && values[:publish] == 'Publish'
+          reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
+          key.failure(l10n("validators.qualifying_life_event_kind.title")) if reasons.include?(value.parameterize)
+        end
       end
 
       rule(:post_event_sep_in_days) do

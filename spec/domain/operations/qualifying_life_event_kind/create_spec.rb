@@ -96,11 +96,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
               'event_kind_label': 'event kind label',
               'is_visible': true,
               'id': q2.id.to_s,
-               'publish': 'Publish',
+              'publish': 'Publish',
               'date_options_available': true }
           end
+
           before do
-            @result = subject.call(qlek_create_params)
+            @result = subject.call(qlek_publish_params)
           end
 
           it 'should return failure' do
@@ -124,7 +125,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         { start_on: "#{TimeKeeper.date_of_record.year}-08-19",
           end_on: "#{TimeKeeper.date_of_record.year}-07-19",
           title: 'test title',
-          tool_tip: 'jhsdjhs',
+          tool_tip: 'test tool tip',
           pre_event_sep_in_days: '10',
           is_self_attested: 'true',
           reason: 'lost_access_to_mec',
@@ -169,7 +170,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         { 'start_on' => "#{TimeKeeper.date_of_record.year}-07-01",
           'end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
           'title' => 'test title',
-          'tool_tip' => 'jhsdjhs',
+          'tool_tip' => 'test tool tip 2',
           'pre_event_sep_in_days' => '10',
           'is_self_attested' => 'true',
           'reason' => 'lost_access_to_mec',
@@ -209,7 +210,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         { 'start_on' => "#{TimeKeeper.date_of_record.year}-08-19",
           'end_on' => "#{TimeKeeper.date_of_record.year}-07-19",
           'title' => 'test title',
-          'tool_tip' => 'jhsdjhs',
+          'tool_tip' => 'test tool tip 3',
           'pre_event_sep_in_days' => '10',
           'is_self_attested' => 'true',
           'reason' => 'lost_access_to_mec',
