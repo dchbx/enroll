@@ -12,7 +12,7 @@ module Effective
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
           dropdown = [
               [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
-               expire_sep_type(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?)) ]
+               can_expire_sep_type?(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?)) ]
           ]
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id.to_s}"}, formats: :html
         }, :filter => false, :sortable => false
@@ -29,7 +29,7 @@ module Effective
         true
       end
 
-      def expire_sep_type(qle, allow)
+      def can_expire_sep_type?(qle, allow)
         return 'disabled' unless allow
         [:active, :expire_pending].include?(qle.aasm_state) ? 'ajax' : 'disabled'
       end
