@@ -240,6 +240,83 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           expect(response.body).to have_content(("End on must be after start on date"))
         end
       end
+    context "for expire", :dbclean => :after_each do
+
+      before :each do
+        sign_in current_user
+      end
+
+      context "POST sep_type_to_expire", :dbclean => :after_each do
+
+        before do
+          post :sep_type_to_expire, params: {qle_id: q1.id, qle_action_id: q1.id}, format: :js, xhr: true
+        end
+
+        it 'should return http redirect' do
+          expect(response).to have_http_status(:ok)
+        end
+
+        it "should render template" do
+          expect(response).to render_template("sep_type_to_expire")
+        end
+      end
+
+      context "POST expire_sep_type", :dbclean => :after_each do
+
+        context 'success case', :dbclean => :after_each do
+          before do
+            post :expire_sep_type, params: {qle_id: q1.id, end_on: TimeKeeper.date_of_record.yesterday}, format: :js, xhr: true
+          end
+
+          it 'should return http redirect' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it "should redirect to manage SEP type root path" do
+            expect(response).to redirect_to(exchanges_manage_sep_types_root_path)
+          end
+
+          it 'should have flash success message' do
+            expect(flash[:notice]).to match(/Sep Type Expired Successfully./i)
+          end
+        end
+
+        context 'failure case', :dbclean => :after_each do
+          before do
+            post :expire_sep_type, params: {qle_id: q1.id, end_on: nil}, format: :js, xhr: true
+          end
+
+          it 'should return http redirect' do
+            expect(response).to have_http_status(:ok)
+          end
+
+          it "should redirect to manage SEP type root path" do
+            expect(response).to redirect_to(exchanges_manage_sep_types_root_path)
+          end
+
+          it 'should have flash failure message' do
+            expect(flash[:notice]).to match(/Unable to Expired Sep Type./i)
+          end
+        end
+      end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          post :expire_sep_type, params: {qle_id: q1.id, end_on: nil}, format: :js, xhr: true
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
     end
 
     context 'for sorting_sep_types' do
