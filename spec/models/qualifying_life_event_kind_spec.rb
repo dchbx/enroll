@@ -365,24 +365,6 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
           expect(::Types::ShopQleReasons.values).to include(qlek.reason)
         end
       end
-
-      context 'for removing a reason' do
-        let!(:qlek) do
-          FactoryBot.create(:qualifying_life_event_kind,
-                            aasm_state: :active,
-                            reason: 'remove reason',
-                            start_on: (TimeKeeper.date_of_record - 50.days),
-                            end_on: (TimeKeeper.date_of_record - 30.days))
-        end
-
-        before do
-          qlek.expire!(qlek.end_on)
-        end
-
-        it 'should remove reason from the ShopQleReasons type' do
-          expect(::Types::ShopQleReasons.values).not_to include(qlek.reason)
-        end
-      end
     end
   end
 
