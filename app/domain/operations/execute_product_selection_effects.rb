@@ -10,7 +10,7 @@ module Operations
 
     # Invoke the operation.
     # @param opts [Entities::ProductSelection] the invocation options
-    def self.call(opts = {})
+    def self.call(opts)
       self.new.call(opts)
     end
 
