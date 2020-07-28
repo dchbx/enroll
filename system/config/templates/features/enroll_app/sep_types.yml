@@ -179,6 +179,23 @@ registry:
       - key: :expire_sep_type
         item: Operations::QualifyingLifeEventKind::Transform.new
         is_enabled: true
+        meta:
+          label: Expire Sep Type
+          content_type: :legend
+          default: :''
+          description: 'Expire Sep Types'
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :end_on
+            item: <%= ENV['end_on'] %>
+            meta:
+              label: ''
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
       - key: :sort_sep_type
         item: Operations::QualifyingLifeEventKind::Sort.new
         is_enabled: true

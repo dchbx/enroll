@@ -63,20 +63,18 @@ module Exchanges
     end
 
     def expire_sep_type
-      begin
-        params.permit(:qle_id, :end_on)
-        result = EnrollRegistry[:expire_sep_type]{
-            {params: params}
-        }
-        if result.failure?
-          message = {notice: l10n("controller.manage_sep_type.expire_failure")}
-        else
-          message = {notice: l10n("controller.manage_sep_type.#{result.success[1]}")}
-        end
-      rescue Exception => e
-        message = {error: e.to_s}
+      @result = EnrollRegistry[:expire_sep_type]{
+        {params: format_expire_sep_type(params)}
+      }
+      @row = params[:qle_action_id]
+
+      if @result.failure?
+        @qle = @result.failure[0]
+        @qle.assign_attributes({end_on: params[:qualifying_life_event_kind][:end_on]})
+        respond_to { |format| format.js { render 'sep_type_to_expire' } }
+      else
+        respond_to { |format| format.js { render 'expire_sep_type' } }
       end
-      redirect_to exchanges_manage_sep_types_root_path, flash: message
     end
 
     def sep_types_dt
@@ -97,7 +95,7 @@ module Exchanges
       begin
         params.permit!
         EnrollRegistry[:sort_sep_type]{
-            {params: params}
+          {params: params}
         }
         render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       rescue => e
@@ -123,6 +121,11 @@ module Exchanges
       params.permit!
       params['forms_qualifying_life_event_kind_form'].merge!({_id: params[:id]})
       params['forms_qualifying_life_event_kind_form'].to_h
+    end
+
+    def format_expire_sep_type(params)
+      params.permit!
+      params.merge!({end_on: params.to_h[:qualifying_life_event_kind][:end_on]})
     end
 
     def updateable?
