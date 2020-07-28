@@ -402,6 +402,10 @@ When("Admin changes start and end dates of draft SEP Type") do
   fill_in "End Date", with: TimeKeeper.date_of_record.next_year.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
+When("Admin changes start on date greater than end on date") do
+  step "Admin fills Create SEP Type form with start on date greater than end on date"
+end
+
 And("Admin clicks on Update SEP Type button") do
   find_button('Update SEP Type').click
 end
@@ -444,4 +448,8 @@ end
 
 Then("Admin should see a failure reason of an Expire") do
   expect(page).to have_content("End on: #{TimeKeeper.date_of_record.prev_year.end_of_month.to_s} must be after start on date")
+end
+
+Then("Admin should see a failure reason of an Update") do
+  expect(page).to have_content("End on: End on must be after start on date")
 end
