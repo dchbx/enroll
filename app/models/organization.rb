@@ -177,11 +177,13 @@ class Organization
       })
   }
 
-  scope :by_benefit_package_id, ->(bcp_id) {
-    unscoped.where({
-      "hbx_profile.benefit_sponsorship.benefit_coverage_periods.benefit_packages._id" => bcp_id
-    })
-  }
+  scope :by_benefit_package_id, (lambda do |bcp_id|
+    unscoped.where(
+      {
+        "hbx_profile.benefit_sponsorship.benefit_coverage_periods.benefit_packages._id" => bcp_id
+      }
+    )
+  end)
 
   scope :employer_attestations, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending', 'approved', 'denied']) }
   scope :employer_attestations_submitted, -> { where(:"employer_profile.employer_attestation.aasm_state" => 'submitted') }

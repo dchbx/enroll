@@ -181,21 +181,13 @@ jobs:
           ruby-version: "2.5.1"
       - name: Setup Node.js for use with actions
         uses: actions/setup-node@v1
-<<<<<<< HEAD
         if: matrix.command_configs.skip_js != 'true'
-=======
-        if: ${{matrix.command_configs.skip_js}} != 'true'
->>>>>>> b2f6fdb... Return to a single, fail-fast matrix.
         with:
           # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
           node-version: 10.16.3
       - name: Launch MongoDB
         uses: wbari/start-mongoDB@v0.2
-<<<<<<< HEAD
         if: matrix.command_configs.skip_js != 'true'
-=======
-        if: ${{matrix.command_configs.skip_js}} != 'true'
->>>>>>> b2f6fdb... Return to a single, fail-fast matrix.
         with:
           mongoDBVersion: ${{ matrix.mongodb-version }}
       - uses: actions/checkout@v2
@@ -211,11 +203,7 @@ jobs:
             ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
       - name: Cache Node Modules
         id: npm-cache
-<<<<<<< HEAD
         if: matrix.command_configs.skip_js != 'true'
-=======
-        if: ${{matrix.command_configs.skip_js}} != 'true'
->>>>>>> b2f6fdb... Return to a single, fail-fast matrix.
         uses: actions/cache@v1
         with:
           path: node_modules
@@ -230,19 +218,11 @@ jobs:
           bundle install --jobs 4 --retry 3
           gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: yarn install
-<<<<<<< HEAD
         if: matrix.command_configs.skip_js != 'true' && steps.npm-cache.outputs.cache-hit != 'true'
         run: |
           yarn install
       - name: run webpack
         if: matrix.command_configs.skip_js != 'true'
-=======
-        if: ${{matrix.command_configs.skip_js}} != 'true' && steps.npm-cache.outputs.cache-hit != 'true'
-        run: |
-          yarn install
-      - name: run webpack
-        if: ${{matrix.command_configs.skip_js}} != 'true'
->>>>>>> b2f6fdb... Return to a single, fail-fast matrix.
         run: |
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: run tests
