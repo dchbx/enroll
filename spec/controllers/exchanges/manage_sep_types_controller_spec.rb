@@ -402,37 +402,49 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
         context 'success case', :dbclean => :after_each do
           before do
-            post :expire_sep_type, params: {qle_id: q1.id, end_on: TimeKeeper.date_of_record.yesterday}, format: :js, xhr: true
+            q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
+            post :expire_sep_type, params: {
+              qualifying_life_event_kind: {end_on: (TimeKeeper.date_of_record.yesterday).strftime("%Y-%m-%d")},
+              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id.to_s}"
+            }, format: :js, xhr: true
           end
 
-          it 'should return http redirect' do
-            expect(response).to have_http_status(:ok)
+          it 'should render expire_sep_type template' do
+            expect(response).to render_template('exchanges/manage_sep_types/expire_sep_type')
           end
 
-          it "should redirect to manage SEP type root path" do
-            expect(response).to redirect_to(exchanges_manage_sep_types_root_path)
+          it 'should assign row' do
+            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id.to_s}")
           end
 
-          it 'should have flash success message' do
-            expect(flash[:notice]).to match(/Sep Type Expired Successfully./i)
+          it 'should assign result' do
+            expect(assigns(:result)).to be_a(Dry::Monads::Result::Success)
           end
         end
 
         context 'failure case', :dbclean => :after_each do
           before do
-            post :expire_sep_type, params: {qle_id: q1.id, end_on: nil}, format: :js, xhr: true
+            q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
+            post :expire_sep_type, params: {
+              qualifying_life_event_kind: {end_on: nil},
+              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id.to_s}"
+            }, format: :js, xhr: true
           end
 
-          it 'should return http redirect' do
-            expect(response).to have_http_status(:ok)
+          it 'should render expire_sep_type template' do
+            expect(response).to render_template('exchanges/manage_sep_types/sep_type_to_expire')
           end
 
-          it "should redirect to manage SEP type root path" do
-            expect(response).to redirect_to(exchanges_manage_sep_types_root_path)
+          it 'should assign row' do
+            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id.to_s}")
           end
 
-          it 'should have flash failure message' do
-            expect(flash[:notice]).to match(/Unable to Expired Sep Type./i)
+          it 'should assign result' do
+            expect(assigns(:result)).to be_a(Dry::Monads::Result::Failure)
+          end
+
+          it 'should assign qle' do
+            expect(assigns(:qle)).to eq(q1)
           end
         end
       end
