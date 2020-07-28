@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module Operations
   module QualifyingLifeEventKind
-    class Create
+    class Persist
       include Dry::Monads[:result, :do]
 
       def call(params:)
