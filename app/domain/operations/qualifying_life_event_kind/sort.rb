@@ -8,7 +8,7 @@ module Operations
     class Sort
       include Dry::Monads[:result, :do]
 
-      def call(params)
+      def call(params:)
         persist_data(params)
       end
 

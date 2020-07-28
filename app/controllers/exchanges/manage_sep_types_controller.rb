@@ -65,7 +65,9 @@ module Exchanges
     def expire_sep_type
       begin
         params.permit(:qle_id, :end_on)
-        result = ::Operations::QualifyingLifeEventKind::Transform.new.call(params)
+        result = EnrollRegistry[:expire_sep_type]{
+            {params: params}
+        }
         if result.failure?
           message = {notice: l10n("controller.manage_sep_type.expire_failure")}
         else
@@ -94,7 +96,9 @@ module Exchanges
     def sort
       begin
         params.permit!
-        ::Operations::QualifyingLifeEventKind::Sort.new.call(params.to_h)
+        EnrollRegistry[:sort_sep_type]{
+            {params: params}
+        }
         render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
       rescue => e
         render json: { message: l10n("controller.manage_sep_type.sort_failure"), status: 'error' }, status: :internal_server_error
