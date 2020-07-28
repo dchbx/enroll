@@ -4,7 +4,7 @@ registry:
       - :create_qle
     features:
       - key: :sep_types
-        item: Operations::QualifyingLifeEventKind::Create.new
+        item: Operations::QualifyingLifeEventKind::Persist.new
         is_enabled: true
         meta:
           label: Create Sep Types
