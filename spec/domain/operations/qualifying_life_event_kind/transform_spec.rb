@@ -14,7 +14,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call({qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 20.days).to_s})
+      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 20.days).to_s})
       qlek.reload
     end
 
@@ -36,7 +36,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call({qle_id: qlek.id.to_s, end_on: TimeKeeper.date_of_record.to_s})
+      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: TimeKeeper.date_of_record.to_s})
       qlek.reload
     end
 

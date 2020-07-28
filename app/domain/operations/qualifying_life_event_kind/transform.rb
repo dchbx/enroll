@@ -8,7 +8,7 @@ module Operations
     class Transform
       include Dry::Monads[:result, :do]
 
-      def call(params)
+      def call(params:)
         end_on = yield parse_date(params)
         qlek   = yield fetch_qlek_object(params)
         tranform_qlek(qlek, end_on)
