@@ -21,6 +21,9 @@ require_relative './support/helpers'
 # users commonly want.
 #
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
+
+require File.expand_path("../dummy/config/environment", __FILE__)
+
 RSpec.configure do |config|
   config.include Helpers
   # rspec-expectations config goes here. You can use an alternate
