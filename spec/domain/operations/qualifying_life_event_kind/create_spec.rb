@@ -36,7 +36,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
 
       context 'without publish' do
         before :each do
-          @result = subject.call(qlek_create_params)
+          @result = subject.call(params: qlek_create_params)
         end
 
         it 'should return success' do
@@ -56,7 +56,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
         context 'for success case', :dbclean => :after_each do
           before :each do
             qlek_create_params.merge!({'publish': 'Publish'})
-            @result = subject.call(qlek_create_params)
+            @result = subject.call(params: qlek_create_params)
           end
 
           it 'should return success' do
@@ -101,7 +101,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
           end
 
           before do
-            @result = subject.call(qlek_publish_params)
+            @result = subject.call(params: qlek_publish_params)
           end
 
           it 'should return failure' do
@@ -140,7 +140,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
       end
 
       before :each do
-        @result = subject.call(qlek_create_params)
+        @result = subject.call(params: qlek_create_params)
       end
 
       it 'should return failure' do
@@ -187,7 +187,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
       end
 
       before :each do
-        @result = subject.call(qlek_update_params)
+        @result = subject.call(params: qlek_update_params)
       end
 
       it 'should return success' do
@@ -226,7 +226,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Create, type: :model, dbclea
       end
 
       before :each do
-        @result = subject.call(qlek_update_params)
+        @result = subject.call(params: qlek_update_params)
         qlek.reload
       end
 
