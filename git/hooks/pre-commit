@@ -1,1 +1,8 @@
 #!/bin/sh
+echo "Running rubocop check"
+
+$GIT_DIR/../rubocop_check_pre_commit.sh
+if [[ $? -ne 0 ]]; then
+  echo "Rubocop Check FAILED"
+  exit 1
+fi
