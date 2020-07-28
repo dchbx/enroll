@@ -19,7 +19,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Sort, type: :model, dbclean:
 
   context 'update ordinal_position' do
     before :each do
-      @result = subject.call(input_params)
+      @result = subject.call(params: input_params)
       qlek1.reload
       qlek2.reload
     end
