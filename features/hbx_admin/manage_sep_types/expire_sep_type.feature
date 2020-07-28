@@ -11,7 +11,7 @@ Feature: Admin has ability to Expire the Active SEP Type
     Given Admin can navigate to the Manage SEP Types screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks <market_kind> filter on SEP Types datatable
-    And clicks on Active filter of <market_kind> market filter
+    And Admin clicks on Active filter of <market_kind> market filter
     When Hbx Admin clicks Action button
     Then Admin should see Expire dropdown button
     When Admin clicks on Expire button of an Active SEP Type
@@ -21,7 +21,7 @@ Feature: Admin has ability to Expire the Active SEP Type
     And Hbx Admin logs out
 
   Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    | market_kind |
+    | individual  |
+    | shop        |
+    | fehb        |
