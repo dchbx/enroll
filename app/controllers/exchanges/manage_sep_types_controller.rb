@@ -15,9 +15,9 @@ module Exchanges
     end
 
     def create
-      formatted_params = format_create_params(params)
-      result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
-      # result = EnrollRegistry[:sep_types] { formatted_params }
+      result = EnrollRegistry[:sep_types]{
+          {params: format_create_params(params)}
+      }
       respond_to do |format|
         format.html do
           if result.failure?
@@ -39,8 +39,9 @@ module Exchanges
 
     def update
       formatted_params = format_update_params(params)
-      result = Operations::QualifyingLifeEventKind::Create.new.call(formatted_params)
-
+      result = EnrollRegistry[:sep_types]{
+          {params: formatted_params}
+      }
       respond_to do |format|
         format.html do
           if result.failure?
