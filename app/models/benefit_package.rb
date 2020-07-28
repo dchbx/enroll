@@ -90,5 +90,9 @@ class BenefitPackage
       message: "%{value} is not a valid premium credit strategy kind"
     }
 
-
+  def self.find(id)
+    ::Organization.by_benefit_package_id(id).map(&:hbx_profile).map(&:benefit_sponsorship).flat_map(&:benefit_coverage_periods).flat_map(&:benefit_packages).detect do |bp|
+      bp.id.to_s == id.to_s
+    end
+  end
 end

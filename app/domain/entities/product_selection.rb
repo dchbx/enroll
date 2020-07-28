@@ -5,7 +5,7 @@ module Entities
   class ProductSelection < Dry::Struct
     transform_keys(&:to_sym)
 
-    # @!attribute [r] enrollment 
+    # @!attribute [r] enrollment
     #   @return [HbxEnrollment] the enrollment the selection was
     #     performed against
     attribute :enrollment, ::Entities::Types.Nominal(HbxEnrollment)
