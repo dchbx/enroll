@@ -1,14 +1,14 @@
 Feature: Admin has ability to create a new SEP Type
   Background:
-    Given a Hbx admin with hbx_tier3 permissions exists
+    Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
-    Given the user is on the Main Page
+    Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the user will see the Manage SEP Types under admin dropdown
-    When Admin clicks Manage SEP Types
+    And the Admin will see the Manage SEP Types under admin dropdown
+    And Admin can click Manage SEP Types link
 
   Scenario Outline: Admin will create a new <market_kind> SEP type
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEP Types screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -37,7 +37,7 @@ Feature: Admin has ability to create a new SEP Type
     | fehb        |  can   |
 
   Scenario Outline: Failure scenario to create <market_kind> market SEP type
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEP Types screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page

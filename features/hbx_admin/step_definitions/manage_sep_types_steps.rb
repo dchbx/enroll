@@ -1,8 +1,13 @@
-Given(/^a Hbx admin with hbx_tier3 permissions exists$/) do
-  #Note: creates an enrollment for testing purposes in the UI
-  p_staff=Permission.create(name: 'hbx_tier3', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
+Given(/^that a user with a HBX staff role with (.*) subrole exists$/) do |subrole|
+  if subrole == 'super_admin' || subrole == 'hbx_tier3'
+    p_staff=Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+        send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+        modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
+  else
+    p_staff=Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+        send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+        modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: false)
+  end
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -10,17 +15,35 @@ Given(/^a Hbx admin with hbx_tier3 permissions exists$/) do
   FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
-And(/^the user will see the Manage SEP Types under admin dropdown$/) do
+And(/the Admin will (.*) the Manage SEP Types under admin dropdown$/) do |action|
   find('.dropdown-toggle', :text => "Admin").click
-  expect(page).to have_content('Manage SEP Types')
+  if action == 'see'
+    find_link('Manage SEP Types').visible? == true
+  else
+    page.has_css?('Manage SEP Types') == false
+  end
 end
 
-When("Admin clicks Manage SEP Types") do
-  page.find('.interaction-click-control-manage-sep-types').click
+Given(/^Admin (.*) click Manage SEP Types link$/) do |action|
+  if action == 'can'
+    page.find('.interaction-click-control-manage-sep-types').click
+  else
+    page.has_css?('Manage SEP Types') == false
+  end
 end
 
-Given("the Admin is navigated to the Manage SEP Types screen") do
-  expect(page).to have_content('Manage SEP Types')
+Then(/^Admin (.*) navigate to the Manage SEP Types screen$/) do |action|
+  if action == 'can'
+    expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
+    expect(page).to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
+    expect(page).to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop')
+    expect(page).to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
+  else
+    expect(page).not_to have_xpath('//*[@id="Tab:all"]', text: 'All')
+    expect(page).not_to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
+    expect(page).not_to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop')
+    expect(page).not_to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
+  end
 end
 
 Then("Admin should see sorting SEP Types button and create SEP Type button") do
@@ -28,19 +51,12 @@ Then("Admin should see sorting SEP Types button and create SEP Type button") do
   step "Admin navigates to Create SEP Type page"
 end
 
-And(/^the Admin has the ability to use the following filters for documents provided: All, Individual, Shop and Congress$/) do
-  expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
-  expect(page).to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
-  expect(page).to have_xpath('//*[@id="Tab:shop_qles"]', text: 'Shop')
-  expect(page).to have_xpath('//*[@id="Tab:fehb_qles"]', text: 'Congress')
-end
-
 When("Admin clicks on List SEP Types link") do
   click_link 'List SEP Types'
 end
 
 Then("Admin navigates to SEP Type List page") do
-  step "the Admin is navigated to the Manage SEP Types screen"
+  step "Admin can navigate to the Manage SEP Types screen"
 end
 
 def sep_type_start_on
