@@ -176,4 +176,9 @@ registry:
               description: Enter Event Label
               is_required: true
               is_visible: true
-
+      - key: :expire_sep_type
+        item: Operations::QualifyingLifeEventKind::Transform.new
+        is_enabled: true
+      - key: :sort_sep_type
+        item: Operations::QualifyingLifeEventKind::Sort.new
+        is_enabled: true
