@@ -1,16 +1,40 @@
 Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save their positions in DB
-         User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
-         User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
+    User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
+    User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
+
   Background:
-    Given a Hbx admin with hbx_tier3 permissions exists
+    Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
-    Given the user is on the Main Page
+    Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the user will see the Manage SEP Types under admin dropdown
-    When Admin clicks Manage SEP Types
+    And the Admin will see the Manage SEP Types under admin dropdown
+    And Admin can click Manage SEP Types link
+
+  Scenario: Admin has ability to sort the SEP Types and saves the ordinal positions to the database
+    Given Admin can navigate to the Manage SEP Types screen
+    When Admin clicks on the Sorting SEP Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Individual tab
+    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    When Admin sorts Individual SEP Types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Individual SEP Types ordinal postions should change
+    When Admin clicks on Shop tab
+    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
+    When Admin sorts Shop SEP Types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Shop SEP Types ordinal postions should change
+    When Admin clicks on Congress tab
+    Then Admin should see listed Congress market SEP Types with ascending ordinal positions
+    When Admin sorts Congress SEP Types by drag and drop
+    Then Admin should see successful message after sorting
+    And listed Congress SEP Types ordinal postions should change
+    When Admin clicks on List SEP Types link
+    Then Admin navigates to SEP Type List page
+    And Hbx Admin logs out
 
   Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
@@ -42,10 +66,10 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And I should see the "Had a baby" at the top of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
-    Given the user is on the Main Page
-    And the user will see the Manage SEP Types under admin dropdown
-    When Admin clicks Manage SEP Types
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given the Admin is on the Main Page
+    And the Admin will see the Manage SEP Types under admin dropdown
+    When Admin can click Manage SEP Types link
+    Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
@@ -62,7 +86,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Individual logs out
 
   Scenario: Admin will sort Shop market SEP Types and it will reflect the same order on the employee home page qle carousel
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Shop tab
@@ -79,10 +103,10 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Employee should see the "Covid-19" at the top of the shop qle list
     Then Employee logs out
     When Hbx Admin logs on to the Hbx Portal
-    Given the user is on the Main Page
-    And the user will see the Manage SEP Types under admin dropdown
-    When Admin clicks Manage SEP Types
-    Given the Admin is navigated to the Manage SEP Types screen
+    Given the Admin is on the Main Page
+    And the Admin will see the Manage SEP Types under admin dropdown
+    When Admin can click Manage SEP Types link
+    Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Shop tab
