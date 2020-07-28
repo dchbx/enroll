@@ -43,7 +43,7 @@ gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.g
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
 gem "transport_profiles", path: "components/transport_profiles"
-gem 'ui_helpers',         path: 'components/ui_helpers'
+gem 'ui_helpers',         path: "components/ui_helpers"
 #######################################################
 
 ## MongoDB gem dependencies
@@ -152,6 +152,7 @@ group :development, :test do
   gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry-byebug'
 end
 
 group :test do

@@ -13,6 +13,8 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+gem 'financial_assistance', path: '../financial_assistance'
+
 gem 'rspec-rails'
 gem 'capybara'
 gem 'byebug'

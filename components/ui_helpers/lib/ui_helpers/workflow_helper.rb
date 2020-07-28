@@ -1,6 +1,17 @@
 module UIHelpers
   module WorkflowHelper
 
+    def find_previous_from_step_one
+      model_name = @model.class.to_s.split('::').last.downcase
+      if  model_name == "applicant"
+        financial_assistance.edit_application_path(@application)
+      elsif model_name == "application"
+        financial_assistance.review_and_submit_application_path(@application)
+      else
+        send("financial_assistance.application_applicant_#{model_name.pluralize}_path", @application, @applicant)
+      end
+    end
+
     def workflow_form_for(model, &block)
       path, method = if model.new_record?
         [controller.request.path.sub('new', 'step'), :post]
