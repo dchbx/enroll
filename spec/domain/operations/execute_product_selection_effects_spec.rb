@@ -16,11 +16,13 @@ describe Operations::ExecuteProductSelectionEffects, "invoked with:
   let(:enrollment) { instance_double(HbxEnrollment) }
 
   let(:operation_options) do
-    Entities::ProductSelection.new({
-      enrollment: enrollment,
-      product: selected_product,
-      family: family
-    })
+    Entities::ProductSelection.new(
+      {
+        enrollment: enrollment,
+        product: selected_product,
+        family: family
+      }
+    )
   end
 
   let(:success) do

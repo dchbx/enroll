@@ -114,6 +114,8 @@ class Organization
          "fein" => 1, "legal_name" => 1, "dba" => 1},
          { name: "broker_agency_employer_search_index" })
 
+  index({"hbx_profile.benefit_sponsorship.benefit_coverage_periods.benefit_packages._id" => 1})
+
   before_save :generate_hbx_id
   after_update :legal_name_or_fein_change_attributes,:if => :check_legal_name_or_fein_changed?
 
@@ -173,6 +175,12 @@ class Organization
           start_on: start_on
         }
       })
+  }
+
+  scope :by_benefit_package_id, ->(bcp_id) {
+    unscoped.where({
+      "hbx_profile.benefit_sponsorship.benefit_coverage_periods.benefit_packages._id" => bcp_id
+    })
   }
 
   scope :employer_attestations, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending', 'approved', 'denied']) }

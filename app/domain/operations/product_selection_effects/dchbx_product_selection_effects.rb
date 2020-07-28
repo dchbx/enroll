@@ -24,12 +24,31 @@ module Operations
           ::Operations::ProductSelectionEffects::TerminatePreviousSelections.call(opts)
         end
 
-        return Success(:ok) unless enrollment.benefit_group_assignment
-        benefit_group_assignment = enrollment.benefit_group_assignment
-        benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
-        benefit_group_assignment.hbx_enrollment = enrollment
-        benefit_group_assignment.save
+        if enrollment.benefit_group_assignment
+          benefit_group_assignment = enrollment.benefit_group_assignment
+          benefit_group_assignment.select_coverage if benefit_group_assignment.may_select_coverage?
+          benefit_group_assignment.hbx_enrollment = enrollment
+          benefit_group_assignment.save
+        end
+
+        renew_ivl_if_is_open_enrollment(enrollment)
         Success(:ok)
+      end
+
+      def renew_ivl_if_is_open_enrollment(enrollment)
+        return nil if enrollment.is_shop?
+        bp = BenefitPackage.find(enrollment.benefit_package_id)
+        bcp = bp.benefit_coverage_period
+        raise "THERE IS CURRENTLY NO SERVICE TO EXECUTE A SINGLE IVL RENEWAL" if in_open_enrollment_before_plan_year_start?(bcp)
+      end
+
+      def in_open_enrollment_before_plan_year_start?(benefit_coverage_period)
+        current_date = TimeKeeper.date_of_record
+        next_coverage_period = benefit_coverage_period.successor
+        return false unless next_coverage_period
+        return false if current_date.year >= next_coverage_period.start_on.year
+        (current_date >= next_coverage_period.open_enrollment_start_on) &&
+          (current_date <= next_coverage_period.open_enrollment_end_on)
       end
     end
   end

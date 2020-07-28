@@ -39,6 +39,14 @@ class BenefitCoveragePeriod
 
   scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
 
+  # Gets the successor coverage period.
+  # @return [BenefitCoveragePeriod, nil] the successor
+  def successor
+    benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+      (self.end_on + 1.day) == bcp.start_on
+    end
+  end
+
   # Sets the ACA Second Lowest Cost Silver Plan (SLCSP) reference plan
   #
   # @raise [ArgumentError] if the referenced plan is not silver metal level
