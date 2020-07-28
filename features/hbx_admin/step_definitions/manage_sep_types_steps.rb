@@ -101,12 +101,24 @@ When("Admin clicks on Individual tab") do
 end
 
 Then("I should see listed Individual market SEP Types") do
-  expect(page).to have_content('Had a baby')
-  expect(page).to have_content('Married')
+  step "Admin should see listed Active individual market SEP Types on datatable"
+end
+
+Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(page).to have_content('Had a baby')
+    expect(page).to have_content('Married')
+  elsif market_kind == 'shop'
+    expect(page).to have_content('Covid-19')
+    expect(page).to have_content('Married')
+  else
+    expect(page).to have_content('Losing other health insurance')
+    expect(page).to have_content('Adopted a child')
+  end
 end
 
 Then(/^\w+ should see listed Individual market SEP Types with ascending ordinal positions$/) do
-  step "I should see listed Individual market SEP Types"
+  step "Admin should see listed Active individual market SEP Types on datatable"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
   birth_ivl['data-ordinal_position'] == '1'
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
@@ -133,8 +145,7 @@ When("Admin clicks on Shop tab") do
 end
 
 Then(/^\w+ should see listed Shop market SEP Types with ascending ordinal positions$/) do
-  expect(page).to have_content('Covid-19')
-  expect(page).to have_content('Married')
+  step "Admin should see listed Active shop market SEP Types on datatable"
   birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
   birth_shop['data-ordinal_position'] == '1'
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
@@ -161,8 +172,7 @@ When("Admin clicks on Congress tab") do
 end
 
 Then(/^\w+ should see listed Congress market SEP Types with ascending ordinal positions$/) do
-  expect(page).to have_content('Losing other health insurance')
-  expect(page).to have_content('Adopted a child')
+  step "Admin should see listed Active fehb market SEP Types on datatable"
   birth_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
   birth_fehb['data-ordinal_position'] == '1'
   marraige_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
@@ -331,7 +341,7 @@ When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
   end
 end
 
-And(/clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
+And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
   if state == 'Draft'
     if market_kind == 'individual'
       filter_divs = page.all('div')

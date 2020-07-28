@@ -26,7 +26,7 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see SEP Type Created Successfully message
     When Admin navigates to SEP Types List page
     When Admin clicks <market_kind> filter on SEP Types datatable
-    And clicks on Draft filter of <market_kind> market filter
+    And Admin clicks on Draft filter of <market_kind> market filter
     Then Admin should see newly created SEP Type title on Datatable
     And Hbx Admin logs out
 

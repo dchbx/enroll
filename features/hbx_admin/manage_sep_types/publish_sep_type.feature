@@ -1,4 +1,4 @@
-Feature: Admin has ability to update a draft SEP Type
+Feature: Admin has ability to update a Draft SEP Type
   Background:
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
@@ -26,7 +26,7 @@ Feature: Admin has ability to update a draft SEP Type
     Then Admin should see SEP Type Created Successfully message
     When Admin navigates to SEP Types List page
     When Admin clicks <market_kind> filter on SEP Types datatable
-    And clicks on Draft filter of <market_kind> market filter
+    And Admin clicks on Draft filter of <market_kind> market filter
     Then Admin should see newly created SEP Type title on Datatable
     When Admin clicks on newly created SEP Type
     Then Admin should navigate to update SEP Type page
@@ -60,7 +60,7 @@ Feature: Admin has ability to update a draft SEP Type
     Then Admin should see SEP Type Created Successfully message
     When Admin navigates to SEP Types List page
     When Admin clicks <market_kind> filter on SEP Types datatable
-    And clicks on Draft filter of <market_kind> market filter
+    And Admin clicks on Draft filter of <market_kind> market filter
     Then Admin should see newly created SEP Type title on Datatable
     When Admin clicks on newly created SEP Type
     Then Admin should navigate to update SEP Type page
