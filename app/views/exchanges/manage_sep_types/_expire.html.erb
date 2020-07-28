@@ -1,34 +1,36 @@
+<%if @result&.failure&[1] %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%= @result.failure[1] %>
+  </div>
+<% end %>
+
 <div class="bottom-pd">
   <%= form_for @qle, remote: true, url: expire_sep_type_exchanges_manage_sep_types_path, method: "post", class: "form" do |f|%>
-
-      <h3 class='title'><%= l10n("exchange.manage_sep_types.expire_sep_types")%></h3>
-
-      <table  class="table table-striped">
-        <tr>
-          <th><%= l10n("exchange.manage_sep_types.title")%></th>
-          <th><%= l10n("exchange.manage_sep_types.market_kind")%></th>
-          <th><%= l10n("exchange.manage_sep_types.state")%></th>
-          <th><%= l10n("exchange.manage_sep_types.start_date")%></th>
-          <th><%= l10n("exchange.manage_sep_types.end_date")%></th>
-        </tr>
-        <tr>
-          <td><%= @qle.title %></td>
-          <td><%= @qle.market_kind %></td>
-          <td><%= @qle.aasm_state %></td>
-          <td><%= @qle.start_on %></td>
-          <!--#TODO Use Registry Here-->
-          <td><%= text_field_tag "end_on", nil, readonly: true, value: @qle.end_on.present? ? @qle.end_on : TimeKeeper.date_of_record, id: "qle-date-picker_#{@qle.id}", class: "form-control date-field date-picker", "data-date-min" =>  @qle.start_on.present? ? @qle.start_on + 1.day : Date.new(2014,1,1) %></td>
-          <%= hidden_field_tag :qle_id, @qle.id %>
-        </tr>
-        <tr><td colspan = "7"><br /></td></tr>
-        <tr>
-          <td colspan = "6">
-            <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
-            <%= f.submit l10n("exchange.manage_sep_types.expire"), :class => "btn btn-primary"%>
-          </td>
-        </tr>
-      </table>
+    <h3 class='title'><%= l10n("exchange.manage_sep_types.expire_sep_types")%></h3>
+    <table  class="table table-striped">
+      <tr>
+        <th><%= l10n("exchange.manage_sep_types.title")%></th>
+        <th><%= l10n("exchange.manage_sep_types.market_kind")%></th>
+        <th><%= l10n("exchange.manage_sep_types.state")%></th>
+        <th><%= l10n("exchange.manage_sep_types.start_date")%></th>
+        <th><%= l10n("exchange.manage_sep_types.end_date")%></th>
+      </tr>
+      <tr>
+        <td><%= @qle.title %></td>
+        <td><%= @qle.market_kind %></td>
+        <td><%= @qle.aasm_state %></td>
+        <td><%= @qle.start_on %></td>
+        <td><%= build_option_field(EnrollRegistry[:expire_sep_type].setting(:end_on), f) %></td>
+        <%= hidden_field_tag :qle_id, @qle.id %>
+        <%= hidden_field_tag :qle_action_id, @row %>
+      </tr>
+      <tr><td colspan = "7"><br /></td></tr>
+      <tr>
+        <td colspan = "6">
+          <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
+          <%= f.submit l10n("exchange.manage_sep_types.expire"), :class => "btn btn-primary"%>
+        </td>
+      </tr>
+    </table>
   <% end %>
 </div>
-
-
