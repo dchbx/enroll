@@ -430,10 +430,18 @@ When("Admin changes the end on date of an Active SEP Type to expire") do
   fill_in "end_on", with: TimeKeeper.date_of_record.end_of_month.to_s
 end
 
+When("Admin fills end on date earlier than start on date of an Active SEP Type") do
+  fill_in "end_on", with: TimeKeeper.date_of_record.prev_year.end_of_month.to_s
+end
+
 When("Admin clicks on Expire button") do
   find_button("Expire").click
 end
 
-Then("Admin Should see a successful flash message of an Expire") do
+Then("Admin should see a successful message of an Expire") do
   expect(page).to have_content('Expiration Date Set On Sep Type Successfully')
+end
+
+Then("Admin should see a failure reason of an Expire") do
+  expect(page).to have_content("End on: #{TimeKeeper.date_of_record.prev_year.end_of_month.to_s} must be after start on date")
 end
