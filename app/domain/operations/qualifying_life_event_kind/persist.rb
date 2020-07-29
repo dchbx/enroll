@@ -9,10 +9,12 @@ module Operations
       include Dry::Monads[:result, :do]
 
       def call(params:)
-        values = yield validate(params)
-        entity = yield initialize_entity(values)
-        qle    = yield persist_data(entity, params)
-        publish_qle(qle, params)
+        values            = yield validate(params)
+        entity            = yield initialize_entity(values)
+        qle               = yield persist_data(entity, params)
+        published_qlek    = yield publish_qle(qle, params)
+
+        Success(published_qlek)
       end
 
       private
@@ -37,12 +39,10 @@ module Operations
         if params['_id']
           qle = ::QualifyingLifeEventKind.find(params['_id'])
           qle.assign_attributes(entity.to_h)
-          qle.save!
         else
           qle = ::QualifyingLifeEventKind.new(entity.to_h)
-          qle.save!
         end
-
+        qle.save!
         Success(qle)
       end
 
