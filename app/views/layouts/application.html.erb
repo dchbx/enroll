@@ -63,7 +63,11 @@
         <%= yield :horizontal_status %>
 
       </div>
+      <% if content_for? :content %>
+        <%= yield :content %>
+      <% else %>
         <%= yield %>
+      <% end %>
 
     </div>
 

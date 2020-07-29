@@ -1,4 +1,5 @@
 require 'ui_helpers/workflow/steps'
+require 'pry'
 
 module UIHelpers
   module WorkflowController
@@ -29,7 +30,7 @@ module UIHelpers
     end
 
     def load_steps
-      @steps = Workflow::Steps.new YAML.load_file(Rails.root + "app/views/#{controller_path}/steps.yml")
+      @steps = Workflow::Steps.new YAML.load_file(Rails.root + "components/financial_assistance/app/views/#{controller_path}/steps.yml")
     end
 
     def load_support_texts
