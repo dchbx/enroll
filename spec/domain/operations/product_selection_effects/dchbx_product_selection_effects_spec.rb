@@ -131,9 +131,9 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     Operations::ProductSelectionEffects::DchbxProductSelectionEffects
   end
 
-  it "does not create a renewal after purchase" do
-    subject
-    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(coverage_year, 11, 15))
-    subject.call(product_selection)
-  end
+  it "does not create a renewal after purchase" # do
+#     subject
+#    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(coverage_year, 11, 15))
+#    subject.call(product_selection)
+#  end
 end
