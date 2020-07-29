@@ -1,5 +1,4 @@
 require 'ui_helpers/workflow/steps'
-require 'pry'
 
 module UIHelpers
   module WorkflowController
