@@ -32,51 +32,9 @@
 
 	 <!-- Tab panes -->
 		<div class="tab-content">
-			<div id="individual" class="container tab-pane active"><br>
-	          <!--// TODO  check here-->
-				<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
-				<div class="container">
-					<div class="row">
-						<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
-							<% @sortable.where(market_kind: "individual").active.each_with_index do |sort, i|%>
-								<div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-									<%= sort.title%>
-								</div>
-							<%end%>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div id="shop" class="container tab-pane fade"><br>
-				<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
-				<div class="container">
-					<div class="row">
-						<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
-							<% @sortable.where(market_kind: "shop").active.each_with_index do |sort, i|%>
-			          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-									<%= sort.title%>
-								</div>
-							<%end%>
-						</div>
-					</div>
-				</div>
-			</div>
-
-			<div id="fehb" class="container tab-pane fade"><br>
-				<h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
-				<div class="container">
-					<div class="row">
-						<div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/sort">
-							<% @sortable.by_market_kind('fehb').active.each_with_index do |sort, i|%>
-			          <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
-									<%= sort.title%>
-			          </div>
-			        <%end%>
-			      </div>
-			    </div>
-			  </div>
-			</div>
+          <%= render partial: 'display_by_market', locals: {market_kind: 'individual', display: 'active'} %>
+          <%= render partial: 'display_by_market', locals: {market_kind: 'shop', display: 'fade'} %>
+          <%= render partial: 'display_by_market', locals: {market_kind: 'fehb', display: 'fade'} %>
 		</div>
 	</div>
 <% end %>
