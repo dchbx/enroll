@@ -18,6 +18,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       allow(person).to receive(:is_consumer_role_active?).and_return true
       assign :person, person
       assign :dependent, dependent
+      assign(:support_texts, {support_text_key: "support-text-description"})
       allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
