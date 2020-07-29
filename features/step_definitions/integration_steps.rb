@@ -635,8 +635,7 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
-  find('.interaction-click-control-add-member', wait: 10)
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
 
@@ -661,6 +660,10 @@ end
 
 When(/^.+ clicks? Add Member$/) do
   click_link("Add Member", :visible => true)
+end
+
+When(/^.+ clicks? Add New Person$/) do
+  click_link "Add New Person"
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -697,7 +700,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  expect(page).to have_link('Add New Person')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
