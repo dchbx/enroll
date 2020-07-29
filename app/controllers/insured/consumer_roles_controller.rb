@@ -8,6 +8,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
+  before_action :load_support_texts, only: [:edit, :search, :match, :update]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
 
@@ -331,7 +332,8 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :is_applying_coverage
     ]
   end
@@ -367,6 +369,10 @@ class Insured::ConsumerRolesController < ApplicationController
     else
       return message
     end
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def build_person_params

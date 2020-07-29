@@ -81,20 +81,24 @@ describe Forms::FamilyMember do
       expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
-    it "with same no_dc_address but without smae no_dc_address_reason" do
+    it "with same no_dc_address but without smae no_dc_address_reasons" do
       allow(person).to receive(:no_dc_address).and_return true
       allow(primary).to receive(:no_dc_address).and_return true
-      allow(person).to receive(:no_dc_address_reason).and_return "reason1"
-      allow(primary).to receive(:no_dc_address_reason).and_return "reason2"
+      allow(person).to receive(:is_homeless?).and_return true
+      allow(primary).to receive(:is_homeless?).and_return false
+      allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+      allow(primary).to receive(:is_temporarily_out_of_state?).and_return false
       expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
-    context "with same no_dc_address and no_dc_address_reason" do
+    context "with same no_dc_address and no_dc_address_reasons" do
       before :each do
         allow(person).to receive(:no_dc_address).and_return true
         allow(primary).to receive(:no_dc_address).and_return true
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
-        allow(primary).to receive(:no_dc_address_reason).and_return "reason"
+        allow(person).to receive(:is_homeless?).and_return true
+        allow(primary).to receive(:is_homeless?).and_return true
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        allow(primary).to receive(:is_temporarily_out_of_state?).and_return true
       end
 
       it "has same address for compare_keys" do
@@ -135,10 +139,12 @@ describe Forms::FamilyMember do
 
       it "update person's attributes" do
         allow(primary).to receive(:no_dc_address).and_return true
-        allow(primary).to receive(:no_dc_address_reason).and_return "no reason"
+        allow(primary).to receive(:is_homeless).and_return false
+        allow(primary).to receive(:is_temporarily_out_of_state).and_return false
         employee_dependent.assign_person_address(person)
         expect(person.no_dc_address).to eq true
-        expect(person.no_dc_address_reason).to eq "no reason"
+        allow(primary).to receive(:is_homeless).and_return false
+        allow(primary).to receive(:is_temporarily_out_of_state).and_return false
       end
 
       it "add new address if address present" do
@@ -248,7 +254,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :is_incarcerated => "no",
       :tribal_id => "test",
       :no_dc_address => nil,
-      :no_dc_address_reason => nil
+      :is_homeless => false,
+      :is_temporarily_out_of_state => false
     }
   }
 
@@ -468,7 +475,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
@@ -476,7 +483,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)

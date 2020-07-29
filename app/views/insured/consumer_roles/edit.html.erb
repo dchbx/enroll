@@ -1,5 +1,7 @@
 <% content_for :horizontal_status do %>
-  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if show_component(request.path) %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
 <%= form_for(@consumer_role.person, url: insured_consumer_role_path(id: @consumer_role.id), :enctype =>"multipart/form-data", html: { multipart: true }, method: :put) do |f| %>
   <%= render partial: "form", locals: {f: f} %>

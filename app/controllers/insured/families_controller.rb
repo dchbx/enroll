@@ -10,6 +10,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
   before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
+  before_action :load_support_texts, only: [:personal, :manage_family]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -319,6 +320,10 @@ class Insured::FamiliesController < FamiliesController
 
   private
 
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
+  end
+
   def can_view_entire_family_enrollment_history?
     authorize Family, :can_view_entire_family_enrollment_history?
   end
@@ -407,7 +412,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.is_consumer_role_active?
-      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      if !(@person.addresses.present? || @person.no_dc_address.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path

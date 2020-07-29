@@ -373,7 +373,8 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :id,
       :consumer_role,
       :is_applying_coverage

@@ -967,19 +967,22 @@ describe Person, :dbclean => :after_each do
 
     it "should false" do
       person.no_dc_address = false
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should false" do
       person.no_dc_address = true
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should true" do
       person.no_dc_address = true
-      person.no_dc_address_reason = "I am Homeless"
+      person.is_homeless = true
+      person.is_temporarily_out_of_state = true
       expect(person.residency_eligible?).to be_truthy
     end
   end
@@ -1000,15 +1003,27 @@ describe Person, :dbclean => :after_each do
     context "when no_dc_address is true" do
       let(:person) { Person.new(no_dc_address: true) }
 
-      it "return false with no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+      it "return false with no_dc_address_reason as is_homeless?" do
+        allow(person).to receive(:is_homeless?).and_return true
         expect(person.is_dc_resident?).to eq true
       end
 
-      it "return true without no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return ""
+      it "return false with no_dc_address_reason as is_temporarily_out_of_state?" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        expect(person.is_dc_resident?).to eq true
+      end
+
+      it "return true without no_dc_address_reason as is_temporarily_out_of_state?" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return false
         expect(person.is_dc_resident?).to eq false
       end
+
+      it "return true without no_dc_address_reason as is_homeless?" do
+        allow(person).to receive(:is_homeless?).and_return false
+        expect(person.is_dc_resident?).to eq false
+      end
+
+
     end
 
     context "when no_dc_address is false" do
