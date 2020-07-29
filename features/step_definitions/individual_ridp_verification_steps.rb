@@ -198,7 +198,7 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
 end
 
 Then(/^HBX admin should see the dependents form$/) do
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 

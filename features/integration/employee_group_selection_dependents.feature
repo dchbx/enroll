@@ -22,7 +22,7 @@ Feature: Employee goes through plan shopping with dependents when employer offer
     When Employee accepts the matched employer
     When Employee completes the matched employee form for Patrick Doe
     Then Employee should see the dependents page
-    When Employee clicks Add Member
+    When Employee clicks Add New Person
     Then Employee should see the new dependent form
     When Employee enters the dependent info of Patrick wife
     When Employee clicks confirm member

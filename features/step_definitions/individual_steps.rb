@@ -269,7 +269,7 @@ Then(/\w+ does not apply for assistance and clicks continue/) do
 end
 
 Then(/\w+ should see the dependents form/) do
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 
@@ -417,7 +417,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -481,7 +481,7 @@ end
 
 Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
-  find('.container .row div div.btn', text: 'Help').click
+  find('.help-me-sign-up').click
   wait_for_ajax
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
