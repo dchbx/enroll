@@ -43,10 +43,10 @@
             <td></td>
             <%
             dropdown = [
-            ['Update Application', edit_financial_assistance_application_path(application), application.is_draft? ? 'static' : 'disabled'],
-            ['Copy to new application', copy_financial_assistance_application_path(application), application.is_draft? || @family.application_in_progress.present? ? 'disabled' : 'static'],
-            ['View Eligibility Determination', eligibility_results_financial_assistance_application_path(application), application.is_determined? ? 'static' : 'disabled'],
-            ['Review Application', review_financial_assistance_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+            ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
+            ['Copy to new application', copy_application_path(application), application.is_draft? || @family.application_in_progress.present? ? 'disabled' : 'static'],
+            ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
+            ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
             ]
             %>
             <td>

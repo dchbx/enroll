@@ -32,7 +32,7 @@ module FinancialAssistance
       @application.populate_applicants_for(@family)
       @application.save!
 
-      redirect_to edit_financial_assistance_application_path(@application)
+      redirect_to edit_application_path(@application)
     end
 
     def edit
@@ -64,10 +64,10 @@ module FinancialAssistance
             payload = generate_payload(@application)
             if @application.publish(payload)
               #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
-              redirect_to wait_for_eligibility_response_financial_assistance_application_path(@application)
+              redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
-              redirect_to application_publish_error_financial_assistance_application_path(@application)
+              redirect_to application_publish_error_application_path(@application)
             end
 
           else
@@ -92,7 +92,7 @@ module FinancialAssistance
     def copy
       service = application_service.new(@family, {application_id: params[:id]})
       @application = service.process_application if service.code == :copy!
-      redirect_to edit_financial_assistance_application_path(@application)
+      redirect_to edit_application_path(@application)
     end
 
     def help_paying_coverage
@@ -108,7 +108,7 @@ module FinancialAssistance
     def get_help_paying_coverage_response
       if params["is_applying_for_assistance"].nil?
         flash[:error] = "Please choose an option before you proceed."
-        redirect_to help_paying_coverage_financial_assistance_applications_path
+        redirect_to help_paying_coverage_applications_path
       elsif params["is_applying_for_assistance"] == "true"
         @family.is_applying_for_assistance = @assistance_status
         @family.save!
@@ -120,11 +120,11 @@ module FinancialAssistance
 
     def uqhp_flow
       @family.applications.where(aasm_state: "draft").destroy_all
-      redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+      redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
 
     def redirect_to_msg
-      redirect_to render_message_financial_assistance_applications_path(message: @message)
+      redirect_to render_message_applications_path(message: @message)
     end
 
     def application_checklist
@@ -237,7 +237,7 @@ module FinancialAssistance
         end
         application.save!
       end
-      redirect_to application_checklist_financial_assistance_applications_path
+      redirect_to application_checklist_applications_path
     end
 
     def dummy_data_for_demo(params)
@@ -282,7 +282,7 @@ module FinancialAssistance
     end
 
     def load_support_texts
-     @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+     @support_texts = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
     end
 
     def permit_params(attributes)

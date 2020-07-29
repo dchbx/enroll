@@ -7,7 +7,7 @@ module FinancialAssistance
     include Acapi::Notifiers
     require 'securerandom'
 
-    belongs_to :family, class_name: "::Family"
+    belongs_to :family, class_name: "Family"
 
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_benchmark_plan_id, :set_external_identifiers
     validates :application_submission_validity, presence: true, on: :submission
@@ -86,7 +86,7 @@ module FinancialAssistance
 
     embeds_many :applicants, class_name: "::FinancialAssistance::Applicant"
 
-    embeds_many :workflow_state_transitions, as: :transitional
+    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
 

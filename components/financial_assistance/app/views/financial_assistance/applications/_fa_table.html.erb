@@ -24,7 +24,7 @@
           <%end%>
         </td>
         <td>
-          <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(@application, @application.active_applicants.find_by(family_member_id: member.id), 1), class: "btn btn-info"  %>
+          <%= link_to "Add Info", go_to_step_application_applicant_path(@application, @application.active_applicants.find_by(family_member_id: member.id), 1), class: "btn btn-info"  %>
         </td>
       </tr>
     <%end%>

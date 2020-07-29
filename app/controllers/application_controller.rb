@@ -429,4 +429,9 @@ class ApplicationController < ActionController::Base
   def check_browser_compatibility
     browser.ie? && !support_for_ie_browser?
   end
+
+  def save_faa_bookmark person, url
+    return if person.consumer_role.blank?
+    person.consumer_role.update_attribute(:bookmark_url, url) if person.consumer_role.identity_verified?
+  end
 end

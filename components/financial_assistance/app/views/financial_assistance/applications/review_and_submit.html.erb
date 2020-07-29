@@ -107,7 +107,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
-                    <%= link_to go_to_step_financial_assistance_application_applicant_path(@application, applicant, 1) do %>
+                    <%= link_to go_to_step_application_applicant_path(@application, applicant, 1) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -263,7 +263,7 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">OTHER QUESTIONS</div>
               <div class="col-md-1">
-                <%= link_to other_questions_financial_assistance_application_applicant_path(@application, applicant) do %>
+                <%= link_to other_questions_application_applicant_path(@application, applicant) do %>
                   <i class="fa fa-pencil fa-lg"></i>
                 <% end %>
               </div>
@@ -484,6 +484,6 @@
   </div>
 
   <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : edit_financial_assistance_application_path(@application), next_url: go_to_step_financial_assistance_application_path(@application, 1)} %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : edit_application_path(@application), next_url: go_to_step_application_path(@application, 1)} %>
   </div>
 </div>

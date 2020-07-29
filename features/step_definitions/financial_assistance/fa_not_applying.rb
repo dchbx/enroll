@@ -72,13 +72,17 @@ end
 When(/the user clicks on add member button/) do
   find(:xpath, '//*[@id="dependent_buttons"]/div/a').click
 end
+
 And(/^the user fills the the add member form/) do
   expect(page).to have_content('Lives with primary subscriber')
   fill_in "dependent[first_name]", :with => "John"
   fill_in "dependent[last_name]", :with => "Doe"
-  fill_in "jq_datepicker_ignore_dependent[dob]", :with => "15/04/1988"
   fill_in "dependent[ssn]", :with => "763434355"
-  find("#dependent_relationship").find(:xpath, 'option[2]').select_option
+  fill_in "jq_datepicker_ignore_dependent[dob]", :with => "04/15/1988"
+  # find("#dependent_relationship").find(:xpath, 'option[2]').select_option
+  #
+  find("span", :text => "choose").click
+  page.find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[2]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -90,7 +94,7 @@ And(/^the user fills the the add member form/) do
 end
 
 And(/^the user clicks the PREVIOUS link1/) do
-  find('.interaction-click-control-previous').trigger 'click'
+  find('.interaction-click-control-previous').click
 end
 
 Then(/^the user navigates to Help Paying for Coverage page/) do

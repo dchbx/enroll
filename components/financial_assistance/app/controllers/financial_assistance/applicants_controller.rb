@@ -26,12 +26,12 @@ module FinancialAssistance
       @applicant = @application.active_applicants.find(params[:id])
       @applicant.assign_attributes(permit_params(params[:financial_assistance_applicant])) if params[:financial_assistance_applicant].present?
       if @applicant.save(context: :other_qns)
-        redirect_to edit_financial_assistance_application_path(@application)
+        redirect_to edit_application_path(@application)
       else
         @applicant.save(validate: false)
         @applicant.valid?(:other_qns)
         flash[:error] = build_error_messages_for_other_qns(@applicant)
-        redirect_to other_questions_financial_assistance_application_applicant_path(@application, @applicant)
+        redirect_to other_questions_application_applicant_path(@application, @applicant)
       end
     end
 

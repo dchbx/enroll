@@ -39,6 +39,7 @@ class Family
   field :status, type: String, default: "" # for aptc block
   field :min_verification_due_date, type: Date, default: nil
   field :vlp_documents_status, type: String
+  field :is_applying_for_assistance, type: Boolean
 
   belongs_to  :person, optional: true
   has_many :hbx_enrollments
@@ -55,6 +56,7 @@ class Family
   embeds_many :general_agency_accounts
   embeds_many :documents, as: :documentable
   has_many :payment_transactions
+  has_many :applications, class_name: "FinancialAssistance::Application"
 
   after_initialize :build_household
   before_save :clear_blank_fields
@@ -844,6 +846,58 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def application_applicable_year
+    current_year = TimeKeeper.date_of_record.year
+    enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
+    current_hbx = HbxProfile.current_hbx
+    if current_hbx && current_hbx.under_open_enrollment? && current_year == enrollment_start_on_year.year
+      current_year + 1
+    else
+      current_year
+    end
+  end
+
+  def latest_applicable_submitted_application
+    return nil unless applications.present?
+    applications.where(:assistance_year => application_applicable_year, :aasm_state.in => ["submitted", "determined"]).order_by(:submitted_at => 'desc').first
+  end
+
+  def has_financial_assistance_verification?
+    return false if applications.blank?
+    latest_applicable_submitted_application.present? ? true : false
+  end
+
+  def application_in_progress
+    # Do we disable creating new Applications if there is one already in “draft”?
+    # Also implement the logic to populate assistance_year (current_year or next_year based on application done before/after OE)
+    #applications.where(aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year).last
+    applications.where(aasm_state: "draft").last
+  end
+
+  def active_approved_application
+    # Returns the most recent application that is approved (has eligibility determination) for the current year.
+    applications.where(aasm_state: "determined", assistance_year: application_applicable_year).order_by(:submitted_at => 'desc').first
+  end
+
+  def approved_applications_for_year(year)
+    # Returns the last application that is approved (has eligibility determination) for a given year.
+    applications.where(aasm_state: "determined", assistance_year: year)
+  end
+
+  def approved_applications
+    # Returns all approved applications
+    applications.where(aasm_state: "determined")
+  end
+
+  def latest_submitted_application
+    #Returns last application submitted, aasm state is not in draft
+    applications.order_by(:submitted_at => 'desc').first
+  end
+
+  def latest_application
+    #Returns latest application
+    applications.order_by(:created_at => 'desc').first
+  end
 
   class << self
 
@@ -1000,6 +1054,145 @@ class Family
 
   def generate_family_search
     ::MapReduce::FamilySearchForFamily.populate_for(self)
+  end
+
+  #Used for RelationshipMatrix
+  def build_relationship_matrix
+    family_id = self.id
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
+    matrix_size = family_members.where(is_active: true).count
+    matrix = Array.new(matrix_size){Array.new(matrix_size)}
+    id_map = {}
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        matrix[xi][yi] = find_existing_relationship(id_map[xi], id_map[yi], family_id)
+        matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi], family_id)
+      end
+    end
+    matrix = apply_rules_and_update_relationships(matrix, family_id)
+    return matrix
+  end
+
+  def find_existing_relationship(member_a_id, member_b_id, family_id)
+    return "self" if member_a_id == member_b_id
+    person = Person.find(member_a_id)
+    rel = person.person_relationships.where(family_id: family_id, predecessor_id: member_a_id, successor_id: member_b_id).first
+    return rel.kind if rel.present?
+  end
+
+  def find_all_relationships(matrix)
+    id_map = {}
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    all_relationships = []
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        if (xi < yi)
+          relation = Person.find(id_map[xi]).person_relationships.where(family_id: self.id, predecessor_id: id_map[xi], successor_id: id_map[yi]).first
+          relation_kind = relation.present? ? relation.kind : nil
+          all_relationships << {:predecessor => id_map[xi], :relation => relation_kind,  :successor => id_map[yi]}
+        end
+      end
+    end
+    all_relationships
+  end
+
+  def find_missing_relationships(matrix)
+    id_map = {}
+    family_members_id = family_members.where(is_active: true).map(&:person_id)
+    family_members_id.each_with_index { |hmid, index| id_map.merge!(index => hmid ) }
+    missing_relationships = []
+    matrix.each_with_index do |x, xi|
+      x.each_with_index do |y, yi|
+        if (xi > yi) && matrix[xi][yi].blank?
+          missing_relationships << {id_map[xi] => id_map[yi]}
+        end
+      end
+    end
+    missing_relationships
+  end
+
+  def apply_rules_and_update_relationships(matrix, family_id)
+    missing_relationship =  find_missing_relationships(matrix)
+
+    # Sibling rule
+    missing_relationship.each do |rel|
+      first_rel = rel.to_a.flatten.first
+      second_rel = rel.to_a.flatten.second
+      relation1 = Person.find(first_rel).person_relationships.where(family_id: family_id, predecessor_id: first_rel, kind: "child").to_a
+      relation2 = Person.find(second_rel).person_relationships.where(family_id: family_id, predecessor_id: second_rel, kind: "child").to_a
+
+      relation = relation1 + relation2
+      s_ids = relation.collect(&:successor_id)
+
+      if s_ids.count > s_ids.uniq.count
+        members = Person.where(:id.in => rel.to_a.flatten)
+        members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling")
+        members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
+        missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+      end
+    end
+
+    #GrandParent/GrandChild
+    missing_relationship.each do |rel|
+      first_rel = rel.to_a.flatten.first
+      second_rel = rel.to_a.flatten.second
+
+      relation1 = Person.find(first_rel).person_relationships.where(family_id: family_id, predecessor_id: first_rel, :kind.in => ['parent', 'child']).to_a
+      relation2 = Person.find(second_rel).person_relationships.where(family_id: family_id, predecessor_id: second_rel, :kind.in => ['parent', 'child']).to_a
+
+      relation = relation1 + relation2
+      s_ids = relation.collect(&:successor_id)
+
+      s_ids.each do |p_id|
+        parent_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, kind: "parent").first
+        child_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: first_rel, kind: "child").first
+        parent_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, kind: "parent").first
+        child_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, successor_id: p_id, predecessor_id: second_rel, kind: "child").first
+
+        if parent_rel1.present? && child_rel2.present?
+          grandchild = Person.where(id: second_rel).first
+          grandparent = Person.where(id: first_rel).first
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
+          missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+          break
+        elsif child_rel1.present? && parent_rel2.present?
+          grandchild = Person.where(id: first_rel).first
+          grandparent = Person.where(id: second_rel).first
+          grandparent.person_relationships.create(family_id: family_id, predecessor_id: grandparent.id, successor_id: grandchild.id, kind: "grandparent")
+          grandchild.person_relationships.create(family_id: family_id, predecessor_id: grandchild.id, successor_id: grandparent.id, kind: "grandchild")
+          missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+          break
+        end
+      end
+    end
+
+    # Spouse Rule
+    missing_relationship.each do |rel|
+      first_rel = rel.to_a.flatten.first
+      second_rel = rel.to_a.flatten.second
+
+      parent_rel1 = Person.find(first_rel).person_relationships.where(family_id: family_id, predecessor_id: first_rel, kind: 'child').first
+      parent_rel2 = Person.find(second_rel).person_relationships.where(family_id: family_id, predecessor_id: second_rel, kind: 'child').first
+
+      if parent_rel1.present? && parent_rel2.present?
+        spouse_relation = Person.find(parent_rel1.successor_id).person_relationships.where(family_id: family_id, predecessor_id: parent_rel1.successor_id, successor_id: parent_rel2.successor_id, kind: "spouse").first
+        if spouse_relation.present?
+          members = Person.where(:id.in => rel.to_a.flatten)
+          members.second.person_relationships.create(family_id: family_id, predecessor_id: members.second.id, successor_id: members.first.id, kind: "sibling")
+          members.first.person_relationships.create(family_id: family_id, predecessor_id: members.first.id, successor_id: members.second.id, kind: "sibling")
+          missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
+        end
+      end
+    end
+
+    return matrix
+  end
+
+  def relationships_complete?
+    find_missing_relationships(build_relationship_matrix).present? ? false : true
   end
 
   def create_dep_consumer_role

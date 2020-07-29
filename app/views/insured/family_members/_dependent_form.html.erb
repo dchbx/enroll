@@ -3,177 +3,234 @@
 
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
 
-      <% if dependent.errors.any? %>
-        <div class="alert alert-error">
-          <h4>
-            <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
-          </h4>
-          <ul>
-            <% dependent.errors.full_messages.each do |msg| %>
-            <li> <%= msg %> </li>
-            <% end %>
-          </ul>
-        </div>
-      <% end %>
+        <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
+        <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
 
-      <%= token_tag form_authenticity_token %>
-
-      <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
-        <div class="dependent_notice_div_<%= dependent.id%>"></div>
-        <div class="row row-form-wrapper no-buffer">
-
-          <div class="col-md-4 col-sm-4 no-pd">
-            <div class="form-group form-group-lg">
-              <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *", autocomplete: :off %>
-            </div>
-          </div>
-
-          <div class="col-md-4 col-sm-4 no-pd">
-            <div class="form-group form-group-lg">
-              <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase, autocomplete: :off%>
-            </div>
-          </div>
-
-          <div class="col-md-4 col-sm-4 no-pd">
-            <div class="form-group form-group-lg">
-              <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *", autocomplete: :off %>
-              <div class="text-right">
-                <% if !dependent.persisted? %>
-                  <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
-                <% else %>
-                  <%= link_to insured_family_member_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
-                      '<i class="fa fa-times"></i>'.html_safe
-                    end %>
+        <% if dependent.errors.any? %>
+            <div class="alert alert-error">
+              <h4>
+                <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
+              </h4>
+              <ul>
+                <% dependent.errors.full_messages.each do |msg| %>
+                    <li> <%= msg %> </li>
                 <% end %>
+              </ul>
+            </div>
+        <% end %>
+
+        <%if
+          @dependent.first_name &&
+              @dependent.last_name &&
+              @dependent.dob &&
+              @dependent.gender &&
+              @dependent.relationship
+        %>
+            <div class="row row-form-wrapper no-buffer">
+              <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+                <div class="col-md-4 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+                  <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.first_name} #{@dependent.middle_name} #{@dependent.last_name}" %></span>
+                </div>
+                <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+                  <label class="static_label label-floatlabel" for="name">AGE</label>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(Date.today)}" %></span>
+                </div>
+                <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+                  <label class="static_label label-floatlabel" for="name">GENDER</label>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.gender.humanize}" %></span>
+                </div>
+                <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+                  <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.relationship.capitalize}" %></span>
+                </div>
+              </div>
+            </div>
+        <%end %>
+
+        <%= token_tag form_authenticity_token %>
+
+        <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
+          <div class="dependent_notice_div_<%= dependent.id%>"></div>
+          <div class="row row-form-wrapper no-buffer">
+
+            <div class="col-md-4 col-sm-4 no-pd">
+              <div class="form-group form-group-lg">
+                <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-4 no-pd">
+              <div class="form-group form-group-lg">
+                <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
+              </div>
+            </div>
+
+            <div class="col-md-4 col-sm-4 no-pd">
+              <div class="form-group form-group-lg">
+                <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
+                <div class="text-right">
+                  <% if !dependent.persisted? %>
+                      <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
+                  <% else %>
+                      <%= link_to insured_family_member_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
+                        '<i class="fa fa-times"></i>'.html_safe
+                      end %>
+                  <% end %>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-3 col-sm-3 no-pd">
-            <div class="form-group form-group-lg">
-              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
-               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
-             </div>
-           </div>
+          <div class="row row-form-wrapper no-buffer">
+            <% if @person.has_active_consumer_role? %>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+                  <label id="is_applying_coverage_value_dep">Does <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> need coverage?</label>
+                </div>
+                <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
+                <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+            <% end %>
+          </div>
 
-
-           <div class="col-md-3 col-sm-3 no-pd">
-             <div class="form-group form-group-lg">
-               <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
-             </div>
-           </div>
-
-           <div class="col-md-3 col-sm-3 no-pd">
-             <div class="col-xs-12">
-               <div class="">
-                 <div class="form-group form-group-lg top-buffer">
-                   <%= f.check_box :no_ssn %>
-                   <%= f.label :no_ssn, :value => true do %>
-                   <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
-                   <% end %>
-                   <!-- <span><i class='fa fa-question-circle'></i></span> -->
-                 </div>
-               </div>
-             </div>
-
-             <div class="col-xs-2">
-             </div>
-           </div>
-
-          <div class="col-md-3 col-sm-3 no-pd">
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div class="radio">
-                <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
-                <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="form-group form-group-lg">
+                <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
+                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
               </div>
             </div>
-            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
-              <div class="radio">
-                <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
-                <label for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
+
+
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="form-group form-group-lg">
+                <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="col-xs-12">
+                <div class="">
+                  <div class="form-group form-group-lg top-buffer">
+                    <%= f.check_box :no_ssn %>
+                    <%= f.label :no_ssn, :value => true do %>
+                        <span class='no_ssn twelve'>&nbsp;<%= l10n("do_not_have_ssn") %></span>
+                    <% end %>
+                    <!-- <span><i class='fa fa-question-circle'></i></span> -->
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xs-2">
+              </div>
+            </div>
+
+            <div class="col-md-3 col-sm-3 no-pd">
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                <div class="radio">
+                  <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male' %>
+                  <label for="radio_male"><span><%= l10n("male").to_s.upcase %></span></label>
+                </div>
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+                <div class="radio">
+                  <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female'  %>
+                  <label for="radio_female"><span><%= l10n("female").to_s.upcase %></span></label>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
+          <div class="row row-form-wrapper no-buffer">
+            <% if has_active_consumer_dependent?(@person,@dependent) %>
+                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
+                  <label class="static_label label-floatlabel mt-label">NAME</label>
+                  <label id="is_applying_coverage_value_dep_1" class= "ml-label">
+                    <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %>
+                  </label>
+                </div>
+            <% end %>
+            <div class="col-md-5 mt18">
+              <div class="select-positioning ml-label"> <label>is</label> </div>
+              <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+              <div class="select-relation rs_selection">
+                <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
+              </div>
+              <label class="position-left"> of</label>
+              <div class="icon-rel">
+                <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                <i class="fa fa-link" aria-hidden="true"></i>
+                <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="col-lg-4 mt18 static-font">
+              <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
+              <span class="position-full-name"> <%= @person.full_name %> </span>
+            </div>
           </div>
-
 
           <% if has_active_consumer_dependent?(@person,@dependent) %>
-            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-              <span id="is_applying_coverage_value_dep">Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage? *</span>
-            </div>
-            <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
-            <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+              <%= render 'shared/ssn_coverage_msg' %>
           <% end %>
+
+          <% if has_active_consumer_dependent?(@person,@dependent) %>
+              <br>
+              <div id="consumer_fields_sets">
+                <%= render 'shared/consumer_fields', f: f %>
+              </div>
+              <div id="dependent-address">
+                <div class="row row-form-wrapper no-buffer">
+                  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
+                    <%= f.check_box :same_with_primary, {}, "true", "false" %>
+                    <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
+                  </div>
+                </div>
+                <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+                  <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
+                </div>
+              </div>
+          <% elsif @person.has_active_employee_role? %>
+              <%= f.hidden_field :same_with_primary, value: 'false' %>
+              <%= render 'shared/address_fields_for_dependent', f: f %>
+          <% end %>
+
+          <%= f.hidden_field :family_id %>
+          <div id="remove_confirm" class="hidden"></div>
         </div>
 
-        <% if has_active_consumer_dependent?(@person,@dependent) %>
-          <%= render 'shared/ssn_coverage_msg' %>
-        <% end %>
+        <div class="clearfix"></div>
+        <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
 
-        <% if has_active_consumer_dependent?(@person,@dependent) %>
-          <br>
-          <div id="consumer_fields_sets">
-          <%= render 'shared/consumer_fields', f: f %>
-          </div>
-          <div id="dependent-address">
-            <div class="row row-form-wrapper no-buffer">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
-                <%= f.check_box :same_with_primary, {}, "true", "false" %>
-                <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
-              </div>
-            </div>
-            <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
-              <%= render 'shared/address_fields_for_dependent', f: f, show_no_dc_address: true %>
-            </div>
-          </div>
-        <% elsif @person.has_active_employee_role? %>
-          <%= f.hidden_field :same_with_primary, value: 'false' %>
-          <%= render 'shared/address_fields_for_dependent', f: f %>
-        <% end %>
+          <% if !dependent.persisted? %>
+              <a href="#" class="btn btn-default remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
+                <%= l10n("cancel") %>
+              </a>
+          <% else %>
+              <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
+          <% end %>
 
-        <%= f.hidden_field :family_id %>
-        <div id="remove_confirm" class="hidden"></div>
-      </div>
+          <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>
+              <%= l10n("confirm_member") %>
+          <% end %>
 
-      <div class="clearfix"></div>
-      <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
-
-        <% if !dependent.persisted? %>
-          <a href="#" class="btn btn-default remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
-          <%= l10n("cancel") %>
-          </a>
-        <% else %>
-          <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
-        <% end %>
-        <%= f.button(id: 'confirm-member', 'data-disable-with' => l10n("please_wait"), class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>
-          <%= l10n("confirm_member") %>
-        <% end %>
-
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+          <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
           <%= l10n("confirm_member") %>
         </span>
-      </div>
+        </div>
     <% end %>
   </div>
 
   <script>
-    $(document).ready(function() {
-      $('.field_with_errors > *').unwrap();
-      Freebies.floatlabels();
-      if($("input#dependent_same_with_primary").is(":checked")){
-        $("#address_info .address_required").removeAttr('required');
-      };
-      $("#dependent_first_name").change(function() {
-        var text = $("#dependent_first_name").val() == '' ? "this person" : $("#dependent_first_name").val()
-        $("#is_applying_coverage_value_dep").text("Is "+ text +" applying for coverage? *");
+      $(document).ready(function() {
+          $('.field_with_errors > *').unwrap();
+          Freebies.floatlabels();
+          if($("input#dependent_same_with_primary").is(":checked")){
+              $("#address_info .address_required").removeAttr('required');
+          };
+          $("#dependent_first_name").change(function() {
+              var text = $("#dependent_first_name").val() == '' ? "this person" : $("#dependent_first_name").val()
+              $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage?");
+              $("#is_applying_coverage_value_dep_1").text(text);
+          });
       });
-    });
   </script>
 </li>

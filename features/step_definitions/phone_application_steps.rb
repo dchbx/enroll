@@ -18,7 +18,7 @@ And(/^the Admin is on the Personal Info page for the family$/) do
 end
 
 And(/^the Admin clicks the Application Type drop down$/) do
-	find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
+  find(:xpath, "//span[@class='label'][contains(., 'choose')]").click
 end
 
 And(/^the Admin selects the Phone application option$/) do
