@@ -59,6 +59,7 @@ RSpec.describe "insured/families/personal.html.erb" do
   if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     context "for consumer role" do
       before :each do
+        assign(:support_texts, {support_text_key: "support-text-description"})
         render file: 'insured/families/personal.html.erb'
       end
 
