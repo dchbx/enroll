@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
+
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
@@ -22,6 +27,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
@@ -38,7 +48,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -46,6 +56,11 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -62,7 +77,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -167,6 +182,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "POST create" do
     let(:address) { double }
+    let(:family_member) { double("FamilyMember")}
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: true) }
     let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
     let(:dependent_properties) { ActionController::Parameters.new(:family_id => "saldjfalkdjf").permit(:family_id) }
     let(:save_result) { false }
@@ -178,7 +195,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       allow(dependent).to receive(:save).and_return(save_result)
       allow(dependent).to receive(:address=)
       allow(dependent).to receive(:family_id).and_return(dependent_properties)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(dependent).to receive(:copy_finanacial_assistances_application)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
+      allow(family_member).to receive_message_chain(:family, :application_in_progress).and_return nil
       post :create, params: {dependent: dependent_properties}
     end
 
@@ -318,7 +340,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   describe "PUT update" do
     let(:address) { double }
     let(:family_member) { double }
-    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
+    let(:dependent) { double(addresses: [address], family_member: double("FamilyMember", family: double("Family", application_in_progress: double("App"))), same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
@@ -349,7 +371,15 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     end
 
     describe "with a valid dependent" do
+      let(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
+      let(:family_member) {  test_family.primary_applicant }
       let(:update_result) { true }
+
+
+      before :each do
+        allow(dependent).to receive(:family_member).and_return(family_member)
+      end
+
       it "should render the show template" do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         put :update, params: {id: dependent_id, dependent: dependent_properties}

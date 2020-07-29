@@ -3,6 +3,7 @@ class Insured::FamilyMembersController < ApplicationController
   include ApplicationHelper
 
   before_action :set_current_person, :set_family
+  before_action :load_support_texts, only: [:new, :edit, :create, :index, :update]
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
   def index
@@ -55,7 +56,9 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @source = session[:source_fa] = params[:source]
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
   end
 
   def new
@@ -206,6 +209,10 @@ class Insured::FamilyMembersController < ApplicationController
 private
   def set_family
     @family = @person.try(:primary_family)
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def init_address_for_dependent

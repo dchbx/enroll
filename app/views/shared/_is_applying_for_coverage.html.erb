@@ -1,4 +1,4 @@
-<div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
+<div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd">
   <div class="radio">
     <%= f.radio_button :is_applying_coverage, true, class: "required floatlabel", id: 'is_applying_coverage_true', checked: first_checked%>
     <label for="is_applying_coverage_true"><span>Yes</span></label>
@@ -9,4 +9,8 @@
     <%= f.radio_button :is_applying_coverage, false, class: "required floatlabel", id: 'is_applying_coverage_false', checked: second_checked %>
     <label for="is_applying_coverage_false"><span>No</span></label>
   </div>
+</div>
+<div class="col-md-2 left-seprator" style="margin-top: 14px">
+  <a href="#is_applying_coverage" data-toggle="modal" data-target="#is_applying_coverage">Not Sure?</a>
+  <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_coverage"} %>
 </div>

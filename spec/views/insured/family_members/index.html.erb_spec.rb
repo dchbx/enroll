@@ -18,12 +18,12 @@ describe "insured/family_members/index.html.erb" do
   end
 
   it "should have title" do
-    render template: "insured/family_members/index.html.erb"
-    expect(rendered).to have_selector("h1", text: 'Family Members')
+    render template: "insured/family_members/index.html.erb", locals: { :group_selection_url => new_insured_group_selection_path(person_id: person.id, consumer_role_id: employee_role.id) }
+    expect(rendered).to have_selector("h2", text: 'Household Info: Family Members')
   end
 
   it "should have memo to indicate required fields" do
-    render template: "insured/family_members/index.html.erb"
+    render template: "insured/family_members/index.html.erb", locals: { :group_selection_url => new_insured_group_selection_path(person_id: person.id, consumer_role_id: employee_role.id) }
     expect(rendered).to have_selector('p.memo', text: '* = required field')
   end
 
@@ -31,7 +31,7 @@ describe "insured/family_members/index.html.erb" do
     before :each do
       assign :type, "employee"
       assign :employee_role, employee_role
-      render template: "insured/family_members/index.html.erb"
+      render template: "insured/family_members/index.html.erb", locals: { :group_selection_url => new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id) }
     end
 
     it "should call signup_progress" do
@@ -44,11 +44,11 @@ describe "insured/family_members/index.html.erb" do
       assign :type, "consumer"
       assign :consumer_role, consumer_role
       allow(view).to receive(:is_under_open_enrollment?).and_return false
-      render template: "insured/family_members/index.html.erb"
+      render template: "insured/family_members/index.html.erb", locals: { :group_selection_url => new_insured_group_selection_path(person_id: person.id, consumer_role_id: consumer_role.id) }
     end
 
     it "should call individual_progress" do
-      expect(rendered).to match /Verify Identity/
+      expect(rendered).not_to match /Verify Identity/
       expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
     end
   end
@@ -58,11 +58,11 @@ describe "insured/family_members/index.html.erb" do
       assign :type, "resident"
       assign :resident_role, resident_role
       allow(view).to receive(:is_under_open_enrollment?).and_return false
-      render template: "insured/family_members/index.html.erb"
+      render template: "insured/family_members/index.html.erb", locals: { :group_selection_url => new_insured_group_selection_path(person_id: person.id, consumer_role_id: consumer_role.id) }
     end
 
     it "should call individual_progress" do
-      expect(rendered).to match /Verify Identity/
+      expect(rendered).not_to match /Verify Identity/
       expect(rendered).not_to have_selector("label.static_label", text: 'SOCIAL SECURITY')
     end
   end

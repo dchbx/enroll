@@ -35,7 +35,8 @@ class Person
                         :race,
                         :tribal_id,
                         :no_dc_address,
-                        :no_dc_address_reason,
+                        :is_homeless,
+                        :is_temporarily_out_of_state,
                         :is_active,
                         :no_ssn],
                 :modifier_field => :modifier,
@@ -89,7 +90,8 @@ class Person
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
-  field :no_dc_address_reason, type: String, default: ""
+  field :is_homeless, type: Boolean, default: false
+  field :is_temporarily_out_of_state, type: Boolean, default: false
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -442,6 +444,14 @@ class Person
     user.identity_verified?
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   #after_save :update_family_search_collection
 
   # before_save :notify_change
@@ -687,7 +697,7 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    no_dc_address and (is_homeless? || is_temporarily_out_of_state?)
   end
 
   def age_on(date)
@@ -700,8 +710,8 @@ class Person
   end
 
   def is_dc_resident?
-    return false if no_dc_address == true && no_dc_address_reason.blank?
-    return true if no_dc_address == true && no_dc_address_reason.present?
+    return false if no_dc_address == true && (is_homeless? && is_temporarily_out_of_state?)
+    return true if no_dc_address == true && (is_homeless? || is_temporarily_out_of_state?)
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}

@@ -201,7 +201,8 @@ class Exchanges::ResidentsController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :is_homeless,
+      :is_temporarily_out_of_state
     ]
   end
 

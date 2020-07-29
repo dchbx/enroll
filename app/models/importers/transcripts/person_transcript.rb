@@ -116,7 +116,8 @@ module Importers::Transcripts
         },
         remove: {
           no_dc_address: 'ignore',
-          no_dc_address_reason: 'ignore',
+          is_homeless: 'ignore',
+          is_temporarily_out_of_state: 'ignore',
           middle_name: 'edi'
         }
       },
@@ -264,7 +265,7 @@ module Importers::Transcripts
 
       if section == :base
         attributes.each do |field, value|
-          dependent_fields_ignore = ['is_incarcerated','no_dc_address','no_dc_address_reason']
+          dependent_fields_ignore = ['is_incarcerated','no_dc_address','is_homeless','is_temporarily_out_of_state']
           if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi') || (@market == 'shop' && !@is_subscriber && dependent_fields_ignore.include?(field.to_s))
             begin
               validate_timestamp(section)
