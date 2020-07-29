@@ -19,8 +19,6 @@ Feature: Update DOB and SSN
     Then the user clicks on add member button
     And the user fills the the add member form
     Then Individual should see the dependents form
-    And Individual clicks on add member button
-    And Individual again clicks on add member button #TODO re-write this step
     And I click on continue button on household info form
     And I click on continue button on group selection page
     And I select three plans to compare
