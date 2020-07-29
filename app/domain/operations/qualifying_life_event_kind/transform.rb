@@ -9,10 +9,12 @@ module Operations
       include Dry::Monads[:result, :do]
 
       def call(params:)
-        qlek   = yield fetch_qlek_object(params)
-        end_on = yield parse_date(qlek, params)
-        yield validate_dates(qlek, end_on)
-        tranform_qlek(qlek, end_on)
+        qlek              = yield fetch_qlek_object(params)
+        end_on            = yield parse_date(qlek, params)
+        date_valid        = yield validate_dates(qlek, end_on)
+        transformed_qle   = yield tranform_qlek(qlek, end_on)
+
+        Success(transformed_qle)
       end
 
       private
