@@ -14,6 +14,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
     before(:each) do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       assign(:person, person)
+      assign(:support_texts, {support_text_key: "support-text-description"})
       person.addresses.build(kind: 'home')
       #controller.request.path_parameters[:employer_profile_id] = employer_profile.id
       #stub_template "shared/_reference_plans_list.html.erb" => ""
@@ -47,7 +48,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /living outside of DC temporarily and intend to return/
+        expect(rendered).to match /Currently living outside of DC temporarily and plan to return./
       end
     end
 
@@ -125,6 +126,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       allow(person).to receive(:is_consumer_role_active?).and_return true
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign(:person, person)
+      assign(:support_texts, {support_text_key: "support-text-description"})
       render :template => "people/landing_pages/_personal.html.erb"
     end
 
