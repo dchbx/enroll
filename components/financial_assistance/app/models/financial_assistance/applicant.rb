@@ -155,8 +155,8 @@ module FinancialAssistance
     embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
-    embeds_many :workflow_state_transitions, as: :transitional
-    embeds_many :verification_types, cascade_callbacks: true, validate: true
+    embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
+    embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"

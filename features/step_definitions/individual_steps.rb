@@ -260,6 +260,14 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   click_link "Continue Application"
 end
 
+Then(/\w+ should be on the Help Paying for Coverage page/) do
+  expect(page).to have_content("Help Paying for Coverage")
+end
+Then(/\w+ does not apply for assistance and clicks continue/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.interaction-click-control-continue').click
+end
+
 Then(/\w+ should see the dependents form/) do
   expect(page).to have_content('Add Member')
   screenshot("dependents")
@@ -419,7 +427,7 @@ Then(/^Individual fills in the form$/) do
   click_link(@u.adult_dob.to_date.day)
   click_outside_datepicker('Household Info: Family Members')
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.label', :text => 'This Person Is', :wait => 10).click
+  find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click

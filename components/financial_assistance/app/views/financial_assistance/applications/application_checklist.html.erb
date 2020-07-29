@@ -7,7 +7,7 @@
     <div id="new_person_wrapper">
       <div class="row">
         <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
-          <%= render :partial => 'shared/left_nav.html.erb' %>
+          <%= render :partial => 'financial_assistance/shared/left_nav.html.erb' %>
         </div>
         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
 
@@ -31,7 +31,7 @@
                     <h4>For Each Person in Your Household:</h4>
                     <div>You will need detailed information on each person in your household (even if they don't need coverage) to complete the application. This includes details like date of birth, income, and other health insurance available. <br> <br>
                     If you gather the information in advance, you can complete the application quickly.<br> <br>
-                    <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i><%= link_to ' View the Complete Application Checklist', checklist_pdf_financial_assistance_applications_path, target: "_blank" %>
+                    <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i><%= link_to ' View the Complete Application Checklist', checklist_pdf_applications_path, target: "_blank" %>
                     </div>
                   </div>
                 </div>
@@ -41,8 +41,8 @@
 
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
             <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-              previous_url: help_paying_coverage_financial_assistance_applications_path,
-              next_url: edit_financial_assistance_application_path(@application)
+              previous_url: help_paying_coverage_applications_path,
+              next_url: edit_application_path(@application)
             } %>
           </div>
         </div>

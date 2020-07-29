@@ -13,9 +13,10 @@ Feature: plan shopping with mixed household determination
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
-    Then Individual should see the dependents form
-    And Individual clicks on add member button
-    And Individual clicks on confirm member
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
+    Then the user clicks on add member button
+    And the user fills the the add member form
     When csr plans exists in db
     Then I click on continue button on household info form
 

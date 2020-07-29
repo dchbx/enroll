@@ -85,7 +85,7 @@
       <div class="col-xs-12">
         <div class="back-link">
           <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
         </div>
       </div>
     </div>
@@ -157,7 +157,7 @@
   <!-- Right NAV -->
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: other_financial_assistance_application_applicant_incomes_path(@application, @applicant),
+      previous_url: other_application_applicant_incomes_path(@application, @applicant),
       next_url: financial_assistance_application_applicant_benefits_path(@application, @applicant)
     } %>
   </div>

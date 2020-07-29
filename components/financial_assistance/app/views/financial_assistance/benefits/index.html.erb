@@ -66,14 +66,14 @@
     </div>
 
     <div class="col-md-4 col-sm-4 col-xs-4">
-    <%#= link_to "Add Health Coverage", new_financial_assistance_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+    <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
     </div>
 
     <div class="row">
       <div class="col-xs-12">
         <div class="back-link">
           <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
-          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_financial_assistance_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
         </div>
       </div>
     </div>
@@ -143,7 +143,7 @@
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
       previous_url: financial_assistance_application_applicant_deductions_path(@application, @applicant),
-      next_url: other_questions_financial_assistance_application_applicant_path(@application, @applicant)
+      next_url: other_questions_application_applicant_path(@application, @applicant)
     } %>
   </div>
 </div>

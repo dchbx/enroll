@@ -49,18 +49,18 @@ module FinancialAssistance
 
     def find_next_application_path(application)
       if application.incomplete_applicants?
-        go_to_step_financial_assistance_application_applicant_path application, application.next_incomplete_applicant, 1
+        go_to_step_application_applicant_path application, application.next_incomplete_applicant, 1
       else
-        review_and_submit_financial_assistance_application_path application
+        review_and_submit_application_path application
       end
     end
 
     def find_previous_from_step_one
       model_name = @model.class.to_s.split('::').last.downcase
       if  model_name == "applicant"
-        edit_financial_assistance_application_path(@application)
+        edit_application_path(@application)
       elsif model_name == "application"
-        review_and_submit_financial_assistance_application_path(@application)
+        review_and_submit_application_path(@application)
       else
         send("financial_assistance_application_applicant_#{model_name.pluralize}_path", @application, @applicant)
       end
@@ -75,7 +75,7 @@ module FinancialAssistance
         # and instead we'll short circuit by checking that -1 is less then i, which always would be true
         (document_flow.index(options[:current]) || -1) < document_flow.index(embeded_document) and applicant.send(embeded_document).present?
       end
-      next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_financial_assistance_application_applicant_path(application, applicant)
+      next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_application_applicant_path(application, applicant)
     end
 
     def find_previous_applicant_path(application, applicant, options={})
@@ -87,7 +87,7 @@ module FinancialAssistance
         # and instead we'll short circuit by checking that -1 is less then i, which always would be true
         (reverse_document_flow.index(options[:current]) || -1) < reverse_document_flow.index(embeded_document) and applicant.send(embeded_document).present?
       end
-      previous_path ? send("financial_assistance_application_applicant_#{previous_path}_path", application, applicant) : go_to_step_financial_assistance_application_applicant_path(application, applicant, 2)
+      previous_path ? send("financial_assistance_application_applicant_#{previous_path}_path", application, applicant) : go_to_step_application_applicant_path(application, applicant, 2)
     end
 
     def left_nav_css(conditional)
@@ -173,7 +173,7 @@ module FinancialAssistance
         if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
           financial_assistance_application_applicant_incomes_path(application, applicant)
         else
-          other_financial_assistance_application_applicant_incomes_path(application, applicant)
+          other_application_applicant_incomes_path(application, applicant)
         end
       end
     end

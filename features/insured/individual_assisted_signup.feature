@@ -8,6 +8,8 @@ Feature: Insured Plan Shopping on Individual Assisted market
     Then Aptc user should see a form to enter personal information
     Then Individual agrees to the privacy agreeement
     Then user should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then user should see the dependents form
     And I click on continue button on household info form
     Then Prepare taxhousehold info for aptc user
