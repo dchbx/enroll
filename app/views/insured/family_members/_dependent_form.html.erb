@@ -145,7 +145,7 @@
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
                   <label class="static_label label-floatlabel mt-label">NAME</label>
                   <label id="is_applying_coverage_value_dep_1" class= "ml-label">
-                    <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %>
+                    <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : 'this person' %>
                   </label>
                 </div>
             <% end %>

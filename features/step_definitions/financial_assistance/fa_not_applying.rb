@@ -79,7 +79,9 @@ And(/^the user fills the the add member form/) do
   fill_in "dependent[last_name]", :with => "Doe"
   fill_in "dependent[ssn]", :with => "763434355"
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => "04/15/1988"
-  find(".button").click
+  click_link('15')
+
+  find("span", text: 'choose').click
   page.find(:xpath, '//*[@id="new_dependent"]/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[2]').click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
