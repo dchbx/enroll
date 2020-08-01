@@ -300,10 +300,16 @@ And("Admin selects effective on kinds for Create SEP Type") do
 end
 
 And(/Admin (.*) select termination on kinds for (.*) SEP Type$/) do |action, market_kind|
-  # binding.pry
   if action == 'cannot' && market_kind == 'individual'
     expect(page).to have_css("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]']:disabled")
   else
+    find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='end_of_event_month']").set(true)
+  end
+end
+
+
+And(/Admin (.*) termination on kinds for (.*) market$/) do |action, market_kind|
+  if action == 'selected'
     find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='end_of_event_month']").set(true)
   end
 end
