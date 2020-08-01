@@ -34,7 +34,7 @@ module Validators
           result_hash[:reason] = "" if result_hash[:reason] == 'Choose...'
           other_params[:reason] = result_hash[:other_reason] if result_hash[:reason] == 'other'
           other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason].parameterize.underscore
-          other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' && result_hash[:termination_on_kinds].nil?
+          other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' || result_hash[:termination_on_kinds].nil?
           result_hash.merge(other_params)
         end
       end
