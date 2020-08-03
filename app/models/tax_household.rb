@@ -44,6 +44,10 @@ class TaxHousehold
     latest_eligibility_determination.csr_eligibility_kind
   end
 
+  def current_csr_percent_as_integer
+    latest_eligibility_determination.csr_percent_as_integer
+  end
+
   def valid_csr_kind(hbx_enrollment)
     csr_kind = latest_eligibility_determination.csr_eligibility_kind
     shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
