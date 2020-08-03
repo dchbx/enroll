@@ -270,6 +270,16 @@ RSpec.describe TaxHousehold, type: :model do
     end
   end
 
+  context 'for current_csr_percent_as_integer' do
+    let(:ed) {EligibilityDetermination.new(csr_percent_as_integer: 73, determined_at: TimeKeeper.date_of_record)}
+    let(:thh) {TaxHousehold.new}
+
+    it 'should equal to the csr_eligibility_kind of latest_eligibility_determination' do
+      thh.eligibility_determinations = [ed]
+      expect(thh.current_csr_percent_as_integer).to eq ed.csr_percent_as_integer
+    end
+  end
+
   context 'is_all_non_aptc?' do
     let!(:family) {create(:family, :with_primary_family_member_and_dependent)}
     let(:household) {create(:household, family: family)}
