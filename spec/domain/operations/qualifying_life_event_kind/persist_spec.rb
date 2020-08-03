@@ -16,8 +16,8 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
     context 'for success case' do
 
       let(:qlek_create_params) do
-        { 'start_on': "#{TimeKeeper.date_of_record.year}-07-01",
-          'end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+        { 'start_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.month}-01",
+          'end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'title': 'test title',
           'tool_tip': 'test tooltip',
           'pre_event_sep_in_days': '10',
@@ -27,7 +27,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'market_kind': 'individual',
           'effective_on_kinds': ['date_of_event'],
           'coverage_effective_on': "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label': 'event kind label',
           'is_visible': true,
           'date_options_available': true }
@@ -81,8 +81,8 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           let!(:q2) {FactoryBot.create(:qualifying_life_event_kind, title: 'test title', market_kind: 'individual', reason: 'lost_access_to_mec', aasm_state: :draft, is_active: false)}
 
           let(:qlek_publish_params) do
-            { 'start_on': "#{TimeKeeper.date_of_record.year}-07-01",
-              'end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+            { 'start_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.month}-01",
+              'end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
               'title': 'test title',
               'tool_tip': 'test tooltip',
               'pre_event_sep_in_days': '10',
@@ -92,7 +92,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
               'market_kind': 'individual',
               'effective_on_kinds': ['date_of_event'],
               'coverage_effective_on': "#{TimeKeeper.date_of_record.year}-07-01",
-              'coverage_end_on': "#{TimeKeeper.date_of_record.year}-08-01",
+              'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
               'event_kind_label': 'event kind label',
               'is_visible': true,
               'id': q2.id.to_s,
@@ -133,7 +133,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           market_kind: 'individual',
           effective_on_kinds: ['date_of_event'],
           coverage_effective_on: "#{TimeKeeper.date_of_record.year}-07-19",
-          coverage_end_on: "#{TimeKeeper.date_of_record.year}-08-01",
+          coverage_end_on: "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           event_kind_label: 'event kind label',
           is_visible: true,
           date_options_available: true }
@@ -167,8 +167,8 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
 
     context 'for success case' do
       let(:qlek_update_params) do
-        { 'start_on' => "#{TimeKeeper.date_of_record.year}-07-01",
-          'end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
+        { 'start_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.month}-01",
+          'end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'title' => 'test title',
           'tool_tip' => 'test tool tip 2',
           'pre_event_sep_in_days' => '10',
@@ -180,7 +180,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'effective_on_kinds' => ['date_of_event'],
           '_id' => qlek.id.to_s,
           'coverage_effective_on' => "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
+          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           'date_options_available' => true }
@@ -219,7 +219,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'effective_on_kinds' => ['date_of_event'],
           '_id' => qlek.id.to_s,
           'coverage_effective_on' => "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
+          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           'date_options_available' => true }
