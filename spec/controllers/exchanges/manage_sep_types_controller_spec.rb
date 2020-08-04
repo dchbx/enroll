@@ -404,7 +404,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           before do
             q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
             post :expire_sep_type, params: {
-              qualifying_life_event_kind: {end_on: (TimeKeeper.date_of_record.yesterday).strftime("%Y-%m-%d")},
+              qualifying_life_event_kind: {end_on: (TimeKeeper.date_of_record).strftime("%Y-%m-%d")},
               qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id.to_s}"
             }, format: :js, xhr: true
           end
