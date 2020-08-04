@@ -59,12 +59,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
     end
   end
 
-  context 'for expired case' do
+  context 'for expired case with future date' do
     before :each do
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 20.days).strftime("%Y-%m-%d")})
+      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record + 20.days).strftime("%Y-%m-%d")})
       qlek.reload
     end
 
@@ -73,15 +73,15 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
     end
 
     it 'should return qlek object' do
-      expect(@result.success).to eq([qlek, 'expire_success'])
+      expect(@result.success).to eq([qlek, 'expire_pending_success'])
     end
 
     it 'should expire the qlek object' do
-      expect(qlek.aasm_state).to eq(:expired)
+      expect(qlek.aasm_state).to eq(:expire_pending)
     end
   end
 
-  context 'for expire pending case' do
+  context 'for expire case with current date' do
     before :each do
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
