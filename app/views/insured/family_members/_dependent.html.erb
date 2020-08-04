@@ -20,7 +20,7 @@
           <label class="static_label label-floatlabel"><%= l10n("last_name").to_s.upcase %></label>
           <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
           <div class="text-right">
-            <%= link_to edit_insured_family_member_path(dependent), remote: true, class: 'close close-2' do %>
+            <%= link_to main_app.edit_insured_family_member_path(dependent), remote: true, class: 'close close-2' do %>
                 <i class="fa fa-edit"></i>
    	    <% end %>
           </div>
