@@ -108,7 +108,7 @@ module Insured::FamiliesHelper
       is_self_attested: qle.is_self_attested,
       current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
       qle_event_date_kind: qle.qle_event_date_kind.to_s
-    }
+    }  #TODO check is_visible needed here
 
     if qle.tool_tip.present?
       data.merge!(toggle: 'tooltip', placement: index > 2 ? 'top' : 'bottom')

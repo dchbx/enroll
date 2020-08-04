@@ -146,6 +146,9 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
+  if Settings.site.key == :dc
+    require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')
+  end
   system "bundle exec rake update_seed:qualifying_life_event"
   puts "::: complete :::"
 
