@@ -69,6 +69,19 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
           expect(rendered).to have_selector("a", text: "Add Plan Year")
         end
       end
+
+      context "when the most recent benefit application is in enrollment ineligible state" do
+
+        before do
+          renewal_application.update_attributes!(:aasm_state => :enrollment_ineligible)
+          renewal_application.reload
+        end
+
+        it "should display add plan year button" do
+          render "benefit_sponsors/profiles/employers/employer_profiles/my_account/benefits.html.erb"
+          expect(rendered).to have_selector("a", text: "Add Plan Year")
+        end
+      end
     end
 
     context "initials" do
