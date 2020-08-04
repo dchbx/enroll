@@ -23,7 +23,7 @@ module FinancialAssistance
     end
 
     def create_plan
-      hbx_profile = FactoryBot.create(:hbx_profile)
+      hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
       benefit_package = hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     end
     
