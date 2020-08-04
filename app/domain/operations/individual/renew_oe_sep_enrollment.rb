@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Operations
-  module Ivl
+  module Individual
     # This class is invoked when an enrollment is purchased by reporting a SEP
     # and we want to renew this enrollment for next year.
     # Constaint for assisted renewals:
