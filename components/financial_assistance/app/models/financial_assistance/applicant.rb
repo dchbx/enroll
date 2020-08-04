@@ -4,7 +4,7 @@ module FinancialAssistance
     include Mongoid::Timestamps
     include AASM
 
-    embedded_in :application, class_name: "::FinancialAssistance::Application"
+    embedded_in :application
 
     TAX_FILER_KINDS = %w[tax_filer single joint separate dependent non_filer].freeze
     STUDENT_KINDS = %w[
