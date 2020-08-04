@@ -18,6 +18,10 @@
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
     <%= javascript_include_tag "application" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
+    <% fa_javascripts = %w[application benefit deduction fa_integration glossary income step_conditionals] %>
+    <% fa_javascripts.each do |js_file_name| %>
+      <%= javascript_include_tag "financial_assistance/#{js_file_name}", media: 'all' %>
+    <% end %>
     <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'legacy', 'data-turbolinks-track': 'reload' %>
     <%= javascript_pack_tag 'incremental_angular', 'data-turbolinks-track': 'reload' %>
