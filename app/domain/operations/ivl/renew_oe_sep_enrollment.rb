@@ -5,15 +5,14 @@ module Operations
     # This class is invoked when an enrollment is purchased by reporting a SEP
     # and we want to renew this enrollment for next year.
     # Constaint for assisted renewals:
-    # Cancel passive renewals before calling this class to get the correct aptc values.
+    # Cancel passive renewals before calling this class to be able to passive renew enrollment.
 
     class RenewOeSepEnrollment
       include Dry::Monads[:result, :do]
 
       def call(enrollment:)
-        current_enrollment = yield validate_for_required_data(enrollment)
         renewal_bcp        = yield fetch_renewal_bcp
-        _result            = yield can_renew_enrollment(current_enrollment, renewal_bcp)
+        current_enrollment = yield validate_for_required_data(enrollment, renewal_bcp)
         tax_household      = yield lookup_for_tax_household(current_enrollment, renewal_bcp)
         aptc_values        = yield fetch_aptc_values(tax_household)
 
@@ -22,11 +21,13 @@ module Operations
 
       private
 
-      def validate_for_required_data(enrollment)
+      def validate_for_required_data(enrollment, renewal_bcp)
         if !enrollment.is_a?(HbxEnrollment)
           Failure('Given object is not a valid enrollment object')
         elsif !enrollment.is_ivl_by_kind?
           Failure('Given enrollment is not IVL by kind')
+        elsif !can_renew_enrollment(enrollment, renewal_bcp)
+          Failure('There exists active enrollments for given family in the year with renewal_benefit_coverage_period')
         else
           Success(enrollment)
         end
@@ -39,8 +40,7 @@ module Operations
 
       def can_renew_enrollment(enrollment, renewal_bcp)
         oeb_object = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
-        result = oeb_object.can_renew_enrollment?(enrollment, enrollment.family, renewal_bcp)
-        result ? Success('Can renew given enrollment') : Failure('There exists active enrollments for given family in the year with renewal_benefit_coverage_period')
+        oeb_object.can_renew_enrollment?(enrollment, enrollment.family, renewal_bcp)
       end
 
       def lookup_for_tax_household(enrollment, renewal_bcp)
