@@ -26,7 +26,7 @@ Feature: Admin has ability to Expire the Active SEP Type
     | shop        |
     | fehb        |
 
-  Scenario Outline: Admin will get failure reason while expiring an Active <market_kind> market SEP type
+  Scenario Outline: Admin will get failure reason while expiring an Active <market_kind> market SEP type with end date earlier than start date
     Given Admin can navigate to the Manage SEP Types screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks <market_kind> filter on SEP Types datatable
@@ -44,3 +44,22 @@ Feature: Admin has ability to Expire the Active SEP Type
     | individual  |
     | shop        |
     | fehb        |
+
+  Scenario Outline: Admin will get failure reason while expiring an Active <market_kind> market SEP type with past end date
+    Given Admin can navigate to the Manage SEP Types screen
+    And expired Qualifying life events of <market_kind> market is present
+    When Admin clicks <market_kind> filter on SEP Types datatable
+    And Admin clicks on Active filter of <market_kind> market filter
+    When Hbx Admin clicks Action button
+    Then Admin should see Expire dropdown button
+    When Admin clicks on Expire button of an Active SEP Type
+    And Admin fills end on with past date
+    And Admin clicks on Expire button
+    Then Admin should see failure reason for past date of an Expire
+    And Hbx Admin logs out
+
+    Examples:
+      | market_kind |
+      | individual  |
+      | shop        |
+      | fehb        |
