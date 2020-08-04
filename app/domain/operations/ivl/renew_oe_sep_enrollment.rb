@@ -15,8 +15,9 @@ module Operations
         current_enrollment = yield validate_for_required_data(enrollment, renewal_bcp)
         tax_household      = yield lookup_for_tax_household(current_enrollment, renewal_bcp)
         aptc_values        = yield fetch_aptc_values(tax_household)
+        renewal_enrollment = yield renew_ivl_enrollment(current_enrollment, tax_household, aptc_values, renewal_bcp)
 
-        renew_ivl_enrollment(current_enrollment, tax_household, aptc_values, renewal_bcp)
+        Success(renewal_enrollment)
       end
 
       private
