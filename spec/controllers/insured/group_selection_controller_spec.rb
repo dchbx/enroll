@@ -565,6 +565,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
             pre_event_sep_in_days: 0,
             post_event_sep_in_days: 30,
             is_self_attested: true,
+            is_visible: true,
             is_active: true
         )
       end
@@ -886,6 +887,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
           pre_event_sep_in_days: 0,
           post_event_sep_in_days: 30,
           is_self_attested: true,
+          is_visible: true,
           is_active: true
         )
       end

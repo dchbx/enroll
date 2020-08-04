@@ -56,6 +56,7 @@ class QualifyingLifeEventKind
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean
+  field :is_visible, type: Mongoid::Boolean
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
@@ -129,7 +130,7 @@ class QualifyingLifeEventKind
 
   class << self
     def shop_market_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => false).active.to_a
+      where(:market_kind => "shop").and(:is_visible.ne => false).active.to_a
     end
 
     def shop_market_events_admin
@@ -137,7 +138,7 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_non_self_attested_events
-      where(:market_kind => "shop").and(:is_self_attested.ne => true).active.to_a
+      where(:market_kind => "shop").and(:is_visible.ne => true).active.to_a
     end
   end
 

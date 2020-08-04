@@ -11,6 +11,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
   )
@@ -28,6 +29,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
   )
@@ -45,6 +47,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # coverage_effective_date: "Date of birth, adoption, placement for adoption, placement in foster care, or marriage.  For marriage: First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
   )
@@ -62,6 +65,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # start_of_sep: "Date partnership entered into",
     # coverage_effective_date: "First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
@@ -80,6 +84,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # start_of_sep: "Date of divorce, legal separation, partnership termination",
     # coverage_effective_date: "First day of the month following plan selection (not following 15th of month rule); this applies to all members of household")
@@ -98,6 +103,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # start_of_sep: "60 days before loss of MEC",
     # coverage_effective_date: "If before loss of coverage: First day of the month after MEC will end. If after loss of MEC: First day of the month following plan selection (not following 15th of month rule)")
@@ -116,6 +122,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # start_of_sep: "Date of move    ",
     # coverage_effective_date: "Regular effective date")
@@ -133,6 +140,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -151,6 +159,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date of eligibility redetermination (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
@@ -168,6 +177,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -185,6 +195,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 30,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -203,6 +214,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 30,
   post_event_sep_in_days: 30,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "30 days prior to date of ineligibility for exemption",
     # coverage_effective_date: "Regular effective date")
@@ -221,6 +233,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # start_of_sep: "Date person begins or ends service in one of the three programs",
     # coverage_effective_date: "Regular effective date")
@@ -239,6 +252,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date of the court order",
     # coverage_effective_date: "Regular effective date")
@@ -257,6 +271,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date change was verified (NOTE: this is not necessarily the date the customer reported the change)",
     # coverage_effective_date: "Regular effective date")
@@ -274,6 +289,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -291,6 +307,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: false,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -308,6 +325,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date consumer received notice of Medicaid ineligibility",
     # coverage_effective_date: "Regular effective date")
@@ -325,6 +343,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date consumer received notice of SHOP ineligibility    ",
     # coverage_effective_date: "Regular effective date")
@@ -342,6 +361,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Day of disaster (or last day of multi-day disaster)",
     # coverage_effective_date: "Regular effective date")
@@ -359,6 +379,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date approved by HBX",
     # coverage_effective_date: "Regular effective date")
@@ -376,6 +397,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Day of outage",
     # coverage_effective_date: "Regular effective date")
@@ -394,6 +416,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Date person leaves spouse or domestic partner",
     # coverage_effective_date: "Regular effective date")
@@ -412,6 +435,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60,
   is_self_attested: false,
+  is_visible: false,
   date_options_available: true,
     # start_of_sep: "Based on circumstances as determined by HBX Date of loss of coverage",
     # coverage_effective_date: "As determined by HBX, with the intent of preventing gaps in health coverage")
@@ -430,6 +454,7 @@ QualifyingLifeEventKind.create!(
   pre_event_sep_in_days: 60,
   post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
   is_self_attested: true,
+  is_visible: true,
   date_options_available: false,
     # event_kind_label: "coverage end date",
     # start_of_sep: "60 days before loss of MEC",
@@ -448,6 +473,7 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: false,
+    is_visible: false,
     date_options_available: false,
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")
@@ -465,6 +491,7 @@ QualifyingLifeEventKind.create!(
     pre_event_sep_in_days: 0,
     post_event_sep_in_days: 60,
     is_self_attested: false,
+    is_visible: false,
     date_options_available: false,
       # start_of_sep: "Date approved by HBX",
       # coverage_effective_date: "Regular effective date")

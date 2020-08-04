@@ -16,6 +16,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               pre_event_sep_in_days: 0,
                               post_event_sep_in_days: 30,
                               is_self_attested: true,
+                              is_visible: true,
                               ordinal_position: 20,
                               event_kind_label: 'Date of domestic partnership',
                               tool_tip: "Enroll or add a family member due to a new domestic partnership"
@@ -34,6 +35,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
                               pre_event_sep_in_days: 0,
                               post_event_sep_in_days: 30,
                               is_self_attested: true,
+                              is_visible: true,
                               is_active: true
                             )
                           }
