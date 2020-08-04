@@ -13,6 +13,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           pre_event_sep_in_days: 0,
                           post_event_sep_in_days: 30,
                           is_self_attested: true,
+                          is_visible: true,
                           ordinal_position: 20,
                           event_kind_label: 'Date of domestic partnership',
                           tool_tip: "Enroll or add a family member due to a new domestic partnership",
@@ -32,6 +33,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           pre_event_sep_in_days: 0,
                           post_event_sep_in_days: 60,
                           is_self_attested: true,
+                          is_visible: true,
                           is_active: true
                         )
                         }
@@ -49,6 +51,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                           pre_event_sep_in_days: 0,
                           post_event_sep_in_days: 30,
                           is_self_attested: true,
+                          is_visible: true,
                           is_active: true
                         )
                         }
@@ -66,6 +69,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                          pre_event_sep_in_days: 60,
                                          post_event_sep_in_days: 60, # "60 days before loss of coverage and 60 days after",
                                          is_self_attested: true,
+                                         is_visible: true,
                                          is_active: true
                                        )
                                        }
@@ -83,6 +87,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                           pre_event_sep_in_days: 0,
                                           post_event_sep_in_days: 30, # "60 days before loss of coverage and 60 days after",
                                           is_self_attested: true,
+                                          is_visible: true,
                                           is_active: true
                                         )
                                         }
@@ -112,6 +117,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       pre_event_sep_in_days: 0,
       post_event_sep_in_days: 30,
       is_self_attested: true,
+      is_visible: true,
       is_active: true
     )
   end

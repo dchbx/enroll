@@ -80,7 +80,7 @@ class QualifyingLifeEventKind
   field :market_kind, type: String # Deprecated
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
-  field :is_self_attested, type: Mongoid::Boolean
+  field :is_self_attested, type: Mongoid::Boolean # is_self_attested set to true QLE can be claimed by Consumer/EE.
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
@@ -92,7 +92,7 @@ class QualifyingLifeEventKind
   field :coverage_effective_on, type: Date
   field :start_on, type: Date
   field :end_on, type: Date
-  field :is_visible, type: Mongoid::Boolean
+  field :is_visible, type: Mongoid::Boolean  # is_visible set to true QLE's will be displayed to Consumer/EE in carousel
   field :termination_on_kinds, type: Array, default: []
   field :coverage_end_on, type: Date
 
@@ -250,7 +250,7 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => false).active.to_a
     end
 
     def shop_market_events_admin
@@ -258,11 +258,11 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => true).active.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => false).active.to_a
     end
 
     def fehb_market_events_admin
@@ -270,11 +270,11 @@ class QualifyingLifeEventKind
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => true).active.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => false).active.to_a
     end
 
     def individual_market_events_admin
@@ -282,7 +282,7 @@ class QualifyingLifeEventKind
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => true).active.to_a
     end
 
     def individual_market_events_without_transition_member_action
