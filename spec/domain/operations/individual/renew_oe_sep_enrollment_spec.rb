@@ -2,7 +2,7 @@
 
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-RSpec.describe Operations::Ivl::RenewOeSepEnrollment, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbclean: :after_each do
   before do
     DatabaseCleaner.clean
   end
