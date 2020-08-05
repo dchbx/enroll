@@ -55,18 +55,6 @@ Given(/^at least one other household members exist$/) do
   #expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
 end
 
-And(/^household member has filled out income and coverage info$/) do
-  while find_all(".btn", text: "ADD INCOME & COVERAGE INFO").length > 0 do  
-    find_all(".btn", text: "ADD INCOME & COVERAGE INFO")[0].click
-    find("#is_required_to_file_taxes_yes").click
-    find("#is_claimed_as_tax_dependent_no").click
-    find("#is_joint_tax_filing_yes").click
-    # find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
-    click_link 'My Household'
-
-  end
-end
-
 Then(/^Family Relationships left section WILL display$/) do
   expect(page).to have_content('Family Relationships')
 end

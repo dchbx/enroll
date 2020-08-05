@@ -16,16 +16,15 @@ Feature: A dedicated page that gives the user access to household member creatio
   Scenario: primary member with other household members
     And the primary member exists
     And at least one other household members exist
-    And household member has filled out income and coverage info
     Then Family Relationships left section WILL display
 
-  # Scenario: CONTINUE button navigation
-  #  When all applicants are in Info Completed state
-  #  Then the CONTINUE button will be ENABLED
+  Scenario: CONTINUE button navigation
+    When all applicants are in Info Completed state
+    Then the CONTINUE button will be ENABLED
 
-  # Scenario: CONTINUE button navigation
-  #  And at least one other household members exist
-  #  When all applicants are in Info Completed state
-  #  And user clicks CONTINUE
-  #  Then the user will navigate to Family Relationships page
+  Scenario: CONTINUE button navigation
+    And at least one other household members exist
+    When all applicants are in Info Completed state
+    And user clicks CONTINUE
+    Then the user will navigate to Family Relationships page
 
