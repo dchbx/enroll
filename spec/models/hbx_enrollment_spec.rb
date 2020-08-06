@@ -3638,4 +3638,27 @@ describe ".parent enrollments", dbclean: :around_each do
     end
   end
 
+  context 'can_renew_coverage?' do
+    let!(:person11)          { FactoryBot.create(:person, :with_consumer_role) }
+    let!(:family11)          { FactoryBot.create(:family, :with_primary_family_member, person: person11) }
+    let!(:hbx_enrollment11)  { FactoryBot.create(:hbx_enrollment, household: family11.active_household, family: family11) }
+    let!(:hbx_profile)       { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
+    let!(:renewal_bcp)       { HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period }
+
+    context 'shop enrollment' do
+      it 'should return false' do
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp)).to be_falsey
+      end
+    end
+
+    context 'ivl enrollment' do
+      before do
+        hbx_enrollment11.update_attributes!(kind: 'individual')
+      end
+
+      it 'should return true' do
+        expect(hbx_enrollment11.can_renew_coverage?(renewal_bcp)).to be_truthy
+      end
+    end
+  end
 end
