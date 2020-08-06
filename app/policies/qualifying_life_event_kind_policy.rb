@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKindPolicy < ApplicationPolicy
 
   def can_manage_qles?

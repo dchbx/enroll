@@ -97,7 +97,7 @@ Given(/^Covid QLE present with top ordinal position$/) do
   FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 30,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 5, qle_event_date_kind: :submitted_at)
 end
 
-Then(/^\w+ should see the "(.*?)" at the top of the (.*?) qle list$/) do |qle_event, market_kind|
+Then(/^\w+ should see the "(.*?)" at the top of the (.*?) qle list$/) do |qle_event, _market_kind|
   expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[0]).to have_content(qle_event)
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the (.*) is on the Main Page$/) do |_type|
   visit exchanges_hbx_profiles_root_path
   expect(current_path).to eq exchanges_hbx_profiles_root_path

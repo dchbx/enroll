@@ -11,7 +11,7 @@ module Operations
       def call(params:)
         qlek              = yield fetch_qlek_object(params)
         end_on            = yield parse_date(qlek, params)
-        date_valid        = yield validate_dates(qlek, end_on)
+        _date_valid       = yield validate_dates(qlek, end_on)
         transformed_qle   = yield tranform_qlek(qlek, end_on)
 
         Success(transformed_qle)
@@ -27,7 +27,7 @@ module Operations
       def parse_date(qlek, params)
         end_date = params[:end_on].to_date
         end_date.is_a?(Date) ? Success(end_date) : Failure([qlek, "Invalid Date: #{params[:end_on]}"])
-      rescue
+      rescue StandardError
         Failure([qlek, "Invalid Date: #{params[:end_on]}"])
       end
 

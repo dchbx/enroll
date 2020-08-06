@@ -12,9 +12,10 @@ RSpec.describe Operations::QualifyingLifeEventKind::Sort, type: :model, dbclean:
 
   let!(:input_params) do
     { 'market_kind' => 'shop',
-      'sort_data'=> [
-        {'id' => qlek2.id.to_s, 'position'=>1},
-        {'id' => qlek1.id.to_s, 'position'=>2}]}
+      'sort_data' => [
+        {'id' => qlek2.id.to_s, 'position' => 1},
+        {'id' => qlek1.id.to_s, 'position' => 2}
+      ]}
   end
 
   context 'update ordinal_position' do

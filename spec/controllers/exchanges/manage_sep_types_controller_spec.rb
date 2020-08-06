@@ -148,7 +148,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         end
 
         it 'should have error message' do
-          expect(response.body).to have_content(("End on must be after start on date"))
+          expect(response.body).to have_content("End on must be after start on date")
         end
       end
 
@@ -291,7 +291,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         end
 
         it 'should have error message' do
-          expect(response.body).to have_content(("End on must be after start on date"))
+          expect(response.body).to have_content("End on must be after start on date")
         end
       end
 
@@ -352,8 +352,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           end
 
           it 'should have error message' do
-            expect(response.body).to have_content(("Active SEP type exists with same reason"))
-            expect(response.body).to have_content(("Active SEP type exists with same title"))
+            expect(response.body).to have_content("Active SEP type exists with same reason")
+            expect(response.body).to have_content("Active SEP type exists with same title")
           end
         end
       end
@@ -404,8 +404,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           before do
             q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
             post :expire_sep_type, params: {
-              qualifying_life_event_kind: {end_on: (TimeKeeper.date_of_record).strftime("%Y-%m-%d")},
-              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id.to_s}"
+              qualifying_life_event_kind: {end_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d")},
+              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id}"
             }, format: :js, xhr: true
           end
 
@@ -414,7 +414,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           end
 
           it 'should assign row' do
-            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id.to_s}")
+            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id}")
           end
 
           it 'should assign result' do
@@ -427,7 +427,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
             q1.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days)
             post :expire_sep_type, params: {
               qualifying_life_event_kind: {end_on: nil},
-              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id.to_s}"
+              qle_id: q1.id, qle_action_id: "sep_type_actions_#{q1.id}"
             }, format: :js, xhr: true
           end
 
@@ -436,7 +436,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           end
 
           it 'should assign row' do
-            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id.to_s}")
+            expect(assigns(:row)).to eq("sep_type_actions_#{q1.id}")
           end
 
           it 'should assign result' do

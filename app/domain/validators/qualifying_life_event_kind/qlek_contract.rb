@@ -105,7 +105,7 @@ module Validators
       end
 
       rule(:termination_on_kinds) do
-        # TODO uncomment when required mandatory for shop market
+        #TODO: uncomment when required mandatory for shop market
         #key.failure('must be selected') if values[:market_kind] != 'individual' && values[:termination_on_kinds].blank?
 
         if values[:termination_on_kinds].present?

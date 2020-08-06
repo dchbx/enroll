@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 Given(/^that a user with a HBX staff role with (.*) subrole exists$/) do |subrole|
-  if subrole == 'super_admin' || subrole == 'hbx_tier3'
-    p_staff=Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-        send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-        modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
-  else
-    p_staff=Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-        send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-        modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: false)
-  end
+  p_staff = if ['super_admin', 'hbx_tier3'].include?(subrole)
+              Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                                send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                                modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: true)
+            else
+              Permission.create(name: subrole, modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                                send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                                modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_access_outstanding_verification_sub_tab: true, can_manage_qles: false)
+            end
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile
   user = FactoryBot.create :user, :with_family, :hbx_staff, email: person[:email], password: person[:password], password_confirmation: person[:password]
@@ -68,16 +70,30 @@ def sep_type_end_on
 end
 
 def ivl_qualifying_life_events
-  {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)}
+  {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map do |event_trait, ordinal_position|
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+  end
 end
 
 def  shop_qualifying_life_events
-  @shop_qles ||= [FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 1,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 1, qle_event_date_kind: :submitted_at,  start_on: sep_type_start_on, end_on: sep_type_end_on),
-    FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)]
+  shop_qle_covid = FactoryBot.create(:qualifying_life_event_kind,
+                                     title: 'Covid-19',
+                                     reason: 'covid-19',
+                                     market_kind: "shop",
+                                     post_event_sep_in_days: 1,
+                                     effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
+                                     ordinal_position: 1,
+                                     qle_event_date_kind: :submitted_at,
+                                     start_on: sep_type_start_on,
+                                     end_on: sep_type_end_on)
+  shop_qle = FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
+  @shop_qualifying_life_events ||= [shop_qle_covid, shop_qle]
 end
 
 def fehb_qualifying_life_events
-  {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map { |event_trait , ordinal_position| FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)}
+  {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map do |event_trait, ordinal_position|
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+  end
 end
 
 And(/^Qualifying life events of all markets are present$/) do
@@ -120,9 +136,9 @@ end
 Then(/^\w+ should see listed Individual market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active individual market SEP Types on datatable"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
-  birth_ivl['data-ordinal_position'] == '1'
+  expect(birth_ivl['data-ordinal_position']).to eq('1')
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
-  marraige_ivl['data-ordinal_position'] == '2'
+  expect(marraige_ivl['data-ordinal_position']).to eq('2')
 end
 
 When("Admin sorts Individual SEP Types by drag and drop") do
@@ -134,10 +150,10 @@ end
 And("listed Individual SEP Types ordinal postions should change") do
   expect(page).to have_content('Married')
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
-  marraige_ivl['data-ordinal_position'] == '1'
+  expect(marraige_ivl['data-ordinal_position']).to eq('1')
   expect(page).to have_content('Had a baby')
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
-  birth_ivl['data-ordinal_position'] == '2'
+  expect(birth_ivl['data-ordinal_position']).to eq('2')
 end
 
 When("Admin clicks on Shop tab") do
@@ -147,9 +163,9 @@ end
 Then(/^\w+ should see listed Shop market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
   birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  birth_shop['data-ordinal_position'] == '1'
+  expect(birth_shop['data-ordinal_position']).to eq('1')
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  marraige_shop['data-ordinal_position'] == '2'
+  expect(marraige_shop['data-ordinal_position']).to eq('2')
 end
 
 When("Admin sorts Shop SEP Types by drag and drop") do
@@ -161,10 +177,10 @@ end
 Then("listed Shop SEP Types ordinal postions should change") do
   expect(page).to have_content('Married')
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  marraige_shop['data-ordinal_position'] == '2'
+  expect(marraige_shop['data-ordinal_position']).to eq('1')
   expect(page).to have_content('Covid-19')
   birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  birth_shop['data-ordinal_position'] == '2'
+  expect(birth_shop['data-ordinal_position']).to eq('2')
 end
 
 When("Admin clicks on Congress tab") do
@@ -174,9 +190,9 @@ end
 Then(/^\w+ should see listed Congress market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
   birth_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  birth_fehb['data-ordinal_position'] == '1'
+  expect(birth_fehb['data-ordinal_position']).to eq('1')
   marraige_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  marraige_fehb['data-ordinal_position'] == '2'
+  expect(marraige_fehb['data-ordinal_position']).to eq('2')
 end
 
 When("Admin sorts Congress SEP Types by drag and drop") do
@@ -188,10 +204,10 @@ end
 Then("listed Congress SEP Types ordinal postions should change") do
   expect(page).to have_content('Adopted a child')
   marraige_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  marraige_fehb['data-ordinal_position'] == '1'
+  expect(marraige_fehb['data-ordinal_position']).to eq('1')
   expect(page).to have_content('Losing other health insurance')
   birth_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  birth_fehb['data-ordinal_position'] == '2'
+  expect(birth_fehb['data-ordinal_position']).to eq('2')
 end
 
 Then(/^Admin should see successful message after sorting$/) do
@@ -220,16 +236,14 @@ Then("Employee should land on home page") do
 end
 
 Given(/expired Qualifying life events of (.*) market is present$/) do |market_kind|
+  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
   if market_kind == "individual"
-    FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
     reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.const_set('IndividualQleReasons', Types::Coercible::String.enum(*reasons))
   elsif market_kind == 'shop'
-    FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
     reasons = QualifyingLifeEventKind.by_market_kind('shop').non_draft.pluck(:reason).uniq
     Types.const_set('ShopQleReasons', Types::Coercible::String.enum(*reasons))
   else
-    FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
     reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.const_set('FehbQleReasons', Types::Coercible::String.enum(*reasons))
   end
@@ -281,7 +295,7 @@ And("Admin clicks reason drop down on Create SEP type form") do
 end
 
 And("Admin selects expired reason from drop down on Create SEP type form") do
-    find("option[value='domestic partnership']").click
+  find("option[value='domestic partnership']").click
 end
 
 And(/Admin selects active reason from drop down for (.*) SEP type form$/) do |market_kind|
@@ -308,10 +322,8 @@ And(/Admin (.*) select termination on kinds for (.*) SEP Type$/) do |action, mar
 end
 
 
-And(/Admin (.*) termination on kinds for (.*) market$/) do |action, market_kind|
-  if action == 'selected'
-    find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='end_of_event_month']").set(true)
-  end
+And(/Admin (.*) termination on kinds for (.*) market$/) do |action, _market_kind|
+  find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='end_of_event_month']").set(true) if action == 'selected'
 end
 
 And("Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates") do
@@ -332,16 +344,14 @@ When("Admin navigates to SEP Types List page") do
 end
 
 When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
+  divs = page.all('div')
   if market_kind == 'individual'
-    divs = page.all('div')
     ivl_filter = divs.detect { |div| div.text == 'Individual' && div[:id] == 'Tab:ivl_qles' }
     ivl_filter.click
   elsif market_kind == 'shop'
-    divs = page.all('div')
     shop_filter = divs.detect { |div| div.text == 'Shop' && div[:id] == 'Tab:shop_qles' }
     shop_filter.click
   else
-    divs = page.all('div')
     fehb_filter = divs.detect { |div| div.text == 'Congress' && div[:id] == 'Tab:fehb_qles' }
     fehb_filter.click
   end
@@ -349,36 +359,30 @@ end
 
 And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind|
   if state == 'Draft'
+    filter_divs = page.all('div')
     if market_kind == 'individual'
-      filter_divs = page.all('div')
       ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
       ivl_draft_filter.click
     elsif market_kind == 'shop'
-      filter_divs = page.all('div')
       shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
       shop_draft_filter.click
     else
-      filter_divs = page.all('div')
       fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
       fehb_draft_filter.click
     end
   elsif state == 'Active'
-       if market_kind == 'individual'
-      filter_divs = page.all('div')
+    filter_divs = page.all('div')
+    if market_kind == 'individual'
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
       ivl_active_filter.click
-      sleep 2
     elsif market_kind == 'shop'
-      filter_divs = page.all('div')
       shop_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:shop_qles-shop_active_qles' }
       shop_active_filter.click
-      sleep 2
     else
-      filter_divs = page.all('div')
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
       fehb_active_filter.click
-      sleep 2
     end
+    sleep 2
   end
 end
 
@@ -457,7 +461,7 @@ Then("Admin should see a successful message of an Expire") do
 end
 
 Then("Admin should see a failure reason of an Expire") do
-  expect(page).to have_content("End on: #{TimeKeeper.date_of_record.prev_year.end_of_month.to_s} must be after start on date")
+  expect(page).to have_content("End on: #{TimeKeeper.date_of_record.prev_year.end_of_month} must be after start on date")
 end
 
 Then("Admin should see failure reason for past date of an Expire") do

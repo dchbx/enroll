@@ -87,7 +87,7 @@ Metrics/CyclomaticComplexity:
 Metrics/BlockLength:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 250
 
 Metrics/MethodLength:
