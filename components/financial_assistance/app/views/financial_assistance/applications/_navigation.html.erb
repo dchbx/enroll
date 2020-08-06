@@ -22,7 +22,7 @@
     
     <% if @person.has_consumer_role? %>
     <li <%= menu_tab_class(@tab, 'verification') %>>
-      <%= link_to "Cost Savings", main_app.financial_assistance_applications_path %>
+      <%= link_to "Cost Savings", applications_path %>
     </li>
     <% end %>
 

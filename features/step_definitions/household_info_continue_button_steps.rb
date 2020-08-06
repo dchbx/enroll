@@ -1,7 +1,7 @@
 
 Given(/^that the user is on FAA Household Info: Family Members page$/) do
   login_as consumer, scope: :user
-  visit financial_assistance_applications_path
+  visit financial_assistance.applications_path
   create_plan
   assign_benchmark_plan_id(application)
   click_button "Start new application"
