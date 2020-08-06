@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require Rails.root.join('app', 'domain', 'types.rb')
 
 EnrollRegistry = ResourceRegistry::Registry.new
