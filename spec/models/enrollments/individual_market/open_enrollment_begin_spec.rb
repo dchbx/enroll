@@ -193,7 +193,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         end
 
         it "for can_renew_coverage?" do
-          value = enrollment.can_renew_coverage?(benefit_coverage_period)
+          value = enrollment.can_renew_coverage?(benefit_coverage_period.start_on)
           expect(value).to eq false
         end
       end
