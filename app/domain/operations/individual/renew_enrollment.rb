@@ -7,36 +7,32 @@ module Operations
     # Constaint for assisted renewals:
     # Cancel passive renewals before calling this class to be able to passive renew enrollment.
 
-    class RenewOeSepEnrollment
+    class RenewEnrollment
       include Dry::Monads[:result, :do]
 
-      def call(enrollment:)
-        renewal_bcp          = yield fetch_renewal_bcp
-        validated_enrollment = yield validate(enrollment, renewal_bcp)
-        aptc_values          = yield fetch_aptc_values(validated_enrollment, renewal_bcp)
-        renewal_enrollment   = yield renew_enrollment(validated_enrollment, aptc_values, renewal_bcp)
+      def call(hbx_enrollment:, effective_on:, aptc_values: {})
+        validated_enrollment = yield validate(hbx_enrollment, effective_on)
+        aptc_values          = yield fetch_aptc_values(validated_enrollment, effective_on, aptc_values)
+        renewal_enrollment   = yield renew_enrollment(validated_enrollment, aptc_values, effective_on)
 
         Success(renewal_enrollment)
       end
 
       private
 
-      def fetch_renewal_bcp
-        renewal_bcp = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
-        renewal_bcp ? Success(renewal_bcp) : Failure('Unable to find the renewal_benefit_coverage_period')
-      end
-
-      def validate(enrollment, renewal_bcp)
+      def validate(enrollment, effective_on)
         return Failure('Given object is not a valid enrollment object') unless enrollment.is_a?(HbxEnrollment)
         return Failure('Given enrollment is not IVL by kind') unless enrollment.is_ivl_by_kind?
-        return Failure('There exists active enrollments for given family in the year with renewal_benefit_coverage_period') unless enrollment.can_renew_coverage?(renewal_bcp)
+        return Failure('There exists active enrollments for given family in the year with renewal_benefit_coverage_period') unless enrollment.can_renew_coverage?(effective_on)
 
         Success(enrollment)
       end
 
-      def fetch_aptc_values(enrollment, renewal_bcp)
+      def fetch_aptc_values(enrollment, effective_on, aptc_values)
+        return Success(aptc_values) if aptc_values.present?
+
         family = enrollment.family
-        tax_household = family.active_household.latest_active_thh_with_year(renewal_bcp.start_on.year)
+        tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
           data = { applied_percentage: 1,
                    applied_aptc: tax_household.current_max_aptc.to_f,
@@ -47,12 +43,12 @@ module Operations
         Success(data || {})
       end
 
-      def renew_enrollment(enrollment, aptc_values, renewal_bcp)
+      def renew_enrollment(enrollment, aptc_values, effective_on)
         enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
         enrollment_renewal.enrollment = enrollment
         enrollment_renewal.assisted = aptc_values.present? ? true : false
         enrollment_renewal.aptc_values = aptc_values
-        enrollment_renewal.renewal_coverage_start = renewal_bcp.start_on
+        enrollment_renewal.renewal_coverage_start = effective_on
         renewed_enrollment = enrollment_renewal.renew
         if renewed_enrollment.is_a?(HbxEnrollment)
           Success(renewed_enrollment)

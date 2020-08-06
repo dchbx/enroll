@@ -2,7 +2,7 @@
 
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
-RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbclean: :after_each do
+RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :after_each do
   before do
     DatabaseCleaner.clean
   end
@@ -51,6 +51,8 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
 
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
 
+  let(:effective_on) { HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period.start_on }
+
   context 'for successfully renewal' do
     before do
       BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
@@ -62,7 +64,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
         before do
           tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
-          @result = subject.call(enrollment: enrollment)
+          @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
 
         it 'should return success' do
@@ -97,7 +99,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
           BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
           tax_household.update_attributes!(effective_starting_on: next_year_date.beginning_of_year)
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
-          @result = subject.call(enrollment: enrollment)
+          @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
         end
 
         it 'should return success' do
@@ -120,7 +122,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
 
     context 'unassisted enrollment renewal' do
       before do
-        @result = subject.call(enrollment: enrollment)
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
       it 'should return success' do
@@ -144,7 +146,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
   context 'for renewal failure' do
     context 'bad input object' do
       before :each do
-        @result = subject.call(enrollment: 'enrollment string')
+        @result = subject.call(hbx_enrollment: 'enrollment string', effective_on: effective_on)
       end
 
       it 'should return failure' do
@@ -159,7 +161,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
     context 'shop enrollment object' do
       before :each do
         enrollment.update_attributes!(kind: 'employer_sponsored')
-        @result = subject.call(enrollment: enrollment)
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
       it 'should return failure' do
@@ -189,7 +191,7 @@ RSpec.describe Operations::Individual::RenewOeSepEnrollment, type: :model, dbcle
       end
 
       before :each do
-        @result = subject.call(enrollment: enrollment)
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
       end
 
       it 'should return failure' do
