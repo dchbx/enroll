@@ -221,11 +221,11 @@ class QualifyingLifeEventKind
     end
 
     event :schedule_expiration, :after => :record_transition do
-      transitions from: [:active, :expire_pending], to: :expire_pending, :guard => :can_be_expire_pending?, :after => :set_end_date
+      transitions from: [:active, :expire_pending], to: :expire_pending, :guard => :can_be_expire_pending?, :after => :update_end_date
     end
 
     event :expire, :after => [:record_transition, :update_qle_reason_types] do
-      transitions from: [:active, :expire_pending], to: :expired, :guard => :can_be_expired?, :after => [:set_end_date, :deactivate_qle]
+      transitions from: [:active, :expire_pending], to: :expired, :guard => :can_be_expired?, :after => [:update_end_date, :deactivate_qle]
     end
 
     event :advance_date, :after => [:record_transition, :update_qle_reason_types] do
@@ -234,11 +234,9 @@ class QualifyingLifeEventKind
   end
 
   def record_transition
-    self.workflow_state_transitions << WorkflowStateTransition.new(
-        from_state: aasm.from_state,
-        to_state: aasm.to_state,
-        event: aasm.current_event
-    )
+    self.workflow_state_transitions << WorkflowStateTransition.new(from_state: aasm.from_state,
+                                                                   to_state: aasm.to_state,
+                                                                   event: aasm.current_event)
   end
 
   class << self
@@ -340,7 +338,7 @@ class QualifyingLifeEventKind
     Types.const_set(const_name, Types::Coercible::String.enum(*reasons))
   end
 
-  def set_end_date(end_date = TimeKeeper.date_of_record)
+  def update_end_date(end_date = TimeKeeper.date_of_record)
     self.update_attributes({ end_on: end_date })
   end
 

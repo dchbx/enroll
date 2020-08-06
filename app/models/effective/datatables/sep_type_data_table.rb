@@ -9,19 +9,17 @@ module Effective
         table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row| row.market_kind}, :filter => false, :sortable => false
         table_column :start_date, :label => l10n("datatables.sep_type_data_table.start_date"), :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
         table_column :state, :label => l10n("datatables.sep_type_data_table.state"), :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
-              [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id.to_s}"),
-               can_expire_sep_type?(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?)) ]
+              [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id}"),
+               can_expire_sep_type?(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?))]
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id.to_s}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
       def collection
-        unless (defined? @qles) && @qles.present?
-          @qles = Queries::SepTypeDatatableQuery.new(attributes)
-        end
+        @qles = Queries::SepTypeDatatableQuery.new(attributes) unless (defined? @qles) && @qles.present?
         @qles
       end
 

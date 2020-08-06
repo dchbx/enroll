@@ -44,7 +44,7 @@ module Forms
       if params.blank?
         params = default_keys_hash
       else
-        schema.each {|item| params[item.name] = nil unless params.has_key?(item.name)}
+        schema.each {|item| params[item.name] = nil unless params.key?(item.name)}
       end
 
       new(params.merge(fetch_additional_params))

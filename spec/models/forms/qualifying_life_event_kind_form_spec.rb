@@ -51,7 +51,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
       expect(@qlek_form._id.to_s).to eq(qlek.id.to_s)
     end
- 
+
     it 'should set post_event_sep_in_days value on to the QualifyingLifeEventKindForm post_event_sep_in_days' do
       expect(@qlek_form.post_event_sep_in_days).to eq(qlek.post_event_sep_in_days)
     end
@@ -77,7 +77,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
       expect(@qlek_form._id.to_s).to eq(qlek.id.to_s)
     end
- 
+
     it 'should set post_event_sep_in_days value on to the QualifyingLifeEventKindForm post_event_sep_in_days' do
       expect(@qlek_form.post_event_sep_in_days).to eq(qlek.post_event_sep_in_days)
     end

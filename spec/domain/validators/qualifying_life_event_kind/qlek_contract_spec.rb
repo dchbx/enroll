@@ -239,7 +239,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
     end
 
-    # TODO uncomment spec when code uncommented here
+    #TODO: uncomment spec when code uncommented here
     # app/domain/validators/qualifying_life_event_kind/qlek_contract.rb:98
     # context 'for termination_on_kinds being empty for shop market' do
     #   before do
