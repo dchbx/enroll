@@ -1,5 +1,5 @@
 module FinancialAssistance
-  class ApplicationsController < ::ApplicationController
+  class ApplicationsController < ApplicationController
 
     before_action :set_current_person
     before_action :set_primary_family
