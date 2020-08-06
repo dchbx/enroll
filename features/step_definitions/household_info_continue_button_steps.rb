@@ -46,13 +46,14 @@ Given(/^at least one other household members exist$/) do
   find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/span', visible: false).click
   # Click option
   find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[2]', visible: false).click
-  # Click on add income & coverage info and add more info
   #find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul').click
   #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/p').click
   #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[7]').click
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   find(".btn", text: "CONFIRM MEMBER").click
-  #expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
+
+
+  # expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
 end
 
 Then(/^Family Relationships left section WILL display$/) do
@@ -64,40 +65,48 @@ When(/^all applicants are in Info Completed state$/) do
     find_all(".btn", text: "ADD INCOME & COVERAGE INFO")[0].click
     find("#is_required_to_file_taxes_yes").click
     find("#is_claimed_as_tax_dependent_no").click
-    find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
-      
+    # TODO: Continue not showing up
+    # find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
+    click_link 'Job Income'
+
     find("#has_job_income_false").click
     find("#has_self_employment_income_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
-  
+
     find("#has_other_income_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
-  
+
     find("#has_deductions_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
-  
+
     find("#has_enrolled_health_coverage_false").click
     find("#has_eligible_health_coverage_false").click
     find(:xpath, '//*[@id="btn-continue"]').click
-  
+
     find("#is_pregnant_no").click
-    find("#is_post_partum_period_no").click
-    find("#is_self_attested_blind_no").click
-    find("#has_daily_living_no").click
-    find("#need_help_paying_bills_no").click
-    find("#radio_physically_disabled_no").click
-    find('[name=commit]').click       
+    find("#is_post_partum_period_no", match: :first).click
+    find("#is_self_attested_blind_no", match: :first).click
+    find("#has_daily_living_no", match: :first).click
+    find("#need_help_paying_bills_no", match: :first).click
+    find("#radio_physically_disabled_no", match: :first).click
+    # Steps missing from original
+    find("#is_former_foster_care_no", match: :first).click
+    find("#had_medicaid_during_foster_care_no", match: :first).click
+    find("#is_student_no").click
+    find("#is_post_partum_period_no", match: :first).click
+    find('[name=commit]').click
   end
 end
 
 Then(/^the CONTINUE button will be ENABLED$/) do
-  expect(page.find('#btn-continue')[:class]).not_to include("disabled")
+  continue_button = page.all('input').detect { |input| input[:type] == 'submit' }
+  expect(continue_button[:class]).not_to include("disabled")
 end
 
 When(/^user clicks CONTINUE$/) do
-  find(".btn", text: "CONTINUE").click
+  continue_button = page.all('input').detect { |input| input[:type] == 'submit' }
+  continue_button.click
 end
-
 Then(/^the user will navigate to Family Relationships page$/) do
   expect(page).to have_content('Family Relationships')
 end

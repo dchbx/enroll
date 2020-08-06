@@ -68,12 +68,12 @@ module FinancialAssistance
 
     def age_of_applicant
       applicant = FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id])
-      render :text => "#{applicant.age_of_the_applicant}"
+      render :plain => "#{applicant.age_of_the_applicant}"
     end
 
     def primary_applicant_has_spouse
       has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
-      render :text => "#{has_spouse}"
+      render :plain => "#{has_spouse}"
     end
 
     def update

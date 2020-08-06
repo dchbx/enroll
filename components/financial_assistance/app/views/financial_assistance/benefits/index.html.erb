@@ -142,7 +142,7 @@
   <!--Right NAV-->
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: financial_assistance_application_applicant_deductions_path(@application, @applicant),
+      previous_url: application_applicant_deductions_path(@application, @applicant),
       next_url: other_questions_application_applicant_path(@application, @applicant)
     } %>
   </div>

@@ -117,9 +117,9 @@ module FinancialAssistance
 
     def income_form_for(application, applicant, income)
       url = if income.new_record?
-        financial_assistance_application_applicant_incomes_path(application, applicant)
+        application_applicant_incomes_path(application, applicant)
       else
-        financial_assistance_application_applicant_income_path(@application, @applicant, income)
+        application_applicant_income_path(@application, @applicant, income)
       end
 
       form_for income, url: url, remote: true do |f|
@@ -129,9 +129,9 @@ module FinancialAssistance
 
     def benefit_form_for(application, applicant, benefit)
       url = if benefit.new_record?
-        financial_assistance_application_applicant_benefits_path(application, applicant)
+        application_applicant_benefits_path(application, applicant)
       else
-        financial_assistance_application_applicant_benefit_path(@application, @applicant, benefit)
+        application_applicant_benefit_path(@application, @applicant, benefit)
       end
 
       form_for benefit, url: url, remote: true do |f|
@@ -141,9 +141,9 @@ module FinancialAssistance
 
     def deduction_form_for(application, applicant, deduction)
       url = if deduction.new_record?
-        financial_assistance_application_applicant_deductions_path(application, applicant)
+        application_applicant_deductions_path(application, applicant)
       else
-        financial_assistance_application_applicant_deduction_path(@application, @applicant, deduction)
+        application_applicant_deduction_path(@application, @applicant, deduction)
       end
 
       form_for deduction, url: url, remote: true do |f|
@@ -168,10 +168,10 @@ module FinancialAssistance
 
     def income_and_deductions_edit(application, applicant, embedded_document)
       if embedded_document.class == FinancialAssistance::Deduction
-        financial_assistance_application_applicant_deductions_path(application, applicant)
+        application_applicant_deductions_path(application, applicant)
       else
         if [FinancialAssistance::Income::JOB_INCOME_TYPE_KIND, FinancialAssistance::Income::NET_SELF_EMPLOYMENT_INCOME_KIND].include? embedded_document.kind
-          financial_assistance_application_applicant_incomes_path(application, applicant)
+          application_applicant_incomes_path(application, applicant)
         else
           other_application_applicant_incomes_path(application, applicant)
         end
