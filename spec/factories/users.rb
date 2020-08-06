@@ -148,5 +148,11 @@ FactoryBot.define do
     end
   end
 
+  trait :with_nuclear_family do
+    after :create do |user|
+      FactoryBot.create :person, :with_nuclear_family, :user => user
+    end
+  end
+
   factory :invalid_user, traits: [:without_email, :without_password, :without_password_confirmation]
 end
