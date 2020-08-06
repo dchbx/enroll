@@ -192,8 +192,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "should not produce a new SHOP health enrollment"
         end
 
-        it ".can_renew_enrollment?" do
-          value = subject.can_renew_enrollment?(enrollment, family, benefit_coverage_period)
+        it "for can_renew_coverage?" do
+          value = enrollment.can_renew_coverage?(benefit_coverage_period)
           expect(value).to eq false
         end
       end
