@@ -53,7 +53,7 @@ module FinancialAssistance
           if params.key? :last_step
             @model.update_attributes!(workflow: { current_step: 1 })
             flash[:notice] = "Income Added - (#{@model.kind})"
-            redirect_to financial_assistance_application_applicant_incomes_path(@application, @applicant)
+            redirect_to application_applicant_incomes_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
             render 'workflow/step', layout: 'financial_assistance'
