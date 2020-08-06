@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Logger::SimpleJsonFormatter < Logger::Formatter
   Format = "[%s] [%s]: %s\n"
 
@@ -7,7 +9,7 @@ class Logger::SimpleJsonFormatter < Logger::Formatter
     "WARN" => "warning",
     "INFO" => "info",
     "FATAL" => "crit"
-  }
+  }.freeze
 
   attr_accessor :datetime_format
 
@@ -15,7 +17,7 @@ class Logger::SimpleJsonFormatter < Logger::Formatter
     @datetime_format = nil
   end
 
-  def call(severity, time, progname, msg)
+  def call(severity, time, _progname, msg)
     JSON.dump({time: format_datetime(time), level: map_severity(severity), full_message: msg2str(msg)}) + "\n"
   end
 
@@ -38,7 +40,7 @@ class Logger::SimpleJsonFormatter < Logger::Formatter
     when ::String
       msg
     when ::Exception
-      ("#{ msg.message } (#{ msg.class })\n" <<
+      ("#{msg.message} (#{msg.class})\n" <<
       (msg.backtrace || []).join("\n"))
     else
       msg.inspect

@@ -19,8 +19,6 @@ class UpdateFehbOeDatesAndContributionCap < MongoidMigrationTask
         update_contribution_cap(benefit_application)
       when 'begin_open_enrollment'
         begin_open_enrollment(benefit_application)
-      else
-
       end
     end
   end

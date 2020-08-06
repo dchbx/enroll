@@ -8,10 +8,10 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
   let(:oe_start_on)                    { TimeKeeper.date_of_record.beginning_of_month}
   let(:expiration_date)                { effective_date }
   let(:effective_period)               { effective_date..(effective_date + 1.year).prev_day }
-  let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }      
-  let(:terminated_on)                  { effective_date.end_of_month }       
+  let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }
+  let(:terminated_on)                  { effective_date.end_of_month }
   let(:termination_kind)               { "non_payment"}
-  let(:termination_reason)             { "non_payment_termination_reason"}  
+  let(:termination_reason)             { "non_payment_termination_reason"}
   let(:missing_params)                 { {_id: BSON::ObjectId.new, hbx_id: '1234567', aasm_state: :draft, profile_id: BSON::ObjectId.new, source_kind: :self_serve  } }
   let(:invalid_params)                 { missing_params.merge({is_no_ssn_enabled: 1, market_kind: :aca_shop, registered_on: 'today' })}
   let(:error_message1)                 { {:market_kind => ["is missing"], :organization_id => ["is missing"], :registered_on => ["is missing"]} }
@@ -50,12 +50,12 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
         {
           expiration_date: expiration_date, open_enrollment_period: oe_period, aasm_state: :draft, recorded_rating_area_id: BSON::ObjectId.new,
           benefit_sponsor_catalog_id: BSON::ObjectId.new, effective_period: effective_period, recorded_service_area_ids: [BSON::ObjectId.new]
-        }   
-      end 
+        }
+      end
       let(:all_params) do
         valid_params_1.merge({benefit_applications: [benefit_application], effective_begin_on: effective_period.min, effective_end_on: effective_period.max,
-                            ssn_enabled_on: nil , ssn_disabled_on: nil })
-      end 
+                              ssn_enabled_on: nil, ssn_disabled_on: nil })
+      end
 
       it "should pass validation" do
         expect(subject.call(all_params).success?).to be_truthy

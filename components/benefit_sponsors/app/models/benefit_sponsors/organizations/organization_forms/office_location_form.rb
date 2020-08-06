@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class OrganizationForms::OfficeLocationForm
@@ -10,7 +12,7 @@ module BenefitSponsors
       attribute :address, ::BenefitSponsors::Organizations::OrganizationForms::AddressForm
       attribute :phone, ::BenefitSponsors::Organizations::OrganizationForms::PhoneForm
 
-      alias_method :is_primary?, :is_primary
+      alias is_primary? is_primary
 
       validate :office_location_form
 
@@ -28,7 +30,7 @@ module BenefitSponsors
       end
 
       def set_is_primary_field(address_form)
-        self.is_primary = address_form.kind == "primary" ? true : false
+        self.is_primary = address_form.kind == "primary"
       end
 
       def office_location_form
@@ -37,9 +39,7 @@ module BenefitSponsors
       end
 
       def validate_form(form)
-        unless form.valid?
-          self.errors.add(:base, form.errors.full_messages)
-        end if form.present?
+        self.errors.add(:base, form.errors.full_messages) if form.present? && !form.valid?
       end
     end
   end

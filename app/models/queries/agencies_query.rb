@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Queries
   class AgenciesQuery
     include Enumerable
 
     def each
       agency_aggregate.each do |rec|
-        model  = ::Mongoid::Factory.from_db(
+        model = ::Mongoid::Factory.from_db(
           BenefitSponsors::Organizations::Organization,
           rec
         )
@@ -20,7 +22,7 @@ module Queries
           rec
         )
         yield model, i
-        i = i + 1
+        i += 1
       end
     end
 
@@ -64,13 +66,12 @@ module Queries
             "_id" => "$_id",
             "dba" => {"$last" => "$dba"},
             "legal_name" => {"$last" => "$legal_name"},
-            "profiles" => {"$push" => 
+            "profiles" => {"$push" =>
              {
                "_type" => "$profiles._type",
                "_id" => "$profiles._id"
-             }
-            }
-          } 
+             }}
+          }
         },
         {
           "$project" => {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FormWorld
   include Employers::EmployerHelper
   include Config::AcaHelper
@@ -25,7 +27,7 @@ module FormWorld
         Dir.glob(cz_pattern).each do |f_name|
           loaded_class_1 = ::SicCode
           yaml_str = File.read(f_name)
-          data = YAML.load(yaml_str)
+          data = YAML.safe_load(yaml_str)
           data.new_record = true
           data_as_json = data.as_json
           sic_code_json_precache << data_as_json
@@ -58,7 +60,7 @@ module FormWorld
 
     fill_in 'agency_staff_roles_attributes_0_first_name', :with => 'John'
     fill_in 'agency_staff_roles_attributes_0_last_name', :with => 'Doe'
-    fill_in 'inputDOB', :with =>  "08/13/1979"
+    fill_in 'inputDOB', :with => "08/13/1979"
     fill_in 'agency_staff_roles_attributes_0_email', :with => 'tronics@example.com'
     fill_in 'agency_staff_roles_attributes_0_area_code', :with => '202'
     phone_number1.set '5551212'

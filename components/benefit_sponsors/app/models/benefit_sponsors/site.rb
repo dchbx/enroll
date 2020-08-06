@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class Site
     include Mongoid::Document
@@ -39,25 +41,25 @@ module BenefitSponsors
     # File name for the site's logo
     field :logo_file_name,  type: String # convention: site_key + "_logo.png"
 
-    # TODO Deprecate logo file name and store as binary in database to support multitenancy
+    # TODO: Deprecate logo file name and store as binary in database to support multitenancy
     field :logo,        type: BSON::Binary
 
 
-    # TODO -- come up with scheme to manage/store these attributes and provide defaults
+    # TODO: -- come up with scheme to manage/store these attributes and provide defaults
     field :colors,  type: Array
 
 
     # Organization responsible for administering this site
     has_one   :owner_organization, inverse_of: :site_owner,
-              class_name: "BenefitSponsors::Organizations::ExemptOrganization"
+                                   class_name: "BenefitSponsors::Organizations::ExemptOrganization"
 
     # Set of organizations who offer, broker and sponsor benefits on this site
     has_many  :site_organizations, inverse_of: :site,
-              class_name: "BenefitSponsors::Organizations::Organization"
+                                   class_name: "BenefitSponsors::Organizations::Organization"
 
     # Curated collections of benefits intended for specific sponsor and member groups
     has_many :benefit_markets, inverse_of: :site,
-             class_name: "::BenefitMarkets::BenefitMarket"
+                               class_name: "::BenefitMarkets::BenefitMarket"
 
 
     accepts_nested_attributes_for :owner_organization
@@ -97,18 +99,14 @@ module BenefitSponsors
     end
 
     def strip_leading_numbers(input_string)
-      while input_string.chr.numeric? do
-        input_string = input_string.slice!(1, input_string.length - 1)
-      end
+      input_string = input_string.slice!(1, input_string.length - 1) while input_string.chr.numeric?
       input_string
     end
 
     def association_limits
-        BenefitMarkets::BENEFIT_MARKET_KINDS.each do |market_kind|
+      BenefitMarkets::BENEFIT_MARKET_KINDS.each do |market_kind|
         market_count = benefit_markets.select { |market| market.kind == market_kind }
-        if market_count.size > 1
-          errors.add(:benefit_markets, "cannot be more than one #{market_kind}")
-        end
+        errors.add(:benefit_markets, "cannot be more than one #{market_kind}") if market_count.size > 1
       end
     end
   end

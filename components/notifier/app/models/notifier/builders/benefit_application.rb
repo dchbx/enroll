@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   module Builders::BenefitApplication
     include ActionView::Helpers::NumberHelper
@@ -10,9 +12,7 @@ module Notifier
     ].freeze
 
     def benefit_application_current_py_start_date
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_start_date = format_date(current_benefit_application.start_on)
-      end
+      merge_model.benefit_application.current_py_start_date = format_date(current_benefit_application.start_on) if current_benefit_application.present?
     end
 
     def benefit_application_current_py_start_date_plus_one_year
@@ -22,9 +22,7 @@ module Notifier
     end
 
     def benefit_application_current_py_end_date
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_end_date = format_date(current_benefit_application.end_on)
-      end
+      merge_model.benefit_application.current_py_end_date = format_date(current_benefit_application.end_on) if current_benefit_application.present?
     end
 
     def benefit_application_renewal_py_start_date
@@ -46,7 +44,7 @@ module Notifier
     end
 
     def benefit_application_next_available_start_date
-      schedular =  BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+      schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
       merge_model.benefit_application.next_available_start_date = schedular.calculate_start_on_dates.first.to_date
     end
 
@@ -55,15 +53,11 @@ module Notifier
     end
 
     def benefit_application_renewal_py_end_date
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_end_date = format_date(renewal_benefit_application.end_on)
-      end
+      merge_model.benefit_application.renewal_py_end_date = format_date(renewal_benefit_application.end_on) if renewal_benefit_application.present?
     end
 
     def benefit_application_current_py_oe_start_date
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_oe_start_date = format_date(current_benefit_application.open_enrollment_period.min)
-      end
+      merge_model.benefit_application.current_py_oe_start_date = format_date(current_benefit_application.open_enrollment_period.min) if current_benefit_application.present?
     end
 
     def benefit_application_monthly_employer_contribution_amount
@@ -83,9 +77,7 @@ module Notifier
     end
 
     def benefit_application_current_py_plus_60_days
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_plus_60_days = format_date(current_benefit_application.end_on + 60.days)
-      end
+      merge_model.benefit_application.current_py_plus_60_days = format_date(current_benefit_application.end_on + 60.days) if current_benefit_application.present?
     end
 
     def benefit_application_group_termination_plus_31_days
@@ -113,15 +105,11 @@ module Notifier
     end
 
     def benefit_application_renewal_py_oe_start_date
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_oe_start_date = format_date(renewal_benefit_application.open_enrollment_period.min)
-      end
+      merge_model.benefit_application.renewal_py_oe_start_date = format_date(renewal_benefit_application.open_enrollment_period.min) if renewal_benefit_application.present?
     end
 
     def benefit_application_renewal_py_oe_end_date
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_oe_end_date = format_date(renewal_benefit_application.open_enrollment_period.max)
-      end
+      merge_model.benefit_application.renewal_py_oe_end_date = format_date(renewal_benefit_application.open_enrollment_period.max) if renewal_benefit_application.present?
     end
 
     def benefit_application_initial_py_publish_advertise_deadline
@@ -160,39 +148,27 @@ module Notifier
     end
 
     def benefit_application_current_py_start_on
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_start_on = current_benefit_application.start_on
-      end
+      merge_model.benefit_application.current_py_start_on = current_benefit_application.start_on if current_benefit_application.present?
     end
 
     def benefit_application_current_py_end_on
-      if current_benefit_application.present?
-        merge_model.benefit_application.current_py_end_on = current_benefit_application.end_on
-      end
+      merge_model.benefit_application.current_py_end_on = current_benefit_application.end_on if current_benefit_application.present?
     end
 
     def benefit_application_renewal_py_start_on
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_start_on = renewal_benefit_application.start_on
-      end
+      merge_model.benefit_application.renewal_py_start_on = renewal_benefit_application.start_on if renewal_benefit_application.present?
     end
 
     def benefit_application_total_enrolled_count
-      if load_benefit_application.present?
-        merge_model.benefit_application.total_enrolled_count = load_benefit_application.all_enrolled_and_waived_member_count
-      end
+      merge_model.benefit_application.total_enrolled_count = load_benefit_application.all_enrolled_and_waived_member_count if load_benefit_application.present?
     end
 
     def benefit_application_eligible_to_enroll_count
-      if load_benefit_application.present?
-        merge_model.benefit_application.eligible_to_enroll_count = load_benefit_application.members_eligible_to_enroll_count
-      end
+      merge_model.benefit_application.eligible_to_enroll_count = load_benefit_application.members_eligible_to_enroll_count if load_benefit_application.present?
     end
 
     def benefit_application_renewal_py_end_on
-      if renewal_benefit_application.present?
-        merge_model.benefit_application.renewal_py_end_on = renewal_benefit_application.end_on
-      end
+      merge_model.benefit_application.renewal_py_end_on = renewal_benefit_application.end_on if renewal_benefit_application.present?
     end
 
     def benefit_application_enrollment_errors
@@ -247,9 +223,7 @@ module Notifier
 
     def load_benefit_application
       benefit_application = nil
-      if payload['event_object_kind'].constantize == BenefitSponsors::BenefitApplications::BenefitApplication
-        benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.find(payload['event_object_id'])
-      end
+      benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.find(payload['event_object_id']) if payload['event_object_kind'].constantize == BenefitSponsors::BenefitApplications::BenefitApplication
 
       if benefit_application.blank?
         benefit_application = enrollment.sponsored_benefit_package.benefit_application if enrollment.present? && enrollment.sponsored_benefit_package
@@ -262,11 +236,11 @@ module Notifier
       return @current_benefit_application if defined? @current_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
-          @current_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted? && ba.end_on == benefit_application.start_on.to_date.prev_day}
-        else
-          @current_benefit_application = benefit_application
-        end
+        @current_benefit_application = if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
+                                         employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| ba.is_submitted? && ba.end_on == benefit_application.start_on.to_date.prev_day}
+                                       else
+                                         benefit_application
+                                       end
       end
     end
 
@@ -274,11 +248,11 @@ module Notifier
       return @renewal_benefit_application if defined? @renewal_benefit_application
       benefit_application = load_benefit_application
       if benefit_application.present?
-        if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
-          @renewal_benefit_application = benefit_application
-        else
-          @renewal_benefit_application = employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| (ba.is_submitted? || ba.draft?) && (ba.end_on == benefit_application.start_on.to_date.prev_day)}
-        end
+        @renewal_benefit_application = if benefit_application.is_renewing? && (benefit_application.pending? || benefit_application.is_submitted? || benefit_application.canceled? || benefit_application.draft? || benefit_application.enrollment_ineligible?)
+                                         benefit_application
+                                       else
+                                         employer_profile.active_benefit_sponsorship.benefit_applications.detect{|ba| (ba.is_submitted? || ba.draft?) && (ba.end_on == benefit_application.start_on.to_date.prev_day)}
+                                       end
       end
     end
 

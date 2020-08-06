@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -6,10 +8,11 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 module BenefitSponsors
   RSpec.describe Concerns::EmployerProfileConcern, type: :model, dbclean: :around_each do
     describe "#billing_benefit_application" do
-      let(:organization) { FactoryBot.build(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_cca_employer_profile_initial_application
-      )}
+      let(:organization) do
+        FactoryBot.build(:benefit_sponsors_organizations_general_organization,
+                         :with_site,
+                         :with_aca_shop_cca_employer_profile_initial_application)
+      end
 
       let(:profile) { organization.employer_profile }
       let(:benefit_sponsorship) { organization.active_benefit_sponsorship }
@@ -89,16 +92,16 @@ module BenefitSponsors
       let!(:service_area2)          { FactoryBot.create_default :benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.prev_year.year }
       let(:benefit_sponsorship) do
         create(
-            :benefit_sponsors_benefit_sponsorship,
-            :with_organization_cca_profile,
-            :with_renewal_benefit_application,
-            :with_rating_area,
-            :with_service_areas,
-            initial_application_state: :active,
-            renewal_application_state: :enrollment_open,
-            default_effective_period: ((TimeKeeper.date_of_record.next_month.end_of_month + 1.day)..(TimeKeeper.date_of_record.next_month.end_of_month + 1.year)),
-            site: site,
-            aasm_state: :active
+          :benefit_sponsors_benefit_sponsorship,
+          :with_organization_cca_profile,
+          :with_renewal_benefit_application,
+          :with_rating_area,
+          :with_service_areas,
+          initial_application_state: :active,
+          renewal_application_state: :enrollment_open,
+          default_effective_period: ((TimeKeeper.date_of_record.next_month.end_of_month + 1.day)..(TimeKeeper.date_of_record.next_month.end_of_month + 1.year)),
+          site: site,
+          aasm_state: :active
         )
       end
 
@@ -111,33 +114,37 @@ module BenefitSponsors
       let(:census_employee) { create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
       let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
       let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-      let!(:active_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                                   household: family.latest_household,
-                                                   coverage_kind: "health",
-                                                   family: family,
-                                                   effective_on: employer_profile.active_benefit_application.start_on,
-                                                   enrollment_kind: "open_enrollment",
-                                                   kind: "employer_sponsored",
-                                                   aasm_state: 'coverage_selected',
-                                                   benefit_sponsorship_id: benefit_sponsorship.id,
-                                                   sponsored_benefit_package_id: active_benefit_package.id,
-                                                   sponsored_benefit_id: active_sponsored_benefit.id,
-                                                   employee_role_id: employee_role.id) }
-      let!(:renewal_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                                    household: family.latest_household,
-                                                    coverage_kind: "health",
-                                                    family: family,
-                                                    effective_on: employer_profile.renewal_benefit_application.start_on,
-                                                    enrollment_kind: "open_enrollment",
-                                                    kind: "employer_sponsored",
-                                                    aasm_state: 'auto_renewing',
-                                                    benefit_sponsorship_id: benefit_sponsorship.id,
-                                                    sponsored_benefit_package_id: renewal_benefit_package.id,
-                                                    employee_role_id: employee_role.id,
-                                                    sponsored_benefit_id: renewal_sponsored_benefit.id) }
+      let!(:active_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                          household: family.latest_household,
+                          coverage_kind: "health",
+                          family: family,
+                          effective_on: employer_profile.active_benefit_application.start_on,
+                          enrollment_kind: "open_enrollment",
+                          kind: "employer_sponsored",
+                          aasm_state: 'coverage_selected',
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: active_benefit_package.id,
+                          sponsored_benefit_id: active_sponsored_benefit.id,
+                          employee_role_id: employee_role.id)
+      end
+      let!(:renewal_enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                          household: family.latest_household,
+                          coverage_kind: "health",
+                          family: family,
+                          effective_on: employer_profile.renewal_benefit_application.start_on,
+                          enrollment_kind: "open_enrollment",
+                          kind: "employer_sponsored",
+                          aasm_state: 'auto_renewing',
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: renewal_benefit_package.id,
+                          employee_role_id: employee_role.id,
+                          sponsored_benefit_id: renewal_sponsored_benefit.id)
+      end
       before do
         census_employee.update_attributes({employee_role_id: employee_role.id})
-         args = {"employer_profile_id" => employer_profile.id.to_s, "termination_reason" => "non_payment", "termination_date" => employer_profile.active_benefit_application.end_on.strftime("%m/%d/%Y"), "transmit_xml" => true}
+        args = {"employer_profile_id" => employer_profile.id.to_s, "termination_reason" => "non_payment", "termination_date" => employer_profile.active_benefit_application.end_on.strftime("%m/%d/%Y"), "transmit_xml" => true}
         employer_profile.terminate_roster_enrollments(args)
       end
 

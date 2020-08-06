@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Takes the given contribution model and produces the needed objects for that
 # model to place under the Sponsoring profile.
 module BenefitMarkets

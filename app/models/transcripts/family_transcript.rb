@@ -1,4 +1,6 @@
-  module Transcripts
+# frozen_string_literal: true
+
+module Transcripts
   class FamilyTranscriptError < StandardError; end
 
   class FamilyTranscript
@@ -28,7 +30,7 @@
 
     def find_relationship(family_member)
       return family_member.primary_relationship if family_member.persisted?
-      
+
       if family_member.is_primary_applicant
         'self'
       else
@@ -68,7 +70,7 @@
 
     def compare_instance
       return if @transcript[:other].blank?
-      differences    = HashWithIndifferentAccess.new
+      differences = HashWithIndifferentAccess.new
 
       if @transcript[:source_is_new]
         differences[:new] = {:new => {:e_case_id => @transcript[:other].e_case_id}}
@@ -87,8 +89,8 @@
 
     def self.enumerated_associations
       [
-        {association: "family_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: [ ]},
-        {association: "irs_groups", enumeration_field: "hbx_assigned_id", cardinality: "one", enumeration: [ ]}
+        {association: "family_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: []},
+        {association: "irs_groups", enumeration_field: "hbx_assigned_id", cardinality: "one", enumeration: []}
       ]
     end
 
@@ -100,9 +102,7 @@
       @primary_hbx_id = primary.person.hbx_id
       matches = match_person_instance(primary.person)
 
-      if matches.size > 1
-        raise 'found more than 1 primary match'
-      end
+      raise 'found more than 1 primary match' if matches.size > 1
 
       primary_person = primary.person
       primary_person = matches[0] if matches.present?
@@ -120,19 +120,19 @@
       matches[0].primary_family
     end
 
-     def match_person_instance(person)
-      if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id) || []
-      else
-        matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
-      end
+    def match_person_instance(person)
+      matched_people = if person.hbx_id.present?
+                         ::Person.where(hbx_id: person.hbx_id) || []
+                       else
+                         ::Person.match_by_id_info(
+                           ssn: person.ssn,
+                           dob: person.dob,
+                           last_name: person.last_name,
+                           first_name: person.first_name
+                         )
+                       end
       matched_people
-    end
+   end
 
     def initialize_family
       fields = ::Family.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }

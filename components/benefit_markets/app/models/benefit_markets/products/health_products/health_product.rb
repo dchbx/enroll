@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     class HealthProducts::HealthProduct < BenefitMarkets::Products::Product
 
-      PRODUCT_PACKAGE_KINDS = [:single_issuer, :metal_level, :single_product]  #shop by default
-      CONGRESSIONAL_PRODUCT_PACKAGE_KINDS  = [:metal_level]
-      METAL_LEVEL_KINDS     = [:bronze, :silver, :gold, :platinum, :catastrophic]
+      PRODUCT_PACKAGE_KINDS = [:single_issuer, :metal_level, :single_product].freeze  #shop by default
+      CONGRESSIONAL_PRODUCT_PACKAGE_KINDS = [:metal_level].freeze
+      METAL_LEVEL_KINDS = [:bronze, :silver, :gold, :platinum, :catastrophic].freeze
 
-      HEALTH_PLAN_MAP  = {
-          hmo: "Health Maintenance Organization", # designated primary care physician (PCP) who's 
+      HEALTH_PLAN_MAP = {
+        hmo: "Health Maintenance Organization", # designated primary care physician (PCP) who's
                                                   #   referral is required for specialists who are in-network
-          ppo: "Preferred provider Organization", # health plan with a “preferred” network of providers 
+        ppo: "Preferred provider Organization", # health plan with a “preferred” network of providers
                                                   #   in an area
-          pos: "Point of Service",                # hmo/ppo hybrid. PCP referral for specialist required. 
-                                                  #   In-network providers are lower cost, may access out-of-network 
+        pos: "Point of Service",                # hmo/ppo hybrid. PCP referral for specialist required.
+                                                  #   In-network providers are lower cost, may access out-of-network
                                                   #   providers at higher cost
-          epo: "Exclusive Provider Network",      # hmo/ppo hybrid. PCP referral for specialist not required, but 
+        epo: "Exclusive Provider Network"      # hmo/ppo hybrid. PCP referral for specialist not required, but
                                                   #   must pay out-of-pocket for doctors outside network
-        }
+      }.freeze
 
 
       field :hios_id,                     type: String
@@ -24,7 +26,7 @@ module BenefitMarkets
       field :csr_variant_id,              type: String
 
       field :health_plan_kind,            type: Symbol  # => :hmo, :ppo, :pos, :epo
-      field :metal_level_kind,            type: Symbol  
+      field :metal_level_kind,            type: Symbol
 
       # Essential Health Benefit (EHB) percentage
       field :ehb,                         type: Float,    default: 0.0
@@ -37,7 +39,7 @@ module BenefitMarkets
       belongs_to  :renewal_product,
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::HealthProducts::HealthProduct",
-                  optional: true 
+                  optional: true
 
       belongs_to  :catastrophic_age_off_product,
                   inverse_of: nil,
@@ -76,8 +78,8 @@ module BenefitMarkets
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
 
-      alias_method :is_standard_plan?, :is_standard_plan
-      alias_method :is_reference_plan_eligible?, :is_reference_plan_eligible
+      alias is_standard_plan? is_standard_plan
+      alias is_reference_plan_eligible? is_reference_plan_eligible
 
       def metal_level
         metal_level_kind.to_s
@@ -90,9 +92,7 @@ module BenefitMarkets
       private
 
       def validate_product_package_kinds
-        if !product_package_kinds.is_a?(Array) || product_package_kinds.detect { |pkg| !PRODUCT_PACKAGE_KINDS.include?(pkg) }
-          errors.add(:product_package_kinds, :invalid)
-        end
+        errors.add(:product_package_kinds, :invalid) if !product_package_kinds.is_a?(Array) || product_package_kinds.detect { |pkg| !PRODUCT_PACKAGE_KINDS.include?(pkg) }
       end
 
     end

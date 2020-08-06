@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^the Admin selects the In Person application option$/) do
   find('li', :text => 'In Person').click
 end

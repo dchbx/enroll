@@ -70,7 +70,7 @@ module Insured
 
         eli_fac_obj = ::Factories::EligibilityFactory.new(reinstatement.id)
         max_applicable_aptc = eli_fac_obj.fetch_max_aptc
-        reinstatement.update_attributes!(elected_aptc_pct: applied_aptc_amount/max_applicable_aptc , applied_aptc_amount: cost_decorator.total_aptc_amount)
+        reinstatement.update_attributes!(elected_aptc_pct: applied_aptc_amount / max_applicable_aptc, applied_aptc_amount: cost_decorator.total_aptc_amount)
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
@@ -130,14 +130,14 @@ module Insured
         year = hbx_created_datetime.year
         month = hbx_created_datetime.month + offset_month
         if month > 12
-          year = year + 1
-          month = month - 12
+          year += 1
+          month -= 12
         end
         day = 1
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
-        return DateTime.new(year, month, day, hour, min, sec)
+        DateTime.new(year, month, day, hour, min, sec)
       end
 
       private

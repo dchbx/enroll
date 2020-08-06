@@ -16,7 +16,7 @@ module BenefitSponsors
         def call(effective_date:, benefit_sponsorship_id:)
           effective_date                   = yield validate_effective_date(effective_date)
           enrollment_eligibility_entity    = yield get_enrollment_eligibility(benefit_sponsorship_id, effective_date)
-          benefit_sponsor_catalog_entity   = yield get_benefit_sponsor_catalog_entity(enrollment_eligibility_entity)          
+          benefit_sponsor_catalog_entity   = yield get_benefit_sponsor_catalog_entity(enrollment_eligibility_entity)
 
           Success(benefit_sponsor_catalog_entity)
         end
@@ -39,8 +39,8 @@ module BenefitSponsors
 
         def get_benefit_sponsor_catalog_entity(enrollment_eligibility)
           result = BenefitMarkets::Operations::BenefitMarkets::CreateBenefitSponsorCatalog.new.call({
-            enrollment_eligibility: enrollment_eligibility
-          })
+                                                                                                      enrollment_eligibility: enrollment_eligibility
+                                                                                                    })
 
           if result.success?
             Success(result.value!)

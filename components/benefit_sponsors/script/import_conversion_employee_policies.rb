@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Used to load conversion employee enrollments through script
 #
 # @return nil if data imported and put the results in conversion_employee_policy_results file
@@ -9,17 +11,16 @@ module BenefitSponsors
       config = YAML.load_file("#{Rails.root}/conversions.yml")
       result_file = File.open(File.join(Rails.root, "conversion_employee_policy_results", "RESULT_" + File.basename(in_file) + ".csv"), 'wb')
 
-      if Settings.site.key == :cca
-        importer = BenefitSponsors::Importers::Mhc::ConversionEmployeePolicySet.new(in_file, result_file, config)
-      else
-        importer = Importers::ConversionEmployeePolicySet.new(in_file, result_file, config["conversions"]["employee_policies_date"], config["conversions"]["employee_policy_year"])
-      end
+      importer = if Settings.site.key == :cca
+                   BenefitSponsors::Importers::Mhc::ConversionEmployeePolicySet.new(in_file, result_file, config)
+                 else
+                   Importers::ConversionEmployeePolicySet.new(in_file, result_file, config["conversions"]["employee_policies_date"], config["conversions"]["employee_policy_year"])
+                 end
       importer.import!
       result_file.close
 
       puts "***" * 10 unless Rails.env.test?
       puts "Placed the results under folder conversion_employee_policy_results" unless Rails.env.test?
-
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Queries
     class BrokerFamiliesQuery
@@ -9,7 +11,7 @@ module BenefitSponsors
       end
 
       def build_base_scope
-        ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch=> {benefit_sponsors_broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
+        ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch => {benefit_sponsors_broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
         shop_broker_agency_criteria = { "family_members.person_id" => {"$in" => employee_person_ids }}
         { "$or" => [
           ivl_broker_agency_criteria,

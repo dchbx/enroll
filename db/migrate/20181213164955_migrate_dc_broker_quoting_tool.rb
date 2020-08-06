@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateDcBrokerQuotingTool < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -16,12 +18,9 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
     end
   end
 
-  def self.down
-
-  end
+  def self.down; end
 
   def self.update_plan_design_organization
-
     say_with_time("Time taken to build data hash") do
       @plan_design_hash = {employer: {}, broker_agency: {}, general_agency: {} }
 
@@ -44,57 +43,56 @@ class MigrateDcBrokerQuotingTool < Mongoid::Migration
       general_agency = @plan_design_hash[:general_agency]
 
       SponsoredBenefits::Organizations::PlanDesignOrganization.batch_size(1000).no_timeout.each do |pdo|
-        begin
 
-          # TODO check raise, commenting for now to migrate data.
+          # TODO: check raise, commenting for now to migrate data.
           # raise "owner profile not found" if pdo.owner_profile_id.blank?
 
-          new_owner_profile_id = broker_agency[pdo.owner_profile_id]
-          new_sponsor_profile_id = employer[pdo.sponsor_profile_id]
+        new_owner_profile_id = broker_agency[pdo.owner_profile_id]
+        new_sponsor_profile_id = employer[pdo.sponsor_profile_id]
 
-          # TODO fix raise
-          # raise "mapping not found for owner profile #{pdo.id}, profile_id: #{pdo.owner_profile_id}" if new_owner_profile_id.blank?
-          # raise "mapping not found for sponsor profile  #{pdo.id}, profile_id: #{pdo.sponsor_profile_id}" if employer[pdo.sponsor_profile_id].present? && new_owner_profile_id.blank?
+        # TODO: fix raise
+        # raise "mapping not found for owner profile #{pdo.id}, profile_id: #{pdo.owner_profile_id}" if new_owner_profile_id.blank?
+        # raise "mapping not found for sponsor profile  #{pdo.id}, profile_id: #{pdo.sponsor_profile_id}" if employer[pdo.sponsor_profile_id].present? && new_owner_profile_id.blank?
 
-          pdo.past_owner_profile_id = pdo.owner_profile_id
-          pdo.past_owner_profile_class_name = "::BrokerAgencyProfile"
-          pdo.past_sponsor_profile_id = pdo.sponsor_profile_id
-          pdo.past_sponsor_profile_class_name = "::EmployerProfile"
+        pdo.past_owner_profile_id = pdo.owner_profile_id
+        pdo.past_owner_profile_class_name = "::BrokerAgencyProfile"
+        pdo.past_sponsor_profile_id = pdo.sponsor_profile_id
+        pdo.past_sponsor_profile_class_name = "::EmployerProfile"
 
-          pdo.owner_profile_id = new_owner_profile_id
-          pdo.owner_profile_class_name = "::BenefitSponsors::Organizations::Profile"
-          pdo.sponsor_profile_id = new_sponsor_profile_id
-          pdo.sponsor_profile_class_name = "::BenefitSponsors::Organizations::Profile"
+        pdo.owner_profile_id = new_owner_profile_id
+        pdo.owner_profile_class_name = "::BenefitSponsors::Organizations::Profile"
+        pdo.sponsor_profile_id = new_sponsor_profile_id
+        pdo.sponsor_profile_class_name = "::BenefitSponsors::Organizations::Profile"
 
-          pdo.general_agency_accounts.unscoped.each do |account|
+        pdo.general_agency_accounts.unscoped.each do |account|
 
-            puts "old general agency profile not found for account" unless account.general_agency_profile_id.present?
-            puts "old broker agency profile not found for account" unless account.broker_agency_profile_id.present?
+          puts "old general agency profile not found for account" unless account.general_agency_profile_id.present?
+          puts "old broker agency profile not found for account" unless account.broker_agency_profile_id.present?
 
-            new_general_agency=  general_agency[account.general_agency_profile_id]
-            new_broker_agency =  broker_agency[account.broker_agency_profile_id]
+          new_general_agency = general_agency[account.general_agency_profile_id]
+          new_broker_agency =  broker_agency[account.broker_agency_profile_id]
 
-            puts "mapping not found for account #{account.id}, old general agency: #{account.general_agency_profile_id}" if new_general_agency.blank?
-            puts "mapping not found for account #{account.id}, old broker agency: #{account.broker_agency_profile_id}," if new_broker_agency.blank?
+          puts "mapping not found for account #{account.id}, old general agency: #{account.general_agency_profile_id}" if new_general_agency.blank?
+          puts "mapping not found for account #{account.id}, old broker agency: #{account.broker_agency_profile_id}," if new_broker_agency.blank?
 
-            account.update_attributes!(benefit_sponsrship_general_agency_profile_id:new_general_agency,
-                                       benefit_sponsrship_broker_agency_profile_id: new_broker_agency)
-          end
-
-          unless pdo.valid?
-            pdo.save!(validate: false) # TODO verify this
-            puts "plan design orgnaization not valid #{pdo.id}"
-          else
-            pdo.save!
-          end
-
-          success += 1
-          print '.' unless Rails.env.test?
-        rescue Exception => e
-          failed += 1
-          print 'F' unless Rails.env.test?
-          @logger.error "update failed for: #{pdo.id}, #{e.inspect}" unless Rails.env.test?
+          account.update_attributes!(benefit_sponsrship_general_agency_profile_id: new_general_agency,
+                                     benefit_sponsrship_broker_agency_profile_id: new_broker_agency)
         end
+
+        if pdo.valid?
+          pdo.save!
+        else
+          pdo.save!(validate: false) # TODO: verify this
+          puts "plan design orgnaization not valid #{pdo.id}"
+          end
+
+        success += 1
+        print '.' unless Rails.env.test?
+      rescue Exception => e
+        failed += 1
+        print 'F' unless Rails.env.test?
+        @logger.error "update failed for: #{pdo.id}, #{e.inspect}" unless Rails.env.test?
+
       end
       @logger.info " Total #{SponsoredBenefits::Organizations::PlanDesignOrganization.all.count} plan design organizations to be migrated" unless Rails.env.test?
       @logger.info " #{success} plan design organizations updated at this point." unless Rails.env.test?

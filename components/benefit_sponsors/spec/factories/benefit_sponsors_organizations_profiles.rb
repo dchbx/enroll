@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_organizations_profile, class: 'BenefitSponsors::Organizations::Profile' do
 
@@ -8,7 +10,7 @@ FactoryBot.define do
       office_location_kind { :primary }
     end
 
-    after(:build) do |office_locations_count, evaluator|
+    after(:build) do |_office_locations_count, evaluator|
       create_list(:office_location, evaluator.office_locations_count, evaluator.office_location_kind, office_location: office_location)
     end
 

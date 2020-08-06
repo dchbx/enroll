@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -7,7 +9,7 @@ module SponsoredBenefits
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
     let!(:person) { FactoryBot.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
     before do
       allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
@@ -16,7 +18,7 @@ module SponsoredBenefits
       person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
       sign_in user_with_broker_role
     end
- 
+
     describe "GET #new" do
       before do
         get :new, params: {plan_design_proposal_id: plan_design_proposal.id}

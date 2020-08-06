@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given /(\w+) is a person$/ do |name|
   SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
 
@@ -7,12 +9,12 @@ Given /(\w+) is a person$/ do |name|
   user = User.create(email: email, password: @pswd, password_confirmation: @pswd, person: person, oim_id: email)
 end
 
-Given /(\w+) is census employee to (.*?)$/ do |name, legal_name|
+Given /(\w+) is census employee to (.*?)$/ do |_name, legal_name|
   org = @organization[legal_name]
   @cesnus_employees = FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: org.benefit_sponsorships.first, employer_profile: org.employer_profile)
 end
 
-Given /(\w+) has already provided security question responses/ do |name|
+Given /(\w+) has already provided security question responses/ do |_name|
   security_questions = []
   3.times do
     security_questions << FactoryBot.create(:security_question)
@@ -29,26 +31,24 @@ end
 And /(\w+) also has a duplicate person with different DOB/ do |name|
   person = Person.where(first_name: name).first
   FactoryBot.create(:person, first_name: person.first_name,
-            last_name: person.last_name, dob: '06/06/1976')
+                             last_name: person.last_name, dob: '06/06/1976')
 end
 Given /(\w+) is a person who has not logged on$/ do |name|
   person = FactoryBot.create(:person, first_name: name)
 end
 
-Then  /(\w+) signs in to portal/ do |name|
-  if page.has_link? 'Sign In Existing Account'
-    find('.interaction-click-control-sign-in-existing-account').click
-  end
+Then /(\w+) signs in to portal/ do |name|
+  find('.interaction-click-control-sign-in-existing-account').click if page.has_link? 'Sign In Existing Account'
   person = Person.where(first_name: name).first
   fill_in "user[login]", :with => person.user.oim_id
   find('#user_login').set(person.user.email)
   fill_in "user[password]", :with => @pswd
-  #TODO this fixes the random login fails b/c of empty params on email
+  #TODO: this fixes the random login fails b/c of empty params on email
   fill_in "user[login]", :with => person.user.email unless find(:xpath, '//*[@id="user_login"]').value == person.user.email
   find('.interaction-click-control-sign-in').click
 end
 
-Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
+Given /(\w+) is a user with no person who goes to the Employer Portal/ do |_name|
   SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
 
   email = Forgery('email').address
@@ -62,7 +62,7 @@ Given /(\w+) is a user with no person who goes to the Employer Portal/ do |name|
   fill_in "user[password_confirmation]", :with => @pswd
 
   find(:xpath, '//label[@for="user_email_or_username"]').set(email)
-  #TODO this fixes the random login fails b/c of empty params on email
+  #TODO: this fixes the random login fails b/c of empty params on email
   fill_in "user[oim_id]", :with => email unless find(:xpath, '//label[@for="user_email_or_username"]').value == email
   find('.interaction-click-control-create-account').click
 end
@@ -137,14 +137,14 @@ When(/(\w+) accesses the Employer Portal/) do |name|
   step "#{name} signs in to portal"
 end
 
-Then /(\w+) decides to Update Business information/ do |person|
+Then /(\w+) decides to Update Business information/ do |_person|
   FactoryBot.create(:sic_code, sic_code: "0111")
   find('.interaction-click-control-update-business-info', :wait => 10).click
   wait_for_ajax(10,2)
   screenshot('update_business_info')
 end
 
-And /(.*?) fills in all mandatory fields and clicks on save$/ do |legal_name|
+And /(.*?) fills in all mandatory fields and clicks on save$/ do |_legal_name|
   find(:xpath, "//*[@id='staff_first_name']").set "john"
   find(:xpath, "//*[@id='staff_last_name']").set "snow"
   find(:xpath, "//*[@id='staff_dob']").set "09/11/1990"
@@ -168,13 +168,13 @@ Then /employer should see a success flash message/ do
   expect(page).to have_content /Role added sucessfully/
 end
 
-Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |staff, new_staff|
+Given /(\w+) adds an EmployerStaffRole to (\w+)/ do |_staff, new_staff|
   person = Person.where(first_name: new_staff).first
 
   click_link 'Add Employer Staff Role'
   fill_in 'staff_first_name', with: person.first_name
   fill_in 'staff_last_name', with: person.last_name
-  fill_in  'staff_dob', with: person.dob
+  fill_in 'staff_dob', with: person.dob
   screenshot('add_existing_person_as_staff')
   find_all('.btn-primary')[0].click
   step 'Point of Contact count is 2'
@@ -206,7 +206,7 @@ Then /(\w+) removes EmployerStaffRole from John/ do |name|
   end
 end
 
-When /(\w+) approves EmployerStaffRole for (\w+)/ do |staff1, staff2|
+When /(\w+) approves EmployerStaffRole for (\w+)/ do |_staff1, staff2|
   staff = Person.where(first_name: staff2).first
   find('#approve_' + staff.id.to_s).click
   screenshot('before_approval')
@@ -214,17 +214,17 @@ When /(\w+) approves EmployerStaffRole for (\w+)/ do |staff1, staff2|
   screenshot('after_approval')
 end
 
-Then /(\w+) sees new employer page/ do |ex_staff|
-  match = current_path.match  /employers\/employer_profiles\/new/
+Then /(\w+) sees new employer page/ do |_ex_staff|
+  match = current_path.match  %r{employers/employer_profiles/new}
   expect(match.present?).to be_truthy
 end
 
-Then /(\w+) enters data for Turner Agency, Inc/ do |name|
+Then /(\w+) enters data for Turner Agency, Inc/ do |_name|
   @fein = Organization.where(legal_name: /Turner Agency, Inc/).first.fein
   step 'NewGuy enters Employer Information'
 end
 
-Then /(\w+) is notified about Employer Staff Role (.*)/ do |name, alert|
+Then /(\w+) is notified about Employer Staff Role (.*)/ do |_name, _alert|
   expect(page).to have_content("Thank you for submitting your request to access the employer account. Your application for access is pending.")
   expect(page).to have_css("a", :text => /back/i)
   screenshot('pending_person_stays_on_new_page')
@@ -277,15 +277,15 @@ end
 
 Given /a FEIN for an existing company/ do
   SicCode.where(sic_code: '0111').first || FactoryBot.create(:sic_code, sic_code: "0111")
-  @fein = 100000000+rand(10000)
-  o=FactoryBot.create(:organization, fein: @fein)
-  @employer_profile= FactoryBot.create(:employer_profile, organization: o)
+  @fein = rand(100_000_000..100_009_999)
+  o = FactoryBot.create(:organization, fein: @fein)
+  @employer_profile = FactoryBot.create(:employer_profile, organization: o)
 end
 
 Given /a FEIN for a new company/ do
-  @fein = 100000000+rand(10000)
+  @fein = rand(100_000_000..100_009_999)
 end
-Given(/^(\w+) enters Employer Information/) do |name|
+Given(/^(\w+) enters Employer Information/) do |_name|
   fill_in 'agency[organization][legal_name]', :with => Forgery('name').company_name
   fill_in 'agency[organization][dba]', :with => Forgery('name').company_name
   fill_in 'agency[organization][fein]', :with => @fein
@@ -300,7 +300,7 @@ Given(/^(\w+) enters Employer Information/) do |name|
   find_button("Confirm").click
 end
 
-Then /(\w+) becomes an Employer/ do |name|
+Then /(\w+) becomes an Employer/ do |_name|
   find('a', text: "I'm an Employer")
 end
 
@@ -312,7 +312,7 @@ Then /there is an unlinked POC/ do
   find('td', text: /Unlinked/)
 end
 
-AfterStep do |scenario|
+AfterStep do |_scenario|
   sleep 1 if ENV['SCREENSHOTS'] == "true"
   screenshot("")
 end

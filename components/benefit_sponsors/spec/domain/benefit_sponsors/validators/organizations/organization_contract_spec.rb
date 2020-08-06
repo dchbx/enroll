@@ -27,7 +27,7 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationContract 
     context "with valid all params" do
       let(:all_params) do
         valid_params.merge({home_page: nil, dba: nil})
-      end 
+      end
 
       it "should pass validation" do
         expect(subject.call(all_params).success?).to be_truthy

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class Timespans::DatePeriod
     include Mongoid::Document
@@ -15,16 +17,16 @@ module BenefitMarkets
     scope :find_name, ->(compare_name){ where(:name => compare_name) unless compare_name.blank? }
 
     def between?(compare_date)
-      range_present? && (compare_date.between?(begin_on, end_on)) ? true : false
+      range_present? && compare_date.between?(begin_on, end_on) ? true : false
     end
 
     def to_range
       begin_on..end_on if range_present?
     end
 
-    alias_method :min,        :begin_on
-    alias_method :max,        :end_on
-    alias_method :contains?,  :between?
+    alias min begin_on
+    alias max end_on
+    alias contains? between?
 
     private
 
@@ -34,7 +36,7 @@ module BenefitMarkets
 
     def ascending_dates
       return unless range_present?
-      errors.add(:begin_on, "must be earlier than End on #{end_on}") unless (begin_on <= end_on)
+      errors.add(:begin_on, "must be earlier than End on #{end_on}") unless begin_on <= end_on
     end
 
   end

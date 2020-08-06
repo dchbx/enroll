@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 namespace :transport_gateway do
   desc "Install the specs into your project"
   task :install_rspec => :environment do

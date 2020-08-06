@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Subscribers
   class FamilyApplicationCompleted < ::Acapi::Subscription
     include Acapi::Notifiers
@@ -6,7 +8,7 @@ module Subscribers
       ["acapi.info.events.family.application_completed"]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       xml = stringed_key_payload["body"]
       sc = ShortCircuit.on(:processing_issue) do |err|
@@ -42,11 +44,9 @@ module Subscribers
       verified_new_address = verified_primary_family_member.person.addresses.select{|adr| adr.type.split('#').last == "home" }.first
       import_home_address(primary_person, verified_new_address)
       if verified_family.broker_accounts.present?
-        newest_broker = verified_family.broker_accounts.max_by{ |broker| broker.start_on}
-        newest_broker_agency_account = family.broker_agency_accounts.max_by{ |baa| baa.start_on }
-        if !newest_broker_agency_account.present? || newest_broker.start_on > newest_broker_agency_account.start_on
-          update_broker_for_family(family, newest_broker.broker_npn)
-        end
+        newest_broker = verified_family.broker_accounts.max_by(&:start_on)
+        newest_broker_agency_account = family.broker_agency_accounts.max_by(&:start_on)
+        update_broker_for_family(family, newest_broker.broker_npn) if !newest_broker_agency_account.present? || newest_broker.start_on > newest_broker_agency_account.start_on
       end
       primary_person = search_person(verified_primary_family_member) #such mongoid
       family.save!
@@ -54,7 +54,7 @@ module Subscribers
       family.e_case_id = verified_family.integrated_case_id
       begin
         active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-      rescue
+      rescue StandardError
         throw(:processing_issue, "Failure to update tax household")
       end
       update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
@@ -66,43 +66,36 @@ module Subscribers
             new_family_member.save!
             active_household.add_household_coverage_member(new_family_member)
           end
-          if active_verified_tax_households.present?
-            active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
-            if active_verified_tax_household.present?
-              new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
-            end
+          next unless active_verified_tax_households.present?
+          active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
+          if active_verified_tax_household.present?
+            new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
+            active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
           end
         end
         if active_household.latest_active_tax_household.present?
-          unless active_household.latest_active_tax_household.eligibility_determinations.present?
-            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-          end
+          log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"}) unless active_household.latest_active_tax_household.eligibility_determinations.present?
         end
-      rescue
+      rescue StandardError
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
-      family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
+      family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each(&:save!)}
       family.save!
     end
 
-    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
-      begin
-        verified_verifications = verified_primary_family_member.verifications
-        consumer_role.import!(authority:"curam")
-        consumer_role.vlp_authority = "curam"
-        consumer_role.residency_determined_at = verified_primary_family_member.created_at
-        consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
-        consumer_role.is_state_resident = verified_verifications.is_lawfully_present
-        consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
-        consumer_role.save!
-        if consumer_role.person.user.present?
-          consumer_role.person.user.ridp_by_payload!
-        end
-      rescue => e
-        errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
-        throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
-      end
+    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member)
+      verified_verifications = verified_primary_family_member.verifications
+      consumer_role.import!(authority: "curam")
+      consumer_role.vlp_authority = "curam"
+      consumer_role.residency_determined_at = verified_primary_family_member.created_at
+      consumer_role.citizen_status = verified_verifications.citizen_status.split('#').last
+      consumer_role.is_state_resident = verified_verifications.is_lawfully_present
+      consumer_role.is_incarcerated = verified_primary_family_member.person_demographics.is_incarcerated
+      consumer_role.save!
+      consumer_role.person.user.ridp_by_payload! if consumer_role.person.user.present?
+    rescue StandardError => e
+      errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
+      throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
     end
 
     def import_home_address(person, verified_new_address)
@@ -112,9 +105,7 @@ module Subscribers
         verified_address_hash
       )
       throw(:processing_issue, "ERROR: Failed to load home address from xml") unless new_address.valid?
-      if person.home_address.present?
-        person.home_address.delete
-      end
+      person.home_address.delete if person.home_address.present?
       person.addresses << new_address
       person.save!
     end
@@ -143,7 +134,7 @@ module Subscribers
               name_pfx: verified_family_member.person.name_pfx,
               name_sfx: verified_family_member.person.name_sfx,
               dob: verified_family_member.person_demographics.birth_date,
-              ssn: verified_family_member.person_demographics.ssn == "999999999" ? "" : verified_family_member.person_demographics.ssn ,
+              ssn: verified_family_member.person_demographics.ssn == "999999999" ? "" : verified_family_member.person_demographics.ssn,
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
             new_member.save!
@@ -177,15 +168,15 @@ module Subscribers
 
       if !ssn.blank?
         Person.where({
-          :encrypted_ssn => Person.encrypt_ssn(ssn),
-          :dob => dob
-        }).first
+                       :encrypted_ssn => Person.encrypt_ssn(ssn),
+                       :dob => dob
+                     }).first
       else
         Person.where({
-          :dob => dob,
-          :last_name => last_name_regex,
-          :first_name => first_name_regex
-        }).first
+                       :dob => dob,
+                       :last_name => last_name_regex,
+                       :first_name => first_name_regex
+                     }).first
       end
     end
   end

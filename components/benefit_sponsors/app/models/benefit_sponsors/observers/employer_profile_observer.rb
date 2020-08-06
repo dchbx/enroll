@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class EmployerProfileObserver
@@ -5,7 +7,7 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def update(employer_profile, options={})
+      def update(employer_profile, _options = {})
         employer_profile.office_locations.each do |office_location|
           if office_location.address.changes.present? && office_location.address.changes.keys.any?{|key| ["address_1", "address_2", "city", "state", "zip"].include?(key)}
             notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"})

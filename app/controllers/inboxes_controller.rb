@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InboxesController < ApplicationController
   before_action :find_inbox_provider, except: [:msg_to_portal]
   before_action :find_hbx_profile, only: [:new, :create]
@@ -30,14 +32,11 @@ class InboxesController < ApplicationController
     end
   end
 
-
   def destroy
     #@message.destroy
     @message.update_attributes(folder: Message::FOLDER_TYPES[:deleted])
     flash[:notice] = "Successfully deleted inbox message."
-    if params[:url].present?
-      @inbox_url = params[:url]
-    end
+    @inbox_url = params[:url] if params[:url].present?
   end
 
   private

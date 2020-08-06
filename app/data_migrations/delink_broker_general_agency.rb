@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class DelinkBrokerGeneralAgency < MongoidMigrationTask
   def migrate
-
     ga_org = Organization.where(fein: "521698168").first
     ga_org.update_attributes!(:legal_name => "Insurance Marketing Center", :dba => "Insurance Marketing Center")
     # br_id = ga_org.broker_agency_profile.id

@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'net/http'
 
 module TransportGateway
   RSpec.describe Gateway do
 
-    let(:sftp_uri)      { URI("sftp://foo:bar@sftp.example.com/path/to/file;type=b") } 
+    let(:sftp_uri)      { URI("sftp://foo:bar@sftp.example.com/path/to/file;type=b") }
     let(:binary_file)   {  }
     let(:logger) { double }
     let(:credential_provider) { double }
 
-     let(:message_inspected_string) { "MESSAGE INSPECTED STRING" }
+    let(:message_inspected_string) { "MESSAGE INSPECTED STRING" }
 
 
     context "A common interface for sending messages with payloads using various protocols" do
@@ -53,7 +55,7 @@ module TransportGateway
             let(:scheme)            { "http"}
 
             let(:from)              { source_file_handle }
-            let(:to)                { URI::Generic.build({ scheme: scheme, host: target_host, path: target_service, userinfo: target_userinfo }) } 
+            let(:to)                { URI::Generic.build({ scheme: scheme, host: target_host, path: target_service, userinfo: target_userinfo }) }
             let(:message)           { Message.new(from: from, to: to) }
 
             before(:each) do
@@ -78,7 +80,7 @@ module TransportGateway
             let(:target_user)       { "foo" }
             let(:target_password)   { "secret_password" }
             let(:bogus_protocol)    { "dljkafklejawfkladf" }
-            let(:to)                { URI::Generic.build({ scheme: bogus_protocol, host: target_host, path: target_service}) } 
+            let(:to)                { URI::Generic.build({ scheme: bogus_protocol, host: target_host, path: target_service}) }
             let(:message)           { Message.new(from: nil, to: to) }
 
             let(:gateway) { Gateway.new(credential_provider, logger) }
@@ -91,7 +93,7 @@ module TransportGateway
               end
               allow(logger).to receive(:error) do |progname, &block|
                 expect(progname).to eq "transport_gateway"
-                expect(block.call).to eq "No Adapter found for #{to.to_s}"
+                expect(block.call).to eq "No Adapter found for #{to}"
               end
             end
 

@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class ConvergeVoids
 
-  FILE_PATH= "#{Rails.root}/sample_xmls"
+  FILE_PATH = "#{Rails.root}/sample_xmls"
 
   def initialize(action)
     @action = action
   end
 
   def query_criteria
-    { 
-      :terminated_on => Date.new(2016,11,30), 
-      :updated_at.gt => Date.new(2016,10,31), 
-      :updated_at.lt => Date.new(2016,11,02),
+    {
+      :terminated_on => Date.new(2016,11,30),
+      :updated_at.gt => Date.new(2016,10,31),
+      :updated_at.lt => Date.new(2016,11,0o2),
       :kind => 'individual'
     }
   end
@@ -51,7 +53,7 @@ class ConvergeVoids
   end
 
   # Void non matching hbx_ids
-  def void_hbx_ids(enrollments, terminated_enrollments)
+  def void_hbx_ids(_enrollments, terminated_enrollments)
     terminated_enrollments.inject([]) do |data, terminated_enrollment|
       terminated_enrollment.invalidate_enrollment!
       terminated_enrollment.update!(terminated_on: nil)
@@ -73,43 +75,41 @@ class ConvergeVoids
       csv << ['Primary HBX ID', 'Primary SSN', 'Primary DOB','Primary Last Name', 'Primary First Name', 'Subscriber HBX ID', 'Enrollment HBX ID', 'Market Kind', 'Coverge Kind', 'Enrollment HIOS ID', 'Created On', 'Updated On', 'Effective On', 'Terminated On', 'Current Status']
 
       families.each do |family|
-        begin
-          count += 1
-          if count % 100 == 0
-            puts "processed #{count}"
-          end
 
-          enrollments = family.active_household.hbx_enrollments.where({
-            :kind => 'individual',
-            :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES)
-            }).order_by(:effective_on.desc).reject{|x| x.plan.active_year != 2016}
+        count += 1
+        puts "processed #{count}" if count % 100 == 0
 
-          terminated_enrollments = family.active_household.hbx_enrollments.where(query_criteria).order_by(:effective_on.desc).reject{|x| x.plan.active_year != 2016}
+        enrollments = family.active_household.hbx_enrollments.where({
+                                                                      :kind => 'individual',
+                                                                      :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+                                                                    }).order_by(:effective_on.desc).select{|x| x.plan.active_year == 2016}
 
-          enrollments_for_display = case @action
-          when 'void'
-            void_hbx_ids(enrollments, terminated_enrollments)
-          when 'switch_and_void'
-            switch_and_void_hbx_ids(enrollments, terminated_enrollments)
-          end
+        terminated_enrollments = family.active_household.hbx_enrollments.where(query_criteria).order_by(:effective_on.desc).select{|x| x.plan.active_year == 2016}
 
-          if enrollments_for_display.present?
-
-            person = family.primary_applicant.person
-            primary_details = [person.hbx_id, person.ssn, format_date(person.dob), person.first_name, person.last_name]
-
-            enrollments_for_display.uniq.each do |enrollment|
-              csv << (primary_details + enrollment_csv_row(enrollment))
-            end
-          end
-        rescue Exception => e
-          failed += 1
-          puts "Failed.....#{e.to_s}"
+        enrollments_for_display = case @action
+                                  when 'void'
+                                    void_hbx_ids(enrollments, terminated_enrollments)
+                                  when 'switch_and_void'
+                                    switch_and_void_hbx_ids(enrollments, terminated_enrollments)
         end
+
+        if enrollments_for_display.present?
+
+          person = family.primary_applicant.person
+          primary_details = [person.hbx_id, person.ssn, format_date(person.dob), person.first_name, person.last_name]
+
+          enrollments_for_display.uniq.each do |enrollment|
+            csv << (primary_details + enrollment_csv_row(enrollment))
+          end
+        end
+      rescue Exception => e
+        failed += 1
+        puts "Failed.....#{e}"
+
       end
     end
 
-    puts count 
+    puts count
     puts failed
   end
 end

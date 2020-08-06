@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module SponsoredBenefits
     # This is an abstract class that represents and documents the interface
@@ -7,7 +9,7 @@ module BenefitMarkets
     class Roster
       # @yieldparam entry [RosterEntry] an individual roster entry element.
       def each
-        raise NotImplementedError.new("This is a documentation only interface.")
+        raise NotImplementedError, "This is a documentation only interface."
       end
     end
   end

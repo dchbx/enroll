@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -190,10 +192,10 @@ module BenefitSponsors
           allow(pricing_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(pricing_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(pricing_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
-          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(family_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(true)
+          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(family_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(true)
         end
 
         it "calculates the total price" do
@@ -211,8 +213,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.product_price).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.product_price).to_s).round(2)
           end
           expect(member_total).to eq(family_price)
         end

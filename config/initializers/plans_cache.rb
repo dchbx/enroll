@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # Organization.exists(carrier_profile: true).map do |org|
 #   Plan.valid_shop_health_plans('carrier', org.carrier_profile.id)
 # end

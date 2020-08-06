@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class Household
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
   include HasFamilyMembers
 
-  ImmediateFamily = %w{self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner}
+  ImmediateFamily = %w[self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner].freeze
 
   embedded_in :family
 
@@ -22,7 +24,7 @@ class Household
   embeds_many :coverage_households, cascade_callbacks: true
 
   accepts_nested_attributes_for :hbx_enrollments, :tax_households, :coverage_households
-  
+
   before_validation :set_effective_starting_on
   before_validation :set_effective_ending_on #, :if => lambda {|household| household.effective_ending_on.blank? } # set_effective_starting_on should be done before this
   before_validation :reset_is_active_for_previous
@@ -34,10 +36,10 @@ class Household
   # after_build :build_irs_group
 
   def active_hbx_enrollments
-    actives = hbx_enrollments.collect() do |list, enrollment|
+    actives = hbx_enrollments.collect do |list, enrollment|
       if enrollment.plan.present? &&
          (enrollment.plan.active_year >= TimeKeeper.date_of_record.year) &&
-         (HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state))
+         HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)
 
         list << enrollment
       end
@@ -47,11 +49,11 @@ class Household
   end
 
   def renewing_hbx_enrollments
-    active_hbx_enrollments.reject { |en| !HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) }
+    active_hbx_enrollments.select { |_en| HbxEnrollment::RENEWAL_STATUSES.include?(enrollment.aasm_state) }
   end
 
   def renewing_individual_market_hbx_enrollments
-    renewing_hbx_enrollments.reject { |en| en.enrollment_kind != 'individual' }
+    renewing_hbx_enrollments.select { |en| en.enrollment_kind == 'individual' }
   end
 
   def add_household_coverage_member(family_member)
@@ -65,7 +67,7 @@ class Household
   end
 
   def immediate_family_coverage_household
-    ch = coverage_households.detect { |hh| hh.is_immediate_family? }
+    ch = coverage_households.detect(&:is_immediate_family?)
     ch ||= coverage_households.build(is_immediate_family: true)
   end
 
@@ -99,7 +101,7 @@ class Household
       th.tax_household_members.build(
         family_member: primary_family_member,
         is_subscriber: true,
-        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible ? verified_primary_tax_household_member.is_insurance_assistance_eligible : false
+        is_ia_eligible: verified_primary_tax_household_member.is_insurance_assistance_eligible || false
       )
 
       # verified_primary_family_member.financial_statements.each do |fs|
@@ -147,13 +149,10 @@ class Household
   end
 
   def effective_ending_on_gt_effective_starting_on
-
     return if effective_ending_on.nil?
     return if effective_starting_on.nil?
 
-    if effective_ending_on < effective_starting_on
-      self.errors.add(:base, "The effective end date should be earlier or equal to effective start date")
-    end
+    self.errors.add(:base, "The effective end date should be earlier or equal to effective start date") if effective_ending_on < effective_starting_on
   end
 
   def parent
@@ -178,19 +177,17 @@ class Household
 
   def latest_coverage_household
     return coverage_households.first if coverage_households.size == 1
-    coverage_households.sort_by(&:submitted_at).last.submitted_at
+    coverage_households.max_by(&:submitted_at).submitted_at
   end
 
   def latest_active_tax_household
     return tax_households.first if tax_households.length == 1
-    tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+    tax_households.where(effective_ending_on: nil).min_by(&:effective_starting_on)
   end
 
   def latest_active_tax_household_with_year(year)
     tax_households = self.tax_households.tax_household_with_year(year)
-    if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
-    end
+    tax_households = self.tax_households.tax_household_with_year(year).active_tax_household if TimeKeeper.date_of_record.year == year
 
     if tax_households.empty?
       nil
@@ -203,23 +200,22 @@ class Household
     tax_households.tax_household_with_year(year).try(:last)
   end
 
-  def end_multiple_thh(options = {})
+  def end_multiple_thh(_options = {})
     all_active_thh = tax_households.active_tax_household
-    all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
-      sorted_ath = active_thh_with_year(k).order_by(:'created_at'.asc)
+    all_active_thh.group_by(&:group_by_year).select {|_k, v| v.size > 1}.each_pair do |k, _v|
+      sorted_ath = active_thh_with_year(k).order_by(:created_at.asc)
       c = sorted_ath.count
-      sorted_ath.limit(c-1).update_all(effective_ending_on: Date.new(k, 12, 31)) if sorted_ath
+      sorted_ath&.limit(c - 1)&.update_all(effective_ending_on: Date.new(k, 12, 31))
     end
   end
 
-
   def latest_active_thh
     return tax_households.first if tax_households.length == 1
-    tax_households.active_tax_household.order_by(:'created_at'.desc).first
+    tax_households.active_tax_household.order_by(:created_at.desc).first
   end
 
   def latest_active_thh_with_year(year)
-    tax_households.tax_household_with_year(year).active_tax_household.order_by(:'created_at'.desc).first
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
   end
 
   def active_thh_with_year(year)
@@ -228,24 +224,24 @@ class Household
 
   def build_thh_and_eligibility(max_aptc, csr, date, slcsp, source)
     th = tax_households.build(
-        allocated_aptc: 0.0,
-        effective_starting_on: Date.new(date.year, date.month, date.day),
-        is_eligibility_determined: true,
-        submitted_at: Date.today
+      allocated_aptc: 0.0,
+      effective_starting_on: Date.new(date.year, date.month, date.day),
+      is_eligibility_determined: true,
+      submitted_at: Date.today
     )
 
     th.tax_household_members.build(
-        family_member: family.primary_family_member,
-        is_subscriber: true,
-        is_ia_eligible: true
+      family_member: family.primary_family_member,
+      is_subscriber: true,
+      is_ia_eligible: true
     )
 
     deter = th.eligibility_determinations.build(
       source: source,
-        benchmark_plan_id: slcsp,
-        max_aptc: max_aptc.to_f,
-        csr_percent_as_integer: (csr == 'limited' ? '-1' : csr),
-        determined_at: Date.today
+      benchmark_plan_id: slcsp,
+      max_aptc: max_aptc.to_f,
+      csr_percent_as_integer: (csr == 'limited' ? '-1' : csr),
+      determined_at: Date.today
     )
 
     deter.save!
@@ -257,9 +253,9 @@ class Household
     family.active_dependents.each do |fm|
       ath = latest_active_thh
       ath.tax_household_members.build(
-          family_member: fm,
-          is_subscriber: false,
-          is_ia_eligible: true
+        family_member: fm,
+        is_subscriber: false,
+        is_ia_eligible: true
       )
       ath.save!
     end
@@ -310,7 +306,7 @@ class Household
   def set_submitted_at
     return true unless self.submitted_at.blank?
 
-    self.submitted_at = tax_households.sort_by(&:updated_at).last.updated_at if tax_households.length > 0
+    self.submitted_at = tax_households.max_by(&:updated_at).updated_at unless tax_households.empty?
     self.submitted_at = parent.submitted_at unless self.submitted_at
     true
   end
@@ -318,11 +314,11 @@ class Household
   def set_effective_starting_on
     return true unless self.effective_starting_on.blank?
 
-    self.effective_starting_on =  parent.submitted_at
+    self.effective_starting_on = parent.submitted_at
     true
   end
 
-  def new_hbx_enrollment_from(family: nil,employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind:nil, external_enrollment: false, opt_effective_on: nil)
+  def new_hbx_enrollment_from(family: nil,employee_role: nil, coverage_household: nil, benefit_group: nil, benefit_group_assignment: nil, resident_role: nil, consumer_role: nil, benefit_package: nil, qle: false, submitted_at: nil, coverage_start: nil, enrollment_kind: nil, external_enrollment: false, opt_effective_on: nil)
     coverage_household = latest_coverage_household unless coverage_household.present?
     HbxEnrollment.new_from(
       employee_role: employee_role,
@@ -365,7 +361,7 @@ class Household
         hbx_enrollment.destroy!
       end
     else
-      return false
+      false
     end
   end
 
@@ -380,7 +376,7 @@ class Household
     enrs = hbx_enrollments.coverage_selected_and_waived
     health_enr = enrs.detect { |a| a.coverage_kind == "health"}
     dental_enr = enrs.detect { |a| a.coverage_kind == "dental"}
-    [health_enr , dental_enr].compact
+    [health_enr, dental_enr].compact
   end
 
   def enrolled_hbx_enrollments

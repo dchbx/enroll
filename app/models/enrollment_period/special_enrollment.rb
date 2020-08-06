@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
   include ScheduledEventService
 
@@ -25,7 +27,7 @@ class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
   before_create :set_submitted_at
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
-    raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
+    raise ArgumentError, "expected QualifyingLifeEventKind" unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
     @qualifying_life_event_kind = new_qualifying_life_event_kind
@@ -63,10 +65,11 @@ class EnrollmentPeriod::SpecialEnrollment < EnrollmentPeriod::Base
 
   def self.find(search_id)
     family = Family.by_special_enrollment_period_id(search_id).first
-    family.special_enrollment_periods.detect() { |sep| sep._id == search_id } unless family.blank?
+    family.special_enrollment_periods.detect { |sep| sep._id == search_id } unless family.blank?
   end
 
-private
+  private
+
   def set_sep_dates
     return unless @qualifying_life_event_kind.present? && qle_on.present? && effective_on_kind.present?
     set_effective_on
@@ -88,16 +91,16 @@ private
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
 
     self.effective_on = case effective_on_kind
-      when "date_of_event"
-        qle_on
-      when "exact_date"
-        qle_on
-      when "first_of_month"
-        first_of_month_effective_date
-      when "first_of_next_month"
-        first_of_next_month_effective_date
-      when "fixed_first_of_next_month"
-        fixed_first_of_next_month_effective_date
+                        when "date_of_event"
+                          qle_on
+                        when "exact_date"
+                          qle_on
+                        when "first_of_month"
+                          first_of_month_effective_date
+                        when "first_of_next_month"
+                          first_of_next_month_effective_date
+                        when "fixed_first_of_next_month"
+                          fixed_first_of_next_month_effective_date
     end
   end
 

@@ -40,7 +40,7 @@ module Exchanges
       if result
         flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application canceled successfully."
       else
-        flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|memo, error| '#{memo}<li>#{error}</li>'}.html_safe}"
+        flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|_memo, _error| '#{memo}<li>#{error}</li>'}.html_safe}"
       end
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end

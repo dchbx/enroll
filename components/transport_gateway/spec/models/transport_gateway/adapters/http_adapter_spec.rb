@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'net/http'
 
@@ -17,7 +19,7 @@ module TransportGateway
       let(:text_string) { "madam in eden i'm adam" }
 
       context "and the endpoint is available" do
-        let(:to)        { URI::HTTP.build({ host: host, path: path }) } 
+        let(:to)        { URI::HTTP.build({ host: host, path: path }) }
         let(:message)   { Message.new(from: from, to: to, body: text_string) }
 
         it "the URL should return a HTTP success status" do
@@ -31,8 +33,8 @@ module TransportGateway
           it "should post text string payload to the server" do
             adapter.send_message(message)
 
-            expect(WebMock).to have_requested(:put, url).
-              with(body: text_string, headers: { content_type: 'text/plain'}).once
+            expect(WebMock).to have_requested(:put, url)
+              .with(body: text_string, headers: { content_type: 'text/plain'}).once
           end
         end
 
@@ -40,14 +42,14 @@ module TransportGateway
           let(:user)          { "foo" }
           let(:password)      { "secret_password" }
           let(:userinfo)      { user + ':' + password }
-          let(:to)            { URI::HTTP.build({ host: host, path: path, userinfo: userinfo }) } 
+          let(:to)            { URI::HTTP.build({ host: host, path: path, userinfo: userinfo }) }
           let(:message)       { Message.new(from: from, to: to, body: text_string) }
 
           it "should post text string payload to the server with credentials in header" do
             adapter.send_message(message)
 
-            expect(WebMock).to have_requested(:put, url).
-              with(basic_auth: [user, password], body: text_string, headers: { content_type: 'text/plain'}).once
+            expect(WebMock).to have_requested(:put, url)
+              .with(basic_auth: [user, password], body: text_string, headers: { content_type: 'text/plain'}).once
           end
         end
 
@@ -56,14 +58,14 @@ module TransportGateway
           let(:file_name)   { File.join(file_folder, "text_file.txt") }
           let(:file_handle) { File.new(file_name) }
           let(:file_data)   { File.read(file_name) }
-          let(:to)          { URI::HTTP.build({ host: host, path: path }) } 
+          let(:to)          { URI::HTTP.build({ host: host, path: path }) }
           let(:message)     { Message.new(from: from, to: to, body: file_handle) }
 
           it "should post file content payload to the server" do
             adapter.send_message(message)
 
-            expect(WebMock).to have_requested(:put, url).
-              with(body: file_data, headers: { content_type: 'text/plain'}).once
+            expect(WebMock).to have_requested(:put, url)
+              .with(body: file_data, headers: { content_type: 'text/plain'}).once
           end
 
         end

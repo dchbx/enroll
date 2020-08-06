@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Searches
   class FamilySearchPerson
     include Mongoid::Document
@@ -8,6 +10,6 @@ module Searches
     field :last_name, type: String
     field :name_pfx, type: String
     field :name_sfx, type: String
-    field :person_id, type: BSON::ObjectId 
+    field :person_id, type: BSON::ObjectId
   end
 end

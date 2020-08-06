@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
   include ApplicationHelper
 
-  def initialize(consumer_role, args = {})
+  def initialize(_consumer_role, args = {})
     @family = Family.find(args[:options][:family])
     find_transition_people(args[:options][:result][:people])
     args[:recipient] = @family.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= @family.primary_applicant.person
+    args[:recipient_document_store] = @family.primary_applicant.person
     args[:to] = @family.primary_applicant.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -30,13 +32,9 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -62,21 +60,18 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
   end
 
   def notice_filename
-    "#{subject.titleize.gsub("Dc", "DC").gsub(/[^0-9a-z]/i,'')}"
+    subject.titleize.gsub('Dc', 'DC').gsub(/[^0-9a-z]/i,'').to_s
   end
-
 
   def check_for_transitioned_individuals
     @transition_people.each do |person|
       notice.individuals << PdfTemplates::Individual.new({
-                                                             :first_name => person.first_name.titleize,
-                                                             :last_name => person.last_name.titleize,
-                                                             :age => calculate_age_by_dob(person.dob),
+                                                           :first_name => person.first_name.titleize,
+                                                           :last_name => person.last_name.titleize,
+                                                           :age => calculate_age_by_dob(person.dob)
                                                          })
     end
   end
-
-
 
   def phone_number(legal_name)
     case legal_name

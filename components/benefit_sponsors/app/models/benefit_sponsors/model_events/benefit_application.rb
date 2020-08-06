@@ -4,8 +4,7 @@
 module BenefitSponsors
   module ModelEvents
     module BenefitApplication
-
-      APPLICATION_EXCEPTION_STATES  = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
+      APPLICATION_EXCEPTION_STATES = [:pending, :assigned, :processing, :reviewing, :information_needed, :appealing].freeze
 
       REGISTERED_EVENTS_ON_SAVE = [
         :application_submitted,
@@ -45,21 +44,13 @@ module BenefitSponsors
         return if self.is_conversion?
         if aasm_state_changed?
 
-          if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
-            is_employer_open_enrollment_completed = true
-          end
+          is_employer_open_enrollment_completed = true if is_transition_matching?(to: :enrollment_closed, from: [:enrollment_open, :enrollment_extended], event: :end_open_enrollment)
 
-          if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
-            is_ineligible_application_submitted = true
-          end
+          is_ineligible_application_submitted = true if is_transition_matching?(to: :pending, from: :draft, event: :submit_for_review)
 
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :approve_application)
-            is_application_submitted = true
-          end
+          is_application_submitted = true if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :approve_application)
 
-          if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
-            is_application_denied = true
-          end
+          is_application_denied = true if is_transition_matching?(to: :enrollment_ineligible, from: BenefitSponsors::BenefitApplications::BenefitApplication::ENROLLING_STATES, event: :deny_enrollment_eligiblity)
 
           is_initial_employee_plan_selection_confirmation = true if is_transition_matching?(to: :binder_paid, from: :enrollment_closed, event: :credit_binder)
 
@@ -71,11 +62,9 @@ module BenefitSponsors
 
           is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: :canceled, from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
 
-          if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
-            is_renewal_application_autosubmitted = true
-          end
+          is_renewal_application_autosubmitted = true if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
 
-          # TODO -- encapsulated notify_observers to recover from errors raised by any of the observers
+          # TODO: -- encapsulated notify_observers to recover from errors raised by any of the observers
           (REGISTERED_EVENTS_ON_SAVE + EMPLOYER_EDI_EVENTS_ON_SAVE).each do |event|
             next unless (event_fired = instance_eval("is_" + event.to_s))
 
@@ -89,9 +78,7 @@ module BenefitSponsors
       end
 
       def notify_on_create
-        if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
-          is_renewal_application_created = true
-        end
+        is_renewal_application_created = true if self.is_renewing? && self.benefit_sponsorship.benefit_applications.published.present?
 
         REGISTERED_EVENTS_ON_CREATE.each do |event|
           next unless (event_fired = instance_eval("is_" + event.to_s))
@@ -126,7 +113,6 @@ module BenefitSponsors
 
       module ClassMethods
         def date_change_event(new_date)
-
           if new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 2 #2 days before soft dead line i.e 3th of the month
             is_renewal_employer_first_reminder_to_publish_plan_year = true
           elsif new_date.day == Settings.aca.shop_market.renewal_application.application_submission_soft_deadline - 1 #one day before advertised soft deadline i.e 4th of the month

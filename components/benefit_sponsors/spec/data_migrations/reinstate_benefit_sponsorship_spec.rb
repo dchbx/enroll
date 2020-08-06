@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", '..', 'app', 'data_migrations', 'reinstate_benefit_sponsorship')
 

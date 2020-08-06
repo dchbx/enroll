@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   module Subscribers
     class TransportArtifactSubscriber
@@ -11,7 +13,7 @@ module TransportProfiles
         )
       end
 
-      def work_with_params(body, delivery_info, properties)
+      def work_with_params(_body, _delivery_info, properties)
         headers = properties.headers || {}
         stringed_payload = headers.stringify_keys
         artifact_key = stringed_payload["artifact_key"]
@@ -22,7 +24,7 @@ module TransportProfiles
           :artifact_key => artifact_key,
           :transport_process => transport_process
         )
-        if !atr.valid?
+        unless atr.valid?
           notify(
             "acapi.error.events.transport_artifact.invalid_transport_request",
             {

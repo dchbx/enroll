@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module BenefitApplications
     class AcaShopCcaBenefitApplicationBuilder < BenefitApplicationBuilder
       attr_reader :record
 
-      def initialize(plan_design_organization, options={})
+      def initialize(plan_design_organization, options = {})
         @application_class = BenefitApplications::AcaShopCcaBenefitApplication
         profile_attr = options.fetch(:profile)
         sponsorship_attr = profile_attr.fetch(:benefit_sponsorship)
@@ -22,19 +24,16 @@ module SponsoredBenefits
         @broker = new_broker
       end
 
-      def add_employer_attestation(new_employer_attestation)
-      end
+      def add_employer_attestation(new_employer_attestation); end
 
-      def benefit_application
-        # raise "" if open_enrollment_term.blank?
-        @benefit_application
-      end
+      attr_reader :benefit_application
 
       def reset
         @benefit_application = @application_class.new
       end
 
-    private
+      private
+
       def one_year_period(begin_on)
         (begin_on..(begin_on + 1.year - 1.day))
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class OrganizationSignup
     include ActiveModel::Validations
@@ -12,15 +14,15 @@ module Forms
     include FnameLname
 
     validates :fein,
-      length: { is: 9, message: "%{value} is not a valid FEIN" },
-      numericality: true
-    validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
-    validates_presence_of :last_name, :if => Proc.new { |m| m.person_id.blank? }
+              length: { is: 9, message: "%{value} is not a valid FEIN" },
+              numericality: true
+    validates_presence_of :dob, :if => proc { |m| m.person_id.blank? }
+    validates_presence_of :first_name, :if => proc { |m| m.person_id.blank? }
+    validates_presence_of :last_name, :if => proc { |m| m.person_id.blank? }
     validates_presence_of :fein, :legal_name
     validates :entity_kind,
-      inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
-      allow_blank: false
+              inclusion: { in: ::Organization::ENTITY_KINDS, message: "%{value} is not a valid business entity kind" },
+              allow_blank: false
 
     validate :office_location_validations
     validate :office_location_kinds
@@ -41,38 +43,34 @@ module Forms
     end
 
     def match_or_create_person(current_user)
-      if !self.person_id.blank?
+      unless self.person_id.blank?
         self.person = Person.find(self.person_id)
         return
       end
-      new_person =   Person.new({
-        :first_name => first_name,
-        :last_name => last_name,
-        :dob => dob
-      })
-      if  self.class.to_s == 'Forms::EmployerProfile'
-        matched_people = Person.where(
-          first_name: regex_for(first_name),
-          last_name: regex_for(last_name),
-          dob: new_person.dob
-          )
-      else
-        matched_people = Person.where(
-          first_name: regex_for(first_name),
-          last_name: regex_for(last_name),
-          # TODO
-          # dob: new_person.dob
-        )
-      end
-      if matched_people.count > 1
-        raise TooManyMatchingPeople.new
-      end
+      new_person = Person.new({
+                                :first_name => first_name,
+                                :last_name => last_name,
+                                :dob => dob
+                              })
+      matched_people = if  self.class.to_s == 'Forms::EmployerProfile'
+                         Person.where(
+                           first_name: regex_for(first_name),
+                           last_name: regex_for(last_name),
+                           dob: new_person.dob
+                         )
+                       else
+                         Person.where(
+                           first_name: regex_for(first_name),
+                           last_name: regex_for(last_name)
+                           # TODO
+                           # dob: new_person.dob
+                         )
+                       end
+      raise TooManyMatchingPeople if matched_people.count > 1
       if matched_people.count == 1
         mp = matched_people.first
         if mp.user.present?
-          if mp.user.id.to_s != current_user.id
-            raise PersonAlreadyMatched.new
-          end
+          raise PersonAlreadyMatched if mp.user.id.to_s != current_user.id
         end
         self.person = mp
       else
@@ -120,14 +118,12 @@ module Forms
     end
 
     def office_locations_attributes
-      @office_locations.map do |office_location|
-        office_location.attributes
-      end
+      @office_locations.map(&:attributes)
     end
 
     def office_locations_attributes=(attrs)
       @office_locations = []
-      attrs.each_pair do |k, att_set|
+      attrs.each_pair do |_k, att_set|
         att_set.delete('phone_attributes') if att_set["phone_attributes"].present? && att_set["phone_attributes"]["number"].blank?
         @office_locations << OfficeLocation.new(att_set)
       end
@@ -135,12 +131,20 @@ module Forms
     end
 
     def dob=(val)
-      @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+      @dob = begin
+               Date.strptime(val,"%Y-%m-%d")
+             rescue StandardError
+               nil
+             end
     end
 
     # Strip non-numeric characters
     def fein=(new_fein)
-      @fein =  new_fein.to_s.gsub(/\D/, '') rescue nil
+      @fein = begin
+                 new_fein.to_s.gsub(/\D/, '')
+              rescue StandardError
+                nil
+               end
     end
 
     def regex_for(str)

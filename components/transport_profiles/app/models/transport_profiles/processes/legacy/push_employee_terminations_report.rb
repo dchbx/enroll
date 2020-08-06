@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   class Processes::Legacy::PushEmployeeTerminationsReport < Processes::Process
     def initialize(report_file_name, gateway)

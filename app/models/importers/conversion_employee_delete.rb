@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeeDelete < ConversionEmployeeCommon
     validate :delete_forbidden

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Services
     class PlanDesignProposalService
 
       attr_reader :proposal, :kind
 
-      def initialize(attrs={})
+      def initialize(attrs = {})
         @kind = attrs[:kind]
         @proposal = attrs[:proposal]
       end
@@ -13,7 +15,7 @@ module SponsoredBenefits
         self.send("ensure_#{kind}_benefits")
       end
 
-      def save_benefits(attrs={})
+      def save_benefits(attrs = {})
         self.send("save_#{kind}_benefits", attrs)
       end
 
@@ -24,23 +26,17 @@ module SponsoredBenefits
       end
 
       def ensure_health_benefits
-        if benefit_group.relationship_benefits.empty?
-          benefit_group.build_relationship_benefits
-        end
-        if benefit_group.sole_source? && benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
+        benefit_group.build_relationship_benefits if benefit_group.relationship_benefits.empty?
+        benefit_group.build_composite_tier_contributions if benefit_group.sole_source? && benefit_group.composite_tier_contributions.empty?
         benefit_group
       end
 
       def ensure_dental_benefits
-        if benefit_group.dental_relationship_benefits.empty?
-          benefit_group.build_dental_relationship_benefits 
-        end
+        benefit_group.build_dental_relationship_benefits if benefit_group.dental_relationship_benefits.empty?
         benefit_group
       end
 
-      def save_health_benefits(attrs={})
+      def save_health_benefits(attrs = {})
         benefit_group = benefit_group(
           attrs.merge!(
             {
@@ -51,9 +47,7 @@ module SponsoredBenefits
         update_benefits(attrs) if benefit_group.persisted?
         benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
 
-        if benefit_group.sole_source? && benefit_group.composite_tier_contributions.empty?
-          benefit_group.build_composite_tier_contributions
-        end
+        benefit_group.build_composite_tier_contributions if benefit_group.sole_source? && benefit_group.composite_tier_contributions.empty?
 
         if benefit_group.sole_source?
           benefit_group.build_relationship_benefits
@@ -63,21 +57,21 @@ module SponsoredBenefits
         benefit_group.set_bounding_cost_plans
       end
 
-      def save_dental_benefits(attrs={})
+      def save_dental_benefits(attrs = {})
         update_benefits(attrs)
         benefit_group.elected_dental_plans = benefit_group.elected_dental_plans_by_option_kind
         benefit_group.set_bounding_cost_dental_plans
       end
 
-      def update_benefits(attrs={})
+      def update_benefits(attrs = {})
         self.send("reset_#{kind}_benefits")
         benefit_group.title = "Benefit Group Created for: #{plan_design_organization.legal_name} by #{plan_design_organization.broker_agency_profile.legal_name}"
         if is_dental_benefits?
           benefit_group.update_attributes({
-            dental_plan_option_kind: attrs[:plan_option_kind],
-            dental_reference_plan_id: attrs[:reference_plan_id],
-            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].as_json
-          })
+                                            dental_plan_option_kind: attrs[:plan_option_kind],
+                                            dental_reference_plan_id: attrs[:reference_plan_id],
+                                            dental_relationship_benefits_attributes: attrs[:relationship_benefits_attributes].as_json
+                                          })
         else
           benefit_group.update_attributes(attrs)
         end
@@ -96,7 +90,7 @@ module SponsoredBenefits
         proposal.plan_design_organization
       end
 
-      def benefit_group(attrs={})
+      def benefit_group(attrs = {})
         return @benefit_group if defined? @benefit_group
         @benefit_group = application.benefit_groups.first || application.benefit_groups.build(attrs)
       end

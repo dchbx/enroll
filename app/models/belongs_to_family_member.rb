@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BelongsToFamilyMember
   def family_member
     return nil unless family

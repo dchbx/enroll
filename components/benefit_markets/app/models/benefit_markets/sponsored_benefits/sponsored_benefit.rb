@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module SponsoredBenefits
     class SponsoredBenefit
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      KINDS = [:health, :dental]
+      KINDS = [:health, :dental].freeze
 
       field :hbx_id,      type: String
       field :title,       type: String

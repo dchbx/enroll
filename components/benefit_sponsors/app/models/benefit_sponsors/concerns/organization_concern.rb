@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/concern'
 
 module BenefitSponsors
@@ -59,7 +61,7 @@ module BenefitSponsors
       end
 
       def office_location_kinds
-        location_kinds = self.office_locations.select{|l| !l.persisted?}.flat_map(&:address).compact.flat_map(&:kind)
+        location_kinds = self.office_locations.reject(&:persisted?).flat_map(&:address).compact.flat_map(&:kind)
         # should validate only office location which are not persisted AND kinds ie. primary, mailing, branch
         return if no_primary = location_kinds.detect{|kind| kind == 'work' || kind == 'home'}
         unless location_kinds.empty?
@@ -70,9 +72,7 @@ module BenefitSponsors
           elsif location_kinds.count('mailing') > 1
             errors.add(:base, "can't have more than one mailing address")
           end
-          if !errors.any?# this means that the validation succeeded and we can delete all the persisted ones
-            self.office_locations.delete_if{|l| l.persisted?}
-          end
+          self.office_locations.delete_if(&:persisted?) if errors.none? # this means that the validation succeeded and we can delete all the persisted ones
         end
       end
 
@@ -88,9 +88,7 @@ module BenefitSponsors
       def notify_legal_name_or_fein_change
         return unless self.employer_profile.present?
         FIELD_AND_EVENT_NAMES_MAP.each do |feild, event_name|
-          if @changed_fields.present? && @changed_fields.include?(feild)
-            notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: "#{event_name}"})
-          end
+          notify("acapi.info.events.employer.#{event_name}", {employer_id: self.hbx_id, event_name: event_name.to_s}) if @changed_fields.present? && @changed_fields.include?(feild)
         end
       end
 
@@ -108,7 +106,7 @@ module BenefitSponsors
     end
 
     class_methods do
-      PROFILE_KINDS = [:plan_design_profile, :employer_profile, :broker_agency_profile, :general_agency_profile]
+      PROFILE_KINDS = [:plan_design_profile, :employer_profile, :broker_agency_profile, :general_agency_profile].freeze
       ENTITY_KINDS = [
         "tax_exempt_organization",
         "c_corporation",
@@ -119,9 +117,9 @@ module BenefitSponsors
         "household_employer",
         "governmental_employer",
         "foreign_embassy_or_consulate"
-      ]
+      ].freeze
 
-      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
+      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}.freeze
     end
   end
 end

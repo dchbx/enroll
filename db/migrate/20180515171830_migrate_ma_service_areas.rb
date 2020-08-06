@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateMaServiceAreas < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
@@ -33,12 +35,12 @@ class MigrateMaServiceAreas < Mongoid::Migration
 
         service_area_state_aggregate.each do |rec|
           ::BenefitMarkets::Locations::ServiceArea.create!({
-            active_year: rec["_id"]["active_year"],
-            issuer_provided_code: rec["_id"]["issuer_provided_code"],
-            covered_states: ["MA"],
-            issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]],
-            issuer_provided_title: rec["issuer_provided_title"]
-          })
+                                                             active_year: rec["_id"]["active_year"],
+                                                             issuer_provided_code: rec["_id"]["issuer_provided_code"],
+                                                             covered_states: ["MA"],
+                                                             issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]],
+                                                             issuer_provided_title: rec["issuer_provided_title"]
+                                                           })
         end
 
         service_area_non_state_aggregate = service_area_collection.find({}).aggregate([
@@ -53,8 +55,8 @@ class MigrateMaServiceAreas < Mongoid::Migration
             },
             "locations" => {
               "$push" => {
-                   "county_name" => "$county_name",
-                   "zip" => "$service_area_zipcode"
+                "county_name" => "$county_name",
+                "zip" => "$service_area_zipcode"
               }
             },
             "issuer_provided_title" => {"$last" => "$service_area_name"}
@@ -70,18 +72,18 @@ class MigrateMaServiceAreas < Mongoid::Migration
           next if existing_state_wide_areas.count > 0
           location_ids = rec['locations'].map do |loc_record|
             county_zip = ::BenefitMarkets::Locations::CountyZip.where({
-             zip: loc_record['zip'],
-             county_name: ::Regexp.compile(loc_record['county_name'], true)
-            }).first
+                                                                        zip: loc_record['zip'],
+                                                                        county_name: ::Regexp.compile(loc_record['county_name'], true)
+                                                                      }).first
             county_zip._id
           end
           ::BenefitMarkets::Locations::ServiceArea.create!({
-            active_year: rec["_id"]["active_year"],
-            issuer_provided_code: rec["_id"]["issuer_provided_code"],
-            issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]],
-            issuer_provided_title: rec["issuer_provided_title"],
-            county_zip_ids: location_ids.uniq
-          })
+                                                             active_year: rec["_id"]["active_year"],
+                                                             issuer_provided_code: rec["_id"]["issuer_provided_code"],
+                                                             issuer_profile_id: new_carrier_profile_map[old_carrier_profile_map[rec["_id"]["issuer_hios_id"]]],
+                                                             issuer_provided_title: rec["issuer_provided_title"],
+                                                             county_zip_ids: location_ids.uniq
+                                                           })
         end
 
       end

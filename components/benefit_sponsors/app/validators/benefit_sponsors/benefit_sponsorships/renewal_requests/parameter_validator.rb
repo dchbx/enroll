@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitSponsorships
     module RenewalRequests
@@ -10,4 +12,3 @@ module BenefitSponsors
     end
   end
 end
-  

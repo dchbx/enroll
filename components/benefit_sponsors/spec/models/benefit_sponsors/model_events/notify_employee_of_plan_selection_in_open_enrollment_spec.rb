@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -8,27 +10,29 @@ module BenefitSponsors
     let!(:organization)           { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
     let(:employer_profile)        { organization.employer_profile }
     let(:benefit_sponsorship)     { employer_profile.add_benefit_sponsorship }
-    let!(:benefit_application)    { FactoryBot.create(:benefit_sponsors_benefit_application,
-                                  :with_benefit_package,
-                                  :benefit_sponsorship => benefit_sponsorship,
-                                  :aasm_state => 'active',
-                                  :effective_period =>  start_on..(start_on + 1.year) - 1.day
-    )}
+    let!(:benefit_application)    do
+      FactoryBot.create(:benefit_sponsors_benefit_application,
+                        :with_benefit_package,
+                        :benefit_sponsorship => benefit_sponsorship,
+                        :aasm_state => 'active',
+                        :effective_period => start_on..(start_on + 1.year) - 1.day)
+    end
     let(:person)                  { FactoryBot.create(:person, :with_family) }
     let(:family)                  { person.primary_family }
-    let!(:census_employee)        { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
+    let!(:census_employee)        { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
     let!(:employee_role)          { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
-    let!(:model_instance)         { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                                    household: family.active_household, 
-                                    family: family,
-                                    aasm_state: "shopping",
-                                    submitted_at: benefit_application.open_enrollment_period.max,
-                                    rating_area_id: benefit_application.recorded_rating_area_id,
-                                    sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
-                                    sponsored_benefit_package_id: benefit_application.benefit_packages.first.id,
-                                    benefit_sponsorship_id:benefit_application.benefit_sponsorship.id, 
-                                    employee_role_id: employee_role.id
-    )}
+    let!(:model_instance)         do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
+                        family: family,
+                        aasm_state: "shopping",
+                        submitted_at: benefit_application.open_enrollment_period.max,
+                        rating_area_id: benefit_application.recorded_rating_area_id,
+                        sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
+                        sponsored_benefit_package_id: benefit_application.benefit_packages.first.id,
+                        benefit_sponsorship_id: benefit_application.benefit_sponsorship.id,
+                        employee_role_id: employee_role.id)
+    end
 
     before do
       employee_role.update_attributes(census_employee_id: census_employee.id)
@@ -68,7 +72,7 @@ module BenefitSponsors
 
     describe "NoticeBuilder" do
 
-      let(:data_elements) {
+      let(:data_elements) do
         [
           "employee_profile.notice_date",
           "employee_profile.first_name",
@@ -78,21 +82,23 @@ module BenefitSponsors
           "employee_profile.enrollment.coverage_kind",
           "employee_profile.enrollment.plan_name"
         ]
-      }
+      end
 
       let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-      let(:payload)   { {
+      let(:payload)   do
+        {
           "event_object_kind" => "HbxEnrollment",
           "event_object_id" => model_instance.id
-      } }
+        }
+      end
       let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
       let(:merge_model) { subject.construct_notice_object }
 
       before do
         allow(subject).to receive(:resource).and_return(employee_role)
         allow(subject).to receive(:payload).and_return(payload)
-        employee_role.update_attributes(census_employee_id: census_employee.id) 
+        employee_role.update_attributes(census_employee_id: census_employee.id)
       end
 
       it "should return merge model" do

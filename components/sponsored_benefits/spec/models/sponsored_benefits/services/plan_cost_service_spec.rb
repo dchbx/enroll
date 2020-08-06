@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbclean: :after_each do
   let!(:rating_area) do
     if Settings.aca.state_abbreviation == "DC"
@@ -9,15 +11,14 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
   let(:plan_design_organization) do
     FactoryBot.create :sponsored_benefits_plan_design_organization,
-      owner_profile_id: owner_profile.id,
-      sponsor_profile_id: sponsor_profile.id
+                      owner_profile_id: owner_profile.id,
+                      sponsor_profile_id: sponsor_profile.id
   end
 
   let(:plan_design_proposal) do
     FactoryBot.create(:plan_design_proposal,
-      :with_profile,
-      plan_design_organization: plan_design_organization
-    ).tap do |proposal|
+                      :with_profile,
+                      plan_design_organization: plan_design_organization).tap do |proposal|
       sponsorship = proposal.profile.benefit_sponsorships.first
       sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
       sponsorship.save
@@ -38,8 +39,8 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
   let(:benefit_application) do
     FactoryBot.create :plan_design_benefit_application,
-      :with_benefit_group,
-      benefit_sponsorship: benefit_sponsorship
+                      :with_benefit_group,
+                      benefit_sponsorship: benefit_sponsorship
   end
 
   let(:benefit_group) do
@@ -58,8 +59,8 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
 
   let!(:plan_design_census_employee) do
     FactoryBot.create_list :plan_design_census_employee, 2,
-      :with_random_age,
-      benefit_sponsorship_id: benefit_sponsorship.id
+                           :with_random_age,
+                           benefit_sponsorship_id: benefit_sponsorship.id
   end
 
   let(:organization) { plan_design_organization.sponsor_profile.organization }
@@ -73,9 +74,8 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       FactoryBot.create(:broker_agency_profile)
     else
       FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_broker_agency_profile
-      ).profiles.first
+                        :with_site,
+                        :with_broker_agency_profile).profiles.first
     end
   end
 
@@ -84,9 +84,8 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
       FactoryBot.create(:employer_profile)
     else
       FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-        :with_site,
-        :with_aca_shop_cca_employer_profile
-      ).profiles.first
+                        :with_site,
+                        :with_aca_shop_cca_employer_profile).profiles.first
     end
   end
 
@@ -108,7 +107,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
     end
     it "should return total monthly employer contribution amount" do
       # Er contribution 80%. No.of Employees = 2
-      expect(subject.monthly_employer_contribution_amount).to eq (0.8*2*78.0)
+      expect(subject.monthly_employer_contribution_amount).to eq (0.8 * 2 * 78.0)
     end
   end
 
@@ -121,7 +120,7 @@ RSpec.describe SponsoredBenefits::Services::PlanCostService, type: :model, dbcle
     end
     it "should return total monthly employee contribution amount" do
       # ER contribution is 80%. EE contribution is 20%
-      expect(subject.monthly_employee_costs).to eq [0.2*78.0, 0.2*78.0]
+      expect(subject.monthly_employee_costs).to eq [0.2 * 78.0, 0.2 * 78.0]
     end
   end
 end

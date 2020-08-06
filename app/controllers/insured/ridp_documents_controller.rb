@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::RidpDocumentsController < ApplicationController
   include ApplicationHelper
 
@@ -57,6 +59,7 @@ class Insured::RidpDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -81,7 +84,6 @@ class Insured::RidpDocumentsController < ApplicationController
     file.original_filename
   end
 
-
   def set_document
     @document = @person.consumer_role.ridp_documents.find(params[:id])
   end
@@ -89,7 +91,7 @@ class Insured::RidpDocumentsController < ApplicationController
   def update_ridp_documents(title, file_uri)
     ridp_type = params[:ridp_verification_type]
     document = @docs_owner.consumer_role.ridp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :ridp_verification_type=>ridp_type, :uploaded_at => TimeKeeper.date_of_record})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :ridp_verification_type => ridp_type, :uploaded_at => TimeKeeper.date_of_record})
 
     if success
       person_consumer_role.mark_ridp_doc_uploaded(ridp_type)
@@ -113,7 +115,7 @@ class Insured::RidpDocumentsController < ApplicationController
   def ridp_docs_clean(person)
     existing_documents = person.consumer_role.ridp_documents
     person_consumer_role = Person.find(person.id).consumer_role
-    person_consumer_role.ridp_documents =[]
+    person_consumer_role.ridp_documents = []
     person_consumer_role.save
     person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.ridp_documents = existing_documents.uniq

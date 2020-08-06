@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RemoveFamilyMember
   def set_instance_variables(family, bson_id)
     @family_member = family.family_members.find(bson_id)
@@ -13,10 +15,10 @@ module RemoveFamilyMember
     dup_hbx_members_exists = @hbx_member_fm_ids.include?(bson_id)
     dup_th_members_exists = @th_member_ids.include?(bson_id)
     if dup_fms_exists
-      if (dup_hbx_members_exists || dup_chms_exists)
-      'other_dependencies'
+      if dup_hbx_members_exists || dup_chms_exists
+        'other_dependencies'
       else
-      'no_dependency'
+        'no_dependency'
       end
     end
   end
@@ -87,17 +89,17 @@ module RemoveFamilyMember
   def remove_duplicate_members(family_member_ids)
     @messages = []
     family_member_ids.each do |family_member_id|
-      begin
-        bson_id = BSON::ObjectId.from_string(family_member_id)
-        family = Family.where("family_members._id" => bson_id).first
-        if family.nil?
-          @messages << "No family member found for id: #{bson_id}"
-          next family_member_id
-        end
-        execute_removal_of_member(family, bson_id)
-      rescue StandardError => e
-        puts e.message unless Rails.env.test?
+
+      bson_id = BSON::ObjectId.from_string(family_member_id)
+      family = Family.where("family_members._id" => bson_id).first
+      if family.nil?
+        @messages << "No family member found for id: #{bson_id}"
+        next family_member_id
       end
+      execute_removal_of_member(family, bson_id)
+    rescue StandardError => e
+      puts e.message unless Rails.env.test?
+
     end
     [true, @messages]
   end

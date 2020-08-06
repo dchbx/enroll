@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Broker-owned model to manage attributes of the prospective of existing employer
 module SponsoredBenefits
   module Organizations
@@ -41,10 +43,10 @@ module SponsoredBenefits
       embeds_many :general_agency_accounts, class_name: "SponsoredBenefits::Accounts::GeneralAgencyAccount", cascade_callbacks: true
 
 
-      validates_presence_of   :legal_name, :has_active_broker_relationship
+      validates_presence_of :legal_name, :has_active_broker_relationship
       validates_presence_of :sic_code, if: :sic_code_exists_for_employer?
-      validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
-      validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: Proc.new { |pdo| pdo.sponsor_profile_id.nil? }
+      validates_uniqueness_of :owner_profile_id, :scope => :sponsor_profile_id, unless: proc { |pdo| pdo.sponsor_profile_id.nil? }
+      validates_uniqueness_of :sponsor_profile_id, :scope => :owner_profile_id, unless: proc { |pdo| pdo.sponsor_profile_id.nil? }
 
 
       index({"owner_profile_id" => 1})
@@ -57,14 +59,14 @@ module SponsoredBenefits
       index({"plan_design_proposals.aasm_state" => 1, "plan_design_proposals.claim_code" => 1})
 
 
-      # TODO These scopes must use both the Profile Class and ID.  Change to pass in profile instance
-      scope :find_by_owner,       -> (owner_id) { where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id)) }
-      scope :find_by_sponsor,     -> (sponsor_id) { where(:"sponsor_profile_id" => BSON::ObjectId.from_string(sponsor_id)) }
+      # TODO: These scopes must use both the Profile Class and ID.  Change to pass in profile instance
+      scope :find_by_owner,       ->(owner_id) { where(:owner_profile_id => BSON::ObjectId.from_string(owner_id)) }
+      scope :find_by_sponsor,     ->(sponsor_id) { where(:sponsor_profile_id => BSON::ObjectId.from_string(sponsor_id)) }
 
-      scope :find_by_proposal,    -> (proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
+      scope :find_by_proposal,    ->(proposal) { where(:"plan_design_proposal._id" => BSON::ObjectId.from_string(proposal)) }
 
-      scope :find_by_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts.benefit_sponsrship_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id))}
-      scope :find_by_active_general_agency, -> (general_agency_profile_id) {where(:"general_agency_accounts" => {:"$elemMatch" => { benefit_sponsrship_general_agency_profile_id: BSON::ObjectId.from_string(general_agency_profile_id), aasm_state: :active}} )}
+      scope :find_by_general_agency, ->(general_agency_profile_id) {where(:"general_agency_accounts.benefit_sponsrship_general_agency_profile_id" => BSON::ObjectId.from_string(general_agency_profile_id))}
+      scope :find_by_active_general_agency, ->(general_agency_profile_id) {where(:general_agency_accounts => {:"$elemMatch" => { benefit_sponsrship_general_agency_profile_id: BSON::ObjectId.from_string(general_agency_profile_id), aasm_state: :active}})}
 
       scope :active_sponsors,     -> { where(:has_active_broker_relationship => true) }
       scope :inactive_sponsors,   -> { where(:has_active_broker_relationship => false) }
@@ -72,8 +74,10 @@ module SponsoredBenefits
 
       scope :draft_proposals,     -> { where(:'plan_design_proposals.aasm_state' => 'draft')}
 
-      scope :datatable_search,    -> (query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)},
-                                                                      {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
+      scope :datatable_search,    lambda { |query|
+                                    self.where({"$or" => [{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)},
+                                                          {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}]})
+                                  }
 
 
 
@@ -88,7 +92,7 @@ module SponsoredBenefits
 
       def general_agency_profile
         general_agency_account = general_agency_accounts.active.first
-        general_agency_account.general_agency_profile if general_agency_account
+        general_agency_account&.general_agency_profile
       end
 
       def active_general_agency_account
@@ -97,14 +101,12 @@ module SponsoredBenefits
 
       def active_employer_benefit_sponsorship
         bs = employer_profile.active_benefit_sponsorship
-        bs if (bs && bs.is_eligible?)
+        bs if bs&.is_eligible?
       end
 
-      # TODO Move this method to BenefitMarket Model
+      # TODO: Move this method to BenefitMarket Model
       def service_areas_available_on(date)
-        if use_simple_employer_calculation_model?
-          return []
-        end
+        return [] if use_simple_employer_calculation_model?
         ::CarrierServiceArea.service_areas_available_on(primary_office_location.address, date.year)
       end
 
@@ -123,7 +125,7 @@ module SponsoredBenefits
       end
 
       def calculate_start_on_options
-        calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+        calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db)]}
       end
 
       def calculate_start_on_dates
@@ -147,15 +149,14 @@ module SponsoredBenefits
       end
 
       def build_proposal_from_existing_employer_profile
-
-        # TODO Use Subclass that belongs to this set, e.g. SponsoredBenefits::BenefitApplications::AcaShopCcaPlanDesignProposalBuilder
+        # TODO: Use Subclass that belongs to this set, e.g. SponsoredBenefits::BenefitApplications::AcaShopCcaPlanDesignProposalBuilder
 
         builder = SponsoredBenefits::BenefitApplications::PlanDesignProposalBuilder.new(self, calculate_start_on_dates[0])
         builder.add_plan_design_profile
         builder.add_benefit_application
         builder.add_plan_design_employees
         builder.plan_design_organization.save
-        builder.census_employees.each{|ce| ce.save}
+        builder.census_employees.each(&:save)
         builder.add_proposal_state(new_proposal_state)
         builder.plan_design_proposal
       end
@@ -165,9 +166,9 @@ module SponsoredBenefits
       end
 
       class << self
-        #TODO Pass object instances, not IDs
+        #TODO: Pass object instances, not IDs
         def find_by_owner_and_sponsor(owner_id, sponsor_id)
-          where(:"owner_profile_id" => BSON::ObjectId.from_string(owner_id), :"sponsor_profile_id" => BSON::ObjectId.from_string(sponsor_id)).first
+          where(:owner_profile_id => BSON::ObjectId.from_string(owner_id), :sponsor_profile_id => BSON::ObjectId.from_string(sponsor_id)).first
         end
       end
 

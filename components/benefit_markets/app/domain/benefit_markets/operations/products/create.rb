@@ -14,12 +14,12 @@ module BenefitMarkets
         def call(product_params:)
           values   = yield validate(product_params)
           product  = yield create(values.to_h)
-          
+
           Success(product)
         end
 
         private
-  
+
         def validate(params)
           contract = contract_class(params[:kind])
           result = contract.new.call(params)

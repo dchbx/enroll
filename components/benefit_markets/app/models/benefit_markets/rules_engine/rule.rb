@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class RulesEngine::Rule
 
@@ -12,9 +14,9 @@ module BenefitMarkets
     # if invalid
     attr_accessor :fail
 
-    NO_OP = lambda {|o| true }
+    NO_OP = ->(_o) { true }
 
-    def initialize(name, options={})
+    def initialize(name, options = {})
       @name     = name
       @priority = options[:priority]  || 10
       @validate = options[:validate]  || NO_OP
@@ -23,13 +25,11 @@ module BenefitMarkets
     end
 
     def run(data)
-
       if validate.call(data)
         success.call(data)
       else
-        fail.call(data)
+        raise.call(data)
       end
-
     end
 
   end

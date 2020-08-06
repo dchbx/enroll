@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   class Steps::Step
     attr_reader :description
@@ -7,7 +9,6 @@ module TransportProfiles
       @gateway = gateway
     end
 
-    def execute(process_context)
-    end
+    def execute(process_context); end
   end
 end

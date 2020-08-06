@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class EnrollmentPeriod
   include Mongoid::Document
-  
+
   embedded_in :benefit_sponsor
 
   field :title, type: String
@@ -20,10 +22,10 @@ class EnrollmentPeriod
     write_attribute(:end_on, new_date.end_of_day)
   end
 
-  alias_method :effective_date=, :start_on=
-  alias_method :effective_date, :start_on
+  alias effective_date= start_on=
+  alias effective_date start_on
 
-private
+  private
 
   def end_date_follows_start_date
     return unless self.end_on.present?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MapReduce
   class FamilySearchForPerson
     include FamilySearchCommon
@@ -7,7 +9,7 @@ module MapReduce
     end
 
     def self.populate_for(person)
-       self.new(person).execute
+      self.new(person).execute
     end
 
     def family_ids_for(person)
@@ -39,9 +41,9 @@ module MapReduce
         reduce_function
       )
       @map_reduce.scope({
-        people: people_hash_for(@person_ids)
-      })
-      @map_reduce.out({merge: "families_search"}) 
+                          people: people_hash_for(@person_ids)
+                        })
+      @map_reduce.out({merge: "families_search"})
       @map_reduce.counts
     end
   end

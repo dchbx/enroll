@@ -4,7 +4,6 @@
 module BenefitSponsors
   module ModelEvents
     module BenefitSponsorship
-
       REGISTERED_EVENTS = [].freeze
 
       def notify_on_save

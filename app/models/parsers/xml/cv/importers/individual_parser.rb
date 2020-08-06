@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv::Importers
   class IndividualParser
     attr_reader :person, :person_demographics, :id, :individual
@@ -12,8 +14,16 @@ module Parsers::Xml::Cv::Importers
     def get_person_object
       nil if person.nil? || person_demographics
 
-      gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
-      hbx_id = person.id.match(/hbx_id#(.*)/)[1] rescue ''
+      gender = begin
+                 person_demographics.sex.match(/gender#(.*)/)[1]
+               rescue StandardError
+                 ''
+               end
+      hbx_id = begin
+                 person.id.match(/hbx_id#(.*)/)[1]
+               rescue StandardError
+                 ''
+               end
 
       person_object = Person.new(
         hbx_id: hbx_id,
@@ -32,35 +42,37 @@ module Parsers::Xml::Cv::Importers
         updated_at: individual.modified_at
       )
       person.addresses.each do |address|
-        kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
+        kind = begin
+                 address.type.match(/address_type#(.*)/)[1]
+               rescue StandardError
+                 'home'
+               end
         person_object.addresses.build({
-          address_1: address.address_line_1,
-          address_2: address.address_line_2,
-          city: address.location_city_name,
-          state: address.location_state_code,
-          zip: address.postal_code,
-          kind: kind,
-        })
+                                        address_1: address.address_line_1,
+                                        address_2: address.address_line_2,
+                                        city: address.location_city_name,
+                                        state: address.location_state_code,
+                                        zip: address.postal_code,
+                                        kind: kind
+                                      })
       end
       person.phones.each do |phone|
         phone_type = phone.type
         phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
-        if Phone::KINDS.include?(phone_type_for_enroll)
-          person_object.phones.build({
-            kind: phone_type_for_enroll,
-            full_phone_number: phone.full_phone_number
-          })
-        end
+        next unless Phone::KINDS.include?(phone_type_for_enroll)
+        person_object.phones.build({
+                                     kind: phone_type_for_enroll,
+                                     full_phone_number: phone.full_phone_number
+                                   })
       end
       person.emails.each do |email|
         email_type = email.type
         email_type_for_enroll = email_type.blank? ? nil : email_type.strip.split("#").last
-        if ["home", "work"].include?(email_type_for_enroll)
-          person_object.emails.build({
-            :kind => email_type_for_enroll,
-            :address => email.email_address
-          })
-        end 
+        next unless ["home", "work"].include?(email_type_for_enroll)
+        person_object.emails.build({
+                                     :kind => email_type_for_enroll,
+                                     :address => email.email_address
+                                   })
       end
       person_object
     end
@@ -72,9 +84,10 @@ module Parsers::Xml::Cv::Importers
     end
 
     private
+
     def bubble_address_errors_by_person(person)
-      addresses = person.addresses.select {|a| !a.valid?}
-      if person.errors.has_key?(:addresses) && addresses.present?
+      addresses = person.addresses.reject(&:valid?)
+      if person.errors.key?(:addresses) && addresses.present?
         addresses.each do |address|
           address.errors.each do |k, v|
             person.errors.add("#{address.kind} address: #{k}", v)

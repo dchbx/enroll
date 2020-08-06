@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), "..", "..", "components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "..", "components/benefit_sponsors/spec/support/benefit_sponsors_product_spec_helpers")
 
 def products_for(product_package, calender_year)
-  puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind.to_s}"
-  BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect { |prod| prod.create_copy_for_embedding }
+  puts "Found #{BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).count} products for #{calender_year} #{product_package.package_kind}"
+  BenefitMarkets::Products::HealthProducts::HealthProduct.by_product_package(product_package).collect(&:create_copy_for_embedding)
 end
 
 def effective_date(start_or_end)
@@ -24,31 +26,31 @@ end
 
 Given (/^.*a CCA sole source employer health benefit package, in open enrollment$/) do
   primary_office_location = ::BenefitSponsors::Locations::OfficeLocation.new({
-    :address => ::BenefitSponsors::Locations::Address.new(
-      {
-        address_1: "27 Reo Road",
-        state: "MA",
-        zip: "01754",
-        county: "Middlesex",
-        city: "Maynard",
-        kind: "work"
-      }
-    ),
-    :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "work"}),
-    is_primary: true
-  })
+                                                                               :address => ::BenefitSponsors::Locations::Address.new(
+                                                                                 {
+                                                                                   address_1: "27 Reo Road",
+                                                                                   state: "MA",
+                                                                                   zip: "01754",
+                                                                                   county: "Middlesex",
+                                                                                   city: "Maynard",
+                                                                                   kind: "work"
+                                                                                 }
+                                                                               ),
+                                                                               :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "work"}),
+                                                                               is_primary: true
+                                                                             })
   e_profile = ::BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new({
-    :sic_code => "2035",
-    :contact_method => :paper_and_electronic,
-    :office_locations => [primary_office_location]
-  })
+                                                                                :sic_code => "2035",
+                                                                                :contact_method => :paper_and_electronic,
+                                                                                :office_locations => [primary_office_location]
+                                                                              })
   @employer_organization = ::BenefitSponsors::Organizations::GeneralOrganization.create!({
-    :legal_name => "Generic Employer",
-    :fein => "123423444",
-    :entity_kind => "c_corporation",
-    :profiles => [e_profile],
-    :site => @site
-  })
+                                                                                           :legal_name => "Generic Employer",
+                                                                                           :fein => "123423444",
+                                                                                           :entity_kind => "c_corporation",
+                                                                                           :profiles => [e_profile],
+                                                                                           :site => @site
+                                                                                         })
   @employer_profile = @employer_organization.profiles.first
   @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
   @benefit_sponsorship.save!
@@ -90,15 +92,15 @@ end
 
 Given (/^.*an employee eligible for shopping during open enrollment, who is linked$/) do
   @census_employee = ::CensusEmployee.new({
-    :benefit_sponsors_employer_profile_id => @employer_profile.id,
-    :dob => Date.new(1970, 3, 4),
-    :ssn => "111111115",
-    :first_name => "Employee",
-    :last_name => "One",
-    :gender => "male",
-    :hired_on => Date.new(2014, 6, 15),
-    :benefit_sponsorship_id => @benefit_sponsorship.id
-  })
+                                            :benefit_sponsors_employer_profile_id => @employer_profile.id,
+                                            :dob => Date.new(1970, 3, 4),
+                                            :ssn => "111111115",
+                                            :first_name => "Employee",
+                                            :last_name => "One",
+                                            :gender => "male",
+                                            :hired_on => Date.new(2014, 6, 15),
+                                            :benefit_sponsorship_id => @benefit_sponsorship.id
+                                          })
   @census_employee.save!
   sqs = [0,1,2].map do |num|
     SecurityQuestion.create!(
@@ -146,8 +148,8 @@ end
 Given (/^.*made a group selection during open enrollment$/) do
   person = @user.person
   params = ActionController::Parameters.new({
-    'person_id' => @user.person.id, 'coverage_kind' => 'health'
-  })
+                                              'person_id' => @user.person.id, 'coverage_kind' => 'health'
+                                            })
   adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params)
   builder = ::EnrollmentShopping::EnrollmentBuilder.new(
     adapter.coverage_household,
@@ -166,7 +168,7 @@ Given (/^.*made a group selection during open enrollment$/) do
 end
 
 When (/^.*visit the group selection page during open enrollment$/) do
- visit new_insured_group_selection_path(person_id: @user.person.id, coverage_kind: 'health')
+  visit new_insured_group_selection_path(person_id: @user.person.id, coverage_kind: 'health')
 end
 
 When (/^.*visit the plan shopping page$/) do

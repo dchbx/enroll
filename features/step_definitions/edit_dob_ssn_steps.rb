@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin should see the list of primary applicants and an Action button$/) do
   within('.effective-datatable') do
     expect(page).to have_css('.dropdown-toggle', count: 1)
@@ -37,7 +39,7 @@ Given("that a user with a HBX staff role with HBX Staff exists and is logged in"
 end
 
 # FIXME: Make this take a 'for' argument, that way we can select which user
-Then(/^Hbx Admin should see an edit DOB\/SSN link$/) do
+Then(%r{^Hbx Admin should see an edit DOB/SSN link$}) do
   find_link('Edit DOB / SSN').visible?
 end
 
@@ -52,7 +54,7 @@ When(/^Hbx Admin enters an invalid SSN and clicks on update$/) do
 end
 
 Then(/^Hbx Admin should see the edit form being rendered again with a validation error message$/) do
-  expect(page).to have_content(/Edit DOB \/ SSN/i)
+  expect(page).to have_content(%r{Edit DOB / SSN}i)
   expect(page).to have_content(/SSN must be 9 digits/i)
 end
 
@@ -63,5 +65,5 @@ When(/^Hbx Admin enters a valid DOB and SSN and clicks on update$/) do
 end
 
 Then(/^Hbx Admin should see the update partial rendered with update sucessful message$/) do
-  expect(page).to have_content(/DOB \/ SSN Update Successful/i)
+  expect(page).to have_content(%r{DOB / SSN Update Successful}i)
 end

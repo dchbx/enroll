@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module Datatables
     class BenefitSponsorsEmployerDatatable < Effective::MongoidDatatable
@@ -5,7 +7,7 @@ module Effective
       include Config::SiteHelper
 
 
-      SOURCE_KINDS = ([:all]+ BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
+      SOURCE_KINDS = ([:all] + BenefitSponsors::BenefitSponsorships::BenefitSponsorship::SOURCE_KINDS).freeze
 
       datatable do
 
@@ -16,13 +18,13 @@ module Effective
           bulk_action 'Enable SSN Requirement', disable_ssn_requirement_exchanges_hbx_profiles_path(:can_update => 'enable'), data: { confirm: 'enable ssn requirement?', no_turbolink: true }
         end
 
-        table_column :legal_name, :proc => Proc.new { |row|
+        table_column :legal_name, :proc => proc { |row|
           @employer_profile = row.organization.employer_profile
           (link_to row.organization.legal_name.titleize, benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile.id, :tab => 'home'), data: {turbolinks: false})
         }, :sortable => false, :filter => false
-        table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| row.organization.fein }, :sortable => false, :filter => false
-        table_column :hbx_id, :label => 'HBX ID', :proc => Proc.new { |row| row.organization.hbx_id }, :sortable => false, :filter => false
-        table_column :broker, :proc => Proc.new { |row|
+        table_column :fein, :label => 'FEIN', :proc => proc { |row| row.organization.fein }, :sortable => false, :filter => false
+        table_column :hbx_id, :label => 'HBX ID', :proc => proc { |row| row.organization.hbx_id }, :sortable => false, :filter => false
+        table_column :broker, :proc => proc { |_row|
           @employer_profile.try(:active_broker_agency_legal_name).try(:titleize) #if row.employer_profile.broker_agency_profile.present?
         }, :filter => false
 
@@ -42,21 +44,22 @@ module Effective
           }, :filter => {include_blank: false, :as => :select, :collection => SOURCE_KINDS, :selected => 'all'}
         end
 
-        table_column :plan_year_state, :proc => Proc.new { |row|
+        table_column :plan_year_state, :proc => proc { |row|
           benefit_application_summarized_state(row.dt_display_benefit_application) if row.dt_display_benefit_application.present?
         }, :filter => false
-        table_column :effective_date, :proc => Proc.new { |row|
+        table_column :effective_date, :proc => proc { |row|
           row.dt_display_benefit_application.effective_period.min.strftime("%m/%d/%Y") if row.dt_display_benefit_application.present?
         }, :filter => false, :sortable => true
 
-        table_column :invoiced?, :proc => Proc.new { |row|
-          boolean_to_glyph(@employer_profile.current_month_invoice.present?)}, :filter => false
+        table_column :invoiced?, :proc => proc { |_row|
+                                            boolean_to_glyph(@employer_profile.current_month_invoice.present?)
+                                          }, :filter => false
 
         # table_column :xml_submitted, :label => 'XML Submitted', :proc => Proc.new {|row| format_time_display(@employer_profile.xml_transmitted_timestamp)}, :filter => false, :sortable => false
 
         if employer_attestation_is_enabled?
-          table_column :attestation_status, :label => 'Attestation Status', :proc => Proc.new {|row|
-            #TODO fix this after employer attestation is fixed, this is only temporary fix
+          table_column :attestation_status, :label => 'Attestation Status', :proc => proc {|row|
+            #TODO: fix this after employer attestation is fixed, this is only temporary fix
             #used below condition, as employer_attestation is embedded from both employer profile and benefit sponsorship
             if row.employer_attestation.present?
               row.employer_attestation.aasm_state.titleize
@@ -66,7 +69,7 @@ module Effective
           }, :filter => false, :sortable => false
         end
 
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
               # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
               ['Transmit XML', "#", "disabled"],
@@ -94,17 +97,15 @@ module Effective
             )
           end
 
-          if employer_attestation_is_enabled?
-            dropdown.insert(2,['Attestation', main_app.edit_employers_employer_attestation_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
-          end
+          dropdown.insert(2,['Attestation', main_app.edit_employers_employer_attestation_path(id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax']) if employer_attestation_is_enabled?
           if row.oe_extendable_benefit_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
             dropdown.insert(3,['Extend Open Enrollment', main_app.oe_extendable_applications_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), 'ajax'])
           end
 
           if row.oe_extended_applications.present? && pundit_allow(HbxProfile, :can_extend_open_enrollment?)
             dropdown.insert(4, ['Close Open Enrollment', main_app.oe_extended_applications_exchanges_hbx_profiles_path(
-                id: @employer_profile.latest_benefit_sponsorship.id,
-                employer_actions_id: "employer_actions_#{@employer_profile.id}"
+              id: @employer_profile.latest_benefit_sponsorship.id,
+              employer_actions_id: "employer_actions_#{@employer_profile.id}"
             ), 'ajax'])
           end
 
@@ -152,7 +153,9 @@ module Effective
             if attributes[:enrolling_initial].present? || attributes[:enrolling_renewing].present?
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_initial]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] != 'all'
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling_renewing]) if attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] != 'all'
-              benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling]) if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] == 'all' || attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] == 'all'
+              if attributes[:enrolling_initial].present? && attributes[:enrolling_initial] == 'all' || attributes[:enrolling_renewing].present? && attributes[:enrolling_renewing] == 'all'
+                benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling])
+              end
             else
               benefit_sponsorships = benefit_sponsorships.send(attributes[:enrolling])
             end
@@ -168,9 +171,7 @@ module Effective
             end
           end
 
-          if attributes[:attestations].present? && attributes[:attestations] != "employer_attestations"
-            benefit_sponsorships = benefit_sponsorships.attestations_by_kind(attributes[:attestations])
-          end
+          benefit_sponsorships = benefit_sponsorships.attestations_by_kind(attributes[:attestations]) if attributes[:attestations].present? && attributes[:attestations] != "employer_attestations"
         end
 
         @employer_collection = benefit_sponsorships
@@ -218,39 +219,39 @@ module Effective
         @next_90_day = @next_60_day.next_month
 
         filters = {
-            enrolling_renewing:
+          enrolling_renewing:
+              [
+                  {scope: 'all', label: 'All'},
+                  {scope: 'benefit_application_renewal_pending', label: 'Application Pending'},
+                  {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'}
+              ],
+          enrolling_initial:
                 [
-                    {scope:'all', label: 'All'},
-                    {scope: 'benefit_application_renewal_pending', label: 'Application Pending'},
-                    {scope: 'benefit_application_enrolling_renewing_oe', label: 'Open Enrollment'}
-                ],
-            enrolling_initial:
-                [
-                    {scope:'all', label: 'All'},
+                    {scope: 'all', label: 'All'},
                     {scope: 'benefit_application_pending', label: 'Application Pending'},
                     {scope: 'benefit_application_enrolling_initial_oe', label: 'Open Enrollment'},
                     {scope: 'benefit_application_initial_binder_paid', label: 'Binder Paid'},
                     {scope: 'benefit_application_initial_binder_pending', label: 'Binder Pending'}
                 ],
-            enrolled:
+          enrolled:
                 [
-                    {scope:'benefit_application_enrolled', label: 'All' },
-                    {scope:'benefit_application_suspended', label: 'Suspended' }
+                    {scope: 'benefit_application_enrolled', label: 'All' },
+                    {scope: 'benefit_application_suspended', label: 'Suspended' }
                 ],
-            upcoming_dates:
+          upcoming_dates:
                 [
                     {scope: @next_30_day, label: @next_30_day },
                     {scope: @next_60_day, label: @next_60_day },
                     {scope: @next_90_day, label: @next_90_day }
                 ],
-            enrolling:
+          enrolling:
                 [
                     {scope: 'benefit_application_enrolling', label: 'All'},
                     {scope: 'benefit_application_enrolling_initial', label: 'Initial', subfilter: :enrolling_initial},
                     {scope: 'benefit_application_enrolling_renewing', label: 'Renewing / Converting', subfilter: :enrolling_renewing},
                     {scope: 'benefit_application_enrolling', label: 'Upcoming Dates', subfilter: :upcoming_dates}
                 ],
-            attestations:
+          attestations:
                 [
                     {scope: 'employer_attestations', label: 'All'},
                     {scope: 'submitted', label: 'Submitted'},
@@ -258,18 +259,16 @@ module Effective
                     {scope: 'approved', label: 'Approved'},
                     {scope: 'denied', label: 'Denied'}
                 ],
-            employers:
+          employers:
                 [
-                    {scope:'all', label: 'All'},
-                    {scope:'benefit_sponsorship_applicant', label: 'Applicants'},
-                    {scope:'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
-                    {scope:'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled}
+                    {scope: 'all', label: 'All'},
+                    {scope: 'benefit_sponsorship_applicant', label: 'Applicants'},
+                    {scope: 'benefit_application_enrolling', label: 'Enrolling', subfilter: :enrolling},
+                    {scope: 'benefit_application_enrolled', label: 'Enrolled', subfilter: :enrolled}
                 ],
-            top_scope: :employers
+          top_scope: :employers
         }
-        if employer_attestation_is_enabled?
-          filters[:employers] << {scope:'employer_attestations', label: 'Employer Attestations', subfilter: :attestations}
-        end
+        filters[:employers] << {scope: 'employer_attestations', label: 'Employer Attestations', subfilter: :attestations} if employer_attestation_is_enabled?
         filters
       end
     end

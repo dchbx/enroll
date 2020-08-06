@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -5,11 +7,11 @@ module BenefitMarkets
     describe "for a disabled, >= 27 year old child" do
       subject do
         ::BenefitMarkets::PricingModels::MemberRelationship.new(
-         relationship_name: "dependent",
-         relationship_kinds: ["child"],
-         age_threshold: 27,
-         age_comparison: :>=,
-         disability_qualifier: true
+          relationship_name: "dependent",
+          relationship_kinds: ["child"],
+          age_threshold: 27,
+          age_comparison: :>=,
+          disability_qualifier: true
         )
       end
 
@@ -47,10 +49,10 @@ module BenefitMarkets
     describe "given no disability qualifier, for a < 26 year old child" do
       subject do
         ::BenefitMarkets::ContributionModels::MemberRelationship.new(
-         relationship_name: "dependent",
-         relationship_kinds: ["child"],
-         age_threshold: 26,
-         age_comparison: :<
+          relationship_name: "dependent",
+          relationship_kinds: ["child"],
+          age_threshold: 26,
+          age_comparison: :<
         )
       end
 

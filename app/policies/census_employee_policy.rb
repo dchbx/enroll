@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CensusEmployeePolicy < ApplicationPolicy
   # TODO: JF JULY 1 review this
   # Last updated July 23 from https://github.com/dchbx/enroll/pull/2782/
@@ -9,7 +11,7 @@ class CensusEmployeePolicy < ApplicationPolicy
       elsif @user.has_role?(:broker)
         @record.employer_profile.try(:active_broker) == @user.person
       elsif has_valid_broker_staff_role?(@user, @record)
-         true
+        true
       elsif @user.has_role?(:general_agency_staff)
         ga_account = @record.employer_profile.general_agency_accounts.select do |general_agency_account|
           @user.person.general_agency_staff_roles.where(benefit_sponsors_general_agency_profile_id: general_agency_account.benefit_sponsrship_general_agency_profile_id)
@@ -43,12 +45,9 @@ class CensusEmployeePolicy < ApplicationPolicy
       broker_agency_profiles = @user.person.active_broker_staff_roles.map(&:broker_agency_profile)
       broker_agency_profiles.each do |ba|
         employer_profiles = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(ba)
-        if employer_profiles
-          emp_ids = employer_profiles.map(&:id)
-          if emp_ids.include?(employee.benefit_sponsors_employer_profile_id)
-            return true
-          end
-        end
+        next unless employer_profiles
+        emp_ids = employer_profiles.map(&:id)
+        return true if emp_ids.include?(employee.benefit_sponsors_employer_profile_id)
       end
     end
   end

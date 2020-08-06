@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^Employer exists and logs in$/) do
   login_as @staff_role
 end

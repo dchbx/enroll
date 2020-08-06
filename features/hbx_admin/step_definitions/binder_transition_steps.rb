@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module BinderTransitionWorld
   include ApplicationHelper
-
 end
 World(BinderTransitionWorld)
 
@@ -17,16 +18,16 @@ And(/^the HBX admin clicks the Binder Transition tab$/) do
   page.find(".title-inline").should have_content("Binder Transition Information")
 end
 
-And(/^the HBX admin sees a checklist$/) do |checklist|
+And(/^the HBX admin sees a checklist$/) do |_checklist|
   expect(page.text).to include eligibility_criteria(employer.employer_profile).gsub("<br>", " ")
 end
 
 When(/^the HBX admin selects the employer to confirm$/) do
   wait_for_ajax
-  page.find("#employer_profile_id_#{employer.employer_profile.id.to_s}").click
+  page.find("#employer_profile_id_#{employer.employer_profile.id}").click
 end
 
-Then(/^the initiate "([^"]*)" button will be active$/) do |arg1|
+Then(/^the initiate "([^"]*)" button will be active$/) do |_arg1|
   expect(find("#binderSubmit")["disabled"]).to eq false # binder paid button should be enabled at this point as we selected an employer
 end
 
@@ -57,11 +58,11 @@ When(/^the DCHBX confirms binder payment has been received by third\-party proce
   pending # Write code here that turns the phrase above into concrete actions
 end
 
-When(/^the HBX admin has verified new \(initial\) Employer meets minimum participation requirements \((\d+)\/(\d+) rule\)$/) do |arg1, arg2|
+When(%r{^the HBX admin has verified new \(initial\) Employer meets minimum participation requirements \((\d+)/(\d+) rule\)$}) do |_arg1, _arg2|
   expect(page.text).to include(eligibility_criteria(employer.employer_profile).gsub("<br>", " "))
 end
 
-When(/^a sufficient number of 'non\-owner' employee\(s\) have enrolled and\/or waived in Employer\-sponsored benefits$/) do
+When(%r{^a sufficient number of 'non\-owner' employee\(s\) have enrolled and/or waived in Employer\-sponsored benefits$}) do
   expect(page.text).to include(non_owner_participation_rule(employer.employer_profile))
 end
 

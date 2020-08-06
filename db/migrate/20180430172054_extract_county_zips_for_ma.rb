@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExtractCountyZipsForMa < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
@@ -10,26 +12,25 @@ class ExtractCountyZipsForMa < Mongoid::Migration
             {"$group" => {_id: {zip_code: "$service_area_zipcode", county_name: "$county_name"}}},
             {"$project" => {zip: "$_id.zip_code", county_name: "$_id.county_name", state: "MA", _id: 0}},
             {"$out" => "benefit_markets_locations_county_zips"}
-          ]).each 
+          ]).each
         end
       end
       if rating_areas
         say_with_time("Extract additional counties and zips using rating areas as our source") do
           rating_areas.find({}).aggregate([
             {"$group" => {_id: {zip_code: "$zip_code", county_name: "$county_name"}}},
-            {"$project" => {zip: "$_id.zip_code", county_name: "$_id.county_name", state: "MA", _id: 0}},
+            {"$project" => {zip: "$_id.zip_code", county_name: "$_id.county_name", state: "MA", _id: 0}}
           ]).each do |ra_record|
             found_existing_record = ::BenefitMarkets::Locations::CountyZip.where({
-              county_name: ra_record['county_name'],
-              zip: ra_record['zip']
-            }).any?
-            unless found_existing_record
-              ::BenefitMarkets::Locations::CountyZip.create!({
-                county_name: ra_record['county_name'],
-                zip: ra_record['zip'],
-                state: "MA"
-              }) 
-            end
+                                                                                   county_name: ra_record['county_name'],
+                                                                                   zip: ra_record['zip']
+                                                                                 }).any?
+            next if found_existing_record
+            ::BenefitMarkets::Locations::CountyZip.create!({
+                                                             county_name: ra_record['county_name'],
+                                                             zip: ra_record['zip'],
+                                                             state: "MA"
+                                                           })
           end
         end
       end
@@ -39,8 +40,6 @@ class ExtractCountyZipsForMa < Mongoid::Migration
   end
 
   def self.down
-    if Settings.site.key.to_s == "cca"
-      ::BenefitMarkets::Locations::CountyZip.all.delete
-    end
+    ::BenefitMarkets::Locations::CountyZip.all.delete if Settings.site.key.to_s == "cca"
   end
 end

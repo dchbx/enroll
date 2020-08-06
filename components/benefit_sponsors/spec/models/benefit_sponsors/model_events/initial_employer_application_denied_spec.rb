@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied', dbclean: :after_each do
@@ -9,12 +11,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_closed',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:model_instance) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'enrollment_closed',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
 
 
   describe "ModelEvent" do
@@ -51,7 +54,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
           "employer_profile.notice_date",
           "employer_profile.employer_name",
@@ -60,15 +63,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
           "employer_profile.benefit_application.enrollment_errors",
           "employer_profile.broker_present?"
       ]
-    }
+    end
 
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
         "event_object_id" => model_instance.id
-    } }
+      }
+    end
     let(:merge_model) { subject.construct_notice_object }
 
     context "when notice event received" do
@@ -118,7 +123,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerApplicationDenied',
             end
           end
         end
-        expect(merge_model.benefit_application.enrollment_errors).to eq (enrollment_errors.join(' AND/OR '))
+        expect(merge_model.benefit_application.enrollment_errors).to eq enrollment_errors.join(' AND/OR ')
       end
     end
   end

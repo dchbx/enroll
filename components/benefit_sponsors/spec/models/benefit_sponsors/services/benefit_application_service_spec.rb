@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
@@ -16,11 +18,13 @@ module BenefitSponsors
     end
 
     describe "constructor" do
-      let(:benefit_sponser_ship) { double("BenefitSponsorship", {
-          :benefit_market => "BenefitMarket",
-          :profile_id => "rspec-id",
-          :organization => "Organization"
-      })}
+      let(:benefit_sponser_ship) do
+        double("BenefitSponsorship", {
+                 :benefit_market => "BenefitMarket",
+                 :profile_id => "rspec-id",
+                 :organization => "Organization"
+               })
+      end
       let(:benefit_factory) { double("BenefitApplicationFactory", benefit_sponser_ship: benefit_sponser_ship) }
 
       it "should initialize service factory" do
@@ -43,8 +47,8 @@ module BenefitSponsors
 
       let(:params) do
         {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period,
+          effective_period: effective_period,
+          open_enrollment_period: open_enrollment_period
         }
       end
 
@@ -63,7 +67,8 @@ module BenefitSponsors
           organization: organization,
           profile_id: organization.profiles.first.id,
           benefit_market: site.benefit_markets[0],
-          employer_attestation: employer_attestation)
+          employer_attestation: employer_attestation
+        )
       end
 
       let(:benefit_application)       { benefit_sponsorship.benefit_applications.new(params) }
@@ -143,7 +148,8 @@ module BenefitSponsors
           organization: organization,
           profile_id: organization.profiles.first.id,
           benefit_market: benefit_market,
-          employer_attestation: employer_attestation)
+          employer_attestation: employer_attestation
+        )
       end
 
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship) }
@@ -221,7 +227,7 @@ module BenefitSponsors
         bs.save!
         bs
       end
-      let(:effective_period)              { Date.new(2019, 02, 01)..Date.new(2020,01,31) }
+      let(:effective_period)              { Date.new(2019, 0o2, 0o1)..Date.new(2020,0o1,31) }
       let(:create_ba_params) do
         {
           "start_on" => effective_period.min.to_s, "end_on" => effective_period.max.to_s, "fte_count" => "11",

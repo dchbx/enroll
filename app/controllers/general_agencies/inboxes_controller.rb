@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeneralAgencies::InboxesController < InboxesController
   include Acapi::Notifiers
 
@@ -11,7 +13,7 @@ class GeneralAgencies::InboxesController < InboxesController
   def msg_to_portal
     @general_agency_provider = GeneralAgencyProfile.find(params["inbox_id"])
     @inbox_provider = @general_agency_provider
-    @inbox_provider_name = @inbox_provider.try(:legal_name) 
+    @inbox_provider_name = @inbox_provider.try(:legal_name)
     @inbox_to_name = "HBX Admin"
     @new_message = @inbox_provider.inbox.messages.build
   end
@@ -45,15 +47,15 @@ class GeneralAgencies::InboxesController < InboxesController
     super
   end
 
- def find_inbox_provider
-    id = params["id"]||params['profile_id']
+  def find_inbox_provider
+    id = params["id"] || params['profile_id']
     if current_user.person._id.to_s == id
       @inbox_provider = current_user.person
     else
-      @general_agency_provider = GeneralAgencyProfile.find(params["id"]||params['profile_id'])
+      @general_agency_provider = GeneralAgencyProfile.find(params["id"] || params['profile_id'])
       @inbox_provider = @general_agency_provider
     end
-  end
+   end
 
   def successful_save_path
     exchanges_hbx_profiles_root_path

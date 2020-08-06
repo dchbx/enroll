@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RatingFactorSet
   include Mongoid::Document
   include MongoidSupport::AssociationProxies

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployerPlanYearCreate < ConversionEmployerPlanYear
 
@@ -15,19 +17,19 @@ module Importers::Mhc
     end
 
     def map_benefit_group(found_carrier)
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, calculated_coverage_start.year).compact
 
       begin
-        reference_plan = select_reference_plan(available_plans, (calculated_coverage_start).year)
+        reference_plan = select_reference_plan(available_plans, calculated_coverage_start.year)
 
         benefit_group_properties = {
           :title => "Standard",
           :plan_option_kind => plan_selection,
           :reference_plan_id => reference_plan.id,
-          :elected_plan_ids => [reference_plan.id],
+          :elected_plan_ids => [reference_plan.id]
         }
 
-        if !new_coverage_policy_value.blank?
+        unless new_coverage_policy_value.blank?
           benefit_group_properties[:effective_on_offset] = new_coverage_policy_value.offset
           benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
         end
@@ -36,24 +38,24 @@ module Importers::Mhc
         benefit_group.composite_tier_contributions = build_composite_tier_contributions(benefit_group)
         benefit_group.build_relationship_benefits
         benefit_group
-      rescue => e
+      rescue StandardError => e
         puts available_plans.inspect
         raise e
       end
     end
 
     def tier_offered?(preference)
-      (preference.present? && eval(preference.downcase)) ? true : false
+      preference.present? && eval(preference.downcase) ? true : false
     end
 
     def build_employee_rating_tier(benefit_group)
       benefit_group.composite_tier_contributions.build({
-        composite_rating_tier: 'employee_only',
-        offered: true,
-        employer_contribution_percent: employee_only_rt_contribution,
-        estimated_tier_premium: employee_only_rt_premium,
-        final_tier_premium: employee_only_rt_premium
-      })
+                                                         composite_rating_tier: 'employee_only',
+                                                         offered: true,
+                                                         employer_contribution_percent: employee_only_rt_contribution,
+                                                         estimated_tier_premium: employee_only_rt_premium,
+                                                         final_tier_premium: employee_only_rt_premium
+                                                       })
     end
 
     def build_composite_tier_contributions(benefit_group)
@@ -64,12 +66,12 @@ module Importers::Mhc
 
       rating_tier_names.each do |rating_tier|
         composite_tiers << benefit_group.composite_tier_contributions.build({
-          composite_rating_tier: rating_tier, 
-          offered: tier_offered?(eval("#{rating_tier}_rt_offered").to_s),
-          employer_contribution_percent: eval("#{rating_tier}_rt_contribution"),
-          estimated_tier_premium: eval("#{rating_tier}_rt_premium"),
-          final_tier_premium: eval("#{rating_tier}_rt_premium")
-        })
+                                                                              composite_rating_tier: rating_tier,
+                                                                              offered: tier_offered?(eval("#{rating_tier}_rt_offered").to_s),
+                                                                              employer_contribution_percent: eval("#{rating_tier}_rt_contribution"),
+                                                                              estimated_tier_premium: eval("#{rating_tier}_rt_premium"),
+                                                                              final_tier_premium: eval("#{rating_tier}_rt_premium")
+                                                                            })
       end
 
       composite_tiers
@@ -90,7 +92,7 @@ module Importers::Mhc
         end
         map_employees_to_benefit_groups(employer, record)
       end
-      return save_result
+      save_result
     end
   end
 end

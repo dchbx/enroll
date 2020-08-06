@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixPlanYear < MongoidMigrationTask
   def migrate
-
     employer_profile = EmployerProfile.find_by_fein(ENV['fein'])
 
     if employer_profile.present?
@@ -14,11 +15,11 @@ class FixPlanYear < MongoidMigrationTask
       prev_enrollments = if prev_state == "terminated"
                            find_by_benefit_groups(plan_year.benefit_groups).select {|enrollment| enrollment.coverage_terminated? && enrollment.terminated_on == plan_year.end_on}
                          elsif prev_state == "active"
-                           find_by_benefit_groups(plan_year.benefit_groups).select {|enrollment| ['coverage_selected','coverage_enrolled'].include?("#{enrollment.aasm_state}")}
+                           find_by_benefit_groups(plan_year.benefit_groups).select {|enrollment| ['coverage_selected','coverage_enrolled'].include?(enrollment.aasm_state.to_s)}
                          elsif prev_state == "expired"
-                           find_by_benefit_groups(plan_year.benefit_groups).select {|enrollment| enrollment.coverage_expired?}
-                         elsif ["canceled","renewing_canceled"].include?("#{prev_state}")
-                           find_by_benefit_groups(plan_year.benefit_groups).select {|enrollment| enrollment.coverage_canceled?}
+                           find_by_benefit_groups(plan_year.benefit_groups).select(&:coverage_expired?)
+                         elsif ["canceled","renewing_canceled"].include?(prev_state.to_s)
+                           find_by_benefit_groups(plan_year.benefit_groups).select(&:coverage_canceled?)
                          end
 
       plan_year.end_on = Date.strptime(ENV['end_on'].to_s, "%m/%d/%Y") if ENV['end_on']
@@ -38,7 +39,7 @@ class FixPlanYear < MongoidMigrationTask
             enrollment.hbx_enrollment_members.each { |mem| mem.update_attributes!(coverage_end_on: nil)}
           end
 
-        elsif ["canceled","renewing_canceled"].include?("#{plan_year.aasm_state}")
+        elsif ["canceled","renewing_canceled"].include?(plan_year.aasm_state.to_s)
           prev_enrollments.each do |enrollment|
             enrollment.update_attributes(aasm_state: "coverage_canceled")
             puts "enrollemnt updated #{enrollment.hbx_id}" unless Rails.env.test?
@@ -67,6 +68,6 @@ class FixPlanYear < MongoidMigrationTask
 
   def find_by_benefit_groups(benefit_groups)
     id_lists = benefit_groups.collect(&:_id).uniq
-      HbxEnrollment.where(:benefit_group_id.in => id_lists).to_a
+    HbxEnrollment.where(:benefit_group_id.in => id_lists).to_a
   end
 end

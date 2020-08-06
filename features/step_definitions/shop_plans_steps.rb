@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given("shop health plans exist for both last and this year") do
   year = (Date.today - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months).year
   plan = FactoryBot.create :plan, :with_premium_tables, active_year: year, market: 'shop', coverage_kind: 'health', deductible: 4000, is_sole_source: false

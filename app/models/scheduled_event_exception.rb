@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EventException
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -12,7 +14,11 @@ class EventException
     if new_time.blank?
       super(TimeKeeper.datetime_of_record)
     else
-      super(Date.strptime(new_time, "%m/%d/%Y").to_date) rescue super(new_time.to_date) 
+      begin
+        super(Date.strptime(new_time, "%m/%d/%Y").to_date)
+      rescue StandardError
+        super(new_time.to_date)
+      end
     end
   end
 end

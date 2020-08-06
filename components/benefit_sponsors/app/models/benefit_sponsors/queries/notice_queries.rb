@@ -1,58 +1,60 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Queries
     class NoticeQueries
 
       def self.initial_employers_by_effective_on_and_state(start_on: TimeKeeper.date_of_record, aasm_state:)
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-          :'benefit_applications' => {
-            :$elemMatch => {
-               :"effective_period.min" => start_on,
-               :aasm_state => aasm_state
-            }
-          }
-        })
+                                                                         :benefit_applications => {
+                                                                           :$elemMatch => {
+                                                                             :"effective_period.min" => start_on,
+                                                                             :aasm_state => aasm_state
+                                                                           }
+                                                                         }
+                                                                       })
       end
 
       def self.organizations_for_force_publish(new_date)
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-          :'benefit_applications' =>
-          { :$elemMatch => {
-            :"effective_period.min" => new_date.next_month.beginning_of_month,
-            :aasm_state => :draft
-          }}
-        })
+                                                                         :benefit_applications =>
+                                                                         { :$elemMatch => {
+                                                                           :"effective_period.min" => new_date.next_month.beginning_of_month,
+                                                                           :aasm_state => :draft
+                                                                         }}
+                                                                       })
       end
 
       def self.organizations_ending_oe_in_two_days(current_date)
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-          :"benefit_applications" => { 
-            :$elemMatch => {
-              :"aasm_state" => :enrollment_open,
-              :"open_enrollment_period.max" => current_date + 2.days
-            }
-          }
-        })
+                                                                         :benefit_applications => {
+                                                                           :$elemMatch => {
+                                                                             :aasm_state => :enrollment_open,
+                                                                             :"open_enrollment_period.max" => current_date + 2.days
+                                                                           }
+                                                                         }
+                                                                       })
       end
 
       def self.initial_employers_in_enrolled_state
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-          :"benefit_applications" => { 
-            :$elemMatch => {
-              :"aasm_state" => :enrollment_closed,
-              :predecessor_id => { :$exists => false }
-            }
-          }
-        })
+                                                                         :benefit_applications => {
+                                                                           :$elemMatch => {
+                                                                             :aasm_state => :enrollment_closed,
+                                                                             :predecessor_id => { :$exists => false }
+                                                                           }
+                                                                         }
+                                                                       })
       end
 
       def self.initial_employers_in_ineligible_state
         BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where({
-          :"benefit_applications" => { 
-            :$elemMatch => {
-              :"aasm_state" => :enrollment_ineligible,
-            }
-          }
-        })
+                                                                         :benefit_applications => {
+                                                                           :$elemMatch => {
+                                                                             :aasm_state => :enrollment_ineligible
+                                                                           }
+                                                                         }
+                                                                       })
       end
     end
   end

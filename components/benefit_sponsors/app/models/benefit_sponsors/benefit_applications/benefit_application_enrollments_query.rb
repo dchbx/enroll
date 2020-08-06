@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationEnrollmentsQuery
@@ -10,10 +12,10 @@ module BenefitSponsors
       end
 
       def call(klass_name, date)
-        end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
+        end_date = benefit_application.effective_period.min > date.end_of_month ? benefit_application.effective_period.min : date.end_of_month
         klass_name.collection.aggregate([
           {"$match" => {"hbx_enrollment_members" => { "$exists" => true }}},
-          {"$project" =>  {
+          {"$project" => {
             "sponsored_benefit_id" => 1,
             "aasm_state" => 1,
             "effective_on" => 1,
@@ -24,7 +26,7 @@ module BenefitSponsors
           {"$match" => {
             "sponsored_benefit_id" => @sponsored_benefit.id,
             "aasm_state" => { "$in" => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::TERMINATED_STATUSES)},
-            "effective_on" =>  {"$lte" => end_date, "$gte" => benefit_application.effective_period.min},
+            "effective_on" => {"$lte" => end_date, "$gte" => benefit_application.effective_period.min},
             "$or" => [
              {"terminated_on" => {"$eq" => nil} },
              {"terminated_on" => {"$gte" => date.end_of_month}}

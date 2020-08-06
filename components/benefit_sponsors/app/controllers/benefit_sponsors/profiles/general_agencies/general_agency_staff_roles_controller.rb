@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module GeneralAgencies
@@ -72,7 +74,7 @@ module BenefitSponsors
         def general_agency_staff_params
           params[:staff].presence || params[:staff] = {}
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "general_agency_staff",
-                                  filter_criteria: params.permit(:q), is_general_agency_registration_page: params[:general_agency_registration_page] || params["staff"]["is_general_agency_registration_page"]})
+                                 filter_criteria: params.permit(:q), is_general_agency_registration_page: params[:general_agency_registration_page] || params["staff"]["is_general_agency_registration_page"]})
           params[:staff].permit!
         end
       end

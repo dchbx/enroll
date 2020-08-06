@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class AddressParser
     include HappyMapper
@@ -21,13 +23,13 @@ module Parsers::Xml::Cv
 
     def to_hash
       response = {
-          address_1: address_line_1,
-          address_2: address_line_2,
-          city: location_city_name,
-          state: location_state_code,
-          country: location_country_name,
-          location_state_code: location_state_code,
-          zip: location_postal_code
+        address_1: address_line_1,
+        address_2: address_line_2,
+        city: location_city_name,
+        state: location_state_code,
+        country: location_country_name,
+        location_state_code: location_state_code,
+        zip: location_postal_code
       }
 
       response[:kind] = type.split("#").last if type

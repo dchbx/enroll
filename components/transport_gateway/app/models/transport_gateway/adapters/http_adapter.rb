@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'openssl'
 require 'net/http'
 
@@ -17,10 +19,10 @@ module TransportGateway
       http_site.request(put_request)
     end
 
-  private
+    private
 
     def select_payload(source, body)
-      return source if (source.present? && source.is_a?(File))
+      return source if source.present? && source.is_a?(File)
       return body if body.present?
       nil
     end
@@ -34,7 +36,7 @@ module TransportGateway
 
     def request_content_type_for(request, content)
       case content
-       when File 
+      when File
         request.set_content_type('text/plain')
         request.body_stream = content
       when String

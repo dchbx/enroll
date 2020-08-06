@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 root_path = File.expand_path(File.join(File.dirname(__FILE__), ".."))
 shared_path = File.expand_path(File.join(root_path, "..", "shared"))
 
@@ -11,7 +13,7 @@ worker_processes 16
 timeout 30
 preload_app true
 
-after_fork do |server, worker|
+after_fork do |_server, _worker|
   Acapi::Requestor.reconnect!
   Acapi::LocalAmqpPublisher.reconnect!
 end

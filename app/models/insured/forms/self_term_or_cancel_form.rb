@@ -80,7 +80,7 @@ module Insured
         return true unless attrs[:term_or_cancel] == 'terminate'
 
         date = Date.strptime(attrs[:term_date], "%m/%d/%Y")
-        return date.today? || date.future?
+        date.today? || date.future?
       end
     end
   end

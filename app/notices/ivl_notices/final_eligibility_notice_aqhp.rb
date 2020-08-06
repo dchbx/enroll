@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   include ApplicationHelper
   attr_accessor :family, :data, :person, :renewing_enrollments, :active_enrollments
@@ -25,13 +27,9 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -63,18 +61,50 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
 
     previous_health_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.current_year}
     previous_dental_enrollments = active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.current_year}
-    renewal_health_plan_id = (previous_health_enrollments.product.renewal_product_id) rescue nil
-    renewal_health_plan_hios_base_id = (previous_health_enrollments.product.hios_base_id) rescue nil
-    future_health_plan_id = (health_enrollments.product.id) rescue nil
-    future_health_plan_hios_base_id = (health_enrollments.product.hios_base_id) rescue nil
+    renewal_health_plan_id = begin
+                               previous_health_enrollments.product.renewal_product_id
+                             rescue StandardError
+                               nil
+                             end
+    renewal_health_plan_hios_base_id = begin
+                                         previous_health_enrollments.product.hios_base_id
+                                       rescue StandardError
+                                         nil
+                                       end
+    future_health_plan_id = begin
+                              health_enrollments.product.id
+                            rescue StandardError
+                              nil
+                            end
+    future_health_plan_hios_base_id = begin
+                                        health_enrollments.product.hios_base_id
+                                      rescue StandardError
+                                        nil
+                                      end
 
-    renewal_dental_plan_id = (previous_dental_enrollments.product.renewal_product_id) rescue nil
-    renewal_dental_plan_hios_base_id = (previous_dental_enrollments.product.hios_base_id) rescue nil
-    future_dental_plan_id = (dental_enrollments.product.id) rescue nil
-    future_dental_plan_hios_base_id = (dental_enrollments.product.hios_base_id) rescue nil
+    renewal_dental_plan_id = begin
+                               previous_dental_enrollments.product.renewal_product_id
+                             rescue StandardError
+                               nil
+                             end
+    renewal_dental_plan_hios_base_id = begin
+                                         previous_dental_enrollments.product.hios_base_id
+                                       rescue StandardError
+                                         nil
+                                       end
+    future_dental_plan_id = begin
+                              dental_enrollments.product.id
+                            rescue StandardError
+                              nil
+                            end
+    future_dental_plan_hios_base_id = begin
+                                        dental_enrollments.product.hios_base_id
+                                      rescue StandardError
+                                        nil
+                                      end
 
-    notice.same_plan_health_enrollment = (renewal_health_plan_id && future_health_plan_id) ? ((renewal_health_plan_id == future_health_plan_id) && (renewal_health_plan_hios_base_id == future_health_plan_hios_base_id )) : false
-    notice.same_plan_dental_enrollment = (renewal_dental_plan_id && future_dental_plan_id) ? ((renewal_dental_plan_id == future_dental_plan_id) && (renewal_dental_plan_hios_base_id == future_dental_plan_hios_base_id) ) : false
+    notice.same_plan_health_enrollment = renewal_health_plan_id && future_health_plan_id ? ((renewal_health_plan_id == future_health_plan_id) && (renewal_health_plan_hios_base_id == future_health_plan_hios_base_id)) : false
+    notice.same_plan_dental_enrollment = renewal_dental_plan_id && future_dental_plan_id ? ((renewal_dental_plan_id == future_dental_plan_id) && (renewal_dental_plan_hios_base_id == future_dental_plan_hios_base_id)) : false
 
     hbx_enrollments << health_enrollments
     hbx_enrollments << dental_enrollments
@@ -90,9 +120,7 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
     notice.enrollments.flatten!
     notice.enrollments.compact!
     #append_enrollment_information
-    if primary_member["aqhp_eligible"].upcase == "YES"
-      notice.tax_households = append_tax_household_information(primary_member)
-    end
+    notice.tax_households = append_tax_household_information(primary_member) if primary_member["aqhp_eligible"].upcase == "YES"
     notice.has_applied_for_assistance = check(primary_member["aqhp_eligible"])
     notice.primary_firstname = primary_member["first_name"].titleize
   end
@@ -100,69 +128,69 @@ class IvlNotices::FinalEligibilityNoticeAqhp < IvlNotice
   def append_member_information_for_aqhp(primary_member)
     data.collect do |datum|
       notice.individuals << PdfTemplates::Individual.new({
-        :first_name => datum["first_name"].titleize,
-        :last_name => datum["last_name"].titleize,
-        :full_name => datum["full_name"].titleize,
-        :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
-        :incarcerated => datum["incarcerated"].present? && datum["incarcerated"].upcase == "N" ? "No" : "Yes",
-        :citizen_status => citizen_status(datum["citizen_status"]),
-        :residency_verified => datum["resident"].upcase == "YES"  ? "Yes" : "No",
-        :actual_income => datum["actual_income"],
-        :taxhh_count => datum["tax_hh_count"],
-        :tax_status => filer_type(datum["filer_type"]),
-        :mec => datum["mec"].try(:upcase) == "YES" ? "Yes" : "No",
-        :is_ia_eligible => check(datum["aqhp_eligible"]),
-        :is_csr_eligible => datum["csr"].try(:upcase) == "YES" ? true : false,
-        :indian_conflict => check(datum["indian"]),
-        :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
-        :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
-        :is_without_assistance => check(datum["uqhp_eligible"]),
-        :is_totally_ineligible => check(datum["totally_inelig"]),
-        :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
-        :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
-        :has_access_to_affordable_coverage => check(datum ["mec"]),
-        :no_medicaid_because_of_income => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "over income" ? true : false,
-        :no_medicaid_because_of_immigration => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "immigration" ? true : false,
-        :no_medicaid_because_of_age => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "age" ? true : false,
-        :no_aptc_because_of_income => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "over income" ? true : false,
-        :no_aptc_because_of_tax => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "tax" ? true : false,
-        :no_aptc_because_of_mec => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
-        :no_csr_because_of_income => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "over income" ? true : false,
-        :no_csr_because_of_tax => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "tax" ? true : false,
-        :no_csr_because_of_mec => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
-        :non_applicant => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "non-applicant" ? true : false,
-        :tax_household => append_tax_household_information(primary_member)
-      })
+                                                           :first_name => datum["first_name"].titleize,
+                                                           :last_name => datum["last_name"].titleize,
+                                                           :full_name => datum["full_name"].titleize,
+                                                           :age => calculate_age_by_dob(Date.strptime(datum["dob"], '%m/%d/%Y')),
+                                                           :incarcerated => datum["incarcerated"].present? && datum["incarcerated"].upcase == "N" ? "No" : "Yes",
+                                                           :citizen_status => citizen_status(datum["citizen_status"]),
+                                                           :residency_verified => datum["resident"].upcase == "YES" ? "Yes" : "No",
+                                                           :actual_income => datum["actual_income"],
+                                                           :taxhh_count => datum["tax_hh_count"],
+                                                           :tax_status => filer_type(datum["filer_type"]),
+                                                           :mec => datum["mec"].try(:upcase) == "YES" ? "Yes" : "No",
+                                                           :is_ia_eligible => check(datum["aqhp_eligible"]),
+                                                           :is_csr_eligible => datum["csr"].try(:upcase) == "YES",
+                                                           :indian_conflict => check(datum["indian"]),
+                                                           :is_medicaid_chip_eligible => check(datum["magi_medicaid"]),
+                                                           :is_non_magi_medicaid_eligible => check(datum["non_magi_medicaid"]),
+                                                           :is_without_assistance => check(datum["uqhp_eligible"]),
+                                                           :is_totally_ineligible => check(datum["totally_inelig"]),
+                                                           :magi_medicaid_monthly_income_limit => datum["medicaid_monthly_income_limit"],
+                                                           :magi_as_percentage_of_fpl => datum["magi_as_fpl"],
+                                                           :has_access_to_affordable_coverage => check(datum ["mec"]),
+                                                           :no_medicaid_because_of_income => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "over income" ? true : false,
+                                                           :no_medicaid_because_of_immigration => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "immigration" ? true : false,
+                                                           :no_medicaid_because_of_age => datum["nonmedi_reason"].present? && datum["nonmedi_reason"].downcase == "age" ? true : false,
+                                                           :no_aptc_because_of_income => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "over income" ? true : false,
+                                                           :no_aptc_because_of_tax => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "tax" ? true : false,
+                                                           :no_aptc_because_of_mec => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
+                                                           :no_csr_because_of_income => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "over income" ? true : false,
+                                                           :no_csr_because_of_tax => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "tax" ? true : false,
+                                                           :no_csr_because_of_mec => datum["noncsr_reason"].present? && datum["noncsr_reason"].downcase == "medicare eligible" ? true : false,
+                                                           :non_applicant => datum["nonaptc_reason"].present? && datum["nonaptc_reason"].downcase == "non-applicant" ? true : false,
+                                                           :tax_household => append_tax_household_information(primary_member)
+                                                         })
     end
   end
 
   def append_enrollment_information(enrollment)
-      plan = PdfTemplates::Plan.new({
-                                      plan_name: enrollment.product.title,
-                                      is_csr: enrollment.product.is_csr?,
-                                      coverage_kind: enrollment.product.kind,
-                                      plan_carrier: enrollment.product.issuer_profile.organization.legal_name,
-                                      family_deductible: enrollment.product.family_deductible.split("|").last.squish,
-                                      deductible: enrollment.product.deductible
-                                    })
-      PdfTemplates::Enrollment.new({
-        premium: enrollment.total_premium.round(2),
-        aptc_amount: enrollment.applied_aptc_amount.round(2),
-        responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
-        phone: phone_number(enrollment.product.issuer_profile.legal_name),
-        is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-        coverage_kind: enrollment.coverage_kind,
-        kind: enrollment.kind,
-        effective_on: enrollment.effective_on,
-        plan: plan,
-        enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-          enrollee = PdfTemplates::Individual.new({
-            full_name: member.person.full_name.titleize,
-            age: member.person.age_on(TimeKeeper.date_of_record)
-          })
-          enrollees << enrollee
-        end
-      })
+    plan = PdfTemplates::Plan.new({
+                                    plan_name: enrollment.product.title,
+                                    is_csr: enrollment.product.is_csr?,
+                                    coverage_kind: enrollment.product.kind,
+                                    plan_carrier: enrollment.product.issuer_profile.organization.legal_name,
+                                    family_deductible: enrollment.product.family_deductible.split("|").last.squish,
+                                    deductible: enrollment.product.deductible
+                                  })
+    PdfTemplates::Enrollment.new({
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
+                                 })
   end
 
   def phone_number(legal_name)

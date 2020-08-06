@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCsrPlanNames < MongoidMigrationTask
   def migrate
-    puts "*"*80 unless Rails.env.test?
+    puts "*" * 80 unless Rails.env.test?
     puts "updating csr plan names" unless Rails.env.test?
 
     hios_base_ids = [
@@ -18,9 +20,7 @@ class UpdateCsrPlanNames < MongoidMigrationTask
           plan = Plan.where(active_year: 2017, hios_id: qcsv.hios_plan_and_variant_id).first
           plan.name = qcsv.plan_marketing_name
           plan.save
-          unless Rails.env.test?
-            puts "updated plan name to -> #{plan.name} :: for #{plan.hios_id} "
-          end
+          puts "updated plan name to -> #{plan.name} :: for #{plan.hios_id} " unless Rails.env.test?
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Api::V1::AgenciesController < Api::V1::ApiBaseController
 
   before_action :authenticate_user!
@@ -6,9 +8,9 @@ class Api::V1::AgenciesController < Api::V1::ApiBaseController
     query = Queries::AgenciesQuery.new
     authorize query, :list_agencies?
     render json: query.to_json(
-             :only => [:dba, :legal_name],
-             :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
-           )
+      :only => [:dba, :legal_name],
+      :methods => [:agency_profile_id, :organization_id, :agency_profile_type]
+    )
   end
 
   def agency_staff

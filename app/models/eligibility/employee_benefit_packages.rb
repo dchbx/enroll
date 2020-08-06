@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Eligibility
   module EmployeeBenefitPackages
     # Deprecated
@@ -6,21 +8,17 @@ module Eligibility
 
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
       if py.present?
-        if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
-          find_or_create_benefit_group_assignment(py.benefit_groups)
-        end
+        find_or_create_benefit_group_assignment(py.benefit_groups) if active_benefit_group_assignment.blank? || active_benefit_group_assignment.benefit_group.plan_year != py
       end
 
       if py = employer_profile.plan_years.renewing.first
-        if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-          add_renew_benefit_group_assignment(py.benefit_groups)
-        end
+        add_renew_benefit_group_assignment(py.benefit_groups) if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
       end
     end
 
     # Deprecated
     def find_or_create_benefit_group_assignment_deprecated(benefit_groups)
-      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:'created_at'.desc)
+      bg_assignments = benefit_group_assignments.where(:benefit_group_id.in => benefit_groups.map(&:_id)).order_by(:created_at.desc)
 
       if bg_assignments.present?
         valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
@@ -34,7 +32,7 @@ module Eligibility
       return find_or_create_benefit_group_assignment_deprecated(benefit_packages) if is_case_old?
 
       if benefit_packages.present?
-        bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
+        bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:created_at.desc)
 
         if bg_assignments.present?
           valid_bg_assignment = bg_assignments.where(:aasm_state.ne => 'initialized').first || bg_assignments.first
@@ -59,9 +57,7 @@ module Eligibility
       return add_renew_benefit_group_assignment_deprecated(renewal_benefit_packages.first) if is_case_old?
       if renewal_benefit_packages.present?
         benefit_group_assignments.renewing.each do |benefit_group_assignment|
-          if renewal_benefit_packages.map(&:id).include?(benefit_group_assignment.benefit_package.id)
-            benefit_group_assignment.destroy
-          end
+          benefit_group_assignment.destroy if renewal_benefit_packages.map(&:id).include?(benefit_group_assignment.benefit_package.id)
         end
 
         bga = BenefitGroupAssignment.new(benefit_group: renewal_benefit_packages.first, start_on: renewal_benefit_packages.first.start_on, is_active: false)
@@ -75,9 +71,7 @@ module Eligibility
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
 
       benefit_group_assignments.renewing.each do |benefit_group_assignment|
-        if benefit_group_assignment.benefit_group_id == new_benefit_group.id
-          benefit_group_assignment.destroy
-        end
+        benefit_group_assignment.destroy if benefit_group_assignment.benefit_group_id == new_benefit_group.id
       end
 
       bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on, is_active: false)
@@ -110,13 +104,11 @@ module Eligibility
     end
 
     def published_benefit_group
-      published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+      published_benefit_group_assignment&.benefit_group
     end
 
     def renewal_published_benefit_group
-      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.is_submitted?
-        renewal_benefit_group_assignment.benefit_group
-      end
+      renewal_benefit_group_assignment.benefit_group if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.is_submitted?
     end
 
     def possible_benefit_package
@@ -133,7 +125,7 @@ module Eligibility
     end
 
     def reset_active_benefit_group_assignments(new_benefit_group)
-      benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
+      benefit_group_assignments.select(&:is_active?).each do |benefit_group_assignment|
         end_on = benefit_group_assignment.end_on || (new_benefit_group.start_on - 1.day)
         if is_case_old?
           end_on = benefit_group_assignment.plan_year.end_on unless benefit_group_assignment.plan_year.coverage_period_contains?(end_on)
@@ -146,14 +138,14 @@ module Eligibility
 
     #Deprecated
     def has_benefit_group_assignment_deprecated?
-      (active_benefit_group_assignment.present? && (PlanYear::PUBLISHED).include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
-      (renewal_benefit_group_assignment.present? && (PlanYear::RENEWING_PUBLISHED_STATE).include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
+      (active_benefit_group_assignment.present? && PlanYear::PUBLISHED.include?(active_benefit_group_assignment.benefit_group.plan_year.aasm_state)) ||
+        (renewal_benefit_group_assignment.present? && PlanYear::RENEWING_PUBLISHED_STATE.include?(renewal_benefit_group_assignment.benefit_group.plan_year.aasm_state))
     end
 
     def has_benefit_group_assignment?
       return has_benefit_group_assignment_deprecated? if is_case_old?
       (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES).include?(active_benefit_group_assignment.benefit_application.aasm_state)) ||
-      (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
+        (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -7,11 +9,13 @@ RSpec.describe SponsoredBenefits::Services::GeneralAgencyManager do
   let(:subject) { SponsoredBenefits::Services::GeneralAgencyManager.new(form)}
 
   describe "#assign_general_agency" do
-    let(:form) { SponsoredBenefits::Forms::GeneralAgencyManager.new(
-      plan_design_organization_ids: [plan_design_organization.id],
-      general_agency_profile_id: general_agency_profile.id,
-      broker_agency_profile_id: broker_agency_profile.id
-    )}
+    let(:form) do
+      SponsoredBenefits::Forms::GeneralAgencyManager.new(
+        plan_design_organization_ids: [plan_design_organization.id],
+        general_agency_profile_id: general_agency_profile.id,
+        broker_agency_profile_id: broker_agency_profile.id
+      )
+    end
 
     before do
       subject.assign_general_agency
@@ -24,10 +28,12 @@ RSpec.describe SponsoredBenefits::Services::GeneralAgencyManager do
   end
 
   describe "#fire_general_agency" do
-    let(:form) { SponsoredBenefits::Forms::GeneralAgencyManager.new(
-      plan_design_organization_ids: [plan_design_organization_with_assigned_ga.id],
-      broker_agency_profile_id: broker_agency_profile.id
-    )}
+    let(:form) do
+      SponsoredBenefits::Forms::GeneralAgencyManager.new(
+        plan_design_organization_ids: [plan_design_organization_with_assigned_ga.id],
+        broker_agency_profile_id: broker_agency_profile.id
+      )
+    end
 
     before do
       subject.fire_general_agency

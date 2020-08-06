@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), "..", "..", "app", "data_migrations", "modify_benefit_application")
 
 # This rake task is to modify benefit applications - canceling, terminating, re-instating and updating aasm state.

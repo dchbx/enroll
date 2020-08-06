@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     module ActuarialFactors
       class ActuarialFactor
         include Mongoid::Document
         include Mongoid::Timestamps
-        
+
         field :active_year, type: Integer
         field :default_factor_value, type: Float
         field :issuer_profile_id, type: BSON::ObjectId
@@ -27,7 +29,7 @@ module BenefitMarkets
           actuarial_factor_entries.each do |entry|
             @cached_values[entry.factor_key] = entry.factor_value
           end
-          self 
+          self
         end
 
         def cached_lookup(key)

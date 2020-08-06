@@ -14,12 +14,12 @@ module BenefitSponsors
         def call(params:)
           values   = yield validate(params)
           product  = yield create(values)
-          
+
           Success(product)
         end
 
         private
-  
+
         def validate(params)
           result = BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsorshipContract.new.call(params)
 

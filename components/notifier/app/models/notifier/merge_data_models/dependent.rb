@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::Dependent
     include Virtus.model

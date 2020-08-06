@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class ConditionalEligibilityNotice
     include Virtus.model
@@ -22,7 +24,7 @@ module PdfTemplates
     attribute :individuals, Array[PdfTemplates::Individual], :default => []
     attribute :ssa_unverified, Array[PdfTemplates::Individual]
     attribute :dhs_unverified, Array[PdfTemplates::Individual]
-    attribute :immigration_unverified , Array[PdfTemplates::Individual]
+    attribute :immigration_unverified, Array[PdfTemplates::Individual]
     attribute :citizenstatus_unverified, Array[PdfTemplates::Individual]
     attribute :american_indian_unverified, Array[PdfTemplates::Individual]
     attribute :residency_inconsistency, Array[PdfTemplates::Individual]
@@ -58,7 +60,7 @@ module PdfTemplates
     end
 
     def broker?
-      return false
+      false
     end
 
     def employee_notice?
@@ -66,31 +68,31 @@ module PdfTemplates
     end
 
     def verified_individuals
-      individuals.select{|individual| individual.verified }
+      individuals.select(&:verified)
     end
 
     def unverified_individuals
-      individuals.reject{|individual| individual.verified }
+      individuals.reject(&:verified)
     end
 
     def ssn_unverified
-      individuals.reject{|individual| individual.ssn_verified}
+      individuals.reject(&:ssn_verified)
     end
 
     def citizenship_unverified
-      individuals.reject{|individual| individual.citizenship_verified}
+      individuals.reject(&:citizenship_verified)
     end
 
     def residency_unverified
-      individuals.reject{|individual| individual.residency_verified}
+      individuals.reject(&:residency_verified)
     end
 
     def indian_conflict
-      individuals.select{|individual| individual.indian_conflict}
+      individuals.select(&:indian_conflict)
     end
 
     def incarcerated
-      individuals.select{|individual| individual.incarcerated}
+      individuals.select(&:incarcerated)
     end
 
     def cover_all?
@@ -114,7 +116,7 @@ module PdfTemplates
     end
 
     def latest_current_year_enrollment
-      enrollments.sort_by(&:effective_on).last
+      enrollments.max_by(&:effective_on)
     end
 
     def current_dental_enrollments
@@ -163,25 +165,25 @@ module PdfTemplates
 
     #FIX ME
     def tax_hh_with_csr
-      tax_households.select{ |thh| thh.csr_percent_as_integer != 100}
+      tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
     end
 
     def enrollment_notice_subject
-      if current_health_enrollments.present? && assisted_enrollments.present?
-        if current_dental_enrollments.present?
-          subject = "Your Health Plan, Cost Savings, and Dental Plan"
-        else
-          subject = "Your Health Plan and Cost Savings"
-        end
-      elsif current_health_enrollments.present? && assisted_enrollments.empty?
-        if current_dental_enrollments.present?
-          subject = "Your Health and Dental Plan"
-        else
-          subject = "Your Health Plan"
-        end
-      else
-        subject = "Your Dental Plan"
-      end
+      subject = if current_health_enrollments.present? && assisted_enrollments.present?
+                  if current_dental_enrollments.present?
+                    "Your Health Plan, Cost Savings, and Dental Plan"
+                  else
+                    "Your Health Plan and Cost Savings"
+                            end
+                elsif current_health_enrollments.present? && assisted_enrollments.empty?
+                  if current_dental_enrollments.present?
+                    "Your Health and Dental Plan"
+                  else
+                    "Your Health Plan"
+                            end
+                else
+                  "Your Dental Plan"
+                end
     end
 
     def eligibility_notice_display_medicaid(ivl)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module SponsoredBenefits
@@ -6,15 +8,15 @@ module SponsoredBenefits
     let(:sic_code)        { '1111' }
 
 
-    let(:valid_params) do 
+    let(:valid_params) do
       {
-        sic_code: sic_code,
+        sic_code: sic_code
       }
     end
 
-    subject {
-        described_class.new(valid_params)
-      }
+    subject do
+      described_class.new(valid_params)
+    end
 
     it "is valid with valid attributes" do
       expect(subject).to be_valid

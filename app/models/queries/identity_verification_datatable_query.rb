@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class IdentityVerificationDatatableQuery
 
@@ -12,14 +14,14 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def person_search search_string
+    def person_search(search_string)
       return Family if search_string.blank?
     end
 
-    def build_scope()
+    def build_scope
       family = Person.for_admin_approval
       person = Person
-      
+
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = Person.search(@search_string).pluck(:_id)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -76,14 +78,14 @@ module SponsoredBenefits
       end
     end
 
-  private
+    private
 
     def load_broker_agency_profile
       @broker_agency_profile = ::BrokerAgencyProfile.find(params[:broker_agency_id]) || BenefitSponsors::Organizations::Profile.find(params[:broker_agency_id])
       @provider = @broker_agency_profile.primary_broker_role.person
     end
 
-    def init_organization(params={})
+    def init_organization(params = {})
       if params.blank?
         @organization = SponsoredBenefits::Forms::PlanDesignOrganizationSignup.new
       else
@@ -108,9 +110,7 @@ module SponsoredBenefits
         ]
       )
 
-      if org_params[:office_locations_attributes].present?
-        org_params[:office_locations_attributes].delete_if {|key, value| value.blank?}
-      end
+      org_params[:office_locations_attributes].delete_if {|_key, value| value.blank?} if org_params[:office_locations_attributes].present?
 
       org_params
     end

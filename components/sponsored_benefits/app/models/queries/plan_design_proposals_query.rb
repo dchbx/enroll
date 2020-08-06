@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class PlanDesignProposalsQuery
     attr_reader :search_string, :custom_attributes
@@ -13,7 +15,7 @@ module Queries
       @plan_design_proposals = @plan_design_organization.plan_design_proposals
     end
 
-    def build_scope()
+    def build_scope
       return [] if @plan_design_proposals.nil?
       case @custom_attributes[:quotes]
       when "initial"

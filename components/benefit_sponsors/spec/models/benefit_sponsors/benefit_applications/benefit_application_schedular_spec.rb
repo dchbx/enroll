@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -28,11 +30,11 @@ module BenefitSponsors
 
       it 'should have sub keys' do
         [:open_enrollment_start_on, :open_enrollment_end_on].each do |dt_key|
-          expect(dates_hash.values.first.has_key?(dt_key)).to be_truthy
+          expect(dates_hash.values.first.key?(dt_key)).to be_truthy
         end
       end
 
-      if (TimeKeeper.date_of_record).future?
+      if TimeKeeper.date_of_record.future?
         it "should return today's date for start_on" do
           expect(first_oe_date).to eq TimeKeeper.date_of_record
         end

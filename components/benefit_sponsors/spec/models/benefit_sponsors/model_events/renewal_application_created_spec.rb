@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -45,7 +47,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employer_profile.notice_date",
         "employer_profile.employer_name",
@@ -60,16 +62,18 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
         "employer_profile.broker.email",
         "employer_profile.broker_present?"
       ]
-    }
+    end
 
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { { 
-      "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-      "event_object_id" => model_instance.id
-    } }
+    let(:payload)   do
+      {
+        "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
+        "event_object_id" => model_instance.id
+      }
+    end
 
     let(:soft_dead_line) { Date.new(start_on.prev_month.year, start_on.prev_month.month, Settings.aca.shop_market.renewal_application.application_submission_soft_deadline) }
 
@@ -97,7 +101,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalApplicationCreated', dbclea
 
       it "should return current plan year start_date" do
         expect(merge_model.benefit_application.current_py_start_on).to eq model_instance.start_on.prev_year
-      end 
+      end
 
       it "should return renewal plan_year start_date" do
         expect(merge_model.benefit_application.renewal_py_start_date).to eq model_instance.start_on.strftime('%m/%d/%Y')

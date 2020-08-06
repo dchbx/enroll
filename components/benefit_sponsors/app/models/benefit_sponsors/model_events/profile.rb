@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ModelEvents
     module Profile
-
-      REGISTERED_EVENTS = []
+      REGISTERED_EVENTS = [].freeze
 
       #TODO: The trigger for this notice is in the controller and it has to be eventually moved to observer pattern.
       #TODO: This is the temporary fix until then.
@@ -22,11 +23,10 @@ module BenefitSponsors
         if aasm_state_changed?
 
           REGISTERED_EVENTS.each do |event|
-            if event_fired = instance_eval("is_" + event.to_s)
-              # event_name = ("on_" + event.to_s).to_sym
-              event_options = {} # instance_eval(event.to_s + "_options") || {}
-              notify_observers(ModelEvent.new(event, self, event_options))
-            end
+            next unless event_fired = instance_eval("is_" + event.to_s)
+            # event_name = ("on_" + event.to_s).to_sym
+            event_options = {} # instance_eval(event.to_s + "_options") || {}
+            notify_observers(ModelEvent.new(event, self, event_options))
           end
         end
       end

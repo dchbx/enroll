@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   class SerializeCurrentUserResource
     def initialize(user)
@@ -5,7 +7,7 @@ module Operations
     end
 
     def call
-      user_data_hash = Hash.new
+      user_data_hash = {}
       account_name = @user.email.blank? ? @user.oim_id : @user.email
       user_data_hash[:account_name] = account_name
       permission_proxy = Admin::PermissionsProxy.new(@user)

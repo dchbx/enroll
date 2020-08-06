@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers::Mhc
     class ConversionEmployerCreate < ::Importers::Mhc::ConversionEmployerCreate
@@ -19,7 +21,7 @@ module BenefitSponsors
 
             benefit_sponsorship.update_attributes!(registered_on: registered_on, source_kind: source_kind.to_sym)
             set_attestation_to_true(benefit_sponsorship)
-          
+
             save_result = new_organization.save!
 
             if save_result
@@ -32,7 +34,7 @@ module BenefitSponsors
             end
 
             propagate_errors(new_organization.employer_profile)
-            return save_result
+            save_result
           end
         end
       end
@@ -63,27 +65,27 @@ module BenefitSponsors
             :city => mailing_location_city,
             :state => mailing_location_state,
             :zip => mailing_location_zip
-            )
+          )
         end
       end
 
       def build_primary_address
         BenefitSponsors::Locations::Address.new(
-            :kind => "primary",
-            :address_1 => primary_location_address_1,
-            :address_2 => primary_location_address_2,
-            :city =>  primary_location_city,
-            :state => primary_location_state,
-            :county => primary_location_county,
-            :location_state_code => primary_location_county_fips,
-            :zip => primary_location_zip
+          :kind => "primary",
+          :address_1 => primary_location_address_1,
+          :address_2 => primary_location_address_2,
+          :city => primary_location_city,
+          :state => primary_location_state,
+          :county => primary_location_county,
+          :location_state_code => primary_location_county_fips,
+          :zip => primary_location_zip
         )
       end
 
       def build_phone
         BenefitSponsors::Locations::Phone.new({
-                                                  :kind => "work",
-                                                  :full_phone_number => contact_phone
+                                                :kind => "work",
+                                                :full_phone_number => contact_phone
                                               })
       end
 
@@ -92,17 +94,17 @@ module BenefitSponsors
         primary_address = build_primary_address
         mailing_address = build_mailing_address
         locations << BenefitSponsors::Locations::OfficeLocation.new({
-                                                                        :is_primary => true,
-                                                                        :address => primary_address,
-                                                                        :phone => build_phone,
+                                                                      :is_primary => true,
+                                                                      :address => primary_address,
+                                                                      :phone => build_phone
                                                                     })
 
         if mailing_address.present?
           unless primary_location_address_1 == mailing_location_address_1
             locations << BenefitSponsors::Locations::OfficeLocation.new({
-              :is_primary => false,
-              :address => mailing_address,
-              })
+                                                                          :is_primary => false,
+                                                                          :address => mailing_address
+                                                                        })
           end
         end
         locations
@@ -110,19 +112,19 @@ module BenefitSponsors
 
       def employer_profile_prams
         {
-            :sic_code => sic_code,
-            :is_benefit_sponsorship_eligible => true,
-            :office_locations => map_office_locations
+          :sic_code => sic_code,
+          :is_benefit_sponsorship_eligible => true,
+          :office_locations => map_office_locations
         }
       end
 
       def form_organizational_params
         {
-            :legal_name => legal_name,
-            :dba => dba,
-            :fein => fein,
-            :entity_kind => :s_corporation,
-            :site => map_site
+          :legal_name => legal_name,
+          :dba => dba,
+          :fein => fein,
+          :entity_kind => :s_corporation,
+          :site => map_site
         }
       end
     end

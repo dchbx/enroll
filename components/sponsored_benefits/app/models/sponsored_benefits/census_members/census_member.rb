@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   class CensusMembers::CensusMember
 
@@ -11,7 +13,7 @@ module SponsoredBenefits
 
     # validates_with ::Validations::DateRangeValidator
 
-    GENDER_KINDS = %W(male female)
+    GENDER_KINDS = %w[male female].freeze
 
     field :first_name, type: String
     field :middle_name, type: String
@@ -47,7 +49,11 @@ module SponsoredBenefits
     end
 
     def date_of_birth=(val)
-      self.dob = Date.strptime(val, "%Y-%m-%d").to_date rescue nil
+      self.dob = begin
+                   Date.strptime(val, "%Y-%m-%d").to_date
+                 rescue StandardError
+                   nil
+                 end
     end
 
     def gender=(val)

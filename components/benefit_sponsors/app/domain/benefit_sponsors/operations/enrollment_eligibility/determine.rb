@@ -52,11 +52,7 @@ module BenefitSponsors
           benefit_sponsorship = find_benefit_sponsorship(benefit_sponsorship_entity._id)
           service_areas = benefit_sponsorship.service_areas_on(effective_date).collect do |service_area|
             result = BenefitMarkets::Operations::ServiceAreas::Create.new.call(service_area_params: service_area.as_json)
-            if result.success?
-              result.value!
-            else
-              nil
-            end
+            result.value! if result.success?
           end.compact
 
           Success(service_areas)
@@ -72,9 +68,9 @@ module BenefitSponsors
         end
 
         def is_initial_sponsor?(benefit_applications, effective_date)
-          recent_benefit_application = benefit_applications.sort { |a, b|  a.effective_period.min <=> b.effective_period.min }.last
+          recent_benefit_application = benefit_applications.max { |a, b|  a.effective_period.min <=> b.effective_period.min }
           return true unless recent_benefit_application
-          return true if (recent_benefit_application.is_termed_or_ineligible? || recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date))
+          return true if recent_benefit_application.is_termed_or_ineligible? || recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date)
 
           ba_states = BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES +
                       BenefitSponsors::BenefitApplications::BenefitApplication::CANCELED_STATES +

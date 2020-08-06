@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exchanges::ResidentsController < ApplicationController
   include ApplicationHelper
   include Pundit
@@ -9,7 +11,7 @@ class Exchanges::ResidentsController < ApplicationController
   before_action :authorize_user
 
   def index
-    @resident_enrollments = Person.where(:resident_enrollment_id.nin =>  ['', nil]).map(&:resident_enrollment)
+    @resident_enrollments = Person.where(:resident_enrollment_id.nin => ['', nil]).map(&:resident_enrollment)
 
     respond_to do |format|
       format.html
@@ -29,7 +31,7 @@ class Exchanges::ResidentsController < ApplicationController
     person = Person.find(params[:person_id])
     resident_role = person.resident_role
 
-    if resident_role && resident_role.bookmark_url
+    if resident_role&.bookmark_url
       redirect_to bookmark_url_path(resident_role.bookmark_url)
     else
       redirect_to family_account_path
@@ -75,16 +77,13 @@ class Exchanges::ResidentsController < ApplicationController
     end
   end
 
-  def show
-  end
+  def show; end
 
   def build
     set_current_person(required: false)
     build_person_params
     render 'match'
   end
-
-
 
   def create
     begin
@@ -104,9 +103,9 @@ class Exchanges::ResidentsController < ApplicationController
     end
 
     respond_to do |format|
-      format.html {
+      format.html do
         redirect_to :action => "edit", :id => @resident_role.id
-      }
+      end
     end
   end
 
@@ -116,7 +115,7 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def update
-    save_and_exit =  params['exit_after_method'] == 'true'
+    save_and_exit = params['exit_after_method'] == 'true'
     if save_and_exit
       respond_to do |format|
         format.html {redirect_to destroy_user_session_path}
@@ -132,7 +131,7 @@ class Exchanges::ResidentsController < ApplicationController
     set_current_person
     if session[:original_application_type] == 'paper'
       redirect_to insured_family_members_path(:resident_role_id => @person.resident_role.id)
-      return
+      nil
     else
       set_resident_bookmark_url
       redirect_to insured_family_members_path(:resident_role_id => @person.resident_role.id)
@@ -147,7 +146,7 @@ class Exchanges::ResidentsController < ApplicationController
 
     @next_ivl_open_enrollment_date = HbxProfile.current_hbx.try(:benefit_sponsorship).try(:renewal_benefit_coverage_period).try(:open_enrollment_start_on)
 
-    @market_kind = (params[:resident_role_id].present? && params[:resident_role_id] != 'None') ? 'coverall' : 'individual'
+    @market_kind = params[:resident_role_id].present? && params[:resident_role_id] != 'None' ? 'coverall' : 'individual'
 
     render :layout => 'application'
   end
@@ -162,7 +161,7 @@ class Exchanges::ResidentsController < ApplicationController
     policy_name = exception.policy.class.to_s.underscore
 
     flash[:error] = "Access not allowed for #{policy_name}.#{exception.query}, (Pundit policy)"
-      respond_to do |format|
+    respond_to do |format|
       format.json { redirect_to destroy_user_session_path }
       format.html { redirect_to destroy_user_session_path }
       format.js   { redirect_to destroy_user_session_path }
@@ -205,19 +204,18 @@ class Exchanges::ResidentsController < ApplicationController
     ]
   end
 
-
   def set_error_message(message)
     if message.include? "year too big to marshal"
-      return "Date of birth cannot be more than 110 years ago"
+      "Date of birth cannot be more than 110 years ago"
     else
-      return message
+      message
     end
   end
 
   def build_person_params
-   @person_params = {:ssn =>  Person.decrypt_ssn(@person.encrypted_ssn)}
+    @person_params = {:ssn => Person.decrypt_ssn(@person.encrypted_ssn)}
 
-    %w(first_name middle_name last_name gender).each do |field|
+    %w[first_name middle_name last_name gender].each do |field|
       @person_params[field] = @person.attributes[field]
     end
 

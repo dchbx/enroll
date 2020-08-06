@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^.+ should not see fein$/) do
   expect(page).not_to have_content("Fein")
 end

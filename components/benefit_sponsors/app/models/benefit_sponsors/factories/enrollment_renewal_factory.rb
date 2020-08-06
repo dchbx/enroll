@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Factories
     class EnrollmentRenewalFactory
@@ -14,12 +16,10 @@ module BenefitSponsors
 
         census_employee = benefit_group_assignment.census_employee
         new_benefit_group_assignment = census_employee.benefit_package_assignment_for(new_benefit_package)
-        
+
         return if new_benefit_group_assignment.blank?
 
-        if !@base_enrollment.is_coverage_waived? && @base_enrollment.product.renewal_product.blank?
-          raise "Unable to map to renewal product"
-        end
+        raise "Unable to map to renewal product" if !@base_enrollment.is_coverage_waived? && @base_enrollment.product.renewal_product.blank?
 
         @sponsored_benefit  = new_benefit_package.sponsored_benefit_for(@base_enrollment.coverage_kind)
         @new_effective_on   = new_benefit_package.start_on
@@ -41,7 +41,7 @@ module BenefitSponsors
           builder.set_benefit_sponsorship(new_benefit_package.benefit_sponsorship)
           builder.set_sponsored_benefit(@sponsored_benefit)
           builder.set_rating_area(new_benefit_package.recorded_rating_area)
-          
+
           if base_enrollment.is_coverage_waived?
             builder.set_waiver_reason(base_enrollment.waiver_reason)
             builder.set_as_renew_waiver
@@ -68,27 +68,25 @@ module BenefitSponsors
           optimizer    = BenefitSponsors::SponsoredBenefits::RosterEligibilityOptimizer.new(@sponsored_benefit.contribution_model)
           member_group = optimizer.optimal_group_for(member_group, @sponsored_benefit)
 
-          eligible_member_ids = member_group.members.map(&:member_id) 
+          eligible_member_ids = member_group.members.map(&:member_id)
           @renewal_enrollment.hbx_enrollment_members = @renewal_enrollment.hbx_enrollment_members.select do |member|
             eligible_member_ids.include?(member.id)
           end
         end
-      end 
+      end
 
       def cloned_enrollment_members
         @base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
           members << HbxEnrollmentMember.new({
-            applicant_id: hbx_enrollment_member.applicant_id,
-            eligibility_date: @new_effective_on,
-            coverage_start_on: @new_effective_on,
-            is_subscriber: hbx_enrollment_member.is_subscriber
-            })
+                                               applicant_id: hbx_enrollment_member.applicant_id,
+                                               eligibility_date: @new_effective_on,
+                                               coverage_start_on: @new_effective_on,
+                                               is_subscriber: hbx_enrollment_member.is_subscriber
+                                             })
         end
-      end   
-  
-      def renewal_enrollment
-        @renewal_enrollment
       end
+
+      attr_reader :renewal_enrollment
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FavoriteGeneralAgency
   include Mongoid::Document
   include SetCurrentUser

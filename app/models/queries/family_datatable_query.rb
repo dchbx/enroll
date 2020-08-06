@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class FamilyDatatableQuery
 
@@ -14,11 +16,11 @@ module Queries
       @limit = 25
     end
 
-    def person_search search_string
+    def person_search(search_string)
       return Family if search_string.blank?
     end
 
-    def build_scope()
+    def build_scope
       family = Family.where("is_active" => true)
       person = Person
       if @custom_attributes['families'] == 'by_enrollment_individual_market'
@@ -29,31 +31,17 @@ module Queries
         family = family.all_enrollments
         family = family.by_enrollment_shop_market
       end
-      if @custom_attributes['families'] == 'non_enrolled'
-        family = family.non_enrolled
-      end
+      family = family.non_enrolled if @custom_attributes['families'] == 'non_enrolled'
       if @custom_attributes['families'] == 'by_enrollment_coverall'
         resident_ids = Person.all_resident_roles.pluck(:_id)
         family = family.where('family_members.person_id' => {"$in" => resident_ids})
       end
-      if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
-        family = family.by_enrollment_renewing
-      end
-      if @custom_attributes['employer_options'] == 'sep_eligible'
-        family = family.sep_eligible
-      end
-      if @custom_attributes['employer_options'] == 'coverage_waived'
-        family = family.coverage_waived
-      end
-      if @custom_attributes['individual_options'] == 'all_assistance_receiving'
-        family = family.all_assistance_receiving
-      end
-      if @custom_attributes['individual_options'] == 'sep_eligible'
-        family = family.sep_eligible
-      end
-      if @custom_attributes['individual_options'] == 'all_unassisted'
-        family = family.all_unassisted
-      end
+      family = family.by_enrollment_renewing if @custom_attributes['employer_options'] == 'by_enrollment_renewing'
+      family = family.sep_eligible if @custom_attributes['employer_options'] == 'sep_eligible'
+      family = family.coverage_waived if @custom_attributes['employer_options'] == 'coverage_waived'
+      family = family.all_assistance_receiving if @custom_attributes['individual_options'] == 'all_assistance_receiving'
+      family = family.sep_eligible if @custom_attributes['individual_options'] == 'sep_eligible'
+      family = family.all_unassisted if @custom_attributes['individual_options'] == 'all_unassisted'
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = build_people_id_criteria(@search_string)
@@ -70,9 +58,8 @@ module Queries
       if clean_str =~ /[a-z]/i
         Person.collection.aggregate([
           {"$match" => {
-              "$text" => {"$search" => clean_str}
-          }.merge(Person.search_hash(clean_str))
-          },
+            "$text" => {"$search" => clean_str}
+          }.merge(Person.search_hash(clean_str))},
           {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
           {"$sort" => {"last_name" => 1, "first_name" => 1}},
           {"$project" => {"_id" => 1}}
@@ -136,7 +123,7 @@ module Queries
     end
 
     def load_enrollment_cache_for(family_ids)
-      enrollment_cache = Hash.new { |h, k| h[k] = Array.new }
+      enrollment_cache = Hash.new { |h, k| h[k] = [] }
       HbxEnrollment.where(:family_id => {"$in" => family_ids}).without(:enrollment_members).each do |en|
         enrollment_cache[en.family_id] = enrollment_cache[en.family_id] + [en]
       end

@@ -1,24 +1,26 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MigrateVerificationTypes < MongoidMigrationTask
   def get_people(offset, limit)
-    Person.where(:"consumer_role" => {"$exists" => true}).offset(offset).limit(limit)
+    Person.where(:consumer_role => {"$exists" => true}).offset(offset).limit(limit)
   end
 
   def migrate
     run_size = 500
     offset = 0
-    while offset < Person.count do
+    while offset < Person.count
       people = get_people(offset, run_size)
       people.each do |person|
-        begin
-          ensure_verification_types(person)
-          puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
-        rescue
-          $stderr.puts "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
-        end
+
+        ensure_verification_types(person)
+        puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
+      rescue StandardError
+        warn "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
+
       end
-      offset = offset + run_size
+      offset += run_size
     end
   end
 
@@ -26,12 +28,12 @@ class MigrateVerificationTypes < MongoidMigrationTask
     live_types = []
     live_types << 'DC Residency'
     live_types << 'Social Security Number' if person.ssn
-    live_types << 'American Indian Status' if !(person.tribal_id.nil? || person.tribal_id.empty?)
-    if person.us_citizen
-      live_types << 'Citizenship'
-    else
-      live_types << 'Immigration status'
-    end
+    live_types << 'American Indian Status' unless person.tribal_id.nil? || person.tribal_id.empty?
+    live_types << if person.us_citizen
+                    'Citizenship'
+                  else
+                    'Immigration status'
+                  end
     person.verification_types.delete_all
     live_types.each do |type|
       add_new_verification_type(person, type)
@@ -40,14 +42,15 @@ class MigrateVerificationTypes < MongoidMigrationTask
 
   def add_new_verification_type(person, type)
     person.verification_types << VerificationType.new(
-        :type_name => type,
-        :validation_status => assign_verification_type_status(type, person),
-        :update_reason => type_update_reason(person, type),
-        :rejected => type_rejected(person, type),
-        :due_date => due_date(person, type),
-        :due_date_type => due_date_type(person, type),
-        :type_history_elements => create_type_history_elements(person, type),
-        :vlp_documents => create_vlp_documents(person, type))
+      :type_name => type,
+      :validation_status => assign_verification_type_status(type, person),
+      :update_reason => type_update_reason(person, type),
+      :rejected => type_rejected(person, type),
+      :due_date => due_date(person, type),
+      :due_date_type => due_date_type(person, type),
+      :type_history_elements => create_type_history_elements(person, type),
+      :vlp_documents => create_vlp_documents(person, type)
+    )
   end
 
   def create_vlp_documents(person, type)
@@ -77,92 +80,91 @@ class MigrateVerificationTypes < MongoidMigrationTask
   end
 
   def due_date(person, type)
-    sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
+    sv = person.consumer_role.special_verifications.where(verification_type: type).order_by(:created_at.desc).first
     sv.due_date if sv.present?
   end
 
   def due_date_type(person, type)
-    sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
+    sv = person.consumer_role.special_verifications.where(verification_type: type).order_by(:created_at.desc).first
     sv.type if sv.present?
   end
 
   def type_rejected(person, type)
     case type
-      when 'DC Residency'
-        person.consumer_role.residency_rejected
-      when 'Social Security Number'
-        person.consumer_role.ssn_rejected
-      when 'American Indian Status'
-        person.consumer_role.native_rejected
-      when 'Citizenship'
-        person.consumer_role.lawful_presence_rejected
-      when 'Immigration status'
-        person.consumer_role.lawful_presence_rejected
+    when 'DC Residency'
+      person.consumer_role.residency_rejected
+    when 'Social Security Number'
+      person.consumer_role.ssn_rejected
+    when 'American Indian Status'
+      person.consumer_role.native_rejected
+    when 'Citizenship'
+      person.consumer_role.lawful_presence_rejected
+    when 'Immigration status'
+      person.consumer_role.lawful_presence_rejected
     end
   end
 
   def type_update_reason(person, type)
     case type
-      when 'DC Residency'
-        person.consumer_role.residency_update_reason
-      when 'Social Security Number'
-        person.consumer_role.ssn_update_reason
-      when 'American Indian Status'
-        person.consumer_role.native_update_reason
-      when 'Citizenship'
-        reason = person.consumer_role.lawful_presence_update_reason
-        person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Citizenship'
-      when 'Immigration status'
-        reason = person.consumer_role.lawful_presence_update_reason
-        person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Immigration status'
+    when 'DC Residency'
+      person.consumer_role.residency_update_reason
+    when 'Social Security Number'
+      person.consumer_role.ssn_update_reason
+    when 'American Indian Status'
+      person.consumer_role.native_update_reason
+    when 'Citizenship'
+      reason = person.consumer_role.lawful_presence_update_reason
+      person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Citizenship'
+    when 'Immigration status'
+      reason = person.consumer_role.lawful_presence_update_reason
+      person.consumer_role.lawful_presence_update_reason[:update_reason] if reason && reason[:v_type] == 'Immigration status'
     end
   end
 
-
   def assign_verification_type_status(type, person)
     consumer = person.consumer_role
-    if (consumer.vlp_authority == "curam" && consumer.fully_verified?)
+    if consumer.vlp_authority == "curam" && consumer.fully_verified?
       "curam"
     else
       case type
-        when 'Social Security Number'
-          if consumer.ssn_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
-            "review"
-          elsif consumer.ssa_pending?
-            "pending"
-          else
-            "outstanding"
-          end
-        when 'American Indian Status'
-          if consumer.native_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
-            "review"
-          else
-            "outstanding"
-          end
-        when 'DC Residency'
-          if consumer.residency_verified?
-            consumer.residency_attested? ? "attested" : "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
-            "review"
-          elsif consumer.residency_pending?
-            "pending"
-          else
-            "outstanding"
-          end
+      when 'Social Security Number'
+        if consumer.ssn_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.ssn_rejected
+          "review"
+        elsif consumer.ssa_pending?
+          "pending"
         else
-          if consumer.lawful_presence_verified?
-            "verified"
-          elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
-            "review"
-          elsif consumer.citizenship_immigration_processing?
-            "pending"
-          else
-            "outstanding"
-          end
+          "outstanding"
+        end
+      when 'American Indian Status'
+        if consumer.native_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.native_rejected
+          "review"
+        else
+          "outstanding"
+        end
+      when 'DC Residency'
+        if consumer.residency_verified?
+          consumer.residency_attested? ? "attested" : "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.residency_rejected
+          "review"
+        elsif consumer.residency_pending?
+          "pending"
+        else
+          "outstanding"
+        end
+      else
+        if consumer.lawful_presence_verified?
+          "verified"
+        elsif consumer.has_docs_for_type?(type) && !consumer.lawful_presence_rejected
+          "review"
+        elsif consumer.citizenship_immigration_processing?
+          "pending"
+        else
+          "outstanding"
+        end
       end
     end
   end

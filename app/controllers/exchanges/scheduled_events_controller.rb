@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exchanges::ScheduledEventsController < ApplicationController
   layout "single_column"
 
@@ -5,8 +7,7 @@ class Exchanges::ScheduledEventsController < ApplicationController
     @scheduled_event = ScheduledEvent.new
   end
 
-  def list
-  end
+  def list; end
 
   def create
     params.permit!
@@ -24,15 +25,12 @@ class Exchanges::ScheduledEventsController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def show
-    begin
-      @time = Date.strptime(params[:time], "%m/%d/%Y").to_date
-    rescue
-      @time = @scheduled_event.start_time
-    end
+    @time = Date.strptime(params[:time], "%m/%d/%Y").to_date
+  rescue StandardError
+    @time = @scheduled_event.start_time
   end
 
   def update
@@ -75,11 +73,8 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def current_events
-    if params[:event] == 'system'
-      @events = ScheduledEvent::SYSTEM_EVENTS
-    end
+    @events = ScheduledEvent::SYSTEM_EVENTS if params[:event] == 'system'
     render partial: 'exchanges/scheduled_events/get_events_field', locals: { event: params[:event] }
-
   end
 
   def delete_current_event
@@ -95,27 +90,27 @@ class Exchanges::ScheduledEventsController < ApplicationController
 
   private
 
-    helper_method :scheduled_event, :scheduled_events
+  helper_method :scheduled_event, :scheduled_events
 
-    def load_calendar_events
-      scheduled_events.flat_map do |e|
-        if params.key?("start_date")
-          e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record ), "%m/%d/%Y").to_date, e.offset_rule)
-        else
-          e.calendar_events((params.fetch(:start_date, TimeKeeper.date_of_record)).to_date, e.offset_rule)
-        end
+  def load_calendar_events
+    scheduled_events.flat_map do |e|
+      if params.key?("start_date")
+        e.calendar_events(Date.strptime(params.fetch(:start_date, TimeKeeper.date_of_record), "%m/%d/%Y").to_date, e.offset_rule)
+      else
+        e.calendar_events(params.fetch(:start_date, TimeKeeper.date_of_record).to_date, e.offset_rule)
       end
     end
+  end
 
-    def scheduled_event_params
-      params.require(:scheduled_event).permit(:type, :event_name, :start_time, :recurring_rules, :one_time, :offset_rule)
-    end
+  def scheduled_event_params
+    params.require(:scheduled_event).permit(:type, :event_name, :start_time, :recurring_rules, :one_time, :offset_rule)
+  end
 
-    def scheduled_event
-      @scheduled_event ||= ScheduledEvent.find(params[:id])
-    end
+  def scheduled_event
+    @scheduled_event ||= ScheduledEvent.find(params[:id])
+  end
 
-    def scheduled_events
-      @scheduled_events ||= ScheduledEvent.all
-    end
+  def scheduled_events
+    @scheduled_events ||= ScheduledEvent.all
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class OrganizationForms::AddressForm
@@ -19,8 +21,8 @@ module BenefitSponsors
 
       validates :zip,
                 format: {
-                    :with => /\A\d{5}(-\d{4})?\z/,
-                    :message => "should be in the form: 12345 or 12345-1234"
+                  :with => /\A\d{5}(-\d{4})?\z/,
+                  :message => "should be in the form: 12345 or 12345-1234"
                 }
 
 

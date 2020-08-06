@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Services
   class EmployeeSignupMatch
     def initialize(form_factory = Factories::MatchedEmployee, census_employee_finder = EmployerProfile)

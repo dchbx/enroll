@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PricingCalculators
     class ShopSimpleListBillPricingCalculator < PricingCalculator
@@ -11,7 +13,7 @@ module BenefitSponsors
           @pricing_model = p_model
           @relationship_totals = Hash.new { |h, k| h[k] = 0 }
           @total = 0.00
-          @member_totals = Hash.new
+          @member_totals = {}
           @rate_schedule_date = r_coverage.rate_schedule_date
           @eligibility_dates = c_eligibility_dates
           @coverage_start_date = r_coverage.coverage_start_on
@@ -28,9 +30,7 @@ module BenefitSponsors
           pu = @pricing_unit_map[rel.to_s]
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
           rel_count = @relationship_totals[rel.to_s]
-          if (rel.to_s == "dependent") && (coverage_age < 21)
-            @discount_kid_count = @discount_kid_count + 1
-          end
+          @discount_kid_count += 1 if (rel.to_s == "dependent") && (coverage_age < 21)
           member_price = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3) && (@product.kind.to_s != :dental.to_s)
                            0.00
                          else
@@ -42,8 +42,8 @@ module BenefitSponsors
                              @rating_area
                            )
                          end
-          @member_totals[member.member_id] = BigDecimal.new(member_price.to_s).round(2)
-          @total = BigDecimal.new((@total + member_price).to_s).round(2)
+          @member_totals[member.member_id] = BigDecimal(member_price.to_s).round(2)
+          @total = BigDecimal((@total + member_price).to_s).round(2)
           self
         end
       end

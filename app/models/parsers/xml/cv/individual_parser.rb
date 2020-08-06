@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers
   module Xml
     module Cv
@@ -14,8 +16,8 @@ module Parsers
 
         def to_hash
           response = {
-              person: person.to_hash,
-              person_demographics: person_demographics.to_hash
+            person: person.to_hash,
+            person_demographics: person_demographics.to_hash
           }
           response[:id] = id.split('#').last if id
           response[:broker_roles] = broker_roles.map(&:to_hash) if broker_roles

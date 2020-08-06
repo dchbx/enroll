@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportProfiles
@@ -45,8 +47,8 @@ module TransportProfiles
           {
             :return_status => "422",
             :body => JSON.dump({
-              "file_name" => ["can't be blank"]
-            })
+                                 "file_name" => ["can't be blank"]
+                               })
           }
         )
         subject.work_with_params("", nil, payload)

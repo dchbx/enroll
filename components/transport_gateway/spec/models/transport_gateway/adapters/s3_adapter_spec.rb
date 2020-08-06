@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportGateway
@@ -140,16 +142,16 @@ module TransportGateway
         allow(Aws::S3::Resource).to receive(:new).with({client: s3_client}).and_return(s3_resource)
         allow(s3_resource).to receive(:bucket).with("bucket").and_return(bucket)
         allow(bucket).to receive(:put_object).with({
-          key: "file_name",
-          content_length: body.bytesize,
-          body: body
-        })
+                                                     key: "file_name",
+                                                     content_length: body.bytesize,
+                                                     body: body
+                                                   })
         subject.assign_providers(nil, credential_provider)
       end
 
       it "creates the client with the credentials and connection info" do
         expected_information = {
-           region: "service_endpoint"
+          region: "service_endpoint"
         }.merge(s3_credential_options)
         expect(Aws::S3::Client).to receive(:new).with(expected_information).and_return(s3_client)
         subject.send_message(message)
@@ -201,9 +203,9 @@ module TransportGateway
 
       let(:source_stream) do
         double({
-          :size => 300,
-          :stream => source_io_stream 
-        })
+                 :size => 300,
+                 :stream => source_io_stream
+               })
       end
 
       let(:gateway) do
@@ -218,17 +220,17 @@ module TransportGateway
         allow(s3_resource).to receive(:bucket).with("bucket").and_return(bucket)
         allow(gateway).to receive(:receive_message).with(message).and_return(source_stream)
         allow(bucket).to receive(:put_object).with({
-          key: "file_name",
-          content_length: 300,
-          body: source_io_stream
-        })
+                                                     key: "file_name",
+                                                     content_length: 300,
+                                                     body: source_io_stream
+                                                   })
         allow(source_stream).to receive(:cleanup)
         subject.assign_providers(gateway, credential_provider)
       end
 
       it "creates the client with the credentials and connection info" do
         expected_information = {
-           region: "service_endpoint"
+          region: "service_endpoint"
         }.merge(s3_credential_options)
         expect(Aws::S3::Client).to receive(:new).with(expected_information).and_return(s3_client)
         subject.send_message(message)
@@ -264,7 +266,7 @@ module TransportGateway
     describe "given:
       - a valid 'from'
       - no credential provider
-      - no source credentials 
+      - no source credentials
     " do
 
       let(:from) { URI.parse("s3://bucket@place/object_key") }

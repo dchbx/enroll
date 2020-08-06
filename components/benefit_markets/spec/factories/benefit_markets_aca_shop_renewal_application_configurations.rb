@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_aca_shop_renewal_application_configuration, class: 'BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration' do
     erlst_strt_prior_eff_months { -2 }

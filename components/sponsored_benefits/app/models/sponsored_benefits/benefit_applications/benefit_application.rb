@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module BenefitApplications
     class BenefitApplication
@@ -100,12 +102,10 @@ module SponsoredBenefits
       end
 
       # Application meets criteria necessary for sponsored group to shop for benefits
-      def is_open_enrollment_eligible?
-      end
+      def is_open_enrollment_eligible?; end
 
       # Application meets criteria necessary for sponsored group to effectuate selected benefits
-      def is_coverage_effective_eligible?
-      end
+      def is_coverage_effective_eligible?; end
 
       # def employer_profile
       #   benefit_sponsorship.benefit_sponsorable
@@ -116,16 +116,14 @@ module SponsoredBenefits
       end
 
       def minimum_employer_contribution
-        unless benefit_groups.size == 0
+        unless benefit_groups.empty?
           benefit_groups.map do |benefit_group|
             if benefit_group.sole_source?
               OpenStruct.new(:premium_pct => 100)
             else
               benefit_group.relationship_benefits.select do |relationship_benefit|
                 relationship_benefit.relationship == "employee"
-              end.min_by do |relationship_benefit|
-                relationship_benefit.premium_pct
-              end
+              end.min_by(&:premium_pct)
             end
           end.map(&:premium_pct).first
         end
@@ -133,7 +131,7 @@ module SponsoredBenefits
 
       def to_benefit_sponsors_benefit_application(organization)
         # Fix Spec after fixing this method!
-        return unless(benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?)
+        return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
 
         new_benefit_sponsorship = build_benefit_sponsors_benefit_sponsorship_if_needed(organization, benefit_sponsorship)
@@ -144,7 +142,7 @@ module SponsoredBenefits
         )
         set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
         new_benefit_application.pull_benefit_sponsorship_attributes
-        if new_benefit_application.valid? && new_benefit_sponsorship.valid?# && new_benefit_application.save
+        if new_benefit_application.valid? && new_benefit_sponsorship.valid? # && new_benefit_application.save
           update_benefit_sponsor_catalog(new_benefit_application, new_benefit_sponsorship)
           add_benefit_packages(new_benefit_application)
         end
@@ -152,7 +150,7 @@ module SponsoredBenefits
         new_benefit_application
       end
 
-      def to_plan_year(organization)
+      def to_plan_year(_organization)
         return unless benefit_sponsorship.present? && effective_period.present? && open_enrollment_period.present?
         raise "Invalid number of benefit_groups: #{benefit_groups.size}" if benefit_groups.size != 1
         copied_benefit_groups = []
@@ -169,15 +167,15 @@ module SponsoredBenefits
       end
 
       def set_predecessor_applications_if_present(new_benefit_sponsorship, new_benefit_application)
-        predecessor_applications = new_benefit_sponsorship.benefit_applications.where(:"effective_period.max" => new_benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in=> [:active, :terminated, :expired, :imported])
+        predecessor_applications = new_benefit_sponsorship.benefit_applications.where(:"effective_period.max" => new_benefit_application.effective_period.min.to_date.prev_day, :aasm_state.in => [:active, :terminated, :expired, :imported])
         if predecessor_applications.present?
-          if predecessor_applications.count < 2
-            new_benefit_application.predecessor_id = predecessor_applications.first.id
-          elsif predecessor_applications.where(:"effective_period.max" => Date.new(2018,7,31)).count == 2  # exception case for 8/1 conversion
-            new_benefit_application.predecessor_id = predecessor_applications.where(aasm_state: :imported).first.id
-          else
-            new_benefit_application.predecessor_id = predecessor_applications.first.id
-          end
+          new_benefit_application.predecessor_id = if predecessor_applications.count < 2
+                                                     predecessor_applications.first.id
+                                                   elsif predecessor_applications.where(:"effective_period.max" => Date.new(2018,7,31)).count == 2  # exception case for 8/1 conversion
+                                                     predecessor_applications.where(aasm_state: :imported).first.id
+                                                   else
+                                                     predecessor_applications.first.id
+                                                   end
         end
       end
 
@@ -191,7 +189,7 @@ module SponsoredBenefits
         end
       end
 
-      def build_benefit_sponsors_benefit_sponsorship_if_needed(organization, old_benefit_sponsorship)
+      def build_benefit_sponsors_benefit_sponsorship_if_needed(organization, _old_benefit_sponsorship)
         if organization.active_benefit_sponsorship.present?
           organization.active_benefit_sponsorship
         else
@@ -206,16 +204,14 @@ module SponsoredBenefits
         predecessor_benefit_packages = benefit_application.predecessor.benefit_packages
 
         if predecessor_benefit_packages.count < 2
-          benefit_package.predecessor_id  = benefit_application.predecessor.benefit_packages.first.id
+          benefit_package.predecessor_id = benefit_application.predecessor.benefit_packages.first.id
           return
         end
 
         new_package_hios_id = benefit_package.health_sponsored_benefit.products(benefit_application.effective_period.min).map(&:hios_id)
         predecessor_benefit_packages.each do |predecessor_package|
           predecessor_package_hios_id = predecessor_package.health_sponsored_benefit.products(predecessor_application.effective_period.min).map(&:hios_id)
-          if ((new_package_hios_id.size == predecessor_package_hios_id.size) && ((new_package_hios_id && predecessor_package_hios_id).size == new_package_hios_id.size))
-            benefit_package.predecessor_id  = predecessor_package.id
-          end
+          benefit_package.predecessor_id = predecessor_package.id if (new_package_hios_id.size == predecessor_package_hios_id.size) && ((new_package_hios_id && predecessor_package_hios_id).size == new_package_hios_id.size)
         end
       end
 
@@ -223,7 +219,7 @@ module SponsoredBenefits
         attributes = benefit_group.attributes.symbolize_keys.slice(
           :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset,
           :plan_option_kind, :relationship_benefits, :dental_relationship_benefits, :dental_plan_option_kind
-          )
+        )
 
         attributes[:is_default] = benefit_group.default
         attributes[:reference_plan_hios_id] = benefit_group.reference_plan.hios_id
@@ -245,9 +241,9 @@ module SponsoredBenefits
       class << self
         def calculate_start_on_dates
           start_on = if TimeKeeper.date_of_record.day > open_enrollment_minimum_begin_day_of_month(true)
-            TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-          else
-            TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+                       TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+                     else
+                       TimeKeeper.date_of_record.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
           end
 
           end_on = TimeKeeper.date_of_record - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months
@@ -255,7 +251,7 @@ module SponsoredBenefits
         end
 
         def calculate_start_on_options
-          calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
+          calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db)]}
         end
 
         def enrollment_timetable_by_effective_date(effective_date, renewal_employer)
@@ -269,32 +265,31 @@ module SponsoredBenefits
           open_enrollment_period_minimum  = Date.new(prior_month.year, prior_month.month, open_enrollment_minimum_day)..open_enrollment_period.end
 
           {
-              effective_date: effective_date,
-              effective_period: effective_period,
-              open_enrollment_period: open_enrollment_period,
-              open_enrollment_period_minimum: open_enrollment_period_minimum,
-              binder_payment_due_on: binder_payment_due_on,
-            }
+            effective_date: effective_date,
+            effective_period: effective_period,
+            open_enrollment_period: open_enrollment_period,
+            open_enrollment_period_minimum: open_enrollment_period_minimum,
+            binder_payment_due_on: binder_payment_due_on
+          }
         end
 
         def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
-          if use_grace_period
-            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
-          else
-            minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
-          end
+          minimum_length = if use_grace_period
+                             Settings.aca.shop_market.open_enrollment.minimum_length.days
+                           else
+                             Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+                           end
 
           open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
           open_enrollment_end_on_day - minimum_length
 
           minimum_day = open_enrollment_end_on_day - minimum_length
-           if minimum_day > 0
-             minimum_day
-           else
-             1
-           end
+          if minimum_day > 0
+            minimum_day
+          else
+            1
+          end
         end
-
 
         # TODOs
         ## handle late rate scenarios where partial or no benefit product plan/rate data exists for effective date
@@ -304,11 +299,11 @@ module SponsoredBenefits
           next_month_start      = given_date.end_of_month + 1.day
           following_month_start = next_month_start + 1.month
 
-          if use_grace_period
-            last_day = open_enrollment_minimum_begin_day_of_month(true)
-          else
-            last_day = open_enrollment_minimum_begin_day_of_month
-          end
+          last_day = if use_grace_period
+                       open_enrollment_minimum_begin_day_of_month(true)
+                     else
+                       open_enrollment_minimum_begin_day_of_month
+                     end
 
           if given_day_of_month > last_day
             following_month_start..(following_month_start + 1.year - 1.day)
@@ -317,9 +312,8 @@ module SponsoredBenefits
           end
         end
 
-
         def open_enrollment_period_by_effective_date(effective_date, renewal_employer)
-          earliest_begin_date = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months # toDo - check
+          earliest_begin_date = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months # TODO: - check
           prior_month = effective_date - 1.month
 
           if renewal_employer
@@ -332,7 +326,6 @@ module SponsoredBenefits
 
           begin_on..end_on
         end
-
 
         def find(id)
           application = nil
@@ -350,29 +343,19 @@ module SponsoredBenefits
       def open_enrollment_date_checks
         return if effective_period.blank? || open_enrollment_period.blank?
 
-        if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
-          errors.add(:effective_period, "start date must be first day of the month")
-        end
+        errors.add(:effective_period, "start date must be first day of the month") if effective_period.begin.mday != effective_period.begin.beginning_of_month.mday
 
-        if effective_period.end.mday != effective_period.end.end_of_month.mday
-          errors.add(:effective_period, "must be last day of the month")
-        end
+        errors.add(:effective_period, "must be last day of the month") if effective_period.end.mday != effective_period.end.end_of_month.mday
 
         if effective_period.end > effective_period.begin.years_since(Settings.aca.shop_market.benefit_period.length_maximum.year)
           errors.add(:effective_period, "benefit period may not exceed #{Settings.aca.shop_market.benefit_period.length_maximum.year} year")
         end
 
-        if open_enrollment_period.end > effective_period.begin
-          errors.add(:effective_period, "start date can't occur before open enrollment end date")
-        end
+        errors.add(:effective_period, "start date can't occur before open enrollment end date") if open_enrollment_period.end > effective_period.begin
 
-        if open_enrollment_period.end < open_enrollment_period.begin
-          errors.add(:open_enrollment_period, "can't occur before open enrollment start date")
-        end
+        errors.add(:open_enrollment_period, "can't occur before open enrollment start date") if open_enrollment_period.end < open_enrollment_period.begin
 
-        if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-          errors.add(:open_enrollment_period, "can't occur earlier than 60 days before start date")
-        end
+        errors.add(:open_enrollment_period, "can't occur earlier than 60 days before start date") if open_enrollment_period.begin < (effective_period.begin - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
 
         if open_enrollment_period.end > (open_enrollment_period.begin + Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
           errors.add(:open_enrollment_period, "open enrollment period is greater than maximum: #{Settings.aca.shop_market.open_enrollment.maximum_length.months} months")

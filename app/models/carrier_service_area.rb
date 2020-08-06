@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarrierServiceArea
   include Mongoid::Document
   include Config::AcaModelConcern
@@ -15,20 +17,20 @@ class CarrierServiceArea
   validates_presence_of :service_area_id, :service_area_name, :serves_entire_state, :issuer_hios_id
 
   validates :county_name, :county_code, :state_code, :service_area_zipcode, presence: true,
-    unless: Proc.new { |a| a.serves_entire_state? }
+                                                                            unless: proc { |a| a.serves_entire_state? }
 
   scope :serving_entire_state, -> { where(serves_entire_state: true) }
-  scope :for_issuer, -> (hios_ids) { where(issuer_hios_id: { "$in" => hios_ids }) }
+  scope :for_issuer, ->(hios_ids) { where(issuer_hios_id: { "$in" => hios_ids }) }
 
   def self.service_areas_available_on(address, year)
     return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
     where({
-      :active_year => year,
-      "$or" => [
+            :active_year => year,
+            "$or" => [
         {:serves_entire_state => true},
         {:service_area_zipcode => address.zip, county_name: ::Regexp.compile(::Regexp.escape(address.county).downcase, true)}
       ]
-    })
+          })
   end
 
   class << self
@@ -37,19 +39,19 @@ class CarrierServiceArea
       issuers = for_issuer(carrier_profile.issuer_hios_ids)
       return true if issuers.serving_entire_state.any?
 
-      return issuers.service_areas_for(office_location: office_location).any?
+      issuers.service_areas_for(office_location: office_location).any?
     end
 
     def valid_for_carrier_on(address:, carrier_profile:, year:)
       return([]) unless address.state.to_s.downcase == aca_state_abbreviation.to_s.downcase
       where({
-        :active_year => year,
-        issuer_hios_id: { "$in" => carrier_profile.issuer_hios_ids },
-        "$or" => [
+              :active_year => year,
+              issuer_hios_id: { "$in" => carrier_profile.issuer_hios_ids },
+              "$or" => [
           {:serves_entire_state => true},
           {:service_area_zipcode => address.zip, county_name: ::Regexp.compile(::Regexp.escape(address.county).downcase, true)}
         ]
-      })
+            })
     end
 
     def service_areas_for(office_location:)

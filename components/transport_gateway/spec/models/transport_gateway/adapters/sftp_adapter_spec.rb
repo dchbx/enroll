@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require File.expand_path(File.join(File.dirname(__FILE__), "shared_adapter"))
@@ -36,7 +38,7 @@ module TransportGateway
       end
 
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/ ) 
+        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/)
       end
     end
 
@@ -58,7 +60,7 @@ module TransportGateway
       end
 
       it "raises an error" do
-        expect { subject.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/ ) 
+        expect { subject.send_message(message) }.to raise_error(ArgumentError, /target server username:password not provided/)
       end
     end
 
@@ -76,7 +78,7 @@ module TransportGateway
       end
 
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /source data not provided/) 
+        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /source data not provided/)
       end
     end
 
@@ -214,7 +216,7 @@ module TransportGateway
     subject { Adapters::SftpAdapter.new }
 
     describe "given:
-    - no source 
+    - no source
     " do
       let(:from)      { nil }
 
@@ -223,7 +225,7 @@ module TransportGateway
       end
 
       it "raises an error" do
-        expect{ subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/) 
+        expect{ subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/)
       end
     end
 
@@ -242,7 +244,7 @@ module TransportGateway
       end
 
       it "raises an error" do
-        expect { subject.receive_message(message) }.to raise_error(ArgumentError, /source server username:password not provided/ ) 
+        expect { subject.receive_message(message) }.to raise_error(ArgumentError, /source server username:password not provided/)
       end
     end
 

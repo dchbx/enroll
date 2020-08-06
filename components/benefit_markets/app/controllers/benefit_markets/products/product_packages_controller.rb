@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     class ProductPackagesController < ::BenefitMarkets::ApplicationController
       include Pundit
-      before_action :set_benefit_catalog, only: [ :show, :edit, :update, :destroy ]
+      before_action :set_benefit_catalog, only: [:show, :edit, :update, :destroy]
 
       def new
         @product_package = ::BenefitMarkets::Products::ProductPackageForm.for_new

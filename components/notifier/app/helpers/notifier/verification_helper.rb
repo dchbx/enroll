@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   module VerificationHelper
     def aqhp_citizen_status(status)

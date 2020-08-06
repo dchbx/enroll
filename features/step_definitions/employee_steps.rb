@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given (/a matched Employee exists with only employee role/) do
   FactoryBot.create(:user)
   person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
@@ -5,14 +7,13 @@ Given (/a matched Employee exists with only employee role/) do
   @benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryBot.build :benefit_group_assignment, benefit_group: @benefit_group
   @employee_role = person.employee_roles[0]
-  ce =  FactoryBot.build(:census_employee,
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
-          employee_role_id: @employee_role.id,
-          employer_profile: org.employer_profile
-        )
+  ce = FactoryBot.build(:census_employee,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        dob: person.dob,
+                        ssn: person.ssn,
+                        employee_role_id: @employee_role.id,
+                        employer_profile: org.employer_profile)
 
   ce.benefit_group_assignments << bga
   ce.link_employee_role!
@@ -20,8 +21,8 @@ Given (/a matched Employee exists with only employee role/) do
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 
-Given (/(.*) has a matched employee role/) do |name|
-  steps %{
+Given (/(.*) has a matched employee role/) do |_name|
+  steps %(
     When Patrick Doe creates an HBX account
     When Employee goes to register as an employee
     Then Employee should see the employee search page
@@ -29,21 +30,20 @@ Given (/(.*) has a matched employee role/) do |name|
     Then Employee should see the matched employee record form
     When Employee accepts the matched employer
     When Employee completes the matched employee form for Patrick Doe
-  }
+  )
 end
 
 def employee_by_legal_name(legal_name, person)
   org = org_by_legal_name(legal_name)
   employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: org.employer_profile.id)
   ce = FactoryBot.create(:census_employee,
-    first_name: person.first_name,
-    last_name: person.last_name,
-    ssn: person.ssn,
-    dob: person.dob,
-    employer_profile: org.employer_profile,
-    benefit_sponsorship: benefit_sponsorship(org),
-    employee_role_id: employee_role.id
-  )
+                         first_name: person.first_name,
+                         last_name: person.last_name,
+                         ssn: person.ssn,
+                         dob: person.dob,
+                         employer_profile: org.employer_profile,
+                         benefit_sponsorship: benefit_sponsorship(org),
+                         employee_role_id: employee_role.id)
 end
 
 Given (/a person exists with dual roles/) do
@@ -52,7 +52,7 @@ Given (/a person exists with dual roles/) do
 end
 
 Then (/(.*) sign in to portal/) do |name|
-  user = Person.where(first_name: "#{name}").first.user
+  user = Person.where(first_name: name.to_s).first.user
   login_as user
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/families/home"
@@ -103,7 +103,7 @@ end
 
 And(/Employee should see today date and clicks continue/) do
   screenshot("current_qle_date")
-  
+
   expect(find('#qle_date').value).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   expect(find('#qle_date')['readonly']).to eq 'true'
   expect(find('input#qle_date', style: {'pointer-events': 'none'})).to be_truthy
@@ -118,12 +118,12 @@ And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks contin
 
   if qle_reason == 'covid-19'
     qle_on = TimeKeeper.date_of_record
-    
+
     effective_on_kind_date = case effective_on_kind
-    when 'fixed_first_of_next_month'
-      qle_on.end_of_month.next_day.to_s
-    when 'first_of_this_month'
-      qle_on.beginning_of_month.to_s
+                             when 'fixed_first_of_next_month'
+                               qle_on.end_of_month.next_day.to_s
+                             when 'first_of_this_month'
+                               qle_on.beginning_of_month.to_s
     end
 
     select effective_on_kind_date, from: 'effective_on_kind'
@@ -136,22 +136,22 @@ end
 Then(/Employee should see the group selection page with "(.*?)" effective date/) do |effective_on_kind|
 
   effective_on = case effective_on_kind
-  when "first_of_this_month"
-    TimeKeeper.date_of_record.beginning_of_month
-  when "fixed_first_of_next_month"
-    TimeKeeper.date_of_record.end_of_month + 1.day
+                 when "first_of_this_month"
+                   TimeKeeper.date_of_record.beginning_of_month
+                 when "fixed_first_of_next_month"
+                   TimeKeeper.date_of_record.end_of_month + 1.day
   end
 
-  expect(find('#effective_date')).to have_content("EFFECTIVE DATE: #{effective_on.strftime("%m/%d/%Y")}")
+  expect(find('#effective_date')).to have_content("EFFECTIVE DATE: #{effective_on.strftime('%m/%d/%Y')}")
 end
 
 Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) do |screen, effective_on_kind|
-  
+
   effective_on = case effective_on_kind
-  when "first_of_this_month"
-    TimeKeeper.date_of_record.beginning_of_month
-  when "fixed_first_of_next_month"
-    TimeKeeper.date_of_record.end_of_month + 1.day
+                 when "first_of_this_month"
+                   TimeKeeper.date_of_record.beginning_of_month
+                 when "fixed_first_of_next_month"
+                   TimeKeeper.date_of_record.end_of_month + 1.day
   end
 
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 5)

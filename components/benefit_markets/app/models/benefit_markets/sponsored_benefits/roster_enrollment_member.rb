@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module SponsoredBenefits
     # This is an abstract class that represents and documents the interface
@@ -7,7 +9,7 @@ module BenefitMarkets
       # Return the member's id.
       # @return [Object] the member id
       def member_id
-        raise NotImplementedError.new("This is a documentation only interface.")
+        raise NotImplementedError, "This is a documentation only interface."
       end
 
       # Return the date from which the premium is eligible to be calculated
@@ -17,19 +19,19 @@ module BenefitMarkets
       # calculation.
       # @return [Date] coverage eligibility date.
       def coverage_eligibility_on
-        raise NotImplementedError.new("This is a documentation only interface.")
+        raise NotImplementedError, "This is a documentation only interface."
       end
 
       # Cost to cover this member.
       # @return [FixNum, BigDecimal] the cost
       def product_price
-        raise NotImplementedError.new("This is a documentation only interface.")
+        raise NotImplementedError, "This is a documentation only interface."
       end
 
       # Contribution by the sponsor for this member
       # @return [FixNum, BigDecimal] the contribution
       def sponsor_contribution
-        raise NotImplementedError.new("This is a documentation only interface.")
+        raise NotImplementedError, "This is a documentation only interface."
       end
     end
   end

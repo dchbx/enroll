@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin should see buttons to filter$/) do
   expect(page).to have_content('Employee')
   expect(page).to have_content('Broker')
@@ -23,11 +25,11 @@ Then(/^Hbx Admin should see columns related to user account$/) do
   expect(page).to have_content('Actions')
 end
 
-When(/^I click Employee button$/)do
+When(/^I click Employee button$/) do
   find(:xpath, '//*[@id="Tab:all_employee_roles"]').click
 end
 
-When(/^I click Employee and Locked button$/)do
+When(/^I click Employee and Locked button$/) do
   find(:xpath, '//*[@id="Tab:all_employee_roles"]').click
   find(:xpath, '//*[@id="Tab:all_employee_roles-locked"]').click
 end
@@ -49,7 +51,7 @@ Then(/^I should see subrole field on datatable$/) do
   expect(page).to have_content("Permission level")
 end
 
-When(/^I click All button$/)do
+When(/^I click All button$/) do
   find(:xpath, '//*[@id="Tab:all"]').click
 end
 
@@ -61,11 +63,11 @@ Then(/^I should see users with any role$/) do
   expect(page).to have_content("Unlocked")
 end
 
-When(/^I click Employer button$/)do
+When(/^I click Employer button$/) do
   find(:xpath, '//*[@id="Tab:all_employer_staff_roles"]').click
 end
 
-Then(/^I should only see user with employer staff role$/)do
+Then(/^I should only see user with employer staff role$/) do
   expect(page).not_to have_content(employee_role.oim_id)
   expect(page).not_to have_content(broker.oim_id)
   expect(page).to have_content(employer_staff.oim_id)
@@ -73,11 +75,11 @@ Then(/^I should only see user with employer staff role$/)do
   expect(page).to have_content("Unlocked")
 end
 
-When(/^I click Broker button$/)do
+When(/^I click Broker button$/) do
   find(:xpath, '//*[@id="Tab:all_broker_roles"]').click
 end
 
-Then(/^I should only see user with broker role$/)do
+Then(/^I should only see user with broker role$/) do
   expect(page).not_to have_content(employee_role.oim_id)
   expect(page).not_to have_content(employer_staff.oim_id)
   expect(page).to have_content(broker.oim_id)

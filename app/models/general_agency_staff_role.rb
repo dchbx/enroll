@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeneralAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
@@ -17,8 +19,8 @@ class GeneralAgencyStaffRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   embeds_many :workflow_state_transitions, as: :transitional
@@ -26,15 +28,15 @@ class GeneralAgencyStaffRole
   associated_with_one :general_agency_profile, :benefit_sponsors_general_agency_profile_id, "::BenefitSponsors::Organizations::GeneralAgencyProfile"
 
   validates_presence_of :npn
-  validates_presence_of :benefit_sponsors_general_agency_profile_id, :if => Proc.new { |m| m.general_agency_profile_id.blank? }
-  validates_presence_of :general_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsors_general_agency_profile_id.blank? }
+  validates_presence_of :benefit_sponsors_general_agency_profile_id, :if => proc { |m| m.general_agency_profile_id.blank? }
+  validates_presence_of :general_agency_profile_id, :if => proc { |m| m.benefit_sponsors_general_agency_profile_id.blank? }
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
   validates :npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: false
+            numericality: {only_integer: true},
+            length: { minimum: 1, maximum: 10 },
+            uniqueness: true,
+            allow_blank: false
 
   aasm do
     state :applicant, initial: true
@@ -49,11 +51,11 @@ class GeneralAgencyStaffRole
       transitions from: [:applicant, :general_agency_pending], to: :active
     end
 
-    event :deny, :after => [:record_transition, :update_general_agency_profile ]  do
+    event :deny, :after => [:record_transition, :update_general_agency_profile]  do
       transitions from: :applicant, to: :denied
     end
 
-    event :decertify, :after => [:record_transition , :update_general_agency_profile] do
+    event :decertify, :after => [:record_transition, :update_general_agency_profile] do
       transitions from: :active, to: :decertified
     end
 
@@ -142,19 +144,17 @@ class GeneralAgencyStaffRole
   def update_general_agency_profile
     return unless is_primary
     case aasm.to_state
-     when :active
-       general_agency_profile.approve!
-      when :denied
-        general_agency_profile.reject!
-      when :decertified
-        general_agency_profile.close!
+    when :active
+      general_agency_profile.approve!
+    when :denied
+      general_agency_profile.reject!
+    when :decertified
+      general_agency_profile.close!
     end
   end
 
   def latest_transition_time
-    if self.workflow_state_transitions.any?
-      self.workflow_state_transitions.first.transition_at
-    end
+    self.workflow_state_transitions.first.transition_at if self.workflow_state_transitions.any?
   end
 
   def record_transition

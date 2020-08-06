@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   class Credential
     include Mongoid::Document
@@ -45,8 +47,7 @@ module TransportProfiles
       self.credential_kind == "s3"
     end
 
-    def export_key
-    end
+    def export_key; end
 
     def update_key(file_path)
       File.read(file_path)

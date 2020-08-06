@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'roo'
 
 module SponsoredBenefits
@@ -16,11 +18,11 @@ module SponsoredBenefits
       TEMPLATE_DATE_CELL = 7
       TEMPLATE_VERSION_CELL = 13
 
-      MEMBER_RELATIONSHIP_KINDS = %w(employee spouse domestic_partner child)
+      MEMBER_RELATIONSHIP_KINDS = %w[employee spouse domestic_partner child].freeze
 
       EmployeeTerminationMap = Struct.new(:employee, :termination_date)
 
-      CENSUS_MEMBER_RECORD = %w(
+      CENSUS_MEMBER_RECORD = %w[
         employer_assigned_family_id
         employee_relationship
         last_name
@@ -43,7 +45,7 @@ module SponsoredBenefits
         state
         zip
         newly_designated
-        )
+        ].freeze
 
       CENSUS_MEMBER_RECORD_TITLES = [
         "Family ID #(to match family members to the EE & each household gets a unique number)",
@@ -67,7 +69,7 @@ module SponsoredBenefits
         "City(Optional)",
         "State(Optional)",
         "Zip(Optional)"
-      ]
+      ].freeze
 
       def initialize(attributes = {})
         @terminate_queue = {}
@@ -77,14 +79,12 @@ module SponsoredBenefits
       end
 
       def check_relationships
-        return true if (@sheet.nil? || @column_header_row.nil?)
+        return true if @sheet.nil? || @column_header_row.nil?
 
         (4..@sheet.last_row).each_with_index.map do |i, index|
           row = Hash[[@column_header_row, @roster.row(i)].transpose]
           record = parse_row(row)
-          if record[:employee_relationship].nil?
-            self.errors.add :base, "Row #{index + 4}: Relationship is required"
-          end
+          self.errors.add :base, "Row #{index + 4}: Relationship is required" if record[:employee_relationship].nil?
         end
       end
 
@@ -114,9 +114,7 @@ module SponsoredBenefits
         @column_header_row = @sheet.row(2)
         # label_header_row  = @sheet.row(3)
 
-        unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-          raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
-        end
+        raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template." unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
 
         census_employees = []
         (4..@sheet.last_row).each_with_index.map do |i, index|
@@ -147,12 +145,10 @@ module SponsoredBenefits
             begin
               census_employee.newly_designate
             rescue Exception => e
-              self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+              self.errors.add :base, "employee can't transition to newly designate state #{e}"
             end
           elsif record[:newly_designated] == '0'
-            if census_employee.may_rebase_new_designee?
-              census_employee.rebase_new_designee
-            end
+            census_employee.rebase_new_designee if census_employee.may_rebase_new_designee?
           end
 
           census_employee ||= nil
@@ -175,7 +171,7 @@ module SponsoredBenefits
           @last_ee_member_record = record
         else
           # Process dependent
-          return nil if (@last_ee_member_record.nil? || @last_ee_member.nil?)
+          return nil if @last_ee_member_record.nil? || @last_ee_member.nil?
           if record[:employer_assigned_family_id] == @last_ee_member_record[:employer_assigned_family_id]
             census_dependent = @last_ee_member.census_dependents.detect do |dependent|
               (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
@@ -205,17 +201,17 @@ module SponsoredBenefits
         member.hired_on = record[:hire_date] if record[:hire_date]
         member.benefit_sponsorship_id = benefit_sponsorship.id
         # is_business_owner blank or false based on it checkbox value will be set
-        if ["0",""].include? record[:is_business_owner].to_s
-          member.is_business_owner = false
-        else
-          member.is_business_owner = true
-        end
+        member.is_business_owner = if ["0",""].include? record[:is_business_owner].to_s
+                                     false
+                                   else
+                                     true
+                                   end
         member.gender = record[:gender].to_s if record[:gender]
         member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]
         member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
         assign_benefit_group(member, record[:benefit_group], record[:plan_year])
         address = SponsoredBenefits::Locations::Address.new({kind: 'home', address_1: record[:address_1], address_2: record[:address_2], city: record[:city],
-                               state: record[:state], zip: record[:zip]})
+                                                             state: record[:state], zip: record[:zip]})
         member.address = address if address.valid?
         member
       end
@@ -258,39 +254,39 @@ module SponsoredBenefits
         zip = parse_text(row["zip"])
         newly_designated = parse_boolean(row["newly_designated"])
         {
-            employer_assigned_family_id: employer_assigned_family_id,
-            employee_relationship: employee_relationship,
-            last_name: last_name,
-            first_name: first_name,
-            middle_name: middle_name,
-            name_sfx: name_sfx,
-            email: email,
-            ssn: ssn,
-            dob: dob,
-            gender: gender,
-            hire_date: hire_date,
-            termination_date: termination_date,
-            is_business_owner: is_business_owner,
-            benefit_group: benefit_group,
-            plan_year: plan_year,
-            kind: kind,
-            address_1: address_1,
-            address_2: address_2,
-            city: city,
-            state: state,
-            zip: zip,
-            newly_designated: newly_designated
+          employer_assigned_family_id: employer_assigned_family_id,
+          employee_relationship: employee_relationship,
+          last_name: last_name,
+          first_name: first_name,
+          middle_name: middle_name,
+          name_sfx: name_sfx,
+          email: email,
+          ssn: ssn,
+          dob: dob,
+          gender: gender,
+          hire_date: hire_date,
+          termination_date: termination_date,
+          is_business_owner: is_business_owner,
+          benefit_group: benefit_group,
+          plan_year: plan_year,
+          kind: kind,
+          address_1: address_1,
+          address_2: address_2,
+          city: city,
+          state: state,
+          zip: zip,
+          newly_designated: newly_designated
         }
       end
 
       def header_valid?(sheet_header_row)
-        if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
-          template_date = sheet_header_row[TEMPLATE_DATE_CELL]
-        else
-          template_date = Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y")
-        end
+        template_date = if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
+                          sheet_header_row[TEMPLATE_DATE_CELL]
+                        else
+                          Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y")
+                        end
         template_date == TEMPLATE_DATE &&
-        sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
+          sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
       end
 
       def column_header_valid?(column_header_row)
@@ -302,19 +298,17 @@ module SponsoredBenefits
         # defined? @last_employer_assigned_family_id ?
         return nil if cell.blank?
         field_map = case parse_text(cell).downcase
-                      when "employee"
-                        "self"
-                      when "spouse"
-                        "spouse"
-                      when "domestic partner"
-                        "domestic_partner"
-                      when "child"
-                        "child_under_26"
-                      when "disabled child"
-                        "disabled_child_26_and_over"
-                      else
-                        nil
-                    end
+                    when "employee"
+                      "self"
+                    when "spouse"
+                      "spouse"
+                    when "domestic partner"
+                      "domestic_partner"
+                    when "child"
+                      "child_under_26"
+                    when "disabled child"
+                      "disabled_child_26_and_over"
+                      end
 
         field_map
       end
@@ -323,10 +317,22 @@ module SponsoredBenefits
         cell.blank? ? nil : sanitize_value(cell)
       end
 
-      def parse_date(cell, field_name="date")
+      def parse_date(cell, field_name = "date")
         return nil if cell.blank?
-        return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
-        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, "#{field_name.camelcase} Error: Invalid date #{cell}" if cell.class == String
+        if cell.class == String
+          begin
+            return DateTime.strptime(cell, "%m/%d/%Y")
+          rescue StandardError
+            raise ImportErrorValue, "#{field_name.camelcase} Error: Invalid date #{cell}"
+          end
+        end
+        if cell.class == String
+          begin
+            return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y")
+          rescue StandardError
+            raise ImportErrorDate, "#{field_name.camelcase} Error: Invalid date #{cell}"
+          end
+        end
         # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
         cell.blank? ? nil : cell
@@ -335,29 +341,34 @@ module SponsoredBenefits
       def parse_ssn(cell)
         cell.blank? ? nil : prepend_zeros(cell.to_s.gsub(/\D/, ''), 9)
       end
-      
+
       def parse_boolean(cell)
-        cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+        cell.blank? ? nil : !cell.match(/(true|t|yes|y|1)$/i).nil? ? "1" : "0"
       end
 
       def self.parse_boolean(cell)
-        cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+        cell.blank? ? nil : !cell.match(/(true|t|yes|y|1)$/i).nil? ? "1" : "0"
       end
 
       def self.parse_number(cell)
-        cell.blank? ? nil : (Float(cell) rescue raise ImportErrorValue, cell)
+        cell.blank? ? nil : (begin
+                               Float(cell)
+                             rescue StandardError
+                               raise ImportErrorValue, cell
+                             end)
       end
 
       def self.parse_integer(cell)
-        cell.blank? ? nil : (Integer(cell) rescue raise ImportErrorValue, cell)
+        cell.blank? ? nil : (begin
+                               Integer(cell)
+                             rescue StandardError
+                               raise ImportErrorValue, cell
+                             end)
       end
 
       def save
-
         if imported_census_employees.compact.map(&:valid?).all? # && (imported_census_employees.exclude? nil)
-          if self.errors.present? || !self.valid?
-            return false
-          end
+          return false if self.errors.present? || !self.valid?
 
           imported_census_employees.compact.each(&:save!)
           terminate_employees if @terminate_queue.present?
@@ -378,14 +389,14 @@ module SponsoredBenefits
 
       def open_spreadsheet
         case File.extname(file.original_filename)
-          when ".csv" then
-            Csv.new(file.path, nil, :ignore)
-          when ".xls" then
-            Excel.new(file.path, nil, :ignore)
-          when ".xlsx" then
-            Excelx.new(file.path, nil, :ignore)
-          else
-            raise "Unknown file type: #{file.original_filename}"
+        when ".csv"
+          Csv.new(file.path, nil, :ignore)
+        when ".xls"
+          Excel.new(file.path, nil, :ignore)
+        when ".xlsx"
+          Excelx.new(file.path, nil, :ignore)
+        else
+          raise "Unknown file type: #{file.original_filename}"
         end
       end
 
@@ -398,8 +409,8 @@ module SponsoredBenefits
       end
 
       def terminate_employees
-        @terminate_queue.each do |row, employee_termination_map|
-           employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+        @terminate_queue.each do |_row, employee_termination_map|
+          employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
         end
       end
 
@@ -409,16 +420,15 @@ module SponsoredBenefits
       end
 
       def encrypt_ssn(val)
-        if val.blank?
-          return nil
-        end
+        return nil if val.blank?
         ssn_val = val.to_s.gsub(/\D/, '')
         SymmetricEncryption.encrypt(ssn_val)
       end
 
-      alias_method :count, :length
+      alias count length
 
       private
+
       def sanitize_value(value)
         value = value.to_s.split('.')[0] if value.is_a? Float
         value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
@@ -430,11 +440,10 @@ module SponsoredBenefits
       end
     end
 
-    class ImportErrorValue < Exception;
+    class ImportErrorValue < RuntimeError
     end
 
-    class ImportErrorDate < Exception;
+    class ImportErrorDate < RuntimeError
     end
-
   end
 end

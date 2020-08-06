@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class MigrateDcEmployerProfiles < Mongoid::Migration
   def self.up
-    # TODO do we need to set rating and service area on benefit_sponsorship --> rating & service area not needed on benefit sponsorship
+    # TODO: do we need to set rating and service area on benefit_sponsorship --> rating & service area not needed on benefit sponsorship
     # TODO check registerd on date feild  --> benefit sponsorship
     # TODO check congress Organization & employer profiles --> ??
     # TODO foreign_embassy_or_consulate entity kind organization-??
@@ -38,7 +40,6 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   private
 
   def self.create_profile(site_key, logger)
-
     sites = find_site(site_key)
     return false unless sites.present?
     site = sites.first
@@ -46,111 +47,115 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     old_organizations = Organization.unscoped.exists(:employer_profile => true)
     total_organizations = old_organizations.count
     existing_organization = 0
-    success =0
+    success = 0
     failed = 0
     limit_count = 1000
 
     say_with_time("Time taken to create benefit sposonsorship") do
       Organization.collection.aggregate([
         {"$match" => {"employer_profile" => { "$exists" => true }}},
-        {"$project" => {"hbx_id"=> 1, "employer_profile.profile_source"=> 1,
+        {"$project" => {"hbx_id" => 1, "employer_profile.profile_source" => 1,
                         "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1,
                         "employer_profile.disable_ssn_date" => 1, "employer_profile.broker_agency_accounts" => 1,
-                        "employer_profile.registered_on"=> 1,"employer_profile.plan_years" => 1}},
+                        "employer_profile.registered_on" => 1,"employer_profile.plan_years" => 1}},
 
         {"$unwind" => {"path": "$employer_profile.plan_years", "preserveNullAndEmptyArrays": true}},
 
         {"$project" => {
-            "hbx_id" => 1, 'employer_profile.profile_source'=> 1, "employer_profile.registered_on" => 1,
-            "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1, "employer_profile.disable_ssn_date" => 1,
-            "employer_profile.broker_agency_accounts" => { "$ifNull" => [ "$employer_profile.broker_agency_accounts", []]},
-            "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
-                                      "_id" => "$employer_profile.plan_years._id",
-                                      "pte_count"=> "$employer_profile.plan_years.pte_count",
-                                      "msp_count"=> "$employer_profile.plan_years.msp_count",
-                                      "created_at"=> "$employer_profile.plan_years.created_at",
-                                      "updated_at"=>"$employer_profile.plan_years.updated_at",
-                                      "terminated_on"=>"$employer_profile.plan_years.terminated_on",
-                                      "termination_kind"=>"$employer_profile.plan_years.termination_kind",
-                                      "aasm_state" => '$employer_profile.plan_years.aasm_state',
-                                      "effective_period" => { "min": "$employer_profile.plan_years.start_on","max": "$employer_profile.plan_years.end_on" },
-                                      "open_enrollment_period" => { "min": "$employer_profile.plan_years.open_enrollment_start_on","max": "$employer_profile.plan_years.open_enrollment_end_on" }}}},
-        {"$group"=>{"_id" =>  "$_id","hbx_id" => {"$last" => "$hbx_id"},
-                    "source_kind" => {"$last"=> "$employer_profile.profile_source"},
-                    "registered_on" => {"$last" => "$employer_profile.registered_on"},
-                    "is_no_ssn_enabled" => {"$last" => "$employer_profile.no_ssn"},
-                    "ssn_enabled_on" => {"$last" => "$employer_profile.enable_ssn_date"},
-                    "ssn_disabled_on" => {"$last" => "$employer_profile.disable_ssn_date"},
-                    "broker_agency_accounts" => {"$last" => "$employer_profile.broker_agency_accounts"},
-                    "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": [ "$benefit_application.effective_period", {}]},
-                                                                        then: "$benefit_application", else: [],}}}}},
-        {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}]).each
+          "hbx_id" => 1, 'employer_profile.profile_source' => 1, "employer_profile.registered_on" => 1,
+          "employer_profile.no_ssn" => 1, "employer_profile.enable_ssn_date" => 1, "employer_profile.disable_ssn_date" => 1,
+          "employer_profile.broker_agency_accounts" => { "$ifNull" => ["$employer_profile.broker_agency_accounts", []]},
+          "benefit_application" => {"fte_count" => "$employer_profile.plan_years.fte_count",
+                                    "_id" => "$employer_profile.plan_years._id",
+                                    "pte_count" => "$employer_profile.plan_years.pte_count",
+                                    "msp_count" => "$employer_profile.plan_years.msp_count",
+                                    "created_at" => "$employer_profile.plan_years.created_at",
+                                    "updated_at" => "$employer_profile.plan_years.updated_at",
+                                    "terminated_on" => "$employer_profile.plan_years.terminated_on",
+                                    "termination_kind" => "$employer_profile.plan_years.termination_kind",
+                                    "aasm_state" => '$employer_profile.plan_years.aasm_state',
+                                    "effective_period" => { "min": "$employer_profile.plan_years.start_on","max": "$employer_profile.plan_years.end_on" },
+                                    "open_enrollment_period" => { "min": "$employer_profile.plan_years.open_enrollment_start_on","max": "$employer_profile.plan_years.open_enrollment_end_on" }}
+        }},
+        {"$group" => {"_id" => "$_id","hbx_id" => {"$last" => "$hbx_id"},
+                      "source_kind" => {"$last" => "$employer_profile.profile_source"},
+                      "registered_on" => {"$last" => "$employer_profile.registered_on"},
+                      "is_no_ssn_enabled" => {"$last" => "$employer_profile.no_ssn"},
+                      "ssn_enabled_on" => {"$last" => "$employer_profile.enable_ssn_date"},
+                      "ssn_disabled_on" => {"$last" => "$employer_profile.disable_ssn_date"},
+                      "broker_agency_accounts" => {"$last" => "$employer_profile.broker_agency_accounts"},
+                      "benefit_applications" => {"$push" => {"$cond" => { if: { "$ne": ["$benefit_application.effective_period", {}]},
+                                                                          then: "$benefit_application", else: []}}}}},
+        {"$out" => "benefit_sponsors_benefit_sponsorships_benefit_sponsorships"}
+]).each
       BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:benefit_applications => [[]]}, {"$unset" => {"benefit_applications" => []}})
-      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:broker_agency_accounts => []}, {"$unset" => {"broker_agency_accounts"=> 1 }})
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.collection.update_many({:broker_agency_accounts => []}, {"$unset" => {"broker_agency_accounts" => 1 }})
     end
 
     say_with_time("Time taken to migrate organizations") do
       old_organizations.batch_size(limit_count).no_timeout.each do |old_org|
-        begin
-          existing_new_organizations = find_new_organization(old_org)
-          if existing_new_organizations.count == 0
-            @old_profile = old_org.employer_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :no_ssn, :enable_ssn_date, :disable_ssn_date, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
-            old_profile_params = JSON.parse(json_data)
+        existing_new_organizations = find_new_organization(old_org)
+        if existing_new_organizations.count == 0
+          @old_profile = old_org.employer_profile
 
-            @new_profile = initialize_new_profile(old_org, old_profile_params)
-            new_organization = initialize_new_organization(old_org, site)
-            market = is_congress?(old_org) ? fehb_benefit_market: benefit_market
+          json_data = @old_profile.to_json(:except => [:_id, :no_ssn, :enable_ssn_date, :disable_ssn_date, :sic_code, :xml_transmitted_timestamp, :entity_kind, :profile_source, :aasm_state, :registered_on, :contact_method, :employer_attestation, :broker_agency_accounts, :general_agency_accounts, :employer_profile_account, :plan_years, :updated_by_id, :workflow_state_transitions, :inbox, :documents])
+          old_profile_params = JSON.parse(json_data)
 
-            @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
-            @benefit_sponsorship.profile_id = @new_profile.id
-            @benefit_sponsorship.benefit_market = market
-            @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
-            @benefit_sponsorship.organization_id = new_organization.id
-            @benefit_sponsorship.unset(:hbx_id)
-            @benefit_sponsorship.send(:generate_hbx_id)
+          @new_profile = initialize_new_profile(old_org, old_profile_params)
+          new_organization = initialize_new_organization(old_org, site)
+          market = is_congress?(old_org) ? fehb_benefit_market : benefit_market
 
-            migrate_employer_profile_account
-            set_benefit_sponsorship_state
-            set_benefit_sponsorship_effective_on
-            construct_workflow_state_for_benefit_sponsorship
+          @benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(hbx_id: old_org.hbx_id).first
+          @benefit_sponsorship.profile_id = @new_profile.id
+          @benefit_sponsorship.benefit_market = market
+          @benefit_sponsorship.source_kind = @old_profile.profile_source.to_sym
+          @benefit_sponsorship.organization_id = new_organization.id
+          @benefit_sponsorship.unset(:hbx_id)
+          @benefit_sponsorship.send(:generate_hbx_id)
 
-            #raise Exception unless @benefit_sponsorship.valid?
-            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
-            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:create, :before, :generate_hbx_id, raise: false)
-            @benefit_sponsorship.save(validate:false)
+          migrate_employer_profile_account
+          set_benefit_sponsorship_state
+          set_benefit_sponsorship_effective_on
+          construct_workflow_state_for_benefit_sponsorship
 
-            raise Exception unless new_organization.valid?
-            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
-            BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
-            new_organization.save!
+          #raise Exception unless @benefit_sponsorship.valid?
+          BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
+          BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:create, :before, :generate_hbx_id, raise: false)
+          @benefit_sponsorship.save(validate: false)
 
-            #employer staff roles migration
-            person_records_with_old_staff_roles = find_staff_roles
-            link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
+          raise Exception unless new_organization.valid?
+          BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+          BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
+          new_organization.save!
 
-            #employee roles migration
-            person_records_with_old_employee_roles = find_employee_roles
-            link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
+          #employer staff roles migration
+          person_records_with_old_staff_roles = find_staff_roles
+          link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
 
-            #census employees migration
-            census_employees_with_old_id = find_census_employees
-            link_existing_census_employees_to_new_profile(census_employees_with_old_id)
+          #employee roles migration
+          person_records_with_old_employee_roles = find_employee_roles
+          link_existing_employee_roles_to_new_profile(person_records_with_old_employee_roles)
 
-            print '.' unless Rails.env.test?
-            success = success + 1
-          end
-        rescue Exception => e
-          failed = failed + 1
-          print 'F' unless Rails.env.test?
-          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-          validation_errors:
-          organization - #{new_organization.errors.messages}
-          profile - #{@new_profile.errors.messages},
-          benefit_sponsorship - #{@benefit_sponsorship.errors.messages},
-          #{e.inspect}" unless Rails.env.test?
+          #census employees migration
+          census_employees_with_old_id = find_census_employees
+          link_existing_census_employees_to_new_profile(census_employees_with_old_id)
+
+          print '.' unless Rails.env.test?
+          success += 1
         end
+      rescue Exception => e
+        failed += 1
+        print 'F' unless Rails.env.test?
+        unless Rails.env.test?
+          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
+            validation_errors:
+            organization - #{new_organization.errors.messages}
+            profile - #{@new_profile.errors.messages},
+            benefit_sponsorship - #{@benefit_sponsorship.errors.messages},
+            #{e.inspect}"
+        end
+
       end
     end
 
@@ -172,7 +177,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create, raise: false)
     BenefitSponsors::Organizations::Profile.set_callback(:save, :after, :publish_profile_event, raise: false)
 
-    return true
+    true
   end
 
   def self.find_new_organization(old_org)
@@ -192,7 +197,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     end
 
     build_office_locations(old_org, new_profile)
-    return new_profile
+    new_profile
   end
 
   def self.build_office_locations(old_org, new_profile)
@@ -214,12 +219,13 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
     general_organization.entity_kind = @old_profile.entity_kind.to_sym
     general_organization.site = site
     general_organization.profiles << [@new_profile]
-    return general_organization
+    general_organization
   end
 
   def self.find_staff_roles
     Person.where(:employer_staff_roles => {
-                     '$elemMatch' => {employer_profile_id: @old_profile.id}})
+                   '$elemMatch' => {employer_profile_id: @old_profile.id}
+                 })
   end
 
   def self.link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
@@ -282,11 +288,7 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
   end
 
   def self.set_benefit_sponsorship_effective_on
-    effective_begin_on = if @old_profile.plan_years.present?
-                           @old_profile.plan_years.asc(:start_on).first.start_on
-                         else
-                           nil
-                         end
+    effective_begin_on = (@old_profile.plan_years.asc(:start_on).first.start_on if @old_profile.plan_years.present?)
     @benefit_sponsorship.effective_begin_on = effective_begin_on
   end
 
@@ -301,16 +303,16 @@ class MigrateDcEmployerProfiles < Mongoid::Migration
 
   def self.find_site(site_key)
     return @site if defined? @site
-    @site =  BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
+    @site = BenefitSponsors::Site.all.where(site_key: site_key.to_sym)
   end
 
   def self.benefit_market
     return @benefit_market if defined? @benefit_market
-    @benefit_market  = find_site('dc').first.benefit_market_for(:aca_shop)
+    @benefit_market = find_site('dc').first.benefit_market_for(:aca_shop)
   end
 
   def self.fehb_benefit_market
     return @fehb_benefit_market if defined? @fehb_benefit_market
-    @fehb_benefit_market  = find_site('dc').first.benefit_market_for(:fehb)
+    @fehb_benefit_market = find_site('dc').first.benefit_market_for(:fehb)
   end
 end

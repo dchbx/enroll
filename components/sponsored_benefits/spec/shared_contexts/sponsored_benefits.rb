@@ -1,16 +1,20 @@
+# frozen_string_literal: true
+
 RSpec.shared_context "set up broker agency profile for BQT, by using configuration settings", :shared_context => :metadata do
 
-  let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
-    owner_profile_id: owner_profile.id,
-    sponsor_profile_id: sponsor_profile.id
-  )}
+  let(:plan_design_organization) do
+    FactoryBot.create(:sponsored_benefits_plan_design_organization,
+                      owner_profile_id: owner_profile.id,
+                      sponsor_profile_id: sponsor_profile.id)
+  end
 
-  let(:prospect_plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
-    owner_profile_id: owner_profile.id,
-    sponsor_profile_id: nil
-  )}
+  let(:prospect_plan_design_organization) do
+    FactoryBot.create(:sponsored_benefits_plan_design_organization,
+                      owner_profile_id: owner_profile.id,
+                      sponsor_profile_id: nil)
+  end
 
-  let(:plan_design_organization_with_assigned_ga) {
+  let(:plan_design_organization_with_assigned_ga) do
     plan_design_organization.general_agency_accounts.create(
       start_on: TimeKeeper.date_of_record,
       broker_role_id: owner_profile.primary_broker_role.id
@@ -20,29 +24,27 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
       account.save
     end
     plan_design_organization
-  }
+  end
 
-  let(:plan_design_proposal) {
+  let(:plan_design_proposal) do
     FactoryBot.create(:plan_design_proposal,
-      :with_profile,
-      plan_design_organization: plan_design_organization
-    ).tap do |proposal|
+                      :with_profile,
+                      plan_design_organization: plan_design_organization).tap do |proposal|
       sponsorship = proposal.profile.benefit_sponsorships.first
       sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
       sponsorship.save
     end
-  }
+  end
 
-  let(:prospect_plan_design_proposal) {
+  let(:prospect_plan_design_proposal) do
     FactoryBot.create(:plan_design_proposal,
-      :with_profile,
-      plan_design_organization: prospect_plan_design_organization
-    ).tap do |proposal|
+                      :with_profile,
+                      plan_design_organization: prospect_plan_design_organization).tap do |proposal|
       sponsorship = proposal.profile.benefit_sponsorships.first
       sponsorship.initial_enrollment_period = benefit_sponsorship_enrollment_period
       sponsorship.save
     end
-  }
+  end
 
   let(:proposal_profile) { plan_design_proposal.profile }
   let(:prospect_proposal_profile) {prospect_proposal_profile.profile}
@@ -53,16 +55,18 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let(:benefit_sponsorship) { proposal_profile.benefit_sponsorships.first }
   let(:prospect_benefit_sponsorship) { prospect_proposal_profile.benefit_sponsorships.first}
 
-  let(:benefit_application) { FactoryBot.create(:plan_design_benefit_application,
-    :with_benefit_group,
-    effective_period: current_effective_date..current_effective_date.next_year.prev_day,
-    benefit_sponsorship: benefit_sponsorship
-  )}
+  let(:benefit_application) do
+    FactoryBot.create(:plan_design_benefit_application,
+                      :with_benefit_group,
+                      effective_period: current_effective_date..current_effective_date.next_year.prev_day,
+                      benefit_sponsorship: benefit_sponsorship)
+  end
 
-  let(:prospect_benefit_application) { FactoryBot.create(:plan_design_benefit_application,
-    :with_benefit_group,
-    benefit_sponsorship: benefit_sponsorship
-  )}
+  let(:prospect_benefit_application) do
+    FactoryBot.create(:plan_design_benefit_application,
+                      :with_benefit_group,
+                      benefit_sponsorship: benefit_sponsorship)
+  end
 
   let(:benefit_group) { benefit_application.benefit_groups.first }
 
@@ -75,13 +79,15 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
   let(:employer_profile) { sponsor_profile }
   let(:benefit_sponsor) { sponsor_profile.organization }
 
-  let(:plan_design_census_employee) { FactoryBot.create(:plan_design_census_employee,
-    benefit_sponsorship_id: benefit_sponsorship.id
-  )}
+  let(:plan_design_census_employee) do
+    FactoryBot.create(:plan_design_census_employee,
+                      benefit_sponsorship_id: benefit_sponsorship.id)
+  end
 
-  let(:prospect_plan_design_census_employee) { FactoryBot.create(:plan_design_census_employee,
-    benefit_sponsorship_id: prospect_benefit_sponsorship.id
-  )}
+  let(:prospect_plan_design_census_employee) do
+    FactoryBot.create(:plan_design_census_employee,
+                      benefit_sponsorship_id: prospect_benefit_sponsorship.id)
+  end
 
   let(:organization) { plan_design_organization.sponsor_profile.organization }
 
@@ -101,13 +107,12 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   def health_product
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
-      :with_renewal_product,
-      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-      product_package_kinds: [:single_issuer, :metal_level, :single_product],
-      service_area: service_area,
-      renewal_service_area: renewal_service_area,
-      metal_level_kind: :gold
-    )
+                      :with_renewal_product,
+                      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                      product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area,
+                      metal_level_kind: :gold)
   end
 
   def dental_plan
@@ -120,30 +125,27 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   def dental_product
     FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
-      :with_renewal_product,
-      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
-      product_package_kinds: [:single_product],
-      service_area: service_area,
-      renewal_service_area: renewal_service_area,
-      metal_level_kind: :dental
-    )
+                      :with_renewal_product,
+                      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                      product_package_kinds: [:single_product],
+                      service_area: service_area,
+                      renewal_service_area: renewal_service_area,
+                      metal_level_kind: :dental)
   end
 
   def service_area
     return @service_area if defined? @service_area
     @service_area = FactoryBot.create(:benefit_markets_locations_service_area,
-      county_zip_ids: [FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
-      active_year: current_effective_date.year
-    )
+                                      county_zip_ids: [FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Middlesex', zip: '01754', state: 'MA').id],
+                                      active_year: current_effective_date.year)
   end
 
   def renewal_service_area
     return @renewal_service_area if defined? @renewal_service_area
 
     @renewal_service_area = FactoryBot.create(:benefit_markets_locations_service_area,
-      county_zip_ids: service_area.county_zip_ids,
-      active_year: service_area.active_year + 1
-    )
+                                              county_zip_ids: service_area.county_zip_ids,
+                                              active_year: service_area.active_year + 1)
   end
 
   def site_key

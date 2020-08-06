@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -58,9 +60,9 @@ module BenefitMarkets
 
         it "should set a kind-appropropriate configuration setting" do
           expect(benefit_market.kind).to eq valid_kind
-          # TODO: Enable following matcher when configuration assocation enabled. 
+          # TODO: Enable following matcher when configuration assocation enabled.
           #       Currently its disabled due to errors on instantiate
-          # expect(benefit_market.configuration.class.to_s).to eq valid_class_name 
+          # expect(benefit_market.configuration.class.to_s).to eq valid_class_name
           # expect(BenefitMarkets::BenefitMarket.new(kind: shop_kind).configuration_setting.class).to eq configuration_setting_class
           # expect(benefit_market.configuration_setting.class).to eq configuration_setting_class
         end
@@ -82,9 +84,9 @@ module BenefitMarkets
         end
 
         it "should save and be findable" do
-            expect(valid_benefit_market.save!).to eq true
-            expect(BenefitMarkets::BenefitMarket.find(valid_benefit_market.id)).to eq valid_benefit_market
-          end
+          expect(valid_benefit_market.save!).to eq true
+          expect(BenefitMarkets::BenefitMarket.find(valid_benefit_market.id)).to eq valid_benefit_market
+        end
 
       end
     end
@@ -93,7 +95,7 @@ module BenefitMarkets
       let(:benefit_market)                  { BenefitMarkets::BenefitMarket.new(kind: kind, title: title, description: description) }
 
       let(:today)                           { Date.today }
-      let(:this_year_range)                 { Date.new(today.year,1,1,)..Date.new(today.year,12,31) }
+      let(:this_year_range)                 { Date.new(today.year,1,1)..Date.new(today.year,12,31) }
       let(:last_year_range)                 { (this_year_range.begin - 1.year)..(this_year_range.end - 1.year)}
       let(:next_year_range)                 { (this_year_range.begin + 1.year)..(this_year_range.end + 1.year)}
 

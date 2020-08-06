@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class BrokerAgencyParser
     include HappyMapper
@@ -17,7 +19,7 @@ module Parsers::Xml::Cv
         npn: npn,
         name: name,
         display_name: display_name,
-        fein: fein,
+        fein: fein
       }
     end
   end

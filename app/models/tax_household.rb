@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'autoinc'
 
 class TaxHousehold
@@ -29,11 +31,11 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations, cascade_callbacks: true
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
+  scope :tax_household_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
+    eligibility_determinations.max {|a, b| a.determined_at <=> b.determined_at}
   end
 
   def group_by_year
@@ -93,7 +95,7 @@ class TaxHousehold
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
     aptc_members.each do |member|
-      #TODO use which date to calculate premiums by slcp
+      #TODO: use which date to calculate premiums by slcp
       product = product_factory.new({product_id: slcsp.id})
       premium = product.cost_for(effective_starting_on, member.age_on_effective_date)
       benchmark_member_cost_hash[member.applicant_id.to_s] = premium
@@ -105,11 +107,11 @@ class TaxHousehold
     # Compute the ratio
     ratio_hash = {}
     benchmark_member_cost_hash.each do |member_id, cost|
-      ratio_hash[member_id] = cost/sum_premium_total
+      ratio_hash[member_id] = cost / sum_premium_total
     end
 
     ratio_hash
-  rescue => e
+  rescue StandardError => e
     log(e.message, {:severity => 'critical'})
     {}
   end
@@ -140,7 +142,7 @@ class TaxHousehold
   end
 
   # to get family members from given enrollment
-  def find_enrolling_fms hbx_enrollment
+  def find_enrolling_fms(hbx_enrollment)
     hbx_enrollment.hbx_enrollment_members.map(&:family_member)
   end
 
@@ -164,8 +166,8 @@ class TaxHousehold
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
     deduction_amount = total_benchmark_amount(unchecked_aptc_fms, hbx_enrollment) if unchecked_aptc_fms
-    total = total - deduction_amount
-    (total < 0.00) ? 0.00 : float_fix(total)
+    total -= deduction_amount
+    total < 0.00 ? 0.00 : float_fix(total)
   end
 
   def total_benchmark_amount(family_members, hbx_enrollment)
@@ -183,14 +185,12 @@ class TaxHousehold
     aptc_ratio_by_member.each do |member_id, ratio|
       aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
     end
-    # FIXME should get hbx_enrollments by effective_starting_on
+    # FIXME: should get hbx_enrollments by effective_starting_on
     enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
     enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
     enrollments.map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
       applicant_id = enrollment_member.applicant_id.to_s
-      if aptc_available_amount_hash.has_key?(applicant_id)
-        aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f)
-      end
+      aptc_available_amount_hash[applicant_id] -= (enrollment_member.applied_aptc_amount || 0).try(:to_f) if aptc_available_amount_hash.key?(applicant_id)
     end
     aptc_available_amount_hash
   end
@@ -210,11 +210,11 @@ class TaxHousehold
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
       given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
       ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
-      if plan.kind == 'dental'
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
-      else
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-      end
+      aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = if plan.kind == 'dental'
+                                                                                         0
+                                                                                       else
+                                                                                         [given_aptc, ehb_premium].min
+                                                                                       end
     end
     aptc_available_amount_hash_for_enrollment
 
@@ -230,9 +230,9 @@ class TaxHousehold
   def total_incomes_by_year
     applicant_links.inject({}) do |acc, per|
       p_incomes = per.financial_statements.inject({}) do |acc, ae|
-        acc.merge(ae.total_incomes_by_year) { |k, ov, nv| ov + nv }
+        acc.merge(ae.total_incomes_by_year) { |_k, ov, nv| ov + nv }
       end
-      acc.merge(p_incomes) { |k, ov, nv| ov + nv }
+      acc.merge(p_incomes) { |_k, ov, nv| ov + nv }
     end
   end
 
@@ -252,11 +252,7 @@ class TaxHousehold
   end
 
   def is_eligibility_determined?
-    if self.elegibility_determinizations.size > 0
-      true
-    else
-      false
-    end
+    !self.elegibility_determinizations.empty?
   end
 
   #primary applicant is the tax household member who is the subscriber

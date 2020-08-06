@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Events
   class PoliciesController < ::ApplicationController
     include Acapi::Amqp::Responder
 
-    def resource(connection, delivery_info, properties, body)
+    def resource(connection, _delivery_info, properties, _body)
       reply_to = properties.reply_to
       headers = properties.headers || {}
       policy_id = headers.stringify_keys["policy_id"]
@@ -19,9 +21,9 @@ module Events
             policy_id,
             "500",
             JSON.dump({
-               exception: e.inspect,
-               backtrace: e.backtrace.inspect
-            })
+                        exception: e.inspect,
+                        backtrace: e.backtrace.inspect
+                      })
           )
         end
       else
@@ -30,13 +32,11 @@ module Events
     end
 
     def reply_with(connection, reply_to, policy_id, return_status, body, eligibility_event_kind = nil)
-      headers = { 
-              :return_status => return_status,
-              :policy_id => policy_id
+      headers = {
+        :return_status => return_status,
+        :policy_id => policy_id
       }
-      if !eligibility_event_kind.blank?
-        headers[:eligibility_event_kind] = eligibility_event_kind
-      end
+      headers[:eligibility_event_kind] = eligibility_event_kind unless eligibility_event_kind.blank?
       with_response_exchange(connection) do |ex|
         ex.publish(
           body,

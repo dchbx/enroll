@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #Capybara.ignore_hidden_elements = false
 
 module BrokerWorld
@@ -43,7 +45,7 @@ end
 And(/^Primary Broker creates new Prospect Employer with default_office_location$/) do
   find('#organization_legal_name').click
   fill_in 'organization[legal_name]', :with => "emp1"
-  fill_in 'organization[dba]', :with => 101010
+  fill_in 'organization[dba]', :with => 101_010
 
   find('.interaction-choice-control-organization-entity-kind').click
   find(".interaction-choice-control-organization-entity-kind-2").click
@@ -92,7 +94,7 @@ And(/^Primary Broker enters quote name$/) do
 
   find(:xpath, "//*[@id='new_forms_plan_design_proposal']/div[1]/div/div[1]/div[2]/div/div[2]/div").click
   expect(page).to have_content((TimeKeeper.date_of_record + 2.months).strftime("%B %Y"))
-  find('li', :text => "#{(TimeKeeper.date_of_record + 2.months).strftime('%B %Y')}").click
+  find('li', :text => (TimeKeeper.date_of_record + 2.months).strftime('%B %Y').to_s).click
   wait_for_ajax(3, 2)
 end
 
@@ -188,13 +190,13 @@ Then(/^the broker should see the data in the table$/) do
 end
 
 Then(/^the broker enters the quote effective date$/) do
-  select "#{(TimeKeeper.date_of_record+3.month).strftime("%B %Y")}", :from => "quote_start_on"
+  select (TimeKeeper.date_of_record + 3.month).strftime('%B %Y').to_s, :from => "quote_start_on"
 end
 
 When(/^the broker selects employer type$/) do
  #find('.interaction-choice-control-quote-employer-type').click()
- select "Prospect", :from => "quote_employer_type"
- fill_in 'quote[employer_name]', with: "prospect test Employee"
+  select "Prospect", :from => "quote_employer_type"
+  fill_in 'quote[employer_name]', with: "prospect test Employee"
 end
 
 When(/^broker enters valid information$/) do

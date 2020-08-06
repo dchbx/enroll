@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module MapReduce
   module FamilySearchCommon
     def map_function
@@ -10,7 +12,7 @@ module MapReduce
            fam["family_members"][i]["person"] = pers;
            if (family_member["is_primary_applicant"]) {
              fam["primary_member"] = pers;
-           } 
+           }
          }
          delete(fam['versions']);
          delete(fam['version']);
@@ -39,8 +41,7 @@ module MapReduce
           :updated_at, :created_at,
           :updated_by_id
         ],
-        :include => {:consumer_role => {:except => [:vlp_documents, :updated_at, :created_at, :documents]}}
-        )
+                                                  :include => {:consumer_role => {:except => [:vlp_documents, :updated_at, :created_at, :documents]}})
       end
       person_data
     end

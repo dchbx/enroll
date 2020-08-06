@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class SponsoredBenefitService
 
       attr_accessor :package, :kind, :catalog, :factory
 
-      def initialize(attrs={})
+      def initialize(attrs = {})
         @package = find_benefit_package(attrs[:benefit_package_id])
         @kind = attrs[:kind]
         @catalog = @package.benefit_sponsor_catalog
@@ -51,10 +53,10 @@ module BenefitSponsors
         if valid_according_to_factory
           return true if sponsored_benefit.save && package.save
           map_errors_for(sponsored_benefit, onto: form)
-          return false
+          false
         else
           map_errors_for(sponsored_benefit, onto: form)
-          return [false, nil]
+          [false, nil]
         end
       end
 
@@ -166,12 +168,12 @@ module BenefitSponsors
         case reference_product.kind
         when :health
           attributes.merge!({
-            plan_kind: reference_product.health_plan_kind
-          })
+                              plan_kind: reference_product.health_plan_kind
+                            })
         when :dental
           attributes.merge!({
-            plan_kind: reference_product.dental_plan_kind
-          })
+                              plan_kind: reference_product.dental_plan_kind
+                            })
         end
         attributes
       end
@@ -185,8 +187,8 @@ module BenefitSponsors
 
         if form.sponsor_contribution.present?
           attributes.merge!({
-            sponsor_contribution_attributes: sponsor_contribution_form_to_params(form.sponsor_contribution)
-            })
+                              sponsor_contribution_attributes: sponsor_contribution_form_to_params(form.sponsor_contribution)
+                            })
         end
 
         attributes
@@ -208,7 +210,7 @@ module BenefitSponsors
         end
       end
 
-      def sanitize_params attrs
+      def sanitize_params(attrs)
         attrs[:id].blank? ? attrs.except(:id) : attrs
       end
     end

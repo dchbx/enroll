@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitMarkets
@@ -14,22 +16,22 @@ module BenefitMarkets
 
       it "is missing a name" do
         subject.valid?
-        expect(subject.errors.has_key?(:name)).to be_truthy
+        expect(subject.errors.key?(:name)).to be_truthy
       end
 
       it "is missing pricing units" do
         subject.valid?
-        expect(subject.errors.has_key?(:pricing_units)).to be_truthy
+        expect(subject.errors.key?(:pricing_units)).to be_truthy
       end
 
       it "is missing member relationships" do
         subject.valid?
-        expect(subject.errors.has_key?(:member_relationships)).to be_truthy
+        expect(subject.errors.key?(:member_relationships)).to be_truthy
       end
 
       it "is missing price calculator kind" do
         subject.valid?
-        expect(subject.errors.has_key?(:price_calculator_kind)).to be_truthy
+        expect(subject.errors.key?(:price_calculator_kind)).to be_truthy
       end
     end
 
@@ -37,12 +39,12 @@ module BenefitMarkets
 
       subject do
         PricingModels::PricingModel.new({
-          :price_calculator_kind => "::BenefitMarkets::PricingModelsMocks::MockPriceCalculator"
-        })
+                                          :price_calculator_kind => "::BenefitMarkets::PricingModelsMocks::MockPriceCalculator"
+                                        })
       end
 
       it "has access to the specified calculator" do
-        expect(subject.pricing_calculator.kind_of?(::BenefitMarkets::PricingModelsMocks::MockPriceCalculator)).to be_truthy
+        expect(subject.pricing_calculator.is_a?(::BenefitMarkets::PricingModelsMocks::MockPriceCalculator)).to be_truthy
       end
     end
 

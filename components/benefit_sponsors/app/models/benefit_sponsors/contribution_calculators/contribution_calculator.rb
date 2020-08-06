@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ContributionCalculators
     class ContributionCalculator
@@ -11,8 +13,8 @@ module BenefitSponsors
       #   the concrete values for contributions
       # @return [BenefitMarkets::SponsoredBenefits::ContributionRosterEntry] the
       #   contribution results paired with the roster
-      def calculate_contribution_for(contribution_model, priced_roster_entry, sponsor_contribution)
-        raise NotImplementedError.new("subclass responsiblity")
+      def calculate_contribution_for(_contribution_model, _priced_roster_entry, _sponsor_contribution)
+        raise NotImplementedError, "subclass responsiblity"
       end
     end
   end

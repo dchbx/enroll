@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxProfilePolicy < ApplicationPolicy
 
   def view_admin_tabs?
@@ -138,28 +140,28 @@ class HbxProfilePolicy < ApplicationPolicy
   end
 
   def access_identity_verification_sub_tab?
-    return @user.person.hbx_staff_role.permission.can_access_identity_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_access_identity_verification_sub_tab if @user.person&.hbx_staff_role
+    false
   end
 
   def access_outstanding_verification_sub_tab?
-    return @user.person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab if @user.person&.hbx_staff_role
+    false
   end
 
   def can_access_accept_reject_identity_documents?
-    return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_identity_documents if @user.person&.hbx_staff_role
+    false
   end
 
   def can_access_accept_reject_paper_application_documents?
-    return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents if @user.person&.hbx_staff_role
+    false
   end
 
   def can_delete_identity_application_documents?
-    return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_delete_identity_application_documents if @user.person&.hbx_staff_role
+    false
   end
 
   def can_access_user_account_tab?

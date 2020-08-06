@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class RosterUploadForm
@@ -37,9 +39,7 @@ module BenefitSponsors
       end
 
       def persist!
-        if valid?
-          service.save(self)
-        end
+        service.save(self) if valid?
       end
 
       def service
@@ -48,7 +48,7 @@ module BenefitSponsors
 
       def roster_template
         template_date = parse_date(self.template_date)
-        unless (template_date == TEMPLATE_DATE && template_version == TEMPLATE_VERSION && header_valid?(sheet.row(2)))
+        unless template_date == TEMPLATE_DATE && template_version == TEMPLATE_VERSION && header_valid?(sheet.row(2))
           self.errors.add(:base, "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template.")
           self.redirection_url = "/benefit_sponsors/profiles/employers/employer_profiles/_download_new_template"
         end
@@ -56,9 +56,7 @@ module BenefitSponsors
 
       def roster_records
         self.census_records.each_with_index do |census_record, i|
-          unless census_record.valid?
-            self.errors.add(:base, "Row #{i + 4}: #{census_record.errors.full_messages}")
-          end
+          self.errors.add(:base, "Row #{i + 4}: #{census_record.errors.full_messages}") unless census_record.valid?
         end
       end
 

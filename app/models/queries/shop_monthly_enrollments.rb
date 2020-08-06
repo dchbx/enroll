@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class ShopMonthlyEnrollments
     include QueryHelpers
@@ -22,70 +24,70 @@ module Queries
       # include new hire enrollment that purchased in open enrollment with effective_on date greater benefit application start date,
       # and quiet period enrollments.
       add({
-        "$match" => {
-          "$or" => [
-            {"$and" =>[
-              "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-              "workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
-            ]},
-            {"$and" =>[
-              "aasm_state" => {"$in" => @enrollment_statuses},
-              "effective_on" => {"$gt" => @effective_on},
-              "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-              "submitted_at" => {"$lt" => quiet_period.begin}
-            ]}
-          ]
-        }
-      })
+            "$match" => {
+              "$or" => [
+                {"$and" => [
+                  "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+                  "workflow_state_transitions" => { "$elemMatch" => quiet_period_expression }
+                ]},
+                {"$and" => [
+                  "aasm_state" => {"$in" => @enrollment_statuses},
+                  "effective_on" => {"$gt" => @effective_on},
+                  "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+                  "submitted_at" => {"$lt" => quiet_period.begin}
+                ]}
+              ]
+            }
+          })
 
       self
     end
 
     def query_families_with_active_enrollments
-       add({
-        "$match" => {
-          "benefit_group_id" => {
-            "$in" => collect_benefit_group_ids
-          }
-        }
-      })
-
-      self
-    end
-
-     def query_active_enrollments
       add({
-        "$match" => {
-          "$or" => [
-            new_coverage_expression
-          ]
-        }
-      })
+            "$match" => {
+              "benefit_group_id" => {
+                "$in" => collect_benefit_group_ids
+              }
+            }
+          })
 
       self
     end
+
+    def query_active_enrollments
+      add({
+            "$match" => {
+              "$or" => [
+                new_coverage_expression
+              ]
+            }
+          })
+
+      self
+   end
 
     def query_quiet_period_enrollments
       add({
-        "$match" => {
-          "$or" => [
-            quiet_period_coverage_expression,
-            new_hire_enrollment_expression
-          ]
-        }
-      })
+            "$match" => {
+              "$or" => [
+                quiet_period_coverage_expression,
+                new_hire_enrollment_expression
+              ]
+            }
+          })
 
       self
     end
 
     def query_families
       add({
-        "$match" => {
-          "benefit_group_id" => {
-            "$in" => (collect_benefit_group_ids + collect_benefit_group_ids(@effective_on.prev_year))
-          }
-        }
-      })
+            "$match" => {
+              "benefit_group_id" => {
+                "$in" => (collect_benefit_group_ids + collect_benefit_group_ids(@effective_on.prev_year))
+              }
+            }
+          })
 
       self
     end
@@ -106,8 +108,8 @@ module Queries
     def quiet_period
       # quiet period check not needed for renewal application(quiet period: OE close to 11th of month) just for initial(quiet period: OE close to 28th of next month)
       # transmission date 16th of month
-      quiet_period_start = Date.new( @effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
-      quiet_period_end =  @effective_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+      quiet_period_start = Date.new(@effective_on.prev_month.year,  @effective_on.prev_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 1)
+      quiet_period_end = @effective_on + Settings.aca.shop_market.initial_application.quiet_period.month_offset.months + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
       TimeKeeper.start_of_exchange_day_from_utc(quiet_period_start)..TimeKeeper.end_of_exchange_day_from_utc(quiet_period_end)
     end
 
@@ -125,18 +127,18 @@ module Queries
       {
         "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
         "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
-        "workflow_state_transitions" => { 
-          "$elemMatch" => quiet_period_expression 
+        "workflow_state_transitions" => {
+          "$elemMatch" => quiet_period_expression
         }
       }
     end
 
     def new_hire_enrollment_expression
       {
-          "effective_on" => {"$gt" => @effective_on},
-          "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-          "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
-          "submitted_at" => {"$lt" => quiet_period.begin}
+        "effective_on" => {"$gt" => @effective_on},
+        "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
+        "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
+        "submitted_at" => {"$lt" => quiet_period.begin}
       }
     end
 
@@ -162,70 +164,68 @@ module Queries
 
     def query_enrollments
       add({
-        "$match" => {
-          "$or" => [
-            new_coverage_expression.merge!("enrollment_kind" => "open_enrollment"),
-            existing_coverage_expression
-          ]
-        }
-      })
+            "$match" => {
+              "$or" => [
+                new_coverage_expression.merge!("enrollment_kind" => "open_enrollment"),
+                existing_coverage_expression
+              ]
+            }
+          })
 
       self
     end
 
     def group_enrollments
       add({
-        "$group" => {
-          "_id" => {
-            "effective_on" => "$effective_on",
-            "employee_role_id" => "$employee_role_id",
-            "bga_id" => "$benefit_group_assignment_id",
-            "coverage_kind" => "$coverage_kind"
-          },
-          "hbx_enrollment_id" => {"$last" => "$hbx_id"},
-          "submitted_at" => {"$last" => "$submitted_at"}
-        }
-      })
+            "$group" => {
+              "_id" => {
+                "effective_on" => "$effective_on",
+                "employee_role_id" => "$employee_role_id",
+                "bga_id" => "$benefit_group_assignment_id",
+                "coverage_kind" => "$coverage_kind"
+              },
+              "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+              "submitted_at" => {"$last" => "$submitted_at"}
+            }
+          })
 
       self
     end
 
     def group_enrollment_events
       add({
-        "$group" => {
-          "_id" => "$hbx_id",
-          "hbx_enrollment_id" => {"$last" => "$hbx_id"},
-          "submitted_at" => {"$last" => "$submitted_at"}
-        }
-      })
+            "$group" => {
+              "_id" => "$hbx_id",
+              "hbx_enrollment_id" => {"$last" => "$hbx_id"},
+              "submitted_at" => {"$last" => "$submitted_at"}
+            }
+          })
 
       self
     end
 
     def sort_enrollments
       add({
-       "$sort" => {"submitted_at" => 1}
-      })
+            "$sort" => {"submitted_at" => 1}
+          })
       self
     end
 
     def project_enrollment_ids
       add({
-        "$project" => {
-         "_id" => 1,
-         "enrollment_hbx_id" => "$hbx_enrollment_id",
-         "enrollment_submitted_at" => "$submitted_at"
-        }
-      })
+            "$project" => {
+              "_id" => 1,
+              "enrollment_hbx_id" => "$hbx_enrollment_id",
+              "enrollment_submitted_at" => "$submitted_at"
+            }
+          })
       self
     end
 
     def collect_benefit_group_ids(effective_on = nil)
       @feins.collect{|e| prepend_zeros(e.to_s, 9) }.inject([]) do |id_list, fein|
         benefit_sponsorship = BenefitSponsors::Organizations::Organization.where(fein: fein).try(:first).try(:active_benefit_sponsorship)
-        if benefit_sponsorship.present?
-          benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on, :aasm_state.in => [:binder_paid, :active]).first
-        end
+        benefit_application = benefit_sponsorship.benefit_applications.where(:predecessor_id => nil, :"effective_period.min" => effective_on || @effective_on, :aasm_state.in => [:binder_paid, :active]).first if benefit_sponsorship.present?
 
         if benefit_application.blank?
           id_list

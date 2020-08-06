@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Enrollments
     class EnrollmentBuilder
@@ -8,8 +10,7 @@ module BenefitSponsors
         builder.hbx_enrollment
       end
 
-      def initialize
-      end
+      def initialize; end
 
       # def set_household(household)
       #   @hbx_enrollment.household_id = household
@@ -36,7 +37,7 @@ module BenefitSponsors
       end
 
       def set_kind(kind)
-        @hbx_enrollment.kind = kind 
+        @hbx_enrollment.kind = kind
       end
 
       def set_coverage_kind(coverage_kind)
@@ -84,9 +85,7 @@ module BenefitSponsors
         @hbx_enrollment.renew_enrollment
       end
 
-      def hbx_enrollment
-        @hbx_enrollment
-      end
+      attr_reader :hbx_enrollment
     end
   end
 end

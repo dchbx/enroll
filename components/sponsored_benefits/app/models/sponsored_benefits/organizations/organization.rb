@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Parent model for any business, government agency, or other organized entity
 module SponsoredBenefits
   module Organizations
@@ -47,34 +49,34 @@ module SponsoredBenefits
 
       index({"employer_profile.workflow_state_transitions.transition_at" => 1,
              "employer_profile.workflow_state_transitions.to_state" => 1},
-             { name: "employer_profile_workflow_to_state" })
+            { name: "employer_profile_workflow_to_state" })
 
       index({"employer_profile.broker_agency_accounts._id" => 1})
       index({"employer_profile.broker_agency_accounts.is_active" => 1,
              "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1},
-             { name: "active_broker_accounts_broker_agency" })
+            { name: "active_broker_accounts_broker_agency" })
       index({"employer_profile.broker_agency_accounts.is_active" => 1,
              "employer_profile.broker_agency_accounts.writing_agent_id" => 1 },
-             { name: "active_broker_accounts_writing_agent" })
+            { name: "active_broker_accounts_writing_agent" })
 
 
       index({"employer_profile.general_agency_accounts._id" => 1})
       index({"employer_profile.broker_agency_accounts.is_active" => 1,
              "employer_profile.broker_agency_accounts.broker_agency_profile_id" => 1,
              "fein" => 1, "legal_name" => 1, "dba" => 1},
-             { name: "broker_agency_employer_search_index" })
+            { name: "broker_agency_employer_search_index" })
 
 
       default_scope                               ->{ order("legal_name ASC") }
-      scope :employer_by_hbx_id,                  ->( employer_id ){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
-      scope :by_broker_agency_profile,            ->( broker_agency_profile_id ) { where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
-      scope :by_broker_role,                      ->( broker_role_id ){ where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } }) }
+      scope :employer_by_hbx_id,                  ->(employer_id){ where(hbx_id: employer_id, "employer_profile" => { "$exists" => true }) }
+      scope :by_broker_agency_profile,            ->(broker_agency_profile_id) { where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, broker_agency_profile_id: broker_agency_profile_id } }) }
+      scope :by_broker_role,                      ->(broker_role_id){ where(:'employer_profile.broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id                   } }) }
       scope :approved_broker_agencies,            ->{ where("broker_agency_profile.aasm_state" => 'is_approved') }
-      scope :broker_agencies_by_market_kind,      ->( market_kind ) { any_in("broker_agency_profile.market_kind" => market_kind) }
-      scope :all_employers_by_plan_year_start_on, ->( start_on ){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on)  if start_on.present? }
-      scope :plan_year_start_on_or_after,         ->( start_on ){ where(:"employer_profile.plan_years.start_on".gte => start_on) if start_on.present? }
-      scope :by_general_agency_profile,           ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
-      scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :"legal_name".asc)}
+      scope :broker_agencies_by_market_kind,      ->(market_kind) { any_in("broker_agency_profile.market_kind" => market_kind) }
+      scope :all_employers_by_plan_year_start_on, ->(start_on){ unscoped.where(:"employer_profile.plan_years.start_on" => start_on)  if start_on.present? }
+      scope :plan_year_start_on_or_after,         ->(start_on){ where(:"employer_profile.plan_years.start_on".gte => start_on) if start_on.present? }
+      scope :by_general_agency_profile,           ->(general_agency_profile_id) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
+      scope :er_invoice_data_table_order,         ->{ reorder(:"employer_profile.plan_years.start_on".asc, :legal_name.asc)}
       scope :has_broker_agency_profile,           ->{ exists(broker_agency_profile: true) }
       scope :has_general_agency_profile,          ->{ exists(general_agency_profile: true) }
       scope :all_employers_renewing,              ->{ unscoped.any_in(:"employer_profile.plan_years.aasm_state" => PlanYear::RENEWING) }
@@ -113,14 +115,15 @@ module SponsoredBenefits
       scope :employer_profile_plan_year_start_on, ->(begin_on){ where(:"employer_profile.plan_years.start_on" => begin_on) if begin_on.present? }
       scope :offset,                              ->(cursor = 0)      {skip(cursor) if cursor.present?}
       scope :limit,                               ->(page_size = 25)  {limit(page_size) if page_size_present?}
-      scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   ->(start_on){
+      scope :all_employers_by_plan_year_start_on_and_valid_plan_year_statuses,   lambda { |start_on|
         unscoped.where(
           :"employer_profile.plan_years" => {
             :$elemMatch => {
-              :"aasm_state".in => PlanYear::PUBLISHED + PlanYear::RENEWING,
+              :aasm_state.in => PlanYear::PUBLISHED + PlanYear::RENEWING,
               start_on: start_on
             }
-          })
+          }
+        )
       }
 
       scope :employer_attestations, -> { where(:"employer_profile.employer_attestation.aasm_state".in => ['submitted', 'pending', 'approved', 'denied']) }
@@ -131,11 +134,11 @@ module SponsoredBenefits
 
       scope :employer_profiles_with_attestation_document, -> { exists(:"employer_profile.employer_attestation.employer_attestation_documents" => true) }
 
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
+      scope :datatable_search, ->(query) { self.where({"$or" => [{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}]}) }
 
       def self.generate_fein
         loop do
-          random_fein = (["00"] + 7.times.map{rand(10)} ).join
+          random_fein = (["00"] + 7.times.map{rand(10)}).join
           break random_fein unless Organization.where(:fein => random_fein).count > 0
         end
       end
@@ -164,10 +167,10 @@ module SponsoredBenefits
       def self.search_hash(s_rex)
         search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
         {
-          "$or" => ([
+          "$or" => [
             {"legal_name" => search_rex},
-            {"fein" => search_rex},
-          ])
+            {"fein" => search_rex}
+          ]
         }
       end
 
@@ -178,17 +181,17 @@ module SponsoredBenefits
 
       def self.valid_carrier_names(filters = { sole_source_only: false, primary_office_location: nil })
         cache_string = "carrier-names-at-#{TimeKeeper.date_of_record.year}"
-        if (filters[:primary_office_location].present?)
+        if filters[:primary_office_location].present?
           office_location = filters[:primary_office_location]
           cache_string = "#{office_location.address.zip}-#{office_location.address.county}-carrier-names-at-#{TimeKeeper.date_of_record.year}"
         end
 
         Rails.cache.fetch(cache_string, expires_in: 2.hour) do
           Organization.exists(carrier_profile: true).inject({}) do |carrier_names, org|
-            unless (filters[:primary_office_location].nil?)
+            unless filters[:primary_office_location].nil?
               next carrier_names unless CarrierServiceArea.valid_for?(office_location: office_location, carrier_profile: org.carrier_profile)
             end
-            if (filters[:sole_source_only]) ## Only sole source carriers requested
+            if filters[:sole_source_only] ## Only sole source carriers requested
               next carrier_names unless org.carrier_profile.offers_sole_source?  # skip carrier unless it is a sole source provider
             end
             carrier_names[org.carrier_profile.id.to_s] = org.carrier_profile.legal_name if Plan.valid_shop_health_plans("carrier", org.carrier_profile.id).present?
@@ -225,8 +228,16 @@ module SponsoredBenefits
       end
 
       def self.upload_invoice(file_path,file_name)
-        invoice_date = invoice_date(file_path) rescue nil
-        org = by_invoice_filename(file_path) rescue nil
+        invoice_date = begin
+                         invoice_date(file_path)
+                       rescue StandardError
+                         nil
+                       end
+        org = begin
+                by_invoice_filename(file_path)
+              rescue StandardError
+                nil
+              end
         if invoice_date && org && !invoice_exist?(invoice_date,org)
           doc_uri = Aws::S3Storage.save(file_path, "invoices",file_name)
           if doc_uri
@@ -238,7 +249,7 @@ module SponsoredBenefits
             document.title = File.basename(file_path)
             org.employer_profile.documents << document
             logger.debug "associated file #{file_path} with the Organization"
-            return document
+            document
           end
         else
           logger.warn("Unable to associate invoice #{file_path}")
@@ -246,9 +257,13 @@ module SponsoredBenefits
       end
 
       def self.upload_invoice_to_print_vendor(file_path,file_name)
-        org = by_invoice_filename(file_path) rescue nil
+        org = begin
+                by_invoice_filename(file_path)
+              rescue StandardError
+                nil
+              end
         if org.employer_profile.is_converting?
-          bucket_name= Settings.paper_notice
+          bucket_name = Settings.paper_notice
           begin
             doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
           rescue Exception => e
@@ -260,14 +275,14 @@ module SponsoredBenefits
       # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
       # Returns Organization
       def self.by_invoice_filename(file_path)
-        hbx_id= File.basename(file_path).split("_")[0]
+        hbx_id = File.basename(file_path).split("_")[0]
         Organization.where(hbx_id: hbx_id).first
       end
 
       # Expects file_path string with file_name format /hbxid_mmddyyyy_invoices_r.pdf
       # Returns Date
       def self.invoice_date(file_path)
-        date_string= File.basename(file_path).split("_")[1]
+        date_string = File.basename(file_path).split("_")[1]
         Date.strptime(date_string, "%m%d%Y")
       end
 
@@ -285,14 +300,11 @@ module SponsoredBenefits
           old_address_dup.delete_if{|s| s["address"]["kind"] == address["address_attributes"]["kind"]}
           keys = address["address_attributes"].keys
           new_address_values = address["address_attributes"].values
-          old_addres_values = old_address.present? ? keys.map{|k| old_address[0]["address"]["#{k}"]} : []
+          old_addres_values = old_address.present? ? keys.map{|k| old_address[0]["address"][k.to_s]} : []
           changed_address << (new_address_values == old_addres_values)
         end
         changed_address << false if old_address_dup.present?
-        unless changed_address.all?
-          notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"})
-        end
-
+        notify("acapi.info.events.employer.address_changed", {employer_id: self.hbx_id, event_name: "address_changed"}) unless changed_address.all?
       end
 
       class << self
@@ -307,18 +319,14 @@ module SponsoredBenefits
         def build_query_params(search_params)
           query_params = []
 
-          if !search_params[:q].blank?
+          unless search_params[:q].blank?
             q = ::Regexp.new(::Regexp.escape(search_params[:q].strip), true)
             query_params << {"legal_name" => q}
           end
 
-          if !search_params[:languages].blank?
-            query_params << {"broker_agency_profile.languages_spoken" => { "$in" => search_params[:languages]} }
-          end
+          query_params << {"broker_agency_profile.languages_spoken" => { "$in" => search_params[:languages]} } unless search_params[:languages].blank?
 
-          if !search_params[:working_hours].blank?
-            query_params << {"broker_agency_profile.working_hours" => eval(search_params[:working_hours])}
-          end
+          query_params << {"broker_agency_profile.working_hours" => eval(search_params[:working_hours])} unless search_params[:working_hours].blank?
 
           query_params
         end
@@ -335,10 +343,10 @@ module SponsoredBenefits
         def broker_agencies_with_matching_agency_or_broker(search_params)
           if search_params[:q].present?
             orgs2 = self.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
-              "broker_agency_profile._id" => {
-                "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
-              }
-            })
+                                                                                                           "broker_agency_profile._id" => {
+                                                                                                             "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
+                                                                                                           }
+                                                                                                         })
 
             brokers = BrokerRole.brokers_matching_search_criteria(search_params[:q])
             if brokers.any?

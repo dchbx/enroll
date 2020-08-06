@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     class ProductPackageFactory
@@ -7,11 +9,11 @@ module BenefitMarkets
 
       def self.call(benefit_catalog:, benefit_kind:, title:, contribution_model:, pricing_model:, **other_params)
         benefit_catalog.product_packages.build benefit_kind: benefit_kind,
-          application_period: benefit_catalog.application_period,
-          title: title,
-          contribution_model: contribution_model,
-          pricing_model: pricing_model,
-          **other_params
+                                               application_period: benefit_catalog.application_period,
+                                               title: title,
+                                               contribution_model: contribution_model,
+                                               pricing_model: pricing_model,
+                                               **other_params
       end
 
       def self.validate(product_package)

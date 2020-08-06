@@ -1,5 +1,6 @@
-module BrokerAgencyWorld
+# frozen_string_literal: true
 
+module BrokerAgencyWorld
   def assign_broker_agency_account(broker_name, broker_agency_name)
     broker_agency_profile = broker_agency_profile(broker_agency_name)
     sponsorship = employer_profile.benefit_sponsorships.first

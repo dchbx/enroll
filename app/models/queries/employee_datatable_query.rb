@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class EmployeeDatatableQuery
     attr_reader :search_string, :custom_attributes
@@ -14,32 +16,29 @@ module Queries
       ).first.try(:employer_profile) || EmployerProfile.find(@custom_attributes[:id]) # Remove try when you deprecate old ER profile
     end
 
-    def build_scope()
+    def build_scope
       return [] if @employer_profile.nil?
       collection = nil
-      case @custom_attributes[:employers]
+      collection = case @custom_attributes[:employers]
 
-        when "active"
-          collection = @employer_profile.census_employees.active
-        when "active_alone"
-          collection = @employer_profile.census_employees.active_alone
-        when "by_cobra"
-          collection = @employer_profile.census_employees.by_cobra
-        when "terminated"
-          collection = @employer_profile.census_employees.terminated
-        when "all"
-          collection = @employer_profile.census_employees
-        else
-          collection = @employer_profile.census_employees.active_alone
-      end
+                   when "active"
+                     @employer_profile.census_employees.active
+                   when "active_alone"
+                     @employer_profile.census_employees.active_alone
+                   when "by_cobra"
+                     @employer_profile.census_employees.by_cobra
+                   when "terminated"
+                     @employer_profile.census_employees.terminated
+                   when "all"
+                     @employer_profile.census_employees
+                   else
+                     @employer_profile.census_employees.active_alone
+                   end
 
-      if @search_string.present?
-        return collection.any_of(CensusEmployee.search_hash(@search_string)).order_by(:last_name.asc, :first_name.asc)
-      end
+      return collection.any_of(CensusEmployee.search_hash(@search_string)).order_by(:last_name.asc, :first_name.asc) if @search_string.present?
 
       collection.order_by(:last_name.asc, :first_name.asc)
     end
-
 
     def skip(num)
       build_scope.skip(num)

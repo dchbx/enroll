@@ -12,13 +12,13 @@ module BenefitMarkets
 
         # @param [ Symbol ] market_kind Benefit Market Catalog for the given Effective Date
         def call(params)
-          benefit_market = yield benefit_market(params[:market_kind])          
-          
+          benefit_market = yield benefit_market(params[:market_kind])
+
           Success(benefit_market)
         end
 
         private
-        
+
         def benefit_market(market_kind)
           benefit_market = ::BenefitMarkets::BenefitMarket.by_market_kind(market_kind).first
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/concern'
 
 module BenefitSponsors
@@ -45,9 +47,7 @@ module BenefitSponsors
       end
 
       def active_broker
-        if active_broker_agency_account && active_broker_agency_account.writing_agent_id
-          Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first
-        end
+        Person.where("broker_role._id" => BSON::ObjectId.from_string(active_broker_agency_account.writing_agent_id)).first if active_broker_agency_account&.writing_agent_id
       end
 
       def active_benefit_application
@@ -63,7 +63,7 @@ module BenefitSponsors
       end
 
       def benefit_applications_with_drafts_statuses
-        draft_benefit_applications.size > 0
+        !draft_benefit_applications.empty?
       end
 
       def is_converting?
@@ -75,7 +75,7 @@ module BenefitSponsors
       end
 
       def renewing_benefit_application
-        benefit_applications.detect { |benefit_application| benefit_application.is_renewing? }
+        benefit_applications.detect(&:is_renewing?)
       end
 
       def is_new_employer?
@@ -100,7 +100,11 @@ module BenefitSponsors
 
       def active_benefit_sponsorship
         return @benefit_sponsorship if defined? @benefit_sponsorship
-        @benefit_sponsorship = organization.active_benefit_sponsorship rescue nil
+        @benefit_sponsorship = begin
+                                 organization.active_benefit_sponsorship
+                               rescue StandardError
+                                 nil
+                               end
       end
 
       def benefit_applications
@@ -109,15 +113,19 @@ module BenefitSponsors
       end
 
       def active_broker_agency_account
-        active_benefit_sponsorship.active_broker_agency_account rescue nil
+        active_benefit_sponsorship.active_broker_agency_account
+      rescue StandardError
+        nil
       end
 
       def broker_agency_profile
-        active_broker_agency_account.broker_agency_profile rescue nil
+        active_broker_agency_account.broker_agency_profile
+      rescue StandardError
+        nil
       end
 
       def active_broker_agency_legal_name
-        active_broker_agency_account.ba_name if active_broker_agency_account
+        active_broker_agency_account&.ba_name
       end
 
       def active_ga_legal_name
@@ -142,7 +150,7 @@ module BenefitSponsors
       end
 
       def today=(new_date)
-        raise ArgumentError.new("expected Date") unless new_date.is_a?(Date)
+        raise ArgumentError, "expected Date" unless new_date.is_a?(Date)
         @today = new_date
       end
 
@@ -169,7 +177,7 @@ module BenefitSponsors
         broker_profile = broker_agency_profile
         active_broker_agency_account.update_attributes!(end_on: terminate_on, is_active: false)
         ::SponsoredBenefits::Organizations::BrokerAgencyProfile.unassign_broker(broker_agency: broker_profile, employer: self) if parent
-        # TODO fix these during notices implementation
+        # TODO: fix these during notices implementation
         # employer_broker_fired
         # notify_broker_terminated
         # broker_fired_confirmation_to_broker
@@ -203,18 +211,16 @@ module BenefitSponsors
       end
 
       def trigger_notices(event)
-        begin
-          ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
-        rescue Exception => e
-          Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
-        end
+        ShopNoticesNotifierJob.perform_later(self.id.to_s, event)
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver #{event.humanize} - notice to #{self.legal_name} due to #{e}" }
       end
 
       def published_benefit_application
         renewing_published_benefit_application || current_benefit_application
       end
 
-      def billing_benefit_application(billing_date=nil)
+      def billing_benefit_application(billing_date = nil)
         billing_report_date = billing_date.is_a?(Date) ? billing_date : TimeKeeper.date_of_record.next_month
         valid_applications = benefit_applications.non_draft.non_canceled
 
@@ -231,7 +237,7 @@ module BenefitSponsors
 
         application = valid_applications.effective_period_cover.first
         return application, TimeKeeper.date_of_record if application.present?
-        return nil, nil
+        [nil, nil]
       end
 
       def is_a_fehb_profile?
@@ -278,7 +284,7 @@ module BenefitSponsors
         renewing_published_benefit_application
       end
 
-      def billing_plan_year(billing_date=nil)
+      def billing_plan_year(billing_date = nil)
         return @billing_benefit_application if defined? @billing_benefit_application
         warn "[Deprecated] Instead use billing_benefit_application" unless Rails.env.test?
         @billing_benefit_application = billing_benefit_application(billing_date)
@@ -306,16 +312,14 @@ module BenefitSponsors
           (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(target_date)
         end
 
-        (benefit_application.present? && benefit_application.imported?) ? renewing_published_benefit_application : benefit_application
+        benefit_application.present? && benefit_application.imported? ? renewing_published_benefit_application : benefit_application
       end
 
       def enrollments_for_billing(billing_date = nil)
         benefit_application, billing_report_date = billing_benefit_application(billing_date)
         hbx_enrollments = []
 
-        if benefit_application.present?
-          hbx_enrollments = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery.new(benefit_application).call(billing_report_date).compact
-        end
+        hbx_enrollments = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery.new(benefit_application).call(billing_report_date).compact if benefit_application.present?
 
         hbx_enrollments
       end
@@ -342,9 +346,13 @@ module BenefitSponsors
 
       class << self
         def upload_invoice_to_print_vendor(file_path,file_name)
-          org = by_invoice_filename(file_path) rescue nil
+          org = begin
+                  by_invoice_filename(file_path)
+                rescue StandardError
+                  nil
+                end
           if org.employer_profile.is_converting?
-            bucket_name= Settings.paper_notice
+            bucket_name = Settings.paper_notice
             begin
               doc_uri = Aws::S3Storage.save(file_path,bucket_name,file_name)
             rescue Exception => e
@@ -354,12 +362,12 @@ module BenefitSponsors
         end
 
         def by_invoice_filename(file_path)
-          hbx_id= File.basename(file_path).split("_")[0]
+          hbx_id = File.basename(file_path).split("_")[0]
           BenefitSponsors::Organizations::Organization.where(hbx_id: hbx_id).first
         end
 
         def invoice_date(file_path)
-          date_string= File.basename(file_path).split("_")[1]
+          date_string = File.basename(file_path).split("_")[1]
           Date.strptime(date_string, "%m%d%Y")
         end
 
@@ -370,8 +378,16 @@ module BenefitSponsors
         end
 
         def upload_invoice(file_path,file_name)
-          invoice_date = invoice_date(file_path) rescue nil
-          org = by_invoice_filename(file_path) rescue nil
+          invoice_date = begin
+                           invoice_date(file_path)
+                         rescue StandardError
+                           nil
+                         end
+          org = begin
+                  by_invoice_filename(file_path)
+                rescue StandardError
+                  nil
+                end
           if invoice_date && org && !invoice_exist?(invoice_date,org)
             doc_uri = Aws::S3Storage.save(file_path, "invoices", file_name)
             if doc_uri
@@ -382,7 +398,7 @@ module BenefitSponsors
               document.subject = 'invoice'
               document.title = File.basename(file_path)
               org.employer_profile.documents << document
-              return document
+              document
             else
               @errors << "Unable to upload PDF to AWS S3 for #{org.hbx_id}"
               Rails.logger.warn("Unable to upload PDF to AWS S3")
@@ -393,13 +409,13 @@ module BenefitSponsors
         end
 
         def find_by_broker_agency_profile(broker_agency_profile)
-          raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile") unless broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+          raise ArgumentError, "expected BenefitSponsors::Organizations::BrokerAgencyProfile" unless broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
           orgs = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_agency_profile(broker_agency_profile.id).map(&:organization)
           orgs.collect(&:employer_profile)
         end
       end
 
-      alias_method :broker_agency_profile=, :hire_broker_agency
+      alias broker_agency_profile= hire_broker_agency
     end
   end
 end

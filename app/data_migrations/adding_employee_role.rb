@@ -1,18 +1,18 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class AddingEmployeeRole < MongoidMigrationTask
   def migrate
-    begin
-      action = ENV['action']
-      case action
-        when 'Add' then add_employee_role
-        when 'Link' then link_employee_role
-        else
-          raise "Invalid action #{action}!"
-      end
-    rescue StandardError => e
-      e.message
+    action = ENV['action']
+    case action
+    when 'Add' then add_employee_role
+    when 'Link' then link_employee_role
+    else
+      raise "Invalid action #{action}!"
     end
+  rescue StandardError => e
+    e.message
   end
 
   private
@@ -37,6 +37,6 @@ class AddingEmployeeRole < MongoidMigrationTask
     ce_ids = ENV['census_employee_ids'].split(",").map(&:strip)
     census_employees = CensusEmployee.where(:id.in => ce_ids)
     raise "No Census Employee found with #{ce_ids.join(', ')}" if census_employees.blank?
-    census_employees.each { |ce| ce.link_employee_role! }
+    census_employees.each(&:link_employee_role!)
   end
 end

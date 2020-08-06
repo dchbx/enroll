@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', dbclean: :around_each  do
   let(:start_on) { TimeKeeper.date_of_record.beginning_of_month}
-  
+
   let!(:person) { create :person }
   let(:user)    { FactoryBot.create(:user, :person => person)}
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
@@ -17,7 +19,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   let!(:broker_agency_profile) { broker_agency_organization1.broker_agency_profile}
   let!(:model_instance) { create :benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile, benefit_sponsorship: benefit_sponsorship }
   let!(:broker_role1) { broker_agency_profile.primary_broker_role }
-  
+
   before do
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role1.id)
   end
@@ -49,7 +51,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
           expect(payload[:event_object_id]).to eq employer_profile.id.to_s
         end
-        
+
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employer.broker_hired_confirmation_to_employer"
           expect(payload[:event_object_kind]).to eq "BenefitSponsors::Organizations::AcaShop#{Settings.site.key.capitalize}EmployerProfile"
@@ -62,9 +64,9 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
   end
 
   describe "NoticeBuilder" do
-     
+
     context "when broker_hired_notice_to_broker is triggered" do
-      let(:data_elements) {
+      let(:data_elements) do
         [
             "broker_profile.notice_date",
             "broker_profile.employer_name",
@@ -75,7 +77,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
             "broker_profile.employer_poc_firstname",
             "broker_profile.employer_poc_lastname"
         ]
-      }
+      end
 
       let(:recipient) { "Notifier::MergeDataModels::BrokerProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
@@ -130,11 +132,11 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       it "should return broker agency name " do
         expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
       end
-    end 
+    end
 
 
     context "when broker_agency_hired_confirmation is triggered" do
-      let(:data_elements) {
+      let(:data_elements) do
         [
           "broker_agency_profile.notice_date",
           "broker_agency_profile.employer_name",
@@ -147,7 +149,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           "broker_agency_profile.employer_poc_phone",
           "broker_agency_profile.employer_poc_email"
         ]
-      }
+      end
 
       let(:recipient) { "Notifier::MergeDataModels::BrokerAgencyProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
@@ -205,10 +207,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
       it "should return broker agency name " do
         expect(merge_model.broker_agency_name).to eq broker_agency_profile.legal_name
       end
-    end 
-    
+    end
+
     context "when broker_agency_hired_confirmation is triggered" do
-      let(:data_elements) {
+      let(:data_elements) do
         [
           "employer_profile.notice_date",
           "employer_profile.employer_name",
@@ -218,7 +220,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerAgencyHiredConfirmation', db
           "employer_profile.broker.primary_first_name",
           "employer_profile.broker.organization"
         ]
-      }
+      end
       let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
       let(:template)  { Notifier::Template.new(data_elements: data_elements) }
       let(:payload) do

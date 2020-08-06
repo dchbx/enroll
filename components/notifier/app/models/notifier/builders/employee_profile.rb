@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class Builders::EmployeeProfile
 
@@ -48,12 +50,12 @@ module Notifier
 
       if mailing_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
-          street_1: mailing_address.address_1,
-          street_2: mailing_address.address_2,
-          city: mailing_address.city,
-          state: mailing_address.state,
-          zip: mailing_address.zip
-          })
+                                                                     street_1: mailing_address.address_1,
+                                                                     street_2: mailing_address.address_2,
+                                                                     city: mailing_address.city,
+                                                                     state: mailing_address.state,
+                                                                     zip: mailing_address.zip
+                                                                   })
       end
     end
 
@@ -143,7 +145,7 @@ module Notifier
       census_employee_health_enrollment? && census_employee_dental_enrollment?
     end
 
-    def latest_terminated_enrollment(coverage_kind)
+    def latest_terminated_enrollment(_coverage_kind)
       enrollment = employee_role.person.primary_family.active_household.hbx_enrollments.shop_market.by_coverage_kind("health").where(:aasm_state.in => ["coverage_termination_pending", "coverage_terminated"]).detect do |hbx|
         census_employee_record.employment_terminated_on <= hbx.terminated_on
       end
@@ -159,15 +161,11 @@ module Notifier
     end
 
     def census_employee_latest_terminated_health_enrollment_plan_name
-      if latest_terminated_health_enrollment.present?
-        merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.product.name
-      end
+      merge_model.census_employee.latest_terminated_health_enrollment_plan_name = latest_terminated_health_enrollment.product.name if latest_terminated_health_enrollment.present?
     end
 
     def census_employee_latest_terminated_dental_enrollment_plan_name
-      if latest_terminated_dental_enrollment.present?
-        merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.product.name
-      end
+      merge_model.census_employee.latest_terminated_dental_enrollment_plan_name = latest_terminated_dental_enrollment.product.name if latest_terminated_dental_enrollment.present?
     end
 
     def dependents_name
@@ -181,17 +179,17 @@ module Notifier
     def dependent_termination_date
       merge_model.dependent_termination_date = format_date(TimeKeeper.date_of_record.end_of_month)
     end
-    
+
     # Using same merge model for special enrollment period and qualifying life event kind.
     def special_enrollment_period
       return @special_enrollment_period if defined? @special_enrollment_period
-      if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod
-        @special_enrollment_period = employee_role.person.primary_family.special_enrollment_periods.find(payload['event_object_id'])
-      elsif payload['event_object_kind'].constantize == QualifyingLifeEventKind
-        @special_enrollment_period = QualifyingLifeEventKind.find(payload['event_object_id'])
-      else
-        @special_enrollment_period = employee_role.person.primary_family.current_sep
-      end
+      @special_enrollment_period = if payload['event_object_kind'].constantize == SpecialEnrollmentPeriod
+                                     employee_role.person.primary_family.special_enrollment_periods.find(payload['event_object_id'])
+                                   elsif payload['event_object_kind'].constantize == QualifyingLifeEventKind
+                                     QualifyingLifeEventKind.find(payload['event_object_id'])
+                                   else
+                                     employee_role.person.primary_family.current_sep
+                                   end
     end
 
     def special_enrollment_period_event_on
@@ -207,13 +205,11 @@ module Notifier
     end
 
     def special_enrollment_period_qle_reported_on
-      merge_model.special_enrollment_period.qle_reported_on = (special_enrollment_period.present? && special_enrollment_period.qle_on.present?) ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
+      merge_model.special_enrollment_period.qle_reported_on = special_enrollment_period.present? && special_enrollment_period.qle_on.present? ? format_date(special_enrollment_period.qle_on) : format_date(TimeKeeper.date_of_record)
     end
 
     def special_enrollment_period_start_on
-      if special_enrollment_period.present? && special_enrollment_period.start_on.present?
-        merge_model.special_enrollment_period.start_on = format_date(special_enrollment_period.start_on)
-      end
+      merge_model.special_enrollment_period.start_on = format_date(special_enrollment_period.start_on) if special_enrollment_period.present? && special_enrollment_period.start_on.present?
     end
 
     def special_enrollment_period_end_on

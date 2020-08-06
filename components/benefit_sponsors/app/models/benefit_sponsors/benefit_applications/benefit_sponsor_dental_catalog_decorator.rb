@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorDentalCatalogDecorator < SimpleDelegator
@@ -17,21 +19,18 @@ module BenefitSponsors
           false
         end
 
-        def contribution_levels_attributes=(val)
-        end
+        def contribution_levels_attributes=(val); end
       end
 
 
       def sponsor_contributions(benefit_package_id = nil)
         return @contributions if defined? @contributions
 
-        if benefit_package_id.present?
-          benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id}
-        end
+        benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id} if benefit_package_id.present?
 
 
         @contributions = product_packages.by_product_kind(:dental).inject({}) do |contributions, product_package|
-          
+
           if benefit_package.present?
             if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
               sponsor_contribution = sponsored_benefit.sponsor_contribution
@@ -128,10 +127,10 @@ module BenefitSponsors
             Product.new(product.id, product.title, product.metal_level, carriers[product.issuer_profile_id.to_s], product.issuer_profile_id, false, product.kind.to_s, product.product_type, product.network_information, product.network)
           end
           @products[product_package.package_kind] = case product_package.package_kind
-            when :multi_product
-              package_products
-            else
-              package_products.group_by(&:carrier_name)
+                                                    when :multi_product
+                                                      package_products
+                                                    else
+                                                      package_products.group_by(&:carrier_name)
             end
         end
 
@@ -142,7 +141,7 @@ module BenefitSponsors
         return @carriers if defined? @carriers
         issuer_orgs = BenefitSponsors::Organizations::Organization.where(:"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile")
         @carriers = issuer_orgs.inject({}) do |issuer_hash, issuer_org|
-          issuer_profile  = issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
+          issuer_profile = issuer_org.profiles.where(:_type => "BenefitSponsors::Organizations::IssuerProfile").first
           issuer_hash[issuer_profile.id.to_s] = issuer_org.legal_name
           issuer_hash
         end

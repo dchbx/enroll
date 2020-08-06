@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module RulesEngine
     class PolicyExecutionContext
@@ -30,7 +32,7 @@ module BenefitMarkets
       end
 
       def rule_result(name)
-        return @rule_results[name] if @rule_results.has_key?(name)
+        return @rule_results[name] if @rule_results.key?(name)
         @rules_by_name[name].evaluate(self)
         @rule_results[name]
       end

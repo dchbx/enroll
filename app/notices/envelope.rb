@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Envelope < PdfReport
 
   def initialize(template_name = nil)
@@ -17,7 +19,7 @@ class Envelope < PdfReport
     # if notice.respond_to?(:employer_name) && notice.employer_name.present?
     #   y_pos = 790.86 - mm2pt(57.15) - 55
     # else
-      y_pos = 850 - mm2pt(57.15) - 50
+    y_pos = 850 - mm2pt(57.15) - 50
     # end
 
     bounding_box([x_pos, y_pos], :width => 300) do
@@ -44,10 +46,10 @@ class Envelope < PdfReport
     #   address += ", " + notice.primary_address.street_2.strip unless notice.primary_address.street_2.blank?
     #   text address
     # else
-      text notice.primary_address.street_1
-      text notice.primary_address.street_2 unless notice.primary_address.street_2.blank?
+    text notice.primary_address.street_1
+    text notice.primary_address.street_2 unless notice.primary_address.street_2.blank?
     # end
 
-    text "#{notice.primary_address.city}, #{notice.primary_address.state} #{notice.primary_address.zip}"      
+    text "#{notice.primary_address.city}, #{notice.primary_address.state} #{notice.primary_address.zip}"
   end
 end

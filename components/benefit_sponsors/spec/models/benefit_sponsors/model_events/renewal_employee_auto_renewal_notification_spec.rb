@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -8,7 +10,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   let(:model_event)  { "employee_coverage_passively_renewed" }
   let(:notice_event) { "employee_coverage_passively_renewed" }
-  
+
   let(:renewal_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
   let(:current_effective_date)  { renewal_effective_date.prev_year }
   let(:employer_profile) { abc_profile }
@@ -16,22 +18,23 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
-  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile ) }
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile) }
   let!(:open_enrollment_start_date) { renewal_application.open_enrollment_period.min }
-  let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                        household: family.active_household,
-                        family: family,
-                        aasm_state: "auto_renewing",
-                        effective_on: renewal_application.start_on,
-                        rating_area_id: renewal_application.recorded_rating_area_id,
-                        sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:renewal_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:renewal_application.benefit_sponsorship.id,
-                        employee_role_id: employee_role.id)
-  }
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                      household: family.active_household,
+                      family: family,
+                      aasm_state: "auto_renewing",
+                      effective_on: renewal_application.start_on,
+                      rating_area_id: renewal_application.recorded_rating_area_id,
+                      sponsored_benefit_id: renewal_application.benefit_packages.first.health_sponsored_benefit.id,
+                      sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
+                      benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
+                      employee_role_id: employee_role.id)
+  end
 
   before do
-    census_employee.update_attributes(:employee_role_id => employee_role.id )
+    census_employee.update_attributes(:employee_role_id => employee_role.id)
   end
 
   describe "ModelEvent" do
@@ -50,7 +53,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
     context "when renewal employee auto renewal" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
 
-      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passively_renewed, census_employee, {event_object:renewal_application}) }
+      let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_coverage_passively_renewed, census_employee, {event_object: renewal_application}) }
 
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -66,7 +69,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employee_profile.notice_date",
         "employee_profile.employer_name",
@@ -79,16 +82,18 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
         "employee_profile.broker.email",
         "employee_profile.broker_present?"
       ]
-    }
+    end
 
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let!(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let!(:payload)   { {
-      "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-      "event_object_id" => renewal_application.id
-    } }
+    let!(:payload)   do
+      {
+        "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
+        "event_object_id" => renewal_application.id
+      }
+    end
 
     context "when notice event received" do
       subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
@@ -96,7 +101,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployeeAutoRenewalNotifica
       before do
         allow(subject).to receive(:resource).and_return(census_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
-        renewal_application.update_attributes(:predecessor_id => predecessor_application.id )
+        renewal_application.update_attributes(:predecessor_id => predecessor_application.id)
         census_employee.trigger_model_event(:employee_coverage_passively_renewed, {event_object: renewal_application})
       end
 

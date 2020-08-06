@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   module DateOfBirthField
     def self.included(base)
@@ -5,7 +7,9 @@ module Forms
         attr_accessor :date_of_birth
 
         def dob
-          Date.strptime(date_of_birth, "%Y-%m-%d") rescue nil
+          Date.strptime(date_of_birth, "%Y-%m-%d")
+        rescue StandardError
+          nil
         end
       end
     end

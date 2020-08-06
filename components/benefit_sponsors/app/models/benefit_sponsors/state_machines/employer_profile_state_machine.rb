@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module StateMachines
     module EmployerProfileStateMachine
-
       extend ActiveSupport::Concern
 
       included do
@@ -86,8 +87,7 @@ module BenefitSponsors
         end
       end
 
-      def record_transition
-      end
+      def record_transition; end
     end
   end
 end

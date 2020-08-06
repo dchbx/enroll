@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployerPlanYear
     NewHireCoveragePolicy = Struct.new(:kind, :offset)
@@ -11,7 +13,7 @@ module Importers
       "first of the month following date of hire" => NewHireCoveragePolicy.new("first_of_month", 0),
       "on the first of the month following date of employment" => NewHireCoveragePolicy.new("first_of_month", 0),
       "first of the month following or coinciding with date of hire" => NewHireCoveragePolicy.new("first_of_month", 0)
-    }
+    }.freeze
 
     CARRIER_MAPPING = {
       "aetna" => "AHI",
@@ -20,7 +22,7 @@ module Importers
       "united healthcare" => "UHIC",
       "united health care" => "UHIC",
       "unitedhealthcare" => "UHIC"
-    }
+    }.freeze
     validates_length_of :fein, is: 9
 
     validate :validate_fein
@@ -33,14 +35,14 @@ module Importers
     attr_reader :fein, :plan_selection, :carrier
 
     attr_accessor :action,
-      :enrolled_employee_count,
-      :new_coverage_policy,
-      :new_coverage_policy_value,
-      :default_plan_year_start,
-      :most_common_hios_id,
-      :single_plan_hios_id,
-      :reference_plan_hios_id,
-      :coverage_start
+                  :enrolled_employee_count,
+                  :new_coverage_policy,
+                  :new_coverage_policy_value,
+                  :default_plan_year_start,
+                  :most_common_hios_id,
+                  :single_plan_hios_id,
+                  :reference_plan_hios_id,
+                  :coverage_start
 
     attr_reader :warnings
 
@@ -72,7 +74,7 @@ module Importers
     end
 
     def plan_selection=(val)
-      @plan_selection = (val.to_s =~ /single plan/i) ? "single_plan" : "single_carrier"
+      @plan_selection = val.to_s =~ /single plan/i ? "single_plan" : "single_carrier"
     end
 
     def validate_fein
@@ -91,7 +93,7 @@ module Importers
       return false if benefit_applications.empty?
       benefit_applications.any? do |benefit_application|
         PlanYear::PUBLISHED.include?(benefit_application.aasm_state) ||
-            PlanYear::RENEWING.include?(benefit_application.aasm_state)
+          PlanYear::RENEWING.include?(benefit_application.aasm_state)
       end
     end
 
@@ -99,16 +101,12 @@ module Importers
       found_employer = find_employer
       return true unless found_employer
       return true if action.to_s.downcase == 'update'
-      if plan_years_are_active?(found_employer.benefit_applications)
-        errors.add(:fein, "already has active plan years")
-      end
+      errors.add(:fein, "already has active plan years") if plan_years_are_active?(found_employer.benefit_applications)
     end
 
     def validate_new_coverage_policy
       return true if new_coverage_policy.blank?
-      if new_coverage_policy_value.blank?
-        warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(",")}), defaulting to first of month following date of hire")
-      end
+      warnings.add(:new_coverage_policy, "invalid new hire coverage start policy specified (not one of #{HIRE_COVERAGE_POLICIES.keys.join(',')}), defaulting to first of month following date of hire") if new_coverage_policy_value.blank?
     end
 
     def find_employer
@@ -132,7 +130,7 @@ module Importers
     def select_reference_plan(available_plans)
       plans_by_cost = available_plans.sort_by { |plan| plan.premium_tables.first.cost }
       most_expensive_plan = plans_by_cost.last
-      if (plan_selection == "single_plan")
+      if plan_selection == "single_plan"
         if !single_plan_hios_id.blank?
           sp_hios = single_plan_hios_id.strip
           found_single_plan = available_plans.detect { |pl| (pl.hios_id == sp_hios) || (pl.hios_id == "#{sp_hios}-01") }
@@ -151,8 +149,8 @@ module Importers
       employer.census_employees.non_terminated.each do |ce|
         next unless ce.valid?
         begin
-        ce.add_benefit_group_assignment(bg)
-        ce.save!
+          ce.add_benefit_group_assignment(bg)
+          ce.save!
         rescue Exception => e
           puts "Issue adding benefit group to employee:"
           puts "\n#{employer.fein} - #{employer.legal_name} - #{ce.full_name}\n#{e.inspect}\n- #{e.backtrace.join("\n")}"

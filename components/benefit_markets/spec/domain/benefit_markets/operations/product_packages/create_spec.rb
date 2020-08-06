@@ -34,11 +34,11 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
 
   let(:contribution_model) do
     ::BenefitMarkets::Entities::ContributionModel.new({
-      _id: BSON::ObjectId.new,
-      title: 'title', key: :zero_percent_sponsor_fixed_percent_contribution_model, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
-      many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
-      member_relationships: member_relationships, contribution_units: [contribution_unit]
-    })
+                                                        _id: BSON::ObjectId.new,
+                                                        title: 'title', key: :zero_percent_sponsor_fixed_percent_contribution_model, sponsor_contribution_kind: 'sponsor_contribution_kind', contribution_calculator_kind: 'contribution_calculator_kind',
+                                                        many_simultaneous_contribution_units: true, product_multiplicities: [:product_multiplicities1, :product_multiplicities2],
+                                                        member_relationships: member_relationships, contribution_units: [contribution_unit]
+                                                      })
   end
 
   let(:product_params) do
@@ -50,7 +50,7 @@ RSpec.describe BenefitMarkets::Operations::ProductPackages::Create, dbclean: :af
       issuer_profile_id: BSON::ObjectId.new, premium_ages: 19..60, provider_directory_url: 'provider_directory_url',
       is_reference_plan_eligible: true, deductible: '123', family_deductible: '345', rx_formulary_url: 'rx_formulary_url',
       issuer_assigned_id: 'issuer_assigned_id', service_area_id: BSON::ObjectId.new, network_information: 'network_information',
-      nationwide: true, dc_in_network: false, sbc_document: nil, premium_tables: premium_tables, renewal_product_id: nil,
+      nationwide: true, dc_in_network: false, sbc_document: nil, premium_tables: premium_tables, renewal_product_id: nil
     }
   end
 

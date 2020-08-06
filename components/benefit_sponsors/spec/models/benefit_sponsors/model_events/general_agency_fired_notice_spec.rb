@@ -42,7 +42,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
         end
 
         it "should trigger notice" do
-          general_agency_account.class.observer_peers.keys.each do |observer|
+          general_agency_account.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_fired, :klass_instance => general_agency_account, :options => {})
@@ -64,7 +64,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
         end
 
         it "should trigger notice" do
-          general_agency_account.class.observer_peers.keys.each do |observer|
+          general_agency_account.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_fired, :klass_instance => general_agency_account, :options => {})
@@ -83,7 +83,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
         end
 
         it "should trigger notice" do
-          general_agency_account.class.observer_peers.keys.each do |observer|
+          general_agency_account.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_fired, :klass_instance => general_agency_account, :options => {})

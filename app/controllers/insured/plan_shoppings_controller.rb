@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::PlanShoppingsController < ApplicationController
   include ApplicationHelper
   include ActionView::Helpers::TagHelper
@@ -25,11 +27,9 @@ class Insured::PlanShoppingsController < ApplicationController
 
     qle = (plan_selection.hbx_enrollment.enrollment_kind == "special_enrollment")
 
-    if !plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
-      if plan_selection.hbx_enrollment.errors.present?
-        flash[:error] = plan_selection.hbx_enrollment.errors.full_messages
-      end
-        redirect_back(fallback_location: :back)
+    unless plan_selection.hbx_enrollment.can_select_coverage?(qle: qle)
+      flash[:error] = plan_selection.hbx_enrollment.errors.full_messages if plan_selection.hbx_enrollment.errors.present?
+      redirect_back(fallback_location: :back)
       return
     end
 
@@ -93,7 +93,7 @@ class Insured::PlanShoppingsController < ApplicationController
       get_aptc_info_from_session(@enrollment)
     end
 
-    # TODO Fix this stub
+    # TODO: Fix this stub
     if @enrollment.is_shop?
       @member_group = HbxEnrollmentSponsoredCostCalculator.new(@enrollment).groups_for_products([@plan]).first
     else
@@ -103,7 +103,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
     @family = @person.primary_family
 
-    #FIXME need to implement can_complete_shopping? for individual
+    #FIXME: need to implement can_complete_shopping? for individual
     @enrollable = @market_kind == 'individual' ? true : @enrollment.can_complete_shopping?(qle: @enrollment.is_special_enrollment?)
     @waivable = @enrollment.can_complete_shopping?
     @change_plan =
@@ -233,7 +233,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @max_deductible = thousand_ceil(@plans.map(&:deductible).map {|d| d.is_a?(String) ? d.gsub(/[$,]/, '').to_i : 0}.max)
   end
 
-  def show_shop(hbx_enrollment_id)
+  def show_shop(_hbx_enrollment_id)
     set_employee_bookmark_url(family_account_path) if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
 
     sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
@@ -305,7 +305,11 @@ class Insured::PlanShoppingsController < ApplicationController
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url(family_account_path)
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
+    @tax_household = begin
+                       @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year)
+                     rescue StandardError
+                       nil
+                     end
     if @tax_household.present?
       if is_eligibility_determined_and_not_csr_0?(@person, @tax_household)
         sort_for_csr(@plans)
@@ -341,7 +345,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   # no dental as of now
   def sort_member_groups(products)
-    products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.select { |prod| prod.group_enrollment.product.id.to_s != @enrolled_hbx_enrollment_plan_ids.first.to_s }.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
+    products.select { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s } + products.reject { |prod| prod.group_enrollment.product.id.to_s == @enrolled_hbx_enrollment_plan_ids.first.to_s }.sort_by { |mg| (mg.group_enrollment.product_cost_total - mg.group_enrollment.sponsor_contribution_total) }
   end
 
   def sort_by_standard_plans(plans)
@@ -357,7 +361,7 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_0?(person, tax_household)
+  def is_eligibility_determined_and_not_csr_0?(_person, tax_household)
     valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
     (EligibilityDetermination::CSR_KINDS.include? valid_csr_eligibility_kind.to_s) && (valid_csr_eligibility_kind.to_s != 'csr_0')
   end
@@ -411,7 +415,6 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def build_same_plan_premiums
-
     enrolled_plans = enrolled_plans_by_hios_id_and_active_year
     if enrolled_plans.present?
       enrolled_plans = enrolled_plans.collect{|p| BenefitMarkets::Products::Product.find(p)}
@@ -422,9 +425,9 @@ class Insured::PlanShoppingsController < ApplicationController
       if @hbx_enrollment.is_shop?
         ref_plan = (@hbx_enrollment.coverage_kind == "health" ? @benefit_group.reference_plan : @benefit_group.dental_reference_plan)
 
-        @enrolled_plans = enrolled_plans.collect{|plan|
+        @enrolled_plans = enrolled_plans.collect do |plan|
           @benefit_group.decorated_plan(plan, same_plan_enrollment, ref_plan)
-        }
+        end
       else
         @enrolled_plans = same_plan_enrollment.calculate_costs_for_plans(enrolled_plans)
       end
@@ -466,12 +469,10 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def can_apply_aptc?(plan)
-    @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    @shopping_tax_household.present? && (@elected_aptc > 0) && plan.present? && plan.can_use_aptc?
   end
 
   def set_elected_aptc_by_params(elected_aptc)
-    if session[:elected_aptc].to_f != elected_aptc.to_f
-      session[:elected_aptc] = elected_aptc.to_f
-    end
+    session[:elected_aptc] = elected_aptc.to_f if session[:elected_aptc].to_f != elected_aptc.to_f
   end
 end

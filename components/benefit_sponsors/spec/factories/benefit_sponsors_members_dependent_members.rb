@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_members_dependent_member, class: 'BenefitSponsors::Members::DependentMember' do
     last_name     { "Jetson" }
@@ -5,11 +7,11 @@ FactoryBot.define do
     ssn do
       Forgery('basic').text(
         :exactly => 9,
-        :allow_numeric  => true,
-        :allow_lower    => false,
-        :allow_upper    => false,
-        :allow_special  => false
-        )
+        :allow_numeric => true,
+        :allow_lower => false,
+        :allow_upper => false,
+        :allow_special => false
+      )
     end
 
     trait :as_female_domestic_partner do

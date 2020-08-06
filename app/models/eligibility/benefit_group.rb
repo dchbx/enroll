@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Eligibility
   module BenefitGroup
-
     def eligible_on(date_of_hire)
       if effective_on_kind == "date_of_hire"
         date_of_hire
@@ -44,7 +45,7 @@ module Eligibility
     end
 
     ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-    def valid_plan_year    
+    def valid_plan_year
       if employer_profile.is_conversion?
         plan_year.is_conversion ? plan_year.employer_profile.renewing_plan_year : plan_year
       else

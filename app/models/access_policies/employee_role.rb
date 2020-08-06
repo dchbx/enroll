@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessPolicies
   class EmployeeRole
     attr_accessor :user
@@ -11,7 +13,7 @@ module AccessPolicies
       if !(user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s)
         controller.redirect_to_check_employee_role
       else
-        return true
+        true
       end
     end
 
@@ -26,11 +28,15 @@ module AccessPolicies
       end
       employers.map(&:id).map(&:to_s).include?(employer_id.to_s)
     end
-    
+
     def is_general_agency_staff_for_employer?(employer_id)
       person = user.person
       if person.general_agency_staff_roles.present?
-        person.general_agency_staff_roles.last.general_agency_profile.employer_clients.map(&:_id).include?(employer_id) rescue false
+        begin
+          person.general_agency_staff_roles.last.general_agency_profile.employer_clients.map(&:_id).include?(employer_id)
+        rescue StandardError
+          false
+        end
       else
         false
       end

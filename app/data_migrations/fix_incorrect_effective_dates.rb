@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FixIncorrectEffectiveDates < MongoidMigrationTask
 
   attr_accessor :plan_year_begin
@@ -13,7 +15,7 @@ class FixIncorrectEffectiveDates < MongoidMigrationTask
       id_list = plan_year.benefit_groups.map(&:id)
 
       families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-      families.inject([]) do |enrollments, family|
+      families.inject([]) do |_enrollments, family|
         family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).each do |enrollment|
           next if (plan_year.start_on..plan_year.end_on).cover?(enrollment.effective_on)
           if enrollment.benefit_group != enrollment.benefit_group_assignment.benefit_group
@@ -37,12 +39,10 @@ class FixIncorrectEffectiveDates < MongoidMigrationTask
       id_list = renewing_plan_year.benefit_groups.map(&:id)
 
       families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
-      families.inject([]) do |enrollments, family|
+      families.inject([]) do |_enrollments, family|
         family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).each do |enrollment|
 
-          if enrollment.renewing_waived? || enrollment.auto_renewing?
-            enrollment.cancel_coverage!
-          end
+          enrollment.cancel_coverage! if enrollment.renewing_waived? || enrollment.auto_renewing?
         end
       end
 
@@ -53,12 +53,12 @@ class FixIncorrectEffectiveDates < MongoidMigrationTask
   def organizations
     Organization.where(:"employer_profile.plan_years" =>
       { :$elemMatch => {:start_on => plan_year_begin.prev_year, :aasm_state.in => PlanYear::PUBLISHED}},
-      :"employer_profile.profile_source" => 'conversion')
+                       :"employer_profile.profile_source" => 'conversion')
   end
 
   def published_organizations
     Organization.where(:"employer_profile.plan_years" =>
       { :$elemMatch => {:start_on => plan_year_begin, :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE}},
-      :"employer_profile.profile_source" => 'conversion')
+                       :"employer_profile.profile_source" => 'conversion')
   end
 end

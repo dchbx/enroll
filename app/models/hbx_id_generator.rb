@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 class HbxIdGenerator
@@ -50,7 +52,7 @@ class HbxIdGenerator
       retry_attempt = 0
       while (retry_attempt < 3) && request_result.nil?
         request_result = Acapi::Requestor.request("sequence.next", {:sequence_name => sequence_name}, 2)
-        retry_attempt = retry_attempt + 1
+        retry_attempt += 1
       end
       JSON.load(request_result.stringify_keys["body"]).first.to_s
     end
@@ -96,7 +98,5 @@ class HbxIdGenerator
 end
 
 # Fix slug setting on request reload
-unless Rails.env.production?
-  HbxIdGenerator.slug!
-end
+HbxIdGenerator.slug! unless Rails.env.production?
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationFactory
@@ -8,7 +10,7 @@ module BenefitSponsors
         new(benefit_sponsorship, args).benefit_application
       end
 
-      def self.validate(benefit_application)
+      def self.validate(_benefit_application)
         # TODO: Add validations
         # Validate open enrollment period
         true
@@ -21,9 +23,7 @@ module BenefitSponsors
         @benefit_application.pull_benefit_sponsorship_attributes
       end
 
-      def benefit_application
-        @benefit_application
-      end
+      attr_reader :benefit_application
 
       protected
 

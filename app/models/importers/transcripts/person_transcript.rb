@@ -1,5 +1,6 @@
+# frozen_string_literal: true
+
 module Importers::Transcripts
-  
   class StaleRecordError < StandardError; end
 
   class PersonTranscript
@@ -10,8 +11,8 @@ module Importers::Transcripts
     ENUMERATION_FIELDS = {
       addresses: { enumeration_field: "kind", enumeration: ["home", "work", "mailing", "primary"] },
       phones: { enumeration_field: "kind", enumeration: Phone::KINDS },
-      emails: { enumeration_field: "kind", enumeration: Email::KINDS },
-    }
+      emails: { enumeration_field: "kind", enumeration: Email::KINDS }
+    }.freeze
 
     DEPENDENT_SOURCE_RULE_MAP = {
       base: {
@@ -53,7 +54,7 @@ module Importers::Transcripts
         update: 'edi',
         remove: 'ignore'
       }
-    }
+    }.freeze
 
     SUBSCRIBER_SOURCE_RULE_MAP = {
       base: {
@@ -61,7 +62,7 @@ module Importers::Transcripts
         update: {
           hbx_id: 'edi',
           first_name: 'edi',
-          middle_name: 'edi', 
+          middle_name: 'edi',
           last_name: 'edi',
           name_sfx: 'edi',
           dob: 'ignore',
@@ -89,7 +90,7 @@ module Importers::Transcripts
         update: 'edi',
         remove: 'ignore'
       }
-    }
+    }.freeze
 
 
     SOURCE_RULE_MAP = {
@@ -97,7 +98,7 @@ module Importers::Transcripts
         add: {
           hbx_id: 'edi',
           first_name: 'edi',
-          middle_name: 'edi', 
+          middle_name: 'edi',
           last_name: 'edi',
           name_sfx: 'edi',
           dob: 'edi',
@@ -107,12 +108,12 @@ module Importers::Transcripts
         update: {
           hbx_id: 'edi',
           first_name: 'edi',
-          middle_name: 'edi', 
+          middle_name: 'edi',
           last_name: 'edi',
           name_sfx: 'edi',
           dob: 'edi',
           ssn: 'edi',
-          gender: 'ignore'  
+          gender: 'ignore'
         },
         remove: {
           no_dc_address: 'ignore',
@@ -137,7 +138,7 @@ module Importers::Transcripts
         update: 'edi',
         remove: 'ignore'
       }
-    }
+    }.freeze
 
     def process
       @updates = {}
@@ -164,9 +165,9 @@ module Importers::Transcripts
     def add(section, attributes)
       rule = find_rule_set(section, :add)
 
-      @updates[:add] ||= {} 
-      @updates[:add][section] ||= {} 
- 
+      @updates[:add] ||= {}
+      @updates[:add][section] ||= {}
+
       if section == :base
         attributes.each do |field, value|
           if rule == 'edi' || (rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')) || (@market == 'shop' && !@is_subscriber && field.to_s == 'middle_name')
@@ -175,7 +176,7 @@ module Importers::Transcripts
               @person.update!({field => value})
               log_success(:add, section, field)
             rescue Exception => e
-              @updates[:add][section][field] = ["Failed", "#{e.inspect}"]
+              @updates[:add][section][field] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:add, section, field)
@@ -192,8 +193,8 @@ module Importers::Transcripts
               end
               @person.send(section).create(association)
               log_success(:add, section, identifier)
-            rescue Exception => e 
-              @updates[:add][section][identifier] = ["Failed", "#{e.inspect}"]
+            rescue Exception => e
+              @updates[:add][section][identifier] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:add, section, identifier)
@@ -205,8 +206,8 @@ module Importers::Transcripts
     def update(section, attributes)
       rule = find_rule_set(section, :update)
 
-      @updates[:update] ||= {} 
-      @updates[:update][section] ||= {} 
+      @updates[:update] ||= {}
+      @updates[:update][section] ||= {}
 
       if section == :base
         attributes.each do |field, value|
@@ -216,7 +217,7 @@ module Importers::Transcripts
               @person.update!({field => value})
               log_success(:update, section, field)
             rescue Exception => e
-              @updates[:update][section][field] = ["Failed", "#{e.inspect}"]
+              @updates[:update][section][field] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:update, section, field)
@@ -229,25 +230,23 @@ module Importers::Transcripts
           if rule == 'edi'
 
             value.each do |key, v|
-              begin
-                validate_timestamp(section)
-                association = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
-                if association.blank?
-                  raise "#{section} #{identifier} record missing!"
-                end
 
-                if key == 'add' || key == 'update'
-                  association.update_attributes(v)
-                elsif key == 'remove'
-                  v.each do |field, val|
-                    association.update!({field => nil})
-                  end
-                end
+              validate_timestamp(section)
+              association = @person.send(section).detect{|assoc| assoc.send(enumerated_association[:enumeration_field]) == identifier}
+              raise "#{section} #{identifier} record missing!" if association.blank?
 
-                log_success(:update, section, identifier)
-              rescue Exception => e
-                @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+              if key == 'add' || key == 'update'
+                association.update_attributes(v)
+              elsif key == 'remove'
+                v.each do |field, _val|
+                  association.update!({field => nil})
+                end
               end
+
+              log_success(:update, section, identifier)
+            rescue Exception => e
+              @updates[:update][section][identifier] = ["Failed", e.inspect.to_s]
+
             end
           else
             log_ignore(:update, section, identifier)
@@ -259,11 +258,11 @@ module Importers::Transcripts
     def remove(section, attributes)
       rule = find_rule_set(section, :remove)
 
-      @updates[:remove] ||= {} 
-      @updates[:remove][section] ||= {} 
+      @updates[:remove] ||= {}
+      @updates[:remove][section] ||= {}
 
       if section == :base
-        attributes.each do |field, value|
+        attributes.each do |field, _value|
           dependent_fields_ignore = ['is_incarcerated','no_dc_address','no_dc_address_reason']
           if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi') || (@market == 'shop' && !@is_subscriber && dependent_fields_ignore.include?(field.to_s))
             begin
@@ -271,7 +270,7 @@ module Importers::Transcripts
               @person.update!({field => nil})
               log_success(:remove, section, field)
             rescue Exception => e
-              @updates[:remove][section][field] = ["Failed", "#{e.inspect}"]
+              @updates[:remove][section][field] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:remove, section, field)
@@ -279,7 +278,7 @@ module Importers::Transcripts
         end
       else
         enumerated_association = ENUMERATION_FIELDS[section]
-        attributes.each do |identifier, value|
+        attributes.each do |identifier, _value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[identifier.to_sym] == 'edi')
             begin
               validate_timestamp(section)
@@ -287,7 +286,7 @@ module Importers::Transcripts
               association.delete
               log_success(:remove, section, identifier)
             rescue Exception => e
-              @updates[:remove][section][identifier] = ["Failed", "#{e.inspect}"]
+              @updates[:remove][section][identifier] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:remove, section, identifier)
@@ -297,11 +296,11 @@ module Importers::Transcripts
     end
 
     def csv_row
-      if @transcript[:source_is_new]
-        person_details = [@transcript[:other]['hbx_id'], Person.decrypt_ssn(@transcript[:other]['encrypted_ssn']), @transcript[:other]['last_name'], @transcript[:other]['first_name']]
-      else
-        person_details = [@transcript[:source]['hbx_id'], Person.decrypt_ssn(@transcript[:source]['encrypted_ssn']), @transcript[:source]['last_name'], @transcript[:source]['first_name']]
-      end
+      person_details = if @transcript[:source_is_new]
+                         [@transcript[:other]['hbx_id'], Person.decrypt_ssn(@transcript[:other]['encrypted_ssn']), @transcript[:other]['last_name'], @transcript[:other]['first_name']]
+                       else
+                         [@transcript[:source]['hbx_id'], Person.decrypt_ssn(@transcript[:source]['encrypted_ssn']), @transcript[:source]['last_name'], @transcript[:source]['first_name']]
+                       end
 
       results = @comparison_result.changeset_sections.reduce([]) do |section_rows, section|
         actions = @comparison_result.changeset_section_actions [section]
@@ -313,7 +312,7 @@ module Importers::Transcripts
           rows += attributes.collect do |attribute, value|
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+              value.each{|_k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
             (person_details + [action, "#{section}:#{attribute}", value] + (@updates[action.to_sym][section][attribute] || []))
           end
@@ -332,12 +331,12 @@ module Importers::Transcripts
     def log_success(action, section, field)
       kind = (section == :base ? 'attribute' : 'record')
       @updates[action][section][field] = case action
-      when :add
-        ["Success", "Added #{field} #{kind} on #{section} using EDI source"]
-      when :update
-        ["Success", "Updated #{field} #{kind} on #{section} using EDI source"]
-      else
-        ["Success", "Removed #{field} on #{section}"]
+                                         when :add
+                                           ["Success", "Added #{field} #{kind} on #{section} using EDI source"]
+                                         when :update
+                                           ["Success", "Updated #{field} #{kind} on #{section} using EDI source"]
+                                         else
+                                           ["Success", "Removed #{field} on #{section}"]
       end
     end
 
@@ -356,9 +355,9 @@ module Importers::Transcripts
     def check_if_subscriber
       @is_subscriber = true if @person.primary_family.present?
       if family = @person.families.first
-        enrollment = family.active_household.hbx_enrollments.enrolled_and_renewing.detect{|e| 
+        enrollment = family.active_household.hbx_enrollments.enrolled_and_renewing.detect do |e|
           e.subscriber.hbx_id == @person.hbx_id
-        }
+        end
         @is_subscriber = true if enrollment.present?
       end
       @is_subscriber ||= false
@@ -367,9 +366,7 @@ module Importers::Transcripts
     def find_instance
       @person = Person.find(@transcript[:source]['_id'])
 
-      if @market == 'shop'
-        check_if_subscriber
-      end
+      check_if_subscriber if @market == 'shop'
     end
 
     def match_person
@@ -378,7 +375,7 @@ module Importers::Transcripts
         dob: @transcript[:other]['dob'],
         last_name: @transcript[:other]['last_name'],
         first_name: @transcript[:other]['first_name']
-        ).first
+      ).first
     end
 
     def create_new_person_record
@@ -396,24 +393,22 @@ module Importers::Transcripts
         else
           raise StaleRecordError, "Person already exists with Hbx ID #{match_person.hbx_id} and created on #{match_person.created_at.strftime('%m/%d/%Y')}"
         end
-      rescue Exception => e 
-        @updates[:new][:new]['ssn'] = ["Failed", "#{e.inspect}"]
+      rescue Exception => e
+        @updates[:new][:new]['ssn'] = ["Failed", e.inspect.to_s]
       end
     end
 
-    def validate_timestamp(section)
+    def validate_timestamp(_section)
       # if section == :base
-        if @transcript[:source]['updated_at'].present?
-          if @last_updated_at > @transcript[:source]['updated_at']
-            raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}"
-          end
+      if @transcript[:source]['updated_at'].present?
+        raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@last_updated_at.strftime('%m/%d/%Y')}" if @last_updated_at > @transcript[:source]['updated_at']
 
-          if @transcript[:other]['updated_at'].present?
-            if @last_updated_at > @transcript[:other]['updated_at']
-              raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
-            end
+        if @transcript[:other]['updated_at'].present?
+          if @last_updated_at > @transcript[:other]['updated_at']
+            raise StaleRecordError, "Change set unprocessed, source record has later updated date. source updated at: #{@last_updated_at.strftime('%m/%d/%Y')}, edi updated at: #{@transcript[:other]['updated_at'].strftime('%m/%d/%Y')}"
           end
         end
+      end
       # end
 
       # if section == :base

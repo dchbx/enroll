@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::BrokerProfile
 
@@ -19,17 +21,17 @@ module Notifier
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::BrokerProfile.new({
-        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        first_name: 'John',
-        last_name: 'Whitmore',
-        broker_agency_name: 'Best Brokers LLC',
-        email: 'john.whitmore@yopmail.com',
-        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
-        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y') ,
-        employer_name: 'North America Football Federation',
-        employer_poc_firstname: 'David',
-        employer_poc_lastname: 'Samules'
-        })
+                                                              notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              first_name: 'John',
+                                                              last_name: 'Whitmore',
+                                                              broker_agency_name: 'Best Brokers LLC',
+                                                              email: 'john.whitmore@yopmail.com',
+                                                              assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              employer_name: 'North America Football Federation',
+                                                              employer_poc_firstname: 'David',
+                                                              employer_poc_lastname: 'Samules'
+                                                            })
       notice.mailing_address = Notifier::MergeDataModels::Address.new
       notice
     end

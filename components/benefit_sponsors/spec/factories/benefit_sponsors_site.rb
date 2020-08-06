@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_site, class: 'BenefitSponsors::Site' do
     byline      { "ACME Healthcare" }
@@ -17,13 +19,13 @@ FactoryBot.define do
     # end
 
     trait :with_owner_exempt_organization do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
 
     trait :as_hbx_profile do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
@@ -39,13 +41,13 @@ FactoryBot.define do
     end
 
     trait :with_benefit_market_catalog do
-      after :create do |site, evaluator|
+      after :create do |site, _evaluator|
         create(:benefit_markets_benefit_market_catalog, benefit_market: site.benefit_markets[0])
       end
     end
 
     trait :with_benefit_market_catalog_and_product_packages do
-      after :create do |site, evaluator|
+      after :create do |site, _evaluator|
         create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: site.benefit_markets[0], issuer_profile: FactoryBot.create(:benefit_sponsors_organizations_issuer_profile))
       end
     end

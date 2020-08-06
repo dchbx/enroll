@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class Builders::EmployerProfile
     include ActionView::Helpers::NumberHelper
@@ -42,12 +44,12 @@ module Notifier
       office_address = employer_profile.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
-          street_1: office_address.address_1,
-          street_2: office_address.address_2,
-          city: office_address.city,
-          state: office_address.state,
-          zip: office_address.zip
-          })
+                                                                     street_1: office_address.address_1,
+                                                                     street_2: office_address.address_2,
+                                                                     city: office_address.city,
+                                                                     state: office_address.state,
+                                                                     zip: office_address.zip
+                                                                   })
       end
     end
 

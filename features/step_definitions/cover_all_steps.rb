@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin should see an DC Resident Application link$/) do
   find_link('DC Resident Application').visible?
 end
@@ -45,7 +47,7 @@ Then(/HBX Admin should see a form to enter personal information$/) do
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
+  fill_in "person_addresses_attributes_0_city", :with => "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
@@ -68,7 +70,7 @@ Then(/^Hbx Admin should see text Special Enrollment Period$/) do
 end
 
 When(/Hbx Admin click the "(.*?)" in qle carousel/) do |qle_event|
-  click_link "#{qle_event}"
+  click_link qle_event.to_s
 end
 
 When(/Hbx Admin select a past qle date/) do
@@ -138,7 +140,7 @@ Then(/^Hbx Admin should see the form being rendered to transition each family me
   expect(page).to have_content(/Transition User?/i)
 end
 
-When(/^Hbx Admin enter\/update information of each member individually$/) do
+When(%r{^Hbx Admin enter/update information of each member individually$}) do
   find("#transition_user", wait: 5).click
   find('input.date-picker').click
   find('.ui-state-highlight', wait: 5).click

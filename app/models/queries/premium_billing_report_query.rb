@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class PremiumBillingReportQuery
     attr_reader :search_string
@@ -10,7 +12,6 @@ module Queries
 
     def initialize(enroll_ids)
       @hbx_enrollment_ids = enroll_ids
-      
     end
 
     def skip(num)
@@ -42,7 +43,7 @@ module Queries
         enrollment_ids = {
           "$and" => [
             { 'households.hbx_enrollments.employee_role_id' => {"$in" => employee_roles} },
-            enrollment_ids 
+            enrollment_ids
           ]
         }
       end

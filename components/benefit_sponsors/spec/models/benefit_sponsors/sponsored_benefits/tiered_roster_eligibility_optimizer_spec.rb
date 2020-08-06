@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -9,7 +11,7 @@ module BenefitSponsors
     let(:roster_entry) do
       ::BenefitSponsors::Members::MemberGroup.new(
         roster_members,
-        group_enrollment: group_enrollment,
+        group_enrollment: group_enrollment
       )
     end
     let(:employee) do
@@ -50,12 +52,12 @@ module BenefitSponsors
       - with an 'employee_only' and 'family' groups (like CCA)
       - where all groups offered coverage by the sponsor" do
 
-      let(:contribution_model) { 
+      let(:contribution_model) do
         instance_double(
           ::BenefitMarkets::ContributionModels::ContributionModel,
           contribution_units: [family_contribution_unit]
         )
-      }
+      end
 
       let(:family_contribution_unit) do
         instance_double(
@@ -326,7 +328,8 @@ module BenefitSponsors
             employee_contribution_level,
             employee_and_spouse_contribution_level,
             employee_and_dependents_contribution_level,
-            family_contribution_level]
+            family_contribution_level
+]
         )
       end
 

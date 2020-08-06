@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PaperApplication < Document
 
   field :aws_key_id, type: String

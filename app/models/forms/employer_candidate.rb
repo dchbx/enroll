@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class EmployerCandidate
     include ActiveModel::Model
@@ -24,7 +26,7 @@ module Forms
         errors.add(
           :base,
           "This company already has a managing staff associated"
-          )
+        )
       end
 
       true

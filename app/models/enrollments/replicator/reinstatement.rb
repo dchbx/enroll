@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Enrollments
   module Replicator
     class Reinstatement
 
       attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment
 
-      def initialize(enrollment, effective_date, new_aptc=nil)
+      def initialize(enrollment, effective_date, new_aptc = nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
         @new_aptc = new_aptc
@@ -33,12 +35,8 @@ module Enrollments
       def renewal_benefit_group_assignment
         assignment = census_employee.renewal_benefit_group_assignment
         if assignment.blank?
-          if census_employee.active_benefit_group_assignment.blank?
-            census_employee.save
-          end
-          if renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
-            assignment = census_employee.published_benefit_group_assignment
-          end
+          census_employee.save if census_employee.active_benefit_group_assignment.blank?
+          assignment = census_employee.published_benefit_group_assignment if renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
         end
         assignment
       end
@@ -89,9 +87,7 @@ module Enrollments
 
       def can_be_reinstated?
         if reinstate_under_renewal_py?
-          if !renewal_plan_offered_by_er?(reinstatement_plan)
-            raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})."
-          end
+          raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})." unless renewal_plan_offered_by_er?(reinstatement_plan)
         end
         true
       end
@@ -171,10 +167,10 @@ module Enrollments
       def clone_hbx_enrollment_members
         base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
           members << HbxEnrollmentMember.new({
-                                                 applicant_id: hbx_enrollment_member.applicant_id,
-                                                 eligibility_date: new_effective_date,
-                                                 coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
-                                                 is_subscriber: hbx_enrollment_member.is_subscriber
+                                               applicant_id: hbx_enrollment_member.applicant_id,
+                                               eligibility_date: new_effective_date,
+                                               coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
+                                               is_subscriber: hbx_enrollment_member.is_subscriber
                                              })
         end
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Subscribers
     class EmployerBenefitRenewalSubscriber
@@ -12,7 +14,7 @@ module BenefitSponsors
         )
       end
 
-      def work_with_params(body, delivery_info, properties)
+      def work_with_params(_body, _delivery_info, properties)
         headers = properties.headers || {}
         stringed_payload = headers.stringify_keys
         benefit_sponsorship_id_string = stringed_payload["benefit_sponsorship_id"]
@@ -37,7 +39,7 @@ module BenefitSponsors
         new_date = validation.output[:new_date]
 
         benefit_sponsorship = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:id => benefit_sponsorship_id).first
- 
+
         unless benefit_sponsorship
           notify(
             "acapi.error.events.benefit_sponsorship.execute_benefit_renewal.benefit_sponsorship_not_found", {
@@ -45,8 +47,8 @@ module BenefitSponsors
               :benefit_sponsorship_id => benefit_sponsorship_id_string,
               :new_date => new_date_string,
               :body => JSON.dump({
-                "benefit sponsorship" => ["can't be found"]
-              })
+                                   "benefit sponsorship" => ["can't be found"]
+                                 })
             }.merge(extract_response_params(properties))
           )
           return :ack
@@ -63,10 +65,10 @@ module BenefitSponsors
               :benefit_sponsorship_id => benefit_sponsorship_id_string,
               :new_date => new_date_string,
               :body => JSON.dump({
-                :error => e.inspect,
-                :message => e.message,
-                :backtrace => e.backtrace
-              })
+                                   :error => e.inspect,
+                                   :message => e.message,
+                                   :backtrace => e.backtrace
+                                 })
             }.merge(extract_response_params(properties))
           )
           return :reject

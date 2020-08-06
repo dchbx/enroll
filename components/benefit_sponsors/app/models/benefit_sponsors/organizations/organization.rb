@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Organization
 # Base class for any business, government agency, or other organized entity
 module BenefitSponsors
@@ -9,21 +11,21 @@ module BenefitSponsors
       include BenefitSponsors::Concerns::Observable
       include BenefitSponsors::ModelEvents::Organization
 
-      ENTITY_KINDS =[
+      ENTITY_KINDS = [
         :tax_exempt_organization,
         :c_corporation,
         :s_corporation,
         :partnership,
         :limited_liability_corporation,
         :limited_liability_partnership,
-        :household_employer,
-      ]
+        :household_employer
+      ].freeze
 
       EXEMPT_ENTITY_KINDS = [
         :governmental_employer,
         :foreign_embassy_or_consulate,
-        :health_insurance_exchange,
-      ]
+        :health_insurance_exchange
+      ].freeze
 
       DC_ENTITY_KINDS = [
         :tax_exempt_organization,
@@ -58,7 +60,7 @@ module BenefitSponsors
       # Federal Employer ID Number
       field :fein, type: String
 
-      # TODO -- track history on changes
+      # TODO: -- track history on changes
       # field :updated_by, type: Symbol
 
 
@@ -69,11 +71,11 @@ module BenefitSponsors
       # org_a.divisions << org_b  # org_b.agency => org_a
       # org_x.agency = org_y      # org_y.divisions => [org_x]
       belongs_to  :agency, inverse_of: :divisions, counter_cache: true,
-                  class_name: "BenefitSponsors::Organizations::Organization",
-                  optional: true
+                           class_name: "BenefitSponsors::Organizations::Organization",
+                           optional: true
 
       has_many    :divisions, inverse_of: :agency, autosave: true,
-                  class_name: "BenefitSponsors::Organizations::Organization"
+                              class_name: "BenefitSponsors::Organizations::Organization"
 
 
       # PlanDesignOrganization (an Organization subclass) association enables an organization
@@ -86,26 +88,26 @@ module BenefitSponsors
       # Example 2: an Employer may prepare one or more plan designs for future coverage.
       # Under this scenario, the Employer is both the plan_design_author and the plan_design_subject
       has_and_belongs_to_many :plan_design_authors, inverse_of: :plan_design_subjects, autosave: true,
-                              class_name: "BenefitSponsors::Organizations::Organization"
+                                                    class_name: "BenefitSponsors::Organizations::Organization"
 
       has_and_belongs_to_many :plan_design_subjects, inverse_of: :plan_design_authors, autosave: true,
-                              class_name: "BenefitSponsors::Organizations::Organization"
+                                                     class_name: "BenefitSponsors::Organizations::Organization"
 
       has_many    :plan_design_organizations, inverse_of: :plan_design_organization,
-                  class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
+                                              class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
       has_many    :plan_design_subject_organizations, inverse_of: :subject_organization,
-                  class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
+                                                      class_name: "BenefitSponsors::Organizations::PlanDesignOrganization"
 
 
       # Organizations with EmployerProfile and HbxProfile belong to a Site
       belongs_to  :site, inverse_of: :site_organizations, counter_cache: true,
-                  class_name: "BenefitSponsors::Site",
-                  optional: true
+                         class_name: "BenefitSponsors::Site",
+                         optional: true
 
       belongs_to  :site_owner, inverse_of: :owner_organization,
-                  class_name: "BenefitSponsors::Site",
-                  optional: true
+                               class_name: "BenefitSponsors::Site",
+                               optional: true
 
       embeds_many :profiles,
                   class_name: "BenefitSponsors::Organizations::Profile", cascade_callbacks: true
@@ -144,36 +146,36 @@ module BenefitSponsors
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
       scope :all_agency_profiles,     ->{ where(:"profiles._type" => /.*AgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
-      scope :by_general_agency_profile,       ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
+      scope :by_general_agency_profile,       ->(general_agency_profile_id) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
 
-      scope :broker_agencies_by_market_kind,  ->( market_kind ) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
+      scope :broker_agencies_by_market_kind,  ->(market_kind) { broker_agency_profiles.any_in(:"profiles.market_kind" => market_kind) }
       scope :approved_broker_agencies,        ->{ broker_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
       scope :approved_general_agencies,        ->{ general_agency_profiles.where(:"profiles.aasm_state" => 'is_approved') }
 
-      scope :by_employer_profile,             ->( profile_id ){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
-      scope :employer_by_hbx_id,              ->( hbx_id ){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
-      scope :broker_by_hbx_id,                ->( hbx_id ){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
-      scope :employer_by_fein,                ->( fein ){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
+      scope :by_employer_profile,             ->(profile_id){ where(:"profiles._id" => BSON::ObjectId.from_string(profile_id)) }
+      scope :employer_by_hbx_id,              ->(hbx_id){ where(:"profiles._type" => /.*EmployerProfile$/, hbx_id: hbx_id)}
+      scope :broker_by_hbx_id,                ->(hbx_id){ where(:"profiles._type" => /.*BrokerAgencyProfile$/, hbx_id: hbx_id)}
+      scope :employer_by_fein,                ->(fein){ where(:"profiles._type" => /.*EmployerProfile$/, fein: fein)}
 
-      scope :'employer_profiles_renewing_application_pending', -> {}
-      scope :'employer_profiles_renewing_open_enrollment',     -> {}
+      scope :employer_profiles_renewing_application_pending, -> {}
+      scope :employer_profiles_renewing_open_enrollment,     -> {}
 
-      scope :'employer_profiles_initial_application_pending',  -> {}
-      scope :'employer_profiles_initial_open_enrollment',      -> {}
-      scope :'employer_profiles_binder_pending',               -> {}
-      scope :'employer_profiles_binder_paid',                  -> {}
+      scope :employer_profiles_initial_application_pending,  -> {}
+      scope :employer_profiles_initial_open_enrollment,      -> {}
+      scope :employer_profiles_binder_pending,               -> {}
+      scope :employer_profiles_binder_paid,                  -> {}
 
 
-      scope :'employer_profiles_enrolled', -> {}
-      scope :'employer_profiles_suspended', -> {}
+      scope :employer_profiles_enrolled, -> {}
+      scope :employer_profiles_suspended, -> {}
 
       scope :employer_profiles_enrolling,     -> {}
       scope :employer_profiles_enrolled,      -> {}
 
-      scope :'employer_profiles_enrolling',   -> {}
-      scope :'employer_profiles_initial_eligible', -> {}
-      scope :'employer_profiles_renewing',    -> {}
-      scope :'employer_profiles_enrolling',   -> {}
+      scope :employer_profiles_enrolling,   -> {}
+      scope :employer_profiles_initial_eligible, -> {}
+      scope :employer_profiles_renewing,    -> {}
+      scope :employer_profiles_enrolling,   -> {}
 
       scope :employer_attestations,           -> {}
       scope :employer_attestations_submitted, -> {}
@@ -181,11 +183,11 @@ module BenefitSponsors
       scope :employer_attestations_approved,  -> {}
       scope :employer_attestations_denied,    -> {}
 
-      scope :'employer_profiles_applicants',  -> {}
-      scope :'employer_profiles_enrolling',   -> {}
-      scope :'employer_profiles_enrolled',    -> {}
+      scope :employer_profiles_applicants,  -> {}
+      scope :employer_profiles_enrolling,   -> {}
+      scope :employer_profiles_enrolled,    -> {}
 
-      scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
+      scope :datatable_search, ->(query) { self.where({"$or" => [{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}]}) }
 
       #
       # API fields
@@ -193,15 +195,15 @@ module BenefitSponsors
 
       # For API. Going to look at better serialization
       def agency_profile_id
-          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._id.to_s
+        self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._id.to_s
       end
 
       def agency_profile_type
-          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._type
+        self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._type
       end
 
       def organization_id
-          self._id
+        self._id
       end
 
       #
@@ -240,7 +242,11 @@ module BenefitSponsors
       def update_benefit_sponsorship(profile)
         rating_area = ::BenefitMarkets::Locations::RatingArea.rating_area_for(profile.primary_office_location.address)
         service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(profile.primary_office_location.address)
-        rating_area_id = rating_area.id.to_s rescue nil
+        rating_area_id = begin
+                           rating_area.id.to_s
+                         rescue StandardError
+                           nil
+                         end
         active_benefit_sponsorship.assign_attributes(rating_area_id: rating_area_id)
         active_benefit_sponsorship.service_areas = service_areas
         active_benefit_sponsorship
@@ -255,7 +261,7 @@ module BenefitSponsors
       end
 
       # Deprecate latest_benefit_sponsorship_for
-      alias_method :latest_benefit_sponsorship_for, :most_recent_benefit_sponsorship_for
+      alias latest_benefit_sponsorship_for most_recent_benefit_sponsorship_for
 
       def find_benefit_sponsorships(ids)
         benefit_sponsorships.find(ids)
@@ -302,7 +308,7 @@ module BenefitSponsors
       end
 
       def active_benefit_sponsorship
-        #TODO pull the correct benefit sponsorship
+        #TODO: pull the correct benefit sponsorship
         benefit_sponsorships.first
       end
 
@@ -313,16 +319,16 @@ module BenefitSponsors
         if bs_without_date.count > 0
           benefit_sponsorship =  bs_without_date.first
         elsif bs_having_start_date.count > 0
-          benefit_sponsorship = bs_having_start_date.order_by(&:'effective_being_on'.desc).first
+          benefit_sponsorship = bs_having_start_date.order_by(&:effective_being_on.desc).first
         end
       end
 
       def benefit_sponsorships_without_benefit_application
-        benefit_sponsorships.where(:'effective_being_on' => nil )
+        benefit_sponsorships.where(:effective_being_on => nil)
       end
 
       def benefit_sponsorships_with_benefit_application
-        benefit_sponsorships.where(:'effective_being_on' => {'$ne' => nil})
+        benefit_sponsorships.where(:effective_being_on => {'$ne' => nil})
       end
 
       class << self
@@ -334,10 +340,10 @@ module BenefitSponsors
         def search_hash(s_rex)
           search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
           {
-            "$or" => ([
+            "$or" => [
               {"legal_name" => search_rex},
-              {"fein" => search_rex},
-            ])
+              {"fein" => search_rex}
+            ]
           }
         end
 
@@ -353,10 +359,10 @@ module BenefitSponsors
         def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
             orgs2 = approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
-              :"profiles._id" => {
-                "$in" => Person.agencies_with_matching_broker(search_params[:q])
-              }
-            })
+                                                                                                      :"profiles._id" => {
+                                                                                                        "$in" => Person.agencies_with_matching_broker(search_params[:q])
+                                                                                                      }
+                                                                                                    })
 
             brokers = Person.brokers_matching_search_criteria(search_params[:q])
             if brokers.any?
@@ -391,16 +397,16 @@ module BenefitSponsors
               search_params.delete(:q)
 
               if search_params.empty?
-                return filter_general_agencies_by_primary_roles(organizations, staff)
+                filter_general_agencies_by_primary_roles(organizations, staff)
               else
                 agencies_matching_advanced_criteria = organizations.where({ "$and" => build_query_params(search_params) })
-                return filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, staff)
+                filter_general_agencies_by_primary_roles(agencies_matching_advanced_criteria, staff)
               end
             elsif value
-              return organizations.where({"$and" => build_query_params(search_params) })
+              organizations.where({"$and" => build_query_params(search_params) })
             end
           elsif search_params[:q].blank? && value
-            return []
+            []
           end
         end
 
@@ -418,18 +424,14 @@ module BenefitSponsors
         def build_query_params(search_params)
           query_params = []
 
-          if !search_params[:q].blank?
+          unless search_params[:q].blank?
             q = ::Regexp.new(::Regexp.escape(search_params[:q].strip), true)
             query_params << { "legal_name" => q }
           end
 
-          if !search_params[:languages].blank?
-            query_params << { :"profiles.languages_spoken" => { "$in" => search_params[:languages]} }
-          end
+          query_params << { :"profiles.languages_spoken" => { "$in" => search_params[:languages]} } unless search_params[:languages].blank?
 
-          if !search_params[:working_hours].blank?
-            query_params << { :"profiles.working_hours" => eval(search_params[:working_hours])}
-          end
+          query_params << { :"profiles.working_hours" => eval(search_params[:working_hours])} unless search_params[:working_hours].blank?
 
           query_params
         end
@@ -451,7 +453,7 @@ module BenefitSponsors
       end
 
       def is_benefit_sponsor?
-        profiles.any? { |profile| profile.is_benefit_sponsorship_eligible? }
+        profiles.any?(&:is_benefit_sponsorship_eligible?)
       end
     end
   end

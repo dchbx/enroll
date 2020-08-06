@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencies::ProfilesController < ApplicationController
   include Acapi::Notifiers
   include ::Config::AcaConcern
@@ -16,10 +18,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
   layout 'single_column'
 
   EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
-    "2"     => "legal_name",
-    "4"     => "employer_profile.aasm_state",
-    "5"     => "employer_profile.plan_years.start_on"
-  }
+    "2" => "legal_name",
+    "4" => "employer_profile.aasm_state",
+    "5" => "employer_profile.plan_years.start_on"
+  }.freeze
 
   def index
     @broker_agency_profiles = BrokerAgencyProfile.all
@@ -45,9 +47,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def show
     set_flash_by_announcement
     session[:person_id] = nil
-     @provider = @broker_agency_profile.primary_broker_role.person
-     @staff_role = current_user.has_broker_agency_staff_role?
-     @id=params[:id]
+    @provider = @broker_agency_profile.primary_broker_role.person
+    @staff_role = current_user.has_broker_agency_staff_role?
+    @id = params[:id]
   end
 
   def edit
@@ -79,9 +81,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
     if @organization.update_attributes(broker_profile_params)
       office_location = @organization.primary_office_location
-      if office_location.present?
-        update_broker_phone(office_location, person)
-      end
+      update_broker_phone(office_location, person) if office_location.present?
 
       flash[:notice] = "Successfully Update Broker Agency Profile"
       redirect_to broker_agencies_profile_path(@broker_agency_profile)
@@ -102,11 +102,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @staff = eligible_brokers
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
-    if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
-    else
-      @staff = @staff.where(last_name: /^#{@q}/i)
-    end
+    @staff = if @q.nil?
+               @staff.where(last_name: /^#{page_no}/i)
+             else
+               @staff.where(last_name: /^#{@q}/i)
+             end
   end
 
   def family_datatable
@@ -186,9 +186,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       return
     end
     documents = @broker_agency_profile.organization.documents
-    if documents
-      @statements = get_commission_statements(documents)
-    end
+    @statements = get_commission_statements(documents) if documents
     collect_and_sort_commission_statements
     respond_to do |format|
       format.js
@@ -196,18 +194,18 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def show_commission_statement
-    options={}
+    options = {}
     options[:filename] = @commission_statement.title
     options[:type] = 'application/pdf'
     options[:disposition] = 'inline'
-    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+    send_data Aws::S3Storage.find(@commission_statement.identifier), options
   end
 
   def download_commission_statement
-    options={}
+    options = {}
     options[:content_type] = @commission_statement.type
     options[:filename] = @commission_statement.title
-    send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+    send_data Aws::S3Storage.find(@commission_statement.identifier), options
   end
 
   def employers
@@ -229,15 +227,23 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def set_default_ga
     authorize @broker_agency_profile, :set_default_ga?
-    @general_agency_profile = GeneralAgencyProfile.find(params[:general_agency_profile_id]) rescue nil
+    @general_agency_profile = begin
+                                GeneralAgencyProfile.find(params[:general_agency_profile_id])
+                              rescue StandardError
+                                nil
+                              end
     if @broker_agency_profile.present?
-      old_default_ga_id = @broker_agency_profile.default_general_agency_profile.id.to_s rescue nil
+      old_default_ga_id = begin
+                            @broker_agency_profile.default_general_agency_profile.id.to_s
+                          rescue StandardError
+                            nil
+                          end
       if params[:type] == 'clear'
         @broker_agency_profile.default_general_agency_profile = nil
       elsif @general_agency_profile.present?
         @broker_agency_profile.default_general_agency_profile = @general_agency_profile
         @broker_agency_profile.employer_clients.each do |employer_profile|
-          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA 
+          @general_agency_profile.general_agency_hired_notice(employer_profile) # GA notice when broker selects a default GA
         end
       end
       @broker_agency_profile.save
@@ -282,11 +288,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       is_search = true
     end
 
-    employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map { |o| o.employer_profile } unless @orgs.blank?
+    employer_profiles = @orgs.skip(dt_query.skip).limit(dt_query.take).map(&:employer_profile) unless @orgs.blank?
     employer_ids = employer_profiles.present? ? employer_profiles.map(&:id) : []
     @census_totals = Hash.new(0)
     census_member_counts = CensusMember.collection.aggregate([
-      { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+      { "$match" => {aasm_state: {"$in" => CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
       { "$group" => {"_id" => "$employer_profile_id", "count" => {"$sum" => 1}}}
     ])
     census_member_counts.each do |cmc|
@@ -297,16 +303,13 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @records_filtered = is_search ? @orgs.count : total_records
     @total_records = total_records
     broker_role = current_user.person.broker_role || nil
-    if general_agency_is_enabled?
-      @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true)
-    end
+    @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(broker_role, approved_only: true) if general_agency_is_enabled?
     @draw = dt_query.draw
     @employer_profiles = employer_profiles.present? ? employer_profiles : []
     render
   end
 
   def assign
-
     page_string = params.permit(:employers_page)[:employers_page]
     page_no = page_string.blank? ? nil : page_string.to_i
     if current_user.has_broker_agency_staff_role? || current_user.has_hbx_staff_role?
@@ -330,7 +333,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       case params[:type]
       when 'fire'
         params[:employer_ids].each do |employer_id|
-          employer_profile = EmployerProfile.find(employer_id) rescue next
+          employer_profile = begin
+                               EmployerProfile.find(employer_id)
+                             rescue StandardError
+                               next
+                             end
 
           employer_profile.fire_general_agency!
           send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Terminate')
@@ -338,42 +345,53 @@ class BrokerAgencies::ProfilesController < ApplicationController
         notice = "Fire these employers successful."
       else
         employer_ids = if params.key? :bulk_actions_resources
-        params[:bulk_actions_resources].map do |pdo_id|
-          SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
-        end
-        else
-          params[:employer_ids]
+                         params[:bulk_actions_resources].map do |pdo_id|
+                           SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
+                         end
+                       else
+                         params[:employer_ids]
         end
         employer_ids.each do |employer_id|
-          employer_profile = EmployerProfile.find(employer_id) rescue nil
-          if employer_profile.present? #FIXME : Please move me to model
-            broker_role_id = current_user.person.broker_role.id rescue nil
-            broker_role_id ||= @broker_agency_profile.primary_broker_role_id
-            employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
-            employer_profile.save
-            send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
-            general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
-          end
+          employer_profile = begin
+                               EmployerProfile.find(employer_id)
+                             rescue StandardError
+                               nil
+                             end
+          next unless employer_profile.present? #FIXME : Please move me to model
+          broker_role_id = begin
+                               current_user.person.broker_role.id
+                           rescue StandardError
+                             nil
+                             end
+          broker_role_id ||= @broker_agency_profile.primary_broker_role_id
+          employer_profile.hire_general_agency(general_agency_profile, broker_role_id)
+          employer_profile.save
+          send_general_agency_assign_msg(general_agency_profile, employer_profile, 'Hire')
+          general_agency_profile.general_agency_hired_notice(employer_profile) #GA notice when broker Assign a GA to employers
         end
-        flash.now[:notice] ="Assign successful."
+        flash.now[:notice] = "Assign successful."
         if params["from_assign"] == "true"
           assign # calling this method as the latest copy of objects are needed.
-          render "assign" and return
+          render("assign") && return
         else
           employers # calling this method as the latest copy of objects are needed.
-          render "update_assign" and return
+          render("update_assign") && return
         end
       end
     elsif params["commit"].try(:downcase) == "clear assignment"
       employer_ids = if params.key? :bulk_actions_resources
-      params[:bulk_actions_resources].map do |pdo_id|
-        SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
-      end
-      else
-        params[:employer_ids]
+                       params[:bulk_actions_resources].map do |pdo_id|
+                         SponsoredBenefits::Organizations::PlanDesignOrganization.find(pdo_id).employer_profile.id
+                       end
+                     else
+                       params[:employer_ids]
       end
       employer_ids.each do |employer_id|
-        employer_profile = EmployerProfile.find(employer_id) rescue next
+        employer_profile = begin
+                             EmployerProfile.find(employer_id)
+                           rescue StandardError
+                             next
+                           end
         if employer_profile.general_agency_profile.present?
           send_general_agency_assign_msg(employer_profile.general_agency_profile, employer_profile, 'Terminate')
           employer_profile.fire_general_agency!
@@ -387,7 +405,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def clear_assign_for_employer
     @broker_role = current_user.person.broker_role || nil
     @general_agency_profiles = GeneralAgencyProfile.all_by_broker_role(@broker_role, approved_only: true)
-    @employer_profile = EmployerProfile.find(params[:employer_id]) rescue nil
+    @employer_profile = begin
+                          EmployerProfile.find(params[:employer_id])
+                        rescue StandardError
+                          nil
+                        end
     authorize @employer_profile, :fire_general_agency?
     if @employer_profile.present?
       send_general_agency_assign_msg(@employer_profile.general_agency_profile, @employer_profile, 'Terminate')
@@ -405,7 +427,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
       broker_role_id = @broker_agency_profile.present? ? @broker_agency_profile.primary_broker_role_id : current_user.person.broker_role.id
       @general_agency_account_history = Kaminari.paginate_array(GeneralAgencyAccount.find_by_broker_role_id(broker_role_id)).page page_no
     else
-      @general_agency_account_history = Kaminari.paginate_array(Array.new)
+      @general_agency_account_history = Kaminari.paginate_array([])
     end
   end
 
@@ -427,14 +449,14 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def inbox
     @sent_box = true
-    id = params["id"]||params['profile_id']
+    id = params["id"] || params['profile_id']
     @broker_agency_provider = BrokerAgencyProfile.find(id)
     @folder = (params[:folder] || 'Inbox').capitalize
-    if current_user.person._id.to_s == id
-      @provider = current_user.person
-    else
-      @provider = @broker_agency_provider
-    end
+    @provider = if current_user.person._id.to_s == id
+                  current_user.person
+                else
+                  @broker_agency_provider
+                end
   end
 
   def redirect_to_show(broker_agency_profile_id)
@@ -471,28 +493,26 @@ class BrokerAgencies::ProfilesController < ApplicationController
   def sanitize_broker_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+      location.delete('phone_attributes') if location['phone_attributes'].present? && location['phone_attributes']['number'].blank?
     end
   end
 
   def check_and_download_commission_statement
-      @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
-      authorize @broker_agency_profile, :access_to_broker_agency_profile?
-      @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
+    @broker_agency_profile = BrokerAgencyProfile.find(params[:id])
+    authorize @broker_agency_profile, :access_to_broker_agency_profile?
+    @commission_statement = @broker_agency_profile.organization.documents.find(params[:statement_id])
   end
 
   def get_commission_statements(documents)
     commission_statements = []
     documents.each do |document|
       # grab only documents that are commission statements by checking the bucket in which they are placed
-      if document.identifier.include?("commission-statements")
-        commission_statements << document
-      end
+      commission_statements << document if document.identifier.include?("commission-statements")
     end
     commission_statements
   end
 
-  def collect_and_sort_commission_statements(sort_order='ASC')
+  def collect_and_sort_commission_statements(_sort_order = 'ASC')
     @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
     #sort_order == 'ASC' ? @statements.sort_by!(&:date) : @statements.sort_by!(&:date).reverse!
     @statements.sort_by!(&:date).reverse!
@@ -534,17 +554,21 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def eligible_brokers
-    Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state'=> 'active').any_in(:'broker_role.market_kind'=>[person_market_kind, "both"])
+    Person.where('broker_role.broker_agency_profile_id': {:$exists => true}).where(:'broker_role.aasm_state' => 'active').any_in(:'broker_role.market_kind' => [person_market_kind, "both"])
   end
 
-  def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
+  def update_ga_for_employers(broker_agency_profile, old_default_ga = nil)
     return if broker_agency_profile.blank?
 
     orgs = Organization.by_broker_agency_profile(broker_agency_profile.id)
-    employer_profiles = orgs.map {|o| o.employer_profile}
+    employer_profiles = orgs.map(&:employer_profile)
     if broker_agency_profile.default_general_agency_profile.blank?
       employer_profiles.each do |employer_profile|
-        general_agency = employer_profile.active_general_agency_account.general_agency_profile rescue nil
+        general_agency = begin
+                           employer_profile.active_general_agency_account.general_agency_profile
+                         rescue StandardError
+                           nil
+                         end
         if general_agency && general_agency == old_default_ga
           send_general_agency_assign_msg(general_agency, employer_profile, 'Terminate')
           employer_profile.fire_general_agency!

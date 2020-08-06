@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   # Delete a local file resource.
   class Steps::DeleteFile < Steps::Step
@@ -14,8 +16,8 @@ module TransportProfiles
 
     # @!visibility private
     def resolve_files(process_context)
-      found_name = @path.kind_of?(Symbol) ? process_context.get(@path) : @path
-      found_name.kind_of?(Array) ? found_name : [found_name]
+      found_name = @path.is_a?(Symbol) ? process_context.get(@path) : @path
+      found_name.is_a?(Array) ? found_name : [found_name]
     end
 
     # @!visibility private

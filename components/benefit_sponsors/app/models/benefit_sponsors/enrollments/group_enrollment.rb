@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class Enrollments::GroupEnrollment
     include ActiveModel::Model
@@ -14,12 +16,12 @@ module BenefitSponsors
       @product                    = nil
       @previous_product           = nil
 
-      @product_cost_total         = 0.00
+      @product_cost_total = 0.00
 
       @benefit_sponsor            = nil
       @sponsor_contribution_total = 0.00
 
-      @member_enrollments         = []
+      @member_enrollments = []
       @rate_schedule_date = nil
       @rating_area = nil
       super(opts)
@@ -34,23 +36,23 @@ module BenefitSponsors
 
     def clone_for_coverage(new_product)
       self.class.new({
-        group_id: @group_id,
-        coverage_start_on: @coverage_start_on,
-        benefit_sponsor: @benefit_sponsor,
-        previous_product: @previous_product,
-        product: new_product,
-        rate_schedule_date: @rate_schedule_date,
-        rating_area: @rating_area,
-        member_enrollments: member_enrollments.map(&:clone_for_coverage),
-        sponsor_contribution_prohibited: @sponsor_contribution_prohibited
-      })
+                       group_id: @group_id,
+                       coverage_start_on: @coverage_start_on,
+                       benefit_sponsor: @benefit_sponsor,
+                       previous_product: @previous_product,
+                       product: new_product,
+                       rate_schedule_date: @rate_schedule_date,
+                       rating_area: @rating_area,
+                       member_enrollments: member_enrollments.map(&:clone_for_coverage),
+                       sponsor_contribution_prohibited: @sponsor_contribution_prohibited
+                     })
     end
 
     def employee_cost_total
       product_cost_total - sponsor_contribution_total
     end
 
-    def as_json(params = {})
+    def as_json(_params = {})
       super(except: ['product', 'previous_product']).merge({ product: product.as_json(except: 'premium_tables'), previous_product: previous_product.as_json(except: 'premium_tables') })
     end
 

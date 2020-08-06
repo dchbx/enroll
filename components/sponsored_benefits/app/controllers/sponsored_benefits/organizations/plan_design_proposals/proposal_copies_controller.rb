@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposals::ProposalCopiesController < ApplicationController
@@ -25,6 +27,7 @@ module SponsoredBenefits
       end
 
       private
+
       helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal
 
       def assign_roster_employees(sponsorship:, roster:)
@@ -60,14 +63,14 @@ module SponsoredBenefits
         new_application = sponsorship.benefit_applications.first
 
         new_bg = new_application.benefit_groups.build({
-          title: bg.title,
-          reference_plan_id: bg.reference_plan_id,
-          dental_reference_plan_id: bg.dental_reference_plan_id,
-          plan_option_kind: bg.plan_option_kind,
-          dental_plan_option_kind: bg.dental_plan_option_kind,
-          elected_plans: bg.elected_plans,
-          elected_dental_plan_ids: bg.elected_dental_plan_ids
-        })
+                                                        title: bg.title,
+                                                        reference_plan_id: bg.reference_plan_id,
+                                                        dental_reference_plan_id: bg.dental_reference_plan_id,
+                                                        plan_option_kind: bg.plan_option_kind,
+                                                        dental_plan_option_kind: bg.dental_plan_option_kind,
+                                                        elected_plans: bg.elected_plans,
+                                                        elected_dental_plan_ids: bg.elected_dental_plan_ids
+                                                      })
         if bg.sole_source?
           bg.composite_tier_contributions.each do |contribution|
             new_bg.composite_tier_contributions << contribution.clone

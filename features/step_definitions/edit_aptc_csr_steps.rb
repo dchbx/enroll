@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then (/^Hbx Admin sees Families link$/) do
   expect(page).to have_text("Families")
 end
@@ -16,6 +18,6 @@ When(/^Hbx Admin click Families dropdown/) do
   wait_for_ajax
 end
 
-Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
+Then(%r{^Hbx Admin should see an Edit APTC / CSR link$}) do
   find_link('Edit APTC / CSR').visible?
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
@@ -11,7 +13,7 @@ module BenefitSponsors
     let!(:employer_profile) {general_org.employer_profile}
     let!(:user) { FactoryBot.create(:user)}
     let!(:person) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user) }
-    let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
+    let!(:active_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id, person: person)}
     let!(:broker_role) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person) }
     let!(:broker_agency_staff_role) { FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person)}
     let(:broker_agency) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
@@ -38,7 +40,7 @@ module BenefitSponsors
         # params = { profile_id: profile_type == "benefit_sponsor" ? employer_profile.id : broker_agency_profile.id}
         params = {profile_id: agency(profile_type).id}
         service = subject.new params
-        expect(service.pluck_profile_type params[:profile_id]).to eq profile_type
+        expect(service.pluck_profile_type(params[:profile_id])).to eq profile_type
       end
 
     end
@@ -78,7 +80,7 @@ module BenefitSponsors
     shared_examples_for "should find profile and return form for profile" do |profile_type|
 
       it "should return form for #{profile_type} type" do
-        params = { profile_id: agency(profile_type).id, profile_type:profile_type}
+        params = { profile_id: agency(profile_type).id, profile_type: profile_type}
         service = subject.new params
         find_hash = service.find
         expect(find_hash[:profile_type]).to eq profile_type
@@ -109,7 +111,7 @@ module BenefitSponsors
 
     describe "has_general_agency_staff_role_for_profile?" do
       context "check for general agency staff role" do
-        let(:general_agency_person) { FactoryBot.create(:person, emails:[FactoryBot.build(:email, kind:'work')],employer_staff_roles:[active_employer_staff_role]) }
+        let(:general_agency_person) { FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')],employer_staff_roles: [active_employer_staff_role]) }
         let(:general_agency_user) { FactoryBot.create(:user, :person => general_agency_person)}
         it "has general_agency_staff_role" do
           expect(subject.new.has_general_agency_staff_role_for_profile?(general_agency_user,general_agency_profile)).to eq false
@@ -166,7 +168,7 @@ module BenefitSponsors
       let(:user1) { FactoryBot.create(:user)}
       let(:general_agency_staff_role) { FactoryBot.build(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, aasm_state: "coverage_terminated")}
       let!(:person1) do
-        FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1, general_agency_staff_roles: [ general_agency_staff_role ])
+        FactoryBot.create(:person, emails: [FactoryBot.build(:email, kind: 'work')], user: user1, general_agency_staff_roles: [general_agency_staff_role])
       end
 
       it 'should return false if general staff role or general role exists for the user' do
@@ -228,7 +230,7 @@ module BenefitSponsors
         )
       end
 
-      let(:plan_design_organization_with_assigned_ga) {
+      let(:plan_design_organization_with_assigned_ga) do
         plan_design_organization.general_agency_accounts.create(
           start_on: TimeKeeper.date_of_record,
           broker_role_id: broker_agency_profile.primary_broker_role.id
@@ -238,7 +240,7 @@ module BenefitSponsors
           account.save
         end
         plan_design_organization
-      }
+      end
 
       let(:params) {{ profile_id: employer_profile.id, profile_type: "benefit_sponsor" }}
       let(:service) {subject.new params}

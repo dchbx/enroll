@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 Given(/^Hbx Admin is on ridp document upload page$/) do
   visit '/insured/consumer_role/upload_ridp_document'
 end
 
 When(/^hbx admin uploads application document and verifies application$/) do
-  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
   find('#upload_application').click
   within '#upload_application' do
-    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
   wait_for_ajax(2)
   expect(page).to have_content('File Saved')
@@ -62,7 +64,7 @@ end
 When(/^clicks on Individual in Families tab$/) do
   login_as hbx_admin
   visit exchanges_hbx_profiles_root_path
-  find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  find(:xpath, "//li[contains(., 'Families')]", :wait => 10).click
   find('li', :text => 'Families', :class => 'tab-second', :wait => 10).click
   find('a', :text => /\AJohn Smith\z/, :wait => 10).click
   expect(page).to have_content('Identity')

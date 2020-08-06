@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class Permission
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
 
-  PERMISSION_KINDS = %w(hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin)
+  PERMISSION_KINDS = %w[hbx_staff hbx_read_only hbx_csr_supervisor hbx_csr_tier1 hbx_csr_tier2 hbx_tier3 developer super_admin].freeze
 
   field :name, type: String
 
@@ -50,24 +52,31 @@ class Permission
     def hbx_staff
       Permission.where(name: 'hbx_staff').first
     end
+
     def hbx_read_only
       Permission.where(name: 'hbx_read_only').first
     end
+
     def hbx_csr_supervisor
       Permission.where(name: 'hbx_csr_supervisor').first
     end
+
     def hbx_csr_tier1
       Permission.where(name: 'hbx_csr_tier1').first
     end
+
     def hbx_csr_tier2
       Permission.where(name: 'hbx_csr_tier2').first
     end
+
     def hbx_tier3
       Permission.where(name: 'hbx_tier3').first
     end
+
     def developer
       Permission.where(name: 'developer').first
     end
+
     def super_admin
       Permission.where(name: 'super_admin').first
     end

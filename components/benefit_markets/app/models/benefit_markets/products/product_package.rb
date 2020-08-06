@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # ProductPackage provides the composite package for benefits that may be purchased.  Site
 # exchange Admins (or seed files) define ProductPackage settings.  Benefit Catalog accesses
 # all Products via ProductPackage.
@@ -74,24 +76,24 @@ module BenefitMarkets
 
     def lowest_cost_product(effective_date)
       return @lowest_cost_product if defined? @lowest_cost_product
-      @lowest_cost_product = load_base_products.min_by { |product|
-          product.min_cost_for_application_period(effective_date)
-      }
+      @lowest_cost_product = load_base_products.min_by do |product|
+        product.min_cost_for_application_period(effective_date)
+      end
     end
 
     def highest_cost_product(effective_date)
       return @highest_cost_product if defined? @highest_cost_product
-      @highest_cost_product ||= load_base_products.max_by { |product|
+      @highest_cost_product ||= load_base_products.max_by do |product|
         product.max_cost_for_application_period(effective_date)
-      }
+      end
     end
 
     def products_sorted_by_cost
       return @products_sorted_by_cost if defined? @products_sorted_by_cost
 
-      @products_sorted_by_cost = load_base_products.sort_by{|product|
+      @products_sorted_by_cost = load_base_products.sort_by do |product|
         product.cost_for_application_period(application_period)
-      }
+      end
     end
 
     def load_base_products
@@ -136,19 +138,19 @@ module BenefitMarkets
 
     def issuer_profiles
       return @issuer_profiles if defined?(@issuer_profiles)
-      @issuer_profiles = active_products.select { |product| product.issuer_profile }.uniq!
+      @issuer_profiles = active_products.select(&:issuer_profile).uniq!
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if defined?(@issuer_profile_products) && @profile_hash&.has_value?(issuer_profile.id)
-      @profile_hash = Hash.new
+      return @issuer_profile_products if defined?(@issuer_profile_products) && @profile_hash&.value?(issuer_profile.id)
+      @profile_hash = {}
       @profile_hash["issuer_profile_id"] = issuer_profile.id
       @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 
     # Load product subset the embedded .products list from BenefitMarket::Products using provided criteria
     def load_embedded_products(service_areas, effective_date)
-      benefit_market_products_available_for(service_areas, effective_date).collect { |prod| prod.create_copy_for_embedding }
+      benefit_market_products_available_for(service_areas, effective_date).collect(&:create_copy_for_embedding)
     end
 
     # Query products from database applicable to this product package

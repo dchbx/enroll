@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module RulesEngine
     class Policy
@@ -24,21 +26,17 @@ module BenefitMarkets
         context.set_rules(self.class.rules)
         self.class.rules_to_evaluate.each do |rule|
           rule.evaluate(context)
-        end 
+        end
       end
 
       def self.compile_rules
         child_rules = []
         @rules.each do |rule|
-          if rule.is_parent_rule
-            child_rules = (child_rules + rule.child_rules).uniq
-          end
+          child_rules = (child_rules + rule.child_rules).uniq if rule.is_parent_rule
         end
         root_rules = []
         @rules.each do |rule|
-          if !child_rules.include?(rule.name)
-            root_rules << rule
-          end
+          root_rules << rule unless child_rules.include?(rule.name)
         end
         @rules_to_evaluate = root_rules
       end

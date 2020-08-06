@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class PlanYearFactory
     def self.default_dates_for_coverage_starting_on(coverage_start_date)

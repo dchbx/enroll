@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerStaffRole
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -22,12 +24,12 @@ class EmployerStaffRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
-  validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsor_employer_profile_id.blank? }
-  validates_presence_of :benefit_sponsor_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }
+  validates_presence_of :employer_profile_id, :if => proc { |m| m.benefit_sponsor_employer_profile_id.blank? }
+  validates_presence_of :benefit_sponsor_employer_profile_id, :if => proc { |m| m.employer_profile_id.blank? }
 
   field :aasm_state, type: String, default: 'is_active'
 
@@ -53,10 +55,10 @@ class EmployerStaffRole
 
   def profile
     return @profile if defined? @profile
-    if benefit_sponsor_employer_profile_id.present?
-      @profile = BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
-    else
-      @profile = EmployerProfile.find(employer_profile_id)
-    end
+    @profile = if benefit_sponsor_employer_profile_id.present?
+                 BenefitSponsors::Organizations::Profile.find(benefit_sponsor_employer_profile_id)
+               else
+                 EmployerProfile.find(employer_profile_id)
+               end
   end
 end

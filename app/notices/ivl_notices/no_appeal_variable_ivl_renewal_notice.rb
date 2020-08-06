@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::NoAppealVariableIvlRenewalNotice < IvlNotices::VariableIvlRenewalNotice
 
   def append_enrollments(eg_ids)
@@ -27,13 +29,9 @@ class IvlNotices::NoAppealVariableIvlRenewalNotice < IvlNotices::VariableIvlRene
     prepend_envelope
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
   end
 
 end

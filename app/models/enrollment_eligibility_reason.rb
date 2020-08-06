@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EnrollmentEligibilityReason
 
   attr_reader :reason_provider, :date_of_reason
@@ -7,7 +9,7 @@ class EnrollmentEligibilityReason
     self.provider = provider
   end
 
-  def provider=(new_provider_object, date_of_reason = TimeKeeper.date_of_record)
+  def provider=(new_provider_object, _date_of_reason = TimeKeeper.date_of_record)
     @provider = ReasonProvider.new(new_provider_object)
   end
 
@@ -38,22 +40,44 @@ class EnrollmentEligibilityReason
 
   class EmployerProfileReasonProvider < ReasonProvider
     attr_reader :employer_profile
-    def initialize(employer_profile); @employer_profile = employer_profile; end
-    def type; "open_enrollment_period"; end
-    def reason; "open_enrollment"; end
+    def initialize(employer_profile)
+      @employer_profile = employer_profile
+    end
+
+    def type
+      "open_enrollment_period"
+    end
+
+    def reason
+      "open_enrollment"
+    end
   end
 
   class BenefitSponsorshipReasonProvider < ReasonProvider
     attr_reader :benefit_sponsorship
-    def initialize(benefit_sponsorship); @benefit_sponsorship = benefit_sponsorship; end
-    def type; "open_enrollment_period"; end
-    def reason; "open_enrollment"; end
+    def initialize(benefit_sponsorship)
+      @benefit_sponsorship = benefit_sponsorship
+    end
+
+    def type
+      "open_enrollment_period"
+    end
+
+    def reason
+      "open_enrollment"
+    end
   end
 
   class SpecialEnrollmentPeriodReasonProvider < ReasonProvider
     attr_reader :special_enrollment_period
-    def initialize(special_enrollment_period); @special_enrollment_period = special_enrollment_period; end
-    def type; "special_enrollment_period"; end
+    def initialize(special_enrollment_period)
+      @special_enrollment_period = special_enrollment_period
+    end
+
+    def type
+      "special_enrollment_period"
+    end
+
     def reason
       special_enrollment_period.qualifying_life_event_kind.reason
     end

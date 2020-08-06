@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Services
   class IvlEnrollmentService
 
@@ -13,7 +15,7 @@ module Services
     end
 
     def expire_individual_market_enrollments
-      @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Started expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
@@ -30,11 +32,11 @@ module Services
         Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
         @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
       end
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
     def begin_coverage_for_ivl_enrollments
-      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       ivl_enrollments = HbxEnrollment.where(
         :effective_on => current_benefit_period.start_on,
@@ -45,11 +47,10 @@ module Services
         @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
         count = 0
         ivl_enrollments.no_timeout.each do |enrollment|
-          if enrollment.may_begin_coverage?
-            enrollment.begin_coverage!
-            count += 1
-            @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-          end
+          next unless enrollment.may_begin_coverage?
+          enrollment.begin_coverage!
+          count += 1
+          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         end
       rescue Exception => e
         family = Family.find(individual_market_enrollments.family_id)
@@ -57,16 +58,16 @@ module Services
         @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
       end
       @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
     def enrollment_notice_for_ivl_families(new_date)
       start_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").beginning_of_day
       end_time = (new_date - 2.days).in_time_zone("Eastern Time (US & Canada)").end_of_day
       Family.where(
-        :"_id".in => HbxEnrollment.where(
+        :_id.in => HbxEnrollment.where(
           kind: "individual",
-          :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES,
+          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
           created_at: { "$gte" => start_time, "$lte" => end_time}
         ).pluck(:family_id)
       )
@@ -75,12 +76,12 @@ module Services
     def send_enrollment_notice_for_ivl(new_date)
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
-        begin
-          person = family.primary_applicant.person
-          IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
-        rescue Exception => e
-          Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
-        end
+
+        person = family.primary_applicant.person
+        IvlNoticesNotifierJob.perform_later(person.id.to_s, "enrollment_notice") if person.consumer_role.present?
+      rescue Exception => e
+        Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
+
       end
     end
 

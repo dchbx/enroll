@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec_helpers.rb"
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers.rb"
@@ -17,9 +19,9 @@ module BenefitSponsors
         benefit_market,
         (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
       )
-        benefit_market.benefit_market_catalogs.where(
-          "application_period.min" => current_effective_date.beginning_of_year
-        ).first
+      benefit_market.benefit_market_catalogs.where(
+        "application_period.min" => current_effective_date.beginning_of_year
+      ).first
     end
     let(:organization)          { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { organization.employer_profile }
@@ -29,18 +31,18 @@ module BenefitSponsors
       sponsorship.save
       sponsorship
     end
-    let(:benefit_application)   {
+    let(:benefit_application)   do
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, default_effective_period: default_effective_period)
       application.benefit_sponsor_catalog.save!
       application
-    }
+    end
     let!(:product_package_kind)     { :single_issuer }
     let!(:product_package)          { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
     let!(:product)                  { product_package.products.first }
     let!(:issuer_profile)           { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site }
 
     shared_context "valid params", :shared_context => :metadata do
-      let(:benefit_package_params) {
+      let(:benefit_package_params) do
         {
           :benefit_application_id => benefit_application.id.to_s,
           :title => "New Benefit Package",
@@ -48,9 +50,9 @@ module BenefitSponsors
           :probation_period_kind => "first_of_month",
           :sponsored_benefits_attributes => sponsored_benefits_params
         }
-      }
+      end
 
-      let(:sponsored_benefits_params) {
+      let(:sponsored_benefits_params) do
         {
           "0" => {
             :sponsor_contribution_attributes => sponsor_contribution_attributes,
@@ -60,26 +62,26 @@ module BenefitSponsors
             :reference_plan_id => product.id.to_s
           }
         }
-      }
+      end
 
-      let(:sponsor_contribution_attributes) {
+      let(:sponsor_contribution_attributes) do
         {
           :contribution_levels_attributes => contribution_levels_attributes
         }
-      }
+      end
 
-      let(:contribution_levels_attributes) {
+      let(:contribution_levels_attributes) do
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "0.95"},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
           "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
           "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
-      }
+      end
     end
 
     shared_context "invalid params", :shared_context => :metadata do
-      let(:benefit_package_params) {
+      let(:benefit_package_params) do
         {
           :benefit_application_id => nil,
           :title => nil,
@@ -87,9 +89,9 @@ module BenefitSponsors
           :probation_period_kind => "first_of_month",
           :sponsored_benefits_attributes => sponsored_benefits_params
         }
-      }
+      end
 
-      let(:sponsored_benefits_params) {
+      let(:sponsored_benefits_params) do
         {
           "0" => {
             :sponsor_contribution_attributes => sponsor_contribution_attributes,
@@ -99,22 +101,22 @@ module BenefitSponsors
             :reference_plan_id => product.id.to_s
           }
         }
-      }
+      end
 
-      let(:sponsor_contribution_attributes) {
+      let(:sponsor_contribution_attributes) do
         {
           :contribution_levels_attributes => invalid_contribution_levels_attributes
         }
-      }
+      end
 
-      let(:invalid_contribution_levels_attributes) {
+      let(:invalid_contribution_levels_attributes) do
         {
           "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => nil},
           "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "0.85"},
           "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "0.75"},
           "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "0.75"}
         }
-      }
+      end
     end
 
     before do
@@ -190,12 +192,12 @@ module BenefitSponsors
 
       let(:benefit_application_id)  { benefit_application.id.to_s }
       let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
-      let(:params_for_edit)  {
+      let(:params_for_edit)  do
         {
           "id" => benefit_package.id.to_s,
           "benefit_application_id" => benefit_application_id
         }
-      }
+      end
 
       before do
         benefit_package.sponsored_benefits.first.reference_product.update_attributes!(:issuer_profile_id => issuer_profile.id)
@@ -222,10 +224,10 @@ module BenefitSponsors
 
       before do
         sponsored_benefits_params["0"].merge!({
-          :id => benefit_package.sponsored_benefits[0].id.to_s,
-        })
+                                                :id => benefit_package.sponsored_benefits[0].id.to_s
+                                              })
 
-        contribution_levels_attributes.each do |k, v|
+        contribution_levels_attributes.each do |_k, v|
           cl = contribution_levels.where(:display_name => v[:display_name].to_s).first
           v.merge!({ :id => cl.id.to_s })
         end
@@ -244,5 +246,4 @@ module BenefitSponsors
     end
 
   end
-
 end

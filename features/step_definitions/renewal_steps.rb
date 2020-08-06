@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/(.*) should see active and renewing enrollments/) do |named_person|
   visit "/families/home"
   person = people[named_person]
@@ -10,19 +12,19 @@ Then(/(.*) should see active and renewing enrollments/) do |named_person|
     find_all('.hbx-enrollment-panel').count { |n| n.find_all("h3", :text => /Coverage/i).any? } > 1
   end
 
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
-    (e.find('.label-success').text() == 'Auto Renewing') &&
-    (e.find('.enrollment-effective').text() == "Plan Start: " + renewal_effective_date.strftime('%m/%d/%Y'))
-  }).to be_truthy
+  expect(page.find_all('.hbx-enrollment-panel').any? do |e|
+    (e.find('.label-success').text == 'Auto Renewing') &&
+    (e.find('.enrollment-effective').text == "Plan Start: " + renewal_effective_date.strftime('%m/%d/%Y'))
+  end).to be_truthy
 
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
-    (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
-  }).to be_truthy
+  expect(page.find_all('.hbx-enrollment-panel').any? do |e|
+    (e.find('.label-success').text == 'Coverage Selected') &&
+    (e.find('.enrollment-effective').text == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
+  end).to be_truthy
 end
 
 # For new updates
-When(/(.*) clicks continue on group selection page for dependents/) do |named_person|
+When(/(.*) clicks continue on group selection page for dependents/) do |_named_person|
   if find_all('.interaction-click-control-continue').any?
     find('.interaction-click-control-continue', wait: 10).click
   else
@@ -30,7 +32,7 @@ When(/(.*) clicks continue on group selection page for dependents/) do |named_pe
   end
 end
 
-When(/(.*) proceed with continue on the group selection page/) do |named_person|
+When(/(.*) proceed with continue on the group selection page/) do |_named_person|
   employer_profile = EmployerProfile.all.first
   plan_year = EmployerProfile.all.first.plan_years.first.start_on.year
   carrier_profile = EmployerProfile.all.first.plan_years.first.benefit_groups.first.reference_plan.carrier_profile
@@ -60,11 +62,11 @@ Then(/(.*) should see \"my account\" page with new enrollment and passive renewa
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   effective_date = ce.employer_profile.renewing_plan_year.start_on
 
-  expect(page.find_all('.hbx-enrollment-panel').any?{|e|
-    (e.find('.label-success').text() == 'Coverage Selected') &&
-    (e.find('.enrollment-effective').text() == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
-  }).to be_truthy
-  expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text() == 'Auto Renewing'}).to be_falsey
+  expect(page.find_all('.hbx-enrollment-panel').any? do |e|
+    (e.find('.label-success').text == 'Coverage Selected') &&
+    (e.find('.enrollment-effective').text == "Plan Start: " + effective_date.strftime('%m/%d/%Y'))
+  end).to be_truthy
+  expect(page.find_all('.family-plan-selection').any?{|e| e.find('.status').find('h4').text == 'Auto Renewing'}).to be_falsey
 end
 
 When(/^.+ selects waiver on the plan shopping page$/) do
@@ -104,7 +106,7 @@ Then(/(.+) should see \"my account\" page with waiver and passive renewal should
 
 
   enrollments = page.all('.hbx-enrollment-panel')
-  statuses = enrollments.collect{|e| e.find('.panel-heading').find('.label-success').text()}
+  statuses = enrollments.collect{|e| e.find('.panel-heading').find('.label-success').text}
 
   expect(statuses).to include('Waived')
   expect(statuses).to include('Coverage Termination Pending')

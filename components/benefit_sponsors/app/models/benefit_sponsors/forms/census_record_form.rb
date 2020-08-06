@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class CensusRecordForm
@@ -18,7 +20,7 @@ module BenefitSponsors
       attribute :employment_terminated_on, String
       attribute :is_business_owner, String
       attribute :no_ssn_allowed, Boolean
-      
+
       # template attributes
       attribute :benefit_group, String
       attribute :plan_year, String

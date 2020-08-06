@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LegacyImporters
   class IndividualPolicy
     attr_reader :errors
@@ -47,9 +49,9 @@ module LegacyImporters
           :person => person,
           :is_applicant => true,
           :lawful_presence_determination => LawfulPresenceDetermination.new(
-             :vlp_authority => "curam",
-             :vlp_verified_at => Time.now,
-             :aasm_state => "verification_successful"
+            :vlp_authority => "curam",
+            :vlp_verified_at => Time.now,
+            :aasm_state => "verification_successful"
           ),
           :aasm_state => "fully_verified",
           :is_state_resident => true
@@ -58,16 +60,16 @@ module LegacyImporters
       cr
     end
 
-    def enrollment_properties_hash(cr, plan, ch, member_props)
+    def enrollment_properties_hash(cr, plan, _ch, member_props)
       e_on = member_props.map { |mp| mp[:coverage_start_on] }.min
       {
-           :applied_aptc_amount => @aptc,
-           :consumer_role_id => cr.id,
-           :hbx_id => @hbx_id,
-           :hbx_enrollment_members_attributes => member_props,
-           :kind => "individual",
-           :plan_id => plan.id,
-           :effective_on => e_on
+        :applied_aptc_amount => @aptc,
+        :consumer_role_id => cr.id,
+        :hbx_id => @hbx_id,
+        :hbx_enrollment_members_attributes => member_props,
+        :kind => "individual",
+        :plan_id => plan.id,
+        :effective_on => e_on
       }
     end
 
@@ -82,9 +84,7 @@ module LegacyImporters
       data["enrollees"].map do |en|
         m_id = en["hbx_id"]
         is_sub = (m_id == sub.hbx_id)
-        if !(is_sub)
-          create_consumer_role(app_lookup[m_id].person)
-        end
+        create_consumer_role(app_lookup[m_id].person) unless is_sub
         prop_hash = {
           :applicant_id => app_lookup[m_id].id,
           :premium_amount => en["premium_amount"],
@@ -92,9 +92,7 @@ module LegacyImporters
           :coverage_start_on => Date.strptime(en["coverage_start"], "%Y%m%d"),
           :eligibility_date => Date.strptime(en["coverage_start"], "%Y%m%d")
         }
-        if !prop_hash["coverage_end"].blank?
-          prop_hash[:coverage_end_on] = Date.strptime(en["coverage_end"], "%Y%m%d")
-        end
+        prop_hash[:coverage_end_on] = Date.strptime(en["coverage_end"], "%Y%m%d") unless prop_hash["coverage_end"].blank?
         prop_hash
       end
     end
@@ -122,7 +120,7 @@ module LegacyImporters
 
     def locate_head_of_family(data)
       Person.where(:hbx_id => data["subscriber_id"]).first.tap do |person|
-        throw :missing_object, "Could not find subscriber with hbx_id: #{data["subscriber_id"]}" if person.nil?
+        throw :missing_object, "Could not find subscriber with hbx_id: #{data['subscriber_id']}" if person.nil?
       end
     end
 

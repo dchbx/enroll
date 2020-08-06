@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 describe URI::S3, "given an s3 uri" do
   subject { URI.parse("s3://bucket@region/object_key/with_extra/delimiters") }
 
   it "returns an s3 uri" do
-    expect(subject.kind_of?(URI::S3)).to be_truthy
+    expect(subject.is_a?(URI::S3)).to be_truthy
   end
 
   it "has the correct bucket" do

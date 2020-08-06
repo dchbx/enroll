@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencyProfilePolicy < ApplicationPolicy
   def access_to_broker_agency_profile?
     return false unless user.person

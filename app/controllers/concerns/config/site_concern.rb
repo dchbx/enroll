@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::SiteConcern
   def site_short_name
     Settings.site.short_name

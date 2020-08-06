@@ -36,7 +36,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyHiredNotice', dbclean
         end
 
         it "should trigger notice" do
-          ga_model_instance.class.observer_peers.keys.each do |observer|
+          ga_model_instance.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_hired, :klass_instance => ga_model_instance, :options => {})
@@ -56,7 +56,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyHiredNotice', dbclean
         let(:model_instance)  { plan_design_organization.general_agency_accounts.build(general_agency_profile: general_agency_profile, start_on: start_on, broker_role_id: broker_agency_profile.primary_broker_role.id) }
 
         it "should trigger notice" do
-          model_instance.class.observer_peers.keys.each do |observer|
+          model_instance.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_hired, :klass_instance => model_instance, :options => {})
@@ -71,7 +71,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyHiredNotice', dbclean
         let(:model_instance)  { plan_design_organization.general_agency_accounts.build(general_agency_profile: general_agency_profile, start_on: start_on, broker_role_id: broker_agency_profile.primary_broker_role.id) }
 
         it "should trigger notice" do
-          model_instance.class.observer_peers.keys.each do |observer|
+          model_instance.class.observer_peers.each_key do |observer|
             expect(observer).to receive(:process_ga_account_events) do |_instance, model_event|
               expect(model_event).to be_an_instance_of(::BenefitSponsors::ModelEvents::ModelEvent)
               expect(model_event).to have_attributes(:event_key => :general_agency_hired, :klass_instance => model_instance, :options => {})

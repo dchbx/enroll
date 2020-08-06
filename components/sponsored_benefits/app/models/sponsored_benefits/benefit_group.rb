@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   class BenefitGroup
     include Mongoid::Document
@@ -10,16 +12,16 @@ module SponsoredBenefits
 
     attr_accessor :metal_level_for_elected_plan, :carrier_for_elected_plan
 
-    PLAN_OPTION_KINDS = %w(sole_source single_plan single_carrier metal_level)
-    EFFECTIVE_ON_KINDS = %w(date_of_hire first_of_month)
-    OFFSET_KINDS = [0, 1, 30, 60]
+    PLAN_OPTION_KINDS = %w[sole_source single_plan single_carrier metal_level].freeze
+    EFFECTIVE_ON_KINDS = %w[date_of_hire first_of_month].freeze
+    OFFSET_KINDS = [0, 1, 30, 60].freeze
     PERSONAL_RELATIONSHIP_KINDS = [
       :employee,
       :spouse,
       :domestic_partner,
       :child_under_26,
       :child_26_and_over
-    ]
+    ].freeze
 
     field :title, type: String, default: ""
     field :description, type: String, default: ""
@@ -62,32 +64,32 @@ module SponsoredBenefits
     accepts_nested_attributes_for :dental_relationship_benefits, reject_if: :all_blank, allow_destroy: true
 
 
-    #TODO add following attributes: :title,
+    #TODO: add following attributes: :title,
     validates_presence_of :relationship_benefits, :effective_on_kind, :terminate_on_kind, :effective_on_offset,
                           :reference_plan_id, :plan_option_kind, :elected_plan_ids
 
     validates_uniqueness_of :title
 
     validates :plan_option_kind,
-      allow_blank: false,
-      inclusion: {
-        in: PLAN_OPTION_KINDS,
-        message: "%{value} is not a valid plan option kind"
-      }
+              allow_blank: false,
+              inclusion: {
+                in: PLAN_OPTION_KINDS,
+                message: "%{value} is not a valid plan option kind"
+              }
 
     validates :effective_on_kind,
-      allow_blank: false,
-      inclusion: {
-        in: EFFECTIVE_ON_KINDS,
-        message: "%{value} is not a valid effective date kind"
-      }
+              allow_blank: false,
+              inclusion: {
+                in: EFFECTIVE_ON_KINDS,
+                message: "%{value} is not a valid effective date kind"
+              }
 
     validates :effective_on_offset,
-      allow_blank: false,
-      inclusion: {
-        in: OFFSET_KINDS,
-        message: "%{value} is not a valid effective date offset kind"
-      }
+              allow_blank: false,
+              inclusion: {
+                in: OFFSET_KINDS,
+                message: "%{value} is not a valid effective date offset kind"
+              }
 
     validate :plan_integrity
     validate :check_employer_contribution_for_employee
@@ -100,8 +102,8 @@ module SponsoredBenefits
     #   super new_plan_option_kind.to_s
     # end
 
-    alias_method :is_default?, :default
-    alias_method :is_congress?, :is_congress
+    alias is_default? default
+    alias is_congress? is_congress
 
 
     def benefit_group_assignments
@@ -121,7 +123,7 @@ module SponsoredBenefits
     end
 
     def reference_plan=(new_reference_plan)
-      raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+      raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
       self.reference_plan_id = new_reference_plan._id
       @reference_plan = new_reference_plan
     end
@@ -146,26 +148,26 @@ module SponsoredBenefits
     def set_bounding_cost_plans
       return if reference_plan_id.nil?
 
-      if plan_option_kind == "single_plan"
-        plans = [reference_plan]
-      elsif plan_option_kind == "sole_source"
-        plans = [reference_plan]
-      else
-        if plan_option_kind == "single_carrier"
-          plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
-        else
-          plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-        end
-      end
+      plans = if plan_option_kind == "single_plan"
+                [reference_plan]
+              elsif plan_option_kind == "sole_source"
+                [reference_plan]
+              else
+                if plan_option_kind == "single_carrier"
+                  Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+                else
+                  Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+                        end
+              end
 
       set_lowest_and_highest(plans)
     end
 
     def set_lowest_and_highest(plans)
-      if plans.size > 0
+      unless plans.empty?
         plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
-        self.lowest_cost_plan_id  = plans_by_cost.first.id
+        self.lowest_cost_plan_id = plans_by_cost.first.id
         @lowest_cost_plan = plans_by_cost.first
 
         self.highest_cost_plan_id = plans_by_cost.last.id
@@ -184,11 +186,11 @@ module SponsoredBenefits
     def elected_plans=(new_plans)
       return unless new_plans.present?
 
-      if new_plans.is_a? Array
-        self.elected_plan_ids = new_plans.reduce([]) { |list, plan| list << plan._id }
-      else
-        self.elected_plan_ids = Array.new(1, new_plans.try(:_id))
-      end
+      self.elected_plan_ids = if new_plans.is_a? Array
+                                new_plans.reduce([]) { |list, plan| list << plan._id }
+                              else
+                                Array.new(1, new_plans.try(:_id))
+                              end
 
       set_bounding_cost_plans
       @elected_plans = new_plans
@@ -199,15 +201,15 @@ module SponsoredBenefits
       @elected_plans ||= Plan.where(:id => {"$in" => elected_plan_ids}).to_a
     end
 
-    def decorated_elected_plans(member_provider, coverage_kind="")
-      max_contribution_cache = Hash.new
+    def decorated_elected_plans(member_provider, coverage_kind = "")
+      max_contribution_cache = {}
       get_elected_plans = (coverage_kind == "health" ? elected_plans : elected_dental_plans)
       ref_plan = (coverage_kind == "health" ? reference_plan : dental_reference_plan)
-      get_elected_plans.collect(){|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
+      get_elected_plans.collect{|plan| decorated_plan(plan, member_provider, ref_plan, max_contribution_cache)}
     end
 
     def decorated_plan(plan, member_provider, ref_plan, max_contribution_cache = {})
-      if self.sole_source? && (!plan.dental?)
+      if self.sole_source? && !plan.dental?
         CompositeRatedPlanCostDecorator.new(plan, self, member_provider.composite_rating_tier, member_provider.is_cobra_status?)
       else
         PlanCostDecorator.new(plan, member_provider, self, ref_plan, max_contribution_cache)
@@ -220,7 +222,7 @@ module SponsoredBenefits
     end
 
     def assignable_to?(census_employee)
-      return !(census_employee.employment_terminated_on < benefit_sponsorship.effective_period.begin || census_employee.hired_on > benefit_sponsorship.effective_period.end)
+      !(census_employee.employment_terminated_on < benefit_sponsorship.effective_period.begin || census_employee.hired_on > benefit_sponsorship.effective_period.end)
     end
 
     def employer_max_amt_in_cents=(new_employer_max_amt_in_cents)
@@ -237,7 +239,7 @@ module SponsoredBenefits
 
     def build_relationship_benefits
       self.relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-         self.relationship_benefits.build(relationship: relationship, offered: true)
+        self.relationship_benefits.build(relationship: relationship, offered: true)
       end
     end
 
@@ -249,7 +251,7 @@ module SponsoredBenefits
 
     def build_dental_relationship_benefits
       self.dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-         self.dental_relationship_benefits.build(relationship: relationship, offered: true)
+        self.dental_relationship_benefits.build(relationship: relationship, offered: true)
       end
     end
 
@@ -259,7 +261,7 @@ module SponsoredBenefits
                                 relationship: :employee,
                                 premium_pct: employee_premium_pct,
                                 employer_max_amt: employer_max_amount,
-                                offered: true),
+                                offered: true)
       ] + PERSONAL_RELATIONSHIP_KINDS.dup.delete_if{|kind| [:employee, :child_26_and_over].include?(kind)}.collect do |relationship|
         RelationshipBenefit.new(benefit_group: self,
                                 relationship: relationship,
@@ -271,7 +273,7 @@ module SponsoredBenefits
                                 relationship: :child_26_and_over,
                                 premium_pct: employee_premium_pct,
                                 employer_max_amt: employer_max_amount,
-                                offered: false),
+                                offered: false)
       ]
     end
 
@@ -292,23 +294,23 @@ module SponsoredBenefits
         estimate_composite_rates
       end
       targeted_census_employees.active.collect do |ce|
-        pcd = if self.sole_source? && (!plan.dental?)
-          CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-        else
-          PlanCostDecorator.new(plan, ce, self, reference_plan)
+        pcd = if self.sole_source? && !plan.dental?
+                CompositeRatedPlanCostDecorator.new(plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+              else
+                PlanCostDecorator.new(plan, ce, self, reference_plan)
         end
         pcd.total_employer_contribution
       end.sum
     end
 
-    def monthly_employee_cost(coverage_kind=nil)
+    def monthly_employee_cost(coverage_kind = nil)
       rp = coverage_kind == "dental" ? dental_reference_plan : reference_plan
       return 0 if targeted_census_employees.count > 100
       targeted_census_employees.active.collect do |ce|
-        pcd = if self.sole_source? && (!rp.dental?)
-          CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
-        else
-          PlanCostDecorator.new(rp, ce, self, rp)
+        pcd = if self.sole_source? && !rp.dental?
+                CompositeRatedPlanCostDecorator.new(rp, self, effective_composite_tier(ce), ce.is_cobra_status?)
+              else
+                PlanCostDecorator.new(rp, ce, self, rp)
         end
         pcd.total_employee_cost
       end
@@ -329,11 +331,11 @@ module SponsoredBenefits
 
     def employee_cost_for_plan(ce, plan = reference_plan)
       pcd = if @is_congress
-        decorated_plan(plan, ce)
-      elsif plan_option_kind == 'sole_source' && !plan.dental?
-        CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
-      else
-        PlanCostDecorator.new(plan, ce, self, reference_plan)
+              decorated_plan(plan, ce)
+            elsif plan_option_kind == 'sole_source' && !plan.dental?
+              CompositeRatedPlanCostDecorator.new(reference_plan, self, effective_composite_tier(ce), ce.is_cobra_status?)
+            else
+              PlanCostDecorator.new(plan, ce, self, reference_plan)
       end
       pcd.total_employee_cost
     end
@@ -380,15 +382,14 @@ module SponsoredBenefits
       census_employees.each do |ce|
         benefit_group_assignments = ce.benefit_group_assignments.where(benefit_group_id: self.id)
 
-        if benefit_group_assignments.present?
-          benefit_group_assignments.each do |bga|
-            bga.hbx_enrollments.each { |enrollment| enrollment.destroy }
-            bga.destroy
-          end
-
-          benefit_groups = self.benefit_application.benefit_groups.select { |bg| bg.id != self.id}
-          ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+        next unless benefit_group_assignments.present?
+        benefit_group_assignments.each do |bga|
+          bga.hbx_enrollments.each(&:destroy)
+          bga.destroy
         end
+
+        benefit_groups = self.benefit_application.benefit_groups.reject { |bg| bg.id == self.id}
+        ce.find_or_create_benefit_group_assignment(benefit_groups.first)
       end
     end
 
@@ -398,9 +399,7 @@ module SponsoredBenefits
 
     # Provide the sic factor for this benefit group.
     def sic_factor_for(plan)
-      if use_simple_employer_calculation_model?
-        return 1.0
-      end
+      return 1.0 if use_simple_employer_calculation_model?
       factor_carrier_id = plan.carrier_profile_id
       @scff_cache ||= Hash.new do |h, k|
         h[k] = lookup_cached_scf_for(k)
@@ -451,18 +450,16 @@ module SponsoredBenefits
       total_employees = targeted_census_employees.count
       return(0.0) if total_employees < 1
       waived_and_active_count = if benefit_application.estimate_group_size?
-                                  targeted_census_employees.select { |ce| ce.expected_to_enroll_or_valid_waive? }.length
+                                  targeted_census_employees.select(&:expected_to_enroll_or_valid_waive?).length
                                 else
                                   all_active_and_waived_health_enrollments.length
                                 end
-      waived_and_active_count/(total_employees * 1.0)
+      waived_and_active_count / (total_employees * 1.0)
     end
 
     # Provide the group size factor for this benefit group.
     def group_size_factor_for(plan)
-      if use_simple_employer_calculation_model?
-        return 1.0
-      end
+      return 1.0 if use_simple_employer_calculation_model?
       factor_carrier_id = plan.carrier_profile_id
       @gsf_cache ||= Hash.new do |h, k|
         h[k] = lookup_cached_gsf_for(k)
@@ -487,15 +484,15 @@ module SponsoredBenefits
       @crtp_cache[composite_rating_tier]
     end
 
-                        def lookup_cached_crtp_for(composite_rating_tier)
-                          ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
-                          benefit_application.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
-                        end
+    def lookup_cached_crtp_for(composite_rating_tier)
+      ct_contribution = composite_tier_contributions.detect { |ctc| ctc.composite_rating_tier == composite_rating_tier }
+      benefit_application.estimate_group_size? ? ct_contribution.estimated_tier_premium : ct_contribution.final_tier_premium
+    end
 
     # Provide the contribution factor for a given composite rating tier.
     def composite_employer_contribution_factor_for(composite_rating_tier)
       @cecf_cache ||= Hash.new do |h, k|
-         h[k] = lookup_cached_eccf_for(k)
+        h[k] = lookup_cached_eccf_for(k)
       end
       @cecf_cache[composite_rating_tier]
     end
@@ -509,7 +506,7 @@ module SponsoredBenefits
     # year status
     def group_size_count
       if benefit_application.estimate_group_size?
-        targeted_census_employees.select { |ce| ce.expected_to_enroll? }.length
+        targeted_census_employees.select(&:expected_to_enroll?).length
       else
         all_active_health_enrollments.length
       end
@@ -517,7 +514,7 @@ module SponsoredBenefits
 
     def composite_rating_enrollment_objects
       if benefit_application.estimate_group_size?
-        targeted_census_employees.select { |ce| ce.expected_to_enroll? }
+        targeted_census_employees.select(&:expected_to_enroll?)
       else
         all_active_health_enrollments
       end
@@ -525,17 +522,13 @@ module SponsoredBenefits
 
     def all_active_and_waived_health_enrollments
       benefit_group_assignments.flat_map do |bga|
-        bga.active_and_waived_enrollments.reject do |en|
-          en.dental?
-        end
+        bga.active_and_waived_enrollments.reject(&:dental?)
       end
     end
 
     def all_active_health_enrollments
       benefit_group_assignments.flat_map do |bga|
-        bga.active_enrollments.reject do |en|
-          en.dental?
-        end
+        bga.active_enrollments.reject(&:dental?)
       end
     end
 
@@ -591,8 +584,7 @@ module SponsoredBenefits
       (Rational(amount_in_cents) / Rational(100)).to_f if amount_in_cents
     end
 
-    def is_eligible_to_enroll_on?(date_of_hire, enrollment_date = TimeKeeper.date_of_record)
-
+    def is_eligible_to_enroll_on?(_date_of_hire, _enrollment_date = TimeKeeper.date_of_record)
       # Length of time prior to effective date that EE may purchase plan
       Settings.aca.shop_market.earliest_enroll_prior_to_effective_on.days
 
@@ -601,7 +593,6 @@ module SponsoredBenefits
 
       # Length of time that EE may enroll following correction to Census Employee Identifying info
       Settings.aca.shop_market.latest_enroll_after_employee_roster_correction_on.days
-
     end
 
     # Non-congressional
@@ -618,22 +609,14 @@ module SponsoredBenefits
     def plan_integrity
       return if elected_plan_ids.blank?
 
-      if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
-        self.errors.add(:elected_plans, "single plan must be the reference plan")
+      self.errors.add(:elected_plans, "single plan must be the reference plan") if (plan_option_kind == "single_plan") && (elected_plan_ids.first != reference_plan_id)
+
+      if plan_option_kind == "single_carrier"
+        self.errors.add(:elected_plans, "single carrier must include reference plan") unless elected_plan_ids.include? reference_plan_id
+        self.errors.add(:elected_plans, "not all from the same carrier as reference plan") if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.try(:carrier_profile_id) }
       end
 
-      if (plan_option_kind == "single_carrier")
-        if !(elected_plan_ids.include? reference_plan_id)
-          self.errors.add(:elected_plans, "single carrier must include reference plan")
-        end
-        if elected_plans.detect { |plan| plan.carrier_profile_id != reference_plan.try(:carrier_profile_id) }
-          self.errors.add(:elected_plans, "not all from the same carrier as reference plan")
-        end
-      end
-
-      if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
-        self.errors.add(:elected_plans, "not all of the same metal level as reference plan")
-      end
+      self.errors.add(:elected_plans, "not all of the same metal level as reference plan") if (plan_option_kind == "metal_level") && !(elected_plan_ids.include? reference_plan_id)
     end
 
     def check_employer_contribution_for_employee
@@ -644,21 +627,21 @@ module SponsoredBenefits
       if start_on.month == 1 && start_on.day == 1
       else
         if self.sole_source?
-          unless composite_tier_contributions.present?
-            self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
-          else
+          if composite_tier_contributions.present?
             employee_tier = composite_tier_contributions.find_by(composite_rating_tier: 'employee_only')
 
             if aca_shop_market_employer_contribution_percent_minimum > (employee_tier.try(:employer_contribution_percent) || 0)
               self.errors.add(:composite_tier_contributions,
-              "Employer contribution for employee must be ≥ #{aca_shop_market_employer_contribution_percent_minimum}%")
+                              "Employer contribution for employee must be ≥ #{aca_shop_market_employer_contribution_percent_minimum}%")
             else
               family_tier = composite_tier_contributions.find_by(composite_rating_tier: 'family')
               if family_tier.offered? &&
-                (family_tier.try(:employer_contribution_percent) || 0) < aca_shop_market_employer_family_contribution_percent_minimum
-                  self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{aca_shop_market_employer_family_contribution_percent_minimum}")
+                 (family_tier.try(:employer_contribution_percent) || 0) < aca_shop_market_employer_family_contribution_percent_minimum
+                self.errors.add(:composite_tier_contributions, "Employer contribution for family plans must be ≥ #{aca_shop_market_employer_family_contribution_percent_minimum}")
               end
             end
+          else
+            self.errors.add(:composite_rating_tier, "Employer must set contribution percentages")
           end
         else
           if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:premium_pct) || 0) < aca_shop_market_employer_contribution_percent_minimum
@@ -669,9 +652,7 @@ module SponsoredBenefits
     end
 
     def check_offered_for_employee
-      if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
-        self.errors.add(:relationship_benefits, "employee must be offered")
-      end
+      self.errors.add(:relationship_benefits, "employee must be offered") if relationship_benefits.present? && (relationship_benefits.find_by(relationship: "employee").try(:offered) != true)
     end
 
   end

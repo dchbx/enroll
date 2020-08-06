@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Events
   class BrokersController < ::ApplicationController
     include Acapi::Amqp::Responder
 
-    def resource(connection, delivery_info, properties, body)
+    def resource(connection, _delivery_info, properties, _body)
       reply_to = properties.reply_to
       headers = properties.headers || {}
       broker_id = headers.stringify_keys["broker_id"]

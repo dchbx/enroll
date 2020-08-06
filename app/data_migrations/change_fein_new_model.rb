@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class ChangeFeinNewModel< MongoidMigrationTask
+class ChangeFeinNewModel < MongoidMigrationTask
   def migrate
     wrong_fein = ENV['old_fein']
     right_fein = ENV['new_fein']

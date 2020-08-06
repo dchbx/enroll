@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class NoticeEvent
     include Mongoid::Document

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   class ResourceQuery
     attr_accessor :from, :source_credentials
@@ -19,7 +21,7 @@ module TransportGateway
 
     def log_inspect
       <<-LOGSTRING
-        From: #{from.to_s}
+        From: #{from}
       LOGSTRING
     end
   end

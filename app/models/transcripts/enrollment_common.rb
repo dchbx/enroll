@@ -1,36 +1,36 @@
+# frozen_string_literal: true
+
 module Transcripts
   module EnrollmentCommon
-
-
     def self.included(base)
       base.extend ClassMethods
     end
-   
+
     def fix_enrollment_coverage_start(enrollment)
       if enrollment.subscriber.coverage_end_on.blank?
         members_with_end_date = enrollment.hbx_enrollment_members.select{|m| m.coverage_end_on.present? }
-        maximum_end_date = members_with_end_date.sort_by{|member| member.coverage_end_on}.reverse.first.try(:coverage_end_on)
-        maximum_start_date = enrollment.hbx_enrollment_members.sort_by{|member| member.coverage_start_on}.reverse.first.coverage_start_on
+        maximum_end_date = members_with_end_date.sort_by(&:coverage_end_on).reverse.first.try(:coverage_end_on)
+        maximum_start_date = enrollment.hbx_enrollment_members.sort_by(&:coverage_start_on).reverse.first.coverage_start_on
 
-        if maximum_end_date.present?
-          enrollment.effective_on = [maximum_start_date, (maximum_end_date + 1.day)].max
-        else
-          enrollment.effective_on = maximum_start_date
-        end
+        enrollment.effective_on = if maximum_end_date.present?
+                                    [maximum_start_date, (maximum_end_date + 1.day)].max
+                                  else
+                                    maximum_start_date
+                                  end
 
-        # enrollment.hbx_enrollment_members.each do |member| 
+        # enrollment.hbx_enrollment_members.each do |member|
         #   member.coverage_start_on = enrollment.effective_on
         # end
 
         enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on.present?}
       else
-        enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.reject{|member| member.coverage_end_on != enrollment.subscriber.coverage_end_on}
+        enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select{|member| member.coverage_end_on == enrollment.subscriber.coverage_end_on}
       end
-      
+
       enrollment
     end
 
-    def matching_ivl_coverages(enrollment, family=nil)
+    def matching_ivl_coverages(enrollment, family = nil)
       family ||= enrollment.family
 
       family.active_household.hbx_enrollments.where({
@@ -42,15 +42,15 @@ module Transcripts
             .select { |en| en.subscriber.present? && enrollment.subscriber.present? && (en.subscriber.hbx_id == enrollment.subscriber.hbx_id) }
     end
 
-    def matching_shop_coverages(enrollment, family=nil)
+    def matching_shop_coverages(enrollment, family = nil)
       if enrollment.persisted?
         assignment = enrollment.benefit_group_assignment
         benefit_group = (assignment.present? ? assignment.benefit_group : enrollment.benefit_group)
-        if benefit_group.blank?
-          id_list = []
-        else
-          id_list = benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
-        end
+        id_list = if benefit_group.blank?
+                    []
+                  else
+                    benefit_group.plan_year.benefit_groups.collect(&:_id).uniq
+                  end
       else
         # TODO: Fix this for Conversion ER
         employer_profile = BenefitSponsors::Organizations::Organization.where(hbx_id: enrollment.employer_profile.hbx_id).first.employer_profile
@@ -71,17 +71,15 @@ module Transcripts
       @people_cache ||= {}
       return @people_cache[person.hbx_id] if @people_cache[person.hbx_id].present?
 
-      if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id)
-      end
+      matched_people = ::Person.where(hbx_id: person.hbx_id) if person.hbx_id.present?
 
 
       other_matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
+        ssn: person.ssn,
+        dob: person.dob,
+        last_name: person.last_name,
+        first_name: person.first_name
+      )
 
       if other_matched_people.size > 1 && matched_people.size == 1
         if matched_people.first.families.blank?
@@ -95,11 +93,11 @@ module Transcripts
 
       if matched_people.blank?
         matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
+          ssn: person.ssn,
+          dob: person.dob,
+          last_name: person.last_name,
+          first_name: person.first_name
+        )
       end
 
       @people_cache[person.hbx_id] = matched_people

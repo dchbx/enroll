@@ -4,21 +4,16 @@
 module BenefitSponsors
   module ModelEvents
     module BrokerAgencyAccount
-
       REGISTERED_EVENTS = [
         :broker_hired,
         :broker_fired
       ].freeze
 
       def notify_on_save
-        if is_active_changed? && (!is_active.nil?)
-          if is_active
-            is_broker_hired = true
-          end
+        if is_active_changed? && !is_active.nil?
+          is_broker_hired = true if is_active
 
-          if !is_active
-            is_broker_fired = true
-          end
+          is_broker_fired = true unless is_active
         end
 
         REGISTERED_EVENTS.each do |event|

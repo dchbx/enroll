@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class EmployerProfilePolicy < ApplicationPolicy
 
@@ -25,7 +27,7 @@ module BenefitSponsors
       show?
     end
 
-    def is_staff_role_for_employer?(profile)
+    def is_staff_role_for_employer?(_profile)
       active_staff_roles = user.person.employer_staff_roles.active
       active_staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == record.id }
     end
@@ -54,7 +56,7 @@ module BenefitSponsors
     end
 
     def updateable?
-      return false if (user.blank? || user.person.blank?)
+      return false if user.blank? || user.person.blank?
       return true if  (user.has_hbx_staff_role? && can_modify_employer?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
       is_staff_role_for_employer?(record)
     end

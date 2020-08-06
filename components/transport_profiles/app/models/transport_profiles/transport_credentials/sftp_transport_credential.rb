@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @deprecated This is for the legacy method of dynamic credential resolution.
 module TransportProfiles::TransportCredentials
   # @deprecated This is for the legacy method of dynamic credential resolution.
@@ -13,7 +15,7 @@ module TransportProfiles::TransportCredentials
     validates_presence_of :password, :allow_blank => false, :if => ->(record) { record.key_pem.blank? }
     validates_presence_of :key_pem, :allow_blank => false, :if => ->(record) { record.password.blank? }
 
-    def key_pem 
+    def key_pem
       SymmetricEncryption.decrypt(encrypted_key_pem)
     end
 

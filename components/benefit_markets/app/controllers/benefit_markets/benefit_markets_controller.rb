@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class BenefitMarketsController < ApplicationController
     layout 'benefit_markets/application.html.slim'
     before_action :set_site_id
     before_action :permit_params, only: [:create]
-    
+
 
     def index
       @benefit_markets = BenefitMarkets::BenefitMarket.where(site_id: @site_id)
@@ -49,7 +51,7 @@ module BenefitMarkets
       @site_id = params[:site_id]
     end
 
-    def permit_params 
+    def permit_params
       self.params = params.permit!
     end
 
@@ -60,12 +62,12 @@ module BenefitMarkets
         :title,
         :description,
         :aca_individual_configuration,
-        :aca_shop_configuration,
+        :aca_shop_configuration
       )
     end
 
     def find_hbx_admin_user
-      fail NotAuthorizedError unless current_user.has_hbx_staff_role?
+      raise NotAuthorizedError unless current_user.has_hbx_staff_role?
       # redirect_to root_url
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GenerateCcaSite < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
@@ -7,7 +9,8 @@ class GenerateCcaSite < Mongoid::Migration
           byline: "The Right Place for the Right Plan",
           short_name: "Health Connector",
           domain_name: "hbxshop.org",
-          long_name: "Massachusetts Health Connector")
+          long_name: "Massachusetts Health Connector"
+        )
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile
@@ -24,13 +27,13 @@ class GenerateCcaSite < Mongoid::Migration
         inital_app_config = BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration.new
         renweal_app_config = BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration.new
         configuration = BenefitMarkets::Configurations::AcaShopConfiguration.new initial_application_configuration: inital_app_config,
-          renewal_application_configuration: renweal_app_config,
-          binder_due_dom: 15
+                                                                                 renewal_application_configuration: renweal_app_config,
+                                                                                 binder_due_dom: 15
         @benefit_market = BenefitMarkets::BenefitMarket.new kind: :aca_shop,
-          site_urn: 'cca',
-          title: 'ACA SHOP',
-          description: 'CCA ACA Shop Market',
-          configuration: configuration
+                                                            site_urn: 'cca',
+                                                            title: 'ACA SHOP',
+                                                            description: 'CCA ACA Shop Market',
+                                                            configuration: configuration
       end
 
       @site.benefit_markets << @benefit_market
@@ -62,7 +65,7 @@ class GenerateCcaSite < Mongoid::Migration
   end
 
   def self.initialize_hbx_profile
-      profile = BenefitSponsors::Organizations::HbxProfile.new(self.sanitize_hbx_params)
+    profile = BenefitSponsors::Organizations::HbxProfile.new(self.sanitize_hbx_params)
     build_inbox_messages(profile)
     build_documents(profile)
     build_office_locations(profile)
@@ -83,7 +86,7 @@ class GenerateCcaSite < Mongoid::Migration
 
   def self.build_office_locations(new_profile)
     @old_org.office_locations.each do |office_location|
-      new_office_location = new_profile.office_locations.new()
+      new_office_location = new_profile.office_locations.new
       new_office_location.is_primary = office_location.is_primary
       address_params = office_location.address.attributes.except("_id")
       phone_params = office_location.phone.attributes.except("_id")
@@ -101,7 +104,7 @@ class GenerateCcaSite < Mongoid::Migration
   end
 
   def self.update_hbx_staff_roles(new_profile)
-    Person.where(:'hbx_staff_role'.exists=>true).each do |person|
+    Person.where(:hbx_staff_role.exists => true).each do |person|
       person.hbx_staff_role.benefit_sponsor_hbx_profile_id = new_profile.id
       person.save!
     end

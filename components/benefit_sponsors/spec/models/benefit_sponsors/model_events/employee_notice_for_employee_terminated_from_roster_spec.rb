@@ -1,38 +1,42 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmployee', :dbclean => :after_each do
 
-  let!(:termination_date) {(TimeKeeper.date_of_record)}
+  let!(:termination_date) {TimeKeeper.date_of_record}
   let(:start_on) { (TimeKeeper.date_of_record - 2.months).beginning_of_month }
 
   let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-                              :with_benefit_package,
-                              :benefit_sponsorship => benefit_sponsorship,
-                              :aasm_state => 'active',
-                              :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:benefit_application) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'active',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
   let!(:benefit_package)  {benefit_application.benefit_packages.first}
   let!(:person)       { FactoryBot.create(:person, :with_family) }
   let!(:family)       { person.primary_family }
-  let!(:model_instance)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id ) }
+  let!(:model_instance)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, active_benefit_group_assignment: benefit_package.id) }
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: model_instance.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
-  let!(:hbx_enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
-                        household: family.active_household,
-                        family: family,
-                        aasm_state: "coverage_termination_pending",
-                        effective_on: benefit_application.start_on,
-                        rating_area_id: benefit_application.recorded_rating_area_id,
-                        sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
-                        sponsored_benefit_package_id:benefit_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:benefit_application.benefit_sponsorship.id,
-                        employee_role_id: employee_role.id)
-  }
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                      household: family.active_household,
+                      family: family,
+                      aasm_state: "coverage_termination_pending",
+                      effective_on: benefit_application.start_on,
+                      rating_area_id: benefit_application.recorded_rating_area_id,
+                      sponsored_benefit_id: benefit_application.benefit_packages.first.health_sponsored_benefit.id,
+                      sponsored_benefit_package_id: benefit_application.benefit_packages.first.id,
+                      benefit_sponsorship_id: benefit_application.benefit_sponsorship.id,
+                      employee_role_id: employee_role.id)
+  end
 
-  
+
   before do
     model_instance.update_attributes(employee_role_id: employee_role.id)
   end
@@ -54,7 +58,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
     context "NoticeTrigger" do
       subject { BenefitSponsors::Observers::NoticeObserver.new }
       let(:model_event) { ::BenefitSponsors::ModelEvents::ModelEvent.new(:employee_terminated_from_roster, model_instance, {}) }
-      
+
       it "should trigger notice event" do
         expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.employee_notice_for_employee_terminated_from_roster"
@@ -69,7 +73,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employee_profile.notice_date",
         "employee_profile.employer_name",
@@ -82,7 +86,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
         "employee_profile.broker.email",
         "employee_profile.broker_present?"
       ]
-    }
+    end
 
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
@@ -94,18 +98,20 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeTerminationNoticeToEmploye
       ee
     end
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "CensusEmployee",
         "event_object_id" => terminated_employee.id,
         "event_name" => 'employee_matches_employer_rooster'
-    } }
+      }
+    end
 
     context "when notice event received" do
       before do
         allow(subject).to receive(:resource).and_return(terminated_employee.employee_role)
         allow(subject).to receive(:payload).and_return(payload)
       end
-      
+
       it "should retrun merge model" do
         expect(merge_model).to be_a(recipient.constantize)
       end

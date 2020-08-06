@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateUserEmail < MongoidMigrationTask
 
   def migrate
     file_path = File.join(Rails.root, 'db', 'seedfiles', "update_user_email.xlsx") # path of excel file with email and oim_id data
-    if File.exists?(file_path)
+    if File.exist?(file_path)
       result = Roo::Spreadsheet.open(file_path)
       2.upto(result.last_row) do |row_number|
         row_info = result.row(row_number)
@@ -16,7 +18,7 @@ class UpdateUserEmail < MongoidMigrationTask
           else
             puts "Unable to find oim_id:#{row_info[0]}" unless Rails.env == 'test'
           end
-        rescue => e
+        rescue StandardError => e
           puts "ERROR: #{row_info} Unable to update email" + e.message unless Rails.env == 'test'
         end
       end

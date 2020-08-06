@@ -1,29 +1,31 @@
+# frozen_string_literal: true
+
 module Transcripts
   class ComparisonResult
     attr_reader :person, :changeset
 
     EVENT_NAMESPACE_PREFIX  = ""
-    CHANGE_ACTION_KINDS     = %w(add remove update new)
+    CHANGE_ACTION_KINDS     = %w[add remove update new].freeze
 
-    CHANGE_EVENT_KINDS      = %w(identifier name demographic address communication)
+    CHANGE_EVENT_KINDS      = %w[identifier name demographic address communication].freeze
 
-    IDENTIFIER_FIELDS       = %w(hbx_id ssn tin)
-    NAME_FIELDS             = %w(first_name last_name middle_name name_pfx name_sfx)
-    DEMOGRAPHIC_FIELDS      = %w(gender dob date_of_death marital_status ethnicity citizenship_status)
+    IDENTIFIER_FIELDS       = %w[hbx_id ssn tin].freeze
+    NAME_FIELDS             = %w[first_name last_name middle_name name_pfx name_sfx].freeze
+    DEMOGRAPHIC_FIELDS      = %w[gender dob date_of_death marital_status ethnicity citizenship_status].freeze
 
-    ADDRESS_FIELDS          = %w(addresses)
-    COMMUNICATION_FIELDS    = %w(emails phones)
+    ADDRESS_FIELDS          = %w[addresses].freeze
+    COMMUNICATION_FIELDS    = %w[emails phones].freeze
 
-    DISABILITY_FIELDS       = %w(disability_kind )
-    DISABILITY_KINDS        = %w(short_term_disability long_term_disability permanent_disability no_disability)
-    LANGUAGE_FIELDS         = %w(language_code)
+    DISABILITY_FIELDS       = %w[disability_kind].freeze
+    DISABILITY_KINDS        = %w[short_term_disability long_term_disability permanent_disability no_disability].freeze
+    LANGUAGE_FIELDS         = %w[language_code].freeze
 
-    PLAN_CHANGE_FIELDS      = %w(cobra_begin cobra_end)
+    PLAN_CHANGE_FIELDS      = %w[cobra_begin cobra_end].freeze
 
-    BASE_PATH     = [:base]
-    ADDRESS_PATH  = [:addresses]
-    EMAILS_PATH   = [:emails]
-    PHONES_PATH   = [:phones]
+    BASE_PATH     = [:base].freeze
+    ADDRESS_PATH  = [:addresses].freeze
+    EMAILS_PATH   = [:emails].freeze
+    PHONES_PATH   = [:phones].freeze
 
     def initialize(person = HashWithIndifferentAccess.new)
       @person = person
@@ -36,7 +38,7 @@ module Transcripts
     end
 
     def changeset_sections
-      changeset.keys.collect { |k| "#{k}".to_sym }
+      changeset.keys.collect { |k| k.to_s.to_sym }
     end
 
     # Access content using array of one or multiple nested hash key(s)
@@ -46,50 +48,44 @@ module Transcripts
     end
 
     def changeset_section_actions(section)
-     changeset_content_at(section).keys || []
+      changeset_content_at(section).keys || []
     end
 
     def changeset_section_attributes_by_action(section, change_action)
-      unless CHANGE_ACTION_KINDS.include?(change_action.to_s)
-        return ArgumentError, "invalid change_action keyword"
-      end 
+      return ArgumentError, "invalid change_action keyword" unless CHANGE_ACTION_KINDS.include?(change_action.to_s)
       changeset_content_at([section, change_action]).keys
     end
 
     def changeset_section_values_by_action(section, change_action)
-      unless CHANGE_ACTION_KINDS.include?(change_action.to_s)
-        return ArgumentError, "invalid change_action keyword"
-      end 
+      return ArgumentError, "invalid change_action keyword" unless CHANGE_ACTION_KINDS.include?(change_action.to_s)
       changeset_content_at([section, change_action]).values
     end
 
-    def name_change
-    end
+    def name_change; end
 
-    def address_change
-    end
+    def address_change; end
 
     def changeset_value_at(path = [])
       changeset_content_at(path).values if changeset_content_at(path).present?
     end
 
     def csv_row
-      if @person[:source_is_new]
-        person_details = [@person[:other]['hbx_id'], Person.decrypt_ssn(@person[:other]['encrypted_ssn']), @person[:other]['last_name'], @person[:other]['first_name']]
-      else
-        person_details = [@person[:source]['hbx_id'], Person.decrypt_ssn(@person[:source]['encrypted_ssn']), @person[:source]['last_name'], @person[:source]['first_name']]
-      end
+      person_details = if @person[:source_is_new]
+                         [@person[:other]['hbx_id'], Person.decrypt_ssn(@person[:other]['encrypted_ssn']), @person[:other]['last_name'], @person[:other]['first_name']]
+                       else
+                         [@person[:source]['hbx_id'], Person.decrypt_ssn(@person[:source]['encrypted_ssn']), @person[:source]['last_name'], @person[:source]['first_name']]
+                       end
 
       results = changeset_sections.reduce([]) do |section_rows, section|
         actions = changeset_section_actions [section]
         section_rows += actions.reduce([]) do |rows, action|
           attributes = changeset_content_at [section, action]
-    
+
           fields_to_ignore = ['_id', 'updated_by']
           rows += attributes.collect do |attribute, value|
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+              value.each{|_k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
 
             (person_details + [action, "#{section}:#{attribute}", value])
@@ -112,8 +108,8 @@ module Transcripts
 
           person_details = [
               @person[:primary_details][:hbx_id],
-              @person[:primary_details][:ssn], 
-              @person[:primary_details][:last_name], 
+              @person[:primary_details][:ssn],
+              @person[:primary_details][:last_name],
               @person[:primary_details][:first_name]
           ]
 
@@ -122,7 +118,7 @@ module Transcripts
 
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+              value.each{|_k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
 
             (person_details + [action, "#{section}:#{attribute}", value])
@@ -139,8 +135,8 @@ module Transcripts
 
           person_details = [
               @person[:primary_details][:hbx_id],
-              @person[:primary_details][:ssn], 
-              @person[:primary_details][:last_name], 
+              @person[:primary_details][:ssn],
+              @person[:primary_details][:last_name],
               @person[:primary_details][:first_name]
           ]
 
@@ -149,7 +145,7 @@ module Transcripts
           attributes.each do |attribute, value|
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+              value.each{|_k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
 
             plan_details = (@person[:plan_details].present? ? @person[:plan_details].values : 4.times.map{nil})
@@ -168,7 +164,7 @@ module Transcripts
               value.each{|val| rows << ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", val]) }
             else
               rows << ([@person[:identifier]] + person_details + plan_details + [action, "#{section}:#{attribute}", value])
-            end   
+            end
           end
 
           rows
@@ -176,23 +172,21 @@ module Transcripts
       end
     end
 
-
-    def csv_header
-    end
+    def csv_header; end
 
     def nodes
       HashWithIndifferentAccess.new(
-        person_hbx_id:      { hash_path: "[:hbx_id]", title: "HBX ID" },
-        person_last_name:   { hash_path: "[:last_name]", title: "Last Name" },
-        person_first_name:  { hash_path: "[:first_name]", title: "First Name" },
+        person_hbx_id: { hash_path: "[:hbx_id]", title: "HBX ID" },
+        person_last_name: { hash_path: "[:last_name]", title: "Last Name" },
+        person_first_name: { hash_path: "[:first_name]", title: "First Name" },
 
-        person_addresses:   { hash_path: "[:addresses]", title: "Addresses" },
-        person_phones:      { hash_path: "[:phones]", title: "Phones" },
-        person_emails:      { hash_path: "[:emails]", title: "Emails" },
+        person_addresses: { hash_path: "[:addresses]", title: "Addresses" },
+        person_phones: { hash_path: "[:phones]", title: "Phones" },
+        person_emails: { hash_path: "[:emails]", title: "Emails" },
 
-        person_created_at:  { hash_path: "[:created_at]", title: "Created At" },
-        person_updated_at:  { hash_path: "[:updated_at]", title: "Updated At" },
-        phone_created_at:   { hash_path: "[:created_at]", title: "Created At" },
+        person_created_at: { hash_path: "[:created_at]", title: "Created At" },
+        person_updated_at: { hash_path: "[:updated_at]", title: "Updated At" },
+        phone_created_at: { hash_path: "[:created_at]", title: "Created At" }
       )
     end
 
@@ -208,10 +202,10 @@ module Transcripts
     def metadata
       HashWithIndifferentAccess.new(
         :metadata => {
-            origin: "enroll_application",
-            created_at: "06 Oct 2016".to_datetime,
-          }
-        )
+          origin: "enroll_application",
+          created_at: "06 Oct 2016".to_datetime
+        }
+      )
     end
 
     def person
@@ -380,7 +374,7 @@ module Transcripts
     #    "version"=>1},
     #  :compare=>
     #   {"base"=>{"update"=>{"dob"=>1975-06-01 00:00:00 UTC}},
-    #    "addresses"=> 
+    #    "addresses"=>
     #     {"update"=>{"home"=>{
     #       "update"=>{"address_1"=>"3312 Gosnell Rd", "city"=>"Vienna", "state"=>"VA", "zip"=>"22180"}}},
     #      "add"=>

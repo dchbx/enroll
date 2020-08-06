@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class Enrollments::MemberEnrollment
     include ActiveModel::Model
@@ -8,16 +10,16 @@ module BenefitSponsors
     def initialize(opts = {})
       @member_id = nil
       @coverage_eligiblity_on = nil
-      @product_price            = 0.00
-      @sponsor_contribution     = 0.00
+      @product_price = 0.00
+      @sponsor_contribution = 0.00
       super(opts)
     end
 
     def clone_for_coverage
       self.class.new({
-       member_id: @member_id,
-       coverage_eligibility_on: @coverage_eligibility_on
-      })
+                       member_id: @member_id,
+                       coverage_eligibility_on: @coverage_eligibility_on
+                     })
     end
 
     def employee_cost

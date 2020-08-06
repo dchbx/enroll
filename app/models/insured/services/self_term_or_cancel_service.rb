@@ -12,7 +12,7 @@ module Insured
         @term_or_cancel = attrs[:term_or_cancel]
         @elected_aptc_pct = attrs[:elected_aptc_pct]
         @selected_aptc = attrs[:aptc_applied_total]
-        @factory_class  = ::Insured::Factories::SelfServiceFactory
+        @factory_class = ::Insured::Factories::SelfServiceFactory
       end
 
       def find

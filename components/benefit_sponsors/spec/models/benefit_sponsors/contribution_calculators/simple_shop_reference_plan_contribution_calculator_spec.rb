@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -25,7 +27,7 @@ module BenefitSponsors
         [
           employee_contribution_unit,
           spouse_contribution_unit,
-          dependent_contribution_unit,
+          dependent_contribution_unit
         ]
       end
 
@@ -75,7 +77,7 @@ module BenefitSponsors
         let(:employee_enrollment) do
           BenefitSponsors::Enrollments::MemberEnrollment.new(
             member_id: employee_member_id,
-            product_price: primary_price 
+            product_price: primary_price
           )
         end
         let(:employee_age) { 27 }
@@ -182,22 +184,22 @@ module BenefitSponsors
             id: "some cacheable id"
           )
         end
-        
+
         let(:reference_product) { double(id: "reference product id") }
 
         before(:each) do
           allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
-          allow(employee_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
-          allow(employee_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(false)
-          allow(employee_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(false)
-          allow(spouse_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
-          allow(spouse_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(true)
-          allow(spouse_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(false)
-          allow(dependent_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
-          allow(dependent_contribution_unit).to receive(:match?).with({"spouse"=>1}).and_return(false)
-          allow(dependent_contribution_unit).to receive(:match?).with({"dependent"=>1}).and_return(true)
+          allow(employee_contribution_unit).to receive(:match?).with({"employee" => 1}).and_return(true)
+          allow(employee_contribution_unit).to receive(:match?).with({"spouse" => 1}).and_return(false)
+          allow(employee_contribution_unit).to receive(:match?).with({"dependent" => 1}).and_return(false)
+          allow(spouse_contribution_unit).to receive(:match?).with({"employee" => 1}).and_return(false)
+          allow(spouse_contribution_unit).to receive(:match?).with({"spouse" => 1}).and_return(true)
+          allow(spouse_contribution_unit).to receive(:match?).with({"dependent" => 1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"employee" => 1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"spouse" => 1}).and_return(false)
+          allow(dependent_contribution_unit).to receive(:match?).with({"dependent" => 1}).and_return(true)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, employee_age, rating_area).and_return(250.00)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, spouse_age, rating_area).and_return(300.00)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, child_age, rating_area).and_return(300.00)
@@ -218,8 +220,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(total_contribution)
         end
@@ -247,7 +249,7 @@ module BenefitSponsors
         let(:employee_enrollment) do
           BenefitSponsors::Enrollments::MemberEnrollment.new(
             member_id: employee_member_id,
-            product_price: primary_price 
+            product_price: primary_price
           )
         end
         let(:employee_age) { 27 }
@@ -310,12 +312,12 @@ module BenefitSponsors
             id: "some cacheable id"
           )
         end
-        
+
         let(:reference_product) { double(id: "reference product id") }
 
         before(:each) do
           allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
-          allow(employee_contribution_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
+          allow(employee_contribution_unit).to receive(:match?).with({"employee" => 1}).and_return(true)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(reference_product, rate_schedule_date, employee_age, rating_area).and_return(541.17)
         end
 
@@ -334,8 +336,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(total_contribution)
         end

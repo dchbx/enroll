@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TranslationsController < ApplicationController
   before_action :set_translation, only: [:show, :edit, :update, :destroy]
 
@@ -5,8 +7,7 @@ class TranslationsController < ApplicationController
     @translations = Translation.order('key ASC').all
   end
 
-  def show
-  end
+  def show; end
 
   def new
     @translation = Translation.new
@@ -27,8 +28,7 @@ class TranslationsController < ApplicationController
     # redirect_to translations_path, :notice => "Added translations"
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     respond_to do |format|
@@ -51,6 +51,7 @@ class TranslationsController < ApplicationController
   end
 
   private
+
   def set_translation
     @translation = Translation.find(params[:id])
   end

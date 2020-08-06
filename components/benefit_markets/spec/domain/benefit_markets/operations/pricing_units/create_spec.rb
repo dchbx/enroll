@@ -6,14 +6,14 @@ RSpec.describe BenefitMarkets::Operations::PricingUnits::Create, dbclean: :after
 
   let(:ee_pricing_unit) do
     {
-      "_id"=>BSON::ObjectId.new,
-      "created_at"=>nil,
-      "discounted_above_threshold"=>nil,
-      "display_name"=>"Employee",
-      "eligible_for_threshold_discount"=>false,
-      "name"=>"employee",
-      "order"=>0,
-      "updated_at"=>nil
+      "_id" => BSON::ObjectId.new,
+      "created_at" => nil,
+      "discounted_above_threshold" => nil,
+      "display_name" => "Employee",
+      "eligible_for_threshold_discount" => false,
+      "name" => "employee",
+      "order" => 0,
+      "updated_at" => nil
     }
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerProfileAccount
   include Mongoid::Document
   include SetCurrentUser
@@ -28,10 +30,10 @@ class EmployerProfileAccount
 
   validates_presence_of :next_premium_due_on, :next_premium_amount
 
-  scope :active,      ->{ not_in(aasm_state: %w(canceled terminated)) }
+  scope :active,      ->{ not_in(aasm_state: %w[canceled terminated]) }
 
   def payments_since_last_invoice
-    current_statement_date.present? ? (self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments")).to_a : []
+    current_statement_date.present? ? self.current_statement_activity.where(:posting_date.gt => current_statement_date, :type => "Payments").to_a : []
   end
 
   def adjustments_since_last_invoice
@@ -49,7 +51,7 @@ class EmployerProfileAccount
   end
 
   def latest_workflow_state_transition
-    workflow_state_transitions.order_by(:'transition_at'.desc).limit(1).first
+    workflow_state_transitions.order_by(:transition_at.desc).limit(1).first
   end
 
   def first_day_of_month?
@@ -57,8 +59,7 @@ class EmployerProfileAccount
   end
 
   # TODO: implement this
-  def notify_employees
-  end
+  def notify_employees; end
 
   aasm do
     # Initial open enrollment period closed, first premium payment not received/processed
@@ -117,7 +118,7 @@ class EmployerProfileAccount
       transitions from: :binder_paid, to: :binder_pending, :guard => :is_before_plan_year_start?, :after => :reverse_binder
       # transitions from: :invoiced, to: :canceled, :guard => :was_last_state?
 
-      # TODO -- add complex state transitions
+      # TODO: -- add complex state transitions
       # transitions from: [:current, :invoiced], to: :delinquent, :guard => :was_last_state?
 
       # transitions from: :binder_paid, to: :canceled, :after => :revert_state
@@ -138,12 +139,13 @@ class EmployerProfileAccount
   end
 
   private
+
   def record_transition
     self.workflow_state_transitions << WorkflowStateTransition.new(
-        from_state: aasm.from_state,
-        to_state: aasm.to_state,
-        event: aasm.current_event,
-        transition_at: Time.now.utc
+      from_state: aasm.from_state,
+      to_state: aasm.to_state,
+      event: aasm.current_event,
+      transition_at: Time.now.utc
     )
   end
 

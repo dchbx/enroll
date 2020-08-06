@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::CensusEmployee
     include Virtus.model
-   
+
     attribute :latest_terminated_health_enrollment_plan_name, String
     attribute :latest_terminated_dental_enrollment_plan_name, String
 

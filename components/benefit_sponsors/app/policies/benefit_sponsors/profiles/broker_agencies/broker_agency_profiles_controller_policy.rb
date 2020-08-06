@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
@@ -12,7 +14,7 @@ module BenefitSponsors
         end
 
         def index?
-          return user.has_hbx_staff_role? || user.has_csr_role?
+          user.has_hbx_staff_role? || user.has_csr_role?
         end
 
         def show?

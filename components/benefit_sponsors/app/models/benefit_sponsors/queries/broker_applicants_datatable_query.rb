@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Queries
     class BrokerApplicantsDatatableQuery
@@ -13,11 +15,11 @@ module BenefitSponsors
         @custom_attributes = attributes
       end
 
-      def person_search search_string
+      def person_search(search_string)
         ::Person.exists(broker_role: true).broker_role_having_agency if search_string.blank?
       end
 
-      def build_scope()
+      def build_scope
         person = ::Person.exists(broker_role: true).broker_role_having_agency.order_by(created_at: :desc)
         person
       end

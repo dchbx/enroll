@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module Analytics
   class Dimensions::MinutesOfHour
     include Mongoid::Document
 
     embedded_in :daily, class_name: "Analytics::Dimensions::Daily"
-    
+
     field :hour, type: Integer
     ## TODO - add child model to track instance refs
     # field :topic_class_name, type: String

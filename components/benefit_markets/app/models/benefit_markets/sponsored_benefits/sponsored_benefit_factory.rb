@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module SponsoredBenefits
     class SponsoredBenefitFactory
@@ -6,8 +8,8 @@ module BenefitMarkets
         validate_product_kind!(product_kind)
 
         klass_name = sponsored_benefit_class_name_for(product_kind)
-        @sponsored_benefit  = klass_name.constantize.new
-        @product_kind       = product_kind
+        @sponsored_benefit = klass_name.constantize.new
+        @product_kind = product_kind
       end
 
       def product_package_kind=(new_product_package_kind)
@@ -17,12 +19,9 @@ module BenefitMarkets
         @product_package_kind = product_package_kind
       end
 
-      def sponsored_benefit
-        @sponsored_benefit
-      end
+      attr_reader :sponsored_benefit
 
-      def add_product_list(new_product_list)
-      end
+      def add_product_list(new_product_list); end
 
       private
 
@@ -31,9 +30,7 @@ module BenefitMarkets
       end
 
       def set_sponsored_benefit
-        if @product_kind.present? && @product_package_kind.present?
-          namespace = namespace_for(self)
-        end        
+        namespace = namespace_for(self) if @product_kind.present? && @product_package_kind.present?
       end
 
       def add_contribution_model(new_contribution_model)
@@ -54,17 +51,17 @@ module BenefitMarkets
       end
 
       def product_package_class_name
-        klass_name = "#{@product_package_kind}_#{@product_kind.to_s}_product_package".camelcase
+        klass_name = "#{@product_package_kind}_#{@product_kind}_product_package".camelcase
         product_kind_namespace + "::#{klass_name}"
       end
 
       def product_namespace
-        local_namespace   = self.class.to_s.deconstantize
+        local_namespace = self.class.to_s.deconstantize
         local_namespace.deconstantize + "::Products"
       end
 
       def contribution_model_namespace
-        local_namespace   = parent_namespace_for(self.class)
+        local_namespace = parent_namespace_for(self.class)
         parent_namespace_for(local_namespace) + "::ContributionModels"
       end
 
@@ -73,16 +70,12 @@ module BenefitMarkets
         [product_namespace, product_dir].join("::")
       end
 
-      def validate_product_kind!(product_kind, product_package_kind)
-        unless BenefitMarkets::Products::Product::KINDS.include?(product_kind)
-          raise "invalid Product kind: #{product_kind}"
-        end
+      def validate_product_kind!(product_kind, _product_package_kind)
+        raise "invalid Product kind: #{product_kind}" unless BenefitMarkets::Products::Product::KINDS.include?(product_kind)
       end
 
       def validate_product_package_kind!(product_package_kind)
-        unless BenefitMarkets::Products::ProductPackage::KINDS.include?(product_package_kind)
-          raise "invalid Product Package kind: #{product_package_kind}"
-        end
+        raise "invalid Product Package kind: #{product_package_kind}" unless BenefitMarkets::Products::ProductPackage::KINDS.include?(product_package_kind)
       end
 
 

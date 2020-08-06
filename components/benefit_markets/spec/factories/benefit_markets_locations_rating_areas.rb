@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_locations_rating_area, class: 'BenefitMarkets::Locations::RatingArea' do
 

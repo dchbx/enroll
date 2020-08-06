@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^Broker staff enters his personal information$/) do
   find('a', :text => "Broker Agency Staff", wait: 5).click
   fill_in 'staff[first_name]', with: 'Ricky'

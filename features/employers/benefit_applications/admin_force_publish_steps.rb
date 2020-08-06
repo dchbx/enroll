@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 include Config::SiteHelper
 
 When(/^the system date is (greater|less) than the earliest_start_prior_to_effective_on$/) do |compare|
@@ -11,20 +13,14 @@ When(/^the system date is (greater|less) than the earliest_start_prior_to_effect
 end
 
 When(/^the system date is (less) than the monthly_open_enrollment_end_on$/) do |compare|
-  if compare == "less"
-    TimeKeeper.date_of_record < initial_application.open_enrollment_period.max == true
-  end
+  TimeKeeper.date_of_record < initial_application.open_enrollment_period.max == true if compare == "less"
 end
 
 And(/^the system date is (greater|less) than the publish_due_day_of_month$/) do |compare|
   if compare == 'less'
-    unless  TimeKeeper.date_of_record < initial_application.last_day_to_publish == true
-      allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish - 1.day))
-    end
+    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish - 1.day)) unless TimeKeeper.date_of_record < initial_application.last_day_to_publish == true
   elsif compare == 'greater'
-    unless TimeKeeper.date_of_record > initial_application.last_day_to_publish == true
-      allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish + 1.day))
-    end
+    allow(TimeKeeper).to receive(:date_of_record).and_return((initial_application.last_day_to_publish + 1.day)) unless TimeKeeper.date_of_record > initial_application.last_day_to_publish == true
   end
 end
 
@@ -50,23 +46,19 @@ Then(/^the force published action should display 'Employer\(s\) Plan Year was su
   expect(page).to have_content('Employer(s) Plan Year was successfully published')
 end
 
-When (/^(.*?) FTE count is (less than or equal|more than) to shop:small_market_employee_count_maximum$/) do |employer, compare|
+When (/^(.*?) FTE count is (less than or equal|more than) to shop:small_market_employee_count_maximum$/) do |_employer, compare|
   if compare == 'less than or equal'
-    initial_application.update_attributes(fte_count: fte_max_count - 1 )
+    initial_application.update_attributes(fte_count: fte_max_count - 1)
   elsif compare == 'more than'
     initial_application.update_attributes(fte_count: fte_max_count + 5)
   end
 end
 
-And (/^(.*?) primary address state (is|is not) MA$/) do |employer, compare|
-  if compare =='is'
-    unless initial_application.sponsor_profile.is_primary_office_local?
-      initial_application.benefit_sponsorship.profile.primary_office_location.address.update_attributes(state: Settings.aca.state_abbreviation.to_s.downcase)
-    end
+And (/^(.*?) primary address state (is|is not) MA$/) do |_employer, compare|
+  if compare == 'is'
+    initial_application.benefit_sponsorship.profile.primary_office_location.address.update_attributes(state: Settings.aca.state_abbreviation.to_s.downcase) unless initial_application.sponsor_profile.is_primary_office_local?
   elsif compare == 'is not'
-    if initial_application.sponsor_profile.is_primary_office_local?
-      initial_application.benefit_sponsorship.profile.primary_office_location.address.update_attributes(state: '')
-    end
+    initial_application.benefit_sponsorship.profile.primary_office_location.address.update_attributes(state: '') if initial_application.sponsor_profile.is_primary_office_local?
   end
 end
 
@@ -86,7 +78,7 @@ And(/^the user clicks force publish$/) do
   find('a', :text => "Force Publish", wait: 5).click
 end
 
-Then(/^the user will see application ineligible message$/) do 
+Then(/^the user will see application ineligible message$/) do
   expect(page).to have_content('As submitted, this application is ineligible for coverage')
 end
 

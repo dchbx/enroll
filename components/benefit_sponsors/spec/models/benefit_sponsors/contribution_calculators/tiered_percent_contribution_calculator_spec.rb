@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -89,7 +91,7 @@ module BenefitSponsors
         let(:employee_enrollment) do
           BenefitSponsors::Enrollments::MemberEnrollment.new(
             member_id: employee_member_id,
-            product_price: primary_price 
+            product_price: primary_price
           )
         end
         let(:employee_age) { 27 }
@@ -182,10 +184,10 @@ module BenefitSponsors
           allow(contribution_model).to receive(:map_relationship_for).with("self", employee_age, false).and_return("employee")
           allow(contribution_model).to receive(:map_relationship_for).with("spouse", spouse_age, false).and_return("spouse")
           allow(contribution_model).to receive(:map_relationship_for).with("child", child_age, false).and_return("dependent")
-          allow(employee_only_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_spouse_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_dependents_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(family_contribution_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(true)
+          allow(employee_only_contribution_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_spouse_contribution_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_dependents_contribution_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(family_contribution_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(true)
         end
 
         it "calculates the total contribution" do
@@ -203,8 +205,8 @@ module BenefitSponsors
             family_roster_entry,
             sponsor_contribution
           )
-          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal.new("0.00")) do |acc, m_en|
-            BigDecimal.new((acc + m_en.sponsor_contribution).to_s).round(2)
+          member_total = calculation_result.group_enrollment.member_enrollments.inject(BigDecimal("0.00")) do |acc, m_en|
+            BigDecimal((acc + m_en.sponsor_contribution).to_s).round(2)
           end
           expect(member_total).to eq(total_contribution)
         end

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
   EnrollmentProductAdapter = Struct.new(:id, :issuer_profile_id, :active_year, :kind)
-  
+
   MemberInfoAdapter = Struct.new(:prefix, :first_name, :middle_name, :last_name, :suffix, :encrypted_ssn) do
     def ssn
       return nil if encrypted_ssn.blank?
@@ -26,7 +28,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
       @sponsored_benefit = s_benefit
       @issuer_profile_id_map = {}
       @active_year_map = {}
-      ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+      ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :application_period).each do |rec|
         @issuer_profile_id_map[rec.first] = rec[1]
         @active_year_map[rec.first] = rec.last["min"].year
       end
@@ -72,8 +74,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
               "in" => "$$fm.person_id"
             }
           }
-          }
-        },
+        }},
         {"$lookup" => {
           "from" => "people",
           "localField" => "people_ids",
@@ -83,7 +84,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
         {"$project" => {
           "hbx_enrollment" => 1,
           "family_members" => 1,
-          "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
+          "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields)
         }}
       ])
     end
@@ -125,17 +126,13 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           person_id_map[fm["person_id"]]["name_sfx"],
           person_id_map[fm["person_id"]]["encrypted_ssn"]
         )
-        if fm["_id"] == sub_member["applicant_id"]
-          sub_person = person_id_map[fm["person_id"]]
-        end
+        sub_person = person_id_map[fm["person_id"]] if fm["_id"] == sub_member["applicant_id"]
       end
       rel_map = {}
       member_entries = []
       member_enrollments = []
-      if sub_person["person_relationships"]
-        sub_person["person_relationships"].each do |pr|
-          rel_map[pr["relative_id"]] = pr["kind"]
-        end
+      sub_person["person_relationships"]&.each do |pr|
+        rel_map[pr["relative_id"]] = pr["kind"]
       end
       employee_roles = (sub_person["employee_roles"].map { |r| Mongoid::Factory.build(::EmployeeRole, r) })
       employee_role = employee_roles.detect do |er|
@@ -159,9 +156,9 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
         @sponsored_benefit
       )
       member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-        member_id: sub_member["_id"],
-        coverage_eligibility_on: sub_member["coverage_start_on"]
-      })
+                                                                                   member_id: sub_member["_id"],
+                                                                                   coverage_eligibility_on: sub_member["coverage_start_on"]
+                                                                                 })
       dep_members.each do |dep_member|
         person_id = family_people_ids[dep_member["applicant_id"]]
         member_entries << EnrollmentMemberAdapter.new(
@@ -175,16 +172,16 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           nil
         )
         member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-          member_id: dep_member["_id"],
-          coverage_eligibility_on: dep_member["coverage_start_on"]
-        })
+                                                                                     member_id: dep_member["_id"],
+                                                                                     coverage_eligibility_on: dep_member["coverage_start_on"]
+                                                                                   })
       end
       product = EnrollmentProductAdapter.new(
-            enrollment_record["hbx_enrollment"]["product_id"],
-            @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]],
-            enrollment_record["hbx_enrollment"]["coverage_kind"]
-          )
+        enrollment_record["hbx_enrollment"]["product_id"],
+        @issuer_profile_id_map[enrollment_record["hbx_enrollment"]["product_id"]],
+        @active_year_map[enrollment_record["hbx_enrollment"]["product_id"]],
+        enrollment_record["hbx_enrollment"]["coverage_kind"]
+      )
       contribution_prohibited = (enrollment_record["hbx_enrollment"]["kind"].to_s == "employer_sponsored_cobra")
       group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
         {
@@ -192,10 +189,11 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
           previous_product: product,
           rate_schedule_date: @sponsored_benefit.rate_schedule_date,
           coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
-          member_enrollments: member_enrollments, 
+          member_enrollments: member_enrollments,
           rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
           sponsor_contribution_prohibited: contribution_prohibited
-        })
+        }
+      )
       ::BenefitSponsors::Members::MemberGroup.new(
         member_entries,
         {group_enrollment: group_enrollment}
@@ -219,9 +217,7 @@ class HbxEnrollmentSponsorEnrollmentCoverageReportCalculator
     contribution_model = p_package.contribution_model
     p_calculator = pricing_model.pricing_calculator
     c_calculator = contribution_model.contribution_calculator
-    if hbx_enrollment_id_list.count < 1
-      return
-    end
+    return if hbx_enrollment_id_list.count < 1
     group_mapper = HbxEnrollmentRosterMapper.new(hbx_enrollment_id_list, sponsored_benefit)
     group_mapper.each do |ce_roster|
       price_group = p_calculator.calculate_price_for(pricing_model, ce_roster, sponsor_contribution)

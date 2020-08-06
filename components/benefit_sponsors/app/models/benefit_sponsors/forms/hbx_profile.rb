@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class HbxProfile
@@ -21,7 +23,7 @@ module BenefitSponsors
       end
 
       def office_locations_attributes=(office_locations)
-        self.office_locations = office_locations.map do |key, office_location|
+        self.office_locations = office_locations.map do |_key, office_location|
           BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm.new office_location
         end
       end

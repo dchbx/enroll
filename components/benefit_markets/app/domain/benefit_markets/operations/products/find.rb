@@ -20,11 +20,10 @@ module BenefitMarkets
           Success(products)
         end
 
-        private 
+        private
 
         # date type check
         def validate_effective_date(effective_date)
-          
           Success(effective_date)
         end
 

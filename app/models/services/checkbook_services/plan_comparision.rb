@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'nokogiri'
 
 module Services
@@ -11,7 +13,7 @@ module Services
       IVL_PATH = Rails.application.config.checkbook_services_ivl_path
       SHOP_PATH = Rails.application.config.checkbook_services_shop_path
 
-      def initialize(hbx_enrollment, is_congress=false)
+      def initialize(hbx_enrollment, is_congress = false)
         @hbx_enrollment = hbx_enrollment
         if @hbx_enrollment.kind.downcase == "individual"
           @person = @hbx_enrollment.consumer_role.person
@@ -36,8 +38,8 @@ module Services
             end
 
           @result = HTTParty.post(@url,
-                :body => construct_body.to_json,
-                :headers => { 'Content-Type' => 'application/json' } )
+                                  :body => construct_body.to_json,
+                                  :headers => { 'Content-Type' => 'application/json' })
           uri =
             if @result.parsed_response.is_a?(String)
               JSON.parse(@result.parsed_response)["URL"]
@@ -45,14 +47,14 @@ module Services
               @result.parsed_response["URL"]
             end
           if uri.present?
-            return uri
+            uri
           else
             raise "Unable to generate url"
           end
         rescue Exception => e
           Rails.logger.error { "Unable to generate url for hbx_enrollment_id #{@hbx_enrollment.id} due to #{e.backtrace}" }
           # redirects to plan shopping show page if url generation is failed.
-          return "/insured/plan_shoppings/#{@hbx_enrollment.id}?market_kind=#{@hbx_enrollment.kind}&coverage_kind=#{@hbx_enrollment.coverage_kind}"
+          "/insured/plan_shoppings/#{@hbx_enrollment.id}?market_kind=#{@hbx_enrollment.kind}&coverage_kind=#{@hbx_enrollment.coverage_kind}"
         end
       end
 
@@ -84,7 +86,7 @@ module Services
           "employer":
           {
             "state": 11,
-            "county": 001
+            "county": 0o01
           },
           "family": build_family,
           "contribution": employer_contributions,
@@ -201,7 +203,7 @@ module Services
         # @census_employee.census_dependents.each do |dependent|
         @hbx_enrollment.hbx_enrollment_members.each do |dependent|
           next if dependent.primary_relationship == "nephew_or_niece"
-          family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d") ,'relationship': dependent.primary_relationship}
+          family << {'dob': dependent.family_member.person.dob.strftime("%Y-%m-%d"),'relationship': dependent.primary_relationship}
         end
         family
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe "benefit_sponsors/profiles/registrations/confirmation.html.erb", type: :view do

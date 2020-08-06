@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::ReminderNotice < IvlNotice
   attr_accessor :family
 
@@ -5,7 +7,7 @@ class IvlNotices::ReminderNotice < IvlNotice
     args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
+    args[:recipient_document_store] = consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -15,18 +17,14 @@ class IvlNotices::ReminderNotice < IvlNotice
     build
     generate_pdf_notice
     attach_blank_page(notice_path)
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_required_documents if notice.documents_needed && !notice.cover_all?
     attach_non_discrimination
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -55,52 +53,44 @@ class IvlNotices::ReminderNotice < IvlNotice
   end
 
   def append_notice_subject
-    notice.notice_subject =  case notice.notification_type
-    when "first_verifications_reminder"
-      "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")}"
-    when "second_verifications_reminder"
-      "DON’T FORGET – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
-    when "third_verifications_reminder"
-      "DON’T MISS THE DEADLINE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
-    when "fourth_verifications_reminder"
-      "FINAL NOTICE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime("%^B %d, %Y")} TO KEEP YOUR INSURANCE"
+    notice.notice_subject = case notice.notification_type
+                            when "first_verifications_reminder"
+                              "REMINDER - KEEPING YOUR INSURANCE - SUBMIT DOCUMENTS BY #{notice.due_date.strftime('%^B %d, %Y')}"
+                            when "second_verifications_reminder"
+                              "DON’T FORGET – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime('%^B %d, %Y')} TO KEEP YOUR INSURANCE"
+                            when "third_verifications_reminder"
+                              "DON’T MISS THE DEADLINE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime('%^B %d, %Y')} TO KEEP YOUR INSURANCE"
+                            when "fourth_verifications_reminder"
+                              "FINAL NOTICE – YOU MUST SUBMIT DOCUMENTS BY #{notice.due_date.strftime('%^B %d, %Y')} TO KEEP YOUR INSURANCE"
     end
   end
 
   def append_unverified_family_members
     family = recipient.primary_family
     enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
+      !hbx_en.is_shop? && !["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state) &&
         (
           hbx_en.terminated_on.blank? ||
           hbx_en.terminated_on >= TimeKeeper.date_of_record
         )
     end
-    enrollments.reject!{|e| e.coverage_terminated? }
-    if enrollments.empty?
-      raise 'enrollments not found!'
-    end
+    enrollments.reject!(&:coverage_terminated?)
+    raise 'enrollments not found!' if enrollments.empty?
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
     people = family_members.map(&:person).uniq
-    people.reject!{|p| p.consumer_role.aasm_state != 'verification_outstanding'}
-    people.reject!{|person| !person.consumer_role.types_include_to_notices.present? }
-    if people.empty?
-      raise 'no family member found with outstanding verification types or verification_outstanding status'
-    end
+    people.select!{|p| p.consumer_role.aasm_state == 'verification_outstanding'}
+    people.select!{|person| person.consumer_role.types_include_to_notices.present? }
+    raise 'no family member found with outstanding verification types or verification_outstanding status' if people.empty?
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.types_include_to_notices.present?
-        outstanding_people << person
-      end
+      outstanding_people << person if person.consumer_role.types_include_to_notices.present?
     end
 
     outstanding_people.uniq!
-    if outstanding_people.empty?
-      raise 'no family member found without uploaded documents'
-    end
+    raise 'no family member found without uploaded documents' if outstanding_people.empty?
 
     hbx_enrollments = []
     en = enrollments.select(&:is_any_enrollment_member_outstanding)
@@ -117,11 +107,11 @@ class IvlNotices::ReminderNotice < IvlNotice
 
     notice.documents_needed = outstanding_people.present? ? true : false
     notice.due_date = family.min_verification_due_date
-    notice.application_date = hbx_enrollments.sort_by(&:created_at).last.created_at.to_date
+    notice.application_date = hbx_enrollments.max_by(&:created_at).created_at.to_date
     append_unverified_individuals(outstanding_people)
   end
 
-   def build_enrollment(hbx_enrollment)
+  def build_enrollment(hbx_enrollment)
     PdfTemplates::Enrollment.new({
                                    plan_name: hbx_enrollment.product.title,
                                    premium: hbx_enrollment.total_premium,
@@ -131,7 +121,7 @@ class IvlNotices::ReminderNotice < IvlNotice
                                    selected_on: hbx_enrollment.created_at,
                                    is_receiving_assistance: hbx_enrollment.applied_aptc_amount > 0 || hbx_enrollment.product.is_csr? ? true : false
                                  })
-   end
+  end
 
   def ssn_outstanding?(person)
     person.consumer_role.types_include_to_notices.map(&:type_name).include?("Social Security Number")
@@ -170,21 +160,21 @@ class IvlNotices::ReminderNotice < IvlNotice
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
+                                                               street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+                                                               street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
+                                                               city: primary_address.city.titleize,
+                                                               state: primary_address.state,
+                                                               zip: primary_address.zip
+                                                             })
   end
 
   def append_hbe
     notice.hbe = PdfTemplates::Hbe.new({
-      url: Settings.site.home_url,
-      phone: phone_number_format(Settings.contact_center.phone_number),
-      email: Settings.contact_center.email_address,
-      short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com",
-    })
+                                         url: Settings.site.home_url,
+                                         phone: phone_number_format(Settings.contact_center.phone_number),
+                                         email: Settings.contact_center.email_address,
+                                         short_url: "#{Settings.site.short_name.gsub(/[^0-9a-z]/i,'').downcase}.com"
+                                       })
   end
 
   def capitalize_quadrant(address_line)
@@ -198,12 +188,12 @@ class IvlNotices::ReminderNotice < IvlNotice
       recipient.hbx_id,
       recipient.first_name,
       recipient.last_name,
-      notice.primary_address.present? ? notice.primary_address.attributes.values.reject{|x| x.blank?}.compact.join(',') : "",
+      notice.primary_address.present? ? notice.primary_address.attributes.values.reject(&:blank?).compact.join(',') : "",
       notice.due_date,
       (notice.enrollments.first.submitted_at || notice.enrollments.first.created_at),
       notice.enrollments.first.effective_on,
-      notice.ssa_unverified.map{|individual| individual.full_name }.join(','),
-      notice.dhs_unverified.map{|individual| individual.full_name }.join(','),
+      notice.ssa_unverified.map(&:full_name).join(','),
+      notice.dhs_unverified.map(&:full_name).join(','),
       recipient.consumer_role.contact_method,
       recipient.home_email.try(:address) || recipient.user.try(:email),
       notice.enrollments.first.aasm_state.to_s

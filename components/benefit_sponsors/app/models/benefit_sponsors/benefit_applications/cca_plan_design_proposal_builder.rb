@@ -1,4 +1,6 @@
-# Generate a CCA PlanDesign Proposal from an existing EA EmployerProfile and child models 
+# frozen_string_literal: true
+
+# Generate a CCA PlanDesign Proposal from an existing EA EmployerProfile and child models
 module BenefitSponsors
   module BenefitApplications
     class CcaPlanDesignProposalBuilder < PlanDesignProposalBuilder
@@ -6,6 +8,5 @@ module BenefitSponsors
 
 
     end
-
   end
 end

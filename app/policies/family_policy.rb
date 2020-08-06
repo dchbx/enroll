@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class FamilyPolicy < ApplicationPolicy
   def show?
     user_person = @user.person
     if user_person
       primary_applicant = @record.primary_applicant
-      return true if (@record.primary_applicant.person_id == user_person.id)
+      return true if @record.primary_applicant.person_id == user_person.id
       return true if can_modify_family?(user_person)
       broker_staff_roles = user_person.active_broker_staff_roles
       broker_role = user_person.broker_role
@@ -57,27 +59,27 @@ class FamilyPolicy < ApplicationPolicy
   end
 
   def updateable?
-    return true unless role = user.person && user.person.hbx_staff_role
+    return true unless role = user.person&.hbx_staff_role
     role.permission.modify_family
   end
 
   def can_update_ssn?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role = user.person&.hbx_staff_role
     role.permission.can_update_ssn
   end
 
   def can_view_username_and_email?
-    return false unless role = (user.person && user.person.hbx_staff_role) || (user.person.csr_role)
+    return false unless role = user.person&.hbx_staff_role || user.person&.csr_role
     role.permission.can_view_username_and_email || user.person.csr_role.present?
   end
 
   def hbx_super_admin_visible?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role = user.person&.hbx_staff_role
     role.permission.can_update_ssn
   end
 
   def can_transition_family_members?
-    return false unless role = user.person && user.person.hbx_staff_role
+    return false unless role = user.person&.hbx_staff_role
     role.permission.can_transition_family_members
   end
 

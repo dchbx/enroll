@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe ::TransportProfiles::Steps::UnzipFile do
@@ -29,11 +31,11 @@ describe ::TransportProfiles::Steps::UnzipFile do
     it "can be cleaned up after" do
       output_dir_name = process_context.get(:list_of_temp_dirs)
       output_dir_name.each do |d_name|
-        expect(File.exists?(d_name)).to be_truthy
+        expect(File.exist?(d_name)).to be_truthy
       end
       process_context.execute_cleanup
       output_dir_name.each do |d_name|
-        expect(File.exists?(d_name)).to be_falsey
+        expect(File.exist?(d_name)).to be_falsey
       end
     end
   end

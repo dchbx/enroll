@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Notifier
   module NoticeKindsHelper
-
     def date_of_notice
       TimeKeeper.date_of_record.strftime('%m/%d/%Y')
     end
@@ -25,8 +26,7 @@ module Notifier
       'staff name'
     end
 
-    def employer_address
-    end
+    def employer_address; end
 
     def open_enrollment_begin
       'open enrollment begin date'

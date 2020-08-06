@@ -12,8 +12,8 @@ RSpec.describe BenefitSponsors::Entities::BenefitApplication do
     let(:oe_start_on)                    { TimeKeeper.date_of_record.beginning_of_month}
     let(:expiration_date)                { effective_date }
     let(:effective_period)               { effective_date..(effective_date + 1.year).prev_day }
-    let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }      
-    let(:terminated_on)                  { effective_date.end_of_month }       
+    let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }
+    let(:terminated_on)                  { effective_date.end_of_month }
     let(:termination_kind)               { "non_payment"}
     let(:termination_reason)             { "non_payment_termination_reason"}
 

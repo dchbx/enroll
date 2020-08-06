@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RuleSet
   module HbxEnrollment
     class IndividualMarketVerification
@@ -9,7 +11,7 @@ module RuleSet
 
       def applicable?
         !hbx_enrollment.product_id.nil? &&
-          hbx_enrollment.affected_by_verifications_made_today? && (!hbx_enrollment.benefit_sponsored?)
+          hbx_enrollment.affected_by_verifications_made_today? && !hbx_enrollment.benefit_sponsored?
       end
 
       def roles_for_determination

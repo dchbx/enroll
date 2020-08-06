@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module PricingModels
     class RelationshipPricingUnit < PricingUnit
@@ -11,9 +13,7 @@ module BenefitMarkets
 
       def threshold_provided_if_eligible
         if eligible_for_threshold_discount
-          if discounted_above_threshold.blank?
-            errors.add(:discounted_above_threshold, "you must provide a value for the discount threshold if the relationship is eligible for discounting")
-          end
+          errors.add(:discounted_above_threshold, "you must provide a value for the discount threshold if the relationship is eligible for discounting") if discounted_above_threshold.blank?
         end
         true
       end
@@ -22,9 +22,7 @@ module BenefitMarkets
         return true if pricing_model.blank?
         return true if pricing_model.member_relationships.blank?
         matching_relationship = pricing_model.member_relationships.select { |mr| mr.relationship_name.to_sym == name.to_sym }
-        if !matching_relationship.any?
-          errors.add(:name, "the name of a relationship pricing unit must match the name of a mapped relationship")
-        end
+        errors.add(:name, "the name of a relationship pricing unit must match the name of a mapped relationship") if matching_relationship.none?
         true
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_site_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_product_spec_helpers")
@@ -27,13 +29,15 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package) }
 
     let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id) }
-    let(:census_employee) { FactoryBot.create(:census_employee,
-      employer_profile: abc_profile,
-      benefit_group_assignments: [benefit_group_assignment]
-    )}
+    let(:census_employee) do
+      FactoryBot.create(:census_employee,
+                        employer_profile: abc_profile,
+                        benefit_group_assignments: [benefit_group_assignment])
+    end
     let(:person) { FactoryBot.create(:person, :with_family) }
     let(:family) { person.primary_family }
-    let!(:enrollment) {  FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+    let!(:enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
                         family: family,
                         aasm_state: "coverage_selected",
@@ -42,11 +46,11 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
                         sponsored_benefit_id: predecessor_application.benefit_packages.first.health_sponsored_benefit.id,
 
                         # sponsored_benefit_id:sponsored_benefit.id,
-                        sponsored_benefit_package_id:predecessor_application.benefit_packages.first.id,
-                        benefit_sponsorship_id:predecessor_application.benefit_sponsorship.id,
+                        sponsored_benefit_package_id: predecessor_application.benefit_packages.first.id,
+                        benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
                         benefit_group_assignment_id: benefit_group_assignment.id,
                         employee_role_id: employee_role.id)
-    }
+    end
 
     around do |example|
       ClimateControl.modify fein: abc_organization.fein do
@@ -55,40 +59,40 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "extend open enrollment" do
-        let!(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
-        let!(:effective_period) { start_on..start_on.next_year.prev_day }
-        let!(:ineligible_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
+      let!(:start_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+      let!(:effective_period) { start_on..start_on.next_year.prev_day }
+      let!(:ineligible_benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, :with_benefit_package, benefit_sponsorship: benefit_sponsorship, aasm_state: "enrollment_ineligible", effective_period: effective_period)}
 
-        around do |example|
-          ClimateControl.modify action: 'extend_open_enrollment', effective_date: start_on.strftime("%m/%d/%Y"), oe_end_date: start_on.prev_day.strftime("%m/%d/%Y") do
-            example.run
-          end
+      around do |example|
+        ClimateControl.modify action: 'extend_open_enrollment', effective_date: start_on.strftime("%m/%d/%Y"), oe_end_date: start_on.prev_day.strftime("%m/%d/%Y") do
+          example.run
         end
+      end
 
-        it "should extend open enrollment from enrollment ineligible" do
-          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_ineligible
-          subject.migrate
-          ineligible_benefit_application.reload
-          benefit_sponsorship.reload
-          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
-          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
-        end
+      it "should extend open enrollment from enrollment ineligible" do
+        expect(ineligible_benefit_application.aasm_state).to eq :enrollment_ineligible
+        subject.migrate
+        ineligible_benefit_application.reload
+        benefit_sponsorship.reload
+        expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+        expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+      end
 
-        it "should extend open enrollment from enrollment open" do
-          ineligible_benefit_application.update_attributes!(aasm_state: "enrollment_open")
-          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_open
-          subject.migrate
-          ineligible_benefit_application.reload
-          benefit_sponsorship.reload
-          expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
-          expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
-        end
+      it "should extend open enrollment from enrollment open" do
+        ineligible_benefit_application.update_attributes!(aasm_state: "enrollment_open")
+        expect(ineligible_benefit_application.aasm_state).to eq :enrollment_open
+        subject.migrate
+        ineligible_benefit_application.reload
+        benefit_sponsorship.reload
+        expect(ineligible_benefit_application.open_enrollment_period.max).to eq start_on.prev_day
+        expect(ineligible_benefit_application.aasm_state).to eq :enrollment_extended
+      end
 
-        it "should not extend open enrollment from draft" do
-          ineligible_benefit_application.update_attributes!(aasm_state: "draft")
-          expect(ineligible_benefit_application.aasm_state).to eq :draft
-          expect { subject.migrate }.to raise_error("Unable to find benefit application!!")
-        end
+      it "should not extend open enrollment from draft" do
+        ineligible_benefit_application.update_attributes!(aasm_state: "draft")
+        expect(ineligible_benefit_application.aasm_state).to eq :draft
+        expect { subject.migrate }.to raise_error("Unable to find benefit application!!")
+      end
     end
 
     context "Update assm state to enrollment open" do
@@ -248,7 +252,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:new_start_date) { effective_date.next_month }
       let(:new_end_date) { new_start_date + 1.year }
       let(:display_name) { 'Employee' }
-      let!(:contribution_unit)  { predecessor_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }      
+      let!(:contribution_unit)  { predecessor_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }
 
       around do |example|
         ClimateControl.modify(
@@ -388,5 +392,5 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         end
       end
     end
-   end
+  end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   # Defines an endpoint from which to transport resources from or to.
   # Includes embedded {TransportProfiles::Credential} records to specify authentication information.
@@ -22,26 +24,26 @@ module TransportProfiles
 
     validates_presence_of :title, :site_key, :key, :uri
 
-    MARKET_KINDS = ["shop", "individual", "any"]
+    MARKET_KINDS = ["shop", "individual", "any"].freeze
 
     validates_inclusion_of :market_kind, in: MARKET_KINDS, message: '%{value} is not a valid market kind', :allow_nil => false
 
     index({key: 1})
     index({site_key: 1, key: 1, market_kind: 1})
 
-    scope :find_by_endpoint_key,  ->(endpoint_key) { where(key: endpoint_key.to_s ) }
+    scope :find_by_endpoint_key,  ->(endpoint_key) { where(key: endpoint_key.to_s) }
 
     def active_credential
       credentials.first
     end
 
     def user
-      sftp_credential = credentials.detect { |cr| cr.sftp? }
+      sftp_credential = credentials.detect(&:sftp?)
       sftp_credential.account_name
     end
 
     def s3_options
-      s3_credential = credentials.detect { |cr| cr.s3? }
+      s3_credential = credentials.detect(&:s3?)
       return nil unless s3_credential
       {
         secret_access_key: s3_credential.secret_access_key,
@@ -50,7 +52,7 @@ module TransportProfiles
     end
 
     def sftp_options
-      sftp_credential = credentials.detect { |cr| cr.sftp? }
+      sftp_credential = credentials.detect(&:sftp?)
       return nil unless sftp_credential
       if sftp_credential.private_rsa_key.blank?
         {

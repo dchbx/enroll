@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class BrokerAgencyProfileForm
 
@@ -27,7 +29,7 @@ module Forms
     end
 
     def save
-      (@organization.save && @current_user.save).tap do 
+      (@organization.save && @current_user.save).tap do
         bubble_broker_agency_profile_errors
       end
     end

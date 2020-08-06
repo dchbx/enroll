@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackagesController < ApplicationController
@@ -17,13 +19,13 @@ module BenefitSponsors
         authorize @benefit_package_form, :updateable?
         if @benefit_package_form.save
           flash[:notice] = "Benefit Package successfully created."
-          # TODO get redirection url from service
+          # TODO: get redirection url from service
           if params[:add_new_benefit_package] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, add_new_benefit_package: true)
           elsif params[:add_dental_benefits] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, @benefit_package_form.show_page_model, kind: "dental")
           else
-            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
+            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab => 'benefits')
           end
         else
           flash[:error] = error_messages(@benefit_package_form)
@@ -40,16 +42,16 @@ module BenefitSponsors
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_update(benefit_package_params.merge({:id => params.require(:id)}))
         if @benefit_package_form.update
           flash[:notice] = "Benefit Package successfully updated."
-          # TODO get redirection url from service
+          # TODO: get redirection url from service
           if params[:add_new_benefit_package] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, add_new_benefit_package: true)
           elsif params[:add_dental_benefits] == "true"
             redirect_to new_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application, @benefit_package_form.show_page_model, kind: "dental")
           elsif params[:edit_dental_benefits] == "true"
             redirect_to edit_benefit_sponsorship_benefit_application_benefit_package_sponsored_benefit_path(@benefit_package_form.service.benefit_application.benefit_sponsorship, @benefit_package_form.show_page_model.benefit_application,
-              @benefit_package_form.show_page_model, @benefit_package_form.show_page_model.dental_sponsored_benefit, kind: "dental")
+                                                                                                            @benefit_package_form.show_page_model, @benefit_package_form.show_page_model.dental_sponsored_benefit, kind: "dental")
           else
-            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits')
+            redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab => 'benefits')
           end
         else
           flash[:error] = error_messages(@benefit_package_form)
@@ -72,10 +74,10 @@ module BenefitSponsors
         authorize @benefit_package_form, :updateable?
         if @benefit_package_form.destroy
           flash[:notice] = "Benefit Package successfully deleted."
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab => 'benefits').to_json}"
         else
           flash[:error] = error_messages(@benefit_package_form)
-          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab=>'benefits').to_json}"
+          render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_package_form.service.benefit_application.benefit_sponsorship.profile, :tab => 'benefits').to_json}"
         end
       end
 
@@ -89,9 +91,7 @@ module BenefitSponsors
       def check_for_late_rates
         @benefit_package_form = BenefitSponsors::Forms::BenefitPackageForm.for_new(params.require(:benefit_application_id))
         date = @benefit_package_form.service.benefit_application.start_on.to_date
-        if BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
-          redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab=>'benefits')
-        end
+        redirect_to profiles_employers_employer_profile_path(@benefit_package_form.service.employer_profile, :tab => 'benefits') if BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
       end
 
       def error_messages(object)
@@ -102,10 +102,9 @@ module BenefitSponsors
         params.require(:benefit_package).permit(
           :title, :description, :probation_period_kind, :benefit_application_id, :id,
           :sponsored_benefits_attributes => [:id, :kind, :product_option_choice, :product_package_kind, :reference_plan_id,
-            :sponsor_contribution_attributes => [
-              :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
-            ]
-          ]
+                                             :sponsor_contribution_attributes => [
+                                               :contribution_levels_attributes => [:id, :is_offered, :display_name, :contribution_factor,:contribution_unit_id]
+                                             ]]
         )
       end
 
@@ -117,11 +116,9 @@ module BenefitSponsors
         params.permit(:id, :benefit_application_id, :sponsored_benefits_attributes => [:product_package_kind, :reference_plan_id, :id])
       end
 
-      def new_package_url
-      end
+      def new_package_url; end
 
-      def dental_benefits_url
-      end
+      def dental_benefits_url; end
     end
   end
 end

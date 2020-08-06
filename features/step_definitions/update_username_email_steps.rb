@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin Tier 3 sees User Accounts link$/) do
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
   expect(page).to have_text("User Accounts")

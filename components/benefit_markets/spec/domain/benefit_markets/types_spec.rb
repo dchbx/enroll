@@ -45,7 +45,7 @@ RSpec.describe ::Types  do
     it 'an incorrect value is not valid' do
       expect{type[invalid_key_string]}.to raise_error  BSON::ObjectId::Invalid
       expect{type[invalid_key_symbol]}.to raise_error  BSON::ObjectId::Invalid
-      expect{type[invalid_key]}.to raise_error  BSON::ObjectId::Invalid
+      expect{type[invalid_key]}.to raise_error BSON::ObjectId::Invalid
     end
 
     it 'an coerces a correct value string type to BSON::ObjectId' do

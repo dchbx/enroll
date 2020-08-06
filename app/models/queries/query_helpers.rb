@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Queries
   module QueryHelpers
-    def last(value, from_expression=nil)
+    def last(value, from_expression = nil)
       lookup_expression = from_expression.nil? ? "$#{value}" : from_expression
       ::Queries::PipelineExpression.new({value => {"$last" => lookup_expression}})
     end
@@ -12,14 +14,14 @@ module Queries
       )
     end
 
-    def project(exps ={})
+    def project(exps = {})
       ::Queries::ProjectExpression.new(exps)
     end
 
     def project_property(name, exp)
       ::Queries::ProjectExpression.new({
-        name => exp
-      })
+                                         name => exp
+                                       })
     end
 
     def sort_on(expr)

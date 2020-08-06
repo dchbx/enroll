@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BenefitEligibilityElementGroup
   include Mongoid::Document
 
@@ -5,7 +7,7 @@ class BenefitEligibilityElementGroup
 
   embedded_in :benefit_package
 
-  INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
+  INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w[
       self
       spouse
       domestic_partner
@@ -20,9 +22,9 @@ class BenefitEligibilityElementGroup
       nephew_or_niece
       grandchild
       grandparent
-    )
+    ].freeze
 
-  Relationships_UI = %w(
+  Relationships_UI = %w[
       self
       spouse
       domestic_partner
@@ -34,16 +36,16 @@ class BenefitEligibilityElementGroup
       nephew_or_niece
       grandchild
       grandparent
-    )
+    ].freeze
 
-  SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w(
+  SHOP_MARKET_RELATIONSHIP_CATEGORY_KINDS = %w[
       self
       spouse
       domestic_partner
       children_under_26
       disabled_children_26_and_over
       children_26_and_over
-    )
+    ].freeze
 
 
   field :market_places,          type: Array, default: ["any"]   # %w[any shop individual],

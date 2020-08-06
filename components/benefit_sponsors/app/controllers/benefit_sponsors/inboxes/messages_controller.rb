@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Inboxes
     class MessagesController < ApplicationController
@@ -7,11 +9,9 @@ module BenefitSponsors
       before_action :set_sent_box, only: [:show, :destroy], if: :is_broker?
       before_action :find_profile, only: [:msg_to_portal]
 
-      def new
-      end
+      def new; end
 
-      def create
-      end
+      def create; end
 
       def show
         BenefitSponsors::Services::MessageService.for_show(@message, @current_user)
@@ -24,16 +24,14 @@ module BenefitSponsors
       def destroy
         BenefitSponsors::Services::MessageService.for_destroy(@message)
         flash[:notice] = "Successfully deleted inbox message."
-        if params[:url].present?
-          @inbox_url = params[:url]
-        end
+        @inbox_url = params[:url] if params[:url].present?
       end
 
       def msg_to_portal
         @inbox_provider = @profile
         @inbox_provider_name = @inbox_provider.try(:legal_name)
         @inbox_to_name = "HBX Admin"
-        log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
+        log("#3969 and #3985 params: #{params}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
         @new_message = @inbox_provider.inbox.messages.build
       end
 
@@ -48,7 +46,7 @@ module BenefitSponsors
       end
 
       def is_broker?
-        return (@inbox_provider.class.to_s == "Person") && (/.*BrokerAgencyProfile$/.match(@inbox_provider.broker_role.broker_agency_profile._type))
+        (@inbox_provider.class.to_s == "Person") && /.*BrokerAgencyProfile$/.match(@inbox_provider.broker_role.broker_agency_profile._type)
       end
 
       def find_inbox_provider
@@ -70,11 +68,9 @@ module BenefitSponsors
         @message = @inbox_provider.inbox.messages.by_message_id(params["message_id"]).to_a.first
       end
 
-      def set_inbox_and_assign_message
-      end
+      def set_inbox_and_assign_message; end
 
-      def successful_save_path
-      end
+      def successful_save_path; end
     end
   end
 end

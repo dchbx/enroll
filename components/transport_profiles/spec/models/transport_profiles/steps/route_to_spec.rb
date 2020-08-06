@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportProfiles
@@ -20,7 +22,7 @@ module TransportProfiles
       - a file name made into a uri
     " do
       let(:file_uri) { URI.parse("file:///some/bogus/path/to/whatever/FileReports%20_FOR_%20Example.pdf") }
-      let(:endpoint) do 
+      let(:endpoint) do
         instance_double(
           WellKnownEndpoint,
           {
@@ -30,7 +32,7 @@ module TransportProfiles
       end
 
       let(:expected_complete_uri) { URI.parse("sftp://some_user@whatever.com/a/dropoff/FileReports%20_FOR_%20Example.pdf") }
-  
+
       it "adds the file name to the sftp" do
         expect(route_to.complete_uri_for(endpoint, file_uri)).to eq expected_complete_uri
       end
@@ -41,7 +43,7 @@ module TransportProfiles
       - a file name made into a uri
     " do
       let(:file_uri) { URI.parse("file:///some/bogus/path/to/whatever/FileReports%20_FOR_%20Example.pdf") }
-      let(:endpoint) do 
+      let(:endpoint) do
         instance_double(
           WellKnownEndpoint,
           {
@@ -58,7 +60,7 @@ module TransportProfiles
       before(:each) do
         allow(SecureRandom).to receive(:uuid).and_return(uuid)
       end
-  
+
       it "adds the file name to the sftp" do
         expect(route_to.complete_uri_for(endpoint, file_uri)).to eq expected_complete_uri
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Insured::FamilyMembersHelper
   def employee_dependent_form_id(model)
     if model.try(:persisted?)
@@ -21,7 +23,7 @@ module Insured::FamilyMembersHelper
     else
       dependent.family_member.person.addresses
     end
-  rescue
+  rescue StandardError
     []
   end
 
@@ -32,6 +34,6 @@ module Insured::FamilyMembersHelper
       first_checked = dependent.family_member.person.consumer_role.is_applying_coverage
       second_checked = !dependent.family_member.person.consumer_role.is_applying_coverage
     end
-    return first_checked, second_checked
+    [first_checked, second_checked]
   end
 end

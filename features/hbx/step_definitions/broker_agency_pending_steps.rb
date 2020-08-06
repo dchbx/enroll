@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 And(/^Hbx Admin should see broker application with carrier appointments$/) do
   if Settings.aca.broker_carrier_appointments_enabled
     find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|

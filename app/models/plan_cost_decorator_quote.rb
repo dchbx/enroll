@@ -1,27 +1,29 @@
+# frozen_string_literal: true
+
 class PlanCostDecoratorQuote < PlanCostDecorator
 
   def plan_year_start_on
-      @benefit_group.quote.start_on
+    @benefit_group.quote.start_on
   end
 
   def add_premiums(combined_family, reference_date)
-    roster_premium = Hash.new{|h,k| h[k]=0.00}
-    combined_family.keys.each {|member|
+    roster_premium = Hash.new{|h,k| h[k] = 0.00}
+    combined_family.each_key do |member|
       age = combined_family[member]
       premium = Caches::PlanDetails.lookup_rate(__getobj__.id, reference_date, age)
       roster_premium[member.employee_relationship] += premium
-   }
+    end
     roster_premium
   end
 
   def add_members(combined_family)
-     member_provider.quote_members.each {|member|
-       combined_family[member] = member.age_on(benefit_group.quote.start_on)
-     }
+    member_provider.quote_members.each do |member|
+      combined_family[member] = member.age_on(benefit_group.quote.start_on)
+    end
   end
 
-  def get_family_details_hash quote_plan_year_start_on
-    members.map{ |m|
+  def get_family_details_hash(quote_plan_year_start_on)
+    members.map do |m|
       {
         :plan => @reference_plan.name,
         :first_name => m.first_name,
@@ -31,33 +33,35 @@ class PlanCostDecoratorQuote < PlanCostDecorator
         :employee_cost => employee_cost_for(m),
         :employer_contribution_percent => employer_contribution_percent(m),
         :employer_contribution => employer_contribution_for(m),
-        :total_premium => employee_cost_for(m).round(2) + employer_contribution_for(m).round(2)}}
+        :total_premium => employee_cost_for(m).round(2) + employer_contribution_for(m).round(2)
+      }
+    end
   end
 
   class << self
 
-    def elected_plans_cost_bounds plans, relationship_benefits, roster_premiums, elected_plans=[]
+    def elected_plans_cost_bounds(plans, relationship_benefits, roster_premiums, elected_plans = [])
       bounds = {
-        carrier_low: Hash.new{|h,k| h[k] = 999999},
+        carrier_low: Hash.new{|h,k| h[k] = 999_999},
         carrier_high: Hash.new{|h,k| h[k] = 0},
-        metal_low: Hash.new{|h,k| h[k] = 999999},
+        metal_low: Hash.new{|h,k| h[k] = 999_999},
         metal_high: Hash.new{|h,k| h[k] = 0},
 
-        carrier_low_plan: Hash.new,
-        carrier_high_plan: Hash.new,
-        metal_low_plan: Hash.new,
-        metal_high_plan: Hash.new,
+        carrier_low_plan: {},
+        carrier_high_plan: {},
+        metal_low_plan: {},
+        metal_high_plan: {},
 
-        elected_plans_cost: [],
+        elected_plans_cost: []
       }
       #employer_premiums={}
-      plans.each{|plan|
+      plans.each do |plan|
         cost = 0
         premiums = roster_premiums[plan.id.to_s]
-        premiums.each {|kind, premium|
+        premiums.each do |kind, premium|
           cost += relationship_benefits.detect{|rb| rb.relationship == kind}.premium_pct * premium
-        }
-        cost = (cost/100).ceil
+        end
+        cost = (cost / 100).ceil
         #employer_premiums[plan.id.to_s] = cost
         carrier = plan.carrier_profile.abbrev
 
@@ -72,14 +76,14 @@ class PlanCostDecoratorQuote < PlanCostDecorator
         bounds[:metal_low][metal] = cost if cost < bounds[:metal_low][metal]
         bounds[:metal_high][metal] = cost if cost > bounds[:metal_high][metal]
 
-        elected_plans_cost <<  cost if elected_plans.include? plan.id
-      }
+        elected_plans_cost << cost if elected_plans.include? plan.id
+      end
       bounds
     end
 
-    def buy_up employer_cost, metal_level, bounds
+    def buy_up(employer_cost, metal_level, bounds)
       return 'No buy up level' if metal_level == 'platinum'
-      move_up = {'bronze'=> 'silver', 'silver'=> 'gold', 'gold' => 'platinum'}
+      move_up = {'bronze' => 'silver', 'silver' => 'gold', 'gold' => 'platinum'}
       up_metal = move_up[metal_level]
       low = bounds[:metal_low][up_metal] - employer_cost
       high = bounds[:metal_high][up_metal] - employer_cost

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::DocumentsVerification < IvlNotice
 
   attr_reader :notice
@@ -12,7 +14,11 @@ class IvlNotices::DocumentsVerification < IvlNotice
 
   def build
     @family = Family.find_by_primary_applicant(@consumer)
-    @hbx_enrollments = @family.try(:latest_household).try(:hbx_enrollments).active rescue []
+    @hbx_enrollments = begin
+                         @family.try(:latest_household).try(:hbx_enrollments).active
+                       rescue StandardError
+                         []
+                       end
     @notice = PdfTemplates::EligibilityNotice.new
     @notice.primary_fullname = @consumer.full_name.titleize
     @notice.primary_identifier = @consumer.hbx_id
@@ -21,11 +27,11 @@ class IvlNotices::DocumentsVerification < IvlNotice
 
   def append_address(primary_address)
     @notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: primary_address.address_1.titleize,
-      street_2: primary_address.address_2.titleize,
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
+                                                                street_1: primary_address.address_1.titleize,
+                                                                street_2: primary_address.address_2.titleize,
+                                                                city: primary_address.city.titleize,
+                                                                state: primary_address.state,
+                                                                zip: primary_address.zip
+                                                              })
   end
 end

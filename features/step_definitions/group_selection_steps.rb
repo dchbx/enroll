@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given (/a matched Employee exists with multiple employee roles/) do
   org1 = FactoryBot.create :organization, :with_active_plan_year
   org2 = FactoryBot.create :organization, :with_active_plan_year_and_without_dental
@@ -10,21 +12,19 @@ Given (/a matched Employee exists with multiple employee roles/) do
   employee_role1 = FactoryBot.create :employee_role, person: @person, employer_profile: org1.employer_profile
   employee_role2 = FactoryBot.create :employee_role, person: @person, employer_profile: org2.employer_profile
   ce1 =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name,
-          last_name: @person.last_name,
-          dob: @person.dob,
-          ssn: @person.ssn,
-          employee_role_id: employee_role1.id,
-          employer_profile: org1.employer_profile
-        )
+                          first_name: @person.first_name,
+                          last_name: @person.last_name,
+                          dob: @person.dob,
+                          ssn: @person.ssn,
+                          employee_role_id: employee_role1.id,
+                          employer_profile: org1.employer_profile)
   ce2 =  FactoryBot.build(:census_employee,
-          first_name: @person.first_name,
-          last_name: @person.last_name,
-          dob: @person.dob,
-          ssn: @person.ssn,
-          employee_role_id: employee_role2.id,
-          employer_profile: org2.employer_profile
-        )
+                          first_name: @person.first_name,
+                          last_name: @person.last_name,
+                          dob: @person.dob,
+                          ssn: @person.ssn,
+                          employee_role_id: employee_role2.id,
+                          employer_profile: org2.employer_profile)
 
   ce1.benefit_group_assignments << bga1
   ce1.link_employee_role!
@@ -121,20 +121,18 @@ And(/(.*) also has a health enrollment with primary person covered/) do |role|
       benefit_group_id: (@benefit_group.id if @benefit_group.present?)
     )
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.primary_applicant.id,
-    eligibility_date: TimeKeeper.date_of_record - 2.months,
-    coverage_start_on: TimeKeeper.date_of_record - 2.months
-  )
+                                                               eligibility_date: TimeKeeper.date_of_record - 2.months,
+                                                               coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enrollment.save!
 end
 
-And(/(.*) has a health enrollment with dependent covered/) do |role|
+And(/(.*) has a health enrollment with dependent covered/) do |_role|
   family = Family.all.first
   enrollment = family.hbx_enrollments.first
   chm = family.active_household.immediate_family_coverage_household.coverage_household_members.last
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: chm,
-    eligibility_date: TimeKeeper.date_of_record - 2.months,
-    coverage_start_on: TimeKeeper.date_of_record - 2.months
-  )
+                                                               eligibility_date: TimeKeeper.date_of_record - 2.months,
+                                                               coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enrollment.save!
 end
 
@@ -186,23 +184,21 @@ And(/employee also has a (.*) enrollment with primary covered under (.*) employe
                   end
   benefit_package =  @person.active_employee_roles.first.employer_profile.benefit_sponsorships.first.benefit_applications.first.benefit_packages.first
   enrollment = FactoryBot.create(:hbx_enrollment, product: product,
-                                  household: @person.primary_family.active_household,
-                                  kind: "employer_sponsored",
-                                  effective_on: TimeKeeper.date_of_record,
-                                  coverage_kind: coverage_kind,
-                                  family: family,
-                                  enrollment_kind: "special_enrollment",
-                                  special_enrollment_period_id: sep.id,
-                                  employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),
-                                  benefit_group_id: benefit_group.id,
-                                  rating_area_id: benefit_package.rating_area.id,
-                                  sponsored_benefit_package_id: benefit_package.id,
-                                  sponsored_benefit: benefit_package.sponsored_benefits[1]
-                                )
+                                                  household: @person.primary_family.active_household,
+                                                  kind: "employer_sponsored",
+                                                  effective_on: TimeKeeper.date_of_record,
+                                                  coverage_kind: coverage_kind,
+                                                  family: family,
+                                                  enrollment_kind: "special_enrollment",
+                                                  special_enrollment_period_id: sep.id,
+                                                  employee_role_id: (var == "first" ? @person.active_employee_roles[0].id : @person.active_employee_roles[1].id),
+                                                  benefit_group_id: benefit_group.id,
+                                                  rating_area_id: benefit_package.rating_area.id,
+                                                  sponsored_benefit_package_id: benefit_package.id,
+                                                  sponsored_benefit: benefit_package.sponsored_benefits[1])
   enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: @person.primary_family.primary_applicant.id,
-    eligibility_date: TimeKeeper.date_of_record - 2.months,
-    coverage_start_on: TimeKeeper.date_of_record - 2.months
-  )
+                                                               eligibility_date: TimeKeeper.date_of_record - 2.months,
+                                                               coverage_start_on: TimeKeeper.date_of_record - 2.months)
   enrollment.save!
 end
 
@@ -218,14 +214,13 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   renewal_bga = FactoryBot.build :benefit_group_assignment, benefit_group: @renewal_benefit_group, benefit_package_id: benefit_package.id
 
   @employee_role = person.employee_roles[0]
-  ce =  FactoryBot.build(:census_employee,
-          first_name: person.first_name,
-          last_name: person.last_name,
-          dob: person.dob,
-          ssn: person.ssn,
-          employee_role_id: @employee_role.id,
-          employer_profile: org.employer_profile
-        )
+  ce = FactoryBot.build(:census_employee,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        dob: person.dob,
+                        ssn: person.ssn,
+                        employee_role_id: @employee_role.id,
+                        employer_profile: org.employer_profile)
   [renewal_bga, active_bga].each do |bga|
     ce.benefit_group_assignments << bga
   end
@@ -236,7 +231,7 @@ Given (/a matched Employee exists with active and renwal plan years/) do
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 
-And(/(.*) should see the (.*) family member (.*) and (.*)/) do |employee, type, disabled, checked|
+And(/(.*) should see the (.*) family member (.*) and (.*)/) do |_employee, type, _disabled, _checked|
   wait_for_ajax
   if type == "ineligible"
     expect(first("input[type='checkbox']:disabled", wait: 5)).to be_disabled
@@ -249,9 +244,7 @@ end
 
 And(/Employer not offers dental benefits for spouse in renewal plan year/) do
   benefits = @renewal_benefit_group.dental_relationship_benefits
-  until benefits.blank?
-    benefits.each { |rb| rb.delete }
-  end
+  benefits.each(&:delete) until benefits.blank?
   rbs = [FactoryBot.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :employee, premium_pct: 49, employer_max_amt: 1000.00),
          FactoryBot.build_stubbed(:dental_relationship_benefit, benefit_group: @renewal_benefit_group, relationship: :spouse, premium_pct: 40, employer_max_amt:  200.00, offered: false)]
   @renewal_benefit_group.save
@@ -270,11 +263,11 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   end
 end
 
-And(/(.*) should see the dental radio button/) do |role|
+And(/(.*) should see the dental radio button/) do |_role|
   expect(page).to have_content "Dental"
 end
 
-And(/(.*) switched to dental benefits/) do |role|
+And(/(.*) switched to dental benefits/) do |_role|
   # choose("coverage_kind_dental")
   wait_for_ajax
   find(:xpath, '//*[@id="dental-radio-button"]/label').click
@@ -284,17 +277,17 @@ Then(/the primary person checkbox should be in unchecked status/) do
   expect(find("#family_member_ids_0")).not_to be_checked
 end
 
-Then(/(.*) should see both dependent and primary/) do |role|
+Then(/(.*) should see both dependent and primary/) do |_role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content "Coverage For:   #{primary.full_name} + 1 Dependent"
 end
 
-Then(/(.*) should only see the dependent name/) do |role|
+Then(/(.*) should only see the dependent name/) do |_role|
   dependent = Person.all.select { |person| person.primary_family.blank? }.first
   expect(page).to have_content "Coverage For:   #{dependent.full_name}"
 end
 
-Then(/(.*) should see primary person/) do |role|
+Then(/(.*) should see primary person/) do |_role|
   primary = Person.all.select { |person| person.primary_family.present? }.first
   expect(page).to have_content "Coverage For:   #{primary.first_name}"
 end
@@ -317,7 +310,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   expect(page).to have_link "Make Changes"
 end
 
-When(/(.*) clicked on make changes button/) do |role|
+When(/(.*) clicked on make changes button/) do |_role|
   click_link('Make Changes',  wait: 10)
 end
 
@@ -344,20 +337,20 @@ Then(/cosumer should see the home page/) do
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 
-When(/(.*) clicked continue on household info page/) do |role|
+When(/(.*) clicked continue on household info page/) do |_role|
   find_all("#btn_household_continue")[0].click
 end
 
-Then(/(.*) should see all the family members names/) do |role|
+Then(/(.*) should see all the family members names/) do |_role|
   people = Person.all
   people.each do |person|
-    expect(page).to have_content "#{person.last_name}"
-    expect(page).to have_content "#{person.first_name}"
+    expect(page).to have_content person.last_name.to_s
+    expect(page).to have_content person.first_name.to_s
 
   end
 end
 
-When(/(.*) (.*) the primary person/) do |role, checked|
+When(/(.*) (.*) the primary person/) do |_role, checked|
   if checked == "checks"
     find("#family_member_ids_0").set(true)
   else
@@ -365,7 +358,7 @@ When(/(.*) (.*) the primary person/) do |role, checked|
   end
 end
 
-And(/(.*) clicked on shop for new plan/) do |role|
+And(/(.*) clicked on shop for new plan/) do |_role|
   find(".interaction-click-control-shop-for-new-plan").click
 end
 
@@ -398,7 +391,11 @@ end
 
 And(/first ER not offers dental benefits to spouse/) do
   benefit_group = @person.active_employee_roles[0].employer_profile.plan_years[0].benefit_groups[0]
-  benefit_group.dental_relationship_benefits.where(relationship: "spouse").first.update_attributes(offered: false) rescue ""
+  begin
+    benefit_group.dental_relationship_benefits.where(relationship: "spouse").first.update_attributes(offered: false)
+  rescue StandardError
+    ""
+  end
   benefit_group.save
 end
 
@@ -441,7 +438,7 @@ Then(/user should (.*) the ivl error message/) do |var|
   end
 end
 
-And(/(.*) should not see the dental radio button/) do |role|
+And(/(.*) should not see the dental radio button/) do |_role|
   expect(page).not_to have_content "Dental"
 end
 

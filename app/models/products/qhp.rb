@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Products::Qhp
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -84,17 +86,17 @@ class Products::Qhp
                         :qhp_or_non_qhp, :emp_contribution_amount_for_hsa_or_hra, :child_only_offering,
                         :plan_effective_date, :out_of_country_coverage, :out_of_service_area_coverage, :national_network
 
-  scope :by_hios_ids_and_active_year, -> (sc_id, year) { where(:standard_component_id.in => sc_id, active_year: year ) }
+  scope :by_hios_ids_and_active_year, ->(sc_id, year) { where(:standard_component_id.in => sc_id, active_year: year) }
 
   embeds_many :qhp_benefits,
-    class_name: "Products::QhpBenefit",
-    cascade_callbacks: true,
-    validate: true
+              class_name: "Products::QhpBenefit",
+              cascade_callbacks: true,
+              validate: true
 
   embeds_many :qhp_cost_share_variances,
-    class_name: "Products::QhpCostShareVariance",
-    cascade_callbacks: true,
-    validate: true
+              class_name: "Products::QhpCostShareVariance",
+              cascade_callbacks: true,
+              validate: true
 
   accepts_nested_attributes_for :qhp_benefits, :qhp_cost_share_variances
 
@@ -106,7 +108,7 @@ class Products::Qhp
   index({"standard_component_id" => 1, "active_year" => 1})
 
   def plan=(new_plan)
-    raise ArgumentError.new("expected Plan") unless new_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_plan.is_a? Plan
     self.plan_id = new_plan._id
     @plan = new_plan
   end
@@ -128,7 +130,7 @@ class Products::Qhp
     "Preferred Brand Drugs",
     "Non-Preferred Brand Drugs",
     "Specialty Drugs"
-  ]
+  ].freeze
 
   DENTAL_VISIT_TYPES = [
     "Routine Dental Services (Adult)",
@@ -140,7 +142,7 @@ class Products::Qhp
     "Orthodontia - Adult",
     "Major Dental Care - Adult",
     "Accidental Dental"
-  ]
+  ].freeze
 
 
   def self.plan_hsa_status_map(plans)

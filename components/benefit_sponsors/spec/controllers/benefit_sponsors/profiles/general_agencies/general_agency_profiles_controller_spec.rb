@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Profiles::GeneralAgencies::GeneralAgencyProfilesController, type: :controller, dbclean: :after_each do
     routes { BenefitSponsors::Engine.routes }
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
     let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
     let(:profile) { general_agency.profiles.first }
 
@@ -46,7 +48,7 @@ module BenefitSponsors
     context "#employers" do
       before do
         sign_in user_with_hbx_staff_role
-        get :employers, params:{id: profile.id}, xhr: true
+        get :employers, params: {id: profile.id}, xhr: true
       end
       it "should set datatable instance variable" do
         expect(assigns(:datatable).class).to eq Effective::Datatables::BenefitSponsorsGeneralAgencyDataTable
@@ -82,7 +84,7 @@ module BenefitSponsors
     context "#families" do
       before do
         sign_in user_with_hbx_staff_role
-        get :families, params:{id: profile.id}, xhr: true
+        get :families, params: {id: profile.id}, xhr: true
       end
       it "should set datatable instance variable" do
         expect(assigns(:datatable).class).to eq Effective::Datatables::BenefitSponsorsGeneralAgencyFamilyDataTable

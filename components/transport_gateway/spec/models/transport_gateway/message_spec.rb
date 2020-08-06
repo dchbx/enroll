@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module TransportGateway
@@ -33,7 +35,7 @@ module TransportGateway
         let(:params)  { valid_params.except(:from) }
 
         it "should not raise an error" do
-          expect{ Message.new(**params) }.not_to raise_error 
+          expect{ Message.new(**params) }.not_to raise_error
         end
       end
 
@@ -41,7 +43,7 @@ module TransportGateway
         let(:params)  { valid_params.except(:to) }
 
         it "should not raise an error" do
-          expect{ Message.new(**params) }.not_to raise_error 
+          expect{ Message.new(**params) }.not_to raise_error
         end
       end
 
@@ -49,7 +51,7 @@ module TransportGateway
         let(:params)  { valid_params.except(:body) }
 
         it "should not raise an error" do
-          expect{ Message.new(**params) }.not_to raise_error 
+          expect{ Message.new(**params) }.not_to raise_error
         end
       end
 
@@ -57,15 +59,15 @@ module TransportGateway
         let(:invalid_uri)  { "@7463$%^&*" }
 
         it "should raise Invalid URI error" do
-          expect{ Message.new(from: from, to: invalid_uri, body: body) }.to raise_error(URI::InvalidURIError) 
+          expect{ Message.new(from: from, to: invalid_uri, body: body) }.to raise_error(URI::InvalidURIError)
         end
-      end      
+      end
 
       context "with valid arguments" do
         let(:params)  { valid_params }
 
         it "should not raise an error" do
-          expect{Message.new(**params)}.not_to raise_error 
+          expect{Message.new(**params)}.not_to raise_error
         end
 
         it "should set the instance vars" do

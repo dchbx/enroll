@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -6,11 +8,13 @@ module SponsoredBenefits
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
     describe "#expire proposals for non Prospect Employer" do
-      let(:organization) { create(:sponsored_benefits_plan_design_organization,
-                              sponsor_profile_id: "1234",
-                              owner_profile_id: "5678",
-                              legal_name: "ABC Company",
-                              sic_code: "0345" ) }
+      let(:organization) do
+        create(:sponsored_benefits_plan_design_organization,
+               sponsor_profile_id: "1234",
+               owner_profile_id: "5678",
+               legal_name: "ABC Company",
+               sic_code: "0345")
+      end
 
       context "when in an expirable state" do
         before(:each) do
@@ -40,11 +44,13 @@ module SponsoredBenefits
     end
 
     describe "#expire proposals for Prospect" do
-      let!(:organization) { create(:sponsored_benefits_plan_design_organization,
-                        sponsor_profile_id: nil,
-                        owner_profile_id: "5678",
-                        legal_name: "ABC Company",
-                        sic_code: "0345" ) }
+      let!(:organization) do
+        create(:sponsored_benefits_plan_design_organization,
+               sponsor_profile_id: nil,
+               owner_profile_id: "5678",
+               legal_name: "ABC Company",
+               sic_code: "0345")
+      end
 
       context "when in an expirable state" do
         before(:each) do
@@ -65,11 +71,12 @@ module SponsoredBenefits
       let(:census_employees) { double(non_terminated: [])}
       let(:employer_profile) { double(active_plan_year: plan_year, census_employees: census_employees, sic_code: "0345")}
 
-      let!(:plan_design_organization) { create(:sponsored_benefits_plan_design_organization,
-        owner_profile_id: "5678",
-        legal_name: "ABC Company",
-        sic_code: "0345" )
-      }
+      let!(:plan_design_organization) do
+        create(:sponsored_benefits_plan_design_organization,
+               owner_profile_id: "5678",
+               legal_name: "ABC Company",
+               sic_code: "0345")
+      end
 
       let(:calculated_dates) { SponsoredBenefits::BenefitApplications::BenefitApplication.calculate_start_on_dates }
 
@@ -145,7 +152,7 @@ module SponsoredBenefits
 
         context "pull active_general_agency_account for organization" do
           it "should return active_general_agency_account" do
-             expect(pdo_with_general_agency.general_agency_profile).to eq general_agency_profile
+            expect(pdo_with_general_agency.general_agency_profile).to eq general_agency_profile
           end
 
           it "should return nil if no active_general_agency_accounts" do

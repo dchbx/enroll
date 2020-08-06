@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -18,17 +20,17 @@ module BenefitMarkets
 
 
     let(:params) do
-        {
-          benefit_kind:           benefit_kind,
-          product_kind:           product_kind,
-          package_kind:           package_kind,
-          title:                  title,
-          description:            description,
-          products:               products,
-          application_period:     benefit_market_catalog.application_period,
-          contribution_model:     contribution_model,
-          pricing_model:          pricing_model,
-        }
+      {
+        benefit_kind: benefit_kind,
+        product_kind: product_kind,
+        package_kind: package_kind,
+        title: title,
+        description: description,
+        products: products,
+        application_period: benefit_market_catalog.application_period,
+        contribution_model: contribution_model,
+        pricing_model: pricing_model
+      }
     end
 
     context "A new model instance" do

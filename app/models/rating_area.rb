@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RatingArea
   include Mongoid::Document
   include Config::AcaModelConcern

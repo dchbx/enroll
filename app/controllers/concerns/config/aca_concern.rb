@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::AcaConcern
   def aca_qle_period
     Settings.aca.qle.with_in_sixty_days
@@ -13,8 +15,8 @@ module Config::AcaConcern
 
   def individual_market_is_enabled?
     unless Settings.aca.market_kinds.include? 'individual'
-     flash[:error] = "This Exchange does not support an individual marketplace"
-     redirect_to root_path
+      flash[:error] = "This Exchange does not support an individual marketplace"
+      redirect_to root_path
     end
   end
 
@@ -23,7 +25,7 @@ module Config::AcaConcern
   end
 
   def general_agency_is_enabled?
-     Settings.aca.general_agency_enabled
+    Settings.aca.general_agency_enabled
   end
 
   def redirect_unless_general_agency_is_enabled?

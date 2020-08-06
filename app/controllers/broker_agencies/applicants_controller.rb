@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencies::ApplicantsController < ApplicationController
 
   before_action :find_broker_agency_profile
@@ -32,7 +34,7 @@ class BrokerAgencies::ApplicantsController < ApplicationController
 
   def update
     role = @broker_applicant.broker_role
-    role = @broker_applicant.broker_agency_staff_roles[0] unless role
+    role ||= @broker_applicant.broker_agency_staff_roles[0]
     # if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
     #   broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
     # end
@@ -55,9 +57,7 @@ class BrokerAgencies::ApplicantsController < ApplicationController
 
   def find_broker_agency_profile
     @broker_agency_profile = BrokerAgencyProfile.find(params[:profile_id])
-    if @broker_agency_profile.nil?
-      redirect_to broker_agencies_profiles_path(@broker_agency_profile), :flash => { :error => "Something went wrong!!" }
-    end
+    redirect_to broker_agencies_profiles_path(@broker_agency_profile), :flash => { :error => "Something went wrong!!" } if @broker_agency_profile.nil?
   end
 
   def find_broker_applicant
@@ -68,7 +68,7 @@ class BrokerAgencies::ApplicantsController < ApplicationController
     return true if current_user.has_hbx_staff_role?
 
     person = current_user.person
-    return true if person.broker_role && person.broker_role.is_primary_broker?
+    return true if person.broker_role&.is_primary_broker?
 
     redirect_to broker_agencies_profiles_path(@broker_agency_profile), :flash => { :error => "You must be a Primary broker" }
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module Datatables
     class GeneralAgencyPlanDesignOrganizationDatatable < ::Effective::MongoidDatatable
@@ -5,17 +7,17 @@ module Effective
 
       datatable do
 
-        table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
+        table_column :legal_name, :label => 'Legal Name', :proc => proc { |row|
           if row.broker_relationship_inactive?
             row.legal_name
           else
             (link_to row.legal_name, eval(benefit_sponsor_home_url(row)))
           end
         }, :sortable => false, :filter => false
-        table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
-        table_column :ee_count, :label => 'EE Count', :proc => Proc.new { |row| ee_count(row) }, :sortable => false, :filter => false
-        table_column :er_state, :label => 'ER State', :proc => Proc.new { |row| er_state(row) }, :sortable => false, :filter => false
-        table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row|
+        table_column :fein, :label => 'FEIN', :proc => proc { |row| er_fein(row) }, :sortable => false, :filter => false
+        table_column :ee_count, :label => 'EE Count', :proc => proc { |row| ee_count(row) }, :sortable => false, :filter => false
+        table_column :er_state, :label => 'ER State', :proc => proc { |row| er_state(row) }, :sortable => false, :filter => false
+        table_column :effective_date, :label => 'Effective Date', :proc => proc { |row|
 
           latest_plan_year = row.employer_profile.latest_plan_year if row.employer_profile.present?
           if latest_plan_year.blank?
@@ -25,16 +27,16 @@ module Effective
           end
         }, :sortable => false, :filter => false
 
-        table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
+        table_column :broker, :label => 'Broker', :proc => proc { |row| broker_name(row) }, :sortable => false, :filter => false
 
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row, profile_id: attributes[:profile_id]), 'ajax'],
             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row, profile_id: attributes[:profile_id]), 'static'],
-            ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row, profile_id: attributes[:profile_id]), edit_employer_link_type(row)],
+            ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row, profile_id: attributes[:profile_id]), edit_employer_link_type(row)]
           ]
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id.to_s}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
@@ -42,7 +44,7 @@ module Effective
         if employer.is_prospect?
           'delete with confirm'
         else
-          return 'disabled'
+          'disabled'
         end
       end
 
@@ -62,8 +64,8 @@ module Effective
       def er_state(row)
         return 'N/A' if row.is_prospect?
         return 'Former Client' if row.broker_relationship_inactive?
-          sponsorship = row.employer_profile.organization.active_benefit_sponsorship
-          sponsorship.aasm_state.capitalize
+        sponsorship = row.employer_profile.organization.active_benefit_sponsorship
+        sponsorship.aasm_state.capitalize
       end
 
       def er_fein(row)
@@ -71,7 +73,7 @@ module Effective
         row.fein
       end
 
-      def benefit_sponsor_home_url(row)
+      def benefit_sponsor_home_url(_row)
         "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
       end
 
@@ -98,7 +100,7 @@ module Effective
 
       def nested_filter_definition
         {
-          filters:[
+          filters: [
                 { scope: 'all', label: 'All'},
                 { scope: 'active_sponsors', label: 'Active'},
                 { scope: 'inactive_sponsors', label: 'Inactive'},

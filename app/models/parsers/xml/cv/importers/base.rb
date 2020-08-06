@@ -1,8 +1,18 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv::Importers
   module Base
     def get_person_object_by(person, person_demographics, person_relationships)
-      hbx_id = person.id.strip.split('#').last rescue ''
-      gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
+      hbx_id = begin
+                 person.id.strip.split('#').last
+               rescue StandardError
+                 ''
+               end
+      gender = begin
+                 person_demographics.sex.match(/gender#(.*)/)[1]
+               rescue StandardError
+                 ''
+               end
 
       person_object = Person.new(
         id: hbx_id,
@@ -17,45 +27,52 @@ module Parsers::Xml::Cv::Importers
         gender: gender,
         ethnicity: [person_demographics.ethnicity],
         language_code: person_demographics.language_code,
-        race: person_demographics.race,
+        race: person_demographics.race
       )
       person_relationships.each do |relationship|
-        relation = relationship.relationship_uri.strip.split("#").last rescue ''
+        relation = begin
+                     relationship.relationship_uri.strip.split("#").last
+                   rescue StandardError
+                     ''
+                   end
+        next unless relationship.subject_individual != relationship.object_individual
         person_object.person_relationships.build({
-          relative_id: relationship.object_individual, #use subject_individual or object_individual
-          kind: relation,
-        }) if relationship.subject_individual != relationship.object_individual
+                                                   relative_id: relationship.object_individual, #use subject_individual or object_individual
+                                                   kind: relation
+                                                 })
       end
       person.addresses.each do |address|
-        kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
+        kind = begin
+                 address.type.match(/address_type#(.*)/)[1]
+               rescue StandardError
+                 'home'
+               end
         person_object.addresses.build({
-          address_1: address.address_line_1,
-          address_2: address.address_line_2,
-          city: address.location_city_name,
-          state: address.location_state_code,
-          zip: address.postal_code,
-          kind: kind,
-        })
+                                        address_1: address.address_line_1,
+                                        address_2: address.address_line_2,
+                                        city: address.location_city_name,
+                                        state: address.location_state_code,
+                                        zip: address.postal_code,
+                                        kind: kind
+                                      })
       end
       person.phones.each do |phone|
         phone_type = phone.type
         phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
-        if Phone::KINDS.include?(phone_type_for_enroll)
-          person_object.phones.build({
-            kind: phone_type_for_enroll,
-            full_phone_number: phone.full_phone_number
-          })
-        end
+        next unless Phone::KINDS.include?(phone_type_for_enroll)
+        person_object.phones.build({
+                                     kind: phone_type_for_enroll,
+                                     full_phone_number: phone.full_phone_number
+                                   })
       end
       person.emails.each do |email|
         email_type = email.type
         email_type_for_enroll = email_type.blank? ? nil : email_type.strip.split("#").last
-        if ["home", "work"].include?(email_type_for_enroll)
-          person_object.emails.build({
-            :kind => email_type_for_enroll,
-            :address => email.email_address
-          })
-        end 
+        next unless ["home", "work"].include?(email_type_for_enroll)
+        person_object.emails.build({
+                                     :kind => email_type_for_enroll,
+                                     :address => email.email_address
+                                   })
       end
 
       person_object

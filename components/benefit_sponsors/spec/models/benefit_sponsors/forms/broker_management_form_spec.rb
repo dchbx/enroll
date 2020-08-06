@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -16,11 +18,11 @@ module BenefitSponsors
 
     describe "#for_create" do
 
-      let(:params) {
-        {:broker_agency_profile_id=> broker_agency_profile.id.to_s,
-         :broker_role_id=> broker_role.id.to_s,
-         :employer_profile_id=> employer_profile.id.to_s}
-      }
+      let(:params) do
+        {:broker_agency_profile_id => broker_agency_profile.id.to_s,
+         :broker_role_id => broker_role.id.to_s,
+         :employer_profile_id => employer_profile.id.to_s}
+      end
 
       let(:create_form) { subject.for_create params }
 
@@ -59,19 +61,19 @@ module BenefitSponsors
       let!(:writing_agent) {broker_agency_account.writing_agent}
 
 
-      let(:terminate_params) {
-        {:direct_terminate=>'true',
-         :termination_date=>TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
-         :broker_agency_profile_id=> broker_agency_profile.id.to_s,
-         :broker_role_id=> writing_agent.id.to_s,
-         :employer_profile_id=> employer_profile.id.to_s}
-      }
+      let(:terminate_params) do
+        {:direct_terminate => 'true',
+         :termination_date => TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+         :broker_agency_profile_id => broker_agency_profile.id.to_s,
+         :broker_role_id => writing_agent.id.to_s,
+         :employer_profile_id => employer_profile.id.to_s}
+      end
 
       let!(:terminate_form) { subject.for_terminate terminate_params }
 
 
       before do
-        organization.benefit_sponsorships =[benefit_sponsorship_with_account]
+        organization.benefit_sponsorships = [benefit_sponsorship_with_account]
         organization.save
       end
 

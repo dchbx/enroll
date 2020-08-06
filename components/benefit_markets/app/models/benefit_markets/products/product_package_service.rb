@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     class ProductPackageService
@@ -122,7 +124,7 @@ module BenefitMarkets
         benefit_catalog_for(form).product_packages.find(form.id)
       end
 
-      def options_for_pricing_model_id(form)
+      def options_for_pricing_model_id(_form)
         BenefitMarkets::PricingModels::PricingModel.all.pluck(:name, :id)
       end
 

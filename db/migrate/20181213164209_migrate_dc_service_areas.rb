@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateDcServiceAreas < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -6,18 +8,17 @@ class MigrateDcServiceAreas < Mongoid::Migration
           ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
             # Todo check on issuer_provided_code, for now set with issuer profile hbx_id
             issuer_profile = issuer_organization.issuer_profile
-            if self.carrier_exists_in_the_year(issuer_profile, year)
-              # issuer_hios_id not required for DC so set as nil
-              ::BenefitMarkets::Locations::ServiceArea.create!({
-                                                                   active_year: year,
-                                                                   issuer_provided_code: "DCS001",
-                                                                   covered_states: ["DC"],
-                                                                   county_zip_ids: [],
-                                                                   issuer_profile_id: issuer_profile.id,
-                                                                   issuer_hios_id: nil,
-                                                                   issuer_provided_title: issuer_profile.legal_name
-                                                               })
-            end
+            next unless self.carrier_exists_in_the_year(issuer_profile, year)
+            # issuer_hios_id not required for DC so set as nil
+            ::BenefitMarkets::Locations::ServiceArea.create!({
+                                                               active_year: year,
+                                                               issuer_provided_code: "DCS001",
+                                                               covered_states: ["DC"],
+                                                               county_zip_ids: [],
+                                                               issuer_profile_id: issuer_profile.id,
+                                                               issuer_hios_id: nil,
+                                                               issuer_provided_title: issuer_profile.legal_name
+                                                             })
           end
         end
       end
@@ -27,8 +28,8 @@ class MigrateDcServiceAreas < Mongoid::Migration
   end
 
   def self.carrier_exists_in_the_year(issuer_profile, year)
-    carrier_profile =  Organization.where(hbx_id: issuer_profile.hbx_id).first.carrier_profile
-    Plan.where(carrier_profile_id:carrier_profile.id, active_year: year).present?
+    carrier_profile = Organization.where(hbx_id: issuer_profile.hbx_id).first.carrier_profile
+    Plan.where(carrier_profile_id: carrier_profile.id, active_year: year).present?
   end
 
   def self.down

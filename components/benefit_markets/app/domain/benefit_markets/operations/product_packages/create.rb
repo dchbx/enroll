@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ProductPackages
-
       class Create
         # include Dry::Monads::Do.for(:call)
         include Dry::Monads[:result, :do]
@@ -43,12 +42,12 @@ module BenefitMarkets
           key = "assign_contribution_model_#{enrollment_eligibility.market_kind}".to_sym
           result =
             if ::EnrollRegistry.feature_enabled?(key) && product_package_values[:product_kind] == :health
-              contribution_model = ::EnrollRegistry[key] {
+              contribution_model = ::EnrollRegistry[key] do
                 {
                   product_package_values: product_package_values,
                   enrollment_eligibility: enrollment_eligibility
                 }
-              }.value!
+              end.value!
               contribution_model[:product_package_values]
             else
               product_package_values[:assigned_contribution_model] = nil

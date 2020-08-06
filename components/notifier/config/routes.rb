@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Notifier::Engine.routes.draw do
   mount Ckeditor::Engine => '/notifier/ckeditor'
 

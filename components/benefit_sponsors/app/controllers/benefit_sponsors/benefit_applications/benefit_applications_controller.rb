@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationsController < ApplicationController
@@ -55,7 +57,7 @@ module BenefitSponsors
             format.js
           end
         else
-          flash[:error] = "Plan Year failed to publish. #{@benefit_application_form.errors.messages.values.flatten.inject(""){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
+          flash[:error] = "Plan Year failed to publish. #{@benefit_application_form.errors.messages.values.flatten.inject(''){|memo, error| "#{memo}<li>#{error}</li>"}.html_safe}"
           render :js => "window.location = #{profiles_employers_employer_profile_path(@benefit_application_form.show_page_model.benefit_sponsorship.profile, tab: 'benefits').to_json}"
         end
       end

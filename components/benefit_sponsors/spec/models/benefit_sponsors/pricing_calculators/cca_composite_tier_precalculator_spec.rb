@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -189,27 +191,27 @@ module BenefitSponsors
             rate_schedule_date,
             employee_age,
             "MA1"
-            ).and_return(200.00)
+          ).and_return(200.00)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
             product,
             rate_schedule_date,
             spouse_age,
             "MA1"
-            ).and_return(100.00)
+          ).and_return(100.00)
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
             product,
             rate_schedule_date,
             child_age,
             "MA1"
-            ).and_return(50.00)
-          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(false)
-          allow(family_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1, "spouse"=>1}).and_return(true)
-          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1}).and_return(false)
-          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1}).and_return(false)
-          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1}).and_return(true)
-          allow(family_pricing_unit).to receive(:match?).with({"dependent"=>1, "employee"=>1}).and_return(false)
+          ).and_return(50.00)
+          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(false)
+          allow(family_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1, "spouse" => 1}).and_return(true)
+          allow(employee_only_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1}).and_return(false)
+          allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1}).and_return(false)
+          allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1}).and_return(true)
+          allow(family_pricing_unit).to receive(:match?).with({"dependent" => 1, "employee" => 1}).and_return(false)
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_only").and_return(1.0)
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_spouse").and_return(1.5)
           allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_dependents").and_return(2.0)
@@ -447,51 +449,51 @@ module BenefitSponsors
           rate_schedule_date,
           employee_age,
           "MA1"
-          ).and_return(200.00)
+        ).and_return(200.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           product,
           rate_schedule_date,
           spouse_age,
           "MA1"
-          ).and_return(100.00)
+        ).and_return(100.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           product,
           rate_schedule_date,
           child1_age,
           "MA1"
-          ).and_return(50.00)
+        ).and_return(50.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
           product,
           rate_schedule_date,
           child2_age,
           "MA1"
-          ).and_return(50.00)
+        ).and_return(50.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            child3_age,
-            "MA1"
-          ).and_return(50.00)
+          product,
+          rate_schedule_date,
+          child3_age,
+          "MA1"
+        ).and_return(50.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            child4_age,
-            "MA1"
-          ).and_return(50.00)
+          product,
+          rate_schedule_date,
+          child4_age,
+          "MA1"
+        ).and_return(50.00)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(
-            product,
-            rate_schedule_date,
-            child5_age,
-            "MA1"
-          ).and_return(50.00)
-        allow(employee_only_pricing_unit).to receive(:match?).with({"dependent"=>5, "employee"=>1, "spouse"=>1}).and_return(false)
-        allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent"=>5, "employee"=>1, "spouse"=>1}).and_return(false)
-        allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent"=>5, "employee"=>1, "spouse"=>1}).and_return(false)
-        allow(family_pricing_unit).to receive(:match?).with({"dependent"=>5, "employee"=>1, "spouse"=>1}).and_return(true)
-        allow(employee_only_pricing_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
-        allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
-        allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"employee"=>1}).and_return(true)
-        allow(family_pricing_unit).to receive(:match?).with({"employee"=>1}).and_return(false)
+          product,
+          rate_schedule_date,
+          child5_age,
+          "MA1"
+        ).and_return(50.00)
+        allow(employee_only_pricing_unit).to receive(:match?).with({"dependent" => 5, "employee" => 1, "spouse" => 1}).and_return(false)
+        allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"dependent" => 5, "employee" => 1, "spouse" => 1}).and_return(false)
+        allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"dependent" => 5, "employee" => 1, "spouse" => 1}).and_return(false)
+        allow(family_pricing_unit).to receive(:match?).with({"dependent" => 5, "employee" => 1, "spouse" => 1}).and_return(true)
+        allow(employee_only_pricing_unit).to receive(:match?).with({"employee" => 1}).and_return(false)
+        allow(employee_and_spouse_pricing_unit).to receive(:match?).with({"employee" => 1}).and_return(false)
+        allow(employee_and_dependents_pricing_unit).to receive(:match?).with({"employee" => 1}).and_return(true)
+        allow(family_pricing_unit).to receive(:match?).with({"employee" => 1}).and_return(false)
         allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_only").and_return(1.0)
         allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_spouse").and_return(1.5)
         allow(::BenefitMarkets::Products::ProductFactorCache).to receive(:lookup_composite_tier_factor).with(product, "employee_and_dependents").and_return(2.0)

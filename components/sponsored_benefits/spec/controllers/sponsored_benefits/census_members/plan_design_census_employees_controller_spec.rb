@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -8,32 +10,34 @@ module SponsoredBenefits
 
     routes { SponsoredBenefits::Engine.routes }
 
-    let(:valid_attributes) {
+    let(:valid_attributes) do
       {
-          "first_name"  => "John",
-          "middle_name" => "",
-          "last_name"   => "Chan",
-          "dob"         => "12/01/1975",
-          "name_sfx"    => "",
-          "ssn"         => "",
-          "benefit_sponsorship_id" => benefit_sponsorship.id,
-          "address_attributes" => {
-              "kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""
-          },
-          "email_attributes" => {
-              "kind"=>"", "address"=>""
-          },
-          "census_dependents_attributes"=>{
-              "0"=>{"first_name"=>"David", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"2002-12-01", "employee_relationship"=>"child_under_26", "_destroy"=>"false", "ssn"=>""},
-              "1"=>{"first_name"=>"Lara", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"1979-12-01", "employee_relationship"=>"spouse", "_destroy"=>"false", "ssn"=>""}
-          }
+        "first_name" => "John",
+        "middle_name" => "",
+        "last_name" => "Chan",
+        "dob" => "12/01/1975",
+        "name_sfx" => "",
+        "ssn" => "",
+        "benefit_sponsorship_id" => benefit_sponsorship.id,
+        "address_attributes" => {
+          "kind" => "home", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""
+        },
+        "email_attributes" => {
+          "kind" => "", "address" => ""
+        },
+        "census_dependents_attributes" => {
+          "0" => {"first_name" => "David", "middle_name" => "", "last_name" => "Chan", "dob" => "2002-12-01", "employee_relationship" => "child_under_26", "_destroy" => "false", "ssn" => ""},
+          "1" => {"first_name" => "Lara", "middle_name" => "", "last_name" => "Chan", "dob" => "1979-12-01", "employee_relationship" => "spouse", "_destroy" => "false", "ssn" => ""}
+        }
       }
-    }
+    end
 
     describe "GET index" do
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -45,9 +49,11 @@ module SponsoredBenefits
     end
 
     describe "GET show" do
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -59,9 +65,11 @@ module SponsoredBenefits
     end
 
     describe "GET new" do
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -85,9 +93,11 @@ module SponsoredBenefits
     end
 
     describe "GET #edit" do
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -102,9 +112,11 @@ module SponsoredBenefits
 
     describe "POST #create" do
 
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -147,36 +159,38 @@ module SponsoredBenefits
         end
       end
 
-        context "with invalid params" do
+      context "with invalid params" do
 
-          before :each do
-            request.env["HTTP_REFERER"] = "http://test.host"
-          end
-
-          it "returns a success response (i.e. to display the 'new' template)" do
-            sign_in user_with_broker_role
-            valid_attributes["dob"] = nil
-            post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
-            expect(flash[:error]).to eq "Unable to create employee record. [\"Dob can't be blank\", \"Dob can't be blank\"]"
-
-            expect(response).to redirect_to "http://test.host"
-          end
+        before :each do
+          request.env["HTTP_REFERER"] = "http://test.host"
         end
+
+        it "returns a success response (i.e. to display the 'new' template)" do
+          sign_in user_with_broker_role
+          valid_attributes["dob"] = nil
+          post :create, params: {plan_design_proposal_id: plan_design_proposal.id, census_members_plan_design_census_employee: valid_attributes}
+          expect(flash[:error]).to eq "Unable to create employee record. [\"Dob can't be blank\", \"Dob can't be blank\"]"
+
+          expect(response).to redirect_to "http://test.host"
+        end
+      end
     end
 
     describe "DELETE #destroy" do
-      let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end }
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
       it "destroys the requested census_members_plan_design_census_employee" do
         sign_in user_with_broker_role
         plan_design_census_employee = CensusMembers::PlanDesignCensusEmployee.create! valid_attributes
-        expect {
+        expect do
           delete :destroy, params: {plan_design_proposal_id: plan_design_proposal.id.to_s, id: plan_design_census_employee.id.to_s, format: :js}
-        }.to change(CensusMembers::PlanDesignCensusEmployee, :count).by(-1)
+        end.to change(CensusMembers::PlanDesignCensusEmployee, :count).by(-1)
       end
 
       it "redirects to the census_members_plan_design_census_employees list" do
@@ -188,25 +202,31 @@ module SponsoredBenefits
     end
 
     describe "PUT #update" do
-      let(:person) {FactoryBot.create(:person, :with_broker_role).tap do |person|
-        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-      end}
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
 
       let!(:user_with_broker_role) {FactoryBot.create(:user, person: person)}
-      let(:new_attributes) {{
-              "first_name"  => "John",
-              "middle_name" => "",
-              "last_name"   => "Chan",
-              "dob"         => "12/01/1975",
-              "name_sfx"    => "",
-              "ssn"         => ""
-              }}
-      let(:address_attributes) {{ "kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>"" }}
-      let(:email_attributes) {{ "kind"=>"", "address"=>"" }}
-      let(:census_dependents_attributes) {{
-          "0"=>{"first_name"=>"David", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"2002-12-01", "employee_relationship"=>"child_under_26", "_destroy"=>"false", "ssn"=>""},
-          "1"=>{"first_name"=>"Lara", "middle_name"=>"", "last_name"=>"Chan", "dob"=>"1979-12-01", "employee_relationship"=>"spouse", "_destroy"=>"false", "ssn"=>""}
-          }}
+      let(:new_attributes) do
+        {
+          "first_name" => "John",
+          "middle_name" => "",
+          "last_name" => "Chan",
+          "dob" => "12/01/1975",
+          "name_sfx" => "",
+          "ssn" => ""
+        }
+      end
+      let(:address_attributes) {{ "kind" => "home", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => "" }}
+      let(:email_attributes) {{ "kind" => "", "address" => "" }}
+      let(:census_dependents_attributes) do
+        {
+          "0" => {"first_name" => "David", "middle_name" => "", "last_name" => "Chan", "dob" => "2002-12-01", "employee_relationship" => "child_under_26", "_destroy" => "false", "ssn" => ""},
+          "1" => {"first_name" => "Lara", "middle_name" => "", "last_name" => "Chan", "dob" => "1979-12-01", "employee_relationship" => "spouse", "_destroy" => "false", "ssn" => ""}
+        }
+      end
       let(:praposal) {plan_design_proposal}
       let(:benefit_sponsor) {benefit_sponsorship}
 
@@ -233,10 +253,12 @@ module SponsoredBenefits
           let(:census_employee) {CensusMembers::PlanDesignCensusEmployee.create(new_attributes.merge(census_dependents_attributes: census_dependents_attributes, benefit_sponsorship: benefit_sponsor))}
           let(:spouse) {census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'spouse'}}
           let(:child) {census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'child_under_26'}}
-          let(:delete_dependents_attributes) {{
+          let(:delete_dependents_attributes) do
+            {
               "0" => {"id" => spouse.id.to_s, "first_name" => "Lara", "middle_name" => "", "last_name" => "Chan", "dob" => "1979-12-01", "employee_relationship" => "spouse", "ssn" => "", "_destroy" => "false"},
               "1" => {"id" => child.id.to_s}
-          }}
+            }
+          end
 
           it "should drop dependents" do
             expect(census_employee.census_dependents.size).to eq 2
@@ -252,7 +274,8 @@ module SponsoredBenefits
           let(:spouse) {census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'spouse'}}
           let(:child) {census_employee.census_dependents.detect {|cd| cd.employee_relationship == 'child_under_26'}}
 
-          let(:updated_attributes) {{
+          let(:updated_attributes) do
+            {
               "first_name" => "John",
               "middle_name" => "",
               "last_name" => "Chan",
@@ -262,10 +285,11 @@ module SponsoredBenefits
               "address_attributes" => {"kind" => "home", "address_1" => "100 Bakers street", "address_2" => "", "city" => "Boston", "state" => "MA", "zip" => "01118"},
               "email_attributes" => {"kind" => "home", "address" => "john.chan@gmail.com"},
               "census_dependents_attributes" => {
-                  "0" => {"id" => child.id.to_s, "first_name" => "David", "middle_name" => "Li", "last_name" => "Chan", "dob" => "2002-12-01", "employee_relationship" => "child_under_26", "_destroy" => "false", "ssn" => ""},
-                  "1" => {"id" => spouse.id.to_s, "first_name" => "Lara", "middle_name" => "", "last_name" => "Chan", "dob" => "1980-12-01", "employee_relationship" => "spouse", "_destroy" => "false", "ssn" => ""}
+                "0" => {"id" => child.id.to_s, "first_name" => "David", "middle_name" => "Li", "last_name" => "Chan", "dob" => "2002-12-01", "employee_relationship" => "child_under_26", "_destroy" => "false", "ssn" => ""},
+                "1" => {"id" => spouse.id.to_s, "first_name" => "Lara", "middle_name" => "", "last_name" => "Chan", "dob" => "1980-12-01", "employee_relationship" => "spouse", "_destroy" => "false", "ssn" => ""}
               }
-          }}
+            }
+          end
 
           it "should update employee and dependents information" do
             put :update, xhr: true, params: {plan_design_proposal_id: praposal.id, :id => census_employee.to_param, :census_members_plan_design_census_employee => updated_attributes}

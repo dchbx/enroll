@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
@@ -15,7 +17,7 @@ module BenefitSponsors
       let!(:dc_args) {{"fte_count" => "5"}}
       let!(:cca_args) {{"recorded_sic_code" => "0113"}}
 
-      context "for dc" do 
+      context "for dc" do
         it "should assign dc attributes to given benefit applcation" do
           expect(BenefitApplications::BenefitApplication).to receive(:new).and_return(dc_benefit_application)
           expect(dc_benefit_application.fte_count).to eq 0
@@ -25,7 +27,7 @@ module BenefitSponsors
         end
       end
 
-      context "for cca" do 
+      context "for cca" do
         it "should assign cca attributes to given benefit application" do
           expect(BenefitApplications::BenefitApplication).to receive(:new).and_return(cca_benefit_application)
           expect(cca_benefit_application.recorded_sic_code).to be_nil

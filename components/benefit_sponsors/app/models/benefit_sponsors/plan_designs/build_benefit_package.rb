@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PlanDesigns
     class BuildBenefitPackage < CompositeTask
 
       def initialize
-
         super("Define benefit products that a sponsor will offer to a set of members")
 
 # NOTE: subtasks are listed here, but need to be moved into subclasses, per indentation
@@ -38,7 +39,6 @@ module BenefitSponsors
         #       add_subtask(BenefitSponsors::PlanDesigns::SetSponsorContribution.new)
 
         # add_subtask(BenefitSponsors::PlanDesigns::AssociateMembers.new) # If default BenefitPackage
-
       end
     end
   end

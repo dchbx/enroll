@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationToPlanYearConverter
 
       attr_reader :benefit_application
-      
+
       def initialize(benefit_application)
         @benefit_application = benefit_application
       end
@@ -26,7 +28,7 @@ module BenefitSponsors
             open_enrollment_start_on: benefit_application.open_enrollment_period.begin,
             open_enrollment_end_on: benefit_application.open_enrollment_period.end,
             benefit_groups: copied_benefit_groups
-            )
+          )
         end
       end
 

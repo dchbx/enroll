@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -33,18 +35,18 @@ module BenefitSponsors
           expect(member_roster.member_groups.first).to eq member_group_1
         end
 
-        context "and additional member_groups are added" do 
-          before { 
-                    member_roster.add_member_group(member_group_2)
-                    member_roster.add_member_group(member_group_3)
-                  }
+        context "and additional member_groups are added" do
+          before do
+            member_roster.add_member_group(member_group_2)
+            member_roster.add_member_group(member_group_3)
+          end
 
           it "should included the added member_groups" do
             expect(member_roster.member_groups.size).to eq 3
             expect(member_roster.member_groups).to include(member_group_3)
           end
 
-          context "and a member_group is dropped" do 
+          context "and a member_group is dropped" do
             it "should remove the member from the group" do
               expect(member_roster.member_groups).to include(member_group_3)
               member_roster.drop_member_group(member_group_3)
@@ -55,7 +57,7 @@ module BenefitSponsors
         end
       end
 
-    end 
+    end
 
   end
 end

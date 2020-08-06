@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Configurations
     class AcaIndividualConfiguration < BenefitMarkets::Configurations::Configuration
@@ -7,7 +9,7 @@ module BenefitMarkets
       field :vr_os_window,         as: :verification_outstanding_window_days, type: Integer, default: 0
       field :vr_due,               as: :verification_due_days, type: Integer, default: 95
       field :open_enrl_start_on,   as: :open_enrollment_start_on, type: Date, default: Date.new(2017,11,1)
-      field :open_enrl_end_on,     as: :open_enrollment_end_on, type: Date, default: Date.new(2017,01,31)
+      field :open_enrl_end_on,     as: :open_enrollment_end_on, type: Date, default: Date.new(2017,0o1,31)
 
       validates_presence_of :mm_enr_due_on, :vr_os_window, :vr_due, :open_enrl_start_on, :open_enrl_end_on
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Transaction
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -38,6 +40,6 @@ class Transaction
       transitions from: :special_enrollment_period, to: :enrollment_closed
       transitions from: :open_and_special_enrollment_period, to: :open_enrollment_period
       transitions from: :enrollment_closed, to: :enrollment_closed
-     end
+    end
   end
 end

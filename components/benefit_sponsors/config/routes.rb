@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 BenefitSponsors::Engine.routes.draw do
 
   namespace :profiles do

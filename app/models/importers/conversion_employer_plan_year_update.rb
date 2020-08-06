@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployerPlanYearUpdate < ConversionEmployerPlanYear
 
@@ -18,21 +20,15 @@ module Importers
       puts "Processing....#{employer.legal_name}...#{employer.fein}" unless Rails.env.test?
 
       current_coverage_start = calculated_coverage_start
-      
+
       available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, current_coverage_start.year)
       reference_plan = select_reference_plan(available_plans)
 
-      if reference_plan.blank?
-        errors.add(:base, 'Unable to find a Reference plan with given Hios ID')
-      end
+      errors.add(:base, 'Unable to find a Reference plan with given Hios ID') if reference_plan.blank?
 
-      if single_plan_hios_id.blank? && most_common_hios_id.blank? && reference_plan_hios_id.blank?
-        errors.add(:base, 'Reference Plan Hios Id missing')
-      end
+      errors.add(:base, 'Reference Plan Hios Id missing') if single_plan_hios_id.blank? && most_common_hios_id.blank? && reference_plan_hios_id.blank?
 
-      if plan_selection == 'single_plan' && single_plan_hios_id.blank?
-        errors.add(:base, 'Single Plan Hios Id missing')
-      end
+      errors.add(:base, 'Single Plan Hios Id missing') if plan_selection == 'single_plan' && single_plan_hios_id.blank?
 
       plan_year = employer.plan_years.where(:start_on => current_coverage_start).first
       if plan_year.blank?
@@ -46,13 +42,9 @@ module Importers
       end
 
       renewing_plan_year = employer.plan_years.where(:start_on => (current_coverage_start + 1.year)).first
-      if renewing_plan_year.blank?
-        warnings.add(:base, 'Renewing plan year not present')
-      end
+      warnings.add(:base, 'Renewing plan year not present') if renewing_plan_year.blank?
 
-      if renewing_plan_year && PlanYear::RENEWING_PUBLISHED_STATE.include?(renewing_plan_year.aasm_state)
-        errors.add(:base, "Renewing plan year already published. Reference plan can't be updated")
-      end
+      errors.add(:base, "Renewing plan year already published. Reference plan can't be updated") if renewing_plan_year && PlanYear::RENEWING_PUBLISHED_STATE.include?(renewing_plan_year.aasm_state)
 
       return false if errors.present?
 
@@ -64,22 +56,22 @@ module Importers
           renewal_reference_plan = Plan.find(reference_plan.renewal_plan_id)
           update_reference_plan(renewing_plan_year, renewal_reference_plan)
         end
-        return true
+        true
       else
         errors.add(:base, "Reference plan is same")
-        return false
+        false
       end
     end
 
     def update_reference_plan(plan_year, reference_plan)
       plan_year.benefit_groups.each do |benefit_group|
-        benefit_group.reference_plan= reference_plan
-        benefit_group.elected_plans= benefit_group.elected_plans_by_option_kind
+        benefit_group.reference_plan = reference_plan
+        benefit_group.elected_plans = benefit_group.elected_plans_by_option_kind
         benefit_group.save!
       end
     end
 
-    def save 
+    def save
       return false unless valid?
       find_and_update_plan_year
     end

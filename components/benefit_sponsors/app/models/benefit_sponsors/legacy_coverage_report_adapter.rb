@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class LegacyCoverageReportAdapter
     include Enumerable
@@ -10,17 +12,17 @@ module BenefitSponsors
       iteration_index = 0
       yielded_so_far = 0
       skip_amount = @skip || 0
-      record_limit = @limit || 100000000
+      record_limit = @limit || 100_000_000
       @criterias.each do |criteria|
         s_benefit, query = criteria
         query_ids = query.lazy.map { |q| q["hbx_enrollment_id"] }
         calculator = HbxEnrollmentSponsorEnrollmentCoverageReportCalculator.new(s_benefit, query_ids)
         calculator.each do |calc_result|
-          iteration_index = iteration_index + 1
+          iteration_index += 1
           next if iteration_index <= skip_amount
           next if yielded_so_far >= record_limit
           yield calc_result
-          yielded_so_far = yielded_so_far + 1
+          yielded_so_far += 1
         end
       end
     end
@@ -49,15 +51,15 @@ module BenefitSponsors
         ]
       ).map(&:employee_roles).flatten.map(&:id)
       add({"$match" => {
-        "hbx_enrollments.employee_role_id" => {"$in" => employee_role_ids}
-      }})
+            "hbx_enrollments.employee_role_id" => {"$in" => employee_role_ids}
+          }})
     end
 
     def add(step)
       pipeline << step.to_hash
     end
 
-    def order_by(opts = {})
+    def order_by(_opts = {})
       self
     end
 

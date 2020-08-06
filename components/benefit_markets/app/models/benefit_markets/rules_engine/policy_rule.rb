@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module RulesEngine
     class PolicyRule
@@ -20,17 +22,16 @@ module BenefitMarkets
       attr_reader :is_parent_rule
       attr_reader :child_rules
 
-      NO_OP = lambda {|o| true }
+      NO_OP = ->(_o) { true }
 
       def initialize(name,
-                      requires: [],
-                      validate: NO_OP,
-                      failure: NO_OP,
-                      success: NO_OP,
-                      any_of: nil,
-                      all_of: nil,
-                      applicable_if: NO_OP 
-                    )
+                     requires: [],
+                     validate: NO_OP,
+                     failure: NO_OP,
+                     success: NO_OP,
+                     any_of: nil,
+                     all_of: nil,
+                     applicable_if: NO_OP)
 
         @name = name
         @failure = failure
@@ -53,10 +54,8 @@ module BenefitMarkets
 
       def evaluate(context)
         missing_keys = @requires - context.provided_values
-        if missing_keys.any?
-          raise RequiredInformationMissingError.new("required keys missing", missing_keys)
-        end
-        if !is_applicable.call(context)
+        raise RequiredInformationMissingError.new("required keys missing", missing_keys) if missing_keys.any?
+        unless is_applicable.call(context)
           context.set_rule_result(name, :not_applicable)
           return
         end
@@ -84,7 +83,7 @@ module BenefitMarkets
             end
             context.set_rule_result(self, end_result)
           end
-        else 
+        else
           if validate.call(context)
             success.call(context)
             context.set_rule_result(name, true)

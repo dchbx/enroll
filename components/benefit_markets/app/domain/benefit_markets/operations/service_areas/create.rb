@@ -14,12 +14,12 @@ module BenefitMarkets
         def call(service_area_params:)
           values       = yield validate(service_area_params)
           service_area = yield create(values)
-          
+
           Success(service_area)
         end
 
         private
-  
+
         def validate(params)
           result = ::BenefitMarkets::Validators::Locations::ServiceAreaContract.new.call(params)
 

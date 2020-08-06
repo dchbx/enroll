@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class Broker
     include Virtus.model
@@ -24,5 +26,4 @@ module PdfTemplates
   def shop?
     false
   end
-
 end

@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class QuoteMember
   include Mongoid::Document
   include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
 
-  GENDER_KINDS = %W(male female)
+  GENDER_KINDS = %w[male female].freeze
 
-  EMPLOYEE_RELATIONSHIP_KINDS = %W[employee self spouse domestic_partner child_under_26  child_26_and_over disabled_child_26_and_over]
+  EMPLOYEE_RELATIONSHIP_KINDS = %w[employee self spouse domestic_partner child_under_26 child_26_and_over disabled_child_26_and_over].freeze
 
   # Required Fields
   # The required fields below are the minimum necessary data for plan cost calculation
@@ -42,9 +44,7 @@ class QuoteMember
   private
 
   def valid_dob
-    if(dob && dob > TimeKeeper.date_of_record)
-      errors.add(:dob, "Please verify your date of birth.")
-    end
+    errors.add(:dob, "Please verify your date of birth.") if dob && dob > TimeKeeper.date_of_record
   end
 
 end

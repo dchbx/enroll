@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require 'csv'
 
@@ -11,7 +13,7 @@ class OutstandingTypesReport < MongoidMigrationTask
       end
     else
       families = person.families.select{|family| family.hbx_enrollments.individual_market.present?}
-      enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop? } if families
+      enrollments = families.flat_map(&:hbx_enrollments).reject(&:is_shop?) if families
       all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
       active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year)}
       return "nil" unless all_enrollments.any?
@@ -41,7 +43,7 @@ class OutstandingTypesReport < MongoidMigrationTask
       end
     else
       families = person.families.select{|family| family.hbx_enrollments.shop_market.present?}
-      enrollments = families.flat_map(&:hbx_enrollments).select{|enrollment| !enrollment.is_shop? } if families
+      enrollments = families.flat_map(&:hbx_enrollments).reject(&:is_shop?) if families
       all_enrollments = enrollments.select{|enrollment| enrollment.hbx_enrollment_members.map(&:person).map(&:id).include?(person.id) }
       active_enrollments = enrollments.select{|enrollment| HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state) && enrollment.effective_on.between?(TimeKeeper.date_of_record.beginning_of_year,TimeKeeper.date_of_record.end_of_year)}
       return "nil" unless all_enrollments.any?
@@ -59,7 +61,7 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def due_date_for_type(type)
-    type.due_date ||  TimeKeeper.date_of_record + 95.days
+    type.due_date || TimeKeeper.date_of_record + 95.days
   end
 
   def no_active_enrollments(person)
@@ -72,31 +74,30 @@ class OutstandingTypesReport < MongoidMigrationTask
   end
 
   def migrate
-    field_names = %w( SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE IVL_ENROLLMENT SHOP_ENROLLMENT)
+    field_names = %w[SUBSCRIBER_ID MEMBER_ID FIRST_NAME LAST_NAME VERIFICATION_TYPE TRANSITION OUTSTANDING DUE_DATE IVL_ENROLLMENT SHOP_ENROLLMENT]
     file_name = "#{Rails.root}/app/reports/outstanding_types_report.csv"
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << field_names
       people.each do |person|
-        begin
-          next if no_active_enrollments(person)
-          if outstanding_types(person).any?
-            outstanding_types(person).each do |type|
-              csv << [  subscriber_id(person),
-                        person.hbx_id,
-                        person.first_name,
-                        person.last_name,
-                        type.type_name,
-                        created_at(person).to_date,
-                        "yes",
-                        due_date_for_type(type).to_date,
-                        ivl_enrollment(person),
-                        shop_enrollment(person)
-              ]
-            end
+
+        next if no_active_enrollments(person)
+        if outstanding_types(person).any?
+          outstanding_types(person).each do |type|
+            csv << [subscriber_id(person),
+                    person.hbx_id,
+                    person.first_name,
+                    person.last_name,
+                    type.type_name,
+                    created_at(person).to_date,
+                    "yes",
+                    due_date_for_type(type).to_date,
+                    ivl_enrollment(person),
+                    shop_enrollment(person)]
           end
-        rescue => e
-          puts "Invalid Person with HBX_ID: #{person.hbx_id}"
         end
+      rescue StandardError => e
+        puts "Invalid Person with HBX_ID: #{person.hbx_id}"
+
       end
     end
     puts "*********** DONE ******************" unless Rails.env.test?

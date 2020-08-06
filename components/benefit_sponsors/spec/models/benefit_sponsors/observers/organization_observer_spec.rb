@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -13,7 +15,7 @@ module BenefitSponsors
             allow_any_instance_of(OrganizationObserver).to receive(:notify)
             organization.assign_attributes(fein: "987654532")
             observer_instance.update(organization, nil)
-            expect(observer_instance).to have_received(:notify).with('acapi.info.events.employer.fein_corrected', {:employer_id=> organization.hbx_id, :event_name=>"fein_corrected"})
+            expect(observer_instance).to have_received(:notify).with('acapi.info.events.employer.fein_corrected', {:employer_id => organization.hbx_id, :event_name => "fein_corrected"})
           end
 
           it 'DBA updated' do

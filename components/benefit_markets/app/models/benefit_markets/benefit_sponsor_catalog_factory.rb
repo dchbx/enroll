@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class BenefitSponsorCatalogFactory
 
     attr_reader :benefit_market_catalog, :benefit_sponsor_catalog
 
-    def self.call(effective_date, benefit_market_catalog, service_areas=nil)
+    def self.call(effective_date, benefit_market_catalog, service_areas = nil)
       new(effective_date, benefit_market_catalog, service_areas).benefit_sponsor_catalog
     end
 
-    def initialize(effective_date, benefit_market_catalog, service_areas=nil)
+    def initialize(effective_date, benefit_market_catalog, service_areas = nil)
       @benefit_market_catalog = benefit_market_catalog
-      @effective_date   = effective_date
+      @effective_date = effective_date
 
       @benefit_sponsor_catalog = ::BenefitMarkets::BenefitSponsorCatalog.new
       @benefit_sponsor_catalog.effective_date = effective_date
@@ -41,7 +43,7 @@ module BenefitMarkets
       #   # product_package.products = product_package.benefit_market_products_available_for(@service_area, @effective_date)
       # end
 
-      benefit_sponsor_catalog.product_packages = benefit_market_catalog.product_packages.collect do |product_package| 
+      benefit_sponsor_catalog.product_packages = benefit_market_catalog.product_packages.collect do |product_package|
         construct_sponsor_product_package(product_package)
       end
     end
@@ -51,7 +53,7 @@ module BenefitMarkets
         title: market_product_package.title,
         description: market_product_package.description,
         product_kind: market_product_package.product_kind,
-        benefit_kind: market_product_package.benefit_kind, 
+        benefit_kind: market_product_package.benefit_kind,
         package_kind: market_product_package.package_kind
       )
 
@@ -62,9 +64,7 @@ module BenefitMarkets
       product_package
     end
 
-    def benefit_sponsor_catalog
-      @benefit_sponsor_catalog
-    end
+    attr_reader :benefit_sponsor_catalog
   end
 end
 

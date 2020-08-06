@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class BrokerAgencyAccountObserver
@@ -5,7 +7,7 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def broker_hired?(account, options={})
+      def broker_hired?(account, _options = {})
         if !account.persisted? && account.valid? && account.benefit_sponsorship?
           profile = account.benefit_sponsorship.profile
           notify(
@@ -18,7 +20,7 @@ module BenefitSponsors
         end
       end
 
-      def broker_fired?(account, options={})
+      def broker_fired?(account, _options = {})
         return unless account.persisted? && account.changed? && account.changed_attributes.include?("end_on") && account.benefit_sponsorship.present?
         profile = account.benefit_sponsorship.profile
         notify(

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Manage enrollment-related behavior for a benefit-sponsoring organization (e.g. employers, congress, HBX, etc.)
 # The model design assumes a once annual enrollment period and effective date.  For scenarios where there's a once-yearly
 # open enrollment, new sponsors may join mid-year for initial enrollment, subsequently renewing on-schedule in following
@@ -17,7 +19,7 @@ module SponsoredBenefits
       include Mongoid::Timestamps
       # include Concerns::Observable
 
-      ENROLLMENT_FREQUENCY_KINDS = [ :annual, :rolling_month ]
+      ENROLLMENT_FREQUENCY_KINDS = [:annual, :rolling_month].freeze
 
       embedded_in :benefit_sponsorable, polymorphic: true
 
@@ -43,13 +45,13 @@ module SponsoredBenefits
       validates_presence_of :benefit_market, :contact_method
 
       validates :enrollment_frequency,
-        inclusion: { in: ENROLLMENT_FREQUENCY_KINDS, message: "%{value} is not a valid enrollment frequency kind" },
-        allow_blank: false
+                inclusion: { in: ENROLLMENT_FREQUENCY_KINDS, message: "%{value} is not a valid enrollment frequency kind" },
+                allow_blank: false
 
       validates :annual_enrollment_period_begin_month,
-        numericality: {only_integer: true},
-        inclusion: { in: 1..12 },
-        allow_blank: true
+                numericality: {only_integer: true},
+                inclusion: { in: 1..12 },
+                allow_blank: true
 
       # delegate :sic_code, to: :benefit_sponsorable
       # delegate :rating_area, to: :benefit_sponsorable
@@ -90,7 +92,7 @@ module SponsoredBenefits
         @inbox.messages.create(subject: welcome_subject, body: welcome_body)
       end
 
-      # TODO - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
+      # TODO: - turn this in to counter_cache -- see: https://gist.github.com/andreychernih/1082313
       def roster_size
         return @roster_size if defined? @roster_size
         @roster_size = census_employees.active.size
@@ -98,11 +100,9 @@ module SponsoredBenefits
 
       def earliest_plan_year_start_on_date
         plan_years = (self.plan_years.published_or_renewing_published + self.plan_years.where(:aasm_state.in => ["expired", "terminated"]))
-        plan_years.reject!{|py| py.can_be_migrated? }
-        plan_year = plan_years.sort_by {|test| test[:start_on]}.first
-        if !plan_year.blank?
-          plan_year.start_on
-        end
+        plan_years.reject!(&:can_be_migrated?)
+        plan_year = plan_years.min_by {|test| test[:start_on]}
+        plan_year.start_on unless plan_year.blank?
       end
 
       def sic_code
@@ -133,6 +133,5 @@ module SponsoredBenefits
       end
 
     end
-
   end
 end

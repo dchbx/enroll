@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 When(/^the user has a family with e_case_id and visit personal information edit page$/) do
   person = FactoryBot.create(:person, first_name: "sarah")

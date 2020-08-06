@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::EmployerProfile
     include Virtus.model
     include ActiveModel::Model
 
-    DATE_ELEMENTS = %w(current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on)
+    DATE_ELEMENTS = %w[current_py_start_on current_py_end_on renewal_py_start_on renewal_py_end_on].freeze
 
     attribute :notice_date, String
     attribute :notice_date_plus_31_days, String
@@ -34,22 +36,22 @@ module Notifier
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployerProfile.new({
-        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        notice_date_plus_31_days: (TimeKeeper.date_of_record + 31.days).strftime('%m/%d/%Y'),
-        first_name: 'John',
-        last_name: 'Whitmore',
-        email: 'johnwhitmore@gmail.com',
-        application_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        invoice_month: TimeKeeper.date_of_record.next_month.strftime('%B'),
-        employer_name: 'North America Football Federation',
-        account_number: '1056530',
-        invoice_number: '1056530072017',
-        invoice_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
-        coverage_month: TimeKeeper.date_of_record.next_month.strftime("%m/%Y"),
-        total_amount_due: '$1523.25',
-        date_due: (TimeKeeper.date_of_record + 10.days).strftime("%m/%d/%Y")
+                                                                notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                                notice_date_plus_31_days: (TimeKeeper.date_of_record + 31.days).strftime('%m/%d/%Y'),
+                                                                first_name: 'John',
+                                                                last_name: 'Whitmore',
+                                                                email: 'johnwhitmore@gmail.com',
+                                                                application_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                                invoice_month: TimeKeeper.date_of_record.next_month.strftime('%B'),
+                                                                employer_name: 'North America Football Federation',
+                                                                account_number: '1056530',
+                                                                invoice_number: '1056530072017',
+                                                                invoice_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+                                                                coverage_month: TimeKeeper.date_of_record.next_month.strftime("%m/%Y"),
+                                                                total_amount_due: '$1523.25',
+                                                                date_due: (TimeKeeper.date_of_record + 10.days).strftime("%m/%d/%Y")
 
-      })
+                                                              })
 
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice.benefit_application = Notifier::MergeDataModels::BenefitApplication.stubbed_object
@@ -66,7 +68,7 @@ module Notifier
     end
 
     def conditions
-      %w{broker_present?}
+      %w[broker_present?]
     end
 
     def primary_address

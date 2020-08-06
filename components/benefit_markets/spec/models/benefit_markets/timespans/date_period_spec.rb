@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -8,8 +10,8 @@ module BenefitMarkets
 
     let(:params) do
       {
-        begin_on:   begin_on,
-        end_on:     end_on,
+        begin_on: begin_on,
+        end_on: end_on
       }
     end
 
@@ -93,7 +95,7 @@ module BenefitMarkets
           end
 
           it "should find each period by matching passed date" do
-            expect( BenefitMarkets::Timespans::DatePeriod.find_on(match_period.begin_on).first).to eq match_period
+            expect(BenefitMarkets::Timespans::DatePeriod.find_on(match_period.begin_on).first).to eq match_period
             expect(described_class.find_on(next_match_period.begin_on).first).to eq next_match_period
           end
 

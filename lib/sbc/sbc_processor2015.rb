@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SbcProcessor2015
   S3_BUCKET = "sbc"
 
@@ -27,10 +29,10 @@ class SbcProcessor2015
 
       # new model
       products = if hios_id.include? '-'
-        ::BenefitMarkets::Products::Product.where(hios_id:hios_id)
-      else
-        ::BenefitMarkets::Products::Product.where(hios_id:/#{hios_id}/)
-      end.select{|a| a.active_year.to_i  == row[2].strip.to_i}
+                   ::BenefitMarkets::Products::Product.where(hios_id: hios_id)
+                 else
+                   ::BenefitMarkets::Products::Product.where(hios_id: /#{hios_id}/)
+      end.select{|a| a.active_year.to_i == row[2].strip.to_i}
 
       products.each do |product|
         file_name = row[1].strip
@@ -41,9 +43,9 @@ class SbcProcessor2015
         end
 
         uri = if Rails.env.test?
-          "urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-test#11111111-1111-1111-1111-111111111111"
-        else
-          Aws::S3Storage.save(pdf_path(file_name), S3_BUCKET)
+                "urn:openhbx:terms:v1:file_storage:s3:bucket:mhc-enroll-sbc-test#11111111-1111-1111-1111-111111111111"
+              else
+                Aws::S3Storage.save(pdf_path(file_name), S3_BUCKET)
         end
         product.sbc_document = Document.new({title: file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
         product.sbc_document.save!
@@ -56,13 +58,12 @@ class SbcProcessor2015
 
     # old model
     Plan.where(active_year: 2020).each do |plan|
-      product = ::BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select{|a| a.active_year.to_i  == plan.active_year.to_i}.first
+      product = ::BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select{|a| a.active_year.to_i == plan.active_year.to_i}.first
 
       plan.sbc_document = product.sbc_document
       plan.save
     end
     # end  old model
     puts "Total #{counter} plans/products updated." unless Rails.env.test?
-
   end
 end

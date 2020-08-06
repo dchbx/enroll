@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployer
     include ActiveModel::Validations
@@ -69,16 +71,12 @@ module Importers
     def validate_tpa_if_specified
       return true if broker_npn.blank?
       return true if tpa_fein.blank?
-      unless find_broker
-        warnings.add(:tpa_fein, "specified, but could not find Broker")
-      end
+      warnings.add(:tpa_fein, "specified, but could not find Broker") unless find_broker
       unless find_ga
         warnings.add(:tpa_fein, "is not an existing General Agency")
         if find_broker
           found_ga = find_broker.broker_agency_profile.default_general_agency_profile
-          unless found_ga
-            warnings.add(:tpa_fein, "can not be assigned from broker default - broker doesn't have one")
-          end
+          warnings.add(:tpa_fein, "can not be assigned from broker default - broker doesn't have one") unless found_ga
         else
           warnings.add(:tpa_fein, "can not be assigned from broker default - no broker")
         end
@@ -93,8 +91,8 @@ module Importers
     def find_ga
       return nil if tpa_fein.blank?
       org = Organization.where({
-                                   :fein => tpa_fein,
-                                   :general_agency_profile => {"$exists" => true}
+                                 :fein => tpa_fein,
+                                 :general_agency_profile => {"$exists" => true}
                                }).first
       return nil unless org
       org.general_agency_profile
@@ -118,31 +116,29 @@ module Importers
 
     def broker_exists_if_specified
       return true if broker_npn.blank?
-      unless BrokerRole.by_npn(broker_npn).present?
-        warnings.add(:broker_npn, "does not correspond to an existing Broker")
-      end
+      warnings.add(:broker_npn, "does not correspond to an existing Broker") unless BrokerRole.by_npn(broker_npn).present?
     end
 
     def build_primary_address
       Address.new(
-          :kind => "primary",
-          :address_1 => primary_location_address_1,
-          :address_2 => primary_location_address_2,
-          :city => primary_location_city,
-          :state => primary_location_state,
-          :county => primary_location_county,
-          :zip => primary_location_zip
+        :kind => "primary",
+        :address_1 => primary_location_address_1,
+        :address_2 => primary_location_address_2,
+        :city => primary_location_city,
+        :state => primary_location_state,
+        :county => primary_location_county,
+        :zip => primary_location_zip
       )
     end
 
     def build_mailing_address
       Address.new(
-          :kind => "mailing",
-          :address_1 => mailing_location_address_1,
-          :address_2 => mailing_location_address_2,
-          :city => mailing_location_city,
-          :state => mailing_location_state,
-          :zip => mailing_location_zip
+        :kind => "mailing",
+        :address_1 => mailing_location_address_1,
+        :address_2 => mailing_location_address_2,
+        :city => mailing_location_city,
+        :state => mailing_location_state,
+        :zip => mailing_location_zip
       )
     end
 
@@ -151,19 +147,19 @@ module Importers
       main_address = build_primary_address
       mailing_address = build_mailing_address
       main_location = OfficeLocation.new({
-                                             :address => main_address,
-                                             :phone => Phone.new({
-                                                                     :kind => "work",
-                                                                     :full_phone_number => contact_phone
-                                                                 }),
-                                             :is_primary => true
+                                           :address => main_address,
+                                           :phone => Phone.new({
+                                                                 :kind => "work",
+                                                                 :full_phone_number => contact_phone
+                                                               }),
+                                           :is_primary => true
                                          })
       locations << main_location
-      if !mailing_address.blank?
-        if !mailing_address.same_address?(main_address)
+      unless mailing_address.blank?
+        unless mailing_address.same_address?(main_address)
           locations << OfficeLocation.new({
-                                              :is_primary => false,
-                                              :address => mailing_address
+                                            :is_primary => false,
+                                            :address => mailing_address
                                           })
         end
       end
@@ -189,13 +185,13 @@ module Importers
 
     def assign_brokers
       broker_agency_accounts = []
-      if !broker_npn.blank?
+      unless broker_npn.blank?
         br = BrokerRole.by_npn(broker_npn).first
-        if !br.nil?
+        unless br.nil?
           broker_agency_accounts << BrokerAgencyAccount.new({
-                                                                start_on: Time.now,
-                                                                writing_agent_id: br.id,
-                                                                broker_agency_profile_id: br.broker_agency_profile_id
+                                                              start_on: Time.now,
+                                                              writing_agent_id: br.id,
+                                                              broker_agency_profile_id: br.broker_agency_profile_id
                                                             })
         end
       end
@@ -208,19 +204,19 @@ module Importers
 
     def map_poc(emp)
       person_attrs = {
-          :first_name => contact_first_name,
-          :last_name => contact_last_name,
-          :employer_staff_roles => [
+        :first_name => contact_first_name,
+        :last_name => contact_last_name,
+        :employer_staff_roles => [
               EmployerStaffRole.new(employer_profile_id: emp.id, benefit_sponsor_employer_profile_id: emp.id, is_owner: false)
           ],
-          :phones => [
+        :phones => [
               Phone.new({
-                            :kind => "work",
-                            :full_phone_number => contact_phone
+                          :kind => "work",
+                          :full_phone_number => contact_phone
                         })
           ]
       }
-      if !contact_email.blank?
+      unless contact_email.blank?
         emails = contact_email.strip.split(',')
         person_attrs[:emails] = emails.map {|email| Email.new(:kind => "work", :address => email.gsub(/\s/, ''))}
       end
@@ -230,21 +226,21 @@ module Importers
     def update_poc(emp)
       return true if contact_first_name.blank? || contact_last_name.blank?
 
-      matching_staff_role = emp.staff_roles.detect {|staff|
+      matching_staff_role = emp.staff_roles.detect do |staff|
         staff.first_name.match(/#{contact_first_name}/i) && staff.last_name.match(/#{contact_last_name}/i)
-      }
+      end
 
       if emp.staff_roles.present? && matching_staff_role.blank?
         emp.staff_roles.each do |person|
-          person.employer_staff_roles.where(employer_profile_id: emp.id).each {|role| role.close_role!}
+          person.employer_staff_roles.where(employer_profile_id: emp.id).each(&:close_role!)
         end
       end
 
       if matching_staff_role.present?
         matching_staff_role.phones = [
             Phone.new({
-                          :kind => "work",
-                          :full_phone_number => contact_phone
+                        :kind => "work",
+                        :full_phone_number => contact_phone
                       })
         ]
 
@@ -264,21 +260,19 @@ module Importers
       broker = find_broker
       return [] unless broker
       general_agency = find_ga
-      unless general_agency
-        general_agency = broker.broker_agency_profile.default_general_agency_profile
-      end
+      general_agency ||= broker.broker_agency_profile.default_general_agency_profile
       return [] unless general_agency
       general_agency_accounts = []
       if broker
         if general_agency
           general_agency_accounts << GeneralAgencyAccount.new(
-              :start_on => Time.now,
-              :general_agency_profile_id => general_agency.id,
-              :broker_role_id => broker.id
+            :start_on => Time.now,
+            :general_agency_profile_id => general_agency.id,
+            :broker_role_id => broker.id
           )
         end
       end
-      return general_agency_accounts
+      general_agency_accounts
     end
 
     def propagate_errors(org)

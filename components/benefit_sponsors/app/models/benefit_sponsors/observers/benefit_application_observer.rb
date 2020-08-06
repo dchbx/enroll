@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class BenefitApplicationObserver
@@ -29,7 +31,7 @@ module BenefitSponsors
       #         if policy.is_satisfied?(benefit_application)
       #           notice_event = benefit_application.is_renewing? ? "renewal_employer_open_enrollment_completed" : "initial_employer_open_enrollment_completed"
       #           deliver(recipient: benefit_application.employer_profile, event_object: benefit_application, notice_event: notice_event)
-                
+
       #           if benefit_application.is_renewing?
       #             benefit_application.benefit_sponsorship.census_employees.non_terminated.each do |ce|
       #               enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments

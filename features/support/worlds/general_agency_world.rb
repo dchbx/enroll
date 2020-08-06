@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GeneralAgencyWorld
   def assign_roles_to_general_agency
     general_agency_profile.general_agency_staff_roles << primary_general_agency_staff_role
@@ -6,7 +8,7 @@ module GeneralAgencyWorld
 
   def primary_general_agency_staff_role
     @general_agency_staff_role = FactoryBot.create(:general_agency_staff_role,
-      benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
+                                                   benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
   end
 
   def general_agency_organization(legal_name = nil, *traits)
@@ -17,15 +19,15 @@ module GeneralAgencyWorld
     if legal_name.blank?
       if @general_agency_organization.empty?
         @general_agency_organization[:default] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                                                                *traits,
-                                                                attributes.merge(site: site))
+                                                                     *traits,
+                                                                     attributes.merge(site: site))
       else
         @general_agency_organization.values.first
       end
     else
       @general_agency_organization[legal_name] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-                                                                *traits,
-                                                                attributes.merge(site: site))
+                                                                     *traits,
+                                                                     attributes.merge(site: site))
     end
   end
 
@@ -92,6 +94,6 @@ When /^the HBX admin visits the link received in the approval email$/ do
   expect(current_email.to).to eq([email_address])
 
   invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  invitation_link.sub!(%r{http\://127\.0\.0\.1\:3000}, '')
   visit(invitation_link)
 end

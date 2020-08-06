@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::DOMAIN do
@@ -24,10 +26,10 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidator
   before :each do
     allow(BenefitSponsors::Services::BrokerRegistrationService).to receive(
       :may_claim_broker_identity?
-      ).with(
-        user,
-        request
-      ).and_return(broker_is_claimable)
+    ).with(
+      user,
+      request
+    ).and_return(broker_is_claimable)
   end
 
   context "with valid data" do

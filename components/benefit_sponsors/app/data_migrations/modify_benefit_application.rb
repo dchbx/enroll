@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), "..", "..", "lib/mongoid_migration_task")
 
-class ModifyBenefitApplication< MongoidMigrationTask
+class ModifyBenefitApplication < MongoidMigrationTask
 
   def migrate
     action = ENV['action'].to_s
@@ -42,8 +44,8 @@ class ModifyBenefitApplication< MongoidMigrationTask
       from_state = benefit_application.aasm_state
       benefit_application.update_attributes!(:aasm_state => :enrollment_open)
       benefit_application.workflow_state_transitions << WorkflowStateTransition.new(
-          from_state: from_state,
-          to_state: "enrollment_open"
+        from_state: from_state,
+        to_state: "enrollment_open"
       )
       if from_state == :approved
         benefit_application.recalc_pricing_determinations
@@ -66,44 +68,42 @@ class ModifyBenefitApplication< MongoidMigrationTask
     end
   end
 
-  def reinstate_benefit_application(benefit_applications)
-
-  end
+  def reinstate_benefit_application(benefit_applications); end
 
   def update_effective_period_and_approve(benefit_applications)
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")
     new_start_date = Date.strptime(ENV['new_start_date'], "%m/%d/%Y")
     new_end_date = Date.strptime(ENV['new_end_date'], "%m/%d/%Y")
     oe_start_on = new_start_date.prev_month
-    oe_end_on = oe_start_on+19.days
+    oe_end_on = oe_start_on + 19.days
     raise 'new_end_date must be greater than new_start_date' if new_start_date >= new_end_date
     benefit_application = benefit_applications.where(:"effective_period.min" => effective_date, :aasm_state => :draft).first
     if benefit_application.present?
-      benefit_sponsorship =  benefit_application.benefit_sponsorship
+      benefit_sponsorship = benefit_application.benefit_sponsorship
       benefit_package = benefit_application.benefit_packages.detect(&:is_active)
       benefit_application.update_attributes!(effective_period: new_start_date..new_end_date, open_enrollment_period: oe_start_on..oe_end_on)
       new_effective_date = benefit_application.effective_period.min
       benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(new_effective_date)
       benefit_application.benefit_sponsor_catalog.delete
       benefit_sponsor_catalog.save!
-      benefit_application.benefit_sponsor_catalog =  benefit_sponsor_catalog
+      benefit_application.benefit_sponsor_catalog = benefit_sponsor_catalog
       update_contribution_unit_ids(benefit_application)
       benefit_application.save!
       benefit_sponsorship.census_employees.each do |ee|
-        ee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).each do|bga|
+        ee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).each do |bga|
           bga.update_attributes!(start_on: new_start_date)
         end
       end
       benefit_application.approve_application!
       if benefit_application.is_renewing?
         bs_from_state = benefit_sponsorship.aasm_state
-         if (bs_from_state != "active")
-        benefit_sponsorship.update_attributes!(aasm_state: "active")
-        benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
+        if bs_from_state != "active"
+          benefit_sponsorship.update_attributes!(aasm_state: "active")
+          benefit_sponsorship.workflow_state_transitions << WorkflowStateTransition.new(
             from_state: bs_from_state,
             to_state: "active"
-        )
-         end
+          )
+        end
       end
     else
       raise "No benefit application found."
@@ -146,7 +146,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
       from_state: from_state,
       to_state: :applicant,
       reason: 'modify_benefit_application'
-      )
+    )
   end
 
   def cancel_benefit_application(benefit_application)
@@ -165,8 +165,7 @@ class ModifyBenefitApplication< MongoidMigrationTask
     benefit_sponsorship.benefit_applications
   end
 
-  def benefit_applications_for_reinstate
-  end
+  def benefit_applications_for_reinstate; end
 
   def benefit_application_for_force_submission
     effective_date = Date.strptime(ENV['effective_date'], "%m/%d/%Y")

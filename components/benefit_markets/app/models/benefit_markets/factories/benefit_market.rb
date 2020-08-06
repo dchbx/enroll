@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Factories
     class BenefitMarket
@@ -10,11 +12,11 @@ module BenefitMarkets
 
       def self.call(description:, kind:, site_urn:, title:, configuration:, site_id:)
         BenefitMarkets::BenefitMarket.new description: description,
-          site_id: site_id,
-          kind: kind,
-          site_urn: site_urn,
-          title: title,
-          configuration: configuration
+                                          site_id: site_id,
+                                          kind: kind,
+                                          site_urn: site_urn,
+                                          title: title,
+                                          configuration: configuration
       end
 
       def self.validate(benefit_market)

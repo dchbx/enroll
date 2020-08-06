@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Notifier
   module Builders::Broker
-
     def broker_agency_account
       if event_name == 'broker_fired_confirmation_to_employer' && terminated_broker_agency_account
         terminated_broker_agency_account
@@ -10,9 +11,7 @@ module Notifier
     end
 
     def terminated_broker_agency_account
-      if payload['event_object_kind'].constantize == BenefitSponsors::Accounts::BrokerAgencyAccount
-        employer_profile.broker_agency_accounts.unscoped.find(payload['event_object_id'])
-      end
+      employer_profile.broker_agency_accounts.unscoped.find(payload['event_object_id']) if payload['event_object_kind'].constantize == BenefitSponsors::Accounts::BrokerAgencyAccount
     end
 
     def format_date(date_value)
@@ -37,33 +36,23 @@ module Notifier
     end
 
     def broker_primary_fullname
-      if broker_present?
-        merge_model.broker.primary_fullname = broker.full_name
-      end
+      merge_model.broker.primary_fullname = broker.full_name if broker_present?
     end
 
     def broker_primary_first_name
-      if broker_present?
-        merge_model.broker.primary_first_name = broker.first_name
-      end
+      merge_model.broker.primary_first_name = broker.first_name if broker_present?
     end
 
     def broker_primary_last_name
-      if broker_present?
-        merge_model.broker.primary_last_name = broker.last_name
-      end
+      merge_model.broker.primary_last_name = broker.last_name if broker_present?
     end
 
     def broker_assignment_date
-      if broker_agency_account.present?
-        merge_model.broker.assignment_date = format_date(broker_agency_account.start_on)
-      end
+      merge_model.broker.assignment_date = format_date(broker_agency_account.start_on) if broker_agency_account.present?
     end
 
     def broker_termination_date
-      if terminated_broker_agency_account.present?
-        merge_model.broker.termination_date = format_date(terminated_broker_agency_account.end_on)
-      end
+      merge_model.broker.termination_date = format_date(terminated_broker_agency_account.end_on) if terminated_broker_agency_account.present?
     end
 
     def broker_organization
@@ -75,15 +64,11 @@ module Notifier
     end
 
     def broker_phone
-      if broker_present?
-        merge_model.broker.phone = broker.work_phone_or_best
-      end
+      merge_model.broker.phone = broker.work_phone_or_best if broker_present?
     end
 
     def broker_email
-      if broker_present?
-        merge_model.broker.email = broker.work_email_or_best
-      end
+      merge_model.broker.email = broker.work_email_or_best if broker_present?
     end
   end
 end

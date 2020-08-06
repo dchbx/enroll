@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'ostruct'
 class SbcProcessor
 
-  SHEETS = ['IVL', 'SHOP Q1', 'SHOP Q2', 'SHOP Q3', 'SHOP Q4']
-  CARRIERS = ["Dominion", "Aetna", "CareFirst", "Delta Dental", "Dentegra", "MetLife", "Kaiser", "UnitedHealthcare"]
+  SHEETS = ['IVL', 'SHOP Q1', 'SHOP Q2', 'SHOP Q3', 'SHOP Q4'].freeze
+  CARRIERS = ["Dominion", "Aetna", "CareFirst", "Delta Dental", "Dentegra", "MetLife", "Kaiser", "UnitedHealthcare"].freeze
   S3_BUCKET = "sbc"
 
   def initialize(matrix_path, sbc_dir_path)
@@ -13,13 +15,10 @@ class SbcProcessor
   end
 
   def run
-    begin
-      read_matrix
-      upload
-    rescue Exception => e
-      puts "ERROR : #{e.message}"
-    end
-
+    read_matrix
+    upload
+  rescue Exception => e
+    puts "ERROR : #{e.message}"
   end
 
   def upload
@@ -31,9 +30,7 @@ class SbcProcessor
         next
       end
       uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name), S3_BUCKET)
-      if uri.nil?
-        uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name.gsub(' ','')), S3_BUCKET)
-      end
+      uri = Aws::S3Storage.save(pdf_path(data.sbc_file_name.gsub(' ','')), S3_BUCKET) if uri.nil?
 
       if uri.nil?
         puts "URI nil #{plan.name} #{plan.hios_id} #{data.sbc_file_name}"
@@ -76,7 +73,7 @@ class SbcProcessor
   # key could be carrier name (CareFirst) or a variation of it (CareFirst/OPM)
   def sbc_hash_key(carrier_name)
     return carrier_name if CARRIERS.include?(carrier_name)
-    return CARRIERS.each.detect do |k|
+    CARRIERS.each.detect do |k|
       (carrier_name.include? k) || (k.include? carrier_name)
     end
   end

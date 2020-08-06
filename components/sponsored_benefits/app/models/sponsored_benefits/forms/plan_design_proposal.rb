@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class PlanDesignProposal
@@ -42,12 +44,9 @@ module SponsoredBenefits
         @plan_design_organization = val
       end
 
-      def profile=(attrs)
-      end
+      def profile=(attrs); end
 
-      def title=(val)
-        @title = val
-      end
+      attr_writer :title
 
       def effective_date=(val)
         @effective_date = Date.strptime(val, "%Y-%m-%d")
@@ -62,9 +61,7 @@ module SponsoredBenefits
         end
       end
 
-      def kind=(val)
-        @kind = val
-      end
+      attr_writer :kind
 
       def prepopulate_attributes
         @title = @proposal.title
@@ -91,9 +88,7 @@ module SponsoredBenefits
           sponsorship.benefit_applications.build
         end
         sponsorship = @profile.benefit_sponsorships.first
-        if sponsorship.benefit_applications.empty?
-          sponsorship.benefit_applications.build
-        end
+        sponsorship.benefit_applications.build if sponsorship.benefit_applications.empty?
       end
 
       def assign_benefit_group(benefit_group)
@@ -126,8 +121,8 @@ module SponsoredBenefits
           renewal_employer = @plan_design_organization.is_renewing_employer?
           enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date, renewal_employer)
           benefit_application = (sponsorship.benefit_applications.first || sponsorship.benefit_applications.build)
-          benefit_application.effective_period= enrollment_dates[:effective_period]
-          benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]
+          benefit_application.effective_period = enrollment_dates[:effective_period]
+          benefit_application.open_enrollment_period = enrollment_dates[:open_enrollment_period]
         end
 
         @proposal.save!
@@ -141,16 +136,15 @@ module SponsoredBenefits
 
         benefit_group = application.benefit_groups.first
 
-        return benefit_group.reference_plan_id.present?
+        benefit_group.reference_plan_id.present?
       end
 
-
       def to_h
-        unless @effective_date.is_a? Date
-          effective_date = Date.strptime(@effective_date, "%Y-%m-%d")
-        else
-          effective_date = @effective_date
-        end
+        effective_date = if @effective_date.is_a? Date
+                           @effective_date
+                         else
+                           Date.strptime(@effective_date, "%Y-%m-%d")
+                         end
         sponsorship = @profile.benefit_sponsorships.first
         {
           title: "Copy of #{@proposal.title}",
@@ -163,7 +157,7 @@ module SponsoredBenefits
               contact_method: sponsorship.contact_method,
               benefit_application: [
                 effective_period: effective_date..(effective_date.next_year.prev_day),
-                open_enrollment_period: TimeKeeper.date_of_record..effective_date,
+                open_enrollment_period: TimeKeeper.date_of_record..effective_date
               ]
             ]
           ]

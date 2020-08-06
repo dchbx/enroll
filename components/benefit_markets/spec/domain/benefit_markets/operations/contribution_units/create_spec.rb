@@ -6,34 +6,34 @@ RSpec.describe BenefitMarkets::Operations::ContributionUnits::Create, dbclean: :
 
   let(:ee_contribution_unit) do
     {
-      "_id"=>BSON::ObjectId.new,
-      "created_at"=>nil,
-      "default_contribution_factor"=>0.0,
-      "display_name"=>"Employee",
-      "member_relationship_maps"=>[
-        {"_id"=>BSON::ObjectId.new, "count"=>1, "created_at"=>nil, "operator"=>:==, "relationship_name"=>:employee, "updated_at"=>nil}
+      "_id" => BSON::ObjectId.new,
+      "created_at" => nil,
+      "default_contribution_factor" => 0.0,
+      "display_name" => "Employee",
+      "member_relationship_maps" => [
+        {"_id" => BSON::ObjectId.new, "count" => 1, "created_at" => nil, "operator" => :==, "relationship_name" => :employee, "updated_at" => nil}
       ],
-      "minimum_contribution_factor"=>0.0,
-      "name"=>"employee",
-      "order"=>0,
-      "updated_at"=>nil
+      "minimum_contribution_factor" => 0.0,
+      "name" => "employee",
+      "order" => 0,
+      "updated_at" => nil
     }
   end
 
   let(:ee_contribution_unit_cap) do
     {
-      "_id"=>BSON::ObjectId.new,
-      "created_at"=>nil,
-      "default_contribution_factor"=>0.0,
-      "display_name"=>"Employee",
-      "member_relationship_maps"=>[
-        {"_id"=>BSON::ObjectId.new, "count"=>1, "created_at"=>nil, "operator"=>:==, "relationship_name"=>:employee, "updated_at"=>nil}
+      "_id" => BSON::ObjectId.new,
+      "created_at" => nil,
+      "default_contribution_factor" => 0.0,
+      "display_name" => "Employee",
+      "member_relationship_maps" => [
+        {"_id" => BSON::ObjectId.new, "count" => 1, "created_at" => nil, "operator" => :==, "relationship_name" => :employee, "updated_at" => nil}
       ],
-      "minimum_contribution_factor"=>0.0,
-      "name"=>"employee",
-      "order"=>0,
-      "default_contribution_cap"=>0.0,
-      "updated_at"=>nil
+      "minimum_contribution_factor" => 0.0,
+      "name" => "employee",
+      "order" => 0,
+      "default_contribution_cap" => 0.0,
+      "updated_at" => nil
     }
   end
 

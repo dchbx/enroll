@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Locations
     # A County-Zip Code pair.  Used as the building block of the geographic

@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Notifier
   module Builders::OfferedProduct
-
     attr_reader :enrollment_service
 
     def offered_products
@@ -29,7 +30,7 @@ module Notifier
     end
 
     def fetch_enrollment(enrollment_id)
-       HbxEnrollment.find enrollment_id
+      HbxEnrollment.find enrollment_id
     end
 
     def build_enrollments(enrollments)
@@ -43,8 +44,8 @@ module Notifier
 
         employee = enr.subscriber.person
         enrollment_model.subscriber = MergeDataModels::Person.new(first_name: employee.first_name, last_name: employee.last_name)
-      
-        dependents = enr.hbx_enrollment_members.reject{|member| member.is_subscriber}
+
+        dependents = enr.hbx_enrollment_members.reject(&:is_subscriber)
         dependents.each do |dependent|
           enrollment_model.dependents << MergeDataModels::Person.new(first_name: dependent.person.first_name, last_name: dependent.person.last_name)
         end

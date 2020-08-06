@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'bcrypt'
 
 class SecurityQuestionResponse
@@ -11,7 +13,7 @@ class SecurityQuestionResponse
   validates_presence_of :question_answer
   before_save :crypt_question_answer
 
-  def matching_response? response_string
+  def matching_response?(response_string)
     BCrypt::Password.new(self.question_answer) == response_string
   end
 

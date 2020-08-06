@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class Individual
     include Virtus.model

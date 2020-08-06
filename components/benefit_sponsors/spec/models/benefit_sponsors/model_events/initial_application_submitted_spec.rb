@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -10,12 +12,13 @@ module BenefitSponsors
 
     let(:benefit_market)      { site.benefit_markets.first }
     let(:issuer_profile)      { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site) }
-    let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                            benefit_market: benefit_market,
-                                            title: "SHOP Benefits for #{current_effective_date.year}",
-                                            issuer_profile: issuer_profile,
-                                            application_period: (start_on.beginning_of_year..start_on.end_of_year))
-                                          }
+    let!(:benefit_market_catalog) do
+      create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+             benefit_market: benefit_market,
+             title: "SHOP Benefits for #{current_effective_date.year}",
+             issuer_profile: issuer_profile,
+             application_period: (start_on.beginning_of_year..start_on.end_of_year))
+    end
     let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
     let(:employer_profile)    { organization.employer_profile }
     let(:benefit_sponsorship) do
@@ -23,11 +26,11 @@ module BenefitSponsors
       sponsorship.save
       sponsorship
     end
-    let!(:model_instance) {
-      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: start_on..start_on.next_year.prev_day, open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on+20.days)
+    let!(:model_instance) do
+      application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period: start_on..start_on.next_year.prev_day, open_enrollment_period: open_enrollment_start_on..open_enrollment_start_on + 20.days)
       application.benefit_sponsor_catalog.save!
       application
-    }
+    end
     let(:start_on) { TimeKeeper.date_of_record.beginning_of_month + 1.month}
     let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
 
@@ -74,7 +77,7 @@ module BenefitSponsors
 
       context "NoticeBuilder", dbclean: :after_each do
 
-        let(:data_elements) {
+        let(:data_elements) do
           [
             "employer_profile.notice_date",
             "employer_profile.employer_name",
@@ -85,14 +88,16 @@ module BenefitSponsors
             "employer_profile.broker.email",
             "employer_profile.broker_present?"
           ]
-        }
+        end
         let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
         let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-        let(:payload)   { {
+        let(:payload)   do
+          {
             "employer_id" => employer_profile.hbx_id.to_s,
             "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
             "event_object_id" => model_instance.id.to_s
-        } }
+          }
+        end
         let(:merge_model) { subject.construct_notice_object }
 
         before do

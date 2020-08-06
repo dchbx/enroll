@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -21,17 +23,19 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/_ee_
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, census_employee: census_employee, employer_profile: benefit_sponsorship.profile) }
     let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:enrollment_kind) { "open_enrollment" }
-    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                        household: family.latest_household,
-                                        coverage_kind: "health",
-                                        family: family,
-                                        effective_on: effective_on,
-                                        enrollment_kind: enrollment_kind,
-                                        kind: "employer_sponsored",
-                                        benefit_sponsorship_id: benefit_sponsorship.id,
-                                        sponsored_benefit_package_id: current_benefit_package.id,
-                                        sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
-                                        employee_role_id: employee_role.id)}
+    let!(:enrollment) do
+      FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                        household: family.latest_household,
+                        coverage_kind: "health",
+                        family: family,
+                        effective_on: effective_on,
+                        enrollment_kind: enrollment_kind,
+                        kind: "employer_sponsored",
+                        benefit_sponsorship_id: benefit_sponsorship.id,
+                        sponsored_benefit_package_id: current_benefit_package.id,
+                        sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                        employee_role_id: employee_role.id)
+    end
 
     before :each do
       census_employee.employee_role_id = employee_role.id

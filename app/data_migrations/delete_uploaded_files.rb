@@ -21,17 +21,16 @@ class DeleteUploadedFiles < MongoidMigrationTask
                                                                   :identifier.ne => nil,
                                                                   :subject.nin => vlp_doc_types)
         uploaded_file_ids = uploaded_files.inject([]) do |file_ids, uploaded_file|
-                              file_ids << uploaded_file.id if uploaded_file.verification_type.present? && uploaded_file.identifier.present? && !vlp_doc_types.include?(uploaded_file.subject)
-                              file_ids
-                            end
+          file_ids << uploaded_file.id if uploaded_file.verification_type.present? && uploaded_file.identifier.present? && !vlp_doc_types.include?(uploaded_file.subject)
+          file_ids
+        end
         uploaded_file_ids.each do |file_id|
           file = uploaded_files.where(id: file_id.to_s).first
-          if file.present?
-            csv << [person.first_name, person.last_name, person.hbx_id,
-                    file.verification_type, file.identifier, file.title,
-                    file.subject, file.created_at, file.updated_at]
-            file.delete
-          end
+          next unless file.present?
+          csv << [person.first_name, person.last_name, person.hbx_id,
+                  file.verification_type, file.identifier, file.title,
+                  file.subject, file.created_at, file.updated_at]
+          file.delete
         end
       rescue StandardError => e
         puts e.message unless Rails.env.test?

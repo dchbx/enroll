@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class HbxEnrollmentPricingDeterminationCalculator
@@ -21,7 +23,7 @@ module BenefitSponsors
           @sponsored_benefit = s_benefit
           @issuer_profile_id_map = {}
           @active_year_map = {}
-          ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :"application_period").each do |rec|
+          ::BenefitMarkets::Products::Product.pluck(:_id, :issuer_profile_id, :application_period).each do |rec|
             @issuer_profile_id_map[rec.first] = rec[1]
             @active_year_map[rec.first] = rec.last["min"].year
           end
@@ -67,8 +69,7 @@ module BenefitSponsors
                   "in" => "$$fm.person_id"
                 }
               }
-              }
-            },
+            }},
             {"$lookup" => {
               "from" => "people",
               "localField" => "people_ids",
@@ -78,7 +79,7 @@ module BenefitSponsors
             {"$project" => {
               "hbx_enrollment" => 1,
               "family_members" => 1,
-              "people" => ({"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields))
+              "people" => {"_id" => 1, "dob" => 1, "person_relationships" => 1, "is_disabled" => 1, "employee_roles" => 1}.merge(person_info_fields)
             }}
           ])
         end
@@ -111,17 +112,13 @@ module BenefitSponsors
             family_people_ids[fm["_id"]] = fm["person_id"]
             family_dobs[fm["_id"]] = person_id_map[fm["person_id"]]["dob"]
             family_disables[fm["_id"]] = person_id_map[fm["person_id"]]["is_disabled"]
-            if fm["_id"] == sub_member["applicant_id"]
-              sub_person = person_id_map[fm["person_id"]]
-            end
+            sub_person = person_id_map[fm["person_id"]] if fm["_id"] == sub_member["applicant_id"]
           end
           rel_map = {}
           member_entries = []
           member_enrollments = []
-          if sub_person["person_relationships"]
-            sub_person["person_relationships"].each do |pr|
-              rel_map[pr["relative_id"]] = pr["kind"]
-            end
+          sub_person["person_relationships"]&.each do |pr|
+            rel_map[pr["relative_id"]] = pr["kind"]
           end
           member_entries << EnrollmentMemberAdapter.new(
             sub_member["_id"],
@@ -131,9 +128,9 @@ module BenefitSponsors
             sub_person["is_disabled"]
           )
           member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-            member_id: sub_member["_id"],
-            coverage_eligibility_on: sub_member["effective_on"]
-          })
+                                                                                       member_id: sub_member["_id"],
+                                                                                       coverage_eligibility_on: sub_member["effective_on"]
+                                                                                     })
           dep_members.each do |dep_member|
             person_id = family_people_ids[dep_member["applicant_id"]]
             member_entries << EnrollmentMemberAdapter.new(
@@ -141,12 +138,12 @@ module BenefitSponsors
               family_dobs[dep_member["applicant_id"]],
               rel_map[person_id],
               false,
-              family_disables[dep_member["applicant_id"]],
+              family_disables[dep_member["applicant_id"]]
             )
             member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-              member_id: dep_member["_id"],
-              coverage_eligibility_on: dep_member["effective_on"]
-            })
+                                                                                         member_id: dep_member["_id"],
+                                                                                         coverage_eligibility_on: dep_member["effective_on"]
+                                                                                       })
           end
           product = EnrollmentProductAdapter.new(
             enrollment_record["hbx_enrollment"]["product_id"],
@@ -162,7 +159,8 @@ module BenefitSponsors
               coverage_start_on: enrollment_record["hbx_enrollment"]["effective_on"],
               member_enrollments: member_enrollments,
               rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code
-            })
+            }
+          )
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,
             {group_enrollment: group_enrollment}
@@ -187,9 +185,7 @@ module BenefitSponsors
         sponsor_contribution = construct_sponsor_contribution_if_needed(sponsored_benefit, p_package)
         price = 0.00
         contribution = 0.00
-        if enrollment_count < 1
-          return sponsor_contribution
-        end
+        return sponsor_contribution if enrollment_count < 1
         if p_determination_builder
           precalculate_costs(
             sponsored_benefit,
@@ -210,7 +206,7 @@ module BenefitSponsors
 
       protected
 
-      def construct_sponsor_contribution_if_needed(sponsored_benefit, product_package)
+      def construct_sponsor_contribution_if_needed(sponsored_benefit, _product_package)
         return sponsored_benefit.sponsor_contribution if sponsored_benefit.sponsor_contribution.present?
         cm_builder = BenefitSponsors::SponsoredBenefits::ProductPackageToSponsorContributionService.new
         sponsor_contribution = cm_builder.build_sponsor_contribution(p_package)
@@ -221,11 +217,11 @@ module BenefitSponsors
       def precalculate_costs(
         sponsored_benefit,
         pricing_model,
-        contribution_model,
+        _contribution_model,
         reference_product,
         sponsor_contribution,
-        p_calculator,
-        c_calculator,
+        _p_calculator,
+        _c_calculator,
         p_determination_builder_klass,
         hbx_enrollment_id_list,
         enrollment_count,
@@ -254,7 +250,7 @@ module BenefitSponsors
       def eligible_employee_count
         @eligible_employee_count ||= begin
                                        employee_count = eligible_employee_criteria.count
-                                       (employee_count < 1) ? 1 : employee_count
+                                       employee_count < 1 ? 1 : employee_count
                                      end
       end
 

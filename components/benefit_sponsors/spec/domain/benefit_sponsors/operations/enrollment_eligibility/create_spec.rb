@@ -15,8 +15,8 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Create, dbcle
     let(:params) do
       {enrollment_eligibility_params: {
         effective_date: effective_date, market_kind: market_kind, benefit_sponsorship_id: benefit_sponsorship_id,
-        benefit_application_kind: benefit_application_kind, service_areas: [service_area.as_json]}
-     }
+        benefit_application_kind: benefit_application_kind, service_areas: [service_area.as_json]
+      }}
     end
 
     let(:result) { subject.call(params) }

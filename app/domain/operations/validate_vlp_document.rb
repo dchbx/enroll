@@ -37,7 +37,7 @@ module Operations
                     "VLP document type is invalid: #{vlp_doc.subject}"
                   else
                     invalid_key = errors.keys.first
-                    invalid_field = (invalid_key == :description) ? :document_description : invalid_key
+                    invalid_field = invalid_key == :description ? :document_description : invalid_key
                     "Please fill in your information for #{invalid_field.to_s.titlecase}" + '.'
                   end
         Failure(message)

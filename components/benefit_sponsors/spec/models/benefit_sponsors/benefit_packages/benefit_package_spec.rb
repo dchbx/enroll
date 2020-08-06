@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -16,7 +18,7 @@ module BenefitSponsors
     let(:params) do
       {
         title: title,
-        probation_period_kind: probation_period_kind,
+        probation_period_kind: probation_period_kind
       }
     end
 
@@ -95,7 +97,7 @@ module BenefitSponsors
           expect(renewal_benefit_package.title).to eq current_benefit_package.title + "(#{renewal_benefit_package.start_on.year})"
           expect(renewal_benefit_package.description).to eq current_benefit_package.description
           expect(renewal_benefit_package.probation_period_kind).to eq current_benefit_package.probation_period_kind
-          expect(renewal_benefit_package.is_default).to eq  current_benefit_package.is_default
+          expect(renewal_benefit_package.is_default).to eq current_benefit_package.is_default
         end
 
         it "should renew sponsored benefits" do
@@ -148,17 +150,17 @@ module BenefitSponsors
           current_bp.renew(renewal_bp)
         end
 
-        context "when renewal product available for both health and dental" do 
+        context "when renewal product available for both health and dental" do
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -172,7 +174,7 @@ module BenefitSponsors
           end
 
           it "does renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+            expect(subject.sponsored_benefit_for(:dental)).to be_present
           end
 
           it "does renew dental reference product" do
@@ -189,20 +191,20 @@ module BenefitSponsors
         context "when renewal product available for health only" do
           before :each do
             BenefitMarkets::Products::Product.where({
-              "application_period.min" => renewal_benefit_market_catalog.application_period.min,
-              "_type" => /Dental/i
-            }).delete_all
+                                                      "application_period.min" => renewal_benefit_market_catalog.application_period.min,
+                                                      "_type" => /Dental/i
+                                                    }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -216,7 +218,7 @@ module BenefitSponsors
           end
 
           it "does not renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank
           end
         end
 
@@ -224,24 +226,24 @@ module BenefitSponsors
 
           before :each do
             BenefitMarkets::Products::Product.where({
-              "application_period.min" => renewal_benefit_market_catalog.application_period.min,
-              "_type" => /Health/i
-            }).delete_all
+                                                      "application_period.min" => renewal_benefit_market_catalog.application_period.min,
+                                                      "_type" => /Health/i
+                                                    }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does not renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+            expect(subject.sponsored_benefit_for(:health)).to be_blank
           end
 
           it "does renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_present 
+            expect(subject.sponsored_benefit_for(:dental)).to be_present
           end
 
           it "does renew dental reference product" do
@@ -255,30 +257,30 @@ module BenefitSponsors
           end
         end
 
-        context "when renewal product not available for both health and dental" do 
+        context "when renewal product not available for both health and dental" do
           before :each do
             BenefitMarkets::Products::Product.where({
-              "application_period.min" => renewal_benefit_market_catalog.application_period.min
-            }).delete_all
+                                                      "application_period.min" => renewal_benefit_market_catalog.application_period.min
+                                                    }).delete_all
           end
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefit_for(:dental) }
-  
+
           it "does build valid renewal benefit package" do
             expect(subject.valid?).to be_truthy
           end
 
           it "does not renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_blank 
+            expect(subject.sponsored_benefit_for(:health)).to be_blank
           end
 
           it "does not renew dental sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:dental)).to be_blank 
+            expect(subject.sponsored_benefit_for(:dental)).to be_blank
           end
         end
 
-        context "when employer has conversion dental sponsored benefit" do 
+        context "when employer has conversion dental sponsored benefit" do
 
           let(:health_sb) { current_bp.sponsored_benefit_for(:health) }
           let(:dental_sb) { current_bp.sponsored_benefits.unscoped.detect{|sb| sb.product_kind == :dental } }
@@ -293,7 +295,7 @@ module BenefitSponsors
           end
 
           it "does renew health sponsored benefit" do
-            expect(subject.sponsored_benefit_for(:health)).to be_present 
+            expect(subject.sponsored_benefit_for(:health)).to be_present
           end
 
           it "does renew health reference product" do
@@ -309,7 +311,7 @@ module BenefitSponsors
           it "does renew dental sponsored benefit" do
             expect(dental_sb.source_kind).to eq :conversion
             expect(subject.sponsored_benefit_for(:dental)).to be_present
-            expect(subject.sponsored_benefit_for(:dental).source_kind).to eq :benefit_sponsor_catalog 
+            expect(subject.sponsored_benefit_for(:dental).source_kind).to eq :benefit_sponsor_catalog
           end
 
           it "does renew dental reference product" do
@@ -490,7 +492,7 @@ module BenefitSponsors
         reference_product.renewal_product = product
         reference_product.save!
       end
-      
+
       let(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(renewal_effective_date) }
       let(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
       let(:renewal_benefit_package)         { renewal_application.benefit_packages.build }
@@ -526,7 +528,7 @@ module BenefitSponsors
 
         before do
           allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
-          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit)
         end
 
         it 'should return true' do
@@ -549,7 +551,7 @@ module BenefitSponsors
 
         before do
           allow(sponsored_benefit).to receive(:products).and_return(renewal_product_package.products)
-          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit) 
+          allow(renewal_benefit_package).to receive(:sponsored_benefit_for).and_return(sponsored_benefit)
         end
 
         it "should return false" do
@@ -599,22 +601,22 @@ module BenefitSponsors
       context 'when application got canceled due to ineligble state' do
 
 
-        context 'given employee coverages got canceled after application cancellation' do 
+        context 'given employee coverages got canceled after application cancellation' do
 
-          it 'should reinstate their canceled coverages' do 
+          it 'should reinstate their canceled coverages' do
           end
         end
 
         context 'given employee coverages got canceled before application cancellation' do
 
-          it 'should not reinstate their canceled coverages' do 
-          end 
+          it 'should not reinstate their canceled coverages' do
+          end
         end
       end
 
-      context 'when application not canceled due to ineligble state' do 
+      context 'when application not canceled due to ineligble state' do
 
-        it 'should not process any reinstatements on enrollments' do 
+        it 'should not process any reinstatements on enrollments' do
         end
       end
     end
@@ -905,7 +907,7 @@ module BenefitSponsors
             :with_enrollment_members,
             :with_product,
             household: family.active_household,
-            family:family,
+            family: family,
             aasm_state: "coverage_selected",
             effective_on: initial_application.start_on,
             rating_area_id: initial_application.recorded_rating_area_id,

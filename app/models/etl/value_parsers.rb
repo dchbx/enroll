@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Etl
   module ValueParsers
-
     def self.included(base)
       base.class_eval do
         extend(::Etl::ValueParsers::ClassMethods)
@@ -13,14 +14,14 @@ module Etl
     module ConverterMethods
       def __parse_gender_value(val)
         return nil if val.blank?
-          
+
         stripped_value = val.strip.downcase
         if stripped_value =~ /\Am/i
-           "male"
+          "male"
         elsif stripped_value =~ /\Af/i
-           "female"
+          "female"
         else
-           val
+          val
         end
       end
     end
@@ -28,11 +29,11 @@ module Etl
     module ClassMethods
       CONVERTER_PARSER_LIST = {
         :gender => :__parse_gender_value
-      }
+      }.freeze
 
       def attr_converter(*names, as:)
         # Special case until we clean up the module
-        if :optimistic_ssn == as
+        if as == :optimistic_ssn
           self.class_eval do
             include ::ValueParsers::OptimisticSsnParser.on(*names)
             attr_reader(*names)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MatchCoverageHouseholdWithFamilyMember < MongoidMigrationTask
@@ -9,19 +11,17 @@ class MatchCoverageHouseholdWithFamilyMember < MongoidMigrationTask
       coverage_household = primary_family.active_household.coverage_households.where(:is_immediate_family => true).first
 
       coverage_household.coverage_household_members.each do |chm|
-        begin
-          active_family_members.find(chm.family_member_id)
-        rescue => e
-          chm.update_attributes(family_member_id: '')
-          chm.coverage_household = nil
-          chm.save
-        end
+
+        active_family_members.find(chm.family_member_id)
+      rescue StandardError => e
+        chm.update_attributes(family_member_id: '')
+        chm.coverage_household = nil
+        chm.save
+
       end
 
       active_family_members.each do |fm|
-        unless coverage_household.coverage_household_members.where(family_member_id: fm.id).any?
-          coverage_household.coverage_household_members.create(family_member_id: fm.id)
-        end
+        coverage_household.coverage_household_members.create(family_member_id: fm.id) unless coverage_household.coverage_household_members.where(family_member_id: fm.id).any?
       end
     else
       raise "Invalid Hbx Id"

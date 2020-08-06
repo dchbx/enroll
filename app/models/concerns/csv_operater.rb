@@ -1,5 +1,7 @@
-module CsvOperater 
-  extend ActiveSupport::Concern 
+# frozen_string_literal: true
+
+module CsvOperater
+  extend ActiveSupport::Concern
 
   module ClassMethods
     def convert_csv(arr)

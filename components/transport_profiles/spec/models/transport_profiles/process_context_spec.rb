@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportProfiles
@@ -8,7 +10,7 @@ module TransportProfiles
 
     it "does not allow the same key to be set twice" do
       subject.put(:key1, "abcde")
-      expect { subject.put(:key1, "abcde") }.to  raise_error(NameError, "name already exists in this context")
+      expect { subject.put(:key1, "abcde") }.to raise_error(NameError, "name already exists in this context")
     end
 
     it "does not allow referencing an undefined key" do
@@ -22,9 +24,9 @@ module TransportProfiles
     subject { ProcessContext.new(process) }
 
     it "yields the provided intial value when the value is unset" do
-     subject.update(:key1, "abcde") do |arg|
-       expect(arg).to eq "abcde"
-     end
+      subject.update(:key1, "abcde") do |arg|
+        expect(arg).to eq "abcde"
+      end
     end
 
     it "yields the pre-existing value if it exists" do

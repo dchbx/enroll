@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CreateEmployerStaffRole < MongoidMigrationTask
@@ -15,7 +17,7 @@ class CreateEmployerStaffRole < MongoidMigrationTask
       else
         puts "User cannot be found for the given person, cannot process" unless Rails.env.test?
       end
-    rescue => e
+    rescue StandardError => e
       puts "Cannot process the given person, error: #{e}, backtrace: #{e.backtrace}" unless Rails.env.test?
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -10,7 +12,7 @@ module BenefitMarkets
       let(:vr_os_window)        { 0 }
       let(:vr_due)              { 95 }
       let(:open_enrl_start_on)  { Date.new(2017,11,1) }
-      let(:open_enrl_end_on)    { Date.new(2017,01,31) }
+      let(:open_enrl_end_on)    { Date.new(2017,0o1,31) }
 
       let(:params) do
         {
@@ -18,7 +20,7 @@ module BenefitMarkets
           vr_os_window: vr_os_window,
           vr_due: vr_due,
           open_enrl_start_on: open_enrl_start_on,
-          open_enrl_end_on: open_enrl_end_on,
+          open_enrl_end_on: open_enrl_end_on
         }
       end
 

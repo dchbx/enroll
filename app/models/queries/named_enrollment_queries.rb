@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 module Queries
   class NamedEnrollmentQueries
 
     class EnrollmentCounter
       def initialize(last_chance_to_cancel, enums_from_aggregation)
         @last_chance_to_cancel = last_chance_to_cancel
-        @source_enums = enums_from_aggregation 
+        @source_enums = enums_from_aggregation
       end
 
       def calculate_totals
@@ -13,14 +14,14 @@ module Queries
         @source_enums.each do |agg|
           agg.each do |rec|
             if ["renewing_waived", "inactive", "void"].include?(rec["aasm_state"].to_s)
-              waived = waived + 1
+              waived += 1
             else
               case passes_cancel_event_test?(rec)
               when false
               when :waiver
-                waived = waived + 1
+                waived += 1
               else
-                enrolled = enrolled + 1
+                enrolled += 1
               end
             end
           end
@@ -29,7 +30,7 @@ module Queries
       end
 
       def passes_cancel_event_test?(record)
-        unless (record['aasm_state'].to_s == "coverage_canceled")
+        unless record['aasm_state'].to_s == "coverage_canceled"
           return (record['product_id'].blank? ? :waiver : true)
         end
         transitions = record['workflow_state_transitions']
@@ -40,7 +41,7 @@ module Queries
         return false if cancel_transitions.blank?
         cancel_time = cancel_transitions.map { |ct| ct['transition_at'] }.compact.max
         return false if cancel_time.blank?
-        return false if (cancel_time <= @last_chance_to_cancel)
+        return false if cancel_time <= @last_chance_to_cancel
         (record['product_id'].blank? ? :waiver : true)
       end
     end
@@ -51,27 +52,25 @@ module Queries
 
       def initialize(last_chance_to_cancel, enums_from_aggregation)
         @last_chance_to_cancel = last_chance_to_cancel
-        @source_enums = enums_from_aggregation 
+        @source_enums = enums_from_aggregation
       end
 
       def each
         @source_enums.each do |agg|
           agg.each do |rec|
             unless ["renewing_waived", "inactive", "void"].include?(rec["aasm_state"].to_s)
-              if passes_cancel_event_test?(rec)
-                yield rec["hbx_enrollment_id"]
-              end
+              next unless passes_cancel_event_test?(rec)yield rec["hbx_enrollment_id"] if passes_cancel_event_test?(rec)
             end
           end
         end
       end
 
       def passes_cancel_event_test?(record)
-        unless (record['aasm_state'].to_s == "coverage_canceled")
-          return (!record['product_id'].blank?) # Waiver canceled/termed later
+        unless record['aasm_state'].to_s == "coverage_canceled"
+          return !record['product_id'].blank? # Waiver canceled/termed later
         end
         return false if record['product_id'].blank? # Canceled or terminated waiver
-        return true unless (record['aasm_state'].to_s == "coverage_canceled")
+        return true unless record['aasm_state'].to_s == "coverage_canceled"
         transitions = record['workflow_state_transitions']
         return false if transitions.blank?
         cancel_transitions = transitions.select do |trans|
@@ -94,9 +93,7 @@ module Queries
       def each
         @source_enums.each do |agg|
           agg.each do |rec|
-            unless ["renewing_waived", "inactive", "void", "coverage_canceled", "coverage_terminated"].include?(rec["aasm_state"].to_s)
-              yield rec["hbx_enrollment_id"]
-            end
+            yield rec["hbx_enrollment_id"] unless ["renewing_waived", "inactive", "void", "coverage_canceled", "coverage_terminated"].include?(rec["aasm_state"].to_s)
           end
         end
       end
@@ -115,9 +112,7 @@ module Queries
         @source_enums.each do |agg|
           agg.each do |rec|
             unless ["renewing_waived", "inactive", "void", "coverage_canceled", "coverage_terminated"].include?(rec["aasm_state"].to_s)
-              if (rec["_id"]["effective_on"] == @coverage_start_date) 
-                yield rec["hbx_enrollment_id"]
-              end
+              next unless (rec["_id"]["effective_on"] == @coverage_start_date)yield rec["hbx_enrollment_id"] if (rec["_id"]["effective_on"] == @coverage_start_date)
             end
           end
         end
@@ -132,7 +127,7 @@ module Queries
         last_chance_to_cancel_at = initial_sponsored_benefit_last_cancel_chance(sb)
         query_for_initial_sponsored_benefit(sb, effective_on)
       end
-      InitialEnrollmentFilter.new(last_chance_to_cancel_at, queries) 
+      InitialEnrollmentFilter.new(last_chance_to_cancel_at, queries)
     end
 
     def self.initial_sponsored_benefit_last_cancel_chance(sb)
@@ -295,7 +290,7 @@ module Queries
 
         termed_enrollments += prev_enrollments.select do |prev_e|
           records.none? do |r|
-            prev_e["_id"]["coverage_kind"] == r["_id"]["coverage_kind"] && r["_id"]["effective_on"] == effective_on 
+            prev_e["_id"]["coverage_kind"] == r["_id"]["coverage_kind"] && r["_id"]["effective_on"] == effective_on
           end
         end.collect{|record| record['enrollment_hbx_id']}
       end

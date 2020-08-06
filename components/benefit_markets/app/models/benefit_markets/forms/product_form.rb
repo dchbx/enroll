@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Forms
     class ProductForm
@@ -12,7 +14,7 @@ module BenefitMarkets
       end
 
       def self.for_new(param)
-       self.new(:date => param)
+        self.new(:date => param)
       end
 
       def fetch_results

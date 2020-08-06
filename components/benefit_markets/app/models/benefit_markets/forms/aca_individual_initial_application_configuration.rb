@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Forms
     class AcaIndividualInitialApplicationConfiguration
       extend  ActiveModel::Naming
-      
+
       include ActiveModel::Conversion
       include ActiveModel::Model
       include ActiveModel::Validations

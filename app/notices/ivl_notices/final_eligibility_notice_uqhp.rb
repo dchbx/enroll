@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
   include ApplicationHelper
   attr_accessor :family, :data, :person
@@ -23,13 +25,9 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -55,18 +53,50 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     previous_health_enrollments = enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.current_year}
     previous_dental_enrollments = enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.current_year}
 
-    renewal_health_plan_id = (previous_health_enrollments.product.renewal_product_id) rescue nil
-    renewal_health_plan_hios_base_id = (previous_health_enrollments.product.hios_base_id) rescue nil
-    future_health_plan_id = (health_enrollments.product.id) rescue nil
-    future_health_plan_hios_base_id = (health_enrollments.product.hios_base_id) rescue nil
+    renewal_health_plan_id = begin
+                               previous_health_enrollments.product.renewal_product_id
+                             rescue StandardError
+                               nil
+                             end
+    renewal_health_plan_hios_base_id = begin
+                                         previous_health_enrollments.product.hios_base_id
+                                       rescue StandardError
+                                         nil
+                                       end
+    future_health_plan_id = begin
+                              health_enrollments.product.id
+                            rescue StandardError
+                              nil
+                            end
+    future_health_plan_hios_base_id = begin
+                                        health_enrollments.product.hios_base_id
+                                      rescue StandardError
+                                        nil
+                                      end
 
-    renewal_dental_plan_id = (previous_dental_enrollments.product.renewal_product_id) rescue nil
-    renewal_dental_plan_hios_base_id = (previous_dental_enrollments.product.hios_base_id) rescue nil
-    future_dental_plan_id = (dental_enrollments.product.id) rescue nil
-    future_dental_plan_hios_base_id = (dental_enrollments.product.hios_base_id) rescue nil
+    renewal_dental_plan_id = begin
+                               previous_dental_enrollments.product.renewal_product_id
+                             rescue StandardError
+                               nil
+                             end
+    renewal_dental_plan_hios_base_id = begin
+                                         previous_dental_enrollments.product.hios_base_id
+                                       rescue StandardError
+                                         nil
+                                       end
+    future_dental_plan_id = begin
+                              dental_enrollments.product.id
+                            rescue StandardError
+                              nil
+                            end
+    future_dental_plan_hios_base_id = begin
+                                        dental_enrollments.product.hios_base_id
+                                      rescue StandardError
+                                        nil
+                                      end
 
-    notice.same_plan_health_enrollment = (renewal_health_plan_id && future_health_plan_id) ? ((renewal_health_plan_id == future_health_plan_id) && (renewal_health_plan_hios_base_id == future_health_plan_hios_base_id )) : false
-    notice.same_plan_dental_enrollment = (renewal_dental_plan_id && future_dental_plan_id) ? ((renewal_dental_plan_id == future_dental_plan_id) && (renewal_dental_plan_hios_base_id == future_dental_plan_hios_base_id) ) : false
+    notice.same_plan_health_enrollment = renewal_health_plan_id && future_health_plan_id ? ((renewal_health_plan_id == future_health_plan_id) && (renewal_health_plan_hios_base_id == future_health_plan_hios_base_id)) : false
+    notice.same_plan_dental_enrollment = renewal_dental_plan_id && future_dental_plan_id ? ((renewal_dental_plan_id == future_dental_plan_id) && (renewal_dental_plan_hios_base_id == future_dental_plan_hios_base_id)) : false
 
     hbx_enrollments << health_enrollments
     hbx_enrollments << dental_enrollments
@@ -101,37 +131,37 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
                                     deductible: enrollment.product.deductible
                                   })
     PdfTemplates::Enrollment.new({
-      premium: enrollment.total_premium.round(2),
-      aptc_amount: enrollment.applied_aptc_amount.round(2),
-      responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
-      phone: phone_number(enrollment.product.issuer_profile.legal_name),
-      is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-      coverage_kind: enrollment.coverage_kind,
-      kind: enrollment.kind,
-      effective_on: enrollment.effective_on,
-      plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name.titleize,
-          age: member.person.age_on(TimeKeeper.date_of_record)
-        })
-        enrollees << enrollee
-      end
-    })
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: number_to_currency((enrollment.total_premium - enrollment.applied_aptc_amount.to_f), precision: 2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
+                                 })
   end
 
   def append_member_information(member)
     notice.individuals << PdfTemplates::Individual.new({
-      :first_name => member.first_name.titleize,
-      :last_name => member.last_name.titleize,
-      :full_name => member.full_name.titleize,
-      :age => calculate_age_by_dob(member.dob),
-      :incarcerated => member.is_incarcerated? ? "Yes" : "No",
-      :citizen_status => citizen_status(member.citizen_status),
-      :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
-      :is_without_assistance => true,
-      :is_totally_ineligible => is_totally_ineligible(member)
-      })
+                                                         :first_name => member.first_name.titleize,
+                                                         :last_name => member.last_name.titleize,
+                                                         :full_name => member.full_name.titleize,
+                                                         :age => calculate_age_by_dob(member.dob),
+                                                         :incarcerated => member.is_incarcerated? ? "Yes" : "No",
+                                                         :citizen_status => citizen_status(member.citizen_status),
+                                                         :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
+                                                         :is_without_assistance => true,
+                                                         :is_totally_ineligible => is_totally_ineligible(member)
+                                                       })
   end
 
   def append_data
@@ -157,12 +187,12 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
     address_to_use = person.addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     if person.addresses.present?
       if person.addresses.select{|address| address.kind == address_to_use && address.state == 'DC'}.present?
-        return true
+        true
       else
-        return false
+        false
       end
     else
-      return ""
+      ""
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -6,7 +8,7 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
     # let(:broker_double) { double(id: '12345') }
     # let(:current_person) { double(:current_person) }
     # let(:broker_role) { double(:broker_role, broker_agency_profile_id: '5ac4cb58be0a6c3ef400009b') }
@@ -21,7 +23,7 @@ module SponsoredBenefits
     #   employer = build(:shop_cca_employer_profile)
     #   employer
     # }
-    
+
 
     context "#employers" do
       before do

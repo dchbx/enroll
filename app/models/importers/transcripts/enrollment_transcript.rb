@@ -96,7 +96,7 @@ module Importers::Transcripts
         end
 
         if @enrollment.present?
-          if !@transcript[:source_is_new] # && @enrollment.updated_at <= Date.new(2016,11,9)
+          unless @transcript[:source_is_new] # && @enrollment.updated_at <= Date.new(2016,11,9)
             if @canceled
               @enrollment.invalidate_enrollment! if @enrollment.may_invalidate_enrollment?
             elsif @other_enrollment.terminated_on.present?
@@ -341,7 +341,9 @@ module Importers::Transcripts
     end
 
     def find_instance
-      ::HbxEnrollment.find(@transcript[:source]['_id']) rescue nil
+      ::HbxEnrollment.find(@transcript[:source]['_id'])
+    rescue StandardError
+      nil
     end
 
     def create_new_enrollment

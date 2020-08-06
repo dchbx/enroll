@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -81,7 +83,7 @@ module BenefitMarkets
         end
 
         it "build the specified kind of contribution level" do
-          expect(subject.first.kind_of?(::BenefitMarkets::MockContributionLevel)).to be_truthy
+          expect(subject.first.is_a?(::BenefitMarkets::MockContributionLevel)).to be_truthy
         end
 
         it "properly assigns the contribution unit" do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class GeneralAgencyProfile < BenefitSponsors::Organizations::Profile
@@ -12,9 +14,9 @@ module BenefitSponsors
         "Individual & Family Marketplace ONLY" => "individual",
         "Small Business Marketplace ONLY" => "shop",
         "Both – Individual & Family AND Small Business Marketplaces" => "both"
-      }
+      }.freeze
 
-      MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
+      MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |_k,v| MARKET_KINDS.include? v.to_sym }
 
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
@@ -38,25 +40,23 @@ module BenefitSponsors
       validates_presence_of :market_kind
 
       validates :corporate_npn,
-        numericality: {only_integer: true},
-        length: { minimum: 1, maximum: 10 },
-        uniqueness: true,
-        allow_blank: true
+                numericality: {only_integer: true},
+                length: { minimum: 1, maximum: 10 },
+                uniqueness: true,
+                allow_blank: true
 
       validates :market_kind,
-        inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
+                inclusion: { in: Organizations::GeneralAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+                allow_blank: false
 
       after_initialize :build_nested_models
 
       scope :active,      ->{ any_in(aasm_state: ["is_applicant", "is_approved"]) }
       scope :inactive,    ->{ any_in(aasm_state: ["is_rejected", "is_suspended", "is_closed"]) }
 
-      def employer_clients
-      end
+      def employer_clients; end
 
-      def family_clients
-      end
+      def family_clients; end
 
       def market_kinds
         MARKET_KINDS_OPTIONS
@@ -71,11 +71,13 @@ module BenefitSponsors
       end
 
       def general_agency_primary_staff
-        general_agency_staff_roles.present? ? general_agency_staff_roles.select { |role| role.is_primary }.first : nil
+        general_agency_staff_roles.present? ? general_agency_staff_roles.select(&:is_primary).first : nil
       end
 
       def current_staff_state
-        primary_staff.current_state rescue ""
+        primary_staff.current_state
+      rescue StandardError
+        ""
       end
 
       def current_state
@@ -88,7 +90,7 @@ module BenefitSponsors
 
       def languages
         if languages_spoken.any?
-          return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+          languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
         end
       end
 
@@ -122,7 +124,7 @@ module BenefitSponsors
           list_embedded BenefitSponsors::Organizations::Organization.general_agency_profiles.order_by([:legal_name]).to_a
         end
 
-        def filter_by(status="is_applicant")
+        def filter_by(status = "is_applicant")
           if status == 'all'
             all
           else
@@ -130,12 +132,16 @@ module BenefitSponsors
                                                                                                          {:$elemMatch => {:aasm_state => status,
                                                                                                                           :_type => "BenefitSponsors::Organizations::GeneralAgencyProfile"}}).order_by([:legal_name]).to_a
           end
-        rescue
+        rescue StandardError
           []
         end
 
-        def all_by_broker_role(broker_role, options={})
-          favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:benefit_sponsors_general_agency_profile_id) rescue []
+        def all_by_broker_role(broker_role, options = {})
+          favorite_general_agency_ids = begin
+                                          broker_role.favorite_general_agencies.map(&:benefit_sponsors_general_agency_profile_id)
+                                        rescue StandardError
+                                          []
+                                        end
           all_ga = if options[:approved_only]
                      all.select{|ga| ga.aasm_state == 'is_approved'}
                    else

@@ -76,7 +76,7 @@ RSpec.describe BenefitMarkets::Validators::Products::ProductPackageContract do
 
   context "Given invalid required parameters" do
     let(:invalid_params)   { missing_params.merge({pricing_model: {}, contribution_model: contribution_model, contribution_models: contribution_models, assigned_contribution_model: assigned_contribution_model})}
-    let(:error_message1)   { {:assigned_contribution_model=>["is missing"], :pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
+    let(:error_message1)   { {:assigned_contribution_model => ["is missing"], :pricing_model => ["is missing"], :contribution_model => ["is missing"], :contribution_models => ["is missing"] } }
     let(:error_message2)   { {:pricing_model => ["must be filled"]} }
 
 

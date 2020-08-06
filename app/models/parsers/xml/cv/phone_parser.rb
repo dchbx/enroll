@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class PhoneParser
     include HappyMapper
@@ -15,10 +17,10 @@ module Parsers::Xml::Cv
 
     def to_hash
       response = {
-          area_code: area_code,
-          country_code: country_code,
-          extension: extension,
-          phone_number:full_phone_number
+        area_code: area_code,
+        country_code: country_code,
+        extension: extension,
+        phone_number: full_phone_number
       }
       response[:kind] = type.split("#").last if type
       response

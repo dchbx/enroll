@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ExpireConversionEmployers < MongoidMigrationTask
@@ -7,7 +9,7 @@ class ExpireConversionEmployers < MongoidMigrationTask
 
       csv << ['FEIN', 'Legal Name', 'Conversion Employer', 'Plan Year Status(Before)', 'Plan Year Status(After)', "External Plan Year Status(Before)", "External Plan Year Status(After)"]
 
-      CSV.foreach("#{Rails.root.to_s}/ConversionERExpiration.csv") do |row|
+      CSV.foreach("#{Rails.root}/ConversionERExpiration.csv") do |row|
 
         fein = prepend_zeros(row[0].to_s, 9)
         start_on = Date.strptime(row[1].to_s, "%m/%d/%Y")
@@ -35,9 +37,7 @@ class ExpireConversionEmployers < MongoidMigrationTask
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
       end
 
-      if plan_year.active?
-        plan_year.update(aasm_state: 'renewing_enrolled')
-      end
+      plan_year.update(aasm_state: 'renewing_enrolled') if plan_year.active?
 
       plan_year.cancel_renewal! if plan_year.may_cancel_renewal?
       plan_year.cancel! if plan_year.may_cancel?

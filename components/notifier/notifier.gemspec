@@ -1,4 +1,6 @@
-$:.push File.expand_path("../lib", __FILE__)
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
 require "notifier/version"
@@ -10,9 +12,9 @@ Gem::Specification.new do |s|
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
   s.homepage    = "https://github.com/dchbx"
-  s.summary     = %q{An engine for generating notices by merging data with template text}
-  s.description = %q{Using a class instance and reference to a pre-defined template, build a customized notice in PDF format \
-                      and drop at well-known endpoint }
+  s.summary     = 'An engine for generating notices by merging data with template text'
+  s.description = 'Using a class instance and reference to a pre-defined template, build a customized notice in PDF format \
+                      and drop at well-known endpoint '
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

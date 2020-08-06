@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class ConsumerRolePolicy < ApplicationPolicy
   def privacy?
-    if @user.has_role? :consumer or
-      @user.has_role? :broker or
-      @user.has_role? :assister or
-      @user.has_role? :csr
+    if @user.has_role?(:consumer) ||
+       @user.has_role?(:broker) ||
+       @user.has_role?(:assister) ||
+       @user.has_role?(:csr)
       true
-    elsif @user.has_role? :employer_staff or
-      @user.has_role? :employee #or
+    elsif @user.has_role?(:employer_staff) ||
+          @user.has_role?(:employee) #or
       #@user.has_role? :broker_agency_staff or
       #@user.has_role? :resident or
       #@user.has_role? :hbx_staff or
@@ -46,8 +48,8 @@ class ConsumerRolePolicy < ApplicationPolicy
       return true if person.id == @record.person.id
     end
     # FIXME: Shouldn't we be checking the access rights of the specific broker here?
-    return true if @user.person && @user.person.has_broker_role?
-    return false
+    return true if @user.person&.has_broker_role?
+    false
   end
 
   def update?
@@ -55,13 +57,13 @@ class ConsumerRolePolicy < ApplicationPolicy
   end
 
   def can_view_application_types?
-    return @user.person.hbx_staff_role.permission.can_view_application_types if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_view_application_types if @user.person&.hbx_staff_role
+    false
   end
 
   def access_new_consumer_application_sub_tab?
-    return @user.person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab if (@user.person && @user.person.hbx_staff_role)
-    return false
+    return @user.person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab if @user.person&.hbx_staff_role
+    false
   end
 
 end

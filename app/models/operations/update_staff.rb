@@ -1,45 +1,43 @@
+# frozen_string_literal: true
+
 module Operations
   class UpdateStaff
     attr_accessor :attrs
 
-    def initialize(attrs={})
+    def initialize(attrs = {})
       @attrs = attrs
       @person_id = attrs[:person_id]
       sanitize_staff_params
     end
 
     def update_person
-      begin
-        return :matching_record_found if matched_people.present?
-        return :information_missing unless has_required_keys?
-        return :invalid_dob if dob_invalid?
-        person.update_attributes(attrs)
-        return :ok
-      rescue Mongoid::Errors::DocumentNotFound
-        :person_not_found
-      rescue
-        :error
-      end
+      return :matching_record_found if matched_people.present?
+      return :information_missing unless has_required_keys?
+      return :invalid_dob if dob_invalid?
+      person.update_attributes(attrs)
+      :ok
+    rescue Mongoid::Errors::DocumentNotFound
+      :person_not_found
+    rescue StandardError
+      :error
     end
 
     def update_email
-      begin
-        attrs[:emails].each do |record|
-          begin
-            email = person.emails.find(record[:id])
-            email.assign_attributes(address: record[:address])
-          rescue
-            return :email_not_found
-          end
-        end
+      attrs[:emails].each do |record|
 
-        return :ok if person.save
-        :error
-      rescue Mongoid::Errors::DocumentNotFound
-        :person_not_found
-      rescue
-        :error
+        email = person.emails.find(record[:id])
+        email.assign_attributes(address: record[:address])
+      rescue StandardError
+        return :email_not_found
+
       end
+
+      return :ok if person.save
+      :error
+    rescue Mongoid::Errors::DocumentNotFound
+      :person_not_found
+    rescue StandardError
+      :error
     end
 
     def person

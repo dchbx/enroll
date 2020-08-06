@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class PlanYear
     include Virtus.model
@@ -11,6 +13,6 @@ module PdfTemplates
     attribute :binder_payment_due_date, Date
     attribute :total_enrolled_count, Integer
     attribute :eligible_to_enroll_count, Integer
-    
+
   end
 end

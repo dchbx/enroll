@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class GroupExpression
     def initialize(group_by_statement, other_properties)

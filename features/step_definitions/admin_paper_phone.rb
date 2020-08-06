@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^I see the (.*?) link$/) do |method|
   find_link(method)
 end

@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
   def self.up
-
     if Settings.site.key.to_s == "cca"
       site_key = "cca"
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/cca_broker_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( legal_name hbx_id new_organization_id  total_roles status)
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
+      file_name = "#{Rails.root}/hbx_report/cca_broker_profile_migration_status_#{TimeKeeper.datetime_of_record.strftime('%m_%d_%Y_%H_%M_%S')}.csv"
+      field_names = %w[legal_name hbx_id new_organization_id total_roles status]
 
       logger = Logger.new("#{Rails.root}/log/cca_broker_profile_migration_data.log") unless Rails.env.test?
       logger.info "Script Start for broker_profile_#{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -32,13 +33,11 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
     end
   end
 
-  def self.down
-  end
+  def self.down; end
 
   private
 
   def self.create_profile(site_key, csv, logger)
-
     #find or build site
     sites = self.find_site(site_key)
     return false unless sites.present?
@@ -56,51 +55,53 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
 
     say_with_time("Time taken to migrate organizations") do
       old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
-        begin
-          existing_new_organizations = find_new_organization(old_org)
-          if existing_new_organizations.count == 0
-            @old_profile = old_org.broker_agency_profile
 
-            json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :inbox, :documents])
-            old_profile_params = JSON.parse(json_data)
+        existing_new_organizations = find_new_organization(old_org)
+        if existing_new_organizations.count == 0
+          @old_profile = old_org.broker_agency_profile
 
-            @new_profile = self.initialize_new_profile(old_org, old_profile_params)
-            new_organization = self.initialize_new_organization(old_org, site)
+          json_data = @old_profile.to_json(:except => [:_id, :entity_kind, :aasm_state_set_on, :inbox, :documents])
+          old_profile_params = JSON.parse(json_data)
 
-            raise Exception unless new_organization.valid?
-            BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
-            new_organization.save!
-            BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create)
+          @new_profile = self.initialize_new_profile(old_org, old_profile_params)
+          new_organization = self.initialize_new_organization(old_org, site)
 
-            #Roles Migration
-            person_records_with_old_staff_roles = find_staff_roles
-            link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
+          raise Exception unless new_organization.valid?
+          BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create)
+          new_organization.save!
+          BenefitSponsors::Organizations::Organization.set_callback(:create, :after, :notify_on_create)
+
+          #Roles Migration
+          person_records_with_old_staff_roles = find_staff_roles
+          link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
 
 
-            print '.' unless Rails.env.test?
-            csv << [old_org.legal_name, old_org.hbx_id, new_organization.id, person_records_with_old_staff_roles.count , "Migration Success"]
-            success = success + 1
-          else
-            existing_organization = existing_organization + 1
-            csv << [old_org.legal_name, old_org.hbx_id, existing_new_organizations.first.id, "-" , "Already Migrated to new model, no action taken"]
-          end
-        rescue Exception => e
-          failed = failed + 1
-          print 'F' unless Rails.env.test?
-          csv << [old_org.legal_name, old_org.hbx_id, "0", "-","Migration Failed"]
-          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-          validation_errors:
-          organization - #{new_organization.errors.messages}
-          profile - #{@new_profile.errors.messages},
-          #{e.inspect}" unless Rails.env.test?
+          print '.' unless Rails.env.test?
+          csv << [old_org.legal_name, old_org.hbx_id, new_organization.id, person_records_with_old_staff_roles.count, "Migration Success"]
+          success += 1
+        else
+          existing_organization += 1
+          csv << [old_org.legal_name, old_org.hbx_id, existing_new_organizations.first.id, "-", "Already Migrated to new model, no action taken"]
         end
+      rescue Exception => e
+        failed += 1
+        print 'F' unless Rails.env.test?
+        csv << [old_org.legal_name, old_org.hbx_id, "0", "-","Migration Failed"]
+        unless Rails.env.test?
+          logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
+            validation_errors:
+            organization - #{new_organization.errors.messages}
+            profile - #{@new_profile.errors.messages},
+            #{e.inspect}"
+        end
+
       end
     end
     logger.info " Total #{total_organizations} old organizations for type: broker agency profile." unless Rails.env.test?
     logger.info " #{failed} organizations failed to migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{success} organizations migrated to new DB at this point." unless Rails.env.test?
     logger.info " #{existing_organization} old organizations are already present in new DB." unless Rails.env.test?
-    return true
+    true
   end
 
   def self.find_new_organization(old_org)
@@ -113,11 +114,10 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
     build_documents(old_org, new_profile)
     build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
-    return new_profile
+    new_profile
   end
 
   def self.build_documents(old_org, new_profile)
-
     @old_profile.documents.each do |document|
       doc = new_profile.documents.new(document.attributes.except("_id", "_type", "identifier","size"))
       doc.identifier = document.identifier if document.identifier.present?
@@ -145,7 +145,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
                           elsif old_org_docs.present?
                             old_org_docs.first.id.to_s
                           end
-        msg.body.gsub!(old_document_id, doc.id.to_s) if (doc.id.to_s.present? && old_document_id.present?)
+        msg.body.gsub!(old_document_id, doc.id.to_s) if doc.id.to_s.present? && old_document_id.present?
       end
 
     end
@@ -153,7 +153,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
 
   def self.build_office_locations(old_org, new_profile)
     old_org.office_locations.each do |office_location|
-      new_office_location = new_profile.office_locations.new()
+      new_office_location = new_profile.office_locations.new
       new_office_location.is_primary = office_location.is_primary
       address_params = office_location.address.attributes.except("_id") if office_location.address.present?
       phone_params = office_location.phone.attributes.except("_id") if office_location.phone.present?
@@ -169,7 +169,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
     exempt_organization.entity_kind = @old_profile.entity_kind.to_sym
     exempt_organization.site = site
     exempt_organization.profiles << [@new_profile]
-    return exempt_organization
+    exempt_organization
   end
 
   def self.find_staff_roles
@@ -177,7 +177,7 @@ class CcaBrokerAgencyProfilesMigration < Mongoid::Migration
               {:"broker_agency_staff_roles.broker_agency_profile_id" => @old_profile.id})
   end
 
-  def self.link_existing_staff_roles_to_new_profile( person_records_with_old_staff_roles)
+  def self.link_existing_staff_roles_to_new_profile(person_records_with_old_staff_roles)
     person_records_with_old_staff_roles.each do |person|
 
       old_broker_role = person.broker_role

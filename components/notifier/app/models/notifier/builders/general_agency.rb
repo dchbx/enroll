@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class Builders::GeneralAgency
     include ActionView::Helpers::NumberHelper
@@ -25,12 +27,12 @@ module Notifier
       office_address = general_agency.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
-          street_1: office_address.address_1,
-          street_2: office_address.address_2,
-          city: office_address.city,
-          state: office_address.state,
-          zip: office_address.zip
-          })
+                                                                     street_1: office_address.address_1,
+                                                                     street_2: office_address.address_2,
+                                                                     city: office_address.city,
+                                                                     state: office_address.state,
+                                                                     zip: office_address.zip
+                                                                   })
       end
     end
 
@@ -51,15 +53,11 @@ module Notifier
     end
 
     def first_name
-      if agency_staff.present?
-        merge_model.first_name = agency_staff.first_name
-      end
+      merge_model.first_name = agency_staff.first_name if agency_staff.present?
     end
 
     def last_name
-      if agency_staff.present?
-        merge_model.last_name = agency_staff.last_name
-      end
+      merge_model.last_name = agency_staff.last_name if agency_staff.present?
     end
 
     def employer

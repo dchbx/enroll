@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
@@ -11,7 +13,7 @@ module BenefitSponsors
 
         def new_broker
           @broker_candidate = BenefitSponsors::Forms::BrokerCandidate.new
-          @organization =  BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(nil)
+          @organization = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(nil)
           respond_to do |format|
             format.html { render 'new' }
             format.js
@@ -116,8 +118,8 @@ module BenefitSponsors
 
         def applicant_params
           params.require(:person).permit(:first_name, :last_name, :dob, :email, :npn, :broker_agency_id, :broker_applicant_type,
-           :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients,
-           :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
+                                         :market_kind, {:languages_spoken => []}, :working_hours, :accept_new_clients,
+                                         :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip])
         end
       end
     end

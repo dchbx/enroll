@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TimeKeeper
   include Config::AcaModelConcern
   include Mongoid::Document
@@ -9,8 +11,7 @@ class TimeKeeper
 
   # time zone management
 
-  def initialize
-  end
+  def initialize; end
 
   def self.local_time(a_time)
     a_time.in_time_zone("Eastern Time (US & Canada)")
@@ -108,11 +109,9 @@ class TimeKeeper
   end
 
   def push_date_change_event
-    begin
-      BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(self.date_of_record)
-    rescue Exception => e
-      Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
-    end
+    BenefitSponsors::BenefitApplications::BenefitApplication.date_change_event(self.date_of_record)
+  rescue Exception => e
+    Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
   end
 
   def self.with_cache

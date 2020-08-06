@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module CensusMembers
-
     class BenefitGroupAssignment
       include Mongoid::Document
       include Mongoid::Timestamps
@@ -26,15 +27,15 @@ module SponsoredBenefits
 
       def self.by_benefit_group_id(bg_id)
         census_employees = PlanDesignCensusEmployee.where({
-          "benefit_group_assignments.benefit_group_id" => bg_id
-          })
+                                                            "benefit_group_assignments.benefit_group_id" => bg_id
+                                                          })
         census_employees.flat_map(&:benefit_group_assignments).select do |bga|
           bga.benefit_group_id == bg_id
         end
       end
 
       def benefit_group=(new_benefit_group)
-        raise ArgumentError.new("expected BenefitGroup") unless new_benefit_group.is_a? BenefitGroup
+        raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a? BenefitGroup
         self.benefit_group_id = new_benefit_group._id
         @benefit_group = new_benefit_group
       end
@@ -52,9 +53,7 @@ module SponsoredBenefits
 
       def make_active
         census_employee.benefit_group_assignments.each do |bg_assignment|
-          if bg_assignment.is_active? && bg_assignment.id != self.id
-            bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max)
-          end
+          bg_assignment.update_attributes(is_active: false, end_on: [start_on - 1.day, bg_assignment.start_on].max) if bg_assignment.is_active? && bg_assignment.id != self.id
         end
 
         update_attributes(is_active: true, activated_at: TimeKeeper.datetime_of_record) unless is_active?
@@ -66,7 +65,7 @@ module SponsoredBenefits
         self.workflow_state_transitions << WorkflowStateTransition.new(
           from_state: aasm.from_state,
           to_state: aasm.to_state
-          )
+        )
       end
     end
   end

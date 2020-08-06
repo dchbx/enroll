@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class OrganizationForms::RegistrationForm
@@ -28,9 +30,7 @@ module BenefitSponsors
       end
 
       def persisted?
-        if profile_id.present?
-          return true
-        end
+        return true if profile_id.present?
         false
       end
 
@@ -43,8 +43,8 @@ module BenefitSponsors
         service = resolve_service(profile_type: attrs[:profile_type])
         form_params = service.build(profile_type: attrs[:profile_type])
         new(form_params.merge!({
-          portal: attrs[:portal]
-        }))
+                                 portal: attrs[:portal]
+                               }))
       end
 
       def self.for_create(attrs)
@@ -63,8 +63,8 @@ module BenefitSponsors
       def self.for_update(attrs)
         service = resolve_service(profile_id: attrs[:profile_id])
         attrs.merge!({
-          profile_type: service.profile_type
-        })
+                       profile_type: service.profile_type
+                     })
         form = new(attrs)
       end
 
@@ -106,18 +106,16 @@ module BenefitSponsors
       end
 
       def validate_form(form)
-        unless form.valid?
-          self.errors.add(:base, form.errors.full_messages)
-        end
+        self.errors.add(:base, form.errors.full_messages) unless form.valid?
       end
 
       protected
 
-      def self.resolve_service(attrs ={})
+      def self.resolve_service(attrs = {})
         BenefitSponsors::Services::NewProfileRegistrationService.new(attrs)
       end
 
-      def service(attrs={})
+      def service(attrs = {})
         return @service if defined?(@service)
         @service = self.class.resolve_service(attrs)
       end

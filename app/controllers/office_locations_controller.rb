@@ -1,11 +1,12 @@
+# frozen_string_literal: true
+
 class OfficeLocationsController < ApplicationController
   class SlugLocationOwner
     def office_locations
       []
     end
 
-    def office_locations_attributes=(vals)
-    end
+    def office_locations_attributes=(vals); end
   end
 
   def new

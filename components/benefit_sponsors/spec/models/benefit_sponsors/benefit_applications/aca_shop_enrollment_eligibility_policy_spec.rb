@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -10,9 +12,10 @@ module BenefitSponsors
 
     let!(:subject) {BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new}
     let!(:benefit_application) {initial_application}
-    let!(:benefit_application_update) {benefit_application.update_attributes(:fte_count => 5,
-                                                                             :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
-    }
+    let!(:benefit_application_update) do
+      benefit_application.update_attributes(:fte_count => 5,
+                                            :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
+    end
 
     describe "New model instance" do
       it "should have businese_policy" do
@@ -63,10 +66,11 @@ module BenefitSponsors
 
     describe "For business_policies_for 1/1 effective date" do
 
-      let!(:benefit_application_update) {benefit_application.update_attributes(:fte_count => 5,
-                                                                               :effective_period => Range.new(TimeKeeper.date_of_record.beginning_of_year-1.year, TimeKeeper.date_of_record.end_of_year-1.year),
-                                                                               :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
-      }
+      let!(:benefit_application_update) do
+        benefit_application.update_attributes(:fte_count => 5,
+                                              :effective_period => Range.new(TimeKeeper.date_of_record.beginning_of_year - 1.year, TimeKeeper.date_of_record.end_of_year - 1.year),
+                                              :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
+      end
 
       context "When all the census employees are emrolled" do
 
@@ -108,11 +112,12 @@ module BenefitSponsors
 
       context "Zero non-owner employees are enrolled" do
 
-        let(:load_enrollments3) {benefit_sponsorship.census_employees.limit(5).each do |ce|
-          ce.update_attributes(is_business_owner: true)
-          ce.save
+        let(:load_enrollments3) do
+          benefit_sponsorship.census_employees.limit(5).each do |ce|
+            ce.update_attributes(is_business_owner: true)
+            ce.save
+          end
         end
-        }
 
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
@@ -150,8 +155,7 @@ module BenefitSponsors
                                            household: family.active_household,
                                            benefit_sponsorship: benefit_sponsorship,
                                            benefit_group_assignment: ce.benefit_group_assignments.first,
-                                           sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id
-                                           )
+                                           sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
             employee_role = FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: TimeKeeper.date_of_record - 2.days, person: person, census_employee: ce)
             ce.update_attributes(employee_role_id: employee_role.id)
             ce.save!

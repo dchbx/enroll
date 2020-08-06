@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     # Provides a cached, efficient lookup for referencing rate values
@@ -32,7 +34,7 @@ module BenefitMarkets
       )
         $pf_cache_for_sic_code[[product.issuer_profile_id, product.active_year]].cached_lookup(sic_code)
       end
-      
+
       # Return the group size factor value for a given product.
       # @param product [Product] the product for which I desire the value
       # @param group_size [String] the group size
@@ -43,18 +45,18 @@ module BenefitMarkets
       )
         $pf_cache_for_group_size[[product.issuer_profile_id, product.active_year]].cached_lookup(group_size)
       end
-      
+
       # Return the participation percent factor value for a given product.
       # @param product [Product] the product for which I desire the value
       # @param participation_percent [String] the participation_percent
       # @return [Float, BigDecimal] the factor
       def self.lookup_participation_percent_factor(
         product,
-        participation_percent 
+        participation_percent
       )
         $pf_cache_for_participation_percent[[product.issuer_profile_id, product.active_year]].cached_lookup(participation_percent)
       end
- 
+
       # Return the rating tier factor value for a given product.
       # @param product [Product] the product for which I desire the value
       # @param rating_tier_name [String] the rating_tier_name

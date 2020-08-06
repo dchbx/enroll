@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rubygems'
 require "rexml/document"
 require "rexml/xpath"
@@ -10,14 +12,14 @@ require "onelogin/ruby-saml/error_handling"
 module XMLSecurity
   class Document < BaseDocument
     def sign_document(private_key, certificate, signature_method = RSA_SHA1, digest_method = SHA1)
-      noko = Nokogiri.parse(self.to_s) do |options|
+      noko = Nokogiri.parse(self.to_s) do |_options|
         options = XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
       end
 
       signature_element = REXML::Element.new("ds:Signature").add_namespace('ds', DSIG)
       signed_info_element = signature_element.add_element("ds:SignedInfo")
       signed_info_element.add_element("ds:CanonicalizationMethod", {"Algorithm" => C14N})
-      signed_info_element.add_element("ds:SignatureMethod", {"Algorithm"=>signature_method})
+      signed_info_element.add_element("ds:SignatureMethod", {"Algorithm" => signature_method})
 
       # Add Reference
       reference_element = signed_info_element.add_element("ds:Reference", {"URI" => "##{uuid}"})
@@ -34,7 +36,7 @@ module XMLSecurity
       reference_element.add_element("ds:DigestValue").text = compute_digest(canon_doc, algorithm(digest_method_element))
 
       # add SignatureValue
-      noko_sig_element = Nokogiri.parse(signature_element.to_s) do |options|
+      noko_sig_element = Nokogiri.parse(signature_element.to_s) do |_options|
         options = XMLSecurity::BaseDocument::NOKOGIRI_OPTIONS
       end
 
@@ -48,9 +50,7 @@ module XMLSecurity
       key_info_element       = signature_element.add_element("ds:KeyInfo")
       x509_element           = key_info_element.add_element("ds:X509Data")
       x509_cert_element      = x509_element.add_element("ds:X509Certificate")
-      if certificate.is_a?(String)
-        certificate = OpenSSL::X509::Certificate.new(certificate)
-      end
+      certificate = OpenSSL::X509::Certificate.new(certificate) if certificate.is_a?(String)
       x509_cert_element.text = Base64.encode64(certificate.to_der).gsub(/\n/, "")
 
       # add the signature

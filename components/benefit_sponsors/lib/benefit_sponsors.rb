@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "benefit_sponsors/engine"
 
 require "mongoid"
@@ -11,7 +13,6 @@ require BenefitSponsors::Engine.root.join('app/domain/benefit_sponsors/types')
 
 
 module BenefitSponsors
-
   # Isolate the namespace portion of the passed class
   def parent_namespace_for(klass)
     klass_name = klass.to_s.split("::")
@@ -59,13 +60,12 @@ module BenefitSponsors
 
 
   # Ensure class type and integrity of date period ranges
-  def self.tidy_date_range(range_period, attribute = nil)
-
+  def self.tidy_date_range(range_period, _attribute = nil)
     return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
     case range_period.begin
     when Date
-      date_range  = range_period
+      date_range = range_period
     when String
       begin_on    = range_period.split("..")[0]
       end_on      = range_period.split("..")[1]
@@ -80,10 +80,10 @@ module BenefitSponsors
     end
 
     if range_is_increasing?(date_range)
-      return date_range
+      date_range
     else
       # @errors.add(attribute.to_sym, "end date may not preceed begin date") if attribute.present?
-      return nil
+      nil
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeeCommon
     include ActiveModel::Validations
@@ -46,14 +48,14 @@ module Importers
     end
 
     RELATIONSHIP_MAP = {
-        "spouse" => "spouse",
-        "domestic partner" => "domestic_partner",
-        "child" => "child_under_26",
-        "child under 26" => "child_under_26",
-        "child over 26" => "child_26_and_over",
-        "disabled child under 26" => "disabled_child_26_and_over",
-        "disabled child over 26" => "disabled_child_26_and_over"
-    }
+      "spouse" => "spouse",
+      "domestic partner" => "domestic_partner",
+      "child" => "child_under_26",
+      "child under 26" => "child_under_26",
+      "child over 26" => "child_26_and_over",
+      "disabled child under 26" => "disabled_child_26_and_over",
+      "disabled child over 26" => "disabled_child_26_and_over"
+    }.freeze
 
     def initialize(opts = {})
       super(opts)
@@ -61,23 +63,31 @@ module Importers
     end
 
     def hire_date=(val)
-      @hire_date = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
+      @hire_date = val.blank? ? nil : (begin
+                                         Date.strptime(val, "%m/%d/%Y")
+                                       rescue StandardError
+                                         nil
+                                       end)
     end
 
     def subscriber_dob=(val)
-      @subscriber_dob = val.blank? ? nil : (Date.strptime(val, "%m/%d/%Y") rescue nil)
+      @subscriber_dob = val.blank? ? nil : (begin
+                                              Date.strptime(val, "%m/%d/%Y")
+                                            rescue StandardError
+                                              nil
+                                            end)
     end
 
     def subscriber_zip=(val)
       if val.blank?
         @subscriber_zip = nil
-        return val
+        val
       else
-        if val.strip.length == 9
-          @subscriber_zip = val[0..4]
-        else
-          @subscriber_zip = val.strip.rjust(5, "0")
-        end
+        @subscriber_zip = if val.strip.length == 9
+                            val[0..4]
+                          else
+                            val.strip.rjust(5, "0")
+                          end
       end
     end
 
@@ -92,11 +102,11 @@ module Importers
           @dep_#{num}_zip = nil
           return val
         else
-          if val.strip.length == 9 
+          if val.strip.length == 9
             @dep_#{num}_zip = val[0..4]
           else
             @dep_#{num}_zip = val.strip.rjust(5, "0")
-          end 
+          end
         end
       end
 
@@ -117,15 +127,15 @@ module Importers
       found_employer = find_employer
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
-                                                     employer_profile_id: found_employer.id,
+                                                   employer_profile_id: found_employer.id,
                                                      # hired_on: {"$lte" => start_date},
-                                                     encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                   encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                  })
       non_terminated_employees = candidate_employees.reject do |ce|
-        (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+        !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
       end
 
-      @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+      @found_employee = non_terminated_employees.max_by(&:hired_on)
     end
 
   end

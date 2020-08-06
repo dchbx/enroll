@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PayloadInflater
   def self.inflate(is_deflated, payload)
     return payload unless is_deflated

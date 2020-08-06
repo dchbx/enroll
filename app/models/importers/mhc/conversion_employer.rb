@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployer < Importers::ConversionEmployer
 
@@ -18,12 +20,12 @@ module Importers::Mhc
                   :primary_location_zip,
                   :mailing_location_zip
 
-    def primary_location_zip=(val='')
-      @primary_location_zip= prepend_zeros(val.to_i.to_s,5)
+    def primary_location_zip=(val = '')
+      @primary_location_zip = prepend_zeros(val.to_i.to_s,5)
     end
 
-    def mailing_location_zip=(val='')
-      @mailing_location_zip= prepend_zeros(val.to_i.to_s,5)
+    def mailing_location_zip=(val = '')
+      @mailing_location_zip = prepend_zeros(val.to_i.to_s,5)
     end
 
     def fein=(val)
@@ -32,14 +34,14 @@ module Importers::Mhc
 
     def build_primary_address
       Address.new(
-          :kind => "primary",
-          :address_1 => primary_location_address_1,
-          :address_2 => primary_location_address_2,
-          :city =>  primary_location_city,
-          :state => primary_location_state,
-          :county => primary_location_county,
-          :location_state_code => primary_location_county_fips,
-          :zip => primary_location_zip
+        :kind => "primary",
+        :address_1 => primary_location_address_1,
+        :address_2 => primary_location_address_2,
+        :city => primary_location_city,
+        :state => primary_location_state,
+        :county => primary_location_county,
+        :location_state_code => primary_location_county_fips,
+        :zip => primary_location_zip
       )
     end
   end

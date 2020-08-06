@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class Employers::EmployerProfilesController < Employers::EmployersController
   include ::Config::AcaConcern
   include ApplicationHelper
-  
+
   before_action :redirect_new_model, only: [:welcome, :index, :new, :show_profile, :edit, :generate_sic_tree, :create]
   before_action :redirect_show, only: [:show]
 
@@ -36,7 +38,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def link_from_quote
     claim_code = params[:claim_code].upcase
-    import_roster = params[:import_roster] == "yes" ? true : false
+    import_roster = params[:import_roster] == "yes"
 
     claim_code_status = Quote.claim_code_status?(claim_code)
 
@@ -56,12 +58,10 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   #Deprecated. Use new model version instead.
-  def index
-  end
+  def index; end
 
   #Deprecated. Use new model version instead.
-  def welcome
-  end
+  def welcome; end
 
   def search
     @employer_profile = Forms::EmployerCandidate.new
@@ -75,7 +75,17 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     @employer_candidate = Forms::EmployerCandidate.new(params.require(:employer_profile))
     if @employer_candidate.valid?
       found_employer = @employer_candidate.match_employer
-      unless params["create_employer"].present?
+      if params["create_employer"].present?
+        params.permit!
+        build_organization
+        @employer_profile.attributes = params[:employer_profile]
+        @organization.save(validate: false)
+        build_office_location
+        respond_to do |format|
+          format.js { render "edit" }
+          format.html { render "edit" }
+        end
+      else
         if found_employer.present?
           @employer_profile = found_employer
           respond_to do |format|
@@ -88,16 +98,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
             format.html { render 'no_match' }
           end
         end
-      else
-        params.permit!
-        build_organization
-        @employer_profile.attributes = params[:employer_profile]
-        @organization.save(validate: false)
-        build_office_location
-        respond_to do |format|
-          format.js { render "edit" }
-          format.html { render "edit" }
-        end
       end
     else
       @employer_profile = @employer_candidate
@@ -109,31 +109,22 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   #Deprecated. Use new model version instead.
-  def my_account
-  end
+  def my_account; end
 
   #Deprecated. Use new model version instead.
-  def show
-  end
+  def show; end
 
   #Deprecated. Use new model version instead.
-  def show_profile
-  end
+  def show_profile; end
 
+  def new; end
 
-
-  def new
-  end
-
-  def edit
-  end
+  def edit; end
 
   #Deprecated. Use new model version instead.
-  def create
-  end
+  def create; end
 
-  def show_pending
-  end
+  def show_pending; end
 
   def generate_sic_tree
     sic_tree = SicCode.generate_sic_array
@@ -197,9 +188,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     end
   end
 
-  def bulk_employee_upload_form
-  end
-
+  def bulk_employee_upload_form; end
 
   def generate_checkbook_urls
     trigger_notice_observer(@employer_profile, @employer_profile, 'out_of_pocket_url_notifier')
@@ -208,21 +197,21 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def download_invoice
-    options={}
+    options = {}
     options[:content_type] = @invoice.type
     options[:filename] = @invoice.title
-    send_data Aws::S3Storage.find(@invoice.identifier) , options
+    send_data Aws::S3Storage.find(@invoice.identifier), options
   end
 
   def bulk_employee_upload
     file = params.require(:file)
-    @census_employee_import = CensusEmployeeImport.new({file:file, employer_profile:@employer_profile})
+    @census_employee_import = CensusEmployeeImport.new({file: file, employer_profile: @employer_profile})
     begin
-    if @census_employee_import.save
-      redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice=>"#{@census_employee_import.length} records uploaded from CSV"
-    else
-      render "employers/employer_profiles/employee_csv_upload_errors"
-    end
+      if @census_employee_import.save
+        redirect_to "/employers/employer_profiles/#{@employer_profile.id}?employer_profile_id=#{@employer_profile.id}&tab=employees", :notice => "#{@census_employee_import.length} records uploaded from CSV"
+      else
+        render "employers/employer_profiles/employee_csv_upload_errors"
+      end
     rescue Exception => e
       if e.message == "Unrecognized Employee Census spreadsheet format. Contact #{site_short_name} for current template."
         render "employers/employer_profiles/_download_new_template"
@@ -231,8 +220,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
         render "employers/employer_profiles/employee_csv_upload_errors"
       end
     end
-
-
   end
 
   def redirect_to_first_allowed
@@ -254,8 +241,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def download_documents # Should be in ER attestations controller
     @employer_profile = EmployerProfile.find(params[:id])
     #begin
-      doc = @employer_profile.documents.find(params[:ids][0])
-    send_file doc.identifier, file_name: doc.title,content_type:doc.format
+    doc = @employer_profile.documents.find(params[:ids][0])
+    send_file doc.identifier, file_name: doc.title,content_type: doc.format
 
       #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
     #rescue => e
@@ -263,22 +250,20 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     #end
 
     #render json: { status: 200, message: 'Successfully Downloaded.' }
-
   end
 
   def delete_documents
     @employer_profile = EmployerProfile.find(params[:id])
     begin
-      @employer_profile.documents.any_in(:_id =>params[:ids]).destroy_all
+      @employer_profile.documents.any_in(:_id => params[:ids]).destroy_all
       render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
-    rescue => e
+    rescue StandardError => e
       render json: { status: 500, message: 'An error occured while submitting employer(s) for binder paid.' }
     end
   end
 
   #Deprecated. Use new model version instead.
-  def counties_for_zip_code
-  end
+  def counties_for_zip_code; end
 
   # def employer_account_creation_notice
   #   begin
@@ -302,7 +287,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     authorize EmployerProfile, :updateable?
   end
 
-  def collect_and_sort_invoices(sort_order='ASC')
+  def collect_and_sort_invoices(sort_order = 'ASC')
     @invoices = []
     @invoices << @employer_profile.organization.try(:documents).to_a
     invoice_documents = @employer_profile.documents.select{ |invoice| ["invoice", "initial_invoice"].include? invoice.subject }
@@ -360,14 +345,12 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def paginate_families
-    #FIXME add paginate
+    #FIXME: add paginate
     @employees = @employer_profile.employee_roles.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
   end
 
   def check_employer_staff_role
-    if current_user.person && current_user.person.has_active_employer_staff_role?
-      redirect_to employers_employer_profile_path(:id => current_user.person.active_employer_staff_roles.first.employer_profile_id, :tab => "home")
-    end
+    redirect_to employers_employer_profile_path(:id => current_user.person.active_employer_staff_roles.first.employer_profile_id, :tab => "home") if current_user.person&.has_active_employer_staff_role?
   end
 
   def find_mailbox_provider
@@ -378,7 +361,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
       broker_id = current_user.person.broker_role.broker_agency_profile_id.to_s
       profile = BrokerAgencyProfile.find(broker_id)
     end
-    return profile
+    profile
   end
 
   def check_show_permissions
@@ -398,9 +381,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
     if current_user.has_hbx_staff_role? || current_user.has_broker_agency_staff_role? || current_user.has_broker_role?
     elsif current_user.has_employer_staff_role?
       ep_id = current_user.person.employer_staff_roles.first.employer_profile_id
-      if ep_id.to_s != params[:id].to_s
-        redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id)
-      end
+      redirect_to employers_employer_profile_path(:id => current_user.person.employer_staff_roles.first.employer_profile_id) if ep_id.to_s != params[:id].to_s
     else
       redirect_to new_employers_employer_profile_path
     end
@@ -430,7 +411,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def employer_profile_params
     params.require(:organization).permit(
-      :employer_profile_attributes => [ :entity_kind, :contact_method, :dba, :legal_name, :sic_code],
+      :employer_profile_attributes => [:entity_kind, :contact_method, :dba, :legal_name, :sic_code],
       :office_locations_attributes => [
         {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
         {:phone_attributes => [:kind, :area_code, :number, :extension]},
@@ -443,11 +424,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def sanitize_employer_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+      location.delete('phone_attributes') if location['phone_attributes'].present? && location['phone_attributes']['number'].blank?
       office_locations = params[:organization][:office_locations_attributes]
-      if office_locations && office_locations[key]
-        params[:organization][:office_locations_attributes][key][:is_primary] = (office_locations[key][:address_attributes][:kind] == 'primary')
-      end
+      params[:organization][:office_locations_attributes][key][:is_primary] = (office_locations[key][:address_attributes][:kind] == 'primary') if office_locations && office_locations[key]
     end
   end
 
@@ -471,9 +450,9 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def wrap_in_benefit_group_cache
 #    prof_result = RubyProf.profile do
-      Caches::RequestScopedCache.allocate(:employer_calculation_cache_for_benefit_groups)
-      yield
-      Caches::RequestScopedCache.release(:employer_calculation_cache_for_benefit_groups)
+    Caches::RequestScopedCache.allocate(:employer_calculation_cache_for_benefit_groups)
+    yield
+    Caches::RequestScopedCache.release(:employer_calculation_cache_for_benefit_groups)
 #    end
 #    printer = RubyProf::MultiPrinter.new(prof_result)
 #    printer.print(:path => File.join(Rails.root, "rprof"), :profile => "profile")
@@ -484,7 +463,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   end
 
   def check_origin?
-    request.referrer.present? and URI.parse(request.referrer).host == "app.dchealthlink.com"
+    request.referrer.present? && (URI.parse(request.referrer).host == "app.dchealthlink.com")
   end
 
   def get_sic_codes

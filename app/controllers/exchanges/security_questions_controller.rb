@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exchanges::SecurityQuestionsController < ApplicationController
   layout 'single_column'
 

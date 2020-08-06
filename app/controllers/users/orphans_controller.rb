@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Users::OrphansController < ApplicationController
   layout "two_column"
   layout "single_column", only: [:index]
@@ -11,8 +13,7 @@ class Users::OrphansController < ApplicationController
     end
   end
 
-  def show
-  end
+  def show; end
 
   def destroy
     @orphan.destroy
@@ -22,16 +23,15 @@ class Users::OrphansController < ApplicationController
     end
   end
 
-private
+  private
+
   def check_agent_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX Administrator" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX Administrator" } unless current_user.has_hbx_staff_role?
   end
 
     # Use callbacks to share common setup or constraints between actions.
-    def set_orphan
-      @orphan = User.find(params[:id])
-    end
+  def set_orphan
+    @orphan = User.find(params[:id])
+  end
 
 end

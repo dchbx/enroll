@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
@@ -41,25 +43,25 @@ class Person
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true     # track document destruction, default is false
 
 
   extend Mongorder
 #  validates_with Validations::DateRangeValidator
 
-  GENDER_KINDS = %W(male female)
+  GENDER_KINDS = %w[male female].freeze
 
-  IDENTIFYING_INFO_ATTRIBUTES = %w(first_name last_name ssn dob)
-  ADDRESS_CHANGE_ATTRIBUTES = %w(addresses phones emails)
-  RELATIONSHIP_CHANGE_ATTRIBUTES = %w(person_relationships)
+  IDENTIFYING_INFO_ATTRIBUTES = %w[first_name last_name ssn dob].freeze
+  ADDRESS_CHANGE_ATTRIBUTES = %w[addresses phones emails].freeze
+  RELATIONSHIP_CHANGE_ATTRIBUTES = %w[person_relationships].freeze
 
   PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
   PERSON_UPDATED_EVENT_NAME = "acapi.info.events.individual.updated"
-  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status']
+  VERIFICATION_TYPES = ['Social Security Number', 'American Indian Status', 'Citizenship', 'Immigration status'].freeze
 
-  NON_SHOP_ROLES = ['Individual','Coverall']
+  NON_SHOP_ROLES = ['Individual','Coverall'].freeze
 
   field :hbx_id, type: String
   field :name_pfx, type: String
@@ -103,22 +105,22 @@ class Person
   belongs_to :user, inverse_of: :person, optional: true
 
   belongs_to :employer_contact,
-                class_name: "EmployerProfile",
-                inverse_of: :employer_contacts,
-                index: true,
-                optional: true
+             class_name: "EmployerProfile",
+             inverse_of: :employer_contacts,
+             index: true,
+             optional: true
 
   belongs_to :broker_agency_contact,
-                class_name: "BrokerAgencyProfile",
-                inverse_of: :broker_agency_contacts,
-                index: true,
-                optional: true
+             class_name: "BrokerAgencyProfile",
+             inverse_of: :broker_agency_contacts,
+             index: true,
+             optional: true
 
   belongs_to :general_agency_contact,
-                class_name: "GeneralAgencyProfile",
-                inverse_of: :general_agency_contacts,
-                index: true,
-                optional: true
+             class_name: "GeneralAgencyProfile",
+             inverse_of: :general_agency_contacts,
+             index: true,
+             optional: true
 
   embeds_one :consumer_role, cascade_callbacks: true, validate: true
   embeds_one :resident_role, cascade_callbacks: true, validate: true
@@ -149,11 +151,11 @@ class Person
   attr_accessor :effective_date
 
   accepts_nested_attributes_for :consumer_role, :resident_role, :broker_role, :hbx_staff_role,
-    :person_relationships, :employee_roles, :phones, :employer_staff_roles
+                                :person_relationships, :employee_roles, :phones, :employer_staff_roles
 
-  accepts_nested_attributes_for :phones, :reject_if => Proc.new { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :addresses, :reject_if => Proc.new { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
-  accepts_nested_attributes_for :emails, :reject_if => Proc.new { |addy| addy[:address].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
+  accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
 
   validates_presence_of :first_name, :last_name
   validate :date_functional_validations
@@ -166,8 +168,8 @@ class Person
   validate :is_only_one_individual_role_active?
 
   validates :gender,
-    allow_blank: true,
-    inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
+            allow_blank: true,
+            inclusion: { in: Person::GENDER_KINDS, message: "%{value} is not a valid gender" }
 
   before_save :generate_hbx_id
   before_save :update_full_name
@@ -178,8 +180,8 @@ class Person
 
   add_observer ::BenefitSponsors::Observers::EmployerStaffRoleObserver.new, :contact_changed?
 
-  index({hbx_id: 1}, {sparse:true, unique: true})
-  index({user_id: 1}, {sparse:true, unique: true})
+  index({hbx_id: 1}, {sparse: true, unique: true})
+  index({user_id: 1}, {sparse: true, unique: true})
 
   index({last_name:  1})
   index({first_name: 1})
@@ -263,16 +265,16 @@ class Person
   scope :all_csr_roles,               -> { exists(csr_role: true) }
   scope :all_assister_roles,          -> { exists(assister_role: true) }
   scope :all_broker_staff_roles,      -> { exists(broker_agency_staff_roles: true) }
-  scope :all_agency_staff_roles,      -> do
+  scope :all_agency_staff_roles,      lambda {
     where(
       {
-      "$or" => [
-          { "broker_agency_staff_roles" => { "$exists" => true } },
-          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" => {"$ne" => false} }
-        ]
+        "$or" => [
+            { "broker_agency_staff_roles" => { "$exists" => true } },
+            { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" => {"$ne" => false} }
+          ]
       }
     )
-  end
+  }
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
@@ -311,8 +313,8 @@ class Person
   def self.api_staff_roles
     Person.where(
       {
-      "is_active" => true,
-      "$or" => [
+        "is_active" => true,
+        "$or" => [
           { "broker_agency_staff_roles" => { "$exists" => true, "$not" => {"$size" => 0} } },
           { "general_agency_staff_roles.is_primary" =>  false }
         ]
@@ -323,8 +325,8 @@ class Person
   def self.api_primary_staff_roles
     Person.where(
       {
-      "is_active" => true,
-      "$or" => [
+        "is_active" => true,
+        "$or" => [
           { "broker_role._id" => {"$exists" => true} },
           { "general_agency_staff_roles.is_primary" =>  true }
         ]
@@ -362,24 +364,22 @@ class Person
     if self.families.present?
       self.families.each do |family|
         household = family.active_household
-        if household && household.hbx_enrollments.where(:'aasm_state'.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).present?
-          return true
-        end
+        return true if household && household.hbx_enrollments.where(:aasm_state.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).present?
       end
     end
     false
   end
 
   def agent_npn
-    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
+    self.general_agency_staff_roles.select(&:is_primary).try(:first).try(:npn) || self.broker_role.try(:npn)
   end
 
   def agent_role_id
-    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:id) || self.broker_role.try(:id)
+    self.general_agency_staff_roles.select(&:is_primary).try(:first).try(:id) || self.broker_role.try(:id)
   end
 
   def connected_profile_id
-    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:benefit_sponsors_general_agency_profile_id) || self.broker_role.try(:benefit_sponsors_broker_agency_profile_id)
+    self.general_agency_staff_roles.select(&:is_primary).try(:first).try(:benefit_sponsors_general_agency_profile_id) || self.broker_role.try(:benefit_sponsors_broker_agency_profile_id)
   end
 
   def active_general_agency_staff_roles
@@ -413,11 +413,11 @@ class Person
   delegate :all_types_verified?, :to => :consumer_role
 
   def notify_created
-    notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_CREATED_EVENT_NAME, {:individual_id => self.hbx_id })
   end
 
   def notify_updated
-    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
+    notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id })
   end
 
   def is_aqhp?
@@ -429,11 +429,11 @@ class Person
     end
   end
 
-  def check_households family
+  def check_households(family)
     family.households.present? ? true : false
   end
 
-  def check_tax_households family
+  def check_tax_households(family)
     family.households.first.tax_households.present? ? true : false
   end
 
@@ -458,17 +458,17 @@ class Person
   end
 
   def strip_empty_fields
-    if encrypted_ssn.blank?
-      unset_sparse("encrypted_ssn")
-    end
+    unset_sparse("encrypted_ssn") if encrypted_ssn.blank?
 
-    if user_id.blank?
-      unset_sparse("user_id")
-    end
+    unset_sparse("user_id") if user_id.blank?
   end
 
   def date_of_birth=(val)
-    self.dob = Date.strptime(val, "%m/%d/%Y").to_date rescue nil
+    self.dob = begin
+                 Date.strptime(val, "%m/%d/%Y").to_date
+               rescue StandardError
+                 nil
+               end
   end
 
   def gender=(new_gender)
@@ -492,14 +492,14 @@ class Person
     @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
   end
 
-  def first_name_last_name_and_suffix(seperator=nil)
+  def first_name_last_name_and_suffix(seperator = nil)
     seperator = seperator.present? ? seperator : " "
     [first_name, last_name, name_sfx].compact.join(seperator)
     case name_sfx
-      when "ii" ||"iii" || "iv" || "v"
-        [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(seperator)
-      else
-        [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(seperator)
+    when "ii" || "iii" || "iv" || "v"
+      [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(seperator)
+    else
+      [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(seperator)
       end
   end
 
@@ -514,11 +514,11 @@ class Person
   end
 
   def add_new_verification_type(new_type)
-    default_status = (new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18) ? "attested" : "unverified"
+    default_status = new_type == "DC Residency" && (consumer_role || resident_role) && age_on(TimeKeeper.date_of_record) < 18 ? "attested" : "unverified"
     if verification_types.map(&:type_name).include? new_type
       verification_type_by_name(new_type).update_attributes(:inactive => false)
     else
-      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status ) if !(us_citizen.nil?)
+      verification_types << VerificationType.new(:type_name => new_type, :validation_status => default_status) unless us_citizen.nil?
     end
   end
 
@@ -529,7 +529,7 @@ class Person
 # collect all ridp_verification_types user in case of unsuccessful ridp
   def ridp_verification_types
     ridp_verification_types = []
-    ridp_verification_types << 'Identity' if consumer_role  && !consumer_role.person.completed_identity_verification?
+    ridp_verification_types << 'Identity' if consumer_role && !consumer_role.person.completed_identity_verification?
     ridp_verification_types << 'Application' if consumer_role && !consumer_role.person.completed_identity_verification?
     ridp_verification_types
   end
@@ -563,9 +563,9 @@ class Person
       existing_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
-        :kind => relationship,
-        :relative_id => person.id
-      })
+                                                            :kind => relationship,
+                                                            :relative_id => person.id
+                                                          })
     end
   end
 
@@ -600,7 +600,7 @@ class Person
 
   def work_email_or_best
     email = emails.detect { |adr| adr.kind == "work" } || emails.first
-    (email && email.address) || (user && user.email)
+    email&.address || user&.email
   end
 
   def work_phone
@@ -620,12 +620,12 @@ class Person
   end
 
   def work_phone_or_best
-    best_phone  = work_phone || mobile_phone || home_phone
+    best_phone = work_phone || mobile_phone || home_phone
     best_phone ? best_phone.full_phone_number : nil
   end
 
   def has_active_consumer_role?
-     consumer_role.present? && consumer_role.is_active?
+    consumer_role.present? && consumer_role.is_active?
   end
 
   def has_active_resident_role?
@@ -637,7 +637,7 @@ class Person
       active_resident_member = self.primary_family.active_family_members.detect { |member| member.person.is_resident_role_active? }
       return true if active_resident_member.present?
     end
-    return false
+    false
   end
 
   def has_active_consumer_member?
@@ -645,7 +645,7 @@ class Person
       active_consumer_member = self.primary_family.active_family_members.detect { |member| member.person.is_consumer_role_active? }
       return true if active_consumer_member.present?
     end
-    return false
+    false
   end
 
   def can_report_shop_qle?
@@ -661,7 +661,7 @@ class Person
   end
 
   def active_employee_roles
-    employee_roles.select{|employee_role| employee_role.census_employee && employee_role.census_employee.is_active? }
+    employee_roles.select{|employee_role| employee_role.census_employee&.is_active? }
   end
 
   def has_multiple_active_employers?
@@ -669,7 +669,7 @@ class Person
   end
 
   def has_active_employer_staff_role?
-    employer_staff_roles.present? and employer_staff_roles.active.present?
+    employer_staff_roles.present? && employer_staff_roles.active.present?
   end
 
   def active_employer_staff_roles
@@ -681,13 +681,11 @@ class Person
   end
 
   def has_active_employee_role_for_census_employee?(census_employee)
-    if census_employee
-      (active_employee_roles.detect { |employee_role| employee_role.census_employee == census_employee }).present?
-    end
+    (active_employee_roles.detect { |employee_role| employee_role.census_employee == census_employee }).present? if census_employee
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    no_dc_address && no_dc_address_reason.present?
   end
 
   def age_on(date)
@@ -705,23 +703,15 @@ class Person
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
-    return false
+    false
   end
 
   def current_individual_market_transition
-    if self.individual_market_transitions.present?
-      self.individual_market_transitions.last
-    else
-      nil
-    end
+    self.individual_market_transitions.last if self.individual_market_transitions.present?
   end
 
   def active_individual_market_role
-    if current_individual_market_transition.present? && current_individual_market_transition.role_type
-      current_individual_market_transition.role_type
-    else
-      nil
-    end
+    current_individual_market_transition.role_type if current_individual_market_transition.present? && current_individual_market_transition.role_type
   end
 
   def has_consumer_or_resident_role?
@@ -729,31 +719,31 @@ class Person
   end
 
   def is_consumer_role_active?
-    self.active_individual_market_role == "consumer" ? true : false
+    self.active_individual_market_role == "consumer"
   end
 
   def is_resident_role_active?
-     self.active_individual_market_role == "resident" ? true : false
+    self.active_individual_market_role == "resident"
   end
 
   def has_pending_broker_staff_role?(broker_agency_profile_id)
-    broker_agency_staff_roles.where({
-                                      aasm_state: :broker_agency_pending,
-                                      '$or' => [
+    !broker_agency_staff_roles.where({
+                                       aasm_state: :broker_agency_pending,
+                                       '$or' => [
                                         {benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id},
                                         {broker_agency_profile_id: broker_agency_profile_id}
                                       ]
-                                    }).size > 0
+                                     }).empty?
   end
 
   def has_pending_ga_staff_role?(general_agency_profile_id)
-    general_agency_staff_roles.where({
-                                      aasm_state: :general_agency_pending,
-                                      '$or' => [
+    !general_agency_staff_roles.where({
+                                        aasm_state: :general_agency_pending,
+                                        '$or' => [
                                         {benefit_sponsors_general_agency_profile_id: general_agency_profile_id},
                                         {general_agency_profile_id: general_agency_profile_id}
                                       ]
-                                    }).size > 0
+                                      }).empty?
   end
 
   def active_broker_staff_roles
@@ -778,12 +768,12 @@ class Person
       clean_str = s_str.strip
       s_rex = Regexp.new("^" + Regexp.escape(clean_str), true)
       if clean_str =~ /[a-z]/i
-          {
-            "$or" => ([
-              {"first_name" => s_rex},
-              {"last_name" => s_rex}
-            ] + additional_exprs(clean_str))
-          }
+        {
+          "$or" => ([
+            {"first_name" => s_rex},
+            {"last_name" => s_rex}
+          ] + additional_exprs(clean_str))
+        }
       else
         {
           "$or" => [
@@ -801,7 +791,7 @@ class Person
         {
           "$or" => ([
             {"first_name" => s_rex},
-            {"last_name" => s_rex},
+            {"last_name" => s_rex}
           ] + additional_exprs(clean_str))
         }
       else
@@ -892,13 +882,13 @@ class Person
           return true if enrollment.is_active
         end
       end
-      return false
+      false
     end
 
     def dob_change_implication_on_active_enrollments(person, new_dob)
       # This method checks if there is a premium implication in all active enrollments when a persons DOB is changed.
       # Returns a hash with Key => HbxEnrollment ID and, Value => true if  enrollment has Premium Implication.
-      premium_impication_for_enrollment = Hash.new
+      premium_impication_for_enrollment = {}
       active_enrolled_hbxs = person.primary_family.active_household.hbx_enrollments.active.enrolled_and_renewal
 
       # Iterate over each enrollment and check if there is a Premium Implication based on the following rule:
@@ -907,13 +897,13 @@ class Person
       active_enrolled_hbxs.each do |hbx|
         new_temp_person = person.dup
         new_temp_person.dob = Date.strptime(new_dob.to_s, '%m/%d/%Y')
-        new_age     = new_temp_person.age_on(hbx.effective_on)  # age with the new DOB on the day coverage started
+        new_age = new_temp_person.age_on(hbx.effective_on)  # age with the new DOB on the day coverage started
         current_age = person.age_on(hbx.effective_on)           # age with the current DOB on the day coverage started
 
         next if new_age == current_age # No Change in age -> No Premium Implication
 
         # No Implication when the change is all within the 0-20 age range or all within the 61+ age range
-        if ( current_age.between?(0,20) && new_age.between?(0,20) ) || ( current_age >= 61 && new_age >= 61 )
+        if (current_age.between?(0,20) && new_age.between?(0,20)) || (current_age >= 61 && new_age >= 61)
           #premium_impication_for_enrollment[hbx.id] = false
         else
           premium_impication_for_enrollment[hbx.id] = true
@@ -929,9 +919,9 @@ class Person
       last_name = options[:last_name]
       first_name = options[:first_name]
 
-      raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
+      raise ArgumentError, "must provide an ssn or first_name/last_name/dob or both" if ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?)
 
-      matches = Array.new
+      matches = []
       matches.concat Person.active.where(encrypted_ssn: encrypt_ssn(ssn_query), dob: dob_query).to_a unless ssn_query.blank?
       #matches.concat Person.where(last_name: last_name, dob: dob_query).active.to_a unless (dob_query.blank? || last_name.blank?)
       if first_name.present? && last_name.present? && dob_query.present?
@@ -944,26 +934,28 @@ class Person
 
     def brokers_or_agency_staff_with_status(query, status)
       query.and(
-                Person.or(
-                          { :"broker_agency_staff_roles.aasm_state" => status },
-                          { :"broker_role.aasm_state" => status }
-                         ).selector
-               )
+        Person.or(
+          { :"broker_agency_staff_roles.aasm_state" => status },
+          { :"broker_role.aasm_state" => status }
+        ).selector
+      )
     end
 
     def staff_for_employer(employer_profile)
-      if employer_profile.is_a? (EmployerProfile)
+      if employer_profile.is_a? EmployerProfile
         self.where(:employer_staff_roles => {
-            '$elemMatch' => {
-                employer_profile_id: employer_profile.id,
-                aasm_state: :is_active}
-        }).to_a
+                     '$elemMatch' => {
+                       employer_profile_id: employer_profile.id,
+                       aasm_state: :is_active
+                     }
+                   }).to_a
       else
         self.where(:employer_staff_roles => {
-            '$elemMatch' => {
-                benefit_sponsor_employer_profile_id: employer_profile.id,
-                aasm_state: :is_active}
-        }).to_a
+                     '$elemMatch' => {
+                       benefit_sponsor_employer_profile_id: employer_profile.id,
+                       aasm_state: :is_active
+                     }
+                   }).to_a
       end
     end
 
@@ -996,20 +988,20 @@ class Person
     end
 
     def staff_for_employer_including_pending(employer_profile)
-      if employer_profile.is_a? (EmployerProfile)
+      if employer_profile.is_a? EmployerProfile
         self.where(:employer_staff_roles => {
-            '$elemMatch' => {
-                employer_profile_id: employer_profile.id,
-                :aasm_state.ne => :is_closed
-            }
-        })
+                     '$elemMatch' => {
+                       employer_profile_id: employer_profile.id,
+                       :aasm_state.ne => :is_closed
+                     }
+                   })
       else
         self.where(:employer_staff_roles => {
-            '$elemMatch' => {
-                benefit_sponsor_employer_profile_id: employer_profile.id,
-                :aasm_state.ne => :is_closed
-            }
-        })
+                     '$elemMatch' => {
+                       benefit_sponsor_employer_profile_id: employer_profile.id,
+                       :aasm_state.ne => :is_closed
+                     }
+                   })
       end
     end
 
@@ -1058,21 +1050,21 @@ class Person
     # Adds employer staff role to person
     # Returns status and message if failed
     # Returns status and person if successful
-    def add_employer_staff_role(first_name, last_name, dob, email, employer_profile)
+    def add_employer_staff_role(first_name, last_name, dob, _email, employer_profile)
       person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
 
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
       return false, 'Person does not exist on the HBX Exchange' if person.count == 0
 
-      if employer_profile.is_a? (EmployerProfile)
-        employer_staff_role = EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
-      else
-        employer_staff_role = EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
-      end
+      employer_staff_role = if employer_profile.is_a? EmployerProfile
+                              EmployerStaffRole.create(person: person.first, employer_profile_id: employer_profile._id)
+                            else
+                              EmployerStaffRole.create(person: person.first, benefit_sponsor_employer_profile_id: employer_profile._id)
+                            end
 
       employer_staff_role.save
 
-      return true, person.first
+      [true, person.first]
     end
 
     # Sets employer staff role to inactive
@@ -1080,17 +1072,16 @@ class Person
     # Returns false if employer staff role not matches
     # Returns true is role was marked inactive
     def deactivate_employer_staff_role(person_id, employer_profile_id)
-
       begin
         person = Person.find(person_id)
-      rescue
+      rescue StandardError
         return false, 'Person not found'
       end
       if role = person.employer_staff_roles.detect{|role| (role.benefit_sponsor_employer_profile_id.to_s == employer_profile_id.to_s || role.employer_profile_id.to_s == employer_profile_id.to_s) && !role.is_closed?}
         role.update_attributes!(:aasm_state => :is_closed)
-        return true, 'Employee Staff Role is inactive'
+        [true, 'Employee Staff Role is inactive']
       else
-        return false, 'No matching employer staff role'
+        [false, 'No matching employer staff role']
       end
     end
 
@@ -1107,9 +1098,7 @@ class Person
   before_save :assign_citizen_status_from_consumer_role
 
   def assign_citizen_status_from_consumer_role
-    if is_consumer_role.to_s=="true"
-      assign_citizen_status
-    end
+    assign_citizen_status if is_consumer_role.to_s == "true"
   end
 
   def us_citizen=(val)
@@ -1131,25 +1120,25 @@ class Person
   end
 
   def us_citizen
-    return @us_citizen if !@us_citizen.nil?
+    return @us_citizen unless @us_citizen.nil?
     return nil if citizen_status.blank?
     @us_citizen ||= ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(citizen_status)
   end
 
   def naturalized_citizen
-    return @naturalized_citizen if !@naturalized_citizen.nil?
+    return @naturalized_citizen unless @naturalized_citizen.nil?
     return nil if citizen_status.blank?
     @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
   end
 
   def indian_tribe_member
-    return @indian_tribe_member if !@indian_tribe_member.nil?
+    return @indian_tribe_member unless @indian_tribe_member.nil?
     return nil if citizen_status.blank?
     @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
   end
 
   def eligible_immigration_status
-    return @eligible_immigration_status if !@eligible_immigration_status.nil?
+    return @eligible_immigration_status unless @eligible_immigration_status.nil?
     return nil if us_citizen.nil?
     return nil if @us_citizen
     return nil if citizen_status.blank?
@@ -1164,7 +1153,7 @@ class Person
       new_status = ::ConsumerRole::US_CITIZEN_STATUS
     elsif eligible_immigration_status
       new_status = ::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS
-    elsif (!eligible_immigration_status.nil?)
+    elsif !eligible_immigration_status.nil?
       new_status = ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
     elsif
       self.errors.add(:base, "Citizenship status can't be nil.")
@@ -1179,7 +1168,7 @@ class Person
 
   def contact_info(email_address, area_code, number, extension)
     if email_address.present?
-      email = emails.detect{|mail|mail.kind == 'work'}
+      email = emails.detect{|mail| mail.kind == 'work'}
       if email
         email.update_attributes!(address: email_address)
       else
@@ -1187,7 +1176,7 @@ class Person
         save
       end
     end
-    phone = phones.detect{|p|p.kind == 'work'}
+    phone = phones.detect{|p| p.kind == 'work'}
     if phone
       phone.update_attributes!(area_code: area_code, number: number, extension: extension)
     else
@@ -1208,6 +1197,7 @@ class Person
   end
 
   private
+
   def is_ssn_composition_correct?
     # Invalid compositions:
     #   All zeros or 000, 666, 900-999 in the area numbers (first three digits);
@@ -1215,10 +1205,10 @@ class Person
     #   0000 in the serial number (last four digits)
 
     if ssn.present?
-      invalid_area_numbers = %w(000 666)
+      invalid_area_numbers = %w[000 666]
       invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
+      invalid_group_numbers = %w[00]
+      invalid_serial_numbers = %w[0000]
 
       return false if ssn.to_s.blank?
       return false if invalid_area_numbers.include?(ssn.to_s[0,3])
@@ -1231,9 +1221,7 @@ class Person
   end
 
   def is_only_one_individual_role_active?
-    if self.is_consumer_role_active? && self.is_resident_role_active?
-      self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.")
-    end
+    self.errors.add(:base, "Resident role and Consumer role can't both be active at the same time.") if self.is_consumer_role_active? && self.is_resident_role_active?
     true
   end
 
@@ -1245,7 +1233,7 @@ class Person
       welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
     end
     mailbox = Inbox.create(recipient: self)
-    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
+    mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: site_short_name.to_s)
   end
 
   def update_full_name
@@ -1254,11 +1242,9 @@ class Person
 
   def no_changing_my_user
     if self.persisted? && self.user_id_changed?
-      old_user, new_user= self.user_id_change
+      old_user, new_user = self.user_id_change
       return if old_user.blank?
-      if (old_user != new_user)
-        errors.add(:base, "you may not change the user_id of a person once it has been set and saved")
-      end
+      errors.add(:base, "you may not change the user_id of a person once it has been set and saved") if old_user != new_user
     end
   end
 

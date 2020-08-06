@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -10,7 +12,7 @@ module SponsoredBenefits
       @datatable = klass.new(profile_id: @profile._id)
     end
 
-  private
+    private
 
     def find_profile
       @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id]) || BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])

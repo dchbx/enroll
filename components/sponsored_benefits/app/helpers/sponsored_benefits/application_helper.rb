@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module ApplicationHelper
     def generate_breadcrumb_links(proposal, organization)
@@ -7,14 +9,12 @@ module SponsoredBenefits
       else
         links = [sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(organization.id)]
       end
-      unless proposal.active_benefit_group.nil?
-        links << sponsored_benefits.new_organizations_plan_design_proposal_plan_review_path(proposal)
-      end
+      links << sponsored_benefits.new_organizations_plan_design_proposal_plan_review_path(proposal) unless proposal.active_benefit_group.nil?
       links
     end
 
     def eligibility_criteria(employer)
-      # toDo - See why do we have this dependency in DC.
+      # TODO: - See why do we have this dependency in DC.
     end
   end
 end

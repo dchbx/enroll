@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'onelogin/ruby-saml/logging'
 
 require 'onelogin/ruby-saml/saml_message'
@@ -13,7 +15,7 @@ require 'xml_security/document'
 module OneLogin
   module RubySaml
     class SamlGenerator < SamlMessage
-      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information']
+      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information'].freeze
       ASSERTION = 'urn:oasis:names:tc:SAML:2.0:assertion'
       PROTOCOL = 'urn:oasis:names:tc:SAML:2.0:protocol'
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
@@ -56,7 +58,7 @@ module OneLogin
         status_code.attributes['Value'] = SUCCESS
 
         # assertion
-        assertion = root.add_element 'saml:Assertion', {'xmlns:saml' =>  ASSERTION }
+        assertion = root.add_element 'saml:Assertion', {'xmlns:saml' => ASSERTION }
         assertion.attributes['ID'] =  "_#{generate_uuid}"
         assertion.attributes['IssueInstant'] =  time
         assertion.attributes['Version'] = '2.0'
@@ -76,10 +78,10 @@ module OneLogin
         subject.add_element 'saml:SubjectConfirmation', { 'Method' => SENDER_VOUCHES }
 
         # conditions
-        assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
+        assertion.add_element 'saml:Conditions', { 'NotBefore' => not_before.to_s,  'NotOnOrAfter' => not_on_or_after_condition.to_s }
 
         # auth statements
-        auth_statement = assertion.add_element 'saml:AuthnStatement', { 'AuthnInstant' => "#{now_iso}",  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => "#{not_on_or_after_condition}" }
+        auth_statement = assertion.add_element 'saml:AuthnStatement', { 'AuthnInstant' => now_iso.to_s,  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => not_on_or_after_condition.to_s }
         auth_context = auth_statement.add_element 'saml:AuthnContext'
         auth_class_reference = auth_context.add_element 'saml:AuthnContextClassRef'
         auth_class_reference.text = PASSWORD
@@ -156,7 +158,7 @@ module OneLogin
       end
 
       def not_on_or_after_condition
-        iso { now + 86400 }
+        iso { now + 86_400 }
       end
 
       def generate_uuid

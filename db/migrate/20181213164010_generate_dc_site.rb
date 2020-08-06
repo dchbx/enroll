@@ -1,14 +1,17 @@
+# frozen_string_literal: true
+
 class GenerateDcSite < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
       say_with_time("Creating DC Site") do
         @site = BenefitSponsors::Site.new(
-            site_key: :dc,
-            byline: "DC's Online Health Insurance Marketplace",
-            short_name: "DC Health Link",
-            domain_name: "https://enroll.dchealthlink.com",
-            long_name: "DC Health Exchange Benefit")
-        # TODO check on domain_name & long_name
+          site_key: :dc,
+          byline: "DC's Online Health Insurance Marketplace",
+          short_name: "DC Health Link",
+          domain_name: "https://enroll.dchealthlink.com",
+          long_name: "DC Health Exchange Benefit"
+        )
+        # TODO: check on domain_name & long_name
 
         @old_org = Organization.unscoped.exists(hbx_profile: true).first
         @old_profile = @old_org.hbx_profile
@@ -33,17 +36,17 @@ class GenerateDcSite < Mongoid::Migration
                                                             description: 'DC ACA Shop Market',
                                                             configuration: configuration
 
-        # TODO Need to verify whether to create new configuartion for congress (or) use shop configuration
+        # TODO: Need to verify whether to create new configuartion for congress (or) use shop configuration
         @congress_benefit_market = BenefitMarkets::BenefitMarket.new kind: :fehb,
-                                                            site_urn: 'dc',
-                                                            title: 'ACA SHOP',
-                                                            description: 'DC ACA Shop Market',
-                                                            configuration: configuration
+                                                                     site_urn: 'dc',
+                                                                     title: 'ACA SHOP',
+                                                                     description: 'DC ACA Shop Market',
+                                                                     configuration: configuration
       end
 
       @site.benefit_markets = [@benefit_market, @congress_benefit_market]
 
-      # TODO ivl benefit_market
+      # TODO: ivl benefit_market
 
       if @site.valid?
         @site.save!
@@ -80,7 +83,7 @@ class GenerateDcSite < Mongoid::Migration
   end
 
   def self.sanitize_hbx_params
-    # TODO check for benefit_sponsorship with IVL team
+    # TODO: check for benefit_sponsorship with IVL team
     json_data = @old_profile.to_json(:except => [:_id, :hbx_staff_roles, :updated_by_id, :enrollment_periods, :benefit_sponsorship, :inbox, :documents])
     JSON.parse(json_data)
   end
@@ -107,7 +110,7 @@ class GenerateDcSite < Mongoid::Migration
 
   def self.build_office_locations(new_profile)
     @old_org.office_locations.each do |office_location|
-      new_office_location = new_profile.office_locations.new()
+      new_office_location = new_profile.office_locations.new
       new_office_location.is_primary = office_location.is_primary
       address_params = office_location.address.attributes.except("_id")
       phone_params = office_location.phone.attributes.except("_id")
@@ -125,9 +128,9 @@ class GenerateDcSite < Mongoid::Migration
   end
 
   def self.update_hbx_staff_roles(new_profile)
-    Person.where(:'hbx_staff_role'.exists=>true).each do |person|
+    Person.where(:hbx_staff_role.exists => true).each do |person|
       person.hbx_staff_role.benefit_sponsor_hbx_profile_id = new_profile.id
-      if person.valid? #TODO verify validation failed person
+      if person.valid? #TODO: verify validation failed person
         person.save!
       else
         person.save!(validate: false)

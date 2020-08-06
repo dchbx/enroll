@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Observers
     class OrganizationObserver
@@ -5,10 +7,10 @@ module BenefitSponsors
 
       attr_accessor :notifier
 
-      def update(instance, options = {})
+      def update(instance, _options = {})
         return unless instance.employer_profile.present?
 
-        event_names = Array.new
+        event_names = []
 
         BenefitSponsors::Organizations::Organization::FIELD_AND_EVENT_NAMES_MAP.each do |key, event_name|
           event_names << event_name if instance.changed_attributes.include?(key)
@@ -17,8 +19,8 @@ module BenefitSponsors
         if event_names.any?
           event_names.each do |event_name|
             payload = {
-                employer_id: instance.hbx_id,
-                event_name: "#{event_name}"
+              employer_id: instance.hbx_id,
+              event_name: event_name.to_s
             }
             notify("acapi.info.events.employer.#{event_name}", payload)
           end

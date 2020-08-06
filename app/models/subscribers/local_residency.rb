@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Subscribers
   class LocalResidency < ::Acapi::Subscription
     include Acapi::Notifiers
@@ -7,49 +9,49 @@ module Subscribers
       ["acapi.info.events.residency.verification_response"]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       process_response(payload)
     end
 
     private
+
     def process_response(payload)
-      begin
-        stringed_key_payload = payload.stringify_keys
-        xml = stringed_key_payload['body']
-        person_hbx_id = stringed_key_payload['individual_id']
-        return_status = stringed_key_payload["return_status"].to_s
+      stringed_key_payload = payload.stringify_keys
+      xml = stringed_key_payload['body']
+      person_hbx_id = stringed_key_payload['individual_id']
+      return_status = stringed_key_payload["return_status"].to_s
 
-        person = find_person(person_hbx_id)
-        return if person.nil? || person.consumer_role.nil?
-        consumer_role = person.consumer_role
-        event_response_record = EventResponse.new({received_at: Time.now, body: xml})
-        consumer_role.local_residency_responses << event_response_record
-        person.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Response",
-                                                                                         modifier: "external Hub",
-                                                                                         update_reason: "Hub response",
-                                                                                         event_response_record_id: event_response_record.id)
+      person = find_person(person_hbx_id)
+      return if person.nil? || person.consumer_role.nil?
+      consumer_role = person.consumer_role
+      event_response_record = EventResponse.new({received_at: Time.now, body: xml})
+      consumer_role.local_residency_responses << event_response_record
+      person.verification_types.by_name("DC Residency").first.add_type_history_element(action: "Local Hub Response",
+                                                                                       modifier: "external Hub",
+                                                                                       update_reason: "Hub response",
+                                                                                       event_response_record_id: event_response_record.id)
 
-        if "503" == return_status.to_s
-          if self_attest_residency_enabled?
-            consumer_role.pass_residency!(fetch_event_args)
-          else
-            consumer_role.fail_residency!
-          end
-          consumer_role.save
-          return
+      if return_status.to_s == "503"
+        if self_attest_residency_enabled?
+          consumer_role.pass_residency!(fetch_event_args)
+        else
+          consumer_role.fail_residency!
         end
-
-        xml_hash = xml_to_hash(xml)
-
-        update_consumer_role(consumer_role, xml_hash)
-      rescue => e
-        notify("acapi.error.application.enroll.remote_listener.local_residency_responses", {
-          :body => JSON.dump({
-            :error => e.inspect,
-            :message => e.message,
-            :backtrace => e.backtrace
-          })})
+        consumer_role.save
+        return
       end
+
+      xml_hash = xml_to_hash(xml)
+
+      update_consumer_role(consumer_role, xml_hash)
+    rescue StandardError => e
+      notify("acapi.error.application.enroll.remote_listener.local_residency_responses", {
+               :body => JSON.dump({
+                                    :error => e.inspect,
+                                    :message => e.message,
+                                    :backtrace => e.backtrace
+                                  })
+             })
     end
 
     def update_consumer_role(consumer_role, xml_hash)
@@ -71,7 +73,7 @@ module Subscribers
     end
 
     def find_person(person_hbx_id)
-      Person.where(hbx_id:person_hbx_id).first
+      Person.where(hbx_id: person_hbx_id).first
     end
 
     def fetch_event_args

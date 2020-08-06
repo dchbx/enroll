@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ## Product premium costs for a specified time period
 # Effective periods:
 #   DC & MA SHOP Health: Q1, Q2, Q3, Q4
@@ -26,10 +28,12 @@ module BenefitMarkets
     # validates_presence_of :premium_tuples, :allow_blank => false
 
 
-    scope :effective_period_cover,    ->(compare_date = TimeKeeper.date_of_record) { where(
-                                                                           :"effective_period.min".lte => compare_date,
-                                                                           :"effective_period.max".gte => compare_date)
-                                                                        }
+    scope :effective_period_cover,    lambda { |compare_date = TimeKeeper.date_of_record|
+                                        where(
+                                          :"effective_period.min".lte => compare_date,
+                                          :"effective_period.max".gte => compare_date
+                                        )
+                                      }
     def comparable_attrs
       [:effective_period, :rating_area]
     end

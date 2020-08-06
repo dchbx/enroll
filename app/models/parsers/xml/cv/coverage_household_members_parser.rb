@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class CoverageHouseholdMembersParser
     include HappyMapper
@@ -11,7 +13,7 @@ module Parsers::Xml::Cv
     def to_hash
       {
         id: id,
-        person_name:{
+        person_name: {
           person_surname: person_surname,
           person_given_name: person_given_name
         }

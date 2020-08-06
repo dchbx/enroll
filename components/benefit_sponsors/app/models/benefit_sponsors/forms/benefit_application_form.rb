@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class BenefitApplicationForm
@@ -133,9 +135,7 @@ module BenefitSponsors
       end
 
       def validate_application_dates
-        if start_on <= end_on
-          errors.add(:start_on, "can't be later than end on date")
-        end
+        errors.add(:start_on, "can't be later than end on date") if start_on <= end_on
       end
 
       def is_renewing?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   module Steps
     # Unzips a source file into a set of temporary files.
@@ -19,7 +21,7 @@ module TransportProfiles
         @source_credentials = resolve_source_credentials(source_credentials)
         @temp_directory_key = temp_directory_key
       end
-      
+
       # @!visibility private
       def execute(process_context)
         source_uris = resolve_message_sources(process_context)
@@ -45,12 +47,11 @@ module TransportProfiles
           temp_stream.stream.rewind
           Zip::InputStream.open(temp_stream.stream) do |io|
             while (entry = io.get_next_entry)
-              if !entry.name_is_directory?
-                output_name = File.join(tmp_dir, entry.name)
-                entry.extract(output_name)
-                process_context.update(@files_key, []) do |f_list|
-                  f_list + [URI.join("file://", URI.escape(output_name))]
-                end
+              next if entry.name_is_directory?
+              output_name = File.join(tmp_dir, entry.name)
+              entry.extract(output_name)
+              process_context.update(@files_key, []) do |f_list|
+                f_list + [URI.join("file://", URI.escape(output_name))]
               end
             end
           end
@@ -60,17 +61,17 @@ module TransportProfiles
 
       # @!visibility private
       def resolve_source_credentials(source_credentials)
-        return source_credentials unless source_credentials.kind_of?(Symbol)
+        return source_credentials unless source_credentials.is_a?(Symbol)
         endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(source_credentials)
-        raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
+        raise ::TransportProfiles::EndpointNotFoundError if endpoints.empty?
         raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
         endpoints.first
       end
 
       # @!visibility private
       def resolve_message_sources(process_context)
-        found_name = @file_name.kind_of?(Symbol) ? process_context.get(@file_name) : @file_name
-        if found_name.kind_of?(Array)
+        found_name = @file_name.is_a?(Symbol) ? process_context.get(@file_name) : @file_name
+        if found_name.is_a?(Array)
           found_name.map do |fn|
             fn.respond_to?(:scheme) ? fn : URI.parse(fn)
           end

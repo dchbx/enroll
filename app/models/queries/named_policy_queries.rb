@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class NamedPolicyQueries
 
@@ -24,8 +26,7 @@ module Queries
     end
 
     def self.shop_quiet_period_enrollments(effective_on, enrollment_statuses)
-      feins = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => false}, :"effective_period.min" => effective_on, :aasm_state.in => [:binder_paid, :active]}}
-      ).map(&:profile).map(&:fein)
+      feins = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {:$elemMatch => {:predecessor_id => { :$exists => false}, :"effective_period.min" => effective_on, :aasm_state.in => [:binder_paid, :active]}}).map(&:profile).map(&:fein)
 
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
       qs.enrollment_statuses = enrollment_statuses
@@ -38,7 +39,7 @@ module Queries
         .project_enrollment_ids
       qs.evaluate.collect{|r| r['enrollment_hbx_id']}
     end
-    
+
     def self.shop_monthly_enrollments(feins, effective_on)
       qs = ::Queries::ShopMonthlyEnrollments.new(feins, effective_on)
 
@@ -60,12 +61,12 @@ module Queries
         .group_enrollments
         .project_enrollment_ids
 
-      qs.evaluate.group_by{|r| r["_id"]["employee_role_id"]}.inject([]) do |termed_enrollments, (subscriber, records)|
+      qs.evaluate.group_by{|r| r["_id"]["employee_role_id"]}.inject([]) do |termed_enrollments, (_subscriber, records)|
         prev_enrollments = records.select{|r| r["_id"]["effective_on"] < effective_on}
 
         termed_enrollments += prev_enrollments.select do |prev_e|
           records.none? do |r|
-            prev_e["_id"]["coverage_kind"] == r["_id"]["coverage_kind"] && r["_id"]["effective_on"] == effective_on 
+            prev_e["_id"]["coverage_kind"] == r["_id"]["coverage_kind"] && r["_id"]["effective_on"] == effective_on
           end
         end.collect{|record| record['enrollment_hbx_id']}
       end

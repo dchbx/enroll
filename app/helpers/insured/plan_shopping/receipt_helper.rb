@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Insured
   module PlanShopping
     module ReceiptHelper

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module PricingModels
     class PricingModel
@@ -44,11 +46,11 @@ module BenefitMarkets
 
       def pricing_units=(params)
         params.each do |param|
-          if param.is_a?(BenefitMarkets::PricingModels::PricingUnit)
-            pricing_units << param
-          else
-            pricing_units << pricing_unit_class.new(param)
-          end
+          pricing_units << if param.is_a?(BenefitMarkets::PricingModels::PricingUnit)
+                             param
+                           else
+                             pricing_unit_class.new(param)
+                           end
         end
       end
 

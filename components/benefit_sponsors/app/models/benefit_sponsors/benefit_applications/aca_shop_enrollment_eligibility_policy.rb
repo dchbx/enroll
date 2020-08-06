@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Business rules governing ACA SHOP BenefitApplication and associated work flow processes.
 # BenefitApplication business rules are checked at two separate steps during the enrollment process:
 #
@@ -19,35 +21,33 @@ module BenefitSponsors
     include BenefitMarkets::BusinessRulesEngine
 
     rule  :minimum_participation_rule,
-            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum},
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
+          validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum},
+          success: ->(_benefit_application){"validated successfully"},
+          fail: ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
 
     rule  :non_business_owner_enrollment_count,
-            validate: ->(benefit_application){
-                            benefit_application.non_business_owner_enrolled.count <= benefit_application.eligible_to_enroll_count &&
-                            benefit_application.non_business_owner_enrolled.count >= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
-                          },
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"At least #{Settings.aca.shop_market.non_owner_participation_count_minimum.to_f} non-owner employee must enroll" }
+          validate: lambda { |benefit_application|
+                      benefit_application.non_business_owner_enrolled.count <= benefit_application.eligible_to_enroll_count &&
+                        benefit_application.non_business_owner_enrolled.count >= Settings.aca.shop_market.non_owner_participation_count_minimum.to_f
+                    },
+          success: ->(_benefit_application){"validated successfully"},
+          fail: ->(_benefit_application){"At least #{Settings.aca.shop_market.non_owner_participation_count_minimum.to_f} non-owner employee must enroll" }
 
     rule :minimum_eligible_member_count,
-            validate: ->(benefit_application){ benefit_application.eligible_to_enroll_count > 0 },
-            success:  ->(benefit_application){"validated successfully"},
-            fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
+         validate: ->(benefit_application){ benefit_application.eligible_to_enroll_count > 0 },
+         success: ->(_benefit_application){"validated successfully"},
+         fail: ->(_benefit_application){"At least one member must be eligible to enroll" }
 
     business_policy :enrollment_elgibility_policy,
                     rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
 
-    def business_policies_for(model_instance, event_name)
-      if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-        enrollment_eligiblity_policy_for(model_instance)
-      end
+    def business_policies_for(model_instance, _event_name)
+      enrollment_eligiblity_policy_for(model_instance) if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
     end
 
     private
 
-    def enrollment_eligiblity_policy_for(model_instance)
+    def enrollment_eligiblity_policy_for(_model_instance)
       business_policies[:enrollment_elgibility_policy]
     end
   end

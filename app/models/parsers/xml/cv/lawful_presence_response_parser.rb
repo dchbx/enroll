@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class LawfulPresenceResponseParser
     include HappyMapper
@@ -13,7 +15,7 @@ module Parsers::Xml::Cv
 
     def to_hash
       response = {
-          case_number: case_number
+        case_number: case_number
       }
 
       response[:lawful_presence_indeterminate] = lawful_presence_indeterminate.to_hash if lawful_presence_indeterminate

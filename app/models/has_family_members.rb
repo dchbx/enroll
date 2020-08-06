@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module HasFamilyMembers
   def family_members
     return [] unless family

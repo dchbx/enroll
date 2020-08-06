@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PlanCostDecoratorCongress < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :reference_plan
 
@@ -14,13 +16,13 @@ class PlanCostDecoratorCongress < SimpleDelegator
   def sole_source?
     false
   end
-  
+
   def plan_year_start_on
     benefit_group.plan_year.start_on
   end
 
   def child_index(member)
-    @children = members.select(){|member| age_of(member) < 21 && relationship_for(member) == "child_under_26"} unless defined?(@children)
+    @children = members.select{|member| age_of(member) < 21 && relationship_for(member) == "child_under_26"} unless defined?(@children)
     @children.index(member) || -1
   end
 
@@ -52,7 +54,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def employer_contribution_for(member)
     return 0 if @member_provider.present? && @member_provider.is_cobra_status?
-    (total_employer_contribution * (premium_for(member)/total_premium)).round(2)
+    (total_employer_contribution * (premium_for(member) / total_premium)).round(2)
     # premium_for(member) * ( total_employer_contribution / total_premium )
   end
 
@@ -62,7 +64,7 @@ class PlanCostDecoratorCongress < SimpleDelegator
 
   def total_employer_contribution
     return 0 if @member_provider.present? && @member_provider.is_cobra_status?
-    ([total_premium.to_f * employer_contribution_percent / 100.00, total_max_employer_contribution.cents/100.00].min).round(2)
+    [total_premium.to_f * employer_contribution_percent / 100.00, total_max_employer_contribution.cents / 100.00].min.round(2)
   end
 
   def total_employee_cost

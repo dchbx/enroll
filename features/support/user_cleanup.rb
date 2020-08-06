@@ -1,5 +1,5 @@
+# frozen_string_literal: true
+
 After do
-  if User.present?
-    User.last.destroy
-  end
+  User.last.destroy if User.present?
 end

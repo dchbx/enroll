@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module GeneralAgencies
       class GeneralAgencyProfilesControllerPolicy < ApplicationPolicy
 
         def families?
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+          user.has_hbx_staff_role? || user.has_general_agency_staff_role?
         end
 
         # def family_datatable?
@@ -21,7 +23,7 @@ module BenefitSponsors
 
         def show?
           return false if user.blank?
-          return user.has_hbx_staff_role? || user.has_general_agency_staff_role?
+          user.has_hbx_staff_role? || user.has_general_agency_staff_role?
         end
 
         def edit_staff?

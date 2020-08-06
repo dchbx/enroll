@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -17,11 +19,11 @@ class QualifyingLifeEventKind
   ## added event_kind_label -- use to populate label for collecting event_on date
   ## renamed property: kind to action_kind (also renamed associated constant)
 
-  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
+  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member].freeze
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w[date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -59,9 +61,9 @@ class QualifyingLifeEventKind
     "exceptional_circumstances",
     "eligibility_failed_or_documents_not_received_by_due_date",
     "eligibility_documents_provided"
-  ]
+  ].freeze
 
-  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on].freeze
 
   field :event_kind_label, type: String
   field :action_kind, type: String
@@ -99,7 +101,7 @@ class QualifyingLifeEventKind
   validates :market_kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: MARKET_KINDS}
 
   # before_create :activate_household_sep
@@ -111,13 +113,15 @@ class QualifyingLifeEventKind
 
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
-  scope :by_date, ->(date = TimeKeeper.date_of_record){ where(
-    :"$or" => [
-      {:start_on.lte => date, :end_on.gte => date},
-      {:start_on.lte => date, :end_on => {:$eq => nil}},
-      {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
-    ]
-  )}
+  scope :by_date, lambda { |date = TimeKeeper.date_of_record|
+                    where(
+                      :"$or" => [
+                        {:start_on.lte => date, :end_on.gte => date},
+                        {:start_on.lte => date, :end_on => {:$eq => nil}},
+                        {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
+                      ]
+                    )
+                  }
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -129,33 +133,33 @@ class QualifyingLifeEventKind
   # If coverage ends on date other than last day of month and plan selected before the month in which coverage ends:
   #   effective date is consumer chooses between 1st of the month when coverage ends (allowing overlap - but no APTC for overlapping month)
   #   or the first of the month following the month when coverage ends
-  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, consumer_coverage_effective_on = nil)
+  def employee_gaining_medicare(coverage_end_on, selected_effective_on = nil, _consumer_coverage_effective_on = nil)
     coverage_end_last_day_of_month = Date.new(coverage_end_on.year, coverage_end_on.month, coverage_end_on.end_of_month.day)
-    if coverage_end_on == coverage_end_last_day_of_month
-      if TimeKeeper.date_of_record <= coverage_end_on
-        coverage_effective_on = coverage_end_last_day_of_month + 1.day
-      else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
-      end
-    else
-      if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
-        coverage_effective_on = if selected_effective_on.blank?
+    coverage_effective_on = if coverage_end_on == coverage_end_last_day_of_month
+                              if TimeKeeper.date_of_record <= coverage_end_on
+                                coverage_end_last_day_of_month + 1.day
+                              else
+                                TimeKeeper.date_of_record.end_of_month + 1.day
+                                                      end
+                            else
+                              if TimeKeeper.date_of_record <= (coverage_end_last_day_of_month - 1.month).end_of_month
+                                if selected_effective_on.blank?
                                   [coverage_end_on.beginning_of_month, coverage_end_last_day_of_month + 1.day]
                                 else
                                   selected_effective_on
-                                end
-      else
-        coverage_effective_on = TimeKeeper.date_of_record.end_of_month + 1.day
-      end
+                                                        end
+                              else
+                                TimeKeeper.date_of_record.end_of_month + 1.day
+                                                      end
 
-      #FIXME what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
+      #FIXME: what's this consumer_coverage_effective_on for, this is no rules for EmployeeGainingMedicare to allowd consumer to choose a particular timing.
       #if (consumer_coverage_effective_on >= coverage_end_on.first_of_month) &&
       #  (consumer_coverage_effective_on <= (coverage_end_on.first_of_month + 1.month))
       #  coverage_effective_on = consumer_coverage_effective_on
       #else
       #  # raise invalid effective date error
       #end
-    end
+                            end
     coverage_effective_on
   end
 
@@ -168,7 +172,7 @@ class QualifyingLifeEventKind
   def is_dependent_loss_of_coverage?
     #["Losing Employer-Subsidized Insurance because employee is going on Medicare", "My employer did not pay my premiums on time"].include? title
     #lost_access_to_mec
-    %w(employee_gaining_medicare employer_sponsored_coverage_termination).include? reason
+    %w[employee_gaining_medicare employer_sponsored_coverage_termination].include? reason
   end
 
   def is_moved_to_dc?
@@ -190,7 +194,7 @@ class QualifyingLifeEventKind
 
   def family_structure_changed?
     #["I've had a baby", "I've adopted a child", "I've married", "I've divorced or ended domestic partnership", "I've entered into a legal domestic partnership"].include? title
-    %w(birth adoption marriage divorce domestic_partnership).include? reason
+    %w[birth adoption marriage divorce domestic_partnership].include? reason
   end
 
   def is_loss_of_other_coverage?
@@ -256,14 +260,14 @@ class QualifyingLifeEventKind
   def date_hint
     start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
-      "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+    "(must fall between #{start_date.strftime('%B %d')} and #{end_date.strftime('%B %d')})"
   end
 
   def active?
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
-  
+
   private
 
   def qle_date_guards

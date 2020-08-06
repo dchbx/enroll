@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), "client_organization_spec_helpers/dc")
 
 module BenefitSponsors

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class FamilyEnrollmentCloneFactory
     include Mongoid::Document
@@ -72,11 +74,11 @@ module Factories
       effective_on = effective_on_for_cobra(enrollment)
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
-          applicant_id: hbx_enrollment_member.applicant_id,
-          eligibility_date: effective_on,
-          coverage_start_on: enrollment.effective_on,
-          is_subscriber: hbx_enrollment_member.is_subscriber
-        })
+                                             applicant_id: hbx_enrollment_member.applicant_id,
+                                             eligibility_date: effective_on,
+                                             coverage_start_on: enrollment.effective_on,
+                                             is_subscriber: hbx_enrollment_member.is_subscriber
+                                           })
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class allows us to check eligibilty for family members.
 # It is only a partial fix until we fully correct the group selection page
 # to be aware of how composite rating can include/exclude members.
@@ -18,7 +20,7 @@ class GroupSelectionEligibilityChecker
   def can_cover?(family_member, coverage_date)
     return false if @sponsored_benefit.blank?
     rel, disability, dob = map_family_member_data(family_member)
-    return true if (rel.to_s == "self")
+    return true if rel.to_s == "self"
     return false if dob > coverage_date
     coverage_age = @age_calculator.calc_coverage_age_for(MemberAgeSlug.new(dob, family_member.id), nil, coverage_date, {}, nil)
     # If the relationship doesn't even map, they aren't allowed

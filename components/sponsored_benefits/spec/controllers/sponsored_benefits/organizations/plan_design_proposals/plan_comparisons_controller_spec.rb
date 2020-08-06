@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 module UserRoles
-  USER_ROLES = [:with_hbx_staff_role, :with_broker_role] unless const_defined?(:USER_ROLES)
+  USER_ROLES = [:with_hbx_staff_role, :with_broker_role].freeze unless const_defined?(:USER_ROLES)
 end
 
 module SponsoredBenefits
@@ -14,7 +16,7 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
 
     describe "GET new" do
-      let!(:person) {
+      let!(:person) do
         FactoryBot.create(:person, :with_broker_role).tap do |person|
           if Settings.aca.state_abbreviation == 'DC'
             person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
@@ -22,7 +24,7 @@ module SponsoredBenefits
             person.broker_role.update_attributes(benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id.to_s)
           end
         end
-      }
+      end
 
       let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
       let(:plans) { FactoryBot.create_list(:plan, 2, :with_premium_tables, market: 'shop') }

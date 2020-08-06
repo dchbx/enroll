@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :model, dbclean: :after_each do
@@ -20,7 +22,7 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
 
   context "initialize without employer_role and file" do
     it "throws exception" do
-      expect { SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new() }.to raise_error(ArgumentError)
+      expect { SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new }.to raise_error(ArgumentError)
     end
   end
 
@@ -67,9 +69,9 @@ RSpec.describe SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport, type: :
 
   context "relationship field is empty" do
     let(:tempfile) { double("", path: 'spec/test_data/census_employee_import/DCHL Employee Census 2.xlsx') }
-    let(:subject) {
+    let(:subject) do
       SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: file, employer_profile: employer_profile})
-    }
+    end
 
     it "should not add the 2nd employee/dependent (as relationship is missing)" do
       expect(subject.save).to be_falsey

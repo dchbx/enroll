@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_organizations_aca_shop_dc_employer_profile, class: 'BenefitSponsors::Organizations::AcaShopDcEmployerProfile' do
     organization { FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site) }
@@ -21,7 +23,7 @@ FactoryBot.define do
     end
 
     trait :with_benefit_sponsorship do
-      after :build do |profile, evaluator|
+      after :build do |profile, _evaluator|
         profile.add_benefit_sponsorship
       end
     end

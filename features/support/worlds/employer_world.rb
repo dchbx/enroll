@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EmployerWorld
   include ActionView::Helpers::NumberHelper
   # This method is designed to be used in two kinds of scenarios,
@@ -7,7 +9,7 @@ module EmployerWorld
   #
   # If no legal_name is specified but an employer has already been created this method
   # defaults to the first employer created
-  def employer(legal_name=nil, *traits)
+  def employer(legal_name = nil, *traits)
     attributes = traits.extract_options!
     traits.push("with_aca_shop_#{Settings.site.key}_employer_profile".to_sym) unless traits.include? :with_aca_shop_cca_employer_profile_no_attestation
     @organization ||= {}
@@ -18,9 +20,8 @@ module EmployerWorld
     if legal_name.blank?
       if @organization.empty?
         @organization[:default] ||= FactoryBot.create(:benefit_sponsors_organizations_general_organization,
-          *traits,
-          attributes.merge(site: site)
-        )
+                                                      *traits,
+                                                      attributes.merge(site: site))
       else
         @organization.values.first
       end
@@ -87,7 +88,7 @@ And(/^(.*?) employer has a staff role$/) do |legal_name|
   @staff_role ||= FactoryBot.create(:user, :person => person)
 end
 
-And(/^(.*?) employer terminates employees$/) do |legal_name|
+And(/^(.*?) employer terminates employees$/) do |_legal_name|
   termination_date = TimeKeeper.date_of_record - 1.day
   @census_employees.each do |employee|
     employee.terminate_employment(termination_date)

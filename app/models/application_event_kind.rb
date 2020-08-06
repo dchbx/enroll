@@ -1,18 +1,20 @@
+# frozen_string_literal: true
+
 class ApplicationEventKind
   include Mongoid::Document
 
   # PERSON_CREATED_EVENT_NAME = "acapi.info.events.individual.created"
 
-  RESOURCE_NAME_KINDS = %w(
-                          family 
+  RESOURCE_NAME_KINDS = %w[
+                          family
                           employer
-                          employee_role 
-                          consumer_role 
-                          broker_agency_profile 
-                          broker_role 
-                          issuer_profile 
+                          employee_role
+                          consumer_role
+                          broker_agency_profile
+                          broker_role
+                          issuer_profile
                           general_agent_profile
-                        )
+                        ].freeze
 
   field :hbx_id, type: String
   field :title, type: String
@@ -25,7 +27,7 @@ class ApplicationEventKind
 
   validates_presence_of :title, :resource_name, :event_name
   validates :resource_name,
-    inclusion: { in: RESOURCE_NAME_KINDS, message: "%{value} is not a defined resource name" }
+            inclusion: { in: RESOURCE_NAME_KINDS, message: "%{value} is not a defined resource name" }
 
   def self.application_events_for(event_name)
     resource_name, event_name = ApplicationEventMapper.extract_event_parts(event_name)
@@ -59,11 +61,10 @@ class ApplicationEventKind
     resource_name.camelize.constantize
   end
 
-private
+  private
+
   def update_key
-    if resource_name.present? && event_name.present?
-      write_attribute(:key, [resource_name, event_name].compact.join("."))
-    end
+    write_attribute(:key, [resource_name, event_name].compact.join(".")) if resource_name.present? && event_name.present?
   end
 
   def stringify(value)

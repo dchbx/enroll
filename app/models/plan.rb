@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 class Plan
   include Mongoid::Document
   include Mongoid::Timestamps
   #  include Mongoid::Versioning
   include Config::AcaModelConcern
-  COVERAGE_KINDS = %w[health dental]
-  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental]
-  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental]
+  COVERAGE_KINDS = %w[health dental].freeze
+  METAL_LEVEL_KINDS = %w[bronze silver gold platinum catastrophic dental].freeze
+  REFERENCE_PLAN_METAL_LEVELS = %w[bronze silver gold platinum dental].freeze
   REFERENCE_PLAN_METAL_LEVELS_NO_DENTAL = %w[bronze silver gold platinum].freeze
-  MARKET_KINDS = %w(shop individual)
-  INDIVIDUAL_MARKET_KINDS = %w(individual coverall)
-  PLAN_TYPE_KINDS = %w[pos hmo epo ppo]
-  DENTAL_METAL_LEVEL_KINDS = %w[high low]
+  MARKET_KINDS = %w[shop individual].freeze
+  INDIVIDUAL_MARKET_KINDS = %w[individual coverall].freeze
+  PLAN_TYPE_KINDS = %w[pos hmo epo ppo].freeze
+  DENTAL_METAL_LEVEL_KINDS = %w[high low].freeze
 
 
   field :hbx_id, type: Integer
@@ -40,7 +42,7 @@ class Plan
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
 
-  # TODO deprecate after migrating SBCs for years prior to 2016
+  # TODO: deprecate after migrating SBCs for years prior to 2016
   field :sbc_file, type: String
   embeds_one :sbc_document, :class_name => "Document", as: :documentable
 
@@ -90,15 +92,15 @@ class Plan
 
   # 2015, "94506DC0390006-01"
   index(
-      {
-        active_year: 1,
-        hios_id: 1,
-        "premium_tables.age": 1,
-        "premium_tables.start_on": 1,
-        "premium_tables.end_on": 1
-      },
-      { name: "plan_premium_age" }
-    )
+    {
+      active_year: 1,
+      hios_id: 1,
+      "premium_tables.age": 1,
+      "premium_tables.start_on": 1,
+      "premium_tables.end_on": 1
+    },
+    { name: "plan_premium_age" }
+  )
 
   # 92479DC0020002, 2015, 32, 2015-04-01, 2015-06-30
   index({ hios_id: 1, active_year: 1, "premium_tables.age": 1, "premium_tables.start_on": 1, "premium_tables.end_on": 1 }, {name: "plan_premium_age_deprecated"})
@@ -121,35 +123,35 @@ class Plan
   validates_presence_of :name, :hios_id, :active_year, :metal_level, :market, :carrier_profile_id
 
   validates :coverage_kind,
-   allow_blank: false,
-   inclusion: {
-     in: COVERAGE_KINDS,
-     message: "%{value} is not a valid coverage kind"
-  }
+            allow_blank: false,
+            inclusion: {
+              in: COVERAGE_KINDS,
+              message: "%{value} is not a valid coverage kind"
+            }
 
   validates :metal_level,
-   allow_blank: false,
-   inclusion: {
-     in: METAL_LEVEL_KINDS,
-     message: "%{value} is not a valid metal level kind"
-  }
+            allow_blank: false,
+            inclusion: {
+              in: METAL_LEVEL_KINDS,
+              message: "%{value} is not a valid metal level kind"
+            }
 
   validates :dental_level,
-   inclusion: {
-     in: DENTAL_METAL_LEVEL_KINDS,
-     message: "%{value} is not a valid dental metal level kind"
-  }, if: Proc.new{|a| a.active_year.present? && a.active_year > 2015 && a.coverage_kind == "dental" } # we do not check for 2015 plans because, they are already imported with metal_level="dental"
+            inclusion: {
+              in: DENTAL_METAL_LEVEL_KINDS,
+              message: "%{value} is not a valid dental metal level kind"
+            }, if: proc{|a| a.active_year.present? && a.active_year > 2015 && a.coverage_kind == "dental" } # we do not check for 2015 plans because, they are already imported with metal_level="dental"
 
   validates :market,
-   allow_blank: false,
-   inclusion: {
-     in: MARKET_KINDS,
-     message: "%{value} is not a valid market"
-   }
+            allow_blank: false,
+            inclusion: {
+              in: MARKET_KINDS,
+              message: "%{value} is not a valid market"
+            }
 
   validates_inclusion_of :active_year,
-    in: 2014..(TimeKeeper.date_of_record.year + 3),
-    message: "%{value} is an invalid active year"
+                         in: 2014..(TimeKeeper.date_of_record.year + 3),
+                         message: "%{value} is an invalid active year"
 
   validates_length_of :carrier_special_plan_identifier, minimum: 1, allow_nil: true
 
@@ -168,14 +170,16 @@ class Plan
   scope :bronze_level,        ->{ where(metal_level: "bronze") }
   scope :catastrophic_level,  ->{ where(metal_level: "catastrophic") }
 
-  scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
+  scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w[platinum gold bronze catastrophic])}
 
   # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
-  scope :silver_level_by_csr_kind, ->(csr_kind = 'csr_0'){ where(
-                                          metal_level: "silver").and(
-                                          csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
-                                        )
-                                      }
+  scope :silver_level_by_csr_kind, lambda { |csr_kind = 'csr_0'|
+                                     where(
+                                       metal_level: "silver"
+                                     ).and(
+                                       csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
+                                     )
+                                   }
 
   # Plan Type
   scope :ppo_plan, ->{ where(plan_type: "ppo") }
@@ -205,93 +209,90 @@ class Plan
   # DEPRECATED - 2015-09-23 - By Sean Carley
     # scope :valid_shop_by_carrier, ->(carrier_profile_id) {where(carrier_profile_id: carrier_profile_id, active_year: TimeKeeper.date_of_record.year, market: "shop",  metal_level: {"$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS})}
     # scope :valid_shop_by_metal_level, ->(metal_level) {where(active_year: TimeKeeper.date_of_record.year, market: "shop", metal_level: metal_level)}
-    scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
-    scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
+  scope :valid_shop_by_carrier, ->(carrier_profile_id) {valid_shop_by_carrier_and_year(carrier_profile_id, TimeKeeper.date_of_record.year)}
+  scope :valid_shop_by_metal_level, ->(metal_level) {valid_shop_by_metal_level_and_year(metal_level, TimeKeeper.date_of_record.year)}
 
   ## DEPRECATED - 2015-10-26 - By Dan Thomas - Use: individual_health_by_active_year_and_csr_kind
-    scope :individual_health_by_active_year, ->(active_year) {where(active_year: active_year, market: "individual", coverage_kind: "health", hios_id: /-01$/ ) }
+  scope :individual_health_by_active_year, ->(active_year) {where(active_year: active_year, market: "individual", coverage_kind: "health", hios_id: /-01$/) }
   # END DEPRECATED
 
-  scope :valid_shop_by_carrier_and_year, ->(carrier_profile_id, year) {
+  scope :valid_shop_by_carrier_and_year, lambda { |carrier_profile_id, year|
     where(
-        carrier_profile_id: carrier_profile_id,
-        active_year: year,
-        market: "shop",
-        hios_id: { "$not" => /-00$/ },
-        metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
-      )
+      carrier_profile_id: carrier_profile_id,
+      active_year: year,
+      market: "shop",
+      hios_id: { "$not" => /-00$/ },
+      metal_level: { "$in" => ::Plan::REFERENCE_PLAN_METAL_LEVELS }
+    )
   }
-  scope :valid_shop_by_metal_level_and_year, ->(metal_level, year) {
+  scope :valid_shop_by_metal_level_and_year, lambda { |metal_level, year|
     where(
-        active_year: year,
-        market: "shop",
-        hios_id: /-01$/,
-        metal_level: metal_level
-      )
+      active_year: year,
+      market: "shop",
+      hios_id: /-01$/,
+      metal_level: metal_level
+    )
   }
 
   scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
 
 
-  scope :shop_health_by_active_year, ->(active_year) {
-      where(
-          active_year: active_year,
-          market: "shop",
-          coverage_kind: "health"
-        )
-    }
+  scope :shop_health_by_active_year, lambda { |active_year|
+                                       where(
+                                         active_year: active_year,
+                                         market: "shop",
+                                         coverage_kind: "health"
+                                       )
+                                     }
 
-  scope :shop_dental_by_active_year, ->(active_year) {
-      where(
-          active_year: active_year,
-          market: "shop",
-          coverage_kind: "dental"
-        )
-    }
+  scope :shop_dental_by_active_year, lambda { |active_year|
+                                       where(
+                                         active_year: active_year,
+                                         market: "shop",
+                                         coverage_kind: "dental"
+                                       )
+                                     }
 
-  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = 'csr_0') {
-    where(
-      "$and" => [
-          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
-          {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
-                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
-                    ]
-            }
-        ]
-      )
-    }
+  scope :individual_health_by_active_year_and_csr_kind, lambda { |active_year, csr_kind = 'csr_0'|
+                                                          where(
+                                                            "$and" => [
+                                                                {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+                                                                {"$or" => [
+                                                                            {:metal_level.in => %w[platinum gold bronze], :csr_variant_id => "01"},
+                                                                            {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                                                                          ]}
+                                                              ]
+                                                          )
+                                                        }
 
-  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = 'csr_0') {
-    where(
-      "$and" => [
-          {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
-          {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze catastrophic), :csr_variant_id => "01"},
-                      {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
-                    ]
-            }
-        ]
-      )
-    }
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, lambda { |active_year, csr_kind = 'csr_0'|
+                                                                            where(
+                                                                              "$and" => [
+                                                                                  {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
+                                                                                  {"$or" => [
+                                                                                              {:metal_level.in => %w[platinum gold bronze catastrophic], :csr_variant_id => "01"},
+                                                                                              {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
+                                                                                            ]}
+                                                                                ]
+                                                                            )
+                                                                          }
 
-  scope :individual_dental_by_active_year, ->(active_year) {
-      where(
-          active_year: active_year,
-          market: "individual",
-          coverage_kind: "dental"
-        )
-    }
+  scope :individual_dental_by_active_year, lambda { |active_year|
+                                             where(
+                                               active_year: active_year,
+                                               market: "individual",
+                                               coverage_kind: "dental"
+                                             )
+                                           }
 
-  scope :individual_health_by_active_year_carrier_profile_csr_kind, ->(active_year, carrier_profile_id, csr_kind) {
+  scope :individual_health_by_active_year_carrier_profile_csr_kind, lambda { |active_year, carrier_profile_id, csr_kind|
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health", :carrier_profile_id => carrier_profile_id },
           {"$or" => [
-                      {:metal_level.in => %w(platinum gold bronze), :csr_variant_id => "01"},
+                      {:metal_level.in => %w[platinum gold bronze], :csr_variant_id => "01"},
                       {:metal_level => "silver", :csr_variant_id => EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]}
-                    ]
-            }
+                    ]}
         ]
     )
   }
@@ -323,9 +324,7 @@ class Plan
         :active_year => active_year,
         :coverage_kind => coverage_kind
       }
-      if metal_level.present?
-        criteria.merge(metal_level: metal_level)
-      end
+      criteria.merge(metal_level: metal_level) if metal_level.present?
       criteria
     end
     self.where("$or" => plan_criteria_set)
@@ -344,7 +343,7 @@ class Plan
     if new_carrier_profile.nil?
       self.carrier_profile_id = nil
     else
-      raise ArgumentError.new("expected CarrierProfile ") unless new_carrier_profile.is_a? CarrierProfile
+      raise ArgumentError, "expected CarrierProfile " unless new_carrier_profile.is_a? CarrierProfile
       self.carrier_profile_id = new_carrier_profile._id
       @carrier_profile = new_carrier_profile
     end
@@ -364,7 +363,7 @@ class Plan
     if new_renewal_plan.nil?
       self.renewal_plan_id = nil
     else
-      raise ArgumentError.new("expected Plan ") unless new_renewal_plan.is_a? Plan
+      raise ArgumentError, "expected Plan " unless new_renewal_plan.is_a? Plan
       self.renewal_plan_id = new_renewal_plan._id
       @renewal_plan = new_renewal_plan
     end
@@ -405,8 +404,8 @@ class Plan
     bound_age_val = bound_age(age)
     begin
       value = premium_table_for(schedule_date).detect {|pt| pt.age == bound_age_val }.cost
-      BigDecimal.new("#{value}").round(2).to_f
-    rescue
+      BigDecimal(value.to_s).round(2).to_f
+    rescue StandardError
       raise [self.id, bound_age_val, schedule_date, age].inspect
     end
   end
@@ -432,17 +431,17 @@ class Plan
     return false unless qhp
     case qhp.hsa_eligibility.downcase
     when "" # dental always has empty data for hsa_eligibility in serff templates.
-      return false
+      false
     when "yes"
-      return true
+      true
     when "no"
-      return false
+      false
     end
   end
 
   def ehb
     percent = read_attribute(:ehb)
-    (percent && percent > 0) ? percent : 1
+    percent && percent > 0 ? percent : 1
   end
 
   def is_csr?
@@ -461,16 +460,16 @@ class Plan
     name = self.name
     regex = name.match("HSA")
     if regex.present?
-      return true
+      true
     else
-      return false
+      false
     end
   end
 
   def plan_hsa
     name = self.name
     regex = name.match("HSA")
-    regex.present? ? 'Yes': 'No'
+    regex.present? ? 'Yes' : 'No'
   end
 
   def renewal_plan_type
@@ -481,29 +480,29 @@ class Plan
     cf_hsa = ["86052DC0400005","86052DC0400006","86052DC0400009"]
     return "2017 Plan" if self.active_year != 2016
     if kp.include?(hios)
-      return "KP"
+      "KP"
     elsif cf_nonhsa.include?(hios)
-      return "CFNONHSA"
+      "CFNONHSA"
     elsif cf_reg.include?(hios)
-      return "CFREG"
+      "CFREG"
     elsif cf_hsa.include?(hios)
-      return "CFHSA"
+      "CFHSA"
     end
   end
 
   class << self
 
-    def has_rates_for_all_carriers?(start_on_date=nil)
+    def has_rates_for_all_carriers?(start_on_date = nil)
       date = start_on_date || PlanYear.calculate_start_on_dates[0]
       return false if date.blank?
 
-      Rails.cache.fetch("#{date.to_s}", expires_in: 2.days) do
+      Rails.cache.fetch(date.to_s, expires_in: 2.days) do
         Plan.collection.aggregate([
           {"$match" => {"active_year" => date.year}},
           {"$match" => {"coverage_kind" => "health"}},
           {"$unwind" => '$premium_tables'},
           {"$match" => {"premium_tables.start_on" => { "$lte" => date}}},
-          {"$match" => {"premium_tables.end_on" => { "$gte" => date}}},
+          {"$match" => {"premium_tables.end_on" => { "$gte" => date}}}
         ],:allow_disk_use => true).to_a.present?
       end
     end
@@ -513,8 +512,8 @@ class Plan
       if plan_year.to_s == coverage_begin_date.to_date.year.to_s
         [insured_age].flatten.each do |age|
           cost = Plan.find_by(active_year: plan_year, hios_id: hios_id)
-          .premium_tables.where(:age => age, :start_on.lte => coverage_begin_date, :end_on.gte => coverage_begin_date)
-          .entries.first.cost
+                     .premium_tables.where(:age => age, :start_on.lte => coverage_begin_date, :end_on.gte => coverage_begin_date)
+                     .entries.first.cost
           result << { age: age, cost: cost }
         end
       end
@@ -525,13 +524,13 @@ class Plan
       Organization.open_enrollment_year
     end
 
-    def valid_shop_health_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
-      Rails.cache.fetch("plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
+    def valid_shop_health_plans(type = "carrier", key = nil, year_of_plans = Plan.open_enrollment_year)
+      Rails.cache.fetch("plans-#{Plan.count}-for-#{key}-at-#{year_of_plans}-ofkind-health", expires_in: 5.hour) do
         Plan.public_send("valid_shop_by_#{type}_and_year", key.to_s, year_of_plans).where({coverage_kind: "health"}).to_a
       end
     end
 
-    def valid_shop_health_plans_for_service_area(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year, carrier_service_area_pairs=[])
+    def valid_shop_health_plans_for_service_area(_type = "carrier", _key = nil, year_of_plans = Plan.open_enrollment_year, carrier_service_area_pairs = [])
       Plan.for_service_areas_and_carriers(carrier_service_area_pairs, year_of_plans)
     end
 
@@ -541,8 +540,8 @@ class Plan
       Plan.shop_dental_by_active_year(active_year).map(&:carrier_profile).uniq
     end
 
-    def valid_shop_dental_plans(type="carrier", key=nil, year_of_plans=Plan.open_enrollment_year)
-      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key.to_s}-at-#{year_of_plans}", expires_in: 5.hour) do
+    def valid_shop_dental_plans(_type = "carrier", key = nil, year_of_plans = Plan.open_enrollment_year)
+      Rails.cache.fetch("dental-plans-#{Plan.count}-for-#{key}-at-#{year_of_plans}", expires_in: 5.hour) do
         Plan.public_send("shop_dental_by_active_year", year_of_plans).to_a
       end
     end
@@ -556,9 +555,21 @@ class Plan
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
-        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
-        csr_kind = tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind rescue nil
+        shopping_family_member_ids = begin
+                                       hbx_enrollment.hbx_enrollment_members.map(&:applicant_id)
+                                     rescue StandardError
+                                       nil
+                                     end
+        csr_kind = begin
+                     tax_household.latest_eligibility_determination.csr_eligibility_kind
+                   rescue StandardError
+                     nil
+                   end
+        csr_kind = begin
+                     tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind
+                   rescue StandardError
+                     nil
+                   end
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else
@@ -567,7 +578,7 @@ class Plan
       end
     end
 
-    def shop_plans coverage_kind, year
+    def shop_plans(coverage_kind, year)
       if coverage_kind == 'health'
         shop_health_plans year
       else
@@ -576,65 +587,63 @@ class Plan
     end
 
     def search_options(plans)
-      options ={
+      options = {
         'plan_type': [],
         'plan_hsa': [],
         'metal_level': [],
         'plan_deductible': []
       }
-      options.each do |option, value|
-        collected = plans.collect { |plan|
+      options.each do |option, _value|
+        collected = plans.collect do |plan|
           if option == :metal_level
             MetalLevel.new(plan.send(option))
           else
             plan.send(option)
           end
-        }.uniq.sort
-        unless collected.none?
-          options[option] = collected
-        end
+        end.uniq.sort
+        options[option] = collected unless collected.none?
       end
       options
     end
 
-    def shop_health_plans year
+    def shop_health_plans(year)
       $shop_plan_cache = {} unless defined? $shop_plan_cache
       if $shop_plan_cache[year].nil?
         $shop_plan_cache[year] =
           Plan::REFERENCE_PLAN_METAL_LEVELS.map do |metal_level|
             Plan.valid_shop_health_plans('metal_level', metal_level, year)
-        end.flatten
+          end.flatten
       end
       $shop_plan_cache[year]
     end
 
-    def shop_dental_plans year
+    def shop_dental_plans(year)
       shop_dental_by_active_year year
     end
 
-    def build_plan_selectors market_kind, coverage_kind, year
+    def build_plan_selectors(_market_kind, coverage_kind, year)
       plans = shop_plans coverage_kind, year
       selectors = {}
       if coverage_kind == 'dental'
-        selectors[:dental_levels] = plans.map{|p| p.dental_level}.uniq.unshift('any')
+        selectors[:dental_levels] = plans.map(&:dental_level).uniq.unshift('any')
       else
-        selectors[:metals] = plans.map{|p| p.metal_level}.uniq.unshift('any')
+        selectors[:metals] = plans.map(&:metal_level).uniq.unshift('any')
       end
-      selectors[:carriers] = plans.map{|p|
+      selectors[:carriers] = plans.map do |p|
         id = p.carrier_profile_id
         carrier_profile = CarrierProfile.find(id)
-        [ carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id ]
-        }.uniq.unshift(['any','any'])
-      selectors[:plan_types] =  plans.map{|p| p.plan_type}.uniq.unshift('any')
+        [carrier_profile.legal_name, carrier_profile.abbrev, carrier_profile.id]
+      end.uniq.unshift(['any','any'])
+      selectors[:plan_types] =  plans.map(&:plan_type).uniq.unshift('any')
       selectors[:dc_network] =  ['any', 'true', 'false']
       selectors[:nationwide] =  ['any', 'true', 'false']
       selectors
     end
 
-    def build_plan_features market_kind, coverage_kind, year
+    def build_plan_features(_market_kind, coverage_kind, year)
       plans = shop_plans coverage_kind, year
       feature_array = []
-      plans.each{|plan|
+      plans.each do |plan|
 
         characteristics = {}
         characteristics['plan_id'] = plan.id.to_s
@@ -655,7 +664,7 @@ class Plan
         else
           Rails.logger.error("ERROR: No deductible found for Plan: #{p.try(:name)}, ID: #{plan.id}")
         end
-      }
+      end
       feature_array
     end
   end
@@ -664,7 +673,7 @@ end
 class MetalLevel
   include Comparable
   attr_reader :name
-  METAL_LEVEL_ORDER = %w(BRONZE SILVER GOLD PLATINUM)
+  METAL_LEVEL_ORDER = %w[BRONZE SILVER GOLD PLATINUM].freeze
   def initialize(name)
     @name = name
   end
@@ -682,7 +691,7 @@ class MetalLevel
 
   def eql?(metal_level)
     metal_level = safe_assign(metal_level)
-    METAL_LEVEL_ORDER.index(self.name) ==  METAL_LEVEL_ORDER.index(metal_level.name)
+    METAL_LEVEL_ORDER.index(self.name) == METAL_LEVEL_ORDER.index(metal_level.name)
   end
 
   def hash
@@ -692,9 +701,7 @@ class MetalLevel
   private
 
   def safe_assign(metal_level)
-    if metal_level.is_a? String
-      metal_level = MetalLevel.new(metal_level)
-    end
+    metal_level = MetalLevel.new(metal_level) if metal_level.is_a? String
     metal_level
   end
 end

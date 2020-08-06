@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -7,11 +9,9 @@ module SponsoredBenefits
     before_action :load_plan_design_proposal
     before_action :load_plan_design_census_employee, only: [:show, :edit, :update, :destroy]
 
-    def index
-    end
+    def index; end
 
-    def show
-    end
+    def show; end
 
     def new
       @census_employee = build_census_employee
@@ -47,7 +47,7 @@ module SponsoredBenefits
       @plan_design_census_employee.update(plan_design_employee_params)
 
       if plan_design_employee_params[:census_dependents_attributes]
-        destroyed_dependent_ids = plan_design_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]}
+        destroyed_dependent_ids = plan_design_employee_params[:census_dependents_attributes].delete_if{|_k,v| v.key?("_destroy") }.values.map{|x| x[:id]}
         destroyed_dependent_ids.each do |g|
           if census_dependent = @plan_design_census_employee.census_dependents.find(g)
             census_dependent.delete
@@ -72,21 +72,21 @@ module SponsoredBenefits
       @census_employee_import = SponsoredBenefits::Forms::PlanDesignCensusEmployeeImport.new({file: params.require(:file), proposal: @plan_design_proposal})
 
       respond_to do |format|
-        begin
-          if @census_employee_import.save
-            format.html { redirect_back fallback_location: main_app.root_path, flash: {:success => "Roster uploaded successfully."} }
-          else
-            format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => "Roster upload failed."} }
-          end
-        rescue Exception => e
-          format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => e.to_s} }
+
+        if @census_employee_import.save
+          format.html { redirect_back fallback_location: main_app.root_path, flash: {:success => "Roster uploaded successfully."} }
+        else
+          format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => "Roster upload failed."} }
         end
+      rescue Exception => e
+        format.html { redirect_back fallback_location: main_app.root_path, flash: {:error => e.to_s} }
+
       end
     end
 
     def export_plan_design_employees
       sponsorship = @plan_design_proposal.profile.benefit_sponsorships[0]
-     
+
       respond_to do |format|
         format.csv { send_data sponsorship.census_employees.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
       end
@@ -100,7 +100,7 @@ module SponsoredBenefits
             census_employee.update_attributes(:expected_selection => params[:expected_selection].downcase)
           end
           render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
-        rescue => e
+        rescue StandardError => e
           render json: { status: 500, message: 'An error occured while submitting employees participation status' }
         end
       end
@@ -125,18 +125,19 @@ module SponsoredBenefits
 
     def plan_design_employee_params
       params.require(:census_members_plan_design_census_employee).permit(
-       :first_name,
-       :middle_name,
-       :last_name,
-       :name_sfx,
-       :dob,
-       :ssn,
-       :gender,
-       :hired_on,
-       :is_business_owner,
-       address_attributes: [:kind, :address_1, :address_2, :city, :state, :zip],
-       email_attributes: [:kind, :address],
-       census_dependents_attributes: [:id, :first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender, :_destroy])
+        :first_name,
+        :middle_name,
+        :last_name,
+        :name_sfx,
+        :dob,
+        :ssn,
+        :gender,
+        :hired_on,
+        :is_business_owner,
+        address_attributes: [:kind, :address_1, :address_2, :city, :state, :zip],
+        email_attributes: [:kind, :address],
+        census_dependents_attributes: [:id, :first_name, :middle_name, :last_name, :dob, :employee_relationship, :ssn, :gender, :_destroy]
+      )
     end
   end
 end

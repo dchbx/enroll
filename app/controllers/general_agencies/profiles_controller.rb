@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeneralAgencies::ProfilesController < ApplicationController
   skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
   skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
@@ -43,9 +45,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
     if @organization.update_attributes(ga_profile_params)
       office_location = @organization.primary_office_location
-      if office_location.present?
-        update_ga_staff_phone(office_location, person)
-      end
+      update_ga_staff_phone(office_location, person) if office_location.present?
       flash[:notice] = "Successfully Update General Agency Profile"
       redirect_to general_agencies_profile_path(@general_agency_profile)
     else
@@ -94,7 +94,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
     set_flash_by_announcement
     @provider = current_user.person
     @staff_role = current_user.has_general_agency_staff_role?
-    @id=params[:id]
+    @id = params[:id]
   end
 
   def employers
@@ -162,14 +162,14 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
   def inbox
     @sent_box = true
-    id = params["id"]||params['profile_id']
+    id = params["id"] || params['profile_id']
     @general_agency_provider = GeneralAgencyProfile.find(id)
     @folder = (params[:folder] || 'Inbox').capitalize
-    if current_user.person._id.to_s == id
-      @provider = current_user.person
-    else
-      @provider = @general_agency_provider
-    end
+    @provider = if current_user.person._id.to_s == id
+                  current_user.person
+                else
+                  @general_agency_provider
+                end
   end
 
   def redirect_to_show(general_agency_profile_id)
@@ -181,6 +181,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   end
 
   private
+
   def find_general_agency_profile
     @general_agency_profile = GeneralAgencyProfile.find(params[:id])
   end
@@ -218,7 +219,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   def sanitize_agency_profile_params
     params[:organization][:office_locations_attributes].each do |key, location|
       params[:organization][:office_locations_attributes].delete(key) unless location['address_attributes']
-      location.delete('phone_attributes') if (location['phone_attributes'].present? && location['phone_attributes']['number'].blank?)
+      location.delete('phone_attributes') if location['phone_attributes'].present? && location['phone_attributes']['number'].blank?
     end
   end
 

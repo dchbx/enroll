@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 class IvlNotificationMailer < ApplicationMailer
   include ActionView::Helpers::UrlHelper
   after_action :send_inbox_notice
-   
+
   def lawful_presence_verified(user)
     @user = user
     @view_type = "lawful_presence_verified"
@@ -31,9 +33,9 @@ class IvlNotificationMailer < ApplicationMailer
       format.html { render "ivl_notification", :locals => { :user => @user.parent }}
     end
   end
-  
+
   private
-  
+
   def send_inbox_notice
     if @user.parent && (to_inbox = @user.parent.inbox)
       @link = link_to('click here', Rails.application.routes.url_helpers.notification_consumer_profiles_path(view: @view_type)).html_safe
@@ -43,6 +45,6 @@ class IvlNotificationMailer < ApplicationMailer
       to_inbox.save!
     end
   end
-  
-end 
+
+end
 

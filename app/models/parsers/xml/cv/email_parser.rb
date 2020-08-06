@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class EmailParser
     include HappyMapper
@@ -11,7 +13,7 @@ module Parsers::Xml::Cv
 
     def to_hash
       response = {
-          email_address:email_address
+        email_address: email_address
       }
       response[:kind] = type.split("#").last if type
       response

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -19,10 +21,10 @@ module SponsoredBenefits
     end
 
     def claim
-      # TODO FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
+      # TODO: FIXME: Raghuram suggested to move this action into employer_profiles_controller.rb in main app as the button exists in the employer portal.
       employer_profile_id = params.fetch(:employer_profile_id, nil)
       employer_profile = EmployerProfile.find(employer_profile_id)
-      employer_profile ||=  BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
+      employer_profile ||= BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId.from_string(employer_profile_id)).first
 
       quote_claim_code = params.fetch(:claim_code, nil).try(:upcase)
 
@@ -41,7 +43,7 @@ module SponsoredBenefits
           SponsoredBenefits::Organizations::PlanDesignProposal.build_plan_year_from_quote(employer_profile, quote)
           flash[:notice] = "Code claimed with success. Your Plan Year has been created."
         rescue Exception => e
-          flash[:error] = "There was an issue claiming this quote. #{e.to_s}"
+          flash[:error] = "There was an issue claiming this quote. #{e}"
         end
       end
 
@@ -103,8 +105,8 @@ module SponsoredBenefits
 
     def create
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
-          organization: @plan_design_organization
-        }.merge(plan_design_proposal_params))
+        organization: @plan_design_organization
+      }.merge(plan_design_proposal_params))
 
       respond_to do |format|
         if @plan_design_proposal.save
@@ -112,14 +114,14 @@ module SponsoredBenefits
         else
           flash[:error] = "Quote information save failed."
         end
-        format.js {render :js => "window.location.href='"+edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id])+"'"}
+        format.js {render :js => "window.location.href='" + edit_organizations_plan_design_organization_plan_design_proposal_path(@plan_design_organization, @plan_design_proposal.proposal, profile_id: params[:profile_id]) + "'"}
       end
     end
 
     def update
       @plan_design_proposal = SponsoredBenefits::Forms::PlanDesignProposal.new({
         organization: @plan_design_organization, proposal_id: params[:id]
-        }.merge(plan_design_proposal_params))
+      }.merge(plan_design_proposal_params))
 
       respond_to do |format|
         if @plan_design_proposal.save
@@ -167,17 +169,17 @@ module SponsoredBenefits
             :annual_enrollment_period_begin_month_of_year,
             benefit_application: [
               :effective_period,
-              :open_enrollment_period,
+              :open_enrollment_period
             ]
           ]
         ]
-        )
+      )
     end
 
     def check_if_county_zip_are_same(quote, employer_profile)
       employer_profile_address = employer_profile.try(:primary_office_location).try(:address)
       if quote.try(:plan_design_organization).try(:office_location_zip) != employer_profile_address.try(:zip) ||
-        quote.try(:plan_design_organization).try(:office_location_county) != employer_profile_address.try(:county)
+         quote.try(:plan_design_organization).try(:office_location_county) != employer_profile_address.try(:county)
         "Unable to claim quote. The Zip/County information used by this quote does not match your Employer record. Please contact the Broker who provided this quote to you."
       end
     end
@@ -193,15 +195,11 @@ module SponsoredBenefits
     end
 
     def published_plans_are_view_only
-      if @plan_design_proposal.published?
-        redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
-      end
+      redirect_to organizations_plan_design_proposal_path(@plan_design_proposal) if @plan_design_proposal.published?
     end
 
     def claimed_quotes_are_view_only
-      if @plan_design_proposal.claimed?
-        redirect_to organizations_plan_design_proposal_path(@plan_design_proposal)
-      end
+      redirect_to organizations_plan_design_proposal_path(@plan_design_proposal) if @plan_design_proposal.claimed?
     end
 
     def load_profile

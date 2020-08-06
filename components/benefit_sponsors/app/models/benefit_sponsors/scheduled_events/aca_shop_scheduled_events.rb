@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ScheduledEvents
     class AcaShopScheduledEvents
@@ -101,13 +103,11 @@ module BenefitSponsors
 
       def auto_transmit_monthly_benefit_sponsors
         if aca_shop_market_transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
-            transmit_scheduled_benefit_sponsors(new_date)
-          end
+          transmit_scheduled_benefit_sponsors(new_date) if (new_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
         end
       end
 
-      def transmit_scheduled_benefit_sponsors(new_date, feins=[])
+      def transmit_scheduled_benefit_sponsors(new_date, feins = [])
         start_on = new_date.prev_day.next_month.beginning_of_month
         transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
@@ -135,12 +135,10 @@ module BenefitSponsors
       end
 
       def process_events_for(&block)
-        begin
-          block.call
-        rescue Exception => e
-          @logger.error e.message
-          @logger.error e.backtrace.join("\n")
-        end
+        block.call
+      rescue Exception => e
+        @logger.error e.message
+        @logger.error e.backtrace.join("\n")
       end
 
       def initialize_logger

@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 class Notice
 
   include Config::AcaHelper
   include Config::SiteHelper
   include Config::ContactCenterHelper
 
-  attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store ,:market_kind, :file_name, :notice , :random_str ,:recipient, :header, :sep, :state
+  attr_accessor :from, :to, :options, :name, :subject, :template,:mpi_indicator, :event_name, :notice_data, :recipient_document_store,:market_kind, :file_name, :notice, :random_str,:recipient, :header, :sep, :state
 
-  Required=[:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store]
+  Required = [:subject,:mpi_indicator,:template,:recipient,:notice,:market_kind,:event_name,:recipient_document_store].freeze
 
   def initialize(params = {})
     validate_params(params)
-    self.subject = "#{params[:subject]}" || "notice_#{random_str}"
+    self.subject = (params[:subject]).to_s || "notice_#{random_str}"
     self.mpi_indicator = params[:mpi_indicator]
     self.template = params[:template]
-    self.notice= params[:notice]
-    self.event_name= params[:event_name]
-    self.market_kind= params[:market_kind]
-    self.recipient= params[:recipient]
+    self.notice = params[:notice]
+    self.event_name = params[:event_name]
+    self.market_kind = params[:market_kind]
+    self.recipient = params[:recipient]
     self.recipient_document_store = params[:recipient_document_store]
     self.to = params[:to]
     self.state = params[:options][:state] if params[:options]
@@ -26,10 +28,10 @@ class Notice
 
   def html(options = {})
     ApplicationController.new.render_to_string({
-      :template => options[:custom_template] || template,
-      :layout => layout,
-      :locals => { notice: notice }
-    })
+                                                 :template => options[:custom_template] || template,
+                                                 :layout => layout,
+                                                 :locals => { notice: notice }
+                                               })
   end
 
   def random_str
@@ -53,7 +55,7 @@ class Notice
   end
 
   def title
-    "#{subject.titleize.gsub(/[^0-9a-z]/i,'')}"
+    subject.titleize.gsub(/[^0-9a-z]/i,'').to_s
   end
 
   def notice_path
@@ -66,7 +68,7 @@ class Notice
 
   def pdf_options
     options = {
-      margin:  {
+      margin: {
         top: 10,
         bottom: 20,
         left: 22,
@@ -79,20 +81,20 @@ class Notice
       encoding: 'utf8',
       header: {
         content: ApplicationController.new.render_to_string({
-          template: header,
-          layout: false,
-          locals: {recipient: recipient, notice: notice}
-          }),
-        }
+                                                              template: header,
+                                                              layout: false,
+                                                              locals: {recipient: recipient, notice: notice}
+                                                            })
+      }
     }
-    footer = (market_kind == "individual") ? "notices/shared/footer_ivl.html.erb" : "notices/shared/footer.html.erb"
-      options.merge!({footer: {
-        content: ApplicationController.new.render_to_string({
-          template: footer,
-          layout: false,
-          locals: {notice: notice}
-        })
-      }})
+    footer = market_kind == "individual" ? "notices/shared/footer_ivl.html.erb" : "notices/shared/footer.html.erb"
+    options.merge!({footer: {
+                     content: ApplicationController.new.render_to_string({
+                                                                           template: footer,
+                                                                           layout: false,
+                                                                           locals: {notice: notice}
+                                                                         })
+                   }})
     options
   end
 
@@ -107,19 +109,18 @@ class Notice
   end
 
   def generate_pdf_notice
-    begin
-      File.open(notice_path, 'wb') do |file|
-        file << self.pdf
-      end
-    rescue Exception => e
-      puts "#{e} #{e.backtrace}"
+    File.open(notice_path, 'wb') do |file|
+      file << self.pdf
     end
+  rescue Exception => e
+    puts "#{e} #{e.backtrace}"
+
     # notice_path
     # clear_tmp
   end
 
   def join_pdfs(pdfs)
-    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
     pdf << CombinePDF.load(pdfs[1])
     pdf.save notice_path
   end
@@ -132,7 +133,7 @@ class Notice
 
   def upload_to_amazonS3
     Aws::S3Storage.save(notice_path, 'notices')
-  rescue => e
+  rescue StandardError => e
     raise "unable to upload to amazon #{e}"
   end
 
@@ -142,7 +143,7 @@ class Notice
   end
 
   def store_paper_notice
-    bucket_name= Settings.paper_notice
+    bucket_name = Settings.paper_notice
     notice_filename_for_paper_notice = "#{recipient.hbx_id}_#{subject.titleize.gsub(/\s*/, '')}_#{mpi_indicator.delete('_')}_IVL"
     notice_path_for_paper_notice = Rails.root.join("tmp", "#{notice_filename_for_paper_notice}.pdf")
     begin
@@ -173,9 +174,9 @@ class Notice
   end
 
   def create_secure_inbox_message(notice)
-    body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
-              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+    body = "<br>You can download the notice by clicking this link " \
+           "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
+                                                                                                  recipient.id, 'documents', notice.id)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
     message = recipient.inbox.messages.build({ subject: subject, body: body, from: site_short_name })
     message.save!
   end
@@ -186,7 +187,7 @@ class Notice
   end
 
   def validate_params(params)
-    errors=[]
+    errors = []
     self.class::Required.uniq.each do |key|
       next if params[key].present?
       errors << key

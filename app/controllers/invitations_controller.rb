@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InvitationsController < ApplicationController
   before_action :require_login_and_allow_new_account
 
@@ -25,7 +27,7 @@ class InvitationsController < ApplicationController
     redirect_to benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_profile)
   end
 
-  def redirect_to_employee_match(census_employee)
+  def redirect_to_employee_match(_census_employee)
     redirect_to welcome_insured_employee_index_path
   end
 

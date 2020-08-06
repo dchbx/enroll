@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
@@ -22,7 +24,7 @@ module BenefitSponsors
       )
       BenefitMarkets::BenefitMarketCatalog.find(bmc_id)
     end
-      
+
      # create(:benefit_markets_benefit_market_catalog, :with_product_packages,
       #                                      benefit_market: benefit_market,
        #                                     title: "SHOP Benefits for #{current_effective_date.year}",
@@ -45,11 +47,11 @@ module BenefitSponsors
     let!(:employer_attestation)     { BenefitSponsors::Documents::EmployerAttestation.new(aasm_state: "approved") }
 
 
-    let!(:benefit_application) {
+    let!(:benefit_application) do
       application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship)
       application.benefit_sponsor_catalog.save!
       application
-    }
+    end
     let!(:benefit_application_id) { benefit_application.id.to_s }
     let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:product_package_kind) { :single_issuer }
@@ -57,16 +59,16 @@ module BenefitSponsors
 
     let(:product) { product_package.products.first }
 
-    let(:sbc_document) {
+    let(:sbc_document) do
       ::Document.new({
-        title: 'sbc_file_name', subject: "SBC",
-        :identifier=>"urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-test#7816ce0f-a138-42d5-89c5-25c5a3408b82"
-        })
-    }
+                       title: 'sbc_file_name', subject: "SBC",
+                       :identifier => "urn:openhbx:terms:v1:file_storage:s3:bucket:#{Settings.site.s3_prefix}-enroll-sbc-test#7816ce0f-a138-42d5-89c5-25c5a3408b82"
+                     })
+    end
 
     let!(:benefit_package) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: benefit_application, product_package: product_package) }
 
-    let(:benefit_package_params) {
+    let(:benefit_package_params) do
       {
         :benefit_application_id => benefit_application.id.to_s,
         :title => "New Benefit Package",
@@ -74,9 +76,9 @@ module BenefitSponsors
         :probation_period_kind => "first_of_month",
         :sponsored_benefits_attributes => sponsored_benefits_params
       }
-    }
+    end
 
-    let(:sponsored_benefits_params) {
+    let(:sponsored_benefits_params) do
       {
         "0" => {
           :sponsor_contribution_attributes => sponsor_contribution_attributes,
@@ -86,22 +88,22 @@ module BenefitSponsors
           :reference_plan_id => product.id.to_s
         }
       }
-    }
+    end
 
-    let(:sponsor_contribution_attributes) {
+    let(:sponsor_contribution_attributes) do
       {
-      :contribution_levels_attributes => contribution_levels_attributes
+        :contribution_levels_attributes => contribution_levels_attributes
       }
-    }
+    end
 
-    let(:contribution_levels_attributes) {
+    let(:contribution_levels_attributes) do
       {
         "0" => {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95", contribution_unit_id: employee_contribution_unit },
         "1" => {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85", contribution_unit_id: spouse_contribution_unit },
         "2" => {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75", contribution_unit_id: partner_contribution_unit },
         "3" => {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75", contribution_unit_id: child_contribution_unit }
       }
-    }
+    end
 
     let(:contribution_model) { product_package.contribution_model }
 
@@ -139,7 +141,7 @@ module BenefitSponsors
         benefit_application.effective_period = future_date.beginning_of_year..future_date.end_of_year
         benefit_application.save
         sign_in_and_do_new
-        expect(response).to redirect_to(profiles_employers_employer_profile_path(assigns(:benefit_package_form).service.employer_profile, :tab=>'benefits'))
+        expect(response).to redirect_to(profiles_employers_employer_profile_path(assigns(:benefit_package_form).service.employer_profile, :tab => 'benefits'))
       end
     end
 
@@ -170,7 +172,7 @@ module BenefitSponsors
 
       context "when create fails" do
 
-        let(:sponsored_benefits_params) {
+        let(:sponsored_benefits_params) do
           {
             "0" => {
               :sponsor_contribution_attributes => sponsor_contribution_attributes,
@@ -180,7 +182,7 @@ module BenefitSponsors
               :reference_plan_id => nil
             }
           }
-        }
+        end
 
         before do
           sign_in_and_do_create
@@ -259,13 +261,13 @@ module BenefitSponsors
 
       let(:contribution_levels) { benefit_package.sponsored_benefits[0].sponsor_contribution.contribution_levels }
 
-      let(:contribution_levels_attributes) {
+      let(:contribution_levels_attributes) do
         {
           "0" => {:id => contribution_levels[0].id.to_s, :is_offered => "true", :display_name => "Employee", :contribution_factor => "95"},
           "1" => {:id => contribution_levels[1].id.to_s, :is_offered => "true", :display_name => "Spouse", :contribution_factor => "85"},
           "2" => {:id => contribution_levels[2].id.to_s, :is_offered => "true", :display_name => "Dependent", :contribution_factor => "75"}
         }
-      }
+      end
 
       def sign_in_and_do_update
         sign_in user
@@ -278,8 +280,8 @@ module BenefitSponsors
 
       def sanitize_params
         sponsored_benefits_params["0"].merge!({
-          id: benefit_package.sponsored_benefits[0].id.to_s
-        })
+                                                id: benefit_package.sponsored_benefits[0].id.to_s
+                                              })
       end
 
       context "when update is success" do
@@ -308,7 +310,7 @@ module BenefitSponsors
 
       context "when update fails" do
 
-        let(:sponsored_benefits_params) {
+        let(:sponsored_benefits_params) do
           {
             "0" => {
               :sponsor_contribution_attributes => sponsor_contribution_attributes,
@@ -318,7 +320,7 @@ module BenefitSponsors
               :reference_plan_id => nil
             }
           }
-        }
+        end
 
         it "should redirect to edit" do
           sign_in_and_do_update

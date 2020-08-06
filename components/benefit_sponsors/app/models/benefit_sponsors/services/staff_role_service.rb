@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class StaffRoleService
 
       attr_accessor :profile_id, :profile_type, :person
 
-      def initialize(attrs={})
+      def initialize(attrs = {})
         @attrs = attrs
         @profile_id = attrs[:profile_id]
       end
@@ -65,12 +67,11 @@ module BenefitSponsors
                else
                  person.employer_staff_roles.detect{|staff| staff.is_applicant? && staff.benefit_sponsor_employer_profile_id.to_s == form[:profile_id]}
                end
-        if role && role.approve && role.save!
-          return true, 'Role is approved'
+        if role&.approve && role&.save!
+          [true, 'Role is approved']
         else
-          return false, 'Please contact HBX Admin to report this error'
+          [false, 'Please contact HBX Admin to report this error']
         end
-
       end
 
       def match_or_create_person(form)
@@ -102,17 +103,17 @@ module BenefitSponsors
 
         if terminated_brokers_with_same_profile.present?
           terminated_brokers_with_same_profile.broker_agency_pending!
-          return true, person
+          [true, person]
         elsif pending_brokers_with_same_profile.present?
-          return false,  "your application status was in pending with this Broker Agency"
+          [false,  "your application status was in pending with this Broker Agency"]
         elsif active_brokers_with_same_profile.present?
-          return false,  "you are already associated with this Broker Agency"
+          [false,  "you are already associated with this Broker Agency"]
         else
           person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
                                                                             broker_agency_profile: profile
                                                                           })
           person.save!
-          return true, person
+          [true, person]
         end
       end
 
@@ -123,11 +124,11 @@ module BenefitSponsors
 
         if terminated_general_agencies_with_same_profile.present?
           terminated_general_agencies_with_same_profile.general_agency_pending!
-          return true, person
+          [true, person]
         elsif pending_general_agencies_with_same_profile.present?
-          return false,  "your application status was in pending with this General Agency"
+          [false,  "your application status was in pending with this General Agency"]
         elsif active_general_agencies_with_same_profile.present?
-          return false,  "you are already associated with this General Agency"
+          [false,  "you are already associated with this General Agency"]
         else
           staff_member = ::GeneralAgencyStaffRole.new({
                                                         general_agency_profile: profile,
@@ -136,7 +137,7 @@ module BenefitSponsors
           person.general_agency_staff_roles << staff_member
           staff_member.general_agency_pending!
           person.save!
-          return true, person
+          [true, person]
         end
       end
 
@@ -152,12 +153,12 @@ module BenefitSponsors
 
       def general_agency_search!(form)
         results = BenefitSponsors::Organizations::Organization.general_agencies_with_matching_ga(form[:filter_criteria].symbolize_keys!, form.is_general_agency_registration_page)
-        if results.first.is_a?(Person)
+        @general_agency_profiles = if results.first.is_a?(Person)
           # @filtered_broker_roles  = results.map(&:broker_role)
-          @general_agency_profiles = results.map{|ga| ga.general_agency_primary_staff.general_agency_profile}.uniq
-        else
-          @general_agency_profiles = results.map(&:general_agency_profile).uniq
-        end
+                                     results.map{|ga| ga.general_agency_primary_staff.general_agency_profile}.uniq
+                                   else
+                                     results.map(&:general_agency_profile).uniq
+                                   end
       end
 
       def add_broker_agency_staff_role(first_name, last_name, dob, _email, broker_agency_profile)
@@ -244,6 +245,7 @@ module BenefitSponsors
                      :dob => form[:dob]
                    })
       end
+
       def regex_for(str)
         clean_string = ::Regexp.escape(str.strip)
         /^#{clean_string}$/i

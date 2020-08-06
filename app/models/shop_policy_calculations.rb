@@ -1,5 +1,6 @@
-module ShopPolicyCalculations
+# frozen_string_literal: true
 
+module ShopPolicyCalculations
   def age_of(member)
     case member.class
     when HbxEnrollmentMember
@@ -58,5 +59,4 @@ module ShopPolicyCalculations
       member.employee_relationship
     end
   end
-
 end

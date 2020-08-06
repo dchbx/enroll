@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class SponsoredBenefits::SponsorContribution
 
@@ -6,14 +8,14 @@ module BenefitSponsors
     include Mongoid::Attributes::Dynamic
 
     embedded_in :sponsored_benefit,
-      class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
+                class_name: "BenefitSponsors::SponsoredBenefits::SponsoredBenefit"
     embeds_many :contribution_levels,
                 class_name: "BenefitSponsors::SponsoredBenefits::ContributionLevel"
 
     delegate :contribution_model, to: :sponsored_benefit
     delegate :reference_product, to: :sponsored_benefit, allow_nil: false
     delegate :recorded_sic_code, to: :sponsored_benefit
-    
+
     accepts_nested_attributes_for :contribution_levels
 #    validates_presence_of :contribution_levels
 #    validate :validate_contribution_levels
@@ -32,7 +34,7 @@ module BenefitSponsors
     def match_contribution_level_for(pricing_unit)
       cl_list = contribution_levels.to_a.sort_by(&:order)
       possible_cl = cl_list[pricing_unit.order]
-      possible_cl ? possible_cl : cl_list.last
+      possible_cl || cl_list.last
     end
 
     def self.sponsor_contribution_for(new_product_package)

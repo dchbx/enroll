@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then (/^Employer Staff should see dialog with Attestation warning$/) do
   wait_for_ajax(3,2)
   expect(page).to have_content('Publish Anyways')
@@ -49,7 +51,7 @@ When (/^Admin clicks employer attestation filter$/) do
   find_by_id('Tab:employer_attestations', wait: 10).click
 end
 
-And(/^Admin clicks (.*) filter in employer attestation$/) do|state|
+And(/^Admin clicks (.*) filter in employer attestation$/) do |state|
   wait_for_ajax
   find_by_id("Tab:employer_attestations-#{state}").click
 end
@@ -65,7 +67,7 @@ When (/^Admin clicks attestation action$/) do
   find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[11]/div/ul/li[3]/a').click
 end
 
-Then (/^Admin should see attestation document$/)do
+Then (/^Admin should see attestation document$/) do
   expect(find(:xpath, '//*[@id="attestation_documents_table"]/div/table/tbody/tr[1]/td[1]')).to have_content "Submitted"
   expect(find(:xpath, '//*[@id="attestation_documents_table"]/div/table/tbody/tr[1]/td[2]')).to have_content "JavaScript.pdf"
 end
@@ -83,7 +85,7 @@ end
 
 When (/^Admin clicks submit in employer attestation form$/) do
   accept_alert do
-    first('#attestation_documents_table .btn-primary',:text=>/SUBMIT/i).click
+    first('#attestation_documents_table .btn-primary',:text => /SUBMIT/i).click
   end
 end
 
@@ -92,7 +94,7 @@ Then (/^Admin should see attestation updated message$/) do
 end
 
 When (/^Admin clicks employer in employers_attestation filter$/) do
-  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[1]').click()
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[1]').click
 end
 
 Then (/^Employer Staff should see attestation status (.*)$/) do |state|
@@ -133,7 +135,7 @@ end
 def enter_plan_year_info
   wait_for_ajax(2,2)
   find('span', text: 'SELECT START ON').click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_period.min).year}')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{effective_period.min.year}')]", :wait => 3).click
   find('.interaction-field-control-fteemployee').click
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'
@@ -209,12 +211,12 @@ end
 
 Then(/^Employer should see disabled delete button in actions$/) do
   find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]').click
- find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]/div/ul/li[2]/a')['disabled'] == "disabled"
+  find(:xpath, '//*[@id="effective_datatable_wrapper"]/div/div/div[3]/div/table/tbody/tr[1]/td[6]/div/ul/li[2]/a')['disabled'] == "disabled"
 end
 
 Then(/^Employer should not see submitted document$/) do
-   find('.interaction-click-control-documents').click
-   expect(page).to have_content('No data available in table')
+  find('.interaction-click-control-documents').click
+  expect(page).to have_content('No data available in table')
 end
 
 Then(/^Employer should see Accepted document$/) do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class BenefitSponsorships::BenefitSponsorshipDirector
     include ::Acapi::Notifiers
@@ -13,22 +15,22 @@ module BenefitSponsors
       if event == :renew_sponsor_benefit
         benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
           notify("acapi.info.events.benefit_sponsorship.execute_benefit_renewal", {
-            :benefit_sponsorship_id => benefit_sponsorship.id.to_s, :new_date => new_date.strftime("%Y-%m-%d")
-          })
+                   :benefit_sponsorship_id => benefit_sponsorship.id.to_s, :new_date => new_date.strftime("%Y-%m-%d")
+                 })
         end
         return
       end
 
       business_policy_name = policy_name(event)
       benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
-        begin
-          business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
-          sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
-        rescue Exception => e
-          @logger.info "EXCEPTION: Event (#{event}) failed for Employer #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
-          @logger.error e.message
-          @logger.error e.backtrace.join("\n")
-        end
+
+        business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
+        sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
+      rescue Exception => e
+        @logger.info "EXCEPTION: Event (#{event}) failed for Employer #{benefit_sponsorship.legal_name}(#{benefit_sponsorship.fein})"
+        @logger.error e.message
+        @logger.error e.backtrace.join("\n")
+
       end
     end
 
@@ -37,9 +39,7 @@ module BenefitSponsors
     end
 
     def sponsor_service_for(benefit_sponsorship)
-      if benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
-        sponsorship_service
-      end
+      sponsorship_service if benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
     end
 
     def policy_name(event_name)

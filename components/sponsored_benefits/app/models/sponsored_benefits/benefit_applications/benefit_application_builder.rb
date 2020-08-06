@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module BenefitApplications
     class BenefitApplicationBuilder
@@ -38,9 +40,7 @@ module SponsoredBenefits
         @benefit_application.benefit_packages << new_benefit_package
       end
 
-      def benefit_application
-        @benefit_application
-      end
+      attr_reader :benefit_application
 
       def reset
         @benefit_application = @application_class.new(options)

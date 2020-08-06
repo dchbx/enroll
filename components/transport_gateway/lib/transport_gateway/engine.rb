@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   class Engine < ::Rails::Engine
     isolate_namespace TransportGateway
@@ -5,7 +7,7 @@ module TransportGateway
     config.generators do |g|
       g.test_framework :rspec, :fixture => false
       g.assets false
-      g.helper false 
+      g.helper false
     end
   end
 end

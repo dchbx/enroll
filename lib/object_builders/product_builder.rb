@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class ProductBuilder
   INVALID_PLAN_IDS = ["88806MA0020005", "88806MA0040005", "88806MA0020051",
-  "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"] # These plan ids are suppressed and we dont save these while importing.
+                      "18076MA0010001", "80538MA0020001", "80538MA0020002", "11821MA0020001", "11821MA0040001"].freeze # These plan ids are suppressed and we dont save these while importing.
   LOG_PATH = "#{Rails.root}/log/rake_xml_import_products_#{Time.now.to_s.gsub(' ', '')}.log"
 
   def initialize(qhp_hash)
@@ -18,7 +20,8 @@ class ProductBuilder
   end
 
   def run
-    @xml_plan_counter, @success_plan_counter = 0,0
+    @xml_plan_counter = 0
+    @success_plan_counter = 0
     @existing_qhp_counter = 0
     iterate_plans
     show_qhp_stats unless Rails.env.test?
@@ -43,26 +46,24 @@ class ProductBuilder
   end
 
   def show_qhp_stats
-    puts "*"*80
+    puts "*" * 80
     puts "Total Number of Products imported from xml: #{@xml_plan_counter}."
     puts "Total Number of Products Saved to database: #{@success_plan_counter}."
     puts "Total Number of Existing Products : #{@existing_qhp_counter}."
     puts "Check the log file #{@log_path}"
-    puts "*"*80
+    puts "*" * 80
     @logger.info "\nTotal Number of Plans imported from xml: #{@xml_plan_counter}.\n"
     @logger.info "\nTotal Number of Plans Saved to database: #{@success_plan_counter}.\n"
   end
 
   def validate_and_persist_qhp
-    begin
-      if !INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
-        associate_product_with_qhp
-        @qhp.save!
-      end
-      @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.standard_component_id} \n"
-    rescue Exception => e
-      @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.standard_component_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
+    unless INVALID_PLAN_IDS.include?(@qhp.standard_component_id.strip)
+      associate_product_with_qhp
+      @qhp.save!
     end
+    @logger.info "\nSaved Plan: #{@qhp.plan_marketing_name}, hios product id: #{@qhp.standard_component_id} \n"
+  rescue Exception => e
+    @logger.error "\n Failed to create plan: #{@qhp.plan_marketing_name}, \n hios product id: #{@qhp.standard_component_id} \n Exception Message: #{e.message} \n\n Errors: #{@qhp.errors.full_messages} \n\n Backtrace: #{e.backtrace.join("\n            ")}\n ******************** \n"
   end
 
   def associate_product_with_qhp
@@ -223,9 +224,7 @@ class ProductBuilder
   end
 
   def update_hsa_eligibility
-    if hios_plan_and_variant_id.split("-").last == "01" && @qhp.active_year > 2015
-      @qhp.hsa_eligibility = hsa_params[:hsa_eligibility]
-    end
+    @qhp.hsa_eligibility = hsa_params[:hsa_eligibility] if hios_plan_and_variant_id.split("-").last == "01" && @qhp.active_year > 2015
   end
 
   def build_cost_share_variance
@@ -253,9 +252,9 @@ class ProductBuilder
 
   def build_sbc_params
     @csv = if sbc_params
-      @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes.merge(sbc_params))
-    else
-      @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes)
+             @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes.merge(sbc_params))
+           else
+             @qhp.qhp_cost_share_variances.build(cost_share_variance_attributes)
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateDcEmployerProfileDocuments < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -19,37 +21,32 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
     end
   end
 
-  def self.down
-
-  end
+  def self.down; end
 
   private
 
   def self.create_profile_document
-
     say_with_time("Time taken to migrate documents employer profile and organization") do
-      Organization.collection.aggregate([ {"$match" => {"employer_profile" => { "$exists" => true }}},
-                                          {"$project" => {"documents" => 1, "employer_profile.documents"=>1, "fein" => 1}},
-                                          {"$lookup" => {
-                                              from: "benefit_sponsors_organizations_organizations",
-                                              localField: "fein",
-                                              foreignField: "fein",
-                                              as: "results"
-                                          }},
-                                          {"$project" => { "documents" => { "$concatArrays" => [{ "$ifNull" => [ "$employer_profile.documents", []]}, {"$ifNull"=>["$documents", []]}]}, "results.profiles" => 1}},
-                                          {"$unwind" => "$documents"},
-                                          {"$unwind" => "$results"},
-                                          {"$unwind" => "$results.profiles"},
-                                          {"$match" => {"results.profiles._type" =>{ "$in" => ["BenefitSponsors::Organizations::FehbEmployerProfile", "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"]}}},
-                                          {"$project"=>{_id: "$documents._id", created_at: "$documents.created_at", updated_at: "$documents.updated_at",
-                                                        documentable_type: "$results.profiles._type", documentable_id:  "$results.profiles._id", title: "$documents.title",
-                                                        creator: "$documents.creator", subject: "$documents.subject", description: "$documents.description", publisher: "$documents.publisher",
-                                                        contributor: "$documents.contributor", date: "$documents.date", type: "$documents.type", format: "$documents.format",
-                                                        identifier: "$documents.identifier", source: "$documents.source", language:"$documents.language", relation: "$documents.relation",
-                                                        coverage: "$documents.coverage", rights: "$documents.rights", tags: "$documents.tags"}},
-                                          {"$out"=> "benefit_sponsors_documents_documents"}
-
-                                        ]).each
+      Organization.collection.aggregate([{"$match" => {"employer_profile" => { "$exists" => true }}},
+                                         {"$project" => {"documents" => 1, "employer_profile.documents" => 1, "fein" => 1}},
+                                         {"$lookup" => {
+                                           from: "benefit_sponsors_organizations_organizations",
+                                           localField: "fein",
+                                           foreignField: "fein",
+                                           as: "results"
+                                         }},
+                                         {"$project" => { "documents" => { "$concatArrays" => [{ "$ifNull" => ["$employer_profile.documents", []]}, {"$ifNull" => ["$documents", []]}]}, "results.profiles" => 1}},
+                                         {"$unwind" => "$documents"},
+                                         {"$unwind" => "$results"},
+                                         {"$unwind" => "$results.profiles"},
+                                         {"$match" => {"results.profiles._type" => { "$in" => ["BenefitSponsors::Organizations::FehbEmployerProfile", "BenefitSponsors::Organizations::AcaShopDcEmployerProfile"]}}},
+                                         {"$project" => {_id: "$documents._id", created_at: "$documents.created_at", updated_at: "$documents.updated_at",
+                                                         documentable_type: "$results.profiles._type", documentable_id:  "$results.profiles._id", title: "$documents.title",
+                                                         creator: "$documents.creator", subject: "$documents.subject", description: "$documents.description", publisher: "$documents.publisher",
+                                                         contributor: "$documents.contributor", date: "$documents.date", type: "$documents.type", format: "$documents.format",
+                                                         identifier: "$documents.identifier", source: "$documents.source", language: "$documents.language", relation: "$documents.relation",
+                                                         coverage: "$documents.coverage", rights: "$documents.rights", tags: "$documents.tags"}},
+                                         {"$out" => "benefit_sponsors_documents_documents"}]).each
 
     end
 
@@ -58,33 +55,35 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
       old_organizations = Organization.unscoped.exists(:employer_profile => true)
 
       total_organizations = old_organizations.count
-      success =0
+      success = 0
       failed = 0
       limit_count = 1000
 
 
       old_organizations.batch_size(limit_count).no_timeout.each do |old_org|
-        begin
-         new_profile = new_profile(old_org)
-         old_profile = old_org.employer_profile
 
-         build_inbox_messages(old_profile, new_profile)
+        new_profile = new_profile(old_org)
+        old_profile = old_org.employer_profile
 
-         raise Exception unless new_profile.valid?
-         BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
-         BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
-         new_profile.save
+        build_inbox_messages(old_profile, new_profile)
 
-         print '.' unless Rails.env.test?
-         success = success + 1
-        rescue Exception => e
-          failed = failed + 1
-          print 'F' unless Rails.env.test?
+        raise Exception unless new_profile.valid?
+        BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+        BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
+        new_profile.save
+
+        print '.' unless Rails.env.test?
+        success += 1
+      rescue Exception => e
+        failed += 1
+        print 'F' unless Rails.env.test?
+        unless Rails.env.test?
           @logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-           validation_errors:
-           profile - #{new_profile.errors.messages if new_profile},
-           #{e.inspect}" unless Rails.env.test?
-        end
+             validation_errors:
+             profile - #{new_profile&.errors&.messages},
+             #{e.inspect}"
+       end
+
       end
 
       @logger.info " Total #{total_organizations} old organizations for type: employer profile" unless Rails.env.test?
@@ -96,7 +95,6 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
 
       return true
     end
-
   end
 
   def self.find_new_organization(old_org)
@@ -108,7 +106,6 @@ class MigrateDcEmployerProfileDocuments < Mongoid::Migration
   end
 
   def self.build_inbox_messages(old_profile, new_profile)
-
     welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s online marketplace where benefit sponsors may select and offer products that meet their member's needs and budget."
     welcome_message = new_profile.inbox.messages.where(body: welcome_body).first
     welcome_message.update_attributes(message_read: true, created_at: new_profile.created_at) if welcome_message.present?

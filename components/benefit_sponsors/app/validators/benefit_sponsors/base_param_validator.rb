@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'i18n'
 require 'dry-schema'
 require 'date'
@@ -9,11 +11,11 @@ module BenefitSponsors
   end
 
   BsonObjectIdString = ValidationTypes.Constructor(BSON::ObjectId) do |value|
-    begin
-      BSON::ObjectId.from_string(value)
-    rescue BSON::ObjectId::Invalid
-      nil
-    end
+
+    BSON::ObjectId.from_string(value)
+  rescue BSON::ObjectId::Invalid
+    nil
+
   end
 
   class BaseParamValidator < Dry::Schema::Params
@@ -27,16 +29,18 @@ module BenefitSponsors
 
   module CommonPredicates
     def us_date?(value)
-      (Date.strptime(value, "%m/%d/%Y") rescue nil).present?
+      (begin
+         Date.strptime(value, "%m/%d/%Y")
+       rescue StandardError
+         nil
+       end).present?
     end
 
     def email?(value)
-      begin
-        parsed = Mail::Address.new(value)
-        true
-      rescue Mail::Field::ParseError => e
-        false
-      end
+      parsed = Mail::Address.new(value)
+      true
+    rescue Mail::Field::ParseError => e
+      false
     end
   end
 

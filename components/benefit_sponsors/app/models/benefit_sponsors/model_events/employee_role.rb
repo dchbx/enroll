@@ -4,13 +4,11 @@
 module BenefitSponsors
   module ModelEvents
     module EmployeeRole
-
       REGISTERED_EVENTS = [
         :employee_matches_employer_roster
       ].freeze
 
       def notify_on_create
-
         (is_employee_matches_employer_roster = true) if present?
 
         REGISTERED_EVENTS.each do |event|

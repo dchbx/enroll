@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UpdateMaListBillPricingModel < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
@@ -24,34 +26,30 @@ class UpdateMaListBillPricingModel < Mongoid::Migration
     say "Found #{p_models.count} matching Pricing Models"
     fix_count = 0
     p_models.each do |p_model|
-      if update_price_model_relationships(p_model)
-        fix_count = fix_count + 1
-      end
+      fix_count += 1 if update_price_model_relationships(p_model)
     end
     say "Corrected #{fix_count} Pricing Models"
   end
 
   def self.correct_benefit_market_catalogs
     catalogs = BenefitMarkets::BenefitMarketCatalog.where({
-      "product_packages" => {
-        "$elemMatch" => {
-            "pricing_model.name" => /MA List Bill Shop Pricing Model/,
-            "pricing_model.member_relationships" => {
-              "$elemMatch" => {
-                "relationship_name" => "spouse",
-                "relationship_kinds" => {"$nin" => ["domestic_partner"]}
-              }
-            }
-        }
-      }
-    })
+                                                            "product_packages" => {
+                                                              "$elemMatch" => {
+                                                                "pricing_model.name" => /MA List Bill Shop Pricing Model/,
+                                                                "pricing_model.member_relationships" => {
+                                                                  "$elemMatch" => {
+                                                                    "relationship_name" => "spouse",
+                                                                    "relationship_kinds" => {"$nin" => ["domestic_partner"]}
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          })
     say "Found #{catalogs.count} matching Benefit Market Catalogs"
     fix_count = 0
     catalogs.each do |cat|
       cat.product_packages.each do |p_package|
-        if update_product_package(p_package)
-          fix_count = fix_count + 1
-        end
+        fix_count += 1 if update_product_package(p_package)
       end
     end
     say "Corrected #{fix_count} Benefit Market Catalog Pricing Models"
@@ -59,25 +57,23 @@ class UpdateMaListBillPricingModel < Mongoid::Migration
 
   def self.correct_benefit_sponsor_catalogs
     catalogs = BenefitMarkets::BenefitSponsorCatalog.where({
-      "product_packages" => {
-        "$elemMatch" => {
-            "pricing_model.name" => /MA List Bill Shop Pricing Model/,
-            "pricing_model.member_relationships" => {
-              "$elemMatch" => {
-                "relationship_name" => "spouse",
-                "relationship_kinds" => {"$nin" => ["domestic_partner"]}
-              }
-            }
-        }
-      }
-    }).without("product_packages.products")
+                                                             "product_packages" => {
+                                                               "$elemMatch" => {
+                                                                 "pricing_model.name" => /MA List Bill Shop Pricing Model/,
+                                                                 "pricing_model.member_relationships" => {
+                                                                   "$elemMatch" => {
+                                                                     "relationship_name" => "spouse",
+                                                                     "relationship_kinds" => {"$nin" => ["domestic_partner"]}
+                                                                   }
+                                                                 }
+                                                               }
+                                                             }
+                                                           }).without("product_packages.products")
     say "Found #{catalogs.count} matching Benefit Sponsor Catalog"
     fix_count = 0
     catalogs.each do |cat|
       cat.product_packages.each do |p_package|
-        if update_product_package(p_package)
-          fix_count = fix_count + 1
-        end
+        fix_count += 1 if update_product_package(p_package)
       end
     end
     say "Corrected #{fix_count} Benefit Sponsor Catalog Pricing Models"

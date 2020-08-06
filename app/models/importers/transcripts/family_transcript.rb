@@ -1,5 +1,6 @@
+# frozen_string_literal: true
+
 module Importers::Transcripts
-  
   class StaleRecordError < StandardError; end
   class AmbiguousMatchError < StandardError; end
   class PersonNotFound < StandardError; end
@@ -10,13 +11,13 @@ module Importers::Transcripts
     attr_accessor :transcript, :updates, :market, :other_family
 
     ENUMERATION_FIELDS = {
-      family_members: { enumeration_field: "hbx_id", enumeration: [ ] },
-      irs_groups: { enumeration_field: "hbx_assigned_id", enumeration: [ ] }
-    }
+      family_members: { enumeration_field: "hbx_id", enumeration: [] },
+      irs_groups: { enumeration_field: "hbx_assigned_id", enumeration: [] }
+    }.freeze
 
     SUBSCRIBER_SOURCE_RULE_MAP = {
 
-    }
+    }.freeze
 
     SOURCE_RULE_MAP = {
       base: {
@@ -36,7 +37,7 @@ module Importers::Transcripts
         update: 'ignore',
         remove: 'ignore'
       }
-    }
+    }.freeze
 
     def process
       @updates = {}
@@ -62,11 +63,11 @@ module Importers::Transcripts
     def add(section, attributes)
       rule = find_rule_set(section, :add)
 
-      @updates[:add] ||= {} 
+      @updates[:add] ||= {}
       @updates[:add][section] ||= {}
 
       if section == :base
-        attributes.each do |field, value|
+        attributes.each do |field, _value|
           if rule == 'edi'
           else
             log_ignore(:add, section, field)
@@ -80,8 +81,8 @@ module Importers::Transcripts
             begin
               send("add_#{section}", association)
               log_success(:add, section, identifier)
-            rescue Exception => e 
-              @updates[:add][section][identifier] = ["Failed", "#{e.inspect}"]
+            rescue Exception => e
+              @updates[:add][section][identifier] = ["Failed", e.inspect.to_s]
             end
           else
             log_ignore(:add, section, identifier)
@@ -93,8 +94,8 @@ module Importers::Transcripts
     def update(section, attributes)
       rule = find_rule_set(section, :update)
 
-      @updates[:update] ||= {} 
-      @updates[:update][section] ||= {} 
+      @updates[:update] ||= {}
+      @updates[:update][section] ||= {}
 
       if section == :base
         attributes.each do |field, value|
@@ -112,9 +113,7 @@ module Importers::Transcripts
             if section == :family_members
               hbx_id = identifier.split(':')[1]
               family_member = @family.family_members.detect{|fm| fm.hbx_id == hbx_id}
-              if family_member.blank?
-                raise "#{section} #{identifier} record missing!"
-              end
+              raise "#{section} #{identifier} record missing!" if family_member.blank?
 
               value.each do |key, v|
                 if v['relationship'].blank?
@@ -126,7 +125,7 @@ module Importers::Transcripts
                   validate_timestamp(section)
                   relationships = [['child', 'spouse'],['spouse', 'ward']]
 
-                  if (key == 'add' || key == 'update')
+                  if key == 'add' || key == 'update'
                     if relationships.detect{|pair| pair.include?(v['relationship']) && pair.include?(family_member.relationship)}
                       @family.primary_applicant.person.ensure_relationship_with(family_member.person, v['relationship'])
                     else
@@ -136,7 +135,7 @@ module Importers::Transcripts
 
                   log_success(:update, section, identifier)
                 rescue Exception => e
-                  @updates[:update][section][identifier] = ["Failed", "#{e.inspect}"]
+                  @updates[:update][section][identifier] = ["Failed", e.inspect.to_s]
                 end
               end
             end
@@ -150,11 +149,11 @@ module Importers::Transcripts
     def remove(section, attributes)
       rule = find_rule_set(section, :remove)
 
-      @updates[:remove] ||= {} 
-      @updates[:remove][section] ||= {} 
+      @updates[:remove] ||= {}
+      @updates[:remove][section] ||= {}
 
       if section == :base
-        attributes.each do |field, value|
+        attributes.each do |field, _value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[field.to_sym] == 'edi')
           else
             log_ignore(:remove, section, field)
@@ -162,7 +161,7 @@ module Importers::Transcripts
         end
       else
         enumerated_association = ENUMERATION_FIELDS[section]
-        attributes.each do |identifier, value|
+        attributes.each do |identifier, _value|
           if rule == 'edi' || (rule.is_a?(Hash) && rule[identifier.to_sym] == 'edi')
           else
             log_ignore(:remove, section, identifier)
@@ -177,12 +176,12 @@ module Importers::Transcripts
         section_rows += actions.reduce([]) do |rows, action|
           attributes = @comparison_result.changeset_content_at [section, action]
 
-         person_details = [
-              @transcript[:primary_details][:hbx_id],
-              @transcript[:primary_details][:ssn], 
-              @transcript[:primary_details][:last_name], 
-              @transcript[:primary_details][:first_name]
-          ]
+          person_details = [
+               @transcript[:primary_details][:hbx_id],
+               @transcript[:primary_details][:ssn],
+               @transcript[:primary_details][:last_name],
+               @transcript[:primary_details][:first_name]
+           ]
 
 
           fields_to_ignore = ['_id', 'updated_by']
@@ -190,7 +189,7 @@ module Importers::Transcripts
           rows += attributes.collect do |attribute, value|
             if value.is_a?(Hash)
               fields_to_ignore.each{|key| value.delete(key) }
-              value.each{|k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
+              value.each{|_k, v| fields_to_ignore.each{|key| v.delete(key) } if v.is_a?(Hash) }
             end
             (person_details + [action, "#{section}:#{attribute}", value] + (@updates[action.to_sym][section][attribute] || []))
           end
@@ -203,12 +202,12 @@ module Importers::Transcripts
     def log_success(action, section, field)
       kind = (section == :base ? 'attribute' : 'record')
       @updates[action][section][field] = case action
-      when :add
-        ["Success", "Added #{field} #{kind} on #{section} using EDI source"]
-      when :update
-        ["Success", "Updated #{field} #{kind} on #{section} using EDI source"]
-      else
-        ["Success", "Removed #{field} on #{section}"]
+                                         when :add
+                                           ["Success", "Added #{field} #{kind} on #{section} using EDI source"]
+                                         when :update
+                                           ["Success", "Updated #{field} #{kind} on #{section} using EDI source"]
+                                         else
+                                           ["Success", "Removed #{field} on #{section}"]
       end
     end
 
@@ -268,25 +267,19 @@ module Importers::Transcripts
       #   family.save!
       #   @updates[:new][:new]['ssn'] = ["Success", "Created new family record"]
 
-      # rescue Exception => e 
+      # rescue Exception => e
       #   @updates[:new][:new]['e_case_id'] = ["Failed", "#{e.inspect}"]
       # end
     end
 
     def add_family_members(attributes)
-      if @family.family_members.detect{|fm| fm.hbx_id == attributes['hbx_id']}
-        raise AmbiguousMatchError, "Family member already exists with given hbx_id."
-      end
+      raise AmbiguousMatchError, "Family member already exists with given hbx_id." if @family.family_members.detect{|fm| fm.hbx_id == attributes['hbx_id']}
 
       matched_people = ::Person.where(hbx_id: attributes['hbx_id'])
 
-      if matched_people.blank?
-        raise PersonNotFound, "Person not found with given family member hbx_id."
-      end
+      raise PersonNotFound, "Person not found with given family member hbx_id." if matched_people.blank?
 
-      if matched_people.size > 1
-        raise AmbiguousMatchError, "Ambiguous primary matches found."
-      end
+      raise AmbiguousMatchError, "Ambiguous primary matches found." if matched_people.size > 1
 
       matched_person = matched_people.first
       @family.add_family_member(matched_person, is_primary_applicant: attributes['is_primary_applicant'])
@@ -294,8 +287,7 @@ module Importers::Transcripts
       @family.save!
     end
 
-    def add_irs_groups(attributes)
-    end
+    def add_irs_groups(attributes); end
 
     def match_person_instance(person)
       # if person.hbx_id.present?
@@ -309,30 +301,22 @@ module Importers::Transcripts
       #     )
       # end
 
-      if matched_people.blank?
-        raise PersonNotFound, "Person record not found."
-      end
+      raise PersonNotFound, "Person record not found." if matched_people.blank?
 
-      if matched_people.size > 1
-        raise AmbiguousMatchError, "Ambiguous primary matches found."
-      end
+      raise AmbiguousMatchError, "Ambiguous primary matches found." if matched_people.size > 1
 
       matched_people.first
     end
 
     def validate_timestamp(section)
       if section == :base
-        if @family.updated_at.to_date > @transcript[:source]['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@family.updated_at.strftime('%m/%d/%Y')}"
-        end
+        raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{@family.updated_at.strftime('%m/%d/%Y')}" if @family.updated_at.to_date > @transcript[:source]['updated_at'].to_date
       else
         transcript_record = @transcript[:source][section.to_s].sort_by{|x| x['updated_at']}.reverse.first if @transcript[:source][section.to_s].present?
-        source_record = @family.send(section).sort_by{|x| x.updated_at}.reverse.first if @family.send(section).present?
+        source_record = @family.send(section).sort_by(&:updated_at).reverse.first if @family.send(section).present?
         return if transcript_record.blank? || source_record.blank?
 
-        if source_record.updated_at.to_date > transcript_record['updated_at'].to_date
-          raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}"
-        end
+        raise StaleRecordError, "Change set unprocessed, source record updated after Transcript generated. Updated on #{source_record.updated_at.strftime('%m/%d/%Y')}" if source_record.updated_at.to_date > transcript_record['updated_at'].to_date
       end
     end
   end

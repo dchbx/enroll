@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     module HealthProducts
@@ -14,7 +16,6 @@ module BenefitMarkets
           "metal_level_health_additional_form_fields"
         end
       end
-
     end
   end
 end

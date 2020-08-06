@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   include ApplicationHelper
 
@@ -8,7 +10,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     args[:recipient] = consumer_role.person.families.first.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person.families.first.primary_applicant.person
+    args[:recipient_document_store] = consumer_role.person.families.first.primary_applicant.person
     args[:to] = consumer_role.person.families.first.primary_applicant.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -25,18 +27,14 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
   def attach_docs
-    attach_required_documents if (notice.documents_needed && !notice.cover_all?)
+    attach_required_documents if notice.documents_needed && !notice.cover_all?
   end
 
   def build
@@ -55,8 +53,6 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     end
   end
 
-
-
   def append_open_enrollment_data
     hbx = HbxProfile.current_hbx
     bc_period = hbx.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| bcp if (bcp.start_on..bcp.end_on).cover?(TimeKeeper.date_of_record.next_year) }
@@ -67,12 +63,12 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   def append_member_information(people)
     people.each do |member|
       notice.individuals << PdfTemplates::Individual.new({
-        :first_name => member.first_name.titleize,
-        :last_name => member.last_name.titleize,
-        :full_name => member.full_name.titleize,
-        :age => calculate_age_by_dob(member.dob),
-        :residency_verified => member.consumer_role.residency_verified?
-        })
+                                                           :first_name => member.first_name.titleize,
+                                                           :last_name => member.last_name.titleize,
+                                                           :full_name => member.full_name.titleize,
+                                                           :age => calculate_age_by_dob(member.dob),
+                                                           :residency_verified => member.consumer_role.residency_verified?
+                                                         })
     end
   end
 
@@ -80,7 +76,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     family = recipient.primary_family
     date = TimeKeeper.date_of_record
 
-    hbx_enrollments = @hbx_enrollment_hbx_ids.inject([]) do | hbx_enrollments, hbx_id|
+    hbx_enrollments = @hbx_enrollment_hbx_ids.inject([]) do |hbx_enrollments, hbx_id|
       hbx_enrollments << HbxEnrollment.all.by_hbx_id(hbx_id)
     end
     hbx_enrollments.flatten!
@@ -109,7 +105,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     end
 
     notice.coverage_year = hbx_enrollments.compact.first.effective_on.year
-    notice.due_date = (family.min_verification_due_date.present? && (family.min_verification_due_date > date)) ? family.min_verification_due_date : min_notice_due_date(family)
+    notice.due_date = family.min_verification_due_date.present? && (family.min_verification_due_date > date) ? family.min_verification_due_date : min_notice_due_date(family)
     outstanding_people.uniq!
     notice.documents_needed = family.has_valid_e_case_id? ? false : (outstanding_people.present? ? true : false)
     append_unverified_individuals(outstanding_people)
@@ -124,11 +120,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
     end
     due_dates.compact!
     earliest_future_due_date = due_dates.select{ |d| d > TimeKeeper.date_of_record }.min
-    if due_dates.present? && earliest_future_due_date.present?
-      earliest_future_due_date.to_date
-    else
-      nil
-    end
+    earliest_future_due_date.to_date if due_dates.present? && earliest_future_due_date.present?
   end
 
   def update_individual_due_date(person, date)
@@ -149,7 +141,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
   end
 
   def immigration_status_outstanding?(person)
-   person.consumer_role.types_include_to_notices.include?('Immigration status')
+    person.consumer_role.types_include_to_notices.include?('Immigration status')
   end
 
   def american_indian_status_outstanding?(person)
@@ -162,25 +154,15 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
 
   def append_unverified_individuals(people)
     people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if ssn_outstanding?(person)
 
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if lawful_presence_outstanding?(person)
 
-      if immigration_status_outstanding?(person)
-        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if immigration_status_outstanding?(person)
 
-      if american_indian_status_outstanding?(person)
-        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if american_indian_status_outstanding?(person)
 
-      if residency_outstanding?(person)
-        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if residency_outstanding?(person)
     end
   end
 
@@ -213,23 +195,23 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
                                     deductible: enrollment.product.deductible
                                   })
     PdfTemplates::Enrollment.new({
-      created_at: enrollment.created_at,
-      premium: enrollment.total_premium.round(2),
-      aptc_amount: enrollment.applied_aptc_amount.round(2),
-      responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-      phone: phone_number(enrollment.product.issuer_profile.legal_name),
-      is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-      coverage_kind: enrollment.coverage_kind,
-      kind: enrollment.kind,
-      effective_on: enrollment.effective_on,
-      plan: plan,
-      enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-        enrollee = PdfTemplates::Individual.new({
-          full_name: member.person.full_name.titleize,
-          age: member.person.age_on(TimeKeeper.date_of_record)
-        })
-        enrollees << enrollee
-      end
-    })
+                                   created_at: enrollment.created_at,
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
+                                 })
   end
 end

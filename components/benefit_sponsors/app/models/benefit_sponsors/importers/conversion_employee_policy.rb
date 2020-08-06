@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers
     class ConversionEmployeePolicy < ::Importers::ConversionEmployeePolicy
@@ -11,13 +13,13 @@ module BenefitSponsors
         found_employer = find_employer
 
         if benefit_application
-          candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
-          @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+          candidate_bgas = census_employee.benefit_group_assignments.where(:benefit_package_id.in => benefit_application.benefit_packages.map(&:id))
+          @found_benefit_group_assignment = candidate_bgas.max_by(&:start_on)
         end
       end
 
       def current_benefit_application(employer)
-        if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+        if employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion"
           employer.benefit_applications.where(:aasm_state => :imported).first
         else
           employer.benefit_applications.where(:aasm_state => :active).first
@@ -31,16 +33,16 @@ module BenefitSponsors
         return nil if found_employer.nil?
         benefit_sponsorship = found_employer.active_benefit_sponsorship
         candidate_employees = CensusEmployee.where({
-                                                       benefit_sponsors_employer_profile_id: found_employer.id,
-                                                       benefit_sponsorship_id: benefit_sponsorship.id,
+                                                     benefit_sponsors_employer_profile_id: found_employer.id,
+                                                     benefit_sponsorship_id: benefit_sponsorship.id,
                                                        # hired_on: {"$lte" => start_date},
-                                                       encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                     encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                    })
         non_terminated_employees = candidate_employees.reject do |ce|
-          (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+          !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
         end
 
-        @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+        @found_employee = non_terminated_employees.max_by(&:hired_on)
       end
 
       def find_plan
@@ -48,11 +50,11 @@ module BenefitSponsors
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
 
-        if sponsored_benefit_kind == :dental
-          corrected_hios_id = clean_hios.split("-")[0]
-        else
-          corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        end
+        corrected_hios_id = if sponsored_benefit_kind == :dental
+                              clean_hios.split("-")[0]
+                            else
+                              (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+                            end
 
         sponsor_benefit = find_sponsor_benefit
 
@@ -70,9 +72,9 @@ module BenefitSponsors
       def find_sponsor_benefit
         benefit_application = fetch_application_based_sponsored_kind
         benefit_package = benefit_application.benefit_packages.first
-        benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
+        benefit_package.sponsored_benefits.unscoped.detect do |sponsored_benefit|
           sponsored_benefit.product_kind == sponsored_benefit_kind
-        }
+        end
       end
 
       # for normal :conversion, :mid_plan_year_conversion we use :imported plan year

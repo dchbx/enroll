@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class AllocatedAptcsParser
     include HappyMapper

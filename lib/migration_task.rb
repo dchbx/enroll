@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class MigrationTask < Rake::Task
   def initialize(task_name, app)
     super(task_name, app)
     task = task_name.to_s.match(/\:?(\w+)$/)[1]
-    migrate = '[self.'+task + ']'
-    @actions << Proc.new{ eval(migrate)}
+    migrate = '[self.' + task + ']'
+    @actions << proc{ eval(migrate)}
   end
 
   def self.define_task(*args, &blk)

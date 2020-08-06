@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class CcaHbxEnrollmentsMigration < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/enrollment_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( employer_name census_emp_id benefit_group_assignment_id enrollment_id status product_id issuer_profile_id benefit_sponsorship_id sponsored_benefit_package_id sponsored_benefit_id)
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
+      file_name = "#{Rails.root}/hbx_report/enrollment_migration_status_#{TimeKeeper.datetime_of_record.strftime('%m_%d_%Y_%H_%M_%S')}.csv"
+      field_names = %w[employer_name census_emp_id benefit_group_assignment_id enrollment_id status product_id issuer_profile_id benefit_sponsorship_id sponsored_benefit_package_id sponsored_benefit_id]
 
       logger = Logger.new("#{Rails.root}/log/enrollment_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -25,8 +27,7 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
     end
   end
 
-  def self.down
-  end
+  def self.down; end
 
   private
 
@@ -65,9 +66,8 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
 
           next unless new_model_ids_nil?(enrollment)
 
-          total_enrollments = total_enrollments + 1
+          total_enrollments += 1
           begin
-
             #get plan_id - product_id
             if enrollment.plan.present?
               hios_id = enrollment.plan.hios_id
@@ -106,28 +106,28 @@ class CcaHbxEnrollmentsMigration < Mongoid::Migration
                                          benefit_sponsorship_id: benefit_sponsorship_id,
                                          sponsored_benefit_package_id: sponsored_benefit_package_id,
                                          sponsored_benefit_id: sponsored_benefit_id,
-                                         rating_area_id: rating_area_id
-            )
+                                         rating_area_id: rating_area_id)
 
             print '.' unless Rails.env.test?
-            updated_enrollments = updated_enrollments + 1
+            updated_enrollments += 1
             csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "updated", enrollment.product_id, enrollment.issuer_profile_id, enrollment.benefit_sponsorship_id, enrollment.sponsored_benefit_package_id, enrollment.sponsored_benefit_id]
-
           rescue Exception => e
             print 'F' unless Rails.env.test?
             csv << [ce.employer_profile.legal_name, ce.id, bga.id, enrollment.id, "failed", enrollment.product_id, enrollment.issuer_profile_id, enrollment.benefit_sponsorship_id, enrollment.sponsored_benefit_package_id, enrollment.sponsored_benefit_id]
-            logger.error "update failed for HBX Enrollment: #{enrollment.id},
-            #{e.inspect}" unless Rails.env.test?
+            unless Rails.env.test?
+              logger.error "update failed for HBX Enrollment: #{enrollment.id},
+              #{e.inspect}"
+            end
           end
         end
       end
     end
     logger.info " Total #{total_enrollments} enrollments to be migrated" unless Rails.env.test?
     logger.info " #{updated_enrollments} enrollments updated at this point." unless Rails.env.test?
-    return true
+    true
   end
 
-  def self.new_model_ids_nil? enrollment
+  def self.new_model_ids_nil?(enrollment)
     enrollment.sponsored_benefit_id.nil?
   end
 

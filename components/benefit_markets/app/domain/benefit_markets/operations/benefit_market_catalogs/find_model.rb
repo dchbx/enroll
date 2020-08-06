@@ -15,13 +15,13 @@ module BenefitMarkets
         # @param [ Date ] effective_date Effective date of the benefit application
         # @param [ Symbol ] market_kind Benefit Market Catalog for the given Effective Date
         def call(params)
-          benefit_market_catalog =  yield benefit_market_catalog(params)
-          
+          benefit_market_catalog = yield benefit_market_catalog(params)
+
           Success(benefit_market_catalog)
         end
 
         private
-        
+
         def benefit_market_catalog(params)
           benefit_market = benefit_market(params)
           benefit_market_catalog = benefit_market.benefit_market_catalog_for(params[:effective_date])

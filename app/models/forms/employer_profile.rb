@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require 'date'
 module Forms
-  class EmployerProfile  < ::Forms::OrganizationSignup
+  class EmployerProfile < ::Forms::OrganizationSignup
     attr_reader :employer_profile
     attr_accessor :email
     attr_accessor :area_code
@@ -13,9 +15,7 @@ module Forms
       existing_org = Organization.where(:fein => fein).first
       if existing_org.present?
         if existing_org.employer_profile.present?
-          if (Person.where({"employer_staff_roles.employer_profile_id" => existing_org.employer_profile._id}).any?)
-            claimed = true
-          end
+          claimed = true if Person.where({"employer_staff_roles.employer_profile_id" => existing_org.employer_profile._id}).any?
         end
       end
       [existing_org, claimed]
@@ -27,7 +27,7 @@ module Forms
       if employer_ids.include? employer_profile.id
         pending = false
       else
-        pending = existing_company && Person.staff_for_employer(employer_profile).detect{|person|person.user_id}
+        pending = existing_company && Person.staff_for_employer(employer_profile).detect(&:user_id)
         role_state = pending ? 'is_applicant' : 'is_active'
         person.employer_staff_roles << EmployerStaffRole.new(person: person, :employer_profile_id => employer_profile.id, is_owner: true, aasm_state: role_state)
       end
@@ -37,7 +37,7 @@ module Forms
       pending
     end
 
-    def save(current_user, employer_profile_id)
+    def save(current_user, _employer_profile_id)
       return false unless valid?
       begin
         match_or_create_person(current_user)
@@ -70,17 +70,17 @@ module Forms
         :legal_name => legal_name,
         :dba => dba,
         :employer_profile => ::EmployerProfile.new({
-          :entity_kind => entity_kind,
-          :contact_method => contact_method,
-          :sic_code => sic_code,
-          :employer_attestation => ::EmployerAttestation.new(),
-        }),
+                                                     :entity_kind => entity_kind,
+                                                     :contact_method => contact_method,
+                                                     :sic_code => sic_code,
+                                                     :employer_attestation => ::EmployerAttestation.new
+                                                   }),
         :office_locations => office_locations
       )
     end
 
     def update_organization(org)
-      if !org.employer_profile.present?
+      unless org.employer_profile.present?
         org.create_employer_profile({:entity_kind => entity_kind, :sic_code => sic_code})
         org.save!
       end

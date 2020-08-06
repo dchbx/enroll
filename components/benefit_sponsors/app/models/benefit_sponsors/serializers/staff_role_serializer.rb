@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Serializers
     class StaffRoleSerializer < ActiveModel::Serializer
@@ -15,12 +17,12 @@ module BenefitSponsors
 
       def phone
         phone = object.phones.detect { |phone| phone.kind == 'work' }
-        phone && phone.to_s
+        phone&.to_s
       end
 
       def status
         state = object.user_id.present? ? " Linked" : " Unlinked"
-        (staff_role.aasm_state.to_s).titleize + state
+        staff_role.aasm_state.to_s.titleize + state
       end
 
       def dob
@@ -49,8 +51,8 @@ module BenefitSponsors
 
       def staff_role
         object.employer_staff_roles.where(
-          :"benefit_sponsor_employer_profile_id" => instance_options[:profile_id],
-          :"aasm_state".in => ['is_active','is_applicant']
+          :benefit_sponsor_employer_profile_id => instance_options[:profile_id],
+          :aasm_state.in => ['is_active','is_applicant']
         ).first
       end
 
@@ -62,7 +64,7 @@ module BenefitSponsors
       def attributes(*args)
         hash = super
         unless object.persisted?
-          
+
         end
         hash
       end

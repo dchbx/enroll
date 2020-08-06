@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class generates v2 xmls
 #
 # Inputs
@@ -17,8 +19,9 @@ class V2GroupXmlGenerator
 
   CARRIER_ABBREVIATIONS = {
     "CareFirst": "GHMSI", "Aetna": "AHI", "Kaiser": "KFMASI", "UnitedHealthcare": "UHIC", "Delta Dental": "DDPA",
-      "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META", "Health New England, Inc.": "HNE", "Boston Medical Center HealthNet Plan": "BMCHP", "Fallon Community Health Plan, Inc.": "FCHP",
-      "Minuteman Health, Inc.": "MHI"}
+    "Dentegra": "DTGA", "Dominion": "DMND", "Guardian": "GARD", "BestLife": "BLHI", "MetLife": "META", "Health New England, Inc.": "HNE", "Boston Medical Center HealthNet Plan": "BMCHP", "Fallon Community Health Plan, Inc.": "FCHP",
+    "Minuteman Health, Inc.": "MHI"
+  }.freeze
 
   # Inputs
   # 1 Array of FEINS
@@ -26,7 +29,7 @@ class V2GroupXmlGenerator
   # 3 plan_year[:end_date] e.g. 20160831
   def initialize(feins, plan_year_start, plan_year_end)
     @feins = feins
-    Dir.mkdir("employer_xmls.v2") unless File.exists?("employer_xmls.v2") #Output directory
+    Dir.mkdir("employer_xmls.v2") unless File.exist?("employer_xmls.v2") #Output directory
     @plan_year = {"start_date": plan_year_start, "end_date": plan_year_end}
   end
 
@@ -46,39 +49,39 @@ class V2GroupXmlGenerator
 # 4 if carrier-switch then generate xml for each of the dropped carrier and add to hash.
     @feins.uniq.each do |fein|
 
-      begin
-        employer_profile = BenefitSponsors::Organizations::Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
-        benefit_application = find_benefit_application(employer_profile)
 
-        unless benefit_application.present?
-          puts "benefit_application not found"
-          return
-        end
+      employer_profile = BenefitSponsors::Organizations::Organization.where(:fein => fein.gsub("-", "")).first.employer_profile
+      benefit_application = find_benefit_application(employer_profile)
 
-        carrier_profiles = benefit_application_carriers(benefit_application).flatten.uniq
-        next if carrier_profiles.length == 0
-
-        cv_xml = nil
-        carrier_profiles.each do |carrier|
-          cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile, manual_gen: true}
-
-          organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
-
-          organizations_hash[carrier.legal_name] << remove_other_carrier_nodes(cv_xml, carrier.legal_name,
-                                                                               employer_profile, benefit_application)
-        end
-
-        # carrier switch scenario
-        switched_carriers(employer_profile, benefit_application).uniq.each do |switched_carrier|
-          organizations_hash[switched_carrier.legal_name] = [] if organizations_hash[switched_carrier.legal_name].nil?
-          organizations_hash[switched_carrier.legal_name] << remove_other_carrier_nodes(cv_xml, switched_carrier.legal_name,
-                                                                                        employer_profile,
-                                                                                        predecessor_application(benefit_application).effective_period.min.strftime("%Y%m%d"),
-                                                                                        {event: "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"})
-        end
-      rescue => e
-        puts "Error FEIN #{fein} #{e.message}\n " + e.backtrace.to_s
+      unless benefit_application.present?
+        puts "benefit_application not found"
+        return
       end
+
+      carrier_profiles = benefit_application_carriers(benefit_application).flatten.uniq
+      next if carrier_profiles.empty?
+
+      cv_xml = nil
+      carrier_profiles.each do |carrier|
+        cv_xml = views_helper.render file: File.join(Rails.root, "/app/views/events/v2/employers/updated.xml.haml"), :locals => {employer: employer_profile, manual_gen: true}
+
+        organizations_hash[carrier.legal_name] = [] if organizations_hash[carrier.legal_name].nil?
+
+        organizations_hash[carrier.legal_name] << remove_other_carrier_nodes(cv_xml, carrier.legal_name,
+                                                                             employer_profile, benefit_application)
+      end
+
+      # carrier switch scenario
+      switched_carriers(employer_profile, benefit_application).uniq.each do |switched_carrier|
+        organizations_hash[switched_carrier.legal_name] = [] if organizations_hash[switched_carrier.legal_name].nil?
+        organizations_hash[switched_carrier.legal_name] << remove_other_carrier_nodes(cv_xml, switched_carrier.legal_name,
+                                                                                      employer_profile,
+                                                                                      predecessor_application(benefit_application).effective_period.min.strftime("%Y%m%d"),
+                                                                                      {event: "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped"})
+      end
+    rescue StandardError => e
+      puts "Error FEIN #{fein} #{e.message}\n " + e.backtrace.to_s
+
     end
 
 # iterate the hash and generate group xml v2 for each carrier, including all employers for that carrier
@@ -90,6 +93,7 @@ class V2GroupXmlGenerator
   end
 
   private
+
   def write(payload, file_name)
     File.open(File.join("employer_xmls.v2", "#{file_name}.xml"), 'w') do |f|
       f.puts payload
@@ -100,23 +104,13 @@ class V2GroupXmlGenerator
     doc = Nokogiri::XML(xml)
     doc.xpath("//cv:elected_plans/cv:elected_plan", {:cv => XML_NS}).each do |node|
       carrier_name = node.at_xpath("cv:carrier/cv:name", {:cv => XML_NS}).content
-      if carrier_name.to_s.strip.downcase != trading_partner.downcase.strip
-        node.remove
-      end
+      node.remove if carrier_name.to_s.strip.downcase != trading_partner.downcase.strip
     end
 
-    doc.xpath("//cv:benefit_group/cv:elected_plans[not(cv:elected_plan)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
-    doc.xpath("//cv:benefit_group[not(cv:elected_plans)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
-    doc.xpath("//cv:plan_year/cv:benefit_groups[not(cv:benefit_group)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
-    doc.xpath("//cv:plan_year[not(cv:benefit_groups)]", {:cv => XML_NS}).each do |node|
-      node.remove
-    end
+    doc.xpath("//cv:benefit_group/cv:elected_plans[not(cv:elected_plan)]", {:cv => XML_NS}).each(&:remove)
+    doc.xpath("//cv:benefit_group[not(cv:elected_plans)]", {:cv => XML_NS}).each(&:remove)
+    doc.xpath("//cv:plan_year/cv:benefit_groups[not(cv:benefit_group)]", {:cv => XML_NS}).each(&:remove)
+    doc.xpath("//cv:plan_year[not(cv:benefit_groups)]", {:cv => XML_NS}).each(&:remove)
     employer_id = doc.at_xpath("//cv:organization/cv:id/cv:id", {:cv => XML_NS}).content
     has_last_year = false
     has_this_year = false
@@ -124,19 +118,13 @@ class V2GroupXmlGenerator
 
     previous_plan_year_value = predecessor_application(benefit_application)
 
-    if previous_plan_year_value.present?
-      has_last_year = true
-    end
+    has_last_year = true if previous_plan_year_value.present?
 
-    if doc.xpath("//cv:plan_year/cv:plan_year_start[contains(text(), '#{@plan_year[:start_date]}')]", {:cv => XML_NS}).any?
-      has_this_year = true
-    end
+    has_this_year = true if doc.xpath("//cv:plan_year/cv:plan_year_start[contains(text(), '#{@plan_year[:start_date]}')]", {:cv => XML_NS}).any?
 
     # carrier switch case
     # the is the xml for the dropped carrier
-    if (options[:event].present?) && (options[:event] == "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped")
-      return [options[:event], employer_id, doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)]
-    end
+    return [options[:event], employer_id, doc.to_xml(:save_with => Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)] if options[:event].present? && (options[:event] == "urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped")
 
     if has_last_year && has_this_year
       if employer_profile.active_benefit_sponsorship.is_eligible?
@@ -179,7 +167,7 @@ class V2GroupXmlGenerator
     return [] if previous_plan_year_value.nil? #no previous plan year
     this_plan_year = find_benefit_application(employer_profile)
     this_plan_year_carrier_profiles = benefit_application_carriers(this_plan_year).flatten.uniq
-    previous_plan_year_carrier_profiles =  benefit_application_carriers(previous_plan_year_value).flatten.uniq
+    previous_plan_year_carrier_profiles = benefit_application_carriers(previous_plan_year_value).flatten.uniq
     previous_plan_year_carrier_profiles - this_plan_year_carrier_profiles
   end
 

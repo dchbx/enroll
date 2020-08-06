@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   class MongoidDatatableTool
     attr_accessor :table_columns
@@ -10,14 +12,12 @@ module Effective
     end
 
     def search_terms
-      @search_terms ||= @datatable.search_terms.select { |name, search_term| table_columns.key?(name) }
+      @search_terms ||= @datatable.search_terms.select { |name, _search_term| table_columns.key?(name) }
     end
 
     def order_by_column
       sort_column = table_columns[@datatable.order_name]
-      if sort_column[:sortable]
-        @order_by_column ||= table_columns[@datatable.order_name]
-      end
+      @order_by_column ||= table_columns[@datatable.order_name] if sort_column[:sortable]
     end
 
     def order(collection)
@@ -27,16 +27,13 @@ module Effective
       column_order
     end
 
-    def order_column_with_defaults(collection, table_column, direction, sql_column)
-
+    def order_column_with_defaults(collection, _table_column, direction, sql_column)
       sql_direction = (direction == :desc ? -1 : 1)
       collection.order_by(sql_column => sql_direction)
     end
 
     def search(collection)
-      if !@datatable.global_search_string.blank?
-        collection = collection.send(@datatable.global_search_method, @datatable.global_search_string)
-      end
+      collection = collection.send(@datatable.global_search_method, @datatable.global_search_string) unless @datatable.global_search_string.blank?
       search_terms.each do |name, search_term|
         column_search = search_column(collection, table_columns[name], search_term, table_columns[name][:column])
         collection = column_search
@@ -44,7 +41,7 @@ module Effective
       collection
     end
 
-    def search_column_with_defaults(collection, table_column, term, sql_column)
+    def search_column_with_defaults(collection, _table_column, _term, _sql_column)
       collection
     end
 

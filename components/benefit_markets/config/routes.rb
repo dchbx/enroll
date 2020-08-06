@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 BenefitMarkets::Engine.routes.draw do
   resources :sites, only: [] do
     resources :benefit_markets, only: [:index, :new, :create], shallow: true

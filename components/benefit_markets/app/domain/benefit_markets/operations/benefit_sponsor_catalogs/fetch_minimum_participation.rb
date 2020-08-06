@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Operations
     module BenefitSponsorCatalogs
-
       class FetchMinimumParticipation
 
         include Dry::Monads[:result, :do]
@@ -10,8 +11,8 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Products::ProductPackage> ] product_packages ProductPackage
         # @return [ BenefitMarkets::Entities::BenefitSponsorCatalog ] benefit_sponsor_catalog Benefit Sponsor Catalog
         def call(product_package:,  calender_year:)
-          minimum_participation  = yield fetch(product_package, calender_year)
-    
+          minimum_participation = yield fetch(product_package, calender_year)
+
           Success(minimum_participation)
         end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 
@@ -11,17 +13,19 @@ module BenefitSponsors
     let(:entity_kind)       { :c_corporation }
     let(:contact_method)    { :paper_and_electronic }
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
-    let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                site: site,
-                                hbx_id: hbx_id,
-                                legal_name: legal_name,
-                                dba: dba,
-                                entity_kind: entity_kind,
-                                fein: fein,
-    )}
+    let(:organization)      do
+      BenefitSponsors::Organizations::GeneralOrganization.new(
+        site: site,
+        hbx_id: hbx_id,
+        legal_name: legal_name,
+        dba: dba,
+        entity_kind: entity_kind,
+        fein: fein
+      )
+    end
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
-    let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    let(:phone)           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let(:office_locations)  { [office_location] }
 
@@ -30,7 +34,7 @@ module BenefitSponsors
       {
         organization: organization,
         office_locations: office_locations,
-        contact_method: contact_method,
+        contact_method: contact_method
       }
     end
 
@@ -78,7 +82,7 @@ module BenefitSponsors
         let(:invalid_address)         { BenefitSponsors::Locations::Address.new(kind: "work", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
         let(:invalid_office_location) { BenefitSponsors::Locations::OfficeLocation.new(is_primary: false, address: invalid_address, phone: phone) }
 
-        subject { described_class.new(office_locations: [invalid_office_location] ) }
+        subject { described_class.new(office_locations: [invalid_office_location]) }
 
         it "should not be valid"
       end
@@ -91,7 +95,7 @@ module BenefitSponsors
         end
 
         context "and all arguments are valid" do
-          before {
+          before do
             site.byline = 'test'
             site.long_name = 'test'
             site.short_name = 'test'
@@ -99,7 +103,7 @@ module BenefitSponsors
             site.owner_organization = organization
             site.site_organizations << organization
             organization.profiles << subject
-          }
+          end
 
           it "should be valid" do
             subject.validate

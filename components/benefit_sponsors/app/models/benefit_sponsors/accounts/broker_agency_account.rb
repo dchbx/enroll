@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Accounts
     class BrokerAgencyAccount
@@ -8,7 +10,7 @@ module BenefitSponsors
       include ::BenefitSponsors::ModelEvents::BrokerAgencyAccount
 
       embedded_in :benefit_sponsorship,
-                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
       embedded_in :family
 
@@ -38,7 +40,7 @@ module BenefitSponsors
 
       # belongs_to broker_agency_profile
       def broker_agency_profile=(new_broker_agency_profile)
-        raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+        raise ArgumentError, "expected BrokerAgencyProfile" unless new_broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
         self.benefit_sponsors_broker_agency_profile_id = new_broker_agency_profile._id
         @broker_agency_profile = new_broker_agency_profile
       end
@@ -58,9 +60,9 @@ module BenefitSponsors
         broker_agency_profile.present? ? broker_agency_profile.legal_name : ""
       end
 
-      #TODO based on new organization and profile
+      #TODO: based on new organization and profile
       def writing_agent=(new_writing_agent)
-        raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
+        raise ArgumentError, "expected BrokerRole" unless new_writing_agent.is_a?(BrokerRole)
         self.writing_agent_id = new_writing_agent._id
         @writing_agent = new_writing_agent
       end

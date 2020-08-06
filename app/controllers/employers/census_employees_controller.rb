@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class Employers::CensusEmployeesController < ApplicationController
   before_action :find_employer
-  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra ,:cobra_reinstate, :confirm_effective_date]
+  before_action :find_census_employee, only: [:edit, :update, :show, :delink, :terminate, :rehire, :benefit_group, :cobra,:cobra_reinstate, :confirm_effective_date]
   before_action :updateable?, except: [:edit, :show, :update, :benefit_group]
   layout "two_column"
   def new
@@ -11,19 +13,17 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def create
     @census_employee = CensusEmployee.new(census_employee_params.merge!({
-      benefit_sponsorship_id: @benefit_sponsorship.id,
-      benefit_sponsors_employer_profile_id: @employer_profile.id,
-      active_benefit_group_assignment: benefit_group_id,
-      renewal_benefit_group_assignment: renewal_benefit_group_id,
-      no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
-    }))
+                                                                          benefit_sponsorship_id: @benefit_sponsorship.id,
+                                                                          benefit_sponsors_employer_profile_id: @employer_profile.id,
+                                                                          active_benefit_group_assignment: benefit_group_id,
+                                                                          renewal_benefit_group_assignment: renewal_benefit_group_id,
+                                                                          no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
+                                                                        }))
     # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
 
     if @census_employee.save
       flash[:notice] = "Census Employee is successfully created."
-      if @census_employee.active_benefit_group_assignment.blank?
-        flash[:notice] = "Your employee was successfully added to your roster."
-      end
+      flash[:notice] = "Your employee was successfully added to your roster." if @census_employee.active_benefit_group_assignment.blank?
       redirect_to benefit_sponsors.profiles_employers_employer_profile_path(@employer_profile, tab: 'employees')
     else
       @reload = true
@@ -45,12 +45,12 @@ class Employers::CensusEmployeesController < ApplicationController
 
     # @census_employee.assign_benefit_packages(benefit_group_id: benefit_group_id, renewal_benefit_group_id: renewal_benefit_group_id)
     @census_employee.attributes = census_employee_params.merge!({
-      active_benefit_group_assignment: benefit_group_id,
-      renewal_benefit_group_assignment: renewal_benefit_group_id,
-      no_ssn_allowed: @census_employee.no_ssn_allowed || @benefit_sponsorship.is_no_ssn_enabled
-    })
+                                                                  active_benefit_group_assignment: benefit_group_id,
+                                                                  renewal_benefit_group_assignment: renewal_benefit_group_id,
+                                                                  no_ssn_allowed: @census_employee.no_ssn_allowed || @benefit_sponsorship.is_no_ssn_enabled
+                                                                })
 
-    destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|k,v| v.has_key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
+    destroyed_dependent_ids = census_employee_params[:census_dependents_attributes].delete_if{|_k,v| v.key?("_destroy") }.values.map{|x| x[:id]} if census_employee_params[:census_dependents_attributes]
     authorize @census_employee, :update?
 
     if @census_employee.attributes[:email].present? && @census_employee.attributes[:email][:address].blank?
@@ -70,9 +70,7 @@ class Employers::CensusEmployeesController < ApplicationController
       end
 
       flash[:notice] = "Census Employee is successfully updated."
-      if benefit_group_id.blank?
-        flash[:notice] += " Note: new employee cannot enroll on #{site_short_name} until they are assigned a benefit group."
-      end
+      flash[:notice] += " Note: new employee cannot enroll on #{site_short_name} until they are assigned a benefit group." if benefit_group_id.blank?
 
       redirect_to employers_employer_profile_census_employee_path(@employer_profile.id, @census_employee.id, tab: 'employees', status: params[:status])
     else
@@ -92,22 +90,20 @@ class Employers::CensusEmployeesController < ApplicationController
 
     if termination_date.present?
       termination_date = DateTime.strptime(termination_date, '%m/%d/%Y').try(:to_date)
-      if termination_date >= (TimeKeeper.date_of_record - 60.days)
-        @fa = @census_employee.terminate_employment(termination_date)
-      end
+      @fa = @census_employee.terminate_employment(termination_date) if termination_date >= (TimeKeeper.date_of_record - 60.days)
     end
 
     respond_to do |format|
-      format.js {
+      format.js do
         if termination_date.present? && @fa
           flash[:notice] = "Successfully terminated Census Employee."
         else
           flash[:error] = "Census Employee could not be terminated: Termination date must be within the past 60 days."
         end
-      }
-      format.all {
+      end
+      format.all do
         flash[:notice] = "Successfully terminated Census Employee."
-      }
+      end
     end
     flash.keep(:error)
     flash.keep(:notice)
@@ -118,11 +114,11 @@ class Employers::CensusEmployeesController < ApplicationController
     authorize EmployerProfile, :updateable?
     status = params[:status]
     rehiring_date = params["rehiring_date"]
-    if rehiring_date.present?
-      rehiring_date = DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
-    else
-      rehiring_date = ""
-    end
+    rehiring_date = if rehiring_date.present?
+                      DateTime.strptime(rehiring_date, '%m/%d/%Y').try(:to_date)
+                    else
+                      ""
+                    end
     @rehiring_date = rehiring_date
     if @rehiring_date.present? && @rehiring_date > @census_employee.employment_terminated_on
       new_census_employee = @census_employee.replicate_for_rehire
@@ -149,17 +145,17 @@ class Employers::CensusEmployeesController < ApplicationController
     end
     flash.keep(:error)
     flash.keep(:notice)
-    render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab=>'employees', status: params[:status])}'"
+    render js: "window.location = '#{employers_employer_profile_path(@employer_profile.id, :tab => 'employees', status: params[:status])}'"
   end
 
   def cobra
     cobra_date = params["cobra_date"]
 
-    if cobra_date.present?
-      @cobra_date = DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
-    else
-      @cobra_date = ""
-    end
+    @cobra_date = if cobra_date.present?
+                    DateTime.strptime(cobra_date, '%m/%d/%Y').try(:to_date)
+                  else
+                    ""
+                  end
 
     if @cobra_date.present? && @census_employee.can_elect_cobra?
       if @census_employee.update_for_cobra(@cobra_date, current_user)
@@ -191,9 +187,7 @@ class Employers::CensusEmployeesController < ApplicationController
     @status = params[:status] || ''
     @no_ssn = @census_employee.no_ssn_allowed || false
     @hbx_enrollments = @census_employee.enrollments_for_display
-    if @census_employee.no_ssn_allowed && !@benefit_sponsorship.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
-      flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required."
-    end
+    flash[:notice] = "This employee does not have an SSN because he/she was created at a time when an SSN was not required." if @census_employee.no_ssn_allowed && !@benefit_sponsorship.is_no_ssn_enabled && @census_employee.encrypted_ssn.nil?
   end
 
   def delink
@@ -232,10 +226,10 @@ class Employers::CensusEmployeesController < ApplicationController
       begin
         census_employees = CensusEmployee.find(params[:ids])
         census_employees.each do |census_employee|
-          census_employee.update_attributes(:expected_selection=>params[:expected_selection].downcase)
+          census_employee.update_attributes(:expected_selection => params[:expected_selection].downcase)
         end
         render json: { status: 200, message: 'successfully submitted the selected Employees participation status' }
-      rescue => e
+      rescue StandardError => e
         render json: { status: 500, message: 'An error occured while submitting employees participation status' }
       end
     end
@@ -248,11 +242,15 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def benefit_group_id
-    params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id] rescue nil
+    params[:census_employee][:benefit_group_assignments_attributes]["0"][:benefit_group_id]
+  rescue StandardError
+    nil
   end
 
   def renewal_benefit_group_id
-    params[:census_employee][:renewal_benefit_group_assignments][:benefit_group_id] rescue nil
+    params[:census_employee][:renewal_benefit_group_assignments][:benefit_group_id]
+  rescue StandardError
+    nil
   end
 
   def census_employee_params
@@ -274,13 +272,12 @@ class Employers::CensusEmployeesController < ApplicationController
 =end
 
     params.require(:census_employee).permit(:id,
-      :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
-      :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
-      :email_attributes => [:id, :kind, :address],
-      :census_dependents_attributes => [
-        :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-      ]
-    )
+                                            :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
+                                            :address_attributes => [:id, :kind, :address_1, :address_2, :city, :state, :zip],
+                                            :email_attributes => [:id, :kind, :address],
+                                            :census_dependents_attributes => [
+                                              :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
+                                            ])
   end
 
   def find_employer

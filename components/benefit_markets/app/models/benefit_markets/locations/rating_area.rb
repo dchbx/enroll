@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class Locations::RatingArea
     include Mongoid::Document
@@ -24,9 +26,7 @@ module BenefitMarkets
     index({covered_state_codes: 1})
 
     def location_specified
-      if county_zip_ids.blank? && covered_states.blank?
-        errors.add(:base, "a location covered by the rating area must be specified")
-      end
+      errors.add(:base, "a location covered by the rating area must be specified") if county_zip_ids.blank? && covered_states.blank?
       true
     end
 
@@ -39,16 +39,16 @@ module BenefitMarkets
         county_name = address.county.blank? ? "" : address.county.titlecase
         zip_code = address.zip
         state_abbrev = address.state.blank? ? "" : address.state.upcase
-        
+
         county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
           :zip => zip_code,
           :county_name => county_name,
           :state => state_abbrev
         ).map(&:id)
-      
-        # TODO FIX
+
+        # TODO: FIX
         # raise "Multiple Rating Areas Returned" if area.count > 1
-        
+
         self.where(
           "active_year" => during.year,
           "$or" => [

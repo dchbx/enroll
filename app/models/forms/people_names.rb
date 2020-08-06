@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   module PeopleNames
     include ::Forms::FnameLname

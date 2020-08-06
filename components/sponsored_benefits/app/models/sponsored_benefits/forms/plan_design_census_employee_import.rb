@@ -1,12 +1,12 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class PlanDesignCensusEmployeeImport < SponsoredBenefits::Forms::CensusEmployeeImport
 
       attr_accessor :proposal
 
-      def proposal=(val)
-        @proposal = val
-      end
+      attr_writer :proposal
 
       def benefit_sponsorship
         @proposal.profile.benefit_sponsorships.first
@@ -28,9 +28,7 @@ module SponsoredBenefits
         @column_header_row = @sheet.row(2)
         # label_header_row  = @sheet.row(3)
 
-        unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-          raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
-        end
+        raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template." unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
 
         census_employees = []
         (4..@sheet.last_row).each_with_index.map do |i, index|
@@ -58,7 +56,7 @@ module SponsoredBenefits
         census_employees
       end
 
-      def assign_benefit_group(member, benefit_group, plan_year)
+      def assign_benefit_group(member, _benefit_group, _plan_year)
         member
       end
 
@@ -72,9 +70,9 @@ module SponsoredBenefits
         last_name = record[:last_name]
         first_name = record[:first_name]
 
-        raise ImportErrorValue, "must provide an ssn or first_name/last_name/dob or both" if (ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?))
+        raise ImportErrorValue, "must provide an ssn or first_name/last_name/dob or both" if ssn_query.blank? && (dob_query.blank? || last_name.blank? || first_name.blank?)
 
-        matches = Array.new
+        matches = []
         matches.concat employees.where(encrypted_ssn: encrypt_ssn(ssn_query), dob: dob_query).to_a unless ssn_query.blank?
 
         if first_name.present? && last_name.present? && dob_query.present?
@@ -85,9 +83,7 @@ module SponsoredBenefits
 
         matches.uniq
 
-        if matches.uniq.size > 1
-          raise ImportErrorValue, "found multiple employee records"
-        end
+        raise ImportErrorValue, "found multiple employee records" if matches.uniq.size > 1
 
         matches.first
       end

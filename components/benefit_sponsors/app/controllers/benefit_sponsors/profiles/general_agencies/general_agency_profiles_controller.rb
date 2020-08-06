@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
@@ -73,19 +75,18 @@ module BenefitSponsors
           @provider = @general_agency_profile
         end
 
-        def agency_messages
-        end
+        def agency_messages; end
 
         def inbox
           @sent_box = true
-          id = params["id"]||params['profile_id']
+          id = params["id"] || params['profile_id']
           @general_agency_provider = BenefitSponsors::Organizations::GeneralAgencyProfile.find(id)
           @folder = (params[:folder] || 'Inbox').capitalize
-          if current_user.person._id.to_s == id
-            @provider = current_user.person
-          else
-            @provider = @general_agency_provider
-          end
+          @provider = if current_user.person._id.to_s == id
+                        current_user.person
+                      else
+                        @general_agency_provider
+                      end
         end
 
         private
@@ -115,7 +116,7 @@ module BenefitSponsors
 
         def create_secure_message(message_params, inbox_provider, folder)
           message = Message.new(message_params)
-          message.folder =  Message::FOLDER_TYPES[folder]
+          message.folder = Message::FOLDER_TYPES[folder]
           msg_box = inbox_provider.inbox
           msg_box.post_message(message)
           msg_box.save
@@ -131,7 +132,7 @@ module BenefitSponsors
           @staff = GeneralAgencyStaffRole.find(params[:id])
         end
 
-        def user_not_authorized(exception)
+        def user_not_authorized(_exception)
           return redirect_to main_app.new_user_registration_path unless current_user
           if current_user.has_general_agency_staff_role?
             redirect_to profiles_general_agencies_general_agency_profile_path(:id => current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id)

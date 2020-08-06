@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   module NoticeBuilder
     include Config::SiteConcern
@@ -5,7 +7,7 @@ module Notifier
     include ApplicationHelper
     include Notifier::ApplicationHelper
 
-    def to_html(options = {})
+    def to_html(_options = {})
       data_object = (resource.present? ? construct_notice_object : recipient.constantize.stubbed_object)
       render_envelope({recipient: data_object}) + render_notice_body({recipient_klass_name => data_object})
     end
@@ -46,19 +48,19 @@ module Notifier
                           else
                             envelope
                           end
-       Notifier::NoticeKindsController.new.render_to_string({
-        :template => template_location,
-        :layout => false,
-        :locals => params.merge(notice_number: self.notice_number, notice: self, notice_recipient: notice_recipient)
-      })
+      Notifier::NoticeKindsController.new.render_to_string({
+                                                             :template => template_location,
+                                                             :layout => false,
+                                                             :locals => params.merge(notice_number: self.notice_number, notice: self, notice_recipient: notice_recipient)
+                                                           })
     end
 
     def render_notice_body(params)
       Notifier::NoticeKindsController.new.render_to_string({
-        :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
-        :layout => layout,
-        :locals => params
-      })
+                                                             :inline => template.raw_body.gsub('${', '<%=').gsub('#{', '<%=').gsub('}','%>').gsub('[[', '<%').gsub(']]', '%>'),
+                                                             :layout => layout,
+                                                             :locals => params
+                                                           })
     end
 
     def save_html
@@ -99,21 +101,21 @@ module Notifier
         encoding: 'utf8',
         header: {
           content: ApplicationController.new.render_to_string({
-            template: header,
-            layout: false,
-            locals: {notice: self, recipient: notice_recipient}
-            }),
-          }
+                                                                template: header,
+                                                                layout: false,
+                                                                locals: {notice: self, recipient: notice_recipient}
+                                                              })
+        }
       }
       #TODO: Add footer partial
       if dc_exchange?
         options.merge!({footer: {
-          content: ApplicationController.new.render_to_string({
-            template: footer,
-            layout: false,
-            locals: {notice: self}
-          })
-        }})
+                         content: ApplicationController.new.render_to_string({
+                                                                               template: footer,
+                                                                               layout: false,
+                                                                               locals: {notice: self}
+                                                                             })
+                       }})
       end
       options
     end
@@ -153,7 +155,7 @@ module Notifier
     end
 
     def display_file_name
-      "#{subject.titleize.gsub(/\s+/, '_')}"
+      subject.titleize.gsub(/\s+/, '_').to_s
     end
 
     def non_discrimination_attachment
@@ -189,7 +191,7 @@ module Notifier
     end
 
     def join_pdfs(pdfs)
-      pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+      pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
       pdf << CombinePDF.load(pdfs[1])
       pdf.save notice_path
     end
@@ -206,14 +208,12 @@ module Notifier
       else
         Aws::S3Storage.save(notice_path, 'notices')
       end
-    rescue => e
+    rescue StandardError => e
       raise "unable to upload to amazon #{e}"
     end
 
     def file_name
-      if initial_invoice?
-        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
-      end
+      "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime('%m%d%Y')}_INVOICE_R.pdf" if initial_invoice?
     end
 
     def invoice_date
@@ -308,7 +308,7 @@ module Notifier
       receiver = resource
       receiver = resource.person if sub_resource?
 
-      title = (event_name == 'generate_initial_employer_invoice') ? file_name : display_file_name
+      title = event_name == 'generate_initial_employer_invoice' ? file_name : display_file_name
 
       doc_params = {
         title: title,
@@ -339,9 +339,9 @@ module Notifier
       if initial_invoice?
         body = "Your Initial invoice is now available in your employer profile under Billing tab. Thank You"
       else
-        body = "<br>You can download the notice by clicking this link " +
+        body = "<br>You can download the notice by clicking this link " \
                "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(receiver.class.to_s,
-        receiver.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+                                                                                                      receiver.id, 'documents', notice.id)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title.gsub(/[^0-9a-z]/i,'') + "</a>"
       end
 
       message = receiver.inbox.messages.build({ subject: subject, body: body, from: site_short_name })

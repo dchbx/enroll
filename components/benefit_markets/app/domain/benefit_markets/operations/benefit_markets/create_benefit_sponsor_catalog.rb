@@ -113,7 +113,6 @@ module BenefitMarkets
           contribution_model_entity = ::BenefitMarkets::Operations::ContributionModels::Create.new.call(contribution_params: params).value!
         end
 
-
         def contribution_models_for(contribution_models_params)
           contribution_models_params.collect do |contribution_model_params|
             build_contribution_model_entity(contribution_model_params)

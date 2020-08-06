@@ -1,14 +1,15 @@
+# frozen_string_literal: true
+
 require File.expand_path(File.join(File.dirname(__FILE__), "../../../components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers"))
 
 module SiteWorld
-
   def site(*traits)
     attributes = traits.extract_options!
-    if attributes.empty?
-      @site ||= ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
-    else
-      @site ||= FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
-    end
+    @site ||= if attributes.empty?
+                ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+              else
+                FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key, attributes)
+              end
   end
 
   def reset_product_cache
@@ -23,7 +24,7 @@ end
 
 World(SiteWorld)
 
-Given(/^a (.*?) site exists with a benefit market$/) do |key|
+Given(/^a (.*?) site exists with a benefit market$/) do |_key|
   site
   make_all_permissions
   generate_sic_codes

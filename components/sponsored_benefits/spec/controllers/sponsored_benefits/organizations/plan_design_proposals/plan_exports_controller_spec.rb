@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -6,11 +8,12 @@ module SponsoredBenefits
     routes { SponsoredBenefits::Engine.routes }
     include_context "set up broker agency profile for BQT, by using configuration settings"
 
-    let!(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-                    person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
+    let!(:person) do
+      FactoryBot.create(:person, :with_broker_role).tap do |person|
+        person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
+      end
     end
-    }
-    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
     let(:enrollment_period) {TimeKeeper.date_of_record.beginning_of_month..(TimeKeeper.date_of_record.beginning_of_month + 15.days)}
 
     describe "POST create" do

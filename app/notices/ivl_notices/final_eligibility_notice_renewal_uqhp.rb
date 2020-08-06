@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
   include ApplicationHelper
   attr_accessor :family, :data, :person
@@ -24,13 +26,9 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -81,35 +79,35 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
                                     deductible: enrollment.product.deductible
                                   })
     PdfTemplates::Enrollment.new({
-                                     premium: enrollment.total_premium.round(2),
-                                     aptc_amount: enrollment.applied_aptc_amount.round(2),
-                                     responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-                                     phone: phone_number(enrollment.product.issuer_profile.legal_name),
-                                     is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-                                     coverage_kind: enrollment.coverage_kind,
-                                     kind: enrollment.kind,
-                                     effective_on: enrollment.effective_on,
-                                     plan: plan,
-                                     enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-                                       enrollee = PdfTemplates::Individual.new({
-                                                                                   full_name: member.person.full_name.titleize,
-                                                                                   age: member.person.age_on(TimeKeeper.date_of_record)
-                                                                               })
-                                       enrollees << enrollee
-                                     end
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
                                  })
   end
 
   def check_for_unverified_individuals
     family = recipient.primary_family
     enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-          (
-          hbx_en.terminated_on.blank? ||
-              hbx_en.terminated_on >= TimeKeeper.date_of_record
-          )
+      !hbx_en.is_shop? && !["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state) &&
+        (
+        hbx_en.terminated_on.blank? ||
+            hbx_en.terminated_on >= TimeKeeper.date_of_record
+      )
     end
-    enrollments.reject!{|e| e.coverage_terminated? }
+    enrollments.reject!(&:coverage_terminated?)
     family_members = enrollments.inject([]) do |family_members, enrollment|
       family_members += enrollment.hbx_enrollment_members.map(&:family_member)
     end.uniq
@@ -118,9 +116,7 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
 
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.outstanding_verification_types.present?
-        outstanding_people << person
-      end
+      outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
     end
 
     notice.due_date = family.min_verification_due_date
@@ -155,40 +151,29 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
 
   def append_unverified_individuals(people)
     people.each do |person|
-      if ssn_outstanding?(person)
-        notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if ssn_outstanding?(person)
 
-      if lawful_presence_outstanding?(person)
-        notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if lawful_presence_outstanding?(person)
 
-      if immigration_status_outstanding?(person)
-        notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if immigration_status_outstanding?(person)
 
-      if american_indian_status_outstanding?(person)
-        notice.american_indian_unverified  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if american_indian_status_outstanding?(person)
 
-      if residency_outstanding?(person)
-        notice.residency_inconsistency  << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-      end
+      notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) }) if residency_outstanding?(person)
     end
   end
 
-
   def append_member_information(member)
     notice.individuals << PdfTemplates::Individual.new({
-                                                           :first_name => member.first_name.titleize,
-                                                           :last_name => member.last_name.titleize,
-                                                           :full_name => member.full_name.titleize,
-                                                           :age => calculate_age_by_dob(member.dob),
-                                                           :incarcerated => member.is_incarcerated? ? "Yes" : "No",
-                                                           :citizen_status => citizen_status(member.citizen_status),
-                                                           :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
-                                                           :is_without_assistance => true,
-                                                           :is_totally_ineligible => is_totally_ineligible(member)
+                                                         :first_name => member.first_name.titleize,
+                                                         :last_name => member.last_name.titleize,
+                                                         :full_name => member.full_name.titleize,
+                                                         :age => calculate_age_by_dob(member.dob),
+                                                         :incarcerated => member.is_incarcerated? ? "Yes" : "No",
+                                                         :citizen_status => citizen_status(member.citizen_status),
+                                                         :residency_verified => is_dc_resident(recipient) ? "Yes" : "No",
+                                                         :is_without_assistance => true,
+                                                         :is_totally_ineligible => is_totally_ineligible(member)
                                                        })
   end
 
@@ -215,40 +200,40 @@ class IvlNotices::FinalEligibilityNoticeRenewalUqhp < IvlNotice
     address_to_use = person.addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     if person.addresses.present?
       if person.addresses.select{|address| address.kind == address_to_use && address.state == 'DC'}.present?
-        return true
+        true
       else
-        return false
+        false
       end
     else
-      return ""
+      ""
     end
   end
 
   def phone_number(legal_name)
     case legal_name
-      when "BestLife"
-        "(800) 433-0088"
-      when "CareFirst"
-        "(855) 444-3119"
-      when "Delta Dental"
-        "(800) 471-0236"
-      when "Dominion"
-        "(855) 224-3016"
-      when "Kaiser"
-        "(844) 524-7370"
+    when "BestLife"
+      "(800) 433-0088"
+    when "CareFirst"
+      "(855) 444-3119"
+    when "Delta Dental"
+      "(800) 471-0236"
+    when "Dominion"
+      "(855) 224-3016"
+    when "Kaiser"
+      "(844) 524-7370"
     end
   end
 
   def citizen_status(status)
     case status
-      when "us_citizen"
-        "US Citizen"
-      when "LP"
-        "Lawfully Present"
-      when "NC"
-        "US Citizen"
-      else
-        ""
+    when "us_citizen"
+      "US Citizen"
+    when "LP"
+      "Lawfully Present"
+    when "NC"
+      "US Citizen"
+    else
+      ""
     end
   end
 end

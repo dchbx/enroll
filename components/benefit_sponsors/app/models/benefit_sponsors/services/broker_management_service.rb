@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class BrokerManagementService
@@ -18,9 +20,9 @@ module BenefitSponsors
           @employer_profile.fire_broker_agency(form.termination_date)
           @employer_profile.fire_general_agency!(form.termination_date)
           @employer_profile.save!
-          return true
+          true
         else
-          return false
+          false
         end
       end
 
@@ -32,13 +34,11 @@ module BenefitSponsors
       end
 
       def send_notification(broker_role_id)
-        begin
-          invitation = BenefitSponsors::Services::InvitationEmailService.new({broker_role_id: broker_role_id, employer_profile: @employer_profile})
-          invitation.send_broker_successfully_associated_email
-        rescue Exception => e
-          puts e.inspect
-          puts e.backtrace
-        end
+        invitation = BenefitSponsors::Services::InvitationEmailService.new({broker_role_id: broker_role_id, employer_profile: @employer_profile})
+        invitation.send_broker_successfully_associated_email
+      rescue Exception => e
+        puts e.inspect
+        puts e.backtrace
       end
 
       def get_bson_id(id)

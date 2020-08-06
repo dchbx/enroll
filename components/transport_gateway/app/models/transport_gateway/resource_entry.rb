@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   # Representation of a remote resource.  Returned usually from a {ResourceQuery}, such as when listing files on an SFTP endpoint.
   #

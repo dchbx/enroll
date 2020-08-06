@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class EligibilityDetermination
     include Virtus.model

@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 And(/^admin has navigated into the NEW CONSUMER APPLICATION$/) do
-	visit exchanges_hbx_profiles_root_path
+  visit exchanges_hbx_profiles_root_path
   find('.interaction-click-control-families', wait: 10).click
-	page.find('.interaction-click-control-new-consumer-application', wait: 10).click
-	visit begin_consumer_enrollment_exchanges_agents_path
+  page.find('.interaction-click-control-new-consumer-application', wait: 10).click
+  visit begin_consumer_enrollment_exchanges_agents_path
 end
 
 And(/^the Admin is on the Personal Info page for the family$/) do
-	fill_in "person_first_name", with: "John"
+  fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
   fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
   fill_in "person_ssn", with: '212-31-3131'
@@ -18,15 +20,15 @@ And(/^the Admin is on the Personal Info page for the family$/) do
 end
 
 And(/^the Admin clicks the Application Type drop down$/) do
-	find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
+  find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
 end
 
 And(/^the Admin selects the Phone application option$/) do
-  find(".interaction-choice-control-application-type-id-1", wait:10)
+  find(".interaction-choice-control-application-type-id-1", wait: 10)
 end
 
 Given(/^all other mandatory fields on the page have been populated$/) do
-	find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
+  find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
   find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
@@ -47,23 +49,23 @@ When(/^Admin clicks Continue button$/) do
 end
 
 Then(/^the Admin should navigate to the Experian Auth and Consent Page$/) do
-	visit '/insured/consumer_role/ridp_agreement'
+  visit '/insured/consumer_role/ridp_agreement'
 end
 
 When(/^the Admin chooses 'I Disagree'$/) do
-	find(:xpath, '//label[@for="agreement_disagree"]', wait: 10).click
+  find(:xpath, '//label[@for="agreement_disagree"]', wait: 10).click
 end
 
 Then(/^the Admin will be navigated to the DOCUMENT UPLOAD page$/) do
-	visit '/insured/consumer_role/upload_ridp_document'
+  visit '/insured/consumer_role/upload_ridp_document'
 end
 
 When(/^the Admin clicks CONTINUE without uploading and verifying an application$/) do
-	find(:xpath, '//*[@id="btn-continue"]', wait: 10).trigger('click')
+  find(:xpath, '//*[@id="btn-continue"]', wait: 10).trigger('click')
 end
 
 Then(/^the Admin can not navigate to the next page$/) do
-	find('.interaction-click-control-continue')['disabled'].should == "disabled"
+  find('.interaction-click-control-continue')['disabled'].should == "disabled"
 end
 
 When(/^the Admin clicks CONTINUE after uploading and verifying an application$/) do

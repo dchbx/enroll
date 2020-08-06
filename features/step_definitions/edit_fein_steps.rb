@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 When(/^the user clicks Change FEIN link in the Actions dropdown for ABC Widgets Employer$/) do
   sleep(3)
@@ -34,7 +35,7 @@ And(/^the user enters FEIN matches an existing Employer Profile FEIN$/) do
 end
 
 Then(/^an warning message will be presented as FEIN matches HBX ID Legal Name$/) do
-  expect(page).to have_content("FEIN matches HBX ID #{employer("Xfinity Enterprise")[:hbx_id]}, #{employer("Xfinity Enterprise")[:legal_name]}")
+  expect(page).to have_content("FEIN matches HBX ID #{employer('Xfinity Enterprise')[:hbx_id]}, #{employer('Xfinity Enterprise')[:legal_name]}")
 end
 
 And(/^the user enters unique FEIN with nine digits$/) do

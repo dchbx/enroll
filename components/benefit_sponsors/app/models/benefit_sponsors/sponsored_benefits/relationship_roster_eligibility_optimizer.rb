@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     # Takes a 'naked' roster entry with possible coverage information and
@@ -47,7 +49,7 @@ module BenefitSponsors
               return self
             end
           end
-          @excluded_dependent_ids = @excluded_dependent_ids + [member.member_id]
+          @excluded_dependent_ids += [member.member_id]
           self
         end
       end

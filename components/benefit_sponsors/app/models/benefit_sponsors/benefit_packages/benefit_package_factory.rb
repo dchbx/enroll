@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackageFactory
- 
+
       # returns benefit package
 
       def self.call(benefit_application, args)
         new(benefit_application, args).benefit_package
       end
 
-      def self.validate(benefit_package)
+      def self.validate(_benefit_package)
         # TODO: Add validations
         true
       end
@@ -35,16 +37,14 @@ module BenefitSponsors
 
       def build_sponsor_contribution(sponsored_benefit, attrs)
         sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
-        
+
         attrs[:contribution_levels_attributes].each do |contribution_level_hash|
           contribution_level = sponsor_contribution.contribution_levels.where(contribution_unit_id: contribution_level_hash[:contribution_unit_id]).first
-          
+
           contribution_level_attrs = contribution_level_hash.except(:id, :display_name)
           contribution_level_attrs[:is_offered] ||= false
 
-          if contribution_level
-            contribution_level.assign_attributes(contribution_level_attrs)
-          end
+          contribution_level&.assign_attributes(contribution_level_attrs)
         end
         sponsor_contribution
       end
@@ -74,9 +74,7 @@ module BenefitSponsors
         sponsored_benefit
       end
 
-      def benefit_package
-        @benefit_package
-      end
+      attr_reader :benefit_package
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::EmployeeProfile
     include Virtus.model
@@ -32,26 +34,26 @@ module Notifier
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::EmployeeProfile.new({
-        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        first_name: 'John',
-        last_name: 'Whitmore',
-        enrollment_plan_name: 'Aetna GOLD',
-        employer_name: 'Whitmore, Inc',
-        email: 'johnwhitmore@yahoo.com',
-        ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
-        ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
+                                                                notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                                first_name: 'John',
+                                                                last_name: 'Whitmore',
+                                                                enrollment_plan_name: 'Aetna GOLD',
+                                                                employer_name: 'Whitmore, Inc',
+                                                                email: 'johnwhitmore@yahoo.com',
+                                                                ivl_oe_start_date: Settings.aca.individual_market.upcoming_open_enrollment.start_on,
+                                                                ivl_oe_end_date: Settings.aca.individual_market.upcoming_open_enrollment.end_on,
         # coverage_begin_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        termination_of_employment: TimeKeeper.date_of_record.prev_day.strftime('%m/%d/%Y'),
-        coverage_terminated_on: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
-        coverage_terminated_on_plus_30_days: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
-        earliest_coverage_begin_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
-        new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
-        new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%m,/%d/%Y')
-      })
+                                                                date_of_hire: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                                termination_of_employment: TimeKeeper.date_of_record.prev_day.strftime('%m/%d/%Y'),
+                                                                coverage_terminated_on: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y'),
+                                                                coverage_terminated_on_plus_30_days: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
+                                                                earliest_coverage_begin_date: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
+                                                                new_hire_oe_end_date: (TimeKeeper.date_of_record + 30.days).strftime('%m/%d/%Y'),
+                                                                new_hire_oe_start_date: TimeKeeper.date_of_record.strftime('%m,/%d/%Y')
+                                                              })
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
-      notice.addresses = [ notice.mailing_address ]
+      notice.addresses = [notice.mailing_address]
       notice.enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object
       notice.dental_enrollment = Notifier::MergeDataModels::Enrollment.stubbed_object_dental
       notice.benefit_application = Notifier::MergeDataModels::BenefitApplication.stubbed_object

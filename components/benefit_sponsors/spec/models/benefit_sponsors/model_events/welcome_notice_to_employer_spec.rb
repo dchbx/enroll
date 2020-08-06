@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean: :around_each  do
@@ -35,14 +37,14 @@ RSpec.describe 'BenefitSponsors::ModelEvents::WelcomeNoticeToEmployer', dbclean:
     end
   end
 
-   describe "NoticeBuilder" do
+  describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
           "employer_profile.notice_date",
           "employer_profile.employer_name"
       ]
-    }
+    end
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
     let(:payload) do

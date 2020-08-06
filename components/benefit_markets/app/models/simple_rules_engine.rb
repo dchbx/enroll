@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SimpleRulesEngine
   extend ActiveSupport::Concern
 
@@ -18,7 +20,7 @@ module SimpleRulesEngine
 
   class_methods do
 
-    def rule(name,options={})
+    def rule(name,options = {})
       self.rules << SimpleRulesEngine::Rule.new(name,options)
     end
   end
@@ -41,9 +43,9 @@ module SimpleRulesEngine
     # test output
     attr_accessor :output
 
-    NO_OP = lambda {|o| true }
+    NO_OP = ->(_o) { true }
 
-    def initialize(name, options={})
+    def initialize(name, options = {})
       self.name = name
       self.priority = options[:priority] || 10
       self.validate = options[:validate] || NO_OP
@@ -57,9 +59,8 @@ module SimpleRulesEngine
       if @output = validate.call(data)
         success.call(data)
       else
-        fail.call(data)
+        raise.call(data)
       end
-
     end
   end
 end

@@ -21,7 +21,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   end
 
   def process_renewals
-    @logger.info "Started process at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
+    @logger.info "Started process at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
     renewal_benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.renewal_benefit_coverage_period
     aptc_reader = Enrollments::IndividualMarket::AssistedIvlAptcReader.new
     aptc_reader.calender_year = renewal_benefit_coverage_period.start_on.year
@@ -31,7 +31,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
     process_aqhp_renewals(renewal_benefit_coverage_period)
     process_uqhp_renewals(renewal_benefit_coverage_period)
-    @logger.info "Process ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}"
+    @logger.info "Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}"
   end
 
   def is_individual_assisted?(enrollment)
@@ -89,7 +89,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       active_household = family.active_household
       coverage_period_tax_household = active_household.latest_active_thh_with_year(renewal_benefit_coverage_period.start_on.year)
 
-      enrollments = active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+      enrollments = active_household.hbx_enrollments.where(query).order(:effective_on.desc)
       enrollments = enrollments.select{|e| e.subscriber.present? && (e.subscriber.hbx_id == person.hbx_id)}
 
       if enrollments.size > 1
@@ -137,7 +137,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       primary_hbx_id = family.primary_applicant.person.hbx_id
 
       begin
-        enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
+        enrollments = family.active_household.hbx_enrollments.where(query).order(:effective_on.desc)
         enrollments = enrollments.select{|en| current_benefit_coverage_period.contains?(en.effective_on)}
         enrollments.each do |enrollment|
           next if @assisted_individuals.key?(primary_hbx_id) && enrollment.coverage_kind == 'health'

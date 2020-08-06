@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   include ApplicationHelper
 
-  def initialize(consumer_role, args = {})
+  def initialize(_consumer_role, args = {})
     @family = Family.find(args[:options][:family])
     find_transition_people(args[:options][:result][:people])
     args[:recipient] = @family.primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= @family.primary_applicant.person
+    args[:recipient_document_store] = @family.primary_applicant.person
     args[:to] = @family.primary_applicant.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -31,13 +33,9 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -46,7 +44,7 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
   end
 
   def notice_filename
-    "#{subject.titleize.gsub("Dc", "DC").gsub(/[^0-9a-z]/i,'')}"
+    subject.titleize.gsub('Dc', 'DC').gsub(/[^0-9a-z]/i,'').to_s
   end
 
   def build
@@ -71,15 +69,14 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     people_ids.each do |person_id|
       @transition_people << Person.find(person_id)
     end
-
   end
 
   def check_for_transitioned_individuals
     @transition_people.each do |person|
       notice.individuals << PdfTemplates::Individual.new({
-                                                             :first_name => person.first_name.titleize,
-                                                             :last_name => person.last_name.titleize,
-                                                             :age => calculate_age_by_dob(person.dob),
+                                                           :first_name => person.first_name.titleize,
+                                                           :last_name => person.last_name.titleize,
+                                                           :age => calculate_age_by_dob(person.dob)
                                                          })
     end
   end
@@ -88,10 +85,10 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
     family = recipient.primary_family
     date = TimeKeeper.date_of_record
     enrollments = HbxEnrollment.where(family_id: family.id).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state)) &&
-          (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
+      !hbx_en.is_shop? && !["coverage_canceled", "shopping", "inactive"].include?(hbx_en.aasm_state) &&
+        (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
     end
-    enrollments.reject!{|e| e.coverage_terminated? }
+    enrollments.reject!(&:coverage_terminated?)
 
     hbx_enrollments = []
     en = enrollments.select{ |en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
@@ -137,26 +134,25 @@ class IvlNotices::IvlToCoverallTransitionNoticeBuilder < IvlNotice
                                     deductible: enrollment.product.deductible
                                   })
     PdfTemplates::Enrollment.new({
-     created_at: enrollment.created_at,
-     premium: enrollment.total_premium.round(2),
-     aptc_amount: enrollment.applied_aptc_amount.round(2),
-     responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
-     phone: phone_number(enrollment.product.issuer_profile.legal_name),
-     is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
-     coverage_kind: enrollment.coverage_kind,
-     kind: enrollment.kind,
-     effective_on: enrollment.effective_on,
-     plan: plan,
-     enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
-       enrollee = PdfTemplates::Individual.new({
-                                                   full_name: member.person.full_name.titleize,
-                                                   age: member.person.age_on(TimeKeeper.date_of_record)
-                                               })
-       enrollees << enrollee
-     end
+                                   created_at: enrollment.created_at,
+                                   premium: enrollment.total_premium.round(2),
+                                   aptc_amount: enrollment.applied_aptc_amount.round(2),
+                                   responsible_amount: (enrollment.total_premium - enrollment.applied_aptc_amount.to_f).round(2),
+                                   phone: phone_number(enrollment.product.issuer_profile.legal_name),
+                                   is_receiving_assistance: enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false,
+                                   coverage_kind: enrollment.coverage_kind,
+                                   kind: enrollment.kind,
+                                   effective_on: enrollment.effective_on,
+                                   plan: plan,
+                                   enrollees: enrollment.hbx_enrollment_members.inject([]) do |enrollees, member|
+                                                enrollee = PdfTemplates::Individual.new({
+                                                                                          full_name: member.person.full_name.titleize,
+                                                                                          age: member.person.age_on(TimeKeeper.date_of_record)
+                                                                                        })
+                                                enrollees << enrollee
+                                              end
                                  })
   end
-
 
   def phone_number(legal_name)
     case legal_name

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -7,8 +9,7 @@ module SponsoredBenefits
         []
       end
 
-      def office_locations_attributes=(vals)
-      end
+      def office_locations_attributes=(vals); end
     end
 
     def new

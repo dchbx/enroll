@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ContributionCalculators
     class SimpleShopReferencePlanContributionCalculator < ContributionCalculator
@@ -26,8 +28,8 @@ module BenefitSponsors
           if !@is_contribution_prohibited
             c_factor = contribution_factor_for(member)
             c_amount = calc_contribution_amount_for(member, c_factor)
-            @member_contributions[member.member_id] = c_amount 
-            @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+            @member_contributions[member.member_id] = c_amount
+            @total_contribution = BigDecimal((@total_contribution + c_amount).to_s).round(2)
           else
             @member_contributions[member.member_id] = 0.00
           end
@@ -36,13 +38,11 @@ module BenefitSponsors
 
         def calc_contribution_amount_for(member, c_factor)
           member_price = @member_prices[member.member_id]
-          if (member_price < 0.01) || (c_factor == 0)
-            return BigDecimal.new("0.00")
-          end
+          return BigDecimal("0.00") if (member_price < 0.01) || (c_factor == 0)
           ref_rate = reference_rate_for(member)
           c_percent = integerize_percent(c_factor)
-          ref_contribution = (ref_rate * c_percent)/100.00
-          BigDecimal.new([member_price,ref_contribution].min.to_s).round(2)
+          ref_contribution = (ref_rate * c_percent) / 100.00
+          BigDecimal([member_price,ref_contribution].min.to_s).round(2)
         end
 
         def reference_rate_for(member)
@@ -70,7 +70,7 @@ module BenefitSponsors
         end
 
         def integerize_percent(cont_percent)
-          BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          BigDecimal((cont_percent * 100.00).to_s).round(0).to_i
         end
       end
 

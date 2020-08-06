@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Concerns
     module ProfileRegistration
-
       private
 
       def broker_new_registration_url
@@ -28,11 +29,11 @@ module BenefitSponsors
         edit_profiles_registration_path(@agency.organization.profile.id)
       end
 
-      def broker_show_registration_url(profile_id=nil)
+      def broker_show_registration_url(profile_id = nil)
         profiles_broker_agencies_broker_agency_profile_path(profile_id || @agency.organization.profile.id)
       end
 
-      def general_show_registration_url(profile_id=nil)
+      def general_show_registration_url(profile_id = nil)
         profiles_general_agencies_general_agency_profile_path(profile_id || @agency.organization.profile.id)
       end
 

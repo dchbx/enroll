@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Publishers
   class Legacy::EmployersFailingParticipationReportPublisher
     attr_reader :gateway

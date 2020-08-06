@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Notifier
   class NoticeKindsController < Notifier::ApplicationController
 
     before_action :check_hbx_staff_role
-    
+
     layout 'notifier/single_column'
 
     def index
@@ -12,9 +14,7 @@ module Notifier
     end
 
     def show
-      if params['id'] == 'upload_notices'
-        redirect_to notice_kinds_path
-      end
+      redirect_to notice_kinds_path if params['id'] == 'upload_notices'
     end
 
     def new
@@ -37,7 +37,7 @@ module Notifier
         redirect_to notice_kinds_path
       else
         @errors = notice_kind.errors.messages
-        
+
         @notice_kinds = Notifier::NoticeKind.all
         @datatable = Effective::Datatables::NoticesDatatable.new
 
@@ -61,9 +61,7 @@ module Notifier
     end
 
     def delete_notices
-      Notifier::NoticeKind.where(:id.in => params['ids']).each do |notice|
-        notice.delete
-      end
+      Notifier::NoticeKind.where(:id.in => params['ids']).each(&:delete)
 
       flash[:notice] = 'Notices deleted successfully'
       redirect_to notice_kinds_path
@@ -71,11 +69,11 @@ module Notifier
 
     def download_notices
       notices = Notifier::NoticeKind.where(:id.in => params['ids'].split(","))
-      
+
       send_data notices.to_csv,
-        :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
-        :disposition => 'attachment',
-        :type => 'text/csv'
+                :filename => "notices_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv",
+                :disposition => 'attachment',
+                :type => 'text/csv'
     end
 
     def upload_notices
@@ -99,9 +97,7 @@ module Notifier
         @errors << 'Please upload csv format files only.'
       end
 
-      if @errors.empty?
-        flash[:notice] = 'Notices loaded successfully.'
-      end
+      flash[:notice] = 'Notices loaded successfully.' if @errors.empty?
 
       @notice_kinds = Notifier::NoticeKind.all
       @datatable = Effective::Datatables::NoticesDatatable.new
@@ -123,9 +119,11 @@ module Notifier
       service.builder = builder_param
       respond_to do |format|
         format.html
-        format.json { render json: { 
-          placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
-        } }
+        format.json do
+          render json: {
+            placeholders: service.placeholders, setting_placeholders: service.setting_placeholders
+          }
+        end
       end
     end
 
@@ -145,9 +143,7 @@ module Notifier
     end
 
     def check_hbx_staff_role
-      if current_user.blank? || !current_user.has_hbx_staff_role?
-        redirect_to main_app.root_path, :flash => { :error => "You must be an HBX staff member" }
-      end
+      redirect_to main_app.root_path, :flash => { :error => "You must be an HBX staff member" } if current_user.blank? || !current_user.has_hbx_staff_role?
     end
 
     def notice_params

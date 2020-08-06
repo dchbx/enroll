@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CompositeRatingListBillPrecalculator < SimpleDelegator
   attr_reader :member_provider, :benefit_group, :plan
 
@@ -11,7 +13,7 @@ class CompositeRatingListBillPrecalculator < SimpleDelegator
   end
 
   def plan_year_start_on
-    #FIXME only for temp ivl
+    #FIXME: only for temp ivl
     if @benefit_group.present?
       benefit_group.plan_year.start_on
     else
@@ -20,7 +22,7 @@ class CompositeRatingListBillPrecalculator < SimpleDelegator
   end
 
   def child_index(member)
-    @children = members.select(){|member| age_of(member) < 21} unless defined?(@children)
+    @children = members.select{|member| age_of(member) < 21} unless defined?(@children)
     @children.index(member)
   end
 
@@ -58,13 +60,13 @@ class CompositeRatingListBillPrecalculator < SimpleDelegator
       "grandchild" => nil,
       "unrelated" => nil,
       "great_grandparent" => nil,
-      "great_grandchild" => nil,
+      "great_grandchild" => nil
     }[person_relationship]
   end
 
   def premium_for(member)
-      value = (Caches::PlanDetails.lookup_rate_with_area(__getobj__.id, plan_year_start_on, age_of(member), benefit_group.rating_area) * large_family_factor(member))
-      adjusted_value = value * benefit_group.sic_factor_for(plan) * benefit_group.group_size_factor_for(plan) * benefit_group.composite_participation_rate_factor_for(plan)
-      BigDecimal.new("#{adjusted_value}").round(2).to_f
+    value = (Caches::PlanDetails.lookup_rate_with_area(__getobj__.id, plan_year_start_on, age_of(member), benefit_group.rating_area) * large_family_factor(member))
+    adjusted_value = value * benefit_group.sic_factor_for(plan) * benefit_group.group_size_factor_for(plan) * benefit_group.composite_participation_rate_factor_for(plan)
+    BigDecimal(adjusted_value.to_s).round(2).to_f
   end
 end

@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module Importers
   module RowSet
     def row_iterator
-      @spreadsheet.kind_of?(Roo::Excelx) ? :process_excel_rows : :process_csv_rows
+      @spreadsheet.is_a?(Roo::Excelx) ? :process_excel_rows : :process_csv_rows
     end
 
     def import!
@@ -27,9 +29,7 @@ module Importers
       out_row = []
       row_mapping.each_with_index do |k, idx|
         value = row[idx]
-        unless (k == :ignore) || value.blank?
-          record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/, "")
-        end
+        record_attrs[k] = value.to_s.strip.gsub(/\.0\Z/, "") unless (k == :ignore) || value.blank?
       end
 
       record = create_model(record_attrs)
@@ -38,9 +38,9 @@ module Importers
 
       result = false
 
-      errors = String.new
+      errors = ''
 
-      census_employee_info = Array.new
+      census_employee_info = []
 
       begin
         result = record.save
@@ -48,9 +48,7 @@ module Importers
         if result
           # should import hbx_ids only for MA
           if BenefitSponsors::Site.by_site_key(:cca).present?
-            if /conversion_employer_results/.match(@out_csv.path)
-              organization = find_organization(record.fein)
-            end
+            organization = find_organization(record.fein) if /conversion_employer_results/.match(@out_csv.path)
             if /conversion_employee_policy_results/.match(@out_csv.path)
               benefit_sponsor = find_organization(record.fein)
               census_employee = find_census_employee(benefit_sponsor.employer_profile, benefit_sponsor.active_benefit_sponsorship, record.subscriber_ssn)
@@ -85,16 +83,15 @@ module Importers
       end
     end
 
-
     def find_organization(fein)
       BenefitSponsors::Organizations::Organization.where(fein: fein).first
     end
 
     def find_census_employee(employer_profile, sponsorship, subscriber_ssn)
-     CensusEmployee.where({
-                               benefit_sponsors_employer_profile_id: employer_profile.id,
-                               benefit_sponsorship_id: sponsorship.id,
-                               encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+      CensusEmployee.where({
+                             benefit_sponsors_employer_profile_id: employer_profile.id,
+                             benefit_sponsorship_id: sponsorship.id,
+                             encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                            })
     end
 

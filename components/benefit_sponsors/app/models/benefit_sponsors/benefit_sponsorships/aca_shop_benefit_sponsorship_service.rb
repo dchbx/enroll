@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class BenefitSponsorships::AcaShopBenefitSponsorshipService
     include ::Acapi::Notifiers
@@ -20,7 +22,7 @@ module BenefitSponsors
     def execute(benefit_sponsorship, event_name, business_policy = nil, async_workflow_id = nil)
       self.benefit_sponsorship = benefit_sponsorship
       if business_policy.blank? || business_policy.is_satisfied?(benefit_sponsorship)
-        if :renew_sponsor_benefit == event_name
+        if event_name == :renew_sponsor_benefit
           process_event { renew_sponsor_benefit(async_workflow_id) }
         else
           process_event { eval(event_name.to_s) }
@@ -33,42 +35,31 @@ module BenefitSponsors
     def begin_open_enrollment
       benefit_application = benefit_sponsorship.application_may_begin_open_enrollment_on(new_date)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).begin_open_enrollment
-      end
+      application_service_for(benefit_application).begin_open_enrollment if benefit_application.present?
     end
 
     def end_open_enrollment
       benefit_application = benefit_sponsorship.application_may_end_open_enrollment_on(new_date)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).end_open_enrollment
-      end
-
+      application_service_for(benefit_application).end_open_enrollment if benefit_application.present?
     end
 
     def begin_sponsor_benefit
       benefit_application = benefit_sponsorship.application_may_begin_benefit_on(new_date)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).begin_benefit
-      end
+      application_service_for(benefit_application).begin_benefit if benefit_application.present?
     end
 
     def end_sponsor_benefit
       benefit_application = benefit_sponsorship.application_may_end_benefit_on(new_date)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).end_benefit
-      end
+      application_service_for(benefit_application).end_benefit if benefit_application.present?
     end
 
     def terminate_sponsor_benefit
       benefit_application = benefit_sponsorship.application_may_terminate_on(new_date)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).terminate
-      end
+      application_service_for(benefit_application).terminate if benefit_application.present?
     end
 
     def terminate_pending_sponsor_benefit
@@ -82,18 +73,14 @@ module BenefitSponsors
 
       benefit_application = benefit_sponsorship.application_may_renew_effective_on(renewal_application_begin)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).renew_application(async_workflow_id)
-      end
+      application_service_for(benefit_application).renew_application(async_workflow_id) if benefit_application.present?
     end
 
     def auto_submit_application
       effective_on = new_date.next_month.beginning_of_month
       benefit_application = benefit_sponsorship.application_may_auto_submit(effective_on)
 
-      if benefit_application.present?
-        application_service_for(benefit_application).force_submit_application
-      end
+      application_service_for(benefit_application).force_submit_application if benefit_application.present?
     end
 
     def mark_initial_ineligible
@@ -121,20 +108,16 @@ module BenefitSponsors
     end
 
     def transmit_renewal_eligible_event
-      if benefit_sponsorship.is_renewal_transmission_eligible?
-        notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG})
-      end
+      notify(RENEWAL_EMPLOYER_TRANSMIT_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_ELIGIBLE_EVENT_TAG}) if benefit_sponsorship.is_renewal_transmission_eligible?
     end
 
     def transmit_renewal_carrier_drop_event
-      if benefit_sponsorship.is_renewal_carrier_drop?
-        notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG})
-      end
+      notify(RENEWAL_EMPLOYER_CARRIER_DROP_EVENT, {employer_id: benefit_sponsorship.profile.hbx_id, event_name: RENEWAL_APPLICATION_CARRIER_DROP_EVENT_TAG}) if benefit_sponsorship.is_renewal_carrier_drop?
     end
 
     # TODO: Need to verify is_renewing? logic for off-cycle renewals
     def self.set_binder_paid(benefit_sponsorship_ids)
-      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"_id".in => benefit_sponsorship_ids)
+      benefit_sponsorships = ::BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:_id.in => benefit_sponsorship_ids)
       benefit_sponsorships.each do |benefit_sponsorship|
         benefit_sponsorship.benefit_applications.each { |benefit_application| benefit_application.credit_binder! if !benefit_application.is_renewing? && benefit_application.may_credit_binder? }
       end
@@ -142,15 +125,15 @@ module BenefitSponsors
 
     def update_fein(new_fein)
       organization = benefit_sponsorship.organization
-      if (organization && new_fein)
+      if organization && new_fein
         begin
           organization.assign_attributes(fein: new_fein)
           organization.save!
-          return true, nil
-        rescue => e
+          [true, nil]
+        rescue StandardError => e
           org_errors = organization.errors.messages
           errors_on_save = update_fein_errors(org_errors, new_fein)
-          return false, errors_on_save
+          [false, errors_on_save]
         end
       end
     end
@@ -162,7 +145,7 @@ module BenefitSponsors
         if error[1].first.include?("is not a valid")
           f_errors << "FEIN must be at least 9 digits"
         elsif error[1].first.include?("is already taken")
-          org = ::BenefitSponsors::Organizations::Organization.where(fein: (new_fein.gsub(/\D/, ''))).first
+          org = ::BenefitSponsors::Organizations::Organization.where(fein: new_fein.gsub(/\D/, '')).first
           f_errors << "FEIN matches HBX ID #{org.hbx_id}, #{org.legal_name}"
         else
           f_errors << error[1].first
@@ -175,12 +158,10 @@ module BenefitSponsors
     end
 
     def process_event(&block)
-      begin
-        block.call
-      rescue Exception => e
-        @logger.error e.message
-        @logger.error e.backtrace.join("\n")
-      end
+      block.call
+    rescue Exception => e
+      @logger.error e.message
+      @logger.error e.backtrace.join("\n")
     end
 
     def initialize_logger

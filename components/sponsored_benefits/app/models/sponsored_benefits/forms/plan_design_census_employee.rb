@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class PlanDesignCensusEmployee < CensusMember
@@ -7,9 +9,8 @@ module SponsoredBenefits
       def initialize(attrs = {})
         super
       end
-   
-      def census_dependents=(attrs)
-      end
+
+      def census_dependents=(attrs); end
 
       def save
         census_employee = SponsoredBenefits::CensusMembers::PlanDesignCensusEmployeeBuilder.build do |builder|

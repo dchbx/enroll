@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateDcBrokerAgencyAccounts < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -13,70 +15,68 @@ class MigrateDcBrokerAgencyAccounts < Mongoid::Migration
     end
   end
 
-  def self.down
-  end
+  def self.down; end
 
   private
 
   def self.migrate_broker_agency_accounts
-
     say_with_time("Time taken to create broker agency profile hash") do
       @broker_hash = {}
-      Organization.where(:'broker_agency_profile'.exists=>true).each do |org|
-        begin
-          new_broker_agency_profile = new_broker_agency_for_old_profile_id(org.broker_agency_profile.id)
-          raise "new broker agency profile not found #{org.hbx_id}" unless new_broker_agency_profile.present?
-          @broker_hash[org.broker_agency_profile.id] = new_broker_agency_profile.id
-        rescue Exception => e
-          print 'F' unless Rails.env.test?
-          @logger.error "Failed to create broker hash: #{org.id}, #{e.inspect}" unless Rails.env.test?
-        end
+      Organization.where(:broker_agency_profile.exists => true).each do |org|
+
+        new_broker_agency_profile = new_broker_agency_for_old_profile_id(org.broker_agency_profile.id)
+        raise "new broker agency profile not found #{org.hbx_id}" unless new_broker_agency_profile.present?
+        @broker_hash[org.broker_agency_profile.id] = new_broker_agency_profile.id
+      rescue Exception => e
+        print 'F' unless Rails.env.test?
+        @logger.error "Failed to create broker hash: #{org.id}, #{e.inspect}" unless Rails.env.test?
+
       end
     end
 
     say_with_time("Time taken to migrate shop broker agency accounts") do
-      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'broker_agency_accounts'.exists=> true).each do |benefit_sponsorship|
-        begin
-          benefit_sponsorship.broker_agency_accounts.unscoped.each do |account|
-            new_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
-            puts "Mapping not found for broker agency profile, sponsorship_id: #{benefit_sponsorship.id}" if new_profile_id.blank?
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:broker_agency_accounts.exists => true).each do |benefit_sponsorship|
 
-            account._id = BSON::ObjectId.new
-            account.benefit_sponsors_broker_agency_profile_id = new_profile_id
+        benefit_sponsorship.broker_agency_accounts.unscoped.each do |account|
+          new_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
+          puts "Mapping not found for broker agency profile, sponsorship_id: #{benefit_sponsorship.id}" if new_profile_id.blank?
 
-            BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:save, :after, :notify_on_save, raise: false)
-            BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:create, :before, :notify_observers, raise: false)
-            BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
+          account._id = BSON::ObjectId.new
+          account.benefit_sponsors_broker_agency_profile_id = new_profile_id
 
-            account.save
-            print '.' unless Rails.env.test?
-          end
-        rescue Exception => e
-          print 'F' unless Rails.env.test?
-          @logger.error "Broker Accounts Migration Failed For Shop: #{benefit_sponsorship.id}, #{e.inspect}" unless Rails.env.test?
+          BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:save, :after, :notify_on_save, raise: false)
+          BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:create, :before, :notify_observers, raise: false)
+          BenefitSponsors::BenefitSponsorships::BenefitSponsorship.skip_callback(:save, :after, :notify_on_save, raise: false)
+
+          account.save
+          print '.' unless Rails.env.test?
         end
+      rescue Exception => e
+        print 'F' unless Rails.env.test?
+        @logger.error "Broker Accounts Migration Failed For Shop: #{benefit_sponsorship.id}, #{e.inspect}" unless Rails.env.test?
+
       end
     end
 
     say_with_time("Time taken to migrate family broker agency accounts") do
-      Family.where(:'broker_agency_accounts'.exists=>true).each do |fam|
-        begin
-          fam.broker_agency_accounts.unscoped.each do |account|
+      Family.where(:broker_agency_accounts.exists => true).each do |fam|
 
-            new_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
-            puts "Mapping not found for broker agency profile, family_id: #{fam.id}" if new_profile_id.blank?
+        fam.broker_agency_accounts.unscoped.each do |account|
 
-            account.benefit_sponsors_broker_agency_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
+          new_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
+          puts "Mapping not found for broker agency profile, family_id: #{fam.id}" if new_profile_id.blank?
 
-            BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:save, :after, :notify_on_save, raise: false)
-            BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:create, :before, :notify_observers, raise: false)
-            account.save
-            print '.' unless Rails.env.test?
-          end
-        rescue Exception => e
-          print 'F' unless Rails.env.test?
-          @logger.error "Broker Accounts Migration Failed For Family: #{fam.id}, #{e.inspect}" unless Rails.env.test?
+          account.benefit_sponsors_broker_agency_profile_id = @broker_hash[account.as_document["broker_agency_profile_id"]]
+
+          BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:save, :after, :notify_on_save, raise: false)
+          BenefitSponsors::Accounts::BrokerAgencyAccount.skip_callback(:create, :before, :notify_observers, raise: false)
+          account.save
+          print '.' unless Rails.env.test?
         end
+      rescue Exception => e
+        print 'F' unless Rails.env.test?
+        @logger.error "Broker Accounts Migration Failed For Family: #{fam.id}, #{e.inspect}" unless Rails.env.test?
+
       end
     end
     reset_hash

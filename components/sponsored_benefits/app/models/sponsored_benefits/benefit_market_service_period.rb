@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   class BenefitMarketServicePeriod
     include Mongoid::Document
@@ -9,7 +11,7 @@ module SponsoredBenefits
     # DC & MA SHOP: Jan-Dec
     # DC IVL: Jan-Dec
     # MA IVL: July-June
-    # GIC: July-June 
+    # GIC: July-June
 
     field :open_enrollment_period,  type: Range
     field :effective_period,  type: Range
@@ -27,7 +29,7 @@ module SponsoredBenefits
     end
 
     def issuer_profiles
-      benefit_products.uniq { |bp| bp.issuer_profile } || []
+      benefit_products.uniq(&:issuer_profile) || []
     end
 
     def benefit_products_by_kind(benefit_product_kind)

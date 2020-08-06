@@ -1,19 +1,21 @@
-Then(/Employee (.*) should click Manage Family/) do |named_person|
+# frozen_string_literal: true
+
+Then(/Employee (.*) should click Manage Family/) do |_named_person|
   find('a.interaction-click-control-manage-family').click
 end
 
-Then(/Employee (.*) should click the Personal Tab/) do |named_person|
+Then(/Employee (.*) should click the Personal Tab/) do |_named_person|
   find('a.interaction-click-control-personal').click
 end
 
-Then(/Employee (.*) should click Change my Password/) do |named_person|
+Then(/Employee (.*) should click Change my Password/) do |_named_person|
   if aca_security_questions
     wait_for_ajax
     page.execute_script("document.querySelector('#change_password_link').click()")
   end
 end
 
-Then(/Employee (.*) should click Update my security challenge responses/) do |named_person|
+Then(/Employee (.*) should click Update my security challenge responses/) do |_named_person|
   if aca_security_questions
     wait_for_ajax
     page.execute_script("document.querySelector('#update_security_responses_link').click()")

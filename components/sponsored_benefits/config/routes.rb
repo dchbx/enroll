@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 SponsoredBenefits::Engine.routes.draw do
 
   resources :plan_design_proposals, only: [] do

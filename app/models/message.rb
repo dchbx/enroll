@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class Message
   include Mongoid::Document
 
   embedded_in :inbox
 
-  FOLDER_TYPES = {inbox: "inbox", sent: "sent", deleted: "deleted"}
+  FOLDER_TYPES = {inbox: "inbox", sent: "sent", deleted: "deleted"}.freeze
 
   field :sender_id, type: BSON::ObjectId
   field :parent_message_id, type: BSON::ObjectId
@@ -21,9 +23,10 @@ class Message
 
   scope :by_message_id, ->(id){where(:id => id)}
 
-  alias_method :message_read?, :message_read
+  alias message_read? message_read
 
-private
+  private
+
   def set_timestamp
     self.created_at = Time.now.utc
   end

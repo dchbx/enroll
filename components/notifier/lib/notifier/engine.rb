@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require 'ckeditor'
 
 require 'mongoid'
@@ -19,12 +21,12 @@ module Notifier
     # end
 
     config.generators do |g|
-      g.orm :mongoid 
+      g.orm :mongoid
       g.template_engine :slim
       g.test_framework :rspec, :fixture => false
       g.fixture_replacement :Factory_bot, :dir => 'spec/factories'
       g.assets true
-      g.helper true 
+      g.helper true
     end
   end
 end

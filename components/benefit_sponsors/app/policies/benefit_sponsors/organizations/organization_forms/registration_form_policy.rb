@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     module OrganizationForms
@@ -20,7 +22,7 @@ module BenefitSponsors
 
         def create?
           return false if benefit_sponsor_not_logged_in?
-          return true unless role = user && user.person && user.person.hbx_staff_role
+          return true unless role = user&.person && user.person.hbx_staff_role
           role.permission.modify_employer
         end
 
@@ -33,10 +35,8 @@ module BenefitSponsors
 
         def update?
           return true if can_update?
-          return true unless role = user && user.person && user.person.hbx_staff_role
-          if is_employer_profile?
-            return role.permission.modify_employer
-          end
+          return true unless role = user&.person && user.person.hbx_staff_role
+          return role.permission.modify_employer if is_employer_profile?
           role.permission.modify_admin_tabs
         end
 
@@ -46,7 +46,7 @@ module BenefitSponsors
 
         def can_edit?
           if is_employer_profile?
-            return true if (service.is_broker_for_employer?(user, record) || service.is_general_agency_staff_for_employer?(user, record))
+            return true if service.is_broker_for_employer?(user, record) || service.is_general_agency_staff_for_employer?(user, record)
             service.is_staff_for_agency?(user, record)
           elsif is_general_agency_profile?
             return false if user.person.general_agency_primary_staff.blank?
@@ -81,9 +81,7 @@ module BenefitSponsors
         end
 
         def benefit_sponsor_not_logged_in?
-          if is_employer_profile?
-            user.blank?
-          end
+          user.blank? if is_employer_profile?
         end
 
         def broker_agency_registered?
@@ -92,17 +90,11 @@ module BenefitSponsors
 
         def redirect_home?
           return false if record.portal && user.blank?
-          if is_employer_profile?
-            return service.is_benefit_sponsor_already_registered?(user, record)
-          end
+          return service.is_benefit_sponsor_already_registered?(user, record) if is_employer_profile?
 
-          if is_broker_profile?
-            return service.is_broker_agency_registered?(user, record)
-          end
+          return service.is_broker_agency_registered?(user, record) if is_broker_profile?
 
-          if is_general_agency_profile?
-            return service.is_general_agency_registered?(user, record)
-          end
+          return service.is_general_agency_registered?(user, record) if is_general_agency_profile?
           true
         end
       end

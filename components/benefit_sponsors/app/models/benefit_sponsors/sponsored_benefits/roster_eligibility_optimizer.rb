@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     # Chose the correct strategy for roster optimization and execute it.
@@ -5,13 +7,13 @@ module BenefitSponsors
 
       def initialize(contribution_model)
         @optimizer = if contribution_model.many_simultaneous_contribution_units?
-          RelationshipRosterEligibilityOptimizer.new
-        else
-          TieredRosterEligibilityOptimizer.new
+                       RelationshipRosterEligibilityOptimizer.new
+                     else
+                       TieredRosterEligibilityOptimizer.new
         end
       end
-      
-      # Deprecated 
+
+      # Deprecated
       def calculate_optimal_group_for(contribution_model, covered_roster_entry, sponsor_contribution)
         @optimizer.calculate_optimal_group_for(contribution_model, covered_roster_entry, sponsor_contribution)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   # An interval tree used for searching dates (for example for Actuarial Factors)
   # This is needed since we now use date ranges instead of directly hashable
@@ -46,7 +48,7 @@ module BenefitMarkets
 
     def add_node(interval, data = nil)
       @nodes_data[interval] = data
-      @size = @size + 1
+      @size += 1
       if @size == 1
         @root = DumbNode.new(interval)
       else
@@ -103,7 +105,7 @@ module BenefitMarkets
 
     def pivot(ranges)
       n, r = ranges.length.divmod 2
-      rightmost_left_element_index = (r == 0) ? (n - 1) : n
+      rightmost_left_element_index = r == 0 ? (n - 1) : n
       pivot_value = ranges[rightmost_left_element_index].max
       ranges.partition { |k| k.min <= pivot_value}
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module BrokerAgencies
@@ -8,7 +10,7 @@ module BenefitSponsors
         before_action :find_broker_applicant, only: [:edit, :update]
 
         def index
-          @datatable = Effective::Datatables::BrokerApplicantsDataTable.new()
+          @datatable = Effective::Datatables::BrokerApplicantsDataTable.new
         end
 
         def edit
@@ -17,8 +19,7 @@ module BenefitSponsors
           end
         end
 
-        def update
-        end
+        def update; end
 
         private
 
@@ -36,9 +37,7 @@ module BenefitSponsors
         end
 
         def check_hbx_staff_role
-          unless current_user.has_hbx_staff_role?
-            redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" }
-          end
+          redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
         end
       end
     end

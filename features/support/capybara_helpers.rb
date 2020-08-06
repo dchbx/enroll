@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module CapybaraHelpers
   # Perform an action then wait for the page to reload before proceeding
   def wait_for_page_reload_until(timeout, slice_size = 0.2, &blk)
     execute_script(<<-JSCODE)
-      window.document['_test_waiting_for_page_reload'] = true; 
+      window.document['_test_waiting_for_page_reload'] = true;
     JSCODE
     blk.call
     wait_for_condition_until(timeout, slice_size) do
@@ -15,14 +17,13 @@ module CapybaraHelpers
     JSCODE
   end
 
-
   # Throw a one-time load callback on datatables so we can use it to make sure
   # it has finished loading.  Useful for clicking a filter and making sure it's
   # done reloading.
   def with_datatable_load_wait(timeout, slice_size = 0.2, &blk)
     execute_script(<<-JSCODE)
       $('.effective-datatable').DataTable().one('draw.dt', function() {
-        window['ef_datatables_done_loading'] = true; 
+        window['ef_datatables_done_loading'] = true;
       });
     JSCODE
     blk.call
@@ -39,10 +40,10 @@ module CapybaraHelpers
   def wait_for_condition_until(timeout, slice_size = 0.2, &blk)
     test_val = blk.call
     waited_time = 0
-    while((!test_val) && (waited_time < timeout)) do
+    while !test_val && (waited_time < timeout)
       sleep slice_size
       test_val = blk.call
-      waited_time = waited_time + slice_size
+      waited_time += slice_size
     end
   end
 
@@ -55,17 +56,13 @@ module CapybaraHelpers
     end
   end
 
-  def wait_for_ajax(delta=2, time_to_sleep=0.2)
+  def wait_for_ajax(delta = 2, time_to_sleep = 0.2)
     start_time = Time.now
     Timeout.timeout(delta) do
-      until finished_all_ajax_requests? do
-        sleep(0.01)
-      end
+      sleep(0.01) until finished_all_ajax_requests?
     end
     end_time = Time.now
-    if Time.now > start_time + delta.seconds
-      fail "ajax request failed: took longer than #{delta.seconds} seconds. It waited #{end_time - start_time} seconds."
-    end
+    raise "ajax request failed: took longer than #{delta.seconds} seconds. It waited #{end_time - start_time} seconds." if Time.now > start_time + delta.seconds
     sleep(time_to_sleep)
   end
 
@@ -88,7 +85,7 @@ module CapybaraHelpers
     find(:xpath, xpath, wait: 5).click
     begin
       find_field(field_name, with: value, checked: true, visible: :all, disabled: :all, wait: 10)
-    rescue
+    rescue StandardError
       all(:xpath, "//input[@name=\"#{field_name}\"]", visible: :all).each do |ele|
         puts xpath
         puts input_id

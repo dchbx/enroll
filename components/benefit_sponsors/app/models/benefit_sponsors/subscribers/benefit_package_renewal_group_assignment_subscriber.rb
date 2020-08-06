@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Subscribers
     class BenefitPackageRenewalGroupAssignmentSubscriber
@@ -12,7 +14,7 @@ module BenefitSponsors
         )
       end
 
-      def work_with_params(body, delivery_info, properties)
+      def work_with_params(_body, _delivery_info, properties)
         headers = properties.headers || {}
         stringed_payload = headers.stringify_keys
         benefit_package_id_string = stringed_payload["benefit_package_id"]
@@ -49,10 +51,10 @@ module BenefitSponsors
               :census_employee_id => census_employee_id_string,
               :effective_on_date => effective_on_date_string,
               :body => JSON.dump({
-                :error => e.inspect,
-                :message => e.message,
-                :backtrace => e.backtrace
-              })
+                                   :error => e.inspect,
+                                   :message => e.message,
+                                   :backtrace => e.backtrace
+                                 })
             }.merge(extract_response_params(properties))
           )
           return :reject
@@ -66,7 +68,7 @@ module BenefitSponsors
             :effective_on_date => effective_on_date_string
           }.merge(extract_response_params(properties))
         )
-        return :ack
+        :ack
       end
 
       private

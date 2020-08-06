@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class Builders::BrokerProfile
 
@@ -23,12 +25,12 @@ module Notifier
       office_address = bap.primary_office_location.address
       if office_address.present?
         merge_model.mailing_address = MergeDataModels::Address.new({
-          street_1: office_address.address_1,
-          street_2: office_address.address_2,
-          city: office_address.city,
-          state: office_address.state,
-          zip: office_address.zip
-          })
+                                                                     street_1: office_address.address_1,
+                                                                     street_2: office_address.address_2,
+                                                                     city: office_address.city,
+                                                                     state: office_address.state,
+                                                                     zip: office_address.zip
+                                                                   })
       end
     end
 
@@ -71,13 +73,11 @@ module Notifier
     end
 
     def terminated_broker_agency_account
-        employer.broker_agency_accounts.unscoped.select{|br| br.is_active ==  false}.sort_by(&:created_at).last
+      employer.broker_agency_accounts.unscoped.select{|br| br.is_active == false}.max_by(&:created_at)
     end
 
     def termination_date
-      if terminated_broker_agency_account.present?
-        merge_model.termination_date = terminated_broker_agency_account.end_on.strftime('%m/%d/%Y')
-      end
+      merge_model.termination_date = terminated_broker_agency_account.end_on.strftime('%m/%d/%Y') if terminated_broker_agency_account.present?
     end
 
     def broker_agency_name

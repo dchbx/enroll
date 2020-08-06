@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ContributionCalculators
     class CcaShopReferencePlanContributionCalculator < ContributionCalculator
@@ -13,7 +15,7 @@ module BenefitSponsors
           @member_prices = m_prices
           @member_contributions = {}
           @reference_product = r_product
-          @eligibility_dates = c_eligibility_dates 
+          @eligibility_dates = c_eligibility_dates
           @coverage_start_on = r_coverage.coverage_start_on
           @rating_area = r_coverage.rating_area
           @level_map = l_map
@@ -28,8 +30,8 @@ module BenefitSponsors
           if !@is_contribution_prohibited
             c_factor = contribution_factor_for(member)
             c_amount = calc_contribution_amount_for(member, c_factor)
-            @member_contributions[member.member_id] = c_amount 
-            @total_contribution = BigDecimal.new((@total_contribution + c_amount).to_s).round(2)
+            @member_contributions[member.member_id] = c_amount
+            @total_contribution = BigDecimal((@total_contribution + c_amount).to_s).round(2)
           else
             @member_contributions[member.member_id] = 0.00
           end
@@ -38,11 +40,9 @@ module BenefitSponsors
 
         def calc_contribution_amount_for(member, c_factor)
           member_price = @member_prices[member.member_id]
-          if (member_price == 0.00) || (c_factor == 0)
-            0.00
-          end
+          0.00 if (member_price == 0.00) || (c_factor == 0)
           ref_rate = reference_rate_for(member)
-          ref_contribution = BigDecimal.new((ref_rate * c_factor * @sic_code_factor * @group_size_factor).to_s).round(2)
+          ref_contribution = BigDecimal((ref_rate * c_factor * @sic_code_factor * @group_size_factor).to_s).round(2)
           if member_price <= ref_contribution
             member_price
           else

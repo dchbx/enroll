@@ -1,22 +1,23 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
-
   RSpec.describe Organizations::OrganizationForms::MessageForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Organizations::OrganizationForms::MessageForm }
 
     describe "model attributes" do
 
-      let!(:params) {
+      let!(:params) do
         {
-            sender_id: '123'
+          sender_id: '123'
         }
-      }
+      end
 
       it "should have all the attributes" do
         [:sender_id].each do |key|
-          expect(subject.new.attributes.has_key?(key)).to be_truthy
+          expect(subject.new.attributes.key?(key)).to be_truthy
         end
       end
 

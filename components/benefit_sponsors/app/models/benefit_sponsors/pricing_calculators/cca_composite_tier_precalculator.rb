@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PricingCalculators
     class CcaCompositeTierPrecalculator < PricingCalculator
@@ -26,27 +28,25 @@ module BenefitSponsors
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
-          if (rel.to_s == "dependent") && (coverage_age < 21)
-            @discount_kid_count = @discount_kid_count + 1
-          end
+          @discount_kid_count += 1 if (rel.to_s == "dependent") && (coverage_age < 21)
           too_many_kids_make_you_crazy = if (rel.to_s == "dependent") && (coverage_age < 21) && (@discount_kid_count > 3)
-            0.0
-          else
-            1.0
+                                           0.0
+                                         else
+                                           1.0
           end
-          member_plan_price =  ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
-                                  @product,
-                                  @rate_schedule_date,
-                                  coverage_age,
-                                  @rating_area
-                               ) * too_many_kids_make_you_crazy
-          member_price = BigDecimal.new((
+          member_plan_price = ::BenefitMarkets::Products::ProductRateCache.lookup_rate(
+            @product,
+            @rate_schedule_date,
+            coverage_age,
+            @rating_area
+          ) * too_many_kids_make_you_crazy
+          member_price = BigDecimal((
             member_plan_price *
             @group_size_factor *
             @participation_percent_factor *
             @sic_code_factor
           ).to_s).round(2)
-          @total = BigDecimal.new((@total + member_price).to_s).round(2)
+          @total = BigDecimal((@total + member_price).to_s).round(2)
           self
         end
 
@@ -66,7 +66,7 @@ module BenefitSponsors
             pricing_unit_id: pu.id,
             price: 0.00
           )
-        end 
+        end
         price_determination = sponsored_benefit.pricing_determinations.build(
           pricing_determination_tiers: price_determination_tiers,
           group_size: 1,
@@ -82,7 +82,7 @@ module BenefitSponsors
             pricing_unit_id: k,
             price: v
           )
-        end 
+        end
         price_determination = sponsored_benefit.pricing_determinations.build(
           pricing_determination_tiers: price_determination_tiers,
           group_size: group_size,
@@ -98,12 +98,12 @@ module BenefitSponsors
           tier_name = pu.name
           tier_factor = ::BenefitMarkets::Products::ProductFactorCache.lookup_composite_tier_factor(product, tier_name)
           tier_factors[pu.id] = tier_factor
-          denominator = denominator + (tier_totals[pu.id] * tier_factor)
+          denominator += (tier_totals[pu.id] * tier_factor)
         end
-        basis_rate = BigDecimal.new((price_total/denominator).to_s).round(2)
+        basis_rate = BigDecimal((price_total / denominator).to_s).round(2)
         tier_rates = {}
         pricing_model.pricing_units.each do |pu|
-          tier_rates[pu.id] = BigDecimal.new((basis_rate * tier_factors[pu.id]).to_s).round(2)
+          tier_rates[pu.id] = BigDecimal((basis_rate * tier_factors[pu.id]).to_s).round(2)
         end
         tier_rates
       end
@@ -113,7 +113,7 @@ module BenefitSponsors
         tier_totals = Hash.new(0)
         coverage_benefit_roster.each do |cbre|
           tier, group_price = tier_and_total_for(pricing_model, cbre, group_size, participation_percent, sic_code)
-          price_total = BigDecimal.new((price_total + group_price).to_s).round(2)
+          price_total = BigDecimal((price_total + group_price).to_s).round(2)
           tier_totals[tier.id] = tier_totals[tier.id] + 1
         end
         [price_total, tier_totals]

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
@@ -10,7 +11,7 @@ class ExtendingOpenEnrollmentEndDateForEmployers < MongoidMigrationTask
     organizations.each do |org|
       org.employer_profile.plan_years.where(:aasm_state.in => PlanYear::RENEWING).first.update_attribute(:open_enrollment_end_on, new_open_enrollment_end_on_date)
       puts "Changing Open Enrollment End On date for #{org.legal_name}" unless Rails.env.test?
-      count = count+1
+      count += 1
     end
     puts "Total effected ER's count is #{count}" unless Rails.env.test?
   end

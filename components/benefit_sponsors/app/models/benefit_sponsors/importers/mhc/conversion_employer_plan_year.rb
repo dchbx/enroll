@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers::Mhc
     class ConversionEmployerPlanYear < ::Importers::Mhc::ConversionEmployerPlanYear
@@ -13,15 +15,13 @@ module BenefitSponsors
           return
         end
 
-        if @sponsored_benefit_kind == :dental
-          reference_product = find_product
-        else
-          reference_product = BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
-        end
+        reference_product = if @sponsored_benefit_kind == :dental
+                              find_product
+                            else
+                              BenefitMarkets::Products::Product.where(hios_id: single_plan_hios_id).first
+                            end
 
-        if reference_product.blank?
-          errors.add(:reference_product, "Unable to find product with HIOS Id #{single_plan_hios_id}.")
-        end
+        errors.add(:reference_product, "Unable to find product with HIOS Id #{single_plan_hios_id}.") if reference_product.blank?
       end
 
       def find_carrier

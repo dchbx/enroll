@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # /lib/simple_rules_engine
 # To use, just include it in any file where you need some rules engine love ...
 # then defile rules like so:
@@ -5,11 +7,11 @@
 # rule :name_of_rule,
 #       priority: 10,
 #       validate: lambda {|o| # do something with o}
-#       fail: lambda {|o| o.fail!}} 
-# 
+#       fail: lambda {|o| o.fail!}}
+#
 # then to run the engine
 # process_rules(your_data_set)
-#   
+#
 module SimpleRulesEngine
   extend ActiveSupport::Concern
 
@@ -19,12 +21,11 @@ module SimpleRulesEngine
   end
 
   module ClassMethods
-
     # rule :name_of_rule,
     #       priority: 10,
     #       validate: lambda {|o| # do something with o}
     #       fail: lambda {|o| o.fail!}}
-    def rule(name,options={})
+    def rule(name,options = {})
       self.rules << SimpleRulesEngine::Rule.new(name,options)
     end
 
@@ -36,7 +37,6 @@ module SimpleRulesEngine
         row.valid!
       end
     end
-
   end
 
   ## Helper Classes
@@ -56,9 +56,9 @@ module SimpleRulesEngine
     # if invalid
     attr_accessor :fail
 
-    NO_OP = lambda {|o| true }
+    NO_OP = ->(_o) { true }
 
-    def initialize(name, options={})
+    def initialize(name, options = {})
       self.name = name
       self.priority = options[:priority] || 10
       self.validate = options[:validate] || NO_OP
@@ -67,14 +67,11 @@ module SimpleRulesEngine
     end
 
     def run(data)
-
       if validate.call(data)
         success.call(data)
       else
-        fail.call(data)
+        raise.call(data)
       end
-
     end
   end
-
 end

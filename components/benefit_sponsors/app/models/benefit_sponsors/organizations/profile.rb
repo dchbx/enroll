@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Profile
 # Base class with attributes, validations and constraints common to all Profile classes
 # embedded in an Organization
@@ -24,14 +26,14 @@ module BenefitSponsors
       delegate :entity_kind,              to: :organization, allow_nil: true
 
       embeds_many :office_locations,
-                  class_name:"BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
+                  class_name: "BenefitSponsors::Locations::OfficeLocation", cascade_callbacks: true
 
       embeds_one  :inbox, as: :recipient, cascade_callbacks: true,
-                  class_name:"BenefitSponsors::Inboxes::Inbox"
+                          class_name: "BenefitSponsors::Inboxes::Inbox"
 
       # Use the Document model for managing any/all documents associated with Organization
       has_many :documents, as: :documentable,
-               class_name: "BenefitSponsors::Documents::Document"
+                           class_name: "BenefitSponsors::Documents::Document"
 
       validates_presence_of :office_locations, :contact_method
       accepts_nested_attributes_for :office_locations, allow_destroy: true
@@ -41,11 +43,11 @@ module BenefitSponsors
       # Initialize settings for the abstract profile
       after_initialize :initialize_profile, :build_nested_models
 
-      alias_method :is_benefit_sponsorship_eligible?, :is_benefit_sponsorship_eligible
+      alias is_benefit_sponsorship_eligible? is_benefit_sponsorship_eligible
 
       validates :contact_method,
-        inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
-        allow_blank: false
+                inclusion: { in: ::BenefitMarkets::CONTACT_METHOD_KINDS, message: "%{value} is not a valid contact method" },
+                allow_blank: false
 
       after_save :publish_profile_event
 
@@ -54,7 +56,7 @@ module BenefitSponsors
       end
 
       def publish_profile_event
-        if primary_office_location && primary_office_location.changed?
+        if primary_office_location&.changed?
           benefit_sponsorships.each do |benefit_sponsorship|
             benefit_sponsorship.profile_event_subscriber(:primary_office_location_change)
           end
@@ -150,12 +152,10 @@ module BenefitSponsors
       private
 
       # Subclasses may extend this method
-      def initialize_profile
-      end
+      def initialize_profile; end
 
       # Subclasses may extend this method
-      def build_nested_models
-      end
+      def build_nested_models; end
     end
   end
 end

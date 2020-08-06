@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Invitation
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -12,7 +14,7 @@ class Invitation
     "csr_role" => "csr_role",
     "hbx_staff_role" => "hbx_staff_role",
     "general_agency_staff_role" => "general_agency_staff_role"
-  }
+  }.freeze
   ROLES = INVITE_TYPES.values
   SOURCE_KINDS = INVITE_TYPES.keys
 
@@ -39,7 +41,7 @@ class Invitation
     state :claimed
 
     event :claim do
-      transitions from: :sent, to: :claimed, :after => Proc.new { |*args| process_claim!(*args) }
+      transitions from: :sent, to: :claimed, :after => proc { |*args| process_claim!(*args) }
     end
   end
 
@@ -84,7 +86,7 @@ class Invitation
     end
   end
 
-  def claim_employee_role(user_obj, redirection_obj)
+  def claim_employee_role(_user_obj, redirection_obj)
     census_employee = CensusEmployee.find(source_id)
     redirection_obj.redirect_to_employee_match(census_employee)
   end
@@ -98,14 +100,12 @@ class Invitation
       broker_agency_profile = broker_role.broker_agency_profile
 
       person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({
-        :broker_agency_profile => broker_agency_profile,
-        :aasm_state => 'active'
-      })
+                                                                        :broker_agency_profile => broker_agency_profile,
+                                                                        :aasm_state => 'active'
+                                                                      })
       person.save!
       user_obj.roles << "broker" unless user_obj.roles.include?("broker")
-      if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
-        user_obj.roles << "broker_agency_staff"
-      end
+      user_obj.roles << "broker_agency_staff" if broker_role.is_primary_broker? && !user_obj.roles.include?("broker_agency_staff")
       user_obj.save!
       redirection_obj.redirect_to_broker_agency_profile(broker_agency_profile)
     end
@@ -177,10 +177,8 @@ class Invitation
   def allowed_invite_types
     result_type = INVITE_TYPES[self.source_kind]
     check_role = result_type.blank? ? nil : result_type.downcase
-    return if (self.source_kind.blank? || self.role.blank?)
-    if result_type != self.role.downcase
-      errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid")
-    end
+    return if self.source_kind.blank? || self.role.blank?
+    errors.add(:base, "a combination of source #{self.source_kind} and role #{self.role} is invalid") if result_type != self.role.downcase
   end
 
   def send_invitation!(invitee_name)
@@ -199,7 +197,7 @@ class Invitation
     UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
   end
 
-  def send_agent_invitation!(invitee_name, person_id=nil)
+  def send_agent_invitation!(invitee_name, person_id = nil)
     UserMailer.agent_invitation_email(invitation_email, invitee_name, self, person_id).deliver_now
   end
 
@@ -216,7 +214,7 @@ class Invitation
   end
 
   def self.invite_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -229,7 +227,7 @@ class Invitation
   end
 
   def self.invite_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -242,7 +240,7 @@ class Invitation
   end
 
   def self.invite_future_employee_for_open_enrollment!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -255,7 +253,7 @@ class Invitation
   end
 
   def self.invite_renewal_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       created_at_range = Date.today.all_day
       return if self.invitation_already_sent?(
         census_employee,
@@ -277,7 +275,7 @@ class Invitation
   end
 
   def self.invite_initial_employee!(census_employee)
-    if !census_employee.email_address.blank?
+    unless census_employee.email_address.blank?
       invitation = self.create(
         :role => "employee_role",
         :source_kind => "census_employee",
@@ -290,7 +288,7 @@ class Invitation
   end
 
   def self.invite_broker!(broker_role)
-    if !broker_role.email_address.blank?
+    unless broker_role.email_address.blank?
       invitation = self.create(
         :role => "broker_role",
         :source_kind => "broker_role",
@@ -303,7 +301,7 @@ class Invitation
   end
 
   def self.invite_broker_agency_staff!(broker_role)
-    if !broker_role.email_address.blank?
+    unless broker_role.email_address.blank?
       invitation = self.create(
         :role => "broker_agency_staff_role",
         :source_kind => "broker_agency_staff_role",
@@ -316,7 +314,7 @@ class Invitation
   end
 
   def self.invite_general_agency_staff!(staff_role)
-    if !staff_role.email_address.blank?
+    unless staff_role.email_address.blank?
       invitation = self.create(
         :role => "general_agency_staff_role",
         :source_kind => "general_agency_staff_role",
@@ -329,36 +327,36 @@ class Invitation
   end
 
   def self.invite_assister!(assister_role, email)
-      invitation = self.create(
-        :role => "assister_role",
-        :source_kind => "assister_role",
-        :source_id => assister_role.id,
-        :invitation_email => email
-      )
-      invitation.send_agent_invitation!(assister_role.parent.full_name)
-      invitation
+    invitation = self.create(
+      :role => "assister_role",
+      :source_kind => "assister_role",
+      :source_id => assister_role.id,
+      :invitation_email => email
+    )
+    invitation.send_agent_invitation!(assister_role.parent.full_name)
+    invitation
   end
 
   def self.invite_csr!(csr_role, email)
-      invitation = self.create(
-        :role => "csr_role",
-        :source_kind => "csr_role",
-        :source_id => csr_role.id,
-        :invitation_email => email
-      )
-      invitation.send_agent_invitation!(csr_role.parent.full_name)
-      invitation
+    invitation = self.create(
+      :role => "csr_role",
+      :source_kind => "csr_role",
+      :source_id => csr_role.id,
+      :invitation_email => email
+    )
+    invitation.send_agent_invitation!(csr_role.parent.full_name)
+    invitation
   end
 
   def self.invite_hbx_staff!(hbx_staff_role, email)
-      invitation = self.create(
-        :role => "hbx_staff_role",
-        :source_kind => "hbx_staff_role",
-        :source_id => hbx_staff_role.id,
-        :invitation_email => email
-      )
-      invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
-      invitation
+    invitation = self.create(
+      :role => "hbx_staff_role",
+      :source_kind => "hbx_staff_role",
+      :source_id => hbx_staff_role.id,
+      :invitation_email => email
+    )
+    invitation.send_agent_invitation!(hbx_staff_role.parent.full_name)
+    invitation
   end
 
   # TODO: Could add a string to the invitation model such as "invitation_email_kind" to better gauge specific emails being sent

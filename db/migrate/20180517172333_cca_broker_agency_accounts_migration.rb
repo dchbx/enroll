@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/cca_baa_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( hbx_id legal_name old_bk_agency_accs benefit_sponsor_organization_id
-                        total_benefit_sponsorships accounts_in_each_benefit_sponsorship migrated_bk_agency_accs status valid_account)
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
+      file_name = "#{Rails.root}/hbx_report/cca_baa_migration_status_#{TimeKeeper.datetime_of_record.strftime('%m_%d_%Y_%H_%M_%S')}.csv"
+      field_names = %w[ hbx_id legal_name old_bk_agency_accs benefit_sponsor_organization_id
+                        total_benefit_sponsorships accounts_in_each_benefit_sponsorship migrated_bk_agency_accs status valid_account]
 
       logger = Logger.new("#{Rails.root}/log/cca_baa_migration.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -24,13 +26,11 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
     end
   end
 
-  def self.down
-  end
+  def self.down; end
 
   private
 
   def self.migrate_accounts(csv, logger)
-
     @new_organizations = BenefitSponsors::Organizations::Organization
 
     migrated_organizations = @new_organizations.employer_profiles
@@ -62,7 +62,6 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
       count += total_bk_agency_accs
 
       begin
-
         if benefit_sponsorships.count == 1
           # This is used when there is only one benefit sponsorship
           old_bk_agency_accs.each do |old_bk_agency_acc|
@@ -78,26 +77,26 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
           if active_bk_accs.present?
             #all active broker agency accounts use this block
             old_active_bk_acc = active_bk_accs.first
-            latest_bs= organization.latest_benefit_sponsorship
+            latest_bs = organization.latest_benefit_sponsorship
             find_and_create(old_active_bk_acc, latest_bs, csv)
           end
 
           bss_with_date = benefit_sponsorships.where(effective_begin_on: {'$ne' => nil})
 
           #all inactive broker agency accounts use this block
-          inactive_bk_accs.order_by(:'start_on'.desc).group_by {|item| item.start_on.to_date}.select {|k, v| v.size > 0}.each_pair do |hire_on, bk_agency_accs|
+          inactive_bk_accs.order_by(:start_on.desc).group_by {|item| item.start_on.to_date}.reject {|_k, v| v.empty?}.each_pair do |hire_on, bk_agency_accs|
 
-            benefit_sponsorships_for_accs = bss_with_date.where(:'effective_begin_on'.lte => hire_on).and(:'effective_end_on'.gte => hire_on)
+            benefit_sponsorships_for_accs = bss_with_date.where(:effective_begin_on.lte => hire_on).and(:effective_end_on.gte => hire_on)
 
-            if benefit_sponsorships_for_accs.count > 0
+            bs = if benefit_sponsorships_for_accs.count > 0
               # pick benefitsponsorship , hire date of broker should be between effective begin on and effective end on
-              bs = benefit_sponsorships_for_accs.order_by(:'effective_begin_on'.desc).first
-            elsif bss_with_date.where(:'effective_begin_on'.lte => hire_on).count
-              bs = bss_with_date.where(:'effective_begin_on'.lte => hire_on).order_by(:'effective_begin_on'.desc).first
-            else
+                   benefit_sponsorships_for_accs.order_by(:effective_begin_on.desc).first
+                 elsif bss_with_date.where(:effective_begin_on.lte => hire_on).count
+                   bss_with_date.where(:effective_begin_on.lte => hire_on).order_by(:effective_begin_on.desc).first
+                 else
               #this is default , if non of the benefitsponsorship fits, this block is used
-              bs = organization.latest_benefit_sponsorship
-            end
+                   organization.latest_benefit_sponsorship
+                 end
 
             next unless bs.present?
 
@@ -115,8 +114,10 @@ class CcaBrokerAgencyAccountsMigration < Mongoid::Migration
         print '.' unless Rails.env.test?
         csv << [old_org.first.hbx_id, old_org.first.legal_name, total_bk_agency_accs, organization.id, total_benefit_sponsorships, arrayed, total_migrated_bk_agency_accs, (total_bk_agency_accs == total_migrated_bk_agency_accs), "-"]
       rescue Exception => e
-        logger.error "Broker Accounts Migration Failed for old Organization HBX_ID: #{old_org.first.hbx_id},
-          #{e.inspect}" unless Rails.env.test?
+        unless Rails.env.test?
+          logger.error "Broker Accounts Migration Failed for old Organization HBX_ID: #{old_org.first.hbx_id},
+            #{e.inspect}"
+        end
       end
     end
     logger.info " Total #{count} accounts to be migrated" unless Rails.env.test?

@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module TransportGateway
   # Shared resources and methods
   ADAPTER_FOLDER    = "adapters"
   CREDENTIAL_FOLDER = "credentials"
-  CREDENTIAL_KINDS  = ["basic", "key"]
+  CREDENTIAL_KINDS  = ["basic", "key"].freeze
 
   class Gateway
     attr_reader :credential_provider, :logger
@@ -14,9 +16,7 @@ module TransportGateway
       load_adapters
     end
 
-    def adapters
-      @adapters
-    end
+    attr_reader :adapters
 
     def list_entries(resource_query)
       logger.info("transport_gateway") { "Started resource query:\n#{resource_query.log_inspect}" }
@@ -42,7 +42,7 @@ module TransportGateway
       adapter.send_message(message)
     end
 
-  private
+    private
 
     def adapter_folder
       "adapters"
@@ -57,12 +57,12 @@ module TransportGateway
     end
 
     def adapter_for_uri(uri)
-      protocol = (uri.scheme == "ftp") ? "sftp" : uri.scheme
+      protocol = uri.scheme == "ftp" ? "sftp" : uri.scheme
 
       adapter_klass = klass_for(TransportGateway::ADAPTER_FOLDER, protocol)
       if adapter_klass.nil?
-        logger.error("transport_gateway") { "No Adapter found for #{uri.to_s}" }
-        raise URI::BadURIError.new("unsupported scheme: #{uri.scheme}")
+        logger.error("transport_gateway") { "No Adapter found for #{uri}" }
+        raise URI::BadURIError, "unsupported scheme: #{uri.scheme}"
       end
       adapter_klass.new
     end
@@ -77,21 +77,21 @@ module TransportGateway
       adapter_dir = File.dirname(__FILE__)
       pattern = File.join(adapter_dir, TransportGateway::ADAPTER_FOLDER, '*.rb')
 
-      Dir.glob(pattern).each do |file|
+      Dir.glob(pattern).sort.each do |file|
         require file
         @adapters << File.basename(file, '.rb').to_sym
       end
     end
 
     def camel_case(string)
-      tokens = string.split('.') 
-      tokens.map! {|t| t.capitalize}
+      tokens = string.split('.')
+      tokens.map!(&:capitalize)
       tokens.join('Dot')
     end
 
     def low_case(string)
       tokens = string.split('.')
-      tokens.map! {|t| t.downcase}
+      tokens.map!(&:downcase)
       tokens.join('_dot_')
     end
 

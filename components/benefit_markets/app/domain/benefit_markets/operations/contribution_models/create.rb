@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ContributionModels
-
       class Create
         # include Dry::Monads::Do.for(:call)
         include Dry::Monads[:result, :do]
@@ -17,7 +16,7 @@ module BenefitMarkets
         def call(contribution_params:)
           contribution_values = yield validate(contribution_params)
           contribution_model  = yield create(contribution_values)
-  
+
           Success(contribution_model)
         end
 

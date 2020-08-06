@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^oustanding verfications users exists$/) do
   person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
   @person_name = person.full_name
@@ -53,6 +55,6 @@ end
 Then(/^the Admin is directed to that user's My DC Health Link page$/) do
   page.find(:xpath, "//table[contains(@class, 'effective-datatable')]/tbody/tr/td[1]/a").click
   expect(page).to have_content("My DC Health Link")
-  expect(page).to have_content("#{@person_name}")
+  expect(page).to have_content(@person_name.to_s)
 end
 

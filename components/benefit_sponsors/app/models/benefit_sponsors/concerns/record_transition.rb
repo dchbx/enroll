@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
-  module Concerns::RecordTransition 
+  module Concerns::RecordTransition
     extend ActiveSupport::Concern
 
     included do
@@ -12,13 +14,12 @@ module BenefitSponsors
 
     def record_transition
       workflow_state_transitions << ::WorkflowStateTransition.new({
-        from_state: aasm.from_state, 
-        to_state: aasm.to_state, 
-        event: aasm.current_event
-        })
+                                                                    from_state: aasm.from_state,
+                                                                    to_state: aasm.to_state,
+                                                                    event: aasm.current_event
+                                                                  })
     end
   end
 end
 
 
-  

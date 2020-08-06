@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlController < ApplicationController
   skip_before_action :verify_authenticity_token
   include Acapi::Notifiers
@@ -8,7 +10,7 @@ class SamlController < ApplicationController
 
   def login
     relay_state = params["RelayState"]
-    response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
+    response = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
     sign_out current_user if current_user.present?
@@ -71,7 +73,6 @@ class SamlController < ApplicationController
   # Going to curam during the initial flow is triggered differently.
   # What we do here is set the navigation flag and send to the right location.
   def navigate_to_assistance
-
     if current_user.present?
 
       ::IdpAccountManager.update_navigation_flag(
@@ -84,7 +85,6 @@ class SamlController < ApplicationController
     else
       redirect_to SamlInformation.iam_login_url
     end
-
   end
 
   def logout

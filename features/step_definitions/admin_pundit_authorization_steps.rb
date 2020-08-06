@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^ the Hbx Admin should see the list of primary applicants and an Action button$/) do
   find_button('Actions').visible?
 end
@@ -32,11 +34,11 @@ Then(/^the Terminate Enrollment option should be disabled$/) do
 end
 
 #Note this step will be used in the future when APTC is completed
-Then(/^the Edit APTC\/CSR option should be enabled$/) do
+Then(%r{^the Edit APTC/CSR option should be enabled$}) do
   find_link('Edit APTC / CSR')['data-remote'].should == 'true'
 end
 
 #Note this step will be used in the future when APTC is completed
-Then(/^the Edit APTC\/CSR option should be disabled$/) do
+Then(%r{^the Edit APTC/CSR option should be disabled$}) do
   find_link('Edit APTC / CSR').should be_disabled
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -28,7 +30,6 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
   end
 
   def self.create_profile
-
     return false unless find_site.present?
     site = find_site.first
 
@@ -44,52 +45,54 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
 
     say_with_time("Time taken to migrate organizations") do
       old_organizations.batch_size(limit_count).no_timeout.all.each do |old_org|
-        begin
-          existing_new_organizations = find_new_organization(old_org)
-          @old_profile = old_org.general_agency_profile
-          json_data = @old_profile.to_json(:except => [:_id, :inbox, :documents])
-          old_profile_params = JSON.parse(json_data)
 
-          @new_profile = self.initialize_new_profile(old_org, old_profile_params)
+        existing_new_organizations = find_new_organization(old_org)
+        @old_profile = old_org.general_agency_profile
+        json_data = @old_profile.to_json(:except => [:_id, :inbox, :documents])
+        old_profile_params = JSON.parse(json_data)
 
-          raise "Duplicate organization exists" if existing_new_organizations.present? && existing_new_organizations.count > 1
+        @new_profile = self.initialize_new_profile(old_org, old_profile_params)
 
-          new_organization = if existing_new_organizations.present?
-                               existing_new_organizations.first.profiles << @new_profile
-                               existing_new_organizations.first
-                             else
-                               self.initialize_new_organization(old_org, site)
-                             end
+        raise "Duplicate organization exists" if existing_new_organizations.present? && existing_new_organizations.count > 1
 
-          BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
-          BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
-          BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
-          BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create, raise: false)
+        new_organization = if existing_new_organizations.present?
+                             existing_new_organizations.first.profiles << @new_profile
+                             existing_new_organizations.first
+                           else
+                             self.initialize_new_organization(old_org, site)
+                           end
 
-          raise Exception unless new_organization.valid?
-          new_organization.save!
+        BenefitSponsors::Organizations::Organization.skip_callback(:create, :after, :notify_on_create, raise: false)
+        BenefitSponsors::Organizations::Organization.skip_callback(:update, :after, :notify_observers, raise: false)
+        BenefitSponsors::Organizations::Profile.skip_callback(:save, :after, :publish_profile_event, raise: false)
+        BenefitSponsors::Documents::Document.skip_callback(:create, :after, :notify_on_create, raise: false)
 
-          # build document for profile
-          profile = new_organization.general_agency_profile
-          build_documents(old_org, profile)
+        raise Exception unless new_organization.valid?
+        new_organization.save!
 
-          print '.' unless Rails.env.test?
-          success = success + 1
-        rescue Exception => e
-          failed = failed + 1
-          print 'F' unless Rails.env.test?
+        # build document for profile
+        profile = new_organization.general_agency_profile
+        build_documents(old_org, profile)
+
+        print '.' unless Rails.env.test?
+        success += 1
+      rescue Exception => e
+        failed += 1
+        print 'F' unless Rails.env.test?
+        unless Rails.env.test?
           @logger.error "Migration Failed for Organization HBX_ID: #{old_org.hbx_id},
-          validation_errors:
-          organization - #{new_organization.errors.messages}
-          profile - #{@new_profile.errors.messages},
-          #{e.inspect}" unless Rails.env.test?
+            validation_errors:
+            organization - #{new_organization.errors.messages}
+            profile - #{@new_profile.errors.messages},
+            #{e.inspect}"
         end
+
       end
     end
 
-    # TODO 19874586 issue with general agency staff role
+    # TODO: 19874586 issue with general agency staff role
     say_with_time("Time taken to migrate general staff roles") do
-      Person.where(:"general_agency_staff_roles".exists => true).each do |person|
+      Person.where(:general_agency_staff_roles.exists => true).each do |person|
         person.general_agency_staff_roles.unscoped.each do |staff|
           general_agency_profile = old_general_agency_profile(staff.general_agency_profile_id.to_s)
 
@@ -117,7 +120,7 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
     BenefitSponsors::Organizations::Profile.set_callback(:save, :after, :publish_profile_event, raise: false)
     BenefitSponsors::Documents::Document.set_callback(:create, :after, :notify_on_create, raise: false)
 
-    return true
+    true
   end
 
   def self.find_new_organization(old_org)
@@ -129,11 +132,10 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
 
     build_inbox_messages(new_profile)
     build_office_locations(old_org, new_profile)
-    return new_profile
+    new_profile
   end
 
   def self.build_documents(old_org, new_profile)
-
     @old_profile.documents.each do |document|
       next if BenefitSponsors::Documents::Document.where(id: document.id).present?
       doc = new_profile.documents.new(document.attributes.except("_type", "identifier","size"))
@@ -159,7 +161,7 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
 
   def self.build_office_locations(old_org, new_profile)
     old_org.office_locations.each do |office_location|
-      new_office_location = new_profile.office_locations.new()
+      new_office_location = new_profile.office_locations.new
       new_office_location.is_primary = office_location.is_primary
       address_params = office_location.address.attributes.except("_id") if office_location.address.present?
       phone_params = office_location.phone.attributes.except("_id") if office_location.phone.present?
@@ -176,7 +178,7 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
     exempt_organization.entity_kind = @old_profile.entity_kind.to_sym
     exempt_organization.site = site
     exempt_organization.profiles << [@new_profile]
-    return exempt_organization
+    exempt_organization
   end
 
   def self.old_general_agency_profile(id)
@@ -194,6 +196,6 @@ class MigrateDcGeneralAgencyProfiles < Mongoid::Migration
 
   def self.find_site
     return @site if defined? @site
-    @site =  BenefitSponsors::Site.all.where(site_key: Settings.site.key.to_sym)
+    @site = BenefitSponsors::Site.all.where(site_key: Settings.site.key.to_sym)
   end
 end

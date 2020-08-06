@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::GeneralAgency
     include Virtus.model
@@ -20,24 +22,24 @@ module Notifier
 
     def self.stubbed_object
       notice = Notifier::MergeDataModels::GeneralAgency.new({
-        notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        first_name: 'Johnny',
-        last_name: 'Pepper',
-        email: 'johnnypepper@ypomail.com',
-        legal_name: 'Best General Agency LLC',
-        assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
-        employer_name: 'North America Football Federation',
-        employer_poc_firstname: 'David',
-        employer_poc_lastname: 'Samules'
-        })
+                                                              notice_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              first_name: 'Johnny',
+                                                              last_name: 'Pepper',
+                                                              email: 'johnnypepper@ypomail.com',
+                                                              legal_name: 'Best General Agency LLC',
+                                                              assignment_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
+                                                              employer_name: 'North America Football Federation',
+                                                              employer_poc_firstname: 'David',
+                                                              employer_poc_lastname: 'Samules'
+                                                            })
       notice.broker = Notifier::MergeDataModels::Broker.stubbed_object
       notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
       notice
     end
 
     def collections
-      %w{addresses}
+      %w[addresses]
     end
 
     def conditions

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class GeneralAgencyProfile < ::Forms::OrganizationSignup
     include ActiveModel::Validations
@@ -17,7 +19,7 @@ module Forms
     validates_format_of :email, :with => /\A[^@\s]+@([^@\s]+\.)+[^@\s]+\z/, message: "%{value} is not valid"
     validate :validate_duplicate_npn
 
-    class OrganizationAlreadyMatched < StandardError;
+    class OrganizationAlreadyMatched < StandardError
     end
 
     def self.model_name
@@ -28,7 +30,7 @@ module Forms
       person.general_agency_staff_roles << ::GeneralAgencyStaffRole.new({:npn => self.npn})
     end
 
-    def save(current_user=nil)
+    def save(_current_user = nil)
       begin
         if only_staff_role?
           general_agency_profile = ::GeneralAgencyProfile.find(self.general_agency_profile_id)
@@ -46,7 +48,7 @@ module Forms
       rescue BSON::ObjectId::Invalid
         errors.add(:base, "General agency can not be blank.")
         return false
-      rescue => e
+      rescue StandardError => e
         return false
       end
 
@@ -65,24 +67,22 @@ module Forms
 
     def match_or_create_person
       matched_people = Person.where(
-          first_name: regex_for(first_name),
-          last_name: regex_for(last_name),
-          dob: dob
+        first_name: regex_for(first_name),
+        last_name: regex_for(last_name),
+        dob: dob
       )
 
-      if matched_people.count > 1
-        raise TooManyMatchingPeople.new
-      end
+      raise TooManyMatchingPeople if matched_people.count > 1
 
-      if matched_people.count == 1
-        self.person = matched_people.first
-      else
-        self.person = Person.new({
-                                     first_name: first_name,
-                                     last_name: last_name,
-                                     dob: dob
+      self.person = if matched_people.count == 1
+                      matched_people.first
+                    else
+                      Person.new({
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   dob: dob
                                  })
-      end
+                    end
 
       self.person.add_work_email(email)
     end
@@ -95,29 +95,30 @@ module Forms
       existing_org = Organization.where(:fein => self.fein)
       if existing_org.present? && !existing_org.first.general_agency_profile.present?
         new_general_agency_profile = ::GeneralAgencyProfile.new({
-                                                                    :entity_kind => entity_kind,
-                                                                    :home_page => home_page,
-                                                                    :market_kind => market_kind,
-                                                                    :languages_spoken => languages_spoken,
-                                                                    :working_hours => working_hours,
-                                                                    :accept_new_clients => accept_new_clients})
+                                                                  :entity_kind => entity_kind,
+                                                                  :home_page => home_page,
+                                                                  :market_kind => market_kind,
+                                                                  :languages_spoken => languages_spoken,
+                                                                  :working_hours => working_hours,
+                                                                  :accept_new_clients => accept_new_clients
+                                                                })
         existing_org = existing_org.first
         existing_org.update_attributes!(general_agency_profile: new_general_agency_profile)
         existing_org
       else
         Organization.create!(
-            :fein => fein,
-            :legal_name => legal_name,
-            :dba => dba,
-            :general_agency_profile => ::GeneralAgencyProfile.new({
-                                                                      :entity_kind => entity_kind,
-                                                                      :home_page => home_page,
-                                                                      :market_kind => market_kind,
-                                                                      :languages_spoken => languages_spoken,
-                                                                      :working_hours => working_hours,
-                                                                      :accept_new_clients => accept_new_clients
-                                                                  }),
-            :office_locations => office_locations
+          :fein => fein,
+          :legal_name => legal_name,
+          :dba => dba,
+          :general_agency_profile => ::GeneralAgencyProfile.new({
+                                                                  :entity_kind => entity_kind,
+                                                                  :home_page => home_page,
+                                                                  :market_kind => market_kind,
+                                                                  :languages_spoken => languages_spoken,
+                                                                  :working_hours => working_hours,
+                                                                  :accept_new_clients => accept_new_clients
+                                                                }),
+          :office_locations => office_locations
         )
       end
     end
@@ -128,25 +129,25 @@ module Forms
       general_agency_role = general_agency_profile.primary_staff
       person = general_agency_role.try(:person)
       attributes = {
-          id: organization.id,
-          legal_name: organization.legal_name,
-          dba: organization.dba,
-          fein: organization.fein,
-          home_page: organization.home_page,
-          npn: general_agency_role.npn,
-          entity_kind: general_agency_profile.entity_kind,
-          market_kind: general_agency_profile.market_kind,
-          languages_spoken: general_agency_profile.languages_spoken,
-          working_hours: general_agency_profile.working_hours,
-          accept_new_clients: general_agency_profile.accept_new_clients,
-          office_locations: organization.office_locations
+        id: organization.id,
+        legal_name: organization.legal_name,
+        dba: organization.dba,
+        fein: organization.fein,
+        home_page: organization.home_page,
+        npn: general_agency_role.npn,
+        entity_kind: general_agency_profile.entity_kind,
+        market_kind: general_agency_profile.market_kind,
+        languages_spoken: general_agency_profile.languages_spoken,
+        working_hours: general_agency_profile.working_hours,
+        accept_new_clients: general_agency_profile.accept_new_clients,
+        office_locations: organization.office_locations
       }
       if person.present?
         attributes.merge!({
-                              first_name: person.first_name,
-                              last_name: person.last_name,
-                              dob: person.dob.try(:strftime, '%Y-%m-%d'),
-                              email: person.emails.first.address,
+                            first_name: person.first_name,
+                            last_name: person.last_name,
+                            dob: person.dob.try(:strftime, '%Y-%m-%d'),
+                            email: person.emails.first.address
                           })
       end
       record = self.new(attributes)
@@ -167,50 +168,46 @@ module Forms
         #  person.update_attributes(extract_person_params)
         #  person.emails.find_by(kind: 'work').update(address: attr[:email])
         #end
-    rescue
-      return false
+    rescue StandardError
+      false
     end
 
     def extract_person_params
       {
-          :first_name => first_name,
-          :last_name => last_name,
-          :dob => dob
+        :first_name => first_name,
+        :last_name => last_name,
+        :dob => dob
       }
     end
 
     def extract_organization_params(attr)
       {
-          :fein => fein,
-          :legal_name => legal_name,
-          :dba => dba,
-          :home_page => home_page,
-          :office_locations_attributes => attr[:office_locations_attributes]
+        :fein => fein,
+        :legal_name => legal_name,
+        :dba => dba,
+        :home_page => home_page,
+        :office_locations_attributes => attr[:office_locations_attributes]
       }
     end
 
     def extract_general_agency_profile_params
       {
-          :entity_kind => entity_kind,
-          :home_page => home_page,
-          :market_kind => market_kind,
-          :languages_spoken => languages_spoken,
-          :working_hours => working_hours,
-          :accept_new_clients => accept_new_clients
+        :entity_kind => entity_kind,
+        :home_page => home_page,
+        :market_kind => market_kind,
+        :languages_spoken => languages_spoken,
+        :working_hours => working_hours,
+        :accept_new_clients => accept_new_clients
       }
     end
 
     def validate_duplicate_npn
-      if Person.where("general_agency_staff_roles.npn" => npn).any?
-        errors.add(:base, "NPN has already been claimed by another general agency staff. Please contact HBX-Customer Service - Call (855) 532-5465.")
-      end
+      errors.add(:base, "NPN has already been claimed by another general agency staff. Please contact HBX-Customer Service - Call (855) 532-5465.") if Person.where("general_agency_staff_roles.npn" => npn).any?
     end
 
     def check_existing_organization
       existing_org = Organization.where(:fein => self.fein)
-      if existing_org.present? && existing_org.first.general_agency_profile.present?
-        raise OrganizationAlreadyMatched.new
-      end
+      raise OrganizationAlreadyMatched if existing_org.present? && existing_org.first.general_agency_profile.present?
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BenefitPackages::RenewalGroupAssignments::ParameterValidator do
@@ -37,8 +39,8 @@ RSpec.describe BenefitSponsors::BenefitPackages::RenewalGroupAssignments::Parame
   describe "given a bogus benefit package id" do
     let(:params) do
       base_valid_params.merge({
-        "benefit_package_id" => "sadfjkjkksef"
-      })
+                                "benefit_package_id" => "sadfjkjkksef"
+                              })
     end
 
     subject { validator.call(params) }
@@ -55,8 +57,8 @@ RSpec.describe BenefitSponsors::BenefitPackages::RenewalGroupAssignments::Parame
   describe "given a bogus census employee id" do
     let(:params) do
       base_valid_params.merge({
-        "census_employee_id" => "sadfjkjkksef"
-      })
+                                "census_employee_id" => "sadfjkjkksef"
+                              })
     end
 
     subject { validator.call(params) }

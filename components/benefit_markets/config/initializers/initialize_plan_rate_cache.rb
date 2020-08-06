@@ -1,3 +1,3 @@
-unless Rails.env.test?
-  ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
-end
+# frozen_string_literal: true
+
+::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache! unless Rails.env.test?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Factories
     class AcaIndividualConfiguration
@@ -9,11 +11,11 @@ module BenefitMarkets
 
       def self.call(initial_application_configuration:, mm_enr_due_on:, open_enrl_end_on:, open_enrl_start_on:, vr_due:, vr_os_window:)
         BenefitMarkets::Configurations::AcaIndividualConfiguration.new initial_application_configuration: initial_application_configuration,
-          mm_enr_due_on: mm_enr_due_on,
-          open_enrl_end_on: open_enrl_end_on,
-          open_enrl_start_on: open_enrl_start_on,
-          vr_due: vr_due,
-          vr_os_window: vr_os_window
+                                                                       mm_enr_due_on: mm_enr_due_on,
+                                                                       open_enrl_end_on: open_enrl_end_on,
+                                                                       open_enrl_start_on: open_enrl_start_on,
+                                                                       vr_due: vr_due,
+                                                                       vr_os_window: vr_os_window
       end
     end
   end

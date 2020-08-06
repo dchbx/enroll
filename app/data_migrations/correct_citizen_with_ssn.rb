@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CorrectCitizenStatus < MongoidMigrationTask
@@ -12,24 +14,22 @@ class CorrectCitizenStatus < MongoidMigrationTask
   end
 
   def move_to_pending_ssa(person)
-    begin
-      person.consumer_role.aasm_state = "ssa_pending"
-      person.save!
-    rescue => e
-      puts "Error for Person id: #{person.id}. Error: #{e.message}"
-    end
+    person.consumer_role.aasm_state = "ssa_pending"
+    person.save!
+  rescue StandardError => e
+    puts "Error for Person id: #{person.id}. Error: #{e.message}"
   end
 
   def get_response_doc(person)
     person.consumer_role.lawful_presence_determination.ssa_responses.select do |sa|
       sa.received_at >= Time.mktime(2016,7,5,8,0,0)
-    end.sort_by(&:received_at).last
+    end.max_by(&:received_at)
   end
 
   def get_previous_response(person)
     person.consumer_role.lawful_presence_determination.ssa_responses.select do |sa|
       sa.received_at < Time.mktime(2016,7,5,8,0,0)
-    end.sort_by(&:received_at).last
+    end.max_by(&:received_at)
   end
 
   def parse_payload(response_doc)
@@ -83,13 +83,13 @@ class CorrectCitizenStatus < MongoidMigrationTask
   def migrate
     people_to_fix = get_people
     people_to_fix.each do |person|
-      begin
-        move_to_pending_ssa(person)
-        person.reload
-        parse_ssa_response(person)
-      rescue
-        $stderr.puts "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}" unless Rails.env.test?
-      end
+
+      move_to_pending_ssa(person)
+      person.reload
+      parse_ssa_response(person)
+    rescue StandardError
+      warn "Issue migrating person: #{person.fullname}, #{person.hbx_id}, #{person.id}" unless Rails.env.test?
+
     end
   end
 

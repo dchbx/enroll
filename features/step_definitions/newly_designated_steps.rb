@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/(.*) is newly designated/) do |named_person|
   person = people[named_person]
 

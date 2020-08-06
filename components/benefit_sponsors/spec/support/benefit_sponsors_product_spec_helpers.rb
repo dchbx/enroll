@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(File.dirname(__FILE__), "client_product_spec_helpers/cca")
 require File.join(File.dirname(__FILE__), "client_product_spec_helpers/dc")
 

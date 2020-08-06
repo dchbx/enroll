@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Employers::BrokerAgencyController < ApplicationController
   include Acapi::Notifiers
   include ApplicationHelper
@@ -31,11 +33,9 @@ class Employers::BrokerAgencyController < ApplicationController
     respond_to do |format|
       format.js
     end
-
   end
 
-  def show
-  end
+  def show; end
 
   def active_broker
     @broker_agency_account = @employer_profile.active_broker_agency_account
@@ -56,16 +56,14 @@ class Employers::BrokerAgencyController < ApplicationController
       send_broker_assigned_msg(@employer_profile, broker_agency_profile)
       @employer_profile.save!(validate: false)
       trigger_notice_observer(broker_agency_profile.primary_broker_role, @employer_profile, "broker_hired_notice_to_broker")
-      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer") 
+      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer")
       trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
     end
     flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
     send_broker_successfully_associated_email broker_role_id
     redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
-  rescue => e
-    if @employer_profile.errors
-      error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages)
-    end
+  rescue StandardError => e
+    error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages) if @employer_profile.errors
     log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
   end
 
@@ -79,22 +77,22 @@ class Employers::BrokerAgencyController < ApplicationController
     end
 
     respond_to do |format|
-      format.js {
+      format.js do
         if params["termination_date"].present? && @fa
           flash[:notice] = "Broker terminated successfully."
           render text: true
         else
           render text: false
         end
-      }
-      format.all {
+      end
+      format.all do
         flash[:notice] = "Broker terminated successfully."
         if params[:direct_terminate]
           redirect_to employers_employer_profile_path(@employer_profile, tab: "brokers")
         else
           redirect_to employers_employer_profile_path(@employer_profile)
         end
-      }
+      end
     end
   end
 
@@ -103,8 +101,9 @@ class Employers::BrokerAgencyController < ApplicationController
   def updateable?
     authorize @employer_profile, :updateable?
   end
-  def send_broker_successfully_associated_email broker_role_id
-    id =BSON::ObjectId.from_string(broker_role_id)
+
+  def send_broker_successfully_associated_email(broker_role_id)
+    id = BSON::ObjectId.from_string(broker_role_id)
     @broker_person = Person.where(:'broker_role._id' => id).first
     body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
 
@@ -130,9 +129,9 @@ class Employers::BrokerAgencyController < ApplicationController
 
   def send_broker_assigned_msg(employer_profile, broker_agency_profile)
     broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on the #{site_short_name}"
-    broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone).to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
+    broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone)}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
     employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on the #{site_short_name} site."
-    employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
+    employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
     secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
     secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
   end

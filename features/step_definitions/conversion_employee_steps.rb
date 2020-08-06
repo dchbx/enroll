@@ -1,20 +1,22 @@
+# frozen_string_literal: true
+
 Given(/^Multiple Conversion Employers for (.*) exist with active and renewing plan years$/) do |named_person|
   person = people[named_person]
 
   secondary_organization = FactoryBot.create :organization, legal_name: person[:mlegal_name],
-                                                   dba: person[:mdba],
-                                                   fein: person[:mfein]
+                                                            dba: person[:mdba],
+                                                            fein: person[:mfein]
   secondary_employer_profile = FactoryBot.create :employer_profile, organization: secondary_organization,
-                                                           profile_source:'conversion',
-                                                           registered_on: TimeKeeper.date_of_record
+                                                                    profile_source: 'conversion',
+                                                                    registered_on: TimeKeeper.date_of_record
   secondary_employee = FactoryBot.create :census_employee, employer_profile: secondary_employer_profile,
-                                                            first_name: person[:first_name],
-                                                            last_name: person[:last_name],
-                                                            ssn: person[:ssn],
-                                                            dob: person[:dob_date]
+                                                           first_name: person[:first_name],
+                                                           last_name: person[:last_name],
+                                                           ssn: person[:ssn],
+                                                           dob: person[:dob_date]
 
- employee_role = FactoryBot.create(:employee_role, employer_profile: secondary_employer_profile)
- secondary_employee.update_attributes!(employee_role_id: employee_role.id)
+  employee_role = FactoryBot.create(:employee_role, employer_profile: secondary_employer_profile)
+  secondary_employee.update_attributes!(employee_role_id: employee_role.id)
 
   open_enrollment_start_on = TimeKeeper.date_of_record
   open_enrollment_end_on = open_enrollment_start_on.end_of_month + 13.days
@@ -23,24 +25,24 @@ Given(/^Multiple Conversion Employers for (.*) exist with active and renewing pl
 
 
   active_plan_year = FactoryBot.create :plan_year, employer_profile: secondary_employer_profile,
-                                                       start_on: start_on - 1.year,
-                                                       end_on: end_on - 1.year,
-                                                       open_enrollment_start_on: open_enrollment_start_on - 1.year,
-                                                       open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
-                                                       fte_count: 2,
-                                                       aasm_state: :published,
-                                                       is_conversion: true
+                                                   start_on: start_on - 1.year,
+                                                   end_on: end_on - 1.year,
+                                                   open_enrollment_start_on: open_enrollment_start_on - 1.year,
+                                                   open_enrollment_end_on: open_enrollment_end_on - 1.year - 3.days,
+                                                   fte_count: 2,
+                                                   aasm_state: :published,
+                                                   is_conversion: true
 
   secondary_benefit_group = FactoryBot.create :benefit_group, plan_year: active_plan_year
   secondary_employee.add_benefit_group_assignment secondary_benefit_group, secondary_benefit_group.start_on
 
   renewing_plan_year = FactoryBot.create :plan_year, employer_profile: secondary_employer_profile,
-                                             start_on: start_on,
-                                             end_on: end_on,
-                                             open_enrollment_start_on: open_enrollment_start_on,
-                                             open_enrollment_end_on: open_enrollment_end_on,
-                                             fte_count: 2,
-                                             aasm_state: :renewing_enrolling
+                                                     start_on: start_on,
+                                                     end_on: end_on,
+                                                     open_enrollment_start_on: open_enrollment_start_on,
+                                                     open_enrollment_end_on: open_enrollment_end_on,
+                                                     fte_count: 2,
+                                                     aasm_state: :renewing_enrolling
 
   benefit_group = FactoryBot.create :benefit_group, plan_year: renewing_plan_year, title: 'this is the BGGG'
   secondary_employee.add_renew_benefit_group_assignment benefit_group
@@ -75,13 +77,13 @@ And(/^Employee sees Enrollment Submitted and clicks Go to My Account$/) do
 end
 
 
-Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, plan_year|
+Then(/Employee (.*) should have the (.*) plan year start date as earliest effective date/) do |named_person, _plan_year|
   person = people[named_person]
   census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).first
   # Original expectations here were unclear
 end
 
-Then(/^Employee (.*) should see their plan start date on the page$/) do |named_person|
+Then(/^Employee (.*) should see their plan start date on the page$/) do |_named_person|
   employer_profile = employer_profile(@organization[@organization.keys.first].legal_name)
   exchange_date = TimeKeeper.date_according_to_exchange_at(employer_profile.benefit_sponsorships.first.created_at)
   expect(page).to have_content(exchange_date.strftime("%m/%d/%Y"))
@@ -90,7 +92,7 @@ end
 Then(/Employee (.*) should not see earliest effective date on the page/) do |named_person|
   person = people[named_person]
   employer_profile = EmployerProfile.find_by_fein(person[:fein])
-  expect(page).not_to have_content "coverage starting #{employer_profile.renewing_plan_year.start_on.strftime("%m/%d/%Y")}."
+  expect(page).not_to have_content "coverage starting #{employer_profile.renewing_plan_year.start_on.strftime('%m/%d/%Y')}."
 end
 
 # Record must already be created
@@ -109,7 +111,7 @@ When(/census employee (.*) logs in/) do |named_person|
   expect(page).to have_link("Logout")
 end
 
-And(/census employee (.*) visits the employee portal page$/) do |named_person|
+And(/census employee (.*) visits the employee portal page$/) do |_named_person|
   click_link 'Employee Portal'
   wait_for_ajax
   sleep(4)
@@ -121,19 +123,19 @@ And(/(.*) already matched and logged into employee portal/) do |named_person|
   ce = employer_profile.census_employees.where(:first_name => /#{person[:first_name]}/i,
                                                :last_name => /#{person[:last_name]}/i).first
   person_record = FactoryBot.create(:person_with_employee_role, first_name: person[:first_name],
-                                                                 last_name: person[:last_name],
-                                                                 ssn: person[:ssn],
-                                                                 dob: person[:dob_date],
-                                                                 census_employee_id: ce.id,
-                                                                 employer_profile_id: employer_profile.id,
-                                                                 hired_on: ce.hired_on)
+                                                                last_name: person[:last_name],
+                                                                ssn: person[:ssn],
+                                                                dob: person[:dob_date],
+                                                                census_employee_id: ce.id,
+                                                                employer_profile_id: employer_profile.id,
+                                                                hired_on: ce.hired_on)
 
   ce.update_attributes(employee_role_id: person_record.employee_roles.first.id)
   FactoryBot.create :family, :with_primary_family_member, person: person_record
   user = FactoryBot.create(:user, person: person_record,
-                                   email: person[:email],
-                                   password: person[:password],
-                                   password_confirmation: person[:password])
+                                  email: person[:email],
+                                  password: person[:password],
+                                  password_confirmation: person[:password])
   login_as user
   visit "/families/home"
 end
@@ -181,7 +183,7 @@ When(/Employee clicks on New Hire Badge/) do
   find('#shop_for_employer_sponsored_coverage').click
 end
 
-When(/(.*) has New Hire Badges for all employers/) do |named_person|
+When(/(.*) has New Hire Badges for all employers/) do |_named_person|
   expect(page).to have_css('#shop_for_employer_sponsored_coverage', count: 2)
 end
 
@@ -205,7 +207,7 @@ Then(/(.*) should see New Hire Badges for 2st ER/) do |named_person|
   expect(page).to have_content(person[:mlegal_name])
 end
 
-When(/(.*) click the button of new hire badge for 2st ER/) do |named_person|
+When(/(.*) click the button of new hire badge for 2st ER/) do |_named_person|
   #py =Person.last.active_employee_roles.last.census_employee.renewal_benefit_group_assignment.benefit_group.plan_year
   #py.publish!
   find_all('#shop_for_employer_sponsored_coverage').last.click
@@ -216,11 +218,11 @@ Then(/(.*) should see the 2st ER name/) do |named_person|
   expect(page).to have_content(person[:mlegal_name])
 end
 
-Then(/(.*) should see \"You're not yet eligible under your employer-sponsored benefits\" error message/) do |named_person|
+Then(/(.*) should see \"You're not yet eligible under your employer-sponsored benefits\" error message/) do |_named_person|
   expect(page).to have_content("You're not yet eligible under your employer-sponsored benefits.")
 end
 
-Then(/(.*) should see \"Unable to find employer-sponsored benefits for enrollment year\" error message/) do |named_person|
+Then(/(.*) should see \"Unable to find employer-sponsored benefits for enrollment year\" error message/) do |_named_person|
   expect(page).to have_content("Unable to find employer-sponsored benefits for enrollment year")
 end
 
@@ -233,7 +235,7 @@ end
 
 Then(/(.*) should get qle effective date as coverage effective date/) do |named_person|
   person = people[named_person]
-  effective_on = Person.where(:first_name=> person[:first_name]).first.primary_family.current_sep.effective_on
+  effective_on = Person.where(:first_name => person[:first_name]).first.primary_family.current_sep.effective_on
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 10)
 end
 
@@ -271,7 +273,7 @@ Then(/(.*) should see the receipt page with renewing plan year start date as eff
 end
 
 When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
-  click_link "#{qle_event}"
+  click_link qle_event.to_s
 end
 
 When(/Employee select a past qle date/) do

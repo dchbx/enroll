@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class OutstandingVerificationDatatableQuery
 
@@ -12,17 +14,16 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def person_search search_string
+    def person_search(search_string)
       Family.outstanding_verification_datatable if search_string.blank?
     end
 
-    def build_scope()
-
+    def build_scope
       family = Family.outstanding_verification_datatable
       person = Person
-      family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
+      family = family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
       if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-         family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
+        family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
       end
       #add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
@@ -41,8 +42,7 @@ module Queries
         Person.collection.aggregate([
                                       {"$match" => {
                                         "$text" => {"$search" => clean_str}
-                                      }.merge(Person.search_hash(clean_str))
-                                      },
+                                      }.merge(Person.search_hash(clean_str))},
                                       {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
                                       {"$sort" => {"last_name" => 1, "first_name" => 1}},
                                       {"$project" => {"_id" => 1}}

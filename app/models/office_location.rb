@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OfficeLocation
   include Mongoid::Document
   include Config::AcaModelConcern
@@ -15,13 +17,11 @@ class OfficeLocation
 
   validate :address_includes_county_for_employers_primary_location
 
-  alias_method :is_primary?, :is_primary
+  alias is_primary? is_primary
 
   def address_includes_county_for_employers_primary_location
     return unless is_an_employer? && OfficeLocation.validate_county?
-    if address.kind == 'primary' && address.county.blank?
-      self.errors.add(:base, 'Employers must have a valid County for their primary office location')
-    end
+    self.errors.add(:base, 'Employers must have a valid County for their primary office location') if address.kind == 'primary' && address.county.blank?
   end
 
   def parent
@@ -37,7 +37,7 @@ class OfficeLocation
     ['primary', 'branch'].include? address.kind if address.present?
   end
 
-  # TODO -- only one office location can be primary
+  # TODO: -- only one office location can be primary
   # def is_primary=(new_primary_value)
   #   if parent.present? && new_primary_value == true
   #     parent.office_locations.each { |loc| loc.is_primary == false unless loc == self }

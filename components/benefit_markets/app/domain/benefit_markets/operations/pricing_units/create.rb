@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module PricingUnits
-
       class Create
         # include Dry::Monads::Do.for(:call)
         include Dry::Monads[:result, :do]

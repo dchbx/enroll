@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class BenefitPackageForm
@@ -30,7 +32,7 @@ module BenefitSponsors
 
       def sponsored_benefits_attributes=(attributes)
         @sponsored_benefits ||= []
-        attributes.each do |i, sponsored_benefit_attributes|
+        attributes.each do |_i, sponsored_benefit_attributes|
           @sponsored_benefits.push(SponsoredBenefitForm.new(sponsored_benefit_attributes))
         end
       end
@@ -146,9 +148,7 @@ module BenefitSponsors
       end
 
       def validate_form(form)
-        unless form.valid?
-          self.errors.add(:base, form.errors.full_messages)
-        end
+        self.errors.add(:base, form.errors.full_messages) unless form.valid?
       end
 
       def products_total

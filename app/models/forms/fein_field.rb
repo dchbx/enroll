@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   module FeinField
     def self.included(base)
@@ -5,9 +7,7 @@ module Forms
         attr_reader :fein
 
         def fein=(new_fein)
-          if !new_fein.blank?
-            @fein = new_fein.to_s.gsub(/\D/, '')
-          end
+          @fein = new_fein.to_s.gsub(/\D/, '') unless new_fein.blank?
         end
       end
     end

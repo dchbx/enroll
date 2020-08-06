@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers
     module ConversionEmployerEmployeeLookUp
-
       def find_carrier
         BenefitSponsors::Organizations::IssuerProfile.find_by_abbrev(carrier)
       end

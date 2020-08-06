@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   module Sources
     class FileSource
@@ -9,9 +11,7 @@ module TransportGateway
       end
 
       def cleanup
-        if !@stream.closed?
-          @stream.close
-        end
+        @stream.close unless @stream.closed?
       end
     end
   end

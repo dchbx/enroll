@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 class QhpRateBuilder
 
-  INVALID_PLAN_IDS = ["78079DC0320003","78079DC0320004","78079DC0340002","78079DC0330002"]
-  METLIFE_HIOS_IDS = ["43849DC0090001", "43849DC0080001"]
+  INVALID_PLAN_IDS = ["78079DC0320003","78079DC0320004","78079DC0340002","78079DC0330002"].freeze
+  METLIFE_HIOS_IDS = ["43849DC0090001", "43849DC0080001"].freeze
 
   def initialize
     @rates_array = []
     @results_array = []
     @rating_area_id_cache = {}
     @rating_area_cache = {}
-    @premium_table_cache = Hash.new {|h, k| h[k] = Hash.new}
+    @premium_table_cache = Hash.new {|h, k| h[k] = {}}
     @action = "new"
   end
 
@@ -22,11 +24,11 @@ class QhpRateBuilder
   def add(rates_hash, action, year)
     set_rating_area_cache
     if year < 2018
-      @rates_array = @rates_array + rates_hash[:items]
+      @rates_array += rates_hash[:items]
       @action = action
     else
       rates_hash[:plan_rate_group_attributes].each do |rate_group_attributes|
-        @rates_array = @rates_array + rate_group_attributes[:items]
+        @rates_array += rate_group_attributes[:items]
         @action = action
       end
     end
@@ -135,7 +137,7 @@ class QhpRateBuilder
   end
 
   def assign_age
-    case(@rate[:age_number])
+    case (@rate[:age_number])
     when "0-14"
       14
     when "0-20"
@@ -152,30 +154,28 @@ class QhpRateBuilder
   def find_plan_and_create_premium_tables
     @results.each do |key, premium_tables|
       hios_id, year = key.split(",")
-      unless INVALID_PLAN_IDS.include?(hios_id)
-        @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
-        @plans.each do |plan|
-          plan.premium_tables = nil
-          plan.premium_tables.create!(premium_tables)
-          plan.minimum_age, plan.maximum_age = plan.premium_tables.map(&:age).minmax
-          plan.save
-        end
+      next if INVALID_PLAN_IDS.include?(hios_id)
+      @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
+      @plans.each do |plan|
+        plan.premium_tables = nil
+        plan.premium_tables.create!(premium_tables)
+        plan.minimum_age, plan.maximum_age = plan.premium_tables.map(&:age).minmax
+        plan.save
       end
     end
   end
 
   def find_plan_and_update_premium_tables
-    @results.each do |key, premium_tables|
+    @results.each do |key, _premium_tables|
       hios_id, year = key.split(",")
-      unless INVALID_PLAN_IDS.include?(hios_id)
-        @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
-        @plans.each do |plan|
-          pts = plan.premium_tables
-          premium_table_hash.each do |value|
-            pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on], rating_area: value[:rating_area]).first
-            pt.cost = value[:cost]
-            pt.save
-          end
+      next if INVALID_PLAN_IDS.include?(hios_id)
+      @plans = Plan.where(hios_id: /#{hios_id}/, active_year: year)
+      @plans.each do |plan|
+        pts = plan.premium_tables
+        premium_table_hash.each do |value|
+          pt = pts.where(age: value[:age], start_on: value[:start_on], end_on: value[:end_on], rating_area: value[:rating_area]).first
+          pt.cost = value[:cost]
+          pt.save
         end
       end
     end

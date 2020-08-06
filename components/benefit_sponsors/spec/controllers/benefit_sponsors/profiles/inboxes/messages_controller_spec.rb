@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -15,7 +17,7 @@ module BenefitSponsors
 
     let(:broker_organization) {FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site)}
     let(:broker_person) { FactoryBot.create(:person, :with_broker_role) }
-    let(:broker_user) { FactoryBot.create(:user, person: broker_person ) }
+    let(:broker_user) { FactoryBot.create(:user, person: broker_person) }
 
     let(:admin_person) {FactoryBot.create(:person)}
     let(:admin_user) {FactoryBot.create(:user, :person => admin_person)}
@@ -104,7 +106,7 @@ module BenefitSponsors
 
         context "show message" do
           before do
-            get :show, params:{id: broker_person.id, message_id: @broker_inbox.messages.first.id}
+            get :show, params: {id: broker_person.id, message_id: @broker_inbox.messages.first.id}
           end
 
           it "should render show template" do
@@ -118,7 +120,7 @@ module BenefitSponsors
 
         context "delete message" do
           before do
-            delete :destroy, params:{id: broker_person.id, message_id: @broker_inbox.messages.first.id}, format: :js
+            delete :destroy, params: {id: broker_person.id, message_id: @broker_inbox.messages.first.id}, format: :js
           end
 
           it "should get a notice" do

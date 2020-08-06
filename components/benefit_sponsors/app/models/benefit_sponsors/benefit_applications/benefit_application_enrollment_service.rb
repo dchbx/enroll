@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class BenefitApplications::BenefitApplicationEnrollmentService
     include Config::AcaModelConcern
@@ -23,7 +25,7 @@ module BenefitSponsors
     def revert_application
       if benefit_application.may_revert_application?
         benefit_application.revert_application!
-        
+
         [true, benefit_application, {}]
       else
         [false, benefit_application]
@@ -71,7 +73,7 @@ module BenefitSponsors
       if business_policy_satisfied_for?(:force_submit_benefit_application) && is_application_eligible?
         if benefit_application.may_approve_application?
           benefit_application.auto_approve_application!
-          
+
           if today >= benefit_application.open_enrollment_period.begin
             benefit_application.begin_open_enrollment!
             @messages['notice'] = 'Employer(s) Plan Year was successfully published.'
@@ -89,7 +91,7 @@ module BenefitSponsors
         @messages['notice'] = 'Employer(s) Plan Year could not be processed.'
         @messages['warnings'] = force_publish_warnings unless force_publish_warnings.empty?
       end
-    rescue => e
+    rescue StandardError => e
       @errors = [e.message]
     end
 
@@ -116,7 +118,7 @@ module BenefitSponsors
             benefit_application.begin_open_enrollment!
           else
             benefit_application.errors.add(:base, "State transition failed")
-            return false
+            false
           end
         end
       else
@@ -219,13 +221,11 @@ module BenefitSponsors
 
     # validate :open_enrollment_date_checks
     ## Trigger events can be dates or from UI
-    def open_enrollments_past_end_on(date = TimeKeeper.date_of_record)
+    def open_enrollments_past_end_on(_date = TimeKeeper.date_of_record)
       # query all benefit_applications in OE state with benefit_application.open_enrollment_period.max < date
       @benefit_applications = BenefitSponsors::BenefitApplications::BenefitApplication.by_open_enrollment_end_date
       @benefit_applications.each do |application|
-        if application && application.may_advance_date?
-          application.advance_date!
-        end
+        application.advance_date! if application&.may_advance_date?
       end
     end
 
@@ -250,8 +250,7 @@ module BenefitSponsors
       {}
     end
 
-    def cancel_open_enrollment(benefit_application)
-    end
+    def cancel_open_enrollment(benefit_application); end
 
     # Exempt exception handling situation
     def extend_open_enrollment(new_end_date = TimeKeeper.date_of_record)
@@ -268,12 +267,9 @@ module BenefitSponsors
     end
 
     # Exempt exception handling situation
-    def retroactive_open_enrollment(benefit_application)
+    def retroactive_open_enrollment(benefit_application); end
 
-    end
-
-    def reinstate
-    end
+    def reinstate; end
 
     def benefit_sponsorship
       return @benefit_sponsorship if defined? @benefit_sponsorship
@@ -282,15 +278,15 @@ module BenefitSponsors
 
     def filter_active_enrollments_by_date(date)
       enrollment_proxies = BenefitApplications::BenefitApplicationEnrollmentsQuery.new(benefit_application).call(::HbxEnrollment, date)
-      return [] if (enrollment_proxies.count > 100)
+      return [] if enrollment_proxies.count > 100
       enrollment_proxies.map do |ep|
         OpenStruct.new(ep)
       end
     end
 
     def hbx_enrollments_by_month(date)
-      end_date = (benefit_application.effective_period.min > date.end_of_month) ? benefit_application.effective_period.min : date.end_of_month
-      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten      
+      end_date = benefit_application.effective_period.min > date.end_of_month ? benefit_application.effective_period.min : date.end_of_month
+      s_benefits = benefit_application.benefit_packages.map(&:sponsored_benefits).flatten
       enrollments = nil
       s_benefits.each do |sponsored_benefit|
         enrollments_by_month = HbxEnrollment.by_benefit_application_and_sponsored_benefit(
@@ -298,11 +294,11 @@ module BenefitSponsors
           sponsored_benefit,
           date
         )
-        if enrollments.nil?
-          enrollments = enrollments_by_month
-        else
-          enrollments = enrollments + enrollments_by_month
-        end
+        enrollments = if enrollments.nil?
+                        enrollments_by_month
+                      else
+                        enrollments + enrollments_by_month
+                      end
       end
       enrollments
     end
@@ -343,7 +339,7 @@ module BenefitSponsors
     def submit_application_warnings
       [application_errors.values + application_eligibility_warnings.values].flatten.reject(&:blank?)
     end
-    
+
     def force_publish_warnings
       submit_warnings = []
       submit_warnings += business_policy.fail_results.values unless business_policy.fail_results.values.blank?
@@ -417,9 +413,9 @@ module BenefitSponsors
 
     #TODO: FIX this
     def non_owner_employee_present?
-      benefit_application.benefit_packages.any?{ |benefit_package|
+      benefit_application.benefit_packages.any? do |benefit_package|
         benefit_package.census_employees_assigned_on(benefit_application.start_on, !benefit_application.is_renewing?).active.non_business_owner.present?
-      }
+      end
     end
   end
 end

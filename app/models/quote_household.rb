@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuoteHousehold
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -20,15 +22,15 @@ class QuoteHousehold
   accepts_nested_attributes_for :quote_members
 
   def employee?
-    quote_members.where("employee_relationship" => "employee").count == 1 ? true : false
+    quote_members.where("employee_relationship" => "employee").count == 1
   end
 
   def spouse?
-    quote_members.where("employee_relationship" => "spouse").count == 1 ? true : false
+    quote_members.where("employee_relationship" => "spouse").count == 1
   end
 
   def children?
-    quote_members.where("employee_relationship" => "child_under_26").count >= 1 ? true : false
+    quote_members.where("employee_relationship" => "child_under_26").count >= 1
   end
 
   def employee
@@ -44,23 +46,17 @@ class QuoteHousehold
   end
 
   def assign_benefit_group_id
-    if quote_benefit_group_id.nil?
-      self.quote_benefit_group_id = quote.quote_benefit_groups.first.id
-    end
+    self.quote_benefit_group_id = quote.quote_benefit_groups.first.id if quote_benefit_group_id.nil?
   end
 
   private
 
   def one_spouse_or_domestic_partner_per_family
-    if quote_members.where(:employee_relationship => { "$in" => ["spouse" , "domestic_partner"]}).count > 1
-      errors.add(:"quote_members.employee_relationship","Should be unique")
-    end
+    errors.add(:"quote_members.employee_relationship","Should be unique") if quote_members.where(:employee_relationship => { "$in" => ["spouse", "domestic_partner"]}).count > 1
   end
 
   def one_employee_per_family
-    if quote_members.where("employee_relationship" => "employee").count > 1
-      errors.add(:"quote_members.employee_relationship","There should be only one employee per family.")
-    end
+    errors.add(:"quote_members.employee_relationship","There should be only one employee per family.") if quote_members.where("employee_relationship" => "employee").count > 1
   end
 
 end

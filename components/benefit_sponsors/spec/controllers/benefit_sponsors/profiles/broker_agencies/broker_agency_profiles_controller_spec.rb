@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -9,9 +11,9 @@ module BenefitSponsors
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:person) { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
     let!(:person01) { FactoryBot.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person01 ) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person01) }
 
     let!(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization_with_hbx_profile)  { site.owner_organization }
@@ -96,7 +98,7 @@ module BenefitSponsors
 
       context "for show with a broker_agency_profile_id and without a user" do
         before :each do
-          get :show, params:{id: bap_id}
+          get :show, params: {id: bap_id}
         end
 
         it "should not return success http status" do
@@ -113,7 +115,7 @@ module BenefitSponsors
       context "with a valid user and with broker_agency_profile_id(on successful pundit)" do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          get :family_index, params:{id: bap_id}, xhr: true
+          get :family_index, params: {id: bap_id}, xhr: true
         end
 
         it "should render family_index template" do
@@ -130,7 +132,7 @@ module BenefitSponsors
 
         before :each do
           sign_in(user_without_person)
-          get :family_index, params:{id: bap_id}, xhr: true
+          get :family_index, params: {id: bap_id}, xhr: true
         end
 
         it "should redirect to new of registration's controller for broker_agency" do
@@ -147,7 +149,7 @@ module BenefitSponsors
       context "with a valid user" do
         before :each do
           sign_in(user_with_hbx_staff_role)
-          get :staff_index, params:{id: bap_id}, xhr: true
+          get :staff_index, params: {id: bap_id}, xhr: true
         end
 
         it "should return success http status" do
@@ -164,7 +166,7 @@ module BenefitSponsors
 
         before :each do
           sign_in(user)
-          get :staff_index, params:{id: bap_id}, xhr: true
+          get :staff_index, params: {id: bap_id}, xhr: true
         end
 
         it "should not return success http status" do
@@ -243,7 +245,7 @@ module BenefitSponsors
 
       context "broker request registration guide" do
         before do
-          post :email_guide, params: {email:'Broker@test.com', first_name:'Broker'}
+          post :email_guide, params: {email: 'Broker@test.com', first_name: 'Broker'}
         end
 
         it "should send Registration Guide to Broker@test.com" do

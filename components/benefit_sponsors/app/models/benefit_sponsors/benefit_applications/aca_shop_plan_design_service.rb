@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class BenefitApplications::AcaShopPlanDesignService
 
@@ -8,7 +10,7 @@ module BenefitSponsors
       # validate :validate_application_dates
 
 
-      # TODO Refactor - Move this to Domain logic
+      # TODO: Refactor - Move this to Domain logic
       # after_update :update_employee_benefit_packages
       # TODO: Refactor code into benefit package updater
       # def update_employee_benefit_packages
@@ -25,18 +27,18 @@ module BenefitSponsors
       # end
 
 
-      # TODO Refactor - Move this to Domain logic
+      # TODO: Refactor - Move this to Domain logic
       # def assigned_census_employees
       #   benefit_packages.flat_map(){ |benefit_package| benefit_package.census_employees.active }
       # end
 
-      # TODO Refactor - Move this to Domain logic
+      # TODO: Refactor - Move this to Domain logic
       ## Stub for BQT
       # def estimate_group_size?
       #   true
       # end
 
-      # TODO Refactor - Move this to Domain logic
+      # TODO: Refactor - Move this to Domain logic
       # def eligible_for_export?
       #   return false if self.aasm_state.blank?
       #   return false if self.is_conversion
@@ -51,5 +53,4 @@ module BenefitSponsors
       # #   BenefitApplicationToPlanYearConverter.new(self).call
       # # end
     end
-
   end

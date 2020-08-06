@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class InvalidateHbxEnrollmentWithBrokenCurrentPremium < MongoidMigrationTask
@@ -13,30 +15,26 @@ class InvalidateHbxEnrollmentWithBrokenCurrentPremium < MongoidMigrationTask
       abort("Aborted! No family record found for person with hbx_id #{@person_hbx_id}.") if @family.blank?
       abort("Aborted! Unable to find person with hbx_id #{@person_hbx_id}.") if @hbx_enrollments.blank?
     end
-    if @hbx_enrollments.present?
-      invalidate_enrollments
-    end
+    invalidate_enrollments if @hbx_enrollments.present?
   end
 
   # Mimics families_helper.rb#current_premium
   def valid_current_premium?(hbx_enrollment)
-    begin
-      if hbx_enrollment.is_shop?
-        hbx_enrollment.total_employee_cost
-        true
-      elsif hbx_enrollment.kind == 'coverall'
-        hbx_enrollment.total_premium
-        true
-      else
-        hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
-        true
-      end
-    rescue Exception => e
-      exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
-      Rails.logger.error(exception_message) unless Rails.env.test?
-      puts(exception_message) unless Rails.env.test?
-      false
+    if hbx_enrollment.is_shop?
+      hbx_enrollment.total_employee_cost
+      true
+    elsif hbx_enrollment.kind == 'coverall'
+      hbx_enrollment.total_premium
+      true
+    else
+      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+      true
     end
+  rescue Exception => e
+    exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id}"
+    Rails.logger.error(exception_message) unless Rails.env.test?
+    puts(exception_message) unless Rails.env.test?
+    false
   end
 
   def invalidate_enrollments

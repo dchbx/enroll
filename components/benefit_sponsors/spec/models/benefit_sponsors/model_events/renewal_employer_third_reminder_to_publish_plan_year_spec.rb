@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -17,7 +19,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
   let!(:date_mock_object) { Date.new(renewal_effective_date.year, renewal_effective_date.prev_month.month, (Settings.aca.shop_market.renewal_application.publish_due_day_of_month - 2)) }
 
   before do
-    model_instance.update_attributes(:effective_period =>  renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)
+    model_instance.update_attributes(:effective_period => renewal_effective_date..(renewal_effective_date + 1.year) - 1.day)
   end
 
   describe "ModelEvent" do
@@ -54,7 +56,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
           "employer_profile.notice_date",
           "employer_profile.employer_name",
@@ -69,16 +71,18 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerReminderToPublishPl
           "employer_profile.broker.email",
           "employer_profile.broker_present?"
       ]
-    }
+    end
 
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
         "event_object_id" => model_instance.id
-    } }
+      }
+    end
 
     context "when notice event received" do
 

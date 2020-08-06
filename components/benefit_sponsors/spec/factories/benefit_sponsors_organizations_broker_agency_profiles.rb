@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_organizations_broker_agency_profile, class: 'BenefitSponsors::Organizations::BrokerAgencyProfile' do
 
@@ -18,15 +20,15 @@ FactoryBot.define do
 
     after(:build) do |profile, evaluator|
       if profile.organization.blank?
-        if evaluator.assigned_site
-          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
-        else
-          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
-        end
+        profile.organization = if evaluator.assigned_site
+                                 FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site)
+                               else
+                                 FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
+                               end
       end
     end
 
-    after(:build) do |profile, evaluator|
+    after(:build) do |profile, _evaluator|
       broker_role = profile.primary_broker_role
       if broker_role.present? && broker_role.benefit_sponsors_broker_agency_profile_id.blank?
         broker_role.benefit_sponsors_broker_agency_profile_id = profile.id

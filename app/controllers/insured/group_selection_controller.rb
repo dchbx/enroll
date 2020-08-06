@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
@@ -75,9 +77,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
-      if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
-        raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
-      end
+      raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime('%m/%d/%Y')} to enroll for coverage." if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
     end
 
     unless @adapter.is_waiving?(params)
@@ -108,12 +108,10 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
+    if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
-      if sep.present?
-        hbx_enrollment.special_enrollment_period_id = sep.id
-      end
+      hbx_enrollment.special_enrollment_period_id = sep.id if sep.present?
 
       hbx_enrollment.product = @hbx_enrollment.product
     end
@@ -154,16 +152,16 @@ class Insured::GroupSelectionController < ApplicationController
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"
     end
-  rescue Exception => error
-    flash[:error] = error.message
-    logger.error "#{error.message}\n#{error.backtrace.join("\n")}"
+  rescue Exception => e
+    flash[:error] = e.message
+    logger.error "#{e.message}\n#{e.backtrace.join("\n")}"
     employee_role_id = @employee_role.id if @employee_role
     consumer_role_id = @consumer_role.id if @consumer_role
-    return redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
+    redirect_to new_insured_group_selection_path(person_id: @person.id, employee_role_id: employee_role_id, change_plan: @change_plan, market_kind: @market_kind, consumer_role_id: consumer_role_id, enrollment_kind: @enrollment_kind)
   end
 
   def terminate_selection
-    @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
+    @hbx_enrollments = @family.enrolled_hbx_enrollments.select(&:may_terminate_coverage?) || []
   end
 
   def terminate_confirm
@@ -212,7 +210,7 @@ class Insured::GroupSelectionController < ApplicationController
   private
 
   def family_member_eligibility_check(family_member)
-    return unless (@adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person))
+    return unless @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person)
 
     role = if family_member.person.is_consumer_role_active?
              family_member.person.consumer_role
@@ -245,7 +243,6 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def build_hbx_enrollment(family_member_ids)
-
     @adapter.if_previous_enrollment_was_special_enrollment do
       @change_plan = 'change_by_qle'
     end
@@ -282,17 +279,18 @@ class Insured::GroupSelectionController < ApplicationController
         resident_role: @adapter.person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     when 'coverall'
       @adapter.coverage_household.household.new_hbx_enrollment_from(
         consumer_role: @person.consumer_role,
         resident_role: @person.resident_role,
         coverage_household: @adapter.coverage_household,
         qle: @adapter.is_qle?,
-        opt_effective_on: @adapter.optional_effective_on)
+        opt_effective_on: @adapter.optional_effective_on
+      )
     end
   end
-
 
   def initialize_common_vars
     @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params)

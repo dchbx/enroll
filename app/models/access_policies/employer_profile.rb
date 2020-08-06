@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessPolicies
   class EmployerProfile
     attr_accessor :user
@@ -10,11 +12,9 @@ module AccessPolicies
       return true if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) || is_general_agency_staff_for_employer?(employer.id)
       person = user.person
 
-      if person.employer_staff_roles.active.length > 0
+      unless person.employer_staff_roles.active.empty?
         ep_ids = user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s)
-        if !ep_ids.include?(employer.id.to_s)
-          controller.redirect_to_first_allowed
-        end
+        controller.redirect_to_first_allowed unless ep_ids.include?(employer.id.to_s)
         return true
       end
       controller.redirect_to_new
@@ -23,9 +23,7 @@ module AccessPolicies
     def authorize_index(broker_agency_id, controller)
       return true if user.has_hbx_staff_role?
       if user.has_broker_role? || user.has_broker_agency_staff_role?
-        if !broker_agency_id.blank?
-          return
-        end
+        return unless broker_agency_id.blank?
       end
       controller.redirect_to_new
     end
@@ -45,7 +43,7 @@ module AccessPolicies
     def authorize_edit(employer_profile, controller)
       return true if @user.has_hbx_staff_role? || is_broker_for_employer?(employer_profile.id) || is_general_agency_staff_for_employer?(employer_profile.id)
       return true if Person.staff_for_employer(employer_profile).include?(@user.person)
-      controller.redirect_to_new and return
+      controller.redirect_to_new && return
     end
 
     def is_general_agency_staff_for_employer?(employer_id)

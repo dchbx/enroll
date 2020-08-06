@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Serializers
     class ProfileSerializer < ActiveModel::Serializer
       attributes :id, :contact_method, :sic_code,
-                   :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
-                    :market_kind, :language_options, :home_page, :grouped_sic_code_options, :ach_routing_number, :ach_account_number
+                 :languages_spoken, :working_hours, :accept_new_clients, :profile_type, :market_kind_options,
+                 :market_kind, :language_options, :home_page, :grouped_sic_code_options, :ach_routing_number, :ach_account_number
       attribute :contact_method_options
       attribute :referred_by_options, if: :is_cca_employer_profile?
       attribute :referred_by, if: :is_cca_employer_profile?
@@ -30,11 +32,11 @@ module BenefitSponsors
       end
 
       def is_cca_employer_profile?
-        object.kind_of?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
+        object.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
       end
 
       def is_dc_employer_profile?
-        object.kind_of?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+        object.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
       end
 
       def is_employer_profile?
@@ -42,11 +44,11 @@ module BenefitSponsors
       end
 
       def is_broker_profile?
-        object.kind_of?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+        object.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
       end
 
       def is_general_agency_profile?
-        object.kind_of?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+        object.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
       end
 
       def is_broker_or_general_agency?

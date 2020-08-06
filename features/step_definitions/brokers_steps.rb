@@ -92,7 +92,7 @@ And(/^.+ enters broker agency information for SHOP markets$/) do
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][zip]', :with => location[:zip]
   if role.include? 'Employer'
     wait_for_ajax
-    select "#{location[:county]}", :from => "agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][county]"
+    select (location[:county]).to_s, :from => "agency[organization][profile_attributes][office_locations_attributes][0][address_attributes][county]"
   end
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][area_code]', :with => location[:phone_area_code]
   fill_in 'agency[organization][profile_attributes][office_locations_attributes][0][phone_attributes][number]', :with => location[:phone_number]
@@ -111,9 +111,7 @@ And(/^.+ clicks? on Create Broker Agency$/) do
 end
 
 Then(/^.+ should see broker registration successful message$/) do
-  if Settings.site.key == :dc
-    expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker')
-  end
+  expect(page).to have_content('Complete the following requirements to become a DC Health Link Registered Broker') if Settings.site.key == :dc
   expect(page).to have_content('Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed.')
 end
 
@@ -126,7 +124,7 @@ Then(/^.+ click the current broker applicant show button$/) do
 end
 
 And(/^.+ should see the broker application with carrier appointments$/) do
-  if (Settings.aca.broker_carrier_appointments_enabled)
+  if Settings.aca.broker_carrier_appointments_enabled
     find_all("[id^=person_broker_role_attributes_carrier_appointments_]").each do |checkbox|
       checkbox.should be_checked
     end
@@ -144,7 +142,7 @@ end
 
 When(/^(.*?) go[es]+ to the brokers tab$/) do |legal_name|
   profile = @organization[legal_name].employer_profile
-  visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'brokers')
+  visit benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'brokers')
 end
 
 And(/^.+ should receive an invitation email$/) do
@@ -162,7 +160,7 @@ end
 
 When(/^.+ visits? invitation url in email$/) do
   invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  invitation_link.sub!(%r{http\://127\.0\.0\.1\:3000}, '')
   visit(invitation_link)
 end
 
@@ -203,7 +201,7 @@ When(/^.+ clicks? on Browse Brokers button$/) do
 end
 
 Then(/^.+ should see broker agencies index view$/) do
-  @broker_agency_profiles.keys.each do |broker_agency_name|
+  @broker_agency_profiles.each_key do |broker_agency_name|
     element = find("div#broker_agencies_listing a", text: /#{broker_agency_name}/i, wait: 5)
     expect(element).to be_present
   end
@@ -302,7 +300,7 @@ Then(/^.* creates and publishes a plan year$/) do
   find('.interaction-click-control-create-plan-year').click
   find('.alert-notice')
 
-  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+  if Settings.aca.enforce_employer_attestation.to_s == "true"
     find('.interaction-click-control-documents').click
     wait_for_ajax
     find('.interaction-click-control-upload').click
@@ -381,14 +379,13 @@ end
 
 Given(/^zip code for county exists as rate reference$/) do
   FactoryBot.create(:rating_area, zip_code: '01010', county_name: 'Worcester', rating_area: Settings.aca.rating_areas.first,
-    zip_code_in_multiple_counties: true)
+                                  zip_code_in_multiple_counties: true)
 end
 
 Given(/^a valid ach record exists$/) do
   FactoryBot.create(:ach_record, routing_number: '123456789', bank_name: 'Big Bank')
 end
 
-#
 Given(/^enters the existing zip code$/) do
   fill_in 'organization[office_locations_attributes][0][address_attributes][zip]', with: '01010'
 end

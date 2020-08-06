@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   class LoggingObserver
     attr_reader :logger

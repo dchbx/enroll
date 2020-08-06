@@ -4,20 +4,15 @@
 module BenefitSponsors
   module ModelEvents
     module Document
-
       REGISTERED_EVENTS = [
         :initial_employer_invoice_available,
         :employer_invoice_available
       ].freeze
 
       def notify_on_create
-        if subject == 'initial_invoice' && identifier.present?
-          is_initial_employer_invoice_available = true
-        end
+        is_initial_employer_invoice_available = true if subject == 'initial_invoice' && identifier.present?
 
-        if subject == 'invoice' && identifier.present?
-          is_employer_invoice_available = true
-        end
+        is_employer_invoice_available = true if subject == 'invoice' && identifier.present?
 
         REGISTERED_EVENTS.each do |event|
           next unless (event_fired = instance_eval("is_" + event.to_s))

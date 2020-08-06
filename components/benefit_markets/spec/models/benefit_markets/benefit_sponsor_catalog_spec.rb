@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -17,14 +19,14 @@ module BenefitMarkets
 
     let(:params) do
       {
-        effective_date:         effective_date,
-        effective_period:       effective_period,
+        effective_date: effective_date,
+        effective_period: effective_period,
         open_enrollment_period: open_enrollment_period,
         probation_period_kinds: probation_period_kinds,
-        service_areas:          service_areas,
-        sponsor_market_policy:  sponsor_market_policy,
-        member_market_policy:   member_market_policy,
-        product_packages:       product_packages,
+        service_areas: service_areas,
+        sponsor_market_policy: sponsor_market_policy,
+        member_market_policy: member_market_policy,
+        product_packages: product_packages
       }
     end
 
@@ -90,7 +92,7 @@ module BenefitMarkets
       end
 
 
- # TODO Fix -- re-enable when seed file supports these
+ # TODO: Fix -- re-enable when seed file supports these
       # context "with no sponsor_market_policy" do
       #   subject { described_class.new(params.except(:sponsor_market_policy)) }
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitSponsorHealthCatalogDecorator < SimpleDelegator
@@ -8,13 +10,11 @@ module BenefitSponsors
       def sponsor_contributions(benefit_package_id = nil)
         return @contributions if defined? @contributions
 
-        if benefit_package_id.present?
-          benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id}
-        end
+        benefit_package = self.benefit_application.benefit_packages.detect{|bp| bp.id.to_s == benefit_package_id} if benefit_package_id.present?
 
 
         @contributions = product_packages.by_product_kind(:health).inject({}) do |contributions, product_package|
-          
+
           if benefit_package.present?
             if sponsored_benefit = benefit_package.sponsored_benefits.detect{|sb| sb.product_package == product_package}
               sponsor_contribution = sponsored_benefit.sponsor_contribution
@@ -28,9 +28,9 @@ module BenefitSponsors
 
           contributions[product_package.package_kind.to_s] = {
             id: nil,
-            contribution_levels: sponsor_contribution.contribution_levels.collect{|cl| 
-                     ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
-                    }
+            contribution_levels: sponsor_contribution.contribution_levels.collect do |cl|
+                                   ContributionLevel.new(cl.id.to_s, cl.display_name, cl.contribution_factor, true, cl.contribution_unit_id)
+                                 end
           }
 
           contributions
@@ -63,8 +63,8 @@ module BenefitSponsors
 
       def probation_period_kinds
         [
-          ["First of the month following or coinciding with date of hire", 'first_of_month'], 
-          ["First of the month following 30 days", 'first_of_month_after_30_days'], 
+          ["First of the month following or coinciding with date of hire", 'first_of_month'],
+          ["First of the month following 30 days", 'first_of_month_after_30_days'],
           ["First of the month following 60 days", 'first_of_month_after_60_days']
         ]
       end
@@ -87,12 +87,12 @@ module BenefitSponsors
                         product.network)
           end
           @products[product_package.package_kind] = case product_package.package_kind
-            when :single_issuer
-              package_products.group_by(&:carrier_name)
-            when :metal_level
-              package_products.group_by(&:metal_level_kind)
-            else
-              package_products.group_by(&:carrier_name)
+                                                    when :single_issuer
+                                                      package_products.group_by(&:carrier_name)
+                                                    when :metal_level
+                                                      package_products.group_by(&:metal_level_kind)
+                                                    else
+                                                      package_products.group_by(&:carrier_name)
             end
         end
 
@@ -103,7 +103,7 @@ module BenefitSponsors
         return @carriers if defined? @carriers
         issuer_orgs = BenefitSponsors::Organizations::Organization.where(:"profiles._type" => "BenefitSponsors::Organizations::IssuerProfile")
         @carriers = issuer_orgs.inject({}) do |issuer_hash, issuer_org|
-          issuer_profile  = issuer_org.profiles.where(:"_type" => "BenefitSponsors::Organizations::IssuerProfile").first
+          issuer_profile = issuer_org.profiles.where(:_type => "BenefitSponsors::Organizations::IssuerProfile").first
           issuer_hash[issuer_profile.id.to_s] = issuer_org.legal_name
           issuer_hash
         end

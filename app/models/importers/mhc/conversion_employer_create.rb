@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployerCreate < ConversionEmployer
 
@@ -14,12 +16,12 @@ module Importers::Mhc
           new_organization.create_employer_profile(employer_attributes)
         else
           new_organization = Organization.new({
-                                                  :fein => fein,
-                                                  :legal_name => legal_name,
-                                                  :dba => dba,
-                                                  :office_locations => map_office_locations,
-                                                  :employer_profile => EmployerProfile.new(employer_attributes),
-                                                  :issuer_assigned_id => assigned_employer_id
+                                                :fein => fein,
+                                                :legal_name => legal_name,
+                                                :dba => dba,
+                                                :office_locations => map_office_locations,
+                                                :employer_profile => EmployerProfile.new(employer_attributes),
+                                                :issuer_assigned_id => assigned_employer_id
                                               })
         end
 
@@ -31,7 +33,7 @@ module Importers::Mhc
         end
 
         propagate_errors(new_organization)
-        return save_result
+        save_result
       end
     end
 
@@ -46,12 +48,12 @@ module Importers::Mhc
 
     def employer_attributes
       {
-          :broker_agency_accounts => assign_brokers,
-          :general_agency_accounts => assign_general_agencies,
-          :entity_kind => "c_corporation",
-          :profile_source => "conversion",
-          :sic_code => sic_code,
-          :registered_on => registered_on
+        :broker_agency_accounts => assign_brokers,
+        :general_agency_accounts => assign_general_agencies,
+        :entity_kind => "c_corporation",
+        :profile_source => "conversion",
+        :sic_code => sic_code,
+        :registered_on => registered_on
       }
     end
   end

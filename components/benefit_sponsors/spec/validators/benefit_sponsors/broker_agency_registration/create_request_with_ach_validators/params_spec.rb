@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS do
   subject { BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchValidators::PARAMS.new.call(data) }
-  
+
   let(:base_valid_data) do
     {
       "legal_name" => "Some Brokerage Company",
@@ -58,23 +60,23 @@ RSpec.describe BenefitSponsors::BrokerAgencyRegistration::CreateRequestWithAchVa
   context "with valid data, and a valid office location" do
     let(:data) do
       base_valid_data.merge({
-        "office_locations" => [
-          {
-            "kind" => "branch",
-            "address" => {
-              "address_1" => "123 Some Street",
-              "address_2" => "And a PO Box",
-              "city" => "Some City",
-              "state" => "MD",
-              "zip" => "20002"
-            },
-            "phone" => {
-              "phone_area_code" => "000",
-              "phone_number" => "1234567"
-            }
-          }
-        ]
-      })
+                              "office_locations" => [
+                                {
+                                  "kind" => "branch",
+                                  "address" => {
+                                    "address_1" => "123 Some Street",
+                                    "address_2" => "And a PO Box",
+                                    "city" => "Some City",
+                                    "state" => "MD",
+                                    "zip" => "20002"
+                                  },
+                                  "phone" => {
+                                    "phone_area_code" => "000",
+                                    "phone_number" => "1234567"
+                                  }
+                                }
+                              ]
+                            })
     end
 
     it "is valid" do

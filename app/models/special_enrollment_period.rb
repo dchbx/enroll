@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SpecialEnrollmentPeriod
   include Mongoid::Document
   include SetCurrentUser
@@ -8,7 +10,7 @@ class SpecialEnrollmentPeriod
   include BenefitSponsors::ModelEvents::SpecialEnrollmentPeriod
 
   after_save :notify_on_save
-  
+
   embedded_in :family
   embeds_many :comments, as: :commentable, cascade_callbacks: true
 
@@ -66,21 +68,21 @@ class SpecialEnrollmentPeriod
   field :market_kind, type: String # Deprecated. Instead use QualifyingLifeEventKind#market_kind
 
   # ADMIN FLAG
-  field :admin_flag, type:Boolean
+  field :admin_flag, type: Boolean
 
   validate :optional_effective_on_dates_within_range, :next_poss_effective_date_within_range, on: :create
 
   validates :csl_num,
-    length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
-    allow_blank: true,
-    numericality: true
+            length: { minimum: 5, maximum: 10, message: "should be a minimum of 5 digits" },
+            allow_blank: true,
+            numericality: true
 
   validates_presence_of :start_on, :end_on, :message => "is invalid"
   validates_presence_of :qualifying_life_event_kind_id, :qle_on, :effective_on_kind, :submitted_at
   validate :end_date_follows_start_date, :is_eligible?
 
-  scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id) + QualifyingLifeEventKind.shop_market_non_self_attested_events.map(&:id) ) }
-  scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id) ) }
+  scope :shop_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.shop_market_events.map(&:id) + QualifyingLifeEventKind.shop_market_non_self_attested_events.map(&:id)) }
+  scope :fehb_market,         ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.fehb_market_events.map(&:id) + QualifyingLifeEventKind.fehb_market_non_self_attested_events.map(&:id)) }
   scope :individual_market,   ->{ where(:qualifying_life_event_kind_id.in => QualifyingLifeEventKind.individual_market_events.map(&:id) + QualifyingLifeEventKind.individual_market_non_self_attested_events.map(&:id)) }
 
   after_initialize :set_submitted_at
@@ -107,8 +109,8 @@ class SpecialEnrollmentPeriod
   end
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
-    raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
-    raise ArgumentError.new("Qualifying life event kind is expired")  unless new_qualifying_life_event_kind.active?
+    raise ArgumentError, "expected QualifyingLifeEventKind" unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
+    raise ArgumentError, "Qualifying life event kind is expired"  unless new_qualifying_life_event_kind.active?
 
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
@@ -119,9 +121,7 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind
     return @qualifying_life_event_kind if defined? @qualifying_life_event_kind
-    if self.qualifying_life_event_kind_id.present?
-      @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id)
-    end
+    @qualifying_life_event_kind = QualifyingLifeEventKind.find(self.qualifying_life_event_kind_id) if self.qualifying_life_event_kind_id.present?
   end
 
   def qle_on=(new_qle_date)
@@ -165,10 +165,11 @@ class SpecialEnrollmentPeriod
 
   def self.find(id)
     family = Family.where("special_enrollment_periods._id" => BSON::ObjectId.from_string(id)).first
-    family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
+    family.special_enrollment_periods.detect { |sep| sep._id == id } unless family.blank?
   end
 
-private
+  private
+
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
@@ -176,7 +177,7 @@ private
     min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
     max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
     if !(min_date || max_date)
-      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      errors.add(:next_poss_effective_date, "No active plan years present") unless errors.messages.values.flatten.include?("No active plan years present")
     elsif !next_poss_effective_date.between?(min_date, max_date)
       errors.add(:next_poss_effective_date, "out of range.")
     end
@@ -190,9 +191,9 @@ private
       min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
       max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
       if !(min_date || max_date)
-        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+        errors.add(:optional_effective_on, "No active plan years present") unless errors.messages.values.flatten.include?("No active plan years present")
       elsif !date_option.between?(min_date, max_date)
-        errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
+        errors.add(:optional_effective_on, "Date #{index + 1} option out of range.")
       end
     end
   end
@@ -221,18 +222,18 @@ private
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
-    when "date_of_event"
-      qle_on
-    when "exact_date"
-      qle_on
-    when "first_of_month"
-      first_of_month_effective_date
-    when "first_of_this_month"
-      first_of_this_month_effective_date
-    when "first_of_next_month"
-      first_of_next_month_effective_date
-    when "fixed_first_of_next_month"
-      fixed_first_of_next_month_effective_date
+                        when "date_of_event"
+                          qle_on
+                        when "exact_date"
+                          qle_on
+                        when "first_of_month"
+                          first_of_month_effective_date
+                        when "first_of_this_month"
+                          first_of_this_month_effective_date
+                        when "first_of_next_month"
+                          first_of_next_month_effective_date
+                        when "fixed_first_of_next_month"
+                          fixed_first_of_next_month_effective_date
     end
   end
 

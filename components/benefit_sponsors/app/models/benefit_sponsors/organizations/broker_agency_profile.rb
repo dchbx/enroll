@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class BrokerAgencyProfile < BenefitSponsors::Organizations::Profile
@@ -14,9 +16,9 @@ module BenefitSponsors
         "Individual & Family Marketplace ONLY" => "individual",
         "Small Business Marketplace ONLY" => "shop",
         "Both – Individual & Family AND Small Business Marketplaces" => "both"
-      }
+      }.freeze
 
-      MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v.to_sym }
+      MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |_k,v| MARKET_KINDS.include? v.to_sym }
 
       field :market_kind, type: Symbol
       field :corporate_npn, type: String
@@ -43,14 +45,14 @@ module BenefitSponsors
       validates_presence_of :market_kind
 
       validates :corporate_npn,
-        numericality: {only_integer: true},
-        length: { minimum: 1, maximum: 10 },
-        uniqueness: true,
-        allow_blank: true
+                numericality: {only_integer: true},
+                length: { minimum: 1, maximum: 10 },
+                uniqueness: true,
+                allow_blank: true
 
       validates :market_kind,
-        inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-        allow_blank: false
+                inclusion: { in: Organizations::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+                allow_blank: false
 
       before_save :notify_before_save
 
@@ -64,7 +66,7 @@ module BenefitSponsors
       # has_one primary_broker_role
       def primary_broker_role=(new_primary_broker_role = nil)
         if new_primary_broker_role.present?
-          raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
+          raise ArgumentError, "expected BrokerRole class" unless new_primary_broker_role.is_a? BrokerRole
           self.primary_broker_role_id = new_primary_broker_role._id
         else
           unset("primary_broker_role_id")
@@ -87,8 +89,7 @@ module BenefitSponsors
         @employer_clients = BenefitSponsors::Concerns::EmployerProfileConcern.find_by_broker_agency_profile(self)
       end
 
-      def family_clients
-      end
+      def family_clients; end
 
       def market_kinds
         MARKET_KINDS_OPTIONS
@@ -100,7 +101,7 @@ module BenefitSponsors
 
       def languages
         if languages_spoken.any?
-          return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+          languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
         end
       end
 
@@ -126,7 +127,7 @@ module BenefitSponsors
       end
 
       def families
-        linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+        linked_active_employees = linked_employees.select(&:has_active_employee_role?)
         employee_families = linked_active_employees.map(&:primary_family).to_a
         consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
         families = (consumer_families + employee_families).uniq
@@ -135,7 +136,7 @@ module BenefitSponsors
 
       def default_general_agency_profile=(new_default_general_agency_profile = nil)
         if new_default_general_agency_profile.present?
-          raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
+          raise ArgumentError, "expected GeneralAgencyProfile class" unless new_default_general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
           self.default_general_agency_profile_id = new_default_general_agency_profile.id
         else
           self.default_general_agency_profile_id = nil

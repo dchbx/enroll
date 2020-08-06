@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "pathname"
 
 module TransportGateway
@@ -7,7 +9,7 @@ module TransportGateway
     def receive_message(message)
       if message.from.blank?
         log(:error, "transport_gateway.s3_adapter ") { "source data not provided" }
-        raise ArgumentError.new "source data not provided"
+        raise ArgumentError, "source data not provided"
       end
 
       credentials = check_source_credential_provider(message)
@@ -38,14 +40,14 @@ module TransportGateway
     end
 
     def send_message(message)
-      if (message.from.blank? && message.body.blank?)
+      if message.from.blank? && message.body.blank?
         log(:error, "transport_gateway.s3_adapter ") { "source data not provided" }
-        raise ArgumentError.new "source data not provided"
+        raise ArgumentError, "source data not provided"
       end
 
       unless message.to.present?
         log(:error, "transport_gateway.s3_adapter") { "destination not provided" }
-        raise ArgumentError.new "destination not provided"
+        raise ArgumentError, "destination not provided"
       end
 
       check_s3_uri(message.to)
@@ -64,10 +66,10 @@ module TransportGateway
         source = gateway.receive_message(message)
         begin
           bucket.put_object({
-            key: key,
-            body: source.stream,
-            content_length: source.size
-          })
+                              key: key,
+                              body: source.stream,
+                              content_length: source.size
+                            })
         rescue Exception => e
           log(:error, "transport_gateway.s3_adapter") { e }
           raise e
@@ -76,28 +78,24 @@ module TransportGateway
         end
       else
         bucket.put_object({
-          key: key,
-          body: message.body,
-          content_length: message.body.bytesize
-        })
+                            key: key,
+                            body: message.body,
+                            content_length: message.body.bytesize
+                          })
       end
     end
 
     def check_source_credential_provider(message)
       cr = CredentialResolvers::S3CredentialResolver.new(message, credential_provider)
       credentials = cr.source_credentials
-      if credentials.blank?
-        raise ArgumentError.new("credentials not found for uri")
-      end
+      raise ArgumentError, "credentials not found for uri" if credentials.blank?
       credentials.s3_options
     end
 
     def check_credential_provider(message)
       cr = CredentialResolvers::S3CredentialResolver.new(message, credential_provider)
       credentials = cr.destination_credentials
-      if credentials.blank?
-        raise ArgumentError.new("credentials not found for uri")
-      end
+      raise ArgumentError, "credentials not found for uri" if credentials.blank?
       credentials.s3_options
     end
 
@@ -105,11 +103,11 @@ module TransportGateway
     def check_s3_uri(uri)
       if uri.bucket.blank?
         log(:error, "transport_gateway.s3_adapter") { "both bucket and file name must be provided" }
-        raise URI::InvalidComponentError.new("both bucket and file name must be provided")
+        raise URI::InvalidComponentError, "both bucket and file name must be provided"
       end
       if uri.key.blank?
         log(:error, "transport_gateway.s3_adapter") { "both bucket and file name must be provided" }
-        raise URI::InvalidComponentError.new("both bucket and file name must be provided")
+        raise URI::InvalidComponentError, "both bucket and file name must be provided"
       end
     end
   end

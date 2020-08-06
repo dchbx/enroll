@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ContributionCalculators
     class TieredPercentWithCapContributionCalculator < ContributionCalculator
@@ -25,21 +27,19 @@ module BenefitSponsors
         end
 
         def add(member)
-          if member.is_primary_member?
-            @primary_member_id = member.member_id
-          end
+          @primary_member_id = member.member_id if member.is_primary_member?
           coverage_age = @contribution_calculator.calc_coverage_age_for(member, @product, @coverage_start, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel_name = @contribution_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @relationship_totals[rel_name.to_s] = @relationship_totals[rel_name.to_s] + 1
-          @member_total = @member_total + 1
-          @member_ids = @member_ids + [member.member_id]
+          @member_total += 1
+          @member_ids += [member.member_id]
           self
         end
 
         def finalize_results
           if !@is_contribution_prohibited
-            member_prices = Hash.new
+            member_prices = {}
             @roster_coverage.member_enrollments.each do |me|
               member_prices[me.member_id] = me.product_price
             end
@@ -48,14 +48,14 @@ module BenefitSponsors
             end
             cu = @level_map[contribution_unit.id]
             c_factor = integerize_percent(cu.contribution_factor)
-            t_contribution = BigDecimal.new("0.00")
+            t_contribution = BigDecimal("0.00")
             @member_ids.each do |m_id|
-              cont_amount = (member_prices[m_id] * c_factor)/100.00
-              t_contribution = t_contribution + cont_amount
+              cont_amount = (member_prices[m_id] * c_factor) / 100.00
+              t_contribution += cont_amount
             end
             cap = cu.contribution_cap
-            @total_contribution = BigDecimal.new(t_contribution.to_s).round(2)
-            rebalance_value = (@total_contribution > cap) ? cap : @total_contribution
+            @total_contribution = BigDecimal(t_contribution.to_s).round(2)
+            rebalance_value = @total_contribution > cap ? cap : @total_contribution
             rebalance_contributions(rebalance_value, member_prices)
           else
             @member_ids.each do |m_id|
@@ -69,23 +69,23 @@ module BenefitSponsors
         def rebalance_contributions(cap, member_prices)
           new_total_contribution = cap
           @total_contribution = new_total_contribution
-          adjusted_contribution_factor = (new_total_contribution * 1.00)/@total_price
-          total_assigned = BigDecimal.new("0.00")
+          adjusted_contribution_factor = (new_total_contribution * 1.00) / @total_price
+          total_assigned = BigDecimal("0.00")
           @member_ids.each do |m_id|
-            assigned_value = BigDecimal.new((adjusted_contribution_factor * member_prices[m_id]).to_s).round(2, BigDecimal::ROUND_DOWN)
+            assigned_value = BigDecimal((adjusted_contribution_factor * member_prices[m_id]).to_s).round(2, BigDecimal::ROUND_DOWN)
             @member_contributions[m_id] = assigned_value
-            total_assigned = total_assigned + assigned_value
+            total_assigned += assigned_value
           end
           difference = @total_contribution - total_assigned
           if (difference > 0.005) && @member_ids.first.present?
             first_member_id = @member_ids.first
-            @member_contributions[first_member_id] = BigDecimal.new((difference + @member_contributions[first_member_id]).to_s).round(2)
+            @member_contributions[first_member_id] = BigDecimal((difference + @member_contributions[first_member_id]).to_s).round(2)
           end
         end
 
         # Integerize the contribution percent to match the old rounding model
         def integerize_percent(cont_percent)
-          per = BigDecimal.new((cont_percent * 100.00).to_s).round(0).to_i
+          per = BigDecimal((cont_percent * 100.00).to_s).round(0).to_i
           per
         end
       end

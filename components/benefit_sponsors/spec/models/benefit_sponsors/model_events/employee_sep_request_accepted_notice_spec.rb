@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbclean => :after_each do
@@ -6,16 +8,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'active',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:benefit_application) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'active',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
   let!(:person){ FactoryBot.create(:person, :with_family)}
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
-  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name ) }
+  let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
   let(:qle) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: "shop") }
   let(:model_instance) { FactoryBot.build(:special_enrollment_period, family: family, qualifying_life_event_kind_id: qle.id, title: "Married") }
 
@@ -47,7 +50,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
       end
 
       it "should trigger notice event" do
-        expect(subject.notifier).to receive(:notify) do |event_name, payload| 
+        expect(subject.notifier).to receive(:notify) do |event_name, payload|
           expect(event_name).to eq "acapi.info.events.employee.sep_accepted_notice_for_ee_active_on_single_roster"
           expect(payload[:event_object_kind]).to eq 'SpecialEnrollmentPeriod'
           expect(payload[:event_object_id]).to eq model_instance.id.to_s
@@ -81,7 +84,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employee_profile.notice_date",
         "employee_profile.employer_name",
@@ -98,14 +101,16 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeSepRequestAccepted', :dbcl
         "employee_profile.special_enrollment_period.qle_reported_on",
         "employee_profile.special_enrollment_period.submitted_at"
       ]
-    }
+    end
 
     let(:recipient) { "Notifier::MergeDataModels::EmployeeProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "SpecialEnrollmentPeriod",
         "event_object_id" => model_instance.id
-    } }
+      }
+    end
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
 

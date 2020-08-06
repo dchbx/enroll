@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.shared_examples "a credential provider, given a URI for which it has credentials" do

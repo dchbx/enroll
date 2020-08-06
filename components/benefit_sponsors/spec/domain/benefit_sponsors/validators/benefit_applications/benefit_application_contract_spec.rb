@@ -8,10 +8,10 @@ RSpec.describe BenefitSponsors::Validators::BenefitApplications::BenefitApplicat
   let(:oe_start_on)                    { TimeKeeper.date_of_record.beginning_of_month}
   let(:expiration_date)                { effective_date }
   let(:effective_period)               { effective_date..(effective_date + 1.year).prev_day }
-  let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }      
-  let(:terminated_on)                  { effective_date.end_of_month }       
+  let(:oe_period)                      { oe_start_on..(oe_start_on + 10.days) }
+  let(:terminated_on)                  { effective_date.end_of_month }
   let(:termination_kind)               { "non_payment"}
-  let(:termination_reason)             { "non_payment_termination_reason"}  
+  let(:termination_reason)             { "non_payment_termination_reason"}
   let(:missing_params)                 { {expiration_date: expiration_date, open_enrollment_period: oe_period, aasm_state: :draft, recorded_rating_area_id: BSON::ObjectId.new, benefit_sponsor_catalog_id: BSON::ObjectId.new } }
   let(:invalid_params)                 { missing_params.merge({recorded_service_area_ids: BSON::ObjectId.new, effective_period: effective_date})}
   let(:error_message1)                 { {:effective_period => ["is missing"], :recorded_service_area_ids => ["is missing"]} }
@@ -43,7 +43,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitApplications::BenefitApplicat
       let(:all_params) do
         valid_params.merge({terminated_on: terminated_on, fte_count: 20, pte_count: 10, msp_count: 1, recorded_sic_code: '034',
                             predecessor_id: BSON::ObjectId.new, termination_kind: termination_kind, termination_reason: termination_reason})
-      end 
+      end
 
       it "should pass validation" do
         expect(subject.call(all_params).success?).to be_truthy

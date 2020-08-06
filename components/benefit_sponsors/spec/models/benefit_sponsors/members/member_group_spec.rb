@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -56,11 +58,12 @@ module BenefitSponsors
 
 
       context "and a new Employee primary member is added" do
-        let(:employee_member)   { Members::EmployeeMember.new(last_name: "Duck",
-                                                              first_name: "Donald",
-                                                              dob: Date.new(1934,6,9),
-                                                              gender: :male,
-                                                             ) }
+        let(:employee_member)   do
+          Members::EmployeeMember.new(last_name: "Duck",
+                                      first_name: "Donald",
+                                      dob: Date.new(1934,6,9),
+                                      gender: :male)
+        end
 
         before { member_group.add_member(employee_member) }
 
@@ -76,11 +79,12 @@ module BenefitSponsors
 
 
         context "and another Employee primary member is added" do
-          let(:another_employee_member)   { Members::EmployeeMember.new(last_name: "McDuck",
-                                                                        first_name: "Scrouge",
-                                                                        dob: Date.new(1924,6,9),
-                                                                        gender: :male,
-                                                                       ) }
+          let(:another_employee_member)   do
+            Members::EmployeeMember.new(last_name: "McDuck",
+                                        first_name: "Scrouge",
+                                        dob: Date.new(1924,6,9),
+                                        gender: :male)
+          end
 
           it "should throw a DuplicatePrimaryMemberError error" do
             expect{member_group.add_member(another_employee_member)}.to raise_error(BenefitSponsors::DuplicatePrimaryMemberError)
@@ -89,12 +93,13 @@ module BenefitSponsors
 
 
         context "and a spouse is added" do
-          let(:spouse_dependent_member)   { Members::DependentMember.new(last_name: "Duck",
-                                                                         first_name: "Daisy",
-                                                                         dob: Date.new(1934,9,6),
-                                                                         gender: :female,
-                                                                         kinship_to_primary_member: :spouse,
-                                                                        ) }
+          let(:spouse_dependent_member)   do
+            Members::DependentMember.new(last_name: "Duck",
+                                         first_name: "Daisy",
+                                         dob: Date.new(1934,9,6),
+                                         gender: :female,
+                                         kinship_to_primary_member: :spouse)
+          end
 
           before { member_group.add_member(spouse_dependent_member) }
 
@@ -113,12 +118,13 @@ module BenefitSponsors
 
 
           context "and a second spouse is added" do
-            let(:another_spouse_dependent_member)   { Members::DependentMember.new(last_name: "Bunny",
-                                                                                   first_name: "Bugs",
-                                                                                   dob: Date.new(1955,5,21),
-                                                                                   gender: :male,
-                                                                                   kinship_to_primary_member: :domestic_partner,
-                                                                                  ) }
+            let(:another_spouse_dependent_member)   do
+              Members::DependentMember.new(last_name: "Bunny",
+                                           first_name: "Bugs",
+                                           dob: Date.new(1955,5,21),
+                                           gender: :male,
+                                           kinship_to_primary_member: :domestic_partner)
+            end
 
             it "should throw a MultipleSpouseRelationshipError error" do
               expect{member_group.add_member(another_spouse_dependent_member)}.to raise_error(BenefitSponsors::MultipleSpouseRelationshipError)

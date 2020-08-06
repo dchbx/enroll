@@ -1,15 +1,13 @@
+# frozen_string_literal: true
+
 module ModelEvents
   module SpecialEnrollmentPeriod
-
     REGISTERED_EVENTS = [
       :employee_sep_request_accepted
-    ]
+    ].freeze
 
     def notify_on_save
-
-      if self._id_changed?
-        is_employee_sep_request_accepted = true
-      end
+      is_employee_sep_request_accepted = true if self._id_changed?
 
       REGISTERED_EVENTS.each do |event|
         if event_fired = instance_eval("is_" + event.to_s)

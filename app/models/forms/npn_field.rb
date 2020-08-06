@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   module NpnField
     def self.included(base)
@@ -5,9 +7,7 @@ module Forms
         attr_reader :npn
 
         def npn=(new_npn)
-          if !new_npn.blank?
-            @npn = new_npn.to_s.gsub(/\D/, '')
-          end
+          @npn = new_npn.to_s.gsub(/\D/, '') unless new_npn.blank?
         end
       end
     end

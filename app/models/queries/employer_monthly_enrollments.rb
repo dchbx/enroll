@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class EmployerMonthlyEnrollments
     def initialize(employer_profile, b_date = nil)
@@ -13,10 +15,10 @@ module Queries
         if benefit_group.is_congress?
           decorator = PlanCostDecoratorCongress.new(plan, fe, benefit_group)
         else
-          if benefit_group.sole_source? && (!plan.dental?)
+          if benefit_group.sole_source? && !plan.dental?
             decorator = CompositeRatedPlanCostDecorator.new(plan, benefit_group, fe.composite_rating_tier, fe.is_cobra_status?)
           else
-            reference_plan = (fe.coverage_kind == 'dental' ?  benefit_group.dental_reference_plan : benefit_group.reference_plan)
+            reference_plan = (fe.coverage_kind == 'dental' ? benefit_group.dental_reference_plan : benefit_group.reference_plan)
             decorator = PlanCostDecorator.new(plan_cache[fe.plan_id], fe, benefit_group, reference_plan)
           end
         end
@@ -33,12 +35,12 @@ module Queries
       plan_year, billing_report_date = @employer_profile.billing_plan_year(@billing_date)
       return nil if plan_year.nil?
       enrollment_calculations = plan_year.filter_active_enrollments_by_date(billing_report_date)
-      plan_ids =  enrollment_calculations.map(&:plan_id)
+      plan_ids = enrollment_calculations.map(&:plan_id)
       enrollment_ids = enrollment_calculations.map(&:hbx_enrollment_id)
       people_ids = enrollment_calculations.flat_map(&:family_members).map do |fm|
         fm["person_id"]
       end
-      people_used  = Person.where(:id => {"$in" => people_ids})
+      people_used = Person.where(:id => {"$in" => people_ids})
       plans_used = Plan.where(:id => {"$in" => plan_ids})
       people_cache = people_used.inject({}) do |acc, person|
         acc[person.id] = person

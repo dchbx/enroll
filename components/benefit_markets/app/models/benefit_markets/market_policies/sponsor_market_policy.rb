@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class MarketPolicies::SponsorMarketPolicy < MarketPolicies::MarketPolicy
 
@@ -7,7 +9,7 @@ module BenefitMarkets
     field :part_time_employee_size_rule,  type: Range,    default: 0..0
 
     field :rostered_non_owner_size_rule,  type: Integer,  default: 0
-    field :benefit_categories,            type: Array,    default: [ :any ]
+    field :benefit_categories,            type: Array,    default: [:any]
 
     # CCA SHOP
     # access frozen plans if number of members enrolled in last year's mapped plan > 0

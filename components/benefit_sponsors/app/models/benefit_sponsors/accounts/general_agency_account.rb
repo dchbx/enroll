@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Accounts
     class GeneralAgencyAccount
@@ -7,7 +9,7 @@ module BenefitSponsors
       include AASM
 
       embedded_in :benefit_sponsorship,
-                class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
+                  class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship"
 
       # Begin date of relationship
       field :start_on, type: DateTime
@@ -23,10 +25,10 @@ module BenefitSponsors
 
       validates_presence_of :start_on, :benefit_sponsrship_general_agency_profile_id
 
-      #TODO based on new profile
+      #TODO: based on new profile
       belongs_to :general_agency_profile
       def general_agency_profile=(new_general_agency_profile)
-        raise ArgumentError.new("expected GeneralAgencyProfile") unless new_general_agency_profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+        raise ArgumentError, "expected GeneralAgencyProfile" unless new_general_agency_profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
         self.benefit_sponsrship_general_agency_profile_id = new_general_agency_profile._id
         @general_agency_profile = new_general_agency_profile
       end
@@ -36,13 +38,11 @@ module BenefitSponsors
         @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(self.benefit_sponsrship_general_agency_profile_id) unless self.benefit_sponsrship_general_agency_profile_id.blank?
       end
 
-
       def ga_name
         Rails.cache.fetch("general-agency-name-#{self.benefit_sponsrship_general_agency_profile_id}", expires_in: 12.hour) do
           legal_name
         end
       end
-
 
       def legal_name
         general_agency_profile.present? ? general_agency_profile.legal_name : ""
@@ -57,11 +57,9 @@ module BenefitSponsors
       end
 
       def for_broker_agency_account?(ba_account)
-        return false unless (broker_role_id == ba_account.writing_agent_id)
+        return false unless broker_role_id == ba_account.writing_agent_id
         return false unless general_agency_profile.present?
-        if !ba_account.end_on.blank?
-          return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
-        end
+        return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on)) unless ba_account.end_on.blank?
         (start_on >= ba_account.start_on)
       end
 

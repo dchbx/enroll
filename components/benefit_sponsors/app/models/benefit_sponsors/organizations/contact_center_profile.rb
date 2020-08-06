@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class ContactCenterProfile
@@ -6,7 +8,7 @@ module BenefitSponsors
 
 
 
-      private 
+      private
 
       def initialize_profile
         return unless is_benefit_sponsorship_eligible.blank?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module Employers
@@ -17,11 +19,11 @@ module BenefitSponsors
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_create(staff_params)
           authorize @staff
           begin
-            @status , @result = @staff.save
-            unless @status
-              flash[:error] = ('Role was not added because '  + @result)
-            else
+            @status, @result = @staff.save
+            if @status
               flash[:notice] = "Role added sucessfully"
+            else
+              flash[:error] = ('Role was not added because ' + @result)
             end
           rescue Exception => e
             flash[:error] = e.message
@@ -34,11 +36,11 @@ module BenefitSponsors
         def approve
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_approve(staff_params)
           authorize @staff
-          @status , @result = @staff.approve
-          unless @status
-            flash[:error] = 'Please contact HBX Admin to report this error'
-          else
+          @status, @result = @staff.approve
+          if @status
             flash[:notice] = 'Role is approved'
+          else
+            flash[:error] = 'Please contact HBX Admin to report this error'
           end
           redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
         end
@@ -47,11 +49,11 @@ module BenefitSponsors
         def destroy
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_destroy(staff_params)
           authorize @staff
-          @status , @result = @staff.destroy!
-          unless @status
-            flash[:error] = @result
-          else
+          @status, @result = @staff.destroy!
+          if @status
             flash[:notice] = 'Staff role was deleted'
+          else
+            flash[:error] = @result
           end
           redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
         end
@@ -59,7 +61,7 @@ module BenefitSponsors
         private
 
         def staff_params
-          params[:staff].present? ? params[:staff] :  params[:staff] = {}
+          params[:staff].present? ? params[:staff] : params[:staff] = {}
           params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"]})
           params[:staff].permit!
         end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitMarkets
@@ -25,10 +27,10 @@ module BenefitMarkets
                 - a metal level package
                 - with a reference product selected
                 - but no metal level selected" do
-       
-      let(:product_package_errors) {
+
+      let(:product_package_errors) do
         double
-      }
+      end
 
       let(:product_package) do
         double(

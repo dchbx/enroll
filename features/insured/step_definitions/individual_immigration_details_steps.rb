@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 Then(/Individual fills demographic details/) do
   find(:xpath, '//label[@for="indian_tribe_member_no"]').click
   find('label[for=radio_incarcerated_no]', wait: 20).click
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
+  fill_in "person_addresses_attributes_0_city", :with => "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   screenshot("personal_form")
 end
 
-Then(/(.*) selects i327 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i327 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-327 (Reentry Permit)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -26,7 +28,7 @@ Then("Individual should see the i327 document text") do
   expect(page).to have_content("Pre-1956 certificates do not contain an Alien Number. In this case, enter '999999999' for the Alien Number. (check for 9 digit numbers)")
 end
 
-Then(/(.*) selects i551 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i551 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-551 (Permanent Resident Card)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -42,7 +44,7 @@ Then("Individual should see the i551 document text") do
   expect(page).to have_content("How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.")
 end
 
-Then(/(.*) selects i571 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i571 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-571 (Refugee Travel Document)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -54,7 +56,7 @@ Then("Individual should see the i571 document text") do
   step "Individual should see the i327 document text"
 end
 
-Then(/(.*) selects i766 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i766 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-766 (Employment Authorization Card)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -67,7 +69,7 @@ Then("Individual should see the i766 document text") do
   step "Individual should see the i551 document text"
 end
 
-Then(/(.*) selects Certificate of Citizenship document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Certificate of Citizenship document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Certificate of Citizenship", match: :prefer_exact, wait: 10).click
   fill_in 'Certificate Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -79,7 +81,7 @@ Then("Individual should see the Certificate of Citizenship document text") do
   expect(page).to have_content("How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.")
 end
 
-Then(/(.*) selects Naturalization Certificate document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Naturalization Certificate document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Naturalization Certificate", match: :prefer_exact, wait: 10).click
   fill_in 'Naturalization Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -90,7 +92,7 @@ Then("Individual should see the Naturalization Certificate document text") do
   expect(page).to have_content("The Naturalization Number entered must have between 6 and 12 numbers and letters. How to find the Naturalization Number: The Naturalization Certificate Number is most often in the upper right hand corner of the Certificate. The Naturalization Certificate Number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.")
 end
 
-Then(/(.*) selects Machine Readable Immigrant Visa document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Machine Readable Immigrant Visa document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Machine Readable Immigrant Visa (with Temporary I-551 Language)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -102,7 +104,7 @@ Then("Individual should see the Machine Readable Immigrant Visa document text") 
   step "Individual should see the i327 document text"
 end
 
-Then(/(.*) selects Temporary i551 Stamp document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Temporary i551 Stamp document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Temporary I-551 Stamp (on passport or I-94)", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -112,7 +114,7 @@ Then("Individual should see the Temporary i551 Stamp document text") do
   step "Individual should see the i327 document text"
 end
 
-Then(/(.*) selects i94 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i94 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-94 (Arrival/Departure Record)", match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
@@ -122,7 +124,7 @@ Then("Individual should see the i94 document text") do
   step 'Individual should see the i94 text'
 end
 
-Then(/(.*) selects i94 in Unexpired Foreign Passport document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i94 in Unexpired Foreign Passport document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
@@ -136,7 +138,7 @@ Then("Individual should see the i94 in Unexpired Foreign Passport document text"
   step "Individual should see the Unexpired Foreign Passport document text"
 end
 
-Then(/(.*) selects Unexpired Foreign Passport document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Unexpired Foreign Passport document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Unexpired Foreign Passport", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'Passport Number', with: (correct_or_incorrect == 'correctly' ? 'L282824' : '@23#5678901')
@@ -149,7 +151,7 @@ Then("Individual should see the Unexpired Foreign Passport document text") do
   expect(page).to have_content("The Passport Number that you enter must have between 6 and 12 numbers and letters.")
 end
 
-Then(/(.*) selects i20 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects i20 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'SEVIS ID', with: (correct_or_incorrect == 'correctly' ? '1234567891' : '@23#5678901')
@@ -160,7 +162,7 @@ Then("Individual should see the i20 document text") do
   expect(page).to have_content("The SEVIS ID entered must have 10 digits.")
 end
 
-Then(/(.*) selects DS2019 document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects DS2019 document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'SEVIS ID', with: (correct_or_incorrect == 'correctly' ? '1234567891' : '@23#5678901')
@@ -170,7 +172,7 @@ Then("Individual should see the DS2019 document text") do
   step "Individual should see the i20 document text"
 end
 
-Then(/(.*) selects Other With Alien Number document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Other With Alien Number document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Other (With Alien Number)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
@@ -182,7 +184,7 @@ Then("Individual should see the Other With Alien Number document text") do
   expect(page).to have_content("Enter the type of document, using no more than 35 characters.")
 end
 
-Then(/(.*) selects Other With i94 Number document and fills required details (.*)$/) do |text, correct_or_incorrect|
+Then(/(.*) selects Other With i94 Number document and fills required details (.*)$/) do |_text, correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 20).click
   find('li', :text => "Other (With I-94 Number)", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class PricingDetermination
@@ -16,7 +18,7 @@ module BenefitSponsors
       def participation_percent
         participation_rate * 100.00
       end
-    
+
     end
   end
 end

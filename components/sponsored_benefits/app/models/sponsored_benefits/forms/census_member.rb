@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class CensusMember
@@ -25,11 +27,9 @@ module SponsoredBenefits
         end
       end
 
-      def addresss=(attrs)
-      end
+      def addresss=(attrs); end
 
-      def email=(attrs)
-      end
+      def email=(attrs); end
 
       def ensure_dependents
         @census_dependents = []

@@ -10,7 +10,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::PricingModelContract d
   let(:pricing_units)            { [{_id: BSON::ObjectId.new, name: 'name', display_name: 'Employee Only', order: 1}] }
   let(:member_relationships)     { [{_id: BSON::ObjectId.new, relationship_name: :employee, relationship_kinds: ['self'], age_threshold: 18, age_comparison: :==, disability_qualifier: true  }] }
 
-  let(:missing_params)   { {name: name1, price_calculator_kind: price_calculator_kind, pricing_units: pricing_units, _id: BSON::ObjectId.new,} }
+  let(:missing_params)   { {name: name1, price_calculator_kind: price_calculator_kind, pricing_units: pricing_units, _id: BSON::ObjectId.new} }
   let(:required_params)  { missing_params.merge({product_multiplicities: product_multiplicities, member_relationships: member_relationships}) }
   let(:invalid_params)   { missing_params.merge({product_multiplicities: [{}], member_relationships: [:member_relationships]}) }
   let(:error_message1)   { {:product_multiplicities => ["is missing"], :member_relationships => ["is missing"]} }

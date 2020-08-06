@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Inboxes
     class Inbox
@@ -8,7 +10,7 @@ module BenefitSponsors
       # Enable polymorphic associations
       embedded_in :recipient, polymorphic: true
       embeds_many :messages,
-                  class_name:"BenefitSponsors::Inboxes::Message"
+                  class_name: "BenefitSponsors::Inboxes::Message"
       accepts_nested_attributes_for :messages
 
       before_create :generate_acccess_key
@@ -19,7 +21,7 @@ module BenefitSponsors
 
       def unread_messages
         messages.where(message_read: false, folder: Message::FOLDER_TYPES[:inbox]) +
-        messages.where(message_read: false, folder: nil)
+          messages.where(message_read: false, folder: nil)
       end
 
       def post_message(new_message)
@@ -28,13 +30,14 @@ module BenefitSponsors
       end
 
       def delete_message(message)
-        return self if self.messages.size == 0
+        return self if self.messages.empty?
         message = self.messages.detect { |m| m.id == message.id }
-        message.delete unless message.nil?
+        message&.delete
         self
       end
 
-    private
+      private
+
       def generate_acccess_key
         self.access_key = [id.to_s, SecureRandom.hex(10)].join
       end

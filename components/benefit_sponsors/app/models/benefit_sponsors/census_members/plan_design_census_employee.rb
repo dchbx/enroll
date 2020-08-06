@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module CensusMembers
     class PlanDesignCensusEmployee < BenefitSponsors::CensusMembers::CensusMember
@@ -7,10 +9,10 @@ module BenefitSponsors
       include Searchable
       include Autocomplete
 
-      EMPLOYMENT_ACTIVE_STATES = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending)
-      EMPLOYMENT_TERMINATED_STATES = %w(employment_terminated cobra_terminated rehired)
-      EMPLOYMENT_ACTIVE_ONLY = %w(eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked)
-      COBRA_STATES = %w(cobra_eligible cobra_linked cobra_terminated cobra_termination_pending)
+      EMPLOYMENT_ACTIVE_STATES = %w[eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked cobra_eligible cobra_linked cobra_termination_pending].freeze
+      EMPLOYMENT_TERMINATED_STATES = %w[employment_terminated cobra_terminated rehired].freeze
+      EMPLOYMENT_ACTIVE_ONLY = %w[eligible employee_role_linked employee_termination_pending newly_designated_eligible newly_designated_linked].freeze
+      COBRA_STATES = %w[cobra_eligible cobra_linked cobra_terminated cobra_termination_pending].freeze
 
       field :is_business_owner, type: Boolean, default: false
       field :hired_on, type: Date
@@ -23,13 +25,13 @@ module BenefitSponsors
 
       has_many :census_survivors, class_name: "BenefitSponsors::CensusMembers::CensusSurvivor"
       embeds_many :census_dependents, as: :census_dependent, class_name: "BenefitSponsors::CensusMembers::CensusDependent",
-                    cascade_callbacks: true,
-                    validate: true
+                                      cascade_callbacks: true,
+                                      validate: true
       accepts_nested_attributes_for :census_dependents
 
       embeds_many :benefit_group_assignments, as: :benefit_assignable, class_name: "BenefitSponsors::CensusMembers::BenefitGroupAssignment",
-                    cascade_callbacks: true,
-                    validate: true
+                                              cascade_callbacks: true,
+                                              validate: true
 
       validates_presence_of :benefit_sponsorship_id, :dob
 
@@ -64,7 +66,7 @@ module BenefitSponsors
         return if ssn.blank?
         dependents_ssn = census_dependents.map(&:ssn).select(&:present?)
         if dependents_ssn.uniq.length != dependents_ssn.length ||
-          dependents_ssn.any?{|dep_ssn| dep_ssn==self.ssn}
+           dependents_ssn.any?{|dep_ssn| dep_ssn == self.ssn}
           errors.add(:base, "SSN's must be unique for each dependent and subscriber")
         end
       end
@@ -90,15 +92,11 @@ module BenefitSponsors
         return true if census_dependents.blank?
 
         relationships = census_dependents.map(&:employee_relationship)
-        if relationships.count{|rs| rs=='spouse' || rs=='domestic_partner'} > 1
-          errors.add(:census_dependents, "can't have more than one spouse or domestic partner.")
-        end
+        errors.add(:census_dependents, "can't have more than one spouse or domestic partner.") if relationships.count{|rs| rs == 'spouse' || rs == 'domestic_partner'} > 1
       end
 
       def check_hired_on_before_dob
-        if hired_on && dob && hired_on <= dob
-          errors.add(:hired_on, "date can't be before  date of birth.")
-        end
+        errors.add(:hired_on, "date can't be before  date of birth.") if hired_on && dob && hired_on <= dob
       end
 
       def is_eligible?
@@ -108,14 +106,12 @@ module BenefitSponsors
 
       def allow_nil_ssn_updates_dependents
         census_dependents.each do |cd|
-          if cd.ssn.blank?
-            cd.unset(:encrypted_ssn)
-          end
+          cd.unset(:encrypted_ssn) if cd.ssn.blank?
         end
       end
 
       def employer_profile=(new_employer_profile)
-        raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
+        raise ArgumentError, "expected EmployerProfile" unless new_employer_profile.is_a?(BenefitSponsors::Organizations::AcaShopCcaEmployerProfile)
         self.employer_profile_id = new_employer_profile._id
         @employer_profile = new_employer_profile
       end
@@ -126,7 +122,7 @@ module BenefitSponsors
       end
 
       def benefit_sponsorship=(benefit_sponsorship)
-        raise ArgumentError.new("expected Benefit Sponsorship") unless benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
+        raise ArgumentError, "expected Benefit Sponsorship" unless benefit_sponsorship.is_a?(BenefitSponsors::BenefitSponsorships::BenefitSponsorship)
         self.benefit_sponsorship_id = benefit_sponsorship._id
         @benefit_sponsorship = benefit_sponsorship
       end
@@ -149,13 +145,13 @@ module BenefitSponsors
       end
 
       def expected_to_enroll_or_valid_waive?
-        %w(enroll waive).include?  expected_selection
+        %w[enroll waive].include? expected_selection
       end
 
       def composite_rating_tier
         return ::CompositeRatingTier::EMPLOYEE_ONLY if self.census_dependents.empty?
         relationships = self.census_dependents.map(&:employee_relationship)
-        if (relationships.include?("spouse") || relationships.include?("domestic_partner"))
+        if relationships.include?("spouse") || relationships.include?("domestic_partner")
           relationships.many? ? ::CompositeRatingTier::FAMILY : ::CompositeRatingTier::EMPLOYEE_AND_SPOUSE
         else
           ::CompositeRatingTier::EMPLOYEE_AND_ONE_OR_MORE_DEPENDENTS
@@ -163,7 +159,6 @@ module BenefitSponsors
       end
 
       def self.to_csv
-
         columns = [
           "Family ID # (to match family members to the EE & each household gets a unique number)(optional)",
           "Relationship (EE, Spouse, Domestic Partner, or Child)",
@@ -189,8 +184,8 @@ module BenefitSponsors
         ]
 
         CSV.generate(headers: true) do |csv|
-          csv << (["#{Settings.site.long_name} Employee Census Template"] +  6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
-          csv << %w(employer_assigned_family_id employee_relationship last_name first_name  middle_name name_sfx  email ssn dob gender  hire_date termination_date  is_business_owner benefit_group plan_year kind  address_1 address_2 city  state zip)
+          csv << (["#{Settings.site.long_name} Employee Census Template"] + 6.times.collect{ "" } + [Date.new(2016,10,26)] + 5.times.collect{ "" } + ["1.1"])
+          csv << %w[employer_assigned_family_id employee_relationship last_name first_name middle_name name_sfx email ssn dob gender hire_date termination_date is_business_owner benefit_group plan_year kind address_1 address_2 city state zip]
           csv << columns
           all.each do |census_employee|
             ([census_employee] + census_employee.census_dependents.to_a).each do |census_member|
@@ -207,22 +202,22 @@ module BenefitSponsors
                 census_member.gender
               ]
 
-              if census_member.is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee)
-                values += [
-                  census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
-                  census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
-                  census_member.is_business_owner ? "yes" : "no"
-                ]
-              else
-                values += ["", "", "no"]
-              end
+              values += if census_member.is_a?(BenefitSponsors::CensusMembers::PlanDesignCensusEmployee)
+                          [
+                            census_member.hired_on.present? ? census_member.hired_on.strftime("%m/%d/%Y") : "",
+                            census_member.employment_terminated_on.present? ? census_member.employment_terminated_on.strftime("%m/%d/%Y") : "",
+                            census_member.is_business_owner ? "yes" : "no"
+                          ]
+                        else
+                          ["", "", "no"]
+                        end
 
               values += 2.times.collect{ "" }
-              if census_member.address.present?
-                values += census_member.address.to_a
-              else
-                values += 6.times.collect{ "" }
-              end
+              values += if census_member.address.present?
+                          census_member.address.to_a
+                        else
+                          6.times.collect{ "" }
+                        end
 
               csv << values
             end
@@ -262,7 +257,7 @@ module BenefitSponsors
           unscoped.where(employer_profile_id: employer_profile._id).order_name_asc
         end
 
-        alias_method :find_by_employer_profile, :find_all_by_employer_profile
+        alias find_by_employer_profile find_all_by_employer_profile
       end
     end
   end

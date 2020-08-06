@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Profiles
     module Employers
@@ -21,7 +23,7 @@ module BenefitSponsors
           end
         end
 
-        def show # TODO - Each when clause should be a seperate action.
+        def show # TODO: - Each when clause should be a seperate action.
           authorize @employer_profile
           @tab = params['tab']
           @broker_agency_profile = @employer_profile.active_broker_agency_account.broker_agency_profile if @employer_profile.active_broker_agency_account.present?
@@ -117,7 +119,7 @@ module BenefitSponsors
             roaster_upload_count = @roster_upload_form.census_records.length
             begin
               if @roster_upload_form.save
-                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
+                flash[:notice] = "#{roaster_upload_count} records uploaded from CSV"
                 redirect_to @roster_upload_form.redirection_url
               else
                 render @roster_upload_form.redirection_url || default_url
@@ -136,7 +138,7 @@ module BenefitSponsors
         end
 
         def file_content_type
-          params[:file].content_type if params[:file]
+          params[:file]&.content_type
         end
 
         def roster_upload_file_type
@@ -156,10 +158,10 @@ module BenefitSponsors
         end
 
         def download_invoice
-          options={}
+          options = {}
           options[:content_type] = @invoice.type
           options[:filename] = @invoice.title
-          send_data Aws::S3Storage.find(@invoice.identifier) , options
+          send_data Aws::S3Storage.find(@invoice.identifier), options
         end
 
         def generate_sic_tree
@@ -212,7 +214,7 @@ module BenefitSponsors
           @invoice = @employer_profile.documents.find(params[:invoice_id])
         end
 
-        def collect_and_sort_invoices(sort_order='ASC')
+        def collect_and_sort_invoices(sort_order = 'ASC')
           @invoices = @employer_profile.invoices
           @invoice_years = (Settings.invoices.minimum_invoice_display_year..TimeKeeper.date_of_record.year).to_a.reverse
           sort_order == 'ASC' ? @invoices.sort_by!(&:date) : @invoices.sort_by!(&:date).reverse! unless @documents
@@ -229,13 +231,17 @@ module BenefitSponsors
         def employee_datatable_params
           data_table_params = { id: params[:id], scopes: params[:scopes] }
 
-          data_table_params.merge!({
-            renewal: true
-          }) if @employer_profile.renewal_benefit_application.present?
+          if @employer_profile.renewal_benefit_application.present?
+            data_table_params.merge!({
+                                       renewal: true
+                                     })
+          end
 
-          data_table_params.merge!({
-            is_submitted: true
-          }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+          if @employer_profile&.renewal_benefit_application&.is_submitted?
+            data_table_params.merge!({
+                                       is_submitted: true
+                                     })
+          end
 
           data_table_params
         end
@@ -251,7 +257,7 @@ module BenefitSponsors
         def load_group_enrollments
           billing_date = Date.strptime(params[:billing_date], "%m/%d/%Y") if params[:billing_date]
           query = Queries::CoverageReportsQuery.new(@employer_profile, billing_date)
-          @group_enrollments =  query.execute
+          @group_enrollments = query.execute
           @product_info = load_products
         end
 
@@ -262,7 +268,7 @@ module BenefitSponsors
 
           plans = BenefitMarkets::Products::Product.aca_shop_market.by_state(Settings.aca.state_abbreviation)
 
-          current_possible_plans = plans.where(:"application_period.min".in =>[
+          current_possible_plans = plans.where(:"application_period.min".in => [
             Date.new(previous_year, 1, 1),
             Date.new(current_year, 1, 1),
             Date.new(next_year, 1, 1)
@@ -286,14 +292,14 @@ module BenefitSponsors
           (output = "").tap do
             CSV.generate(output) do |csv|
               csv << ["Name", "SSN", "DOB", "Hired On", "Benefit Group", "Type", "Name", "Issuer", "Covered Ct", "Employer Contribution",
-              "Employee Premium", "Total Premium"]
+                      "Employee Premium", "Total Premium"]
               groups.each do |element|
                 primary = element.primary_member
                 census_employee = primary.employee_role.census_employee
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,
@@ -306,7 +312,7 @@ module BenefitSponsors
                           view_context.number_to_currency(element.group_enrollment.sponsor_contribution_total.to_s),
                           view_context.number_to_currency((element.group_enrollment.product_cost_total.to_f - element.group_enrollment.sponsor_contribution_total.to_f).to_s),
                           view_context.number_to_currency(element.group_enrollment.product_cost_total.to_s)
-                        ]
+]
               end
             end
           end
@@ -314,10 +320,10 @@ module BenefitSponsors
 
         def csv_content_type
           case request.user_agent
-            when /windows/i
-              'application/vnd.ms-excel'
-            else
-              'text/csv'
+          when /windows/i
+            'application/vnd.ms-excel'
+          else
+            'text/csv'
           end
         end
 

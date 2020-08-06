@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class ChangeFein< MongoidMigrationTask
+class ChangeFein < MongoidMigrationTask
   def migrate
     trigger_single_table_inheritance_auto_load_of_child = VlpDocument
 

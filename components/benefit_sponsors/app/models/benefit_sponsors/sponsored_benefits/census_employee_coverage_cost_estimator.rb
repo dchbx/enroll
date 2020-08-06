@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class CensusEmployeeCoverageCostEstimator
@@ -52,21 +54,20 @@ module BenefitSponsors
             false
           )]
           member_enrollments = [::BenefitSponsors::Enrollments::MemberEnrollment.new({
-            member_id: census_employee.id
-          })]
+                                                                                       member_id: census_employee.id
+                                                                                     })]
           census_employee.census_dependents.each do |cm|
-            if cm.dob <= coverage_start
-              member_entries << EnrollmentMemberAdapter.new(
-                cm.id,
-                cm.dob,
-                map_ce_relationship(cm.employee_relationship),
-                false,
-                map_ce_disabled(cm.employee_relationship)
-              )
-              member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
-                member_id: cm.id
-              })
-            end
+            next unless cm.dob <= coverage_start
+            member_entries << EnrollmentMemberAdapter.new(
+              cm.id,
+              cm.dob,
+              map_ce_relationship(cm.employee_relationship),
+              false,
+              map_ce_disabled(cm.employee_relationship)
+            )
+            member_enrollments << ::BenefitSponsors::Enrollments::MemberEnrollment.new({
+                                                                                         member_id: cm.id
+                                                                                       })
           end
           group_enrollment = ::BenefitSponsors::Enrollments::GroupEnrollment.new(
             {
@@ -76,7 +77,8 @@ module BenefitSponsors
               member_enrollments: member_enrollments,
               rating_area: @sponsored_benefit.recorded_rating_area.exchange_provided_code,
               sponsor_contribution_prohibited: ["cobra_eligible", "cobra_linked", "cobra_termination_pending"].include?(census_employee.aasm_state)
-            })
+            }
+          )
           ::BenefitSponsors::Members::MemberGroup.new(
             member_entries,
             {group_enrollment: group_enrollment}
@@ -155,7 +157,7 @@ module BenefitSponsors
         sponsor_contribution
       end
 
-      def create_fake_pricing_determination(sponsored_benefit, sponsor_contribution, pricing_model, contribution_model, p_determination_builder_klass)
+      def create_fake_pricing_determination(sponsored_benefit, _sponsor_contribution, pricing_model, _contribution_model, p_determination_builder_klass)
         p_determination_builder = p_determination_builder_klass.new
         p_determination_builder.create_fake_pricing_determinations(sponsored_benefit, pricing_model)
       end
@@ -166,8 +168,8 @@ module BenefitSponsors
         contribution_model,
         reference_product,
         sponsor_contribution,
-        p_calculator,
-        c_calculator,
+        _p_calculator,
+        _c_calculator,
         roster_eligibility_optimizer,
         p_determination_builder_klass
       )
@@ -201,8 +203,8 @@ module BenefitSponsors
           roster_group = roster_eligibility_optimizer.calculate_optimal_group_for(contribution_model, ce_roster, sponsor_contribution)
           price_group = p_calculator.calculate_price_for(pricing_model, roster_group, sponsor_contribution)
           contribution_group = c_calculator.calculate_contribution_for(contribution_model, price_group, sponsor_contribution)
-          price_total = price_total + contribution_group.group_enrollment.product_cost_total
-          contribution_total = contribution_total + contribution_group.group_enrollment.sponsor_contribution_total
+          price_total += contribution_group.group_enrollment.product_cost_total
+          contribution_total += contribution_group.group_enrollment.sponsor_contribution_total
         end
         [price_total, contribution_total]
       end

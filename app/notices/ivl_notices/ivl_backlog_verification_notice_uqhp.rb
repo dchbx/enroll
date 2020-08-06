@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
   include ApplicationHelper
   attr_accessor :family, :data, :person
 
-  def initialize(consumer_role, args = {})
+  def initialize(_consumer_role, args = {})
     args[:recipient] = args[:family].primary_applicant.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= args[:family].primary_applicant.person
+    args[:recipient_document_store] = args[:family].primary_applicant.person
     args[:to] = args[:family].primary_applicant.person.work_email_or_best
     self.person = args[:person]
     self.data = args[:data]
@@ -24,13 +26,9 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -45,7 +43,6 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     end
   end
 
-
   def check_for_unverified_individuals
     family = recipient.primary_family
     enrollments = HbxEnrollment.where(family_id: family.id, :is_any_enrollment_member_outstanding => true,
@@ -57,9 +54,7 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     people = family_members.map(&:person).uniq
     outstanding_people = []
     people.each do |person|
-      if person.consumer_role.outstanding_verification_types.present?
-        outstanding_people << person
-      end
+      outstanding_people << person if person.consumer_role.outstanding_verification_types.present?
     end
     notice.due_date = family.min_verification_due_date
     outstanding_people.uniq!
@@ -71,21 +66,20 @@ class IvlNotices::IvlBacklogVerificationNoticeUqhp < IvlNotice
     people.each do |person|
       person.consumer_role.outstanding_verification_types.each do |verification_type|
         case verification_type.type_name
-          when "Social Security Number"
-            notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-          when "Immigration status"
-            notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-          when "Citizenship"
-            notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-          when "American Indian Status"
-            notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
-          when "DC Residency"
-            notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        when "Social Security Number"
+          notice.ssa_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        when "Immigration status"
+          notice.immigration_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        when "Citizenship"
+          notice.dhs_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        when "American Indian Status"
+          notice.american_indian_unverified << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
+        when "DC Residency"
+          notice.residency_inconsistency << PdfTemplates::Individual.new({ full_name: person.full_name.titleize, documents_due_date: notice.due_date, age: person.age_on(TimeKeeper.date_of_record) })
         end
       end
     end
   end
-
 
   def append_data
     notice.notification_type = self.event_name

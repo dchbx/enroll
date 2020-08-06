@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers::Mhc
     class ConversionEmployerSet < ::Importers::Mhc::ConversionEmployerSet
@@ -6,7 +8,7 @@ module BenefitSponsors
         row_action = record_attrs[:action].blank? ? "add" : record_attrs[:action].to_s.strip.downcase
 
         if row_action == 'add'
-           BenefitSponsors::Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date, :mid_year_conversion => @mid_year_conversion}))
+          BenefitSponsors::Importers::Mhc::ConversionEmployerCreate.new(record_attrs.merge({:registered_on => @conversion_date, :mid_year_conversion => @mid_year_conversion}))
         elsif row_action == 'update'
           ::Importers::Mhc::ConversionEmployerUpdate.new(record_attrs.merge({:registered_on => @conversion_date}))
         else

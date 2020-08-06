@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Organizations
     class PlanDesignProposalBuilder
 
       attr_reader :plan_design_organization, :benefit_sponsorship
 
-      def initialize(plan_design_organization, effective_date, options={})
+      def initialize(plan_design_organization, effective_date, options = {})
         @plan_design_organization = plan_design_organization
         @effective_date = effective_date
 
-        @title  = options[:title] || "Plan Design for #{effective_date.to_s}"
+        @title = options[:title] || "Plan Design for #{effective_date}"
 
         @plan_design_profile = nil
         @benefit_sponsorship = nil
@@ -25,28 +27,26 @@ module SponsoredBenefits
         @plan_design_profile
       end
 
-      def add_benefit_sponsorship(benefit_market = :aca_shop_cca, 
+      def add_benefit_sponsorship(_benefit_market = :aca_shop_cca,
                                   annual_enrollment_period_begin_month = @effective_date.month,
-                                  enrollment_frequency = :rolling_month, 
-                                  contact_method = :paper_and_electronic)
+                                  _enrollment_frequency = :rolling_month,
+                                  _contact_method = :paper_and_electronic)
 
-        @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new( benefit_market: @benefit_market,
+        @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.new(benefit_market: @benefit_market,
                                                                                               enrollment_frequency: @enrollment_frequency,
                                                                                               contact_method: @contact_method,
-                                                                                              annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
-                                                                                          )   
-        
-        @plan_design_profile.benefit_sponsorships << @benefit_sponsorship if @plan_design_profile.present? 
-        benefit_sponsorship_id_for(@census_members_roster) if @census_members_roster.present?
+                                                                                              annual_enrollment_period_begin_month: annual_enrollment_period_begin_month)
 
+        @plan_design_profile.benefit_sponsorships << @benefit_sponsorship if @plan_design_profile.present?
+        benefit_sponsorship_id_for(@census_members_roster) if @census_members_roster.present?
       end
 
       def benefit_sponsorship_id_for(census_members_roster)
         census_members_roster.each { |census_member| census_member.benefit_sponsorship_id = @benefit_sponsorship.id }
       end
 
-      def add_benefit_application(new_benefit_application)
-        is_renewing =  @plan_design_organization.is_renewing_employer?
+      def add_benefit_application(_new_benefit_application)
+        is_renewing = @plan_design_organization.is_renewing_employer?
         enrollment_timetable = SponsoredBenefits::BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(effective_date, is_renewing)
         @benefit_application = SponsoredBenefits::BenefitApplications::BenefitApplication.new(effective_period: enrollment_timetable[:effective_period], open_enrollment_period:  enrollment_timetable[:open_enrollment_period])
         # fail NotImplementedError, 'abstract'
@@ -56,17 +56,14 @@ module SponsoredBenefits
         @census_members_roster = new_census_members_roster  # SponsoredBenefits::CensusMembers::Roster.new
       end
 
-
       def plan_design_proposal
         raise "must add a plan design profile" if @plan_design_profile.blank?
         add_benefit_sponsorship if @benefit_sponsorship.blank?
-          
+
         @plan_design_proposal
       end
 
-      def census_members_roster
-        @census_members_roster
-      end
+      attr_reader :census_members_roster
 
 
     end

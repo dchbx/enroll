@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class ContributionModels::MemberRelationshipMap
     include Mongoid::Document
@@ -16,9 +18,7 @@ module BenefitMarkets
     validate :has_mappable_relationship
 
     def has_mappable_relationship
-      if display_relationship_name.blank?
-        errors.add(:relationship_name, "does not match a member relationship in the contribution model")
-      end
+      errors.add(:relationship_name, "does not match a member relationship in the contribution model") if display_relationship_name.blank?
     end
 
     def display_relationship_name
@@ -34,9 +34,9 @@ module BenefitMarkets
       when :>
         type_count > count
       when :<=
-          type_count <= count
+        type_count <= count
       when :>=
-          type_count >= count
+        type_count >= count
       else
         type_count == count
       end
@@ -45,11 +45,10 @@ module BenefitMarkets
     protected
 
     def search_member_relationships
-
       return nil if contribution_unit.blank?
       return nil if contribution_unit.contribution_model.blank?
       return nil if contribution_unit.contribution_model.member_relationships.blank?
-      
+
       contribution_unit.contribution_model.member_relationships.detect do |mrel|
         mrel.relationship_name == relationship_name
       end

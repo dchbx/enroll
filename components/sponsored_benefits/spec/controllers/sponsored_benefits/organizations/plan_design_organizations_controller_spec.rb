@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
 module UserRoles
-  USER_ROLES = [:with_hbx_staff_role, :with_broker_role] unless const_defined?(:USER_ROLES)
+  USER_ROLES = [:with_hbx_staff_role, :with_broker_role].freeze unless const_defined?(:USER_ROLES)
 end
 
 module SponsoredBenefits
@@ -13,49 +15,42 @@ module SponsoredBenefits
 
     routes { SponsoredBenefits::Engine.routes }
 
-    let(:valid_attributes) {
+    let(:valid_attributes) do
       {
-        "legal_name"  =>  "Some Name",
-        "dba"         =>  "",
-        "entity_kind" =>  "",
-        "sic_code"    =>  "0116",
+        "legal_name" => "Some Name",
+        "dba" => "",
+        "entity_kind" => "",
+        "sic_code" => "0116",
         "office_locations_attributes" =>
-              {"0"=>
+              {"0" =>
                   { "address_attributes" =>
-                      { "kind"      =>  "primary",
-                        "address_1" =>  "",
-                        "address_2" =>  "",
-                        "city"      =>  "",
-                        "state"     =>  "",
-                        "zip"       =>  "01001",
-                        "county"    =>  "Hampden"
-                      },
+                      { "kind" => "primary",
+                        "address_1" => "",
+                        "address_2" => "",
+                        "city" => "",
+                        "state" => "",
+                        "zip" => "01001",
+                        "county" => "Hampden"},
                     "phone_attributes" =>
-                      { "kind"      =>  "work",
-                        "area_code" =>  "",
-                        "number"    =>  "",
-                        "extension" =>  ""
-                      }
-                  }
-        }
+                      { "kind" => "work",
+                        "area_code" => "",
+                        "number" => "",
+                        "extension" => ""}}}
       }
-    }
+    end
 
-    let(:invalid_attributes) {
+    let(:invalid_attributes) do
       {
-        "legal_name"  =>  "",
-        "sic_code"    =>  nil,
+        "legal_name" => "",
+        "sic_code" => nil,
         "office_locations_attributes" =>
-              {"0"=>
+              {"0" =>
                   { "address_attributes" =>
-                      { "kind"      =>  "primary",
-                        "zip"       =>  "01001",
-                        "county"    =>  "Hampden"
-                      }
-                  }
-        }
+                      { "kind" => "primary",
+                        "zip" => "01001",
+                        "county" => "Hampden"}}}
       }
-    }
+    end
 
     def person(trait)
       FactoryBot.create(:person, trait).tap do |person|
@@ -110,21 +105,21 @@ module SponsoredBenefits
       end
 
       USER_ROLES.each do |role|
-       context "for user with role #{role} by passing invalid params" do
-         before :each do
-           person = person(role)
-           sign_in user(person)
-           post :create, params: {organization: invalid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}
-         end
+        context "for user with role #{role} by passing invalid params" do
+          before :each do
+            person = person(role)
+            sign_in user(person)
+            post :create, params: {organization: invalid_attributes, broker_agency_id: broker_agency_profile.id, format: 'js'}
+          end
 
-         it " should not create a new Organizations::PlanDesignOrganization" do
-           expect(SponsoredBenefits::Organizations::PlanDesignOrganization.where(legal_name: invalid_attributes["legal_name"]).present?).to be_falsy
-         end
+          it " should not create a new Organizations::PlanDesignOrganization" do
+            expect(SponsoredBenefits::Organizations::PlanDesignOrganization.where(legal_name: invalid_attributes["legal_name"]).present?).to be_falsy
+          end
 
-         it "renders the new view" do
-           expect(response).to render_template(:new)
-         end
-       end
+          it "renders the new view" do
+            expect(response).to render_template(:new)
+          end
+        end
       end
     end
 

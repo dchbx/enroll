@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class HealthSponsoredBenefit < BenefitSponsors::SponsoredBenefits::SponsoredBenefit
 
-      FILTER_MAP =  { 
-                      issuer_profiles: -> { products.issuer_profiles },
+      FILTER_MAP = {
+        issuer_profiles: -> { products.issuer_profiles },
                       # metal_level_kinds: BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS,
-                      health_plan_kinds: BenefitMarkets::Products::HealthProducts::HealthProduct::HEALTH_PLAN_MAP.keys,
-                    }
+        health_plan_kinds: BenefitMarkets::Products::HealthProducts::HealthProduct::HEALTH_PLAN_MAP.keys
+      }.freeze
 
     end
   end

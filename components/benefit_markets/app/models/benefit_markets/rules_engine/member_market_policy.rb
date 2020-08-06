@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class RulesEngine::MemberMarketPolicy
     #include BenefitMarkets::RulesEngine::Policy

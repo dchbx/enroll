@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class SponsorContributionForm
-      
+
       include Virtus.model
       include ActiveModel::Model
 
@@ -12,7 +14,7 @@ module BenefitSponsors
 
       def contribution_levels_attributes=(attributes)
         @contribution_levels ||= []
-        attributes.each do |i, contribution_level_attributes|
+        attributes.each do |_i, contribution_level_attributes|
           @contribution_levels.push(ContributionLevelForm.new(contribution_level_attributes))
         end
       end
@@ -24,7 +26,7 @@ module BenefitSponsors
       end
 
       def min_contributions_map
-        contribution_levels.inject({}) {|data, cl| data[cl.display_name] = cl.min_contribution_factor * 100; data;}
+        contribution_levels.inject({}) {|data, cl| data[cl.display_name] = cl.min_contribution_factor * 100; data; }
       end
     end
   end

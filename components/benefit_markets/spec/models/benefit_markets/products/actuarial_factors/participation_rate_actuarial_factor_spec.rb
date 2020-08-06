@@ -1,22 +1,24 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitMarkets
   RSpec.describe Products::ActuarialFactors::ParticipationRateActuarialFactor do
-    let(:validation_errors) {
+    let(:validation_errors) do
       subject.valid?
       subject.errors
-    }
+    end
 
     it "requires an issuer profile" do
-      expect(validation_errors.has_key?(:issuer_profile_id)).to be_truthy  
+      expect(validation_errors.key?(:issuer_profile_id)).to be_truthy
     end
 
     it "requires a default factor value" do
-      expect(validation_errors.has_key?(:default_factor_value)).to be_truthy  
+      expect(validation_errors.key?(:default_factor_value)).to be_truthy
     end
 
     it "requires an active year" do
-      expect(validation_errors.has_key?(:active_year)).to be_truthy  
+      expect(validation_errors.key?(:active_year)).to be_truthy
     end
   end
 
@@ -33,10 +35,10 @@ module BenefitMarkets
 
     subject do
       Products::ActuarialFactors::ParticipationRateActuarialFactor.new({
-        :default_factor_value => default_factor_value,
-        :active_year => active_year,
-        :issuer_profile_id => issuer_profile_id
-      })
+                                                                         :default_factor_value => default_factor_value,
+                                                                         :active_year => active_year,
+                                                                         :issuer_profile_id => issuer_profile_id
+                                                                       })
     end
 
     it "is valid" do
@@ -57,13 +59,13 @@ module BenefitMarkets
 
     subject do
       Products::ActuarialFactors::ParticipationRateActuarialFactor.new({
-        :actuarial_factor_entries => [
-          Products::ActuarialFactors::ActuarialFactorEntry.new({
-            :factor_key => '1',
-            :factor_value => 1.345
-          })
-        ]
-      })
+                                                                         :actuarial_factor_entries => [
+                                                                           Products::ActuarialFactors::ActuarialFactorEntry.new({
+                                                                                                                                  :factor_key => '1',
+                                                                                                                                  :factor_value => 1.345
+                                                                                                                                })
+                                                                         ]
+                                                                       })
     end
 
     it "returns the '1.345' for a lookup of 0" do
@@ -82,13 +84,13 @@ module BenefitMarkets
 
     subject do
       Products::ActuarialFactors::ParticipationRateActuarialFactor.new({
-        :actuarial_factor_entries => [
-          Products::ActuarialFactors::ActuarialFactorEntry.new({
-            :factor_key => '11',
-            :factor_value => 1.345
-          })
-        ]
-      })
+                                                                         :actuarial_factor_entries => [
+                                                                           Products::ActuarialFactors::ActuarialFactorEntry.new({
+                                                                                                                                  :factor_key => '11',
+                                                                                                                                  :factor_value => 1.345
+                                                                                                                                })
+                                                                         ]
+                                                                       })
     end
 
     it "returns the '1.345' for a lookup of 11" do

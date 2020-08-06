@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generate a CCA EnrollApp EmployerProfile and child models from an existing PlanDesign Proposal
 module SponsoredBenefits
   module BenefitApplications
@@ -6,8 +8,7 @@ module SponsoredBenefits
 
 
 
-    def sic_code(new)
-    end
+      def sic_code(new); end
 
     end
   end

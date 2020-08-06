@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'net/ssh'
 require 'net/sftp'
 require 'tempfile'
@@ -12,7 +14,7 @@ module TransportGateway
     def list_entries(resource_query)
       if resource_query.from.blank?
         log(:error, "transport_gateway.sftp_adapter") { "query endpoint not provided" }
-        raise ArgumentError.new "query endpoint not provided"
+        raise ArgumentError, "query endpoint not provided"
       end
 
       target_uri = resource_query.from
@@ -20,7 +22,7 @@ module TransportGateway
       resolve_from_credentials(resource_query)
       if @user.blank? || @credential_options.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source server credentials not found" }
-        raise ArgumentError.new("source server username:password not provided")
+        raise ArgumentError, "source server username:password not provided"
       end
 
       begin
@@ -43,7 +45,7 @@ module TransportGateway
     def receive_message(message)
       if message.from.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source file not provided" }
-        raise ArgumentError.new "source file not provided"
+        raise ArgumentError, "source file not provided"
       end
 
       target_uri = message.from
@@ -51,9 +53,9 @@ module TransportGateway
       resolve_from_credentials(message)
       if @user.blank? || @credential_options.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source server credentials not found" }
-        raise ArgumentError.new("source server username:password not provided")
+        raise ArgumentError, "source server username:password not provided"
       end
-      
+
       source_stream = Tempfile.new('tgw_sftp_adapter_dl')
       source_stream.binmode
 
@@ -71,13 +73,13 @@ module TransportGateway
     end
 
     def send_message(message)
-      if (message.from.blank? && message.body.blank?)
+      if message.from.blank? && message.body.blank?
         log(:error, "transport_gateway.sftp_adapter") { "source data not provided" }
-        raise ArgumentError.new "source data not provided"
+        raise ArgumentError, "source data not provided"
       end
       unless message.to.present?
         log(:error, "transport_gateway.sftp_adapter") { "destination not provided" }
-        raise ArgumentError.new "destination not provided"
+        raise ArgumentError, "destination not provided"
       end
 
       target_uri = message.to
@@ -85,7 +87,7 @@ module TransportGateway
       resolve_to_credentials(message)
       if @user.blank? || @credential_options.blank?
         log(:error, "transport_gateway.sftp_adapter") { "target server credentials not found" }
-        raise ArgumentError.new("target server username:password not provided")
+        raise ArgumentError, "target server username:password not provided"
       end
 
       source = provide_source_for(message)
@@ -123,35 +125,33 @@ module TransportGateway
     end
 
     def provide_source_for(message)
-      unless message.body.blank?
-        return Sources::StringIOSource.new(message.body)
-      end
+      return Sources::StringIOSource.new(message.body) unless message.body.blank?
       gateway.receive_message(message)
     end
 
-    def send_messages(messages)
+    def send_messages(_messages)
       handle1 = sftp.open!("/path/to/file1")
       handle2 = sftp.open!("/path/to/file2")
 
       r1 = sftp.read(handle1, 0, 1024)
       r2 = sftp.read(handle2, 0, 1024)
 
-      sftp.loop { [r1, r2].any? { |r| r.pending? } }
+      sftp.loop { [r1, r2].any?(&:pending?) }
 
       puts "chunk #1: #{r1.response[:data]}"
       puts "chunk #2: #{r2.response[:data]}"
     end
 
     private
+
     def find_or_create_target_folder_for(sftp, path)
       folder = File.dirname(path)
       begin
         sftp.stat!(folder)
-      rescue
+      rescue StandardError
         sftp.mkdir!(folder)
       end
     end
-
 
     # open session and block until connection is initialized
     def open_session(ssh)
@@ -160,15 +160,15 @@ module TransportGateway
       sftp
     end
 
-    def open(uploader, *args)
+    def open(_uploader, *_args)
       Rails.logger("Starting upload...")
     end
 
-    def close(uploader, *args)
+    def close(_uploader, *_args)
       Rails.logger("Upload complete")
     end
 
-    def finish(uploader, *args)
+    def finish(_uploader, *_args)
       Rails.logger("All done")
     end
 

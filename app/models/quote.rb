@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Quote
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -7,13 +9,13 @@ class Quote
   extend Mongorder
 
 
-  PLAN_OPTION_KINDS = [:single_plan, :single_carrier, :metal_level]
+  PLAN_OPTION_KINDS = [:single_plan, :single_carrier, :metal_level].freeze
   field :quote_name, type: String, default: "Sample Quote"
   #field :plan_year, type: Integer, default: TimeKeeper.date_of_record.year
   def plan_year
     start_on.year
   end
-  
+
   field :start_on, type: Date
   field :broker_role_id, type: BSON::ObjectId
 
@@ -64,9 +66,9 @@ class Quote
   def self.search_hash(s_rex)
     search_rex = ::Regexp.compile(::Regexp.escape(s_rex), true)
     {
-      "$or" => ([
+      "$or" => [
         {"quote_name" => search_rex}
-      ])
+      ]
     }
   end
 
@@ -79,12 +81,12 @@ class Quote
   end
 
   def all_benefit_groups_have_plans?
-    quote_benefit_groups.reject{ |q| !q.is_assigned? }.map(&:plan).include?(nil) ? false : true
+    quote_benefit_groups.select(&:is_assigned?).map(&:plan).include?(nil) ? false : true
   end
 
   def min_employer_contribution
-    unless quote_benefit_groups.size == 0
-      quote_benefit_groups.reject{ |q| !q.is_assigned? }.map do |qbg|
+    unless quote_benefit_groups.empty?
+      quote_benefit_groups.select(&:is_assigned?).map do |qbg|
         qbg.relationship_benefit_for("employee")
       end.map(&:premium_pct).min
     end
@@ -95,15 +97,13 @@ class Quote
   end
 
   def quote_warnings
-    if !is_quote_eligible?
-      quote_eligibility_warnings.each_pair(){ |k, v| self.errors.add(:base, v)}
-    end
+    quote_eligibility_warnings.each_pair{ |_k, v| self.errors.add(:base, v)} unless is_quote_eligible?
   end
 
   def quote_eligibility_warnings
     warnings = {}
     unless start_on.yday == 1
-      if quote_benefit_groups.size > 0 && (min_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
+      if !quote_benefit_groups.empty? && (min_employer_contribution < Settings.aca.shop_market.employer_contribution_percent_minimum)
         warnings.merge!({min_employer_contribution: "Employer contribution percent toward employee premium (#{min_employer_contribution.to_i}%) is less than minimum allowed (#{Settings.aca.shop_market.employer_contribution_percent_minimum.to_i}%)"})
       end
     end
@@ -122,13 +122,13 @@ class Quote
   end
 
   def generate_character
-    ascii = rand(36) + 48
+    ascii = rand(48..83)
     ascii += 39 if ascii >= 58
     ascii.chr.upcase
   end
 
   def employer_claim_code
-     4.times.map{generate_character}.join + '-' + 4.times.map{generate_character}.join
+    4.times.map{generate_character}.join + '-' + 4.times.map{generate_character}.join
   end
 
   def set_employer_claim_code
@@ -138,19 +138,19 @@ class Quote
 
   def clone
     q = super
-    is_copy, root_of_copied_name = *(q.quote_name.match(/(.+)\(\d+\)$/))
+    is_copy, root_of_copied_name = *q.quote_name.match(/(.+)\(\d+\)$/)
     name = root_of_copied_name || q.quote_name
     max_copies = 0
-    Quote.where(broker_role_id: q.broker_role_id).each{|quote|
+    Quote.where(broker_role_id: q.broker_role_id).each do |quote|
       matched, matched_name,match_count = *(quote.quote_name.match /(.+)\((\d+)\)$/)
-      max_copies = match_count.to_i if matched_name == name && ((match_count.to_i) > max_copies)
-    }
-   q.quote_name = "#{name}(#{max_copies+1})"
-   q.aasm_state = 'draft'
-   q.claim_code = nil
-   q.quote_benefit_groups.each {|bg| bg._id = BSON::ObjectId.new}
-   q.save
-   q
+      max_copies = match_count.to_i if matched_name == name && (match_count.to_i > max_copies)
+    end
+    q.quote_name = "#{name}(#{max_copies + 1})"
+    q.aasm_state = 'draft'
+    q.claim_code = nil
+    q.quote_benefit_groups.each {|bg| bg._id = BSON::ObjectId.new}
+    q.save
+    q
  end
 
   aasm do
@@ -172,16 +172,16 @@ class Quote
     def claim_code_status?(quote_claim_code)
       claim_code = Quote.where("claim_code" => quote_claim_code).first
       if claim_code.nil?
-        return "invalid"
+        "invalid"
       else
-        return claim_code.aasm_state
+        claim_code.aasm_state
       end
     end
 
   end
 
   def update_default_benefit_group
-    qbg=quote_benefit_groups.first
+    qbg = quote_benefit_groups.first
     quote_households.each do |qoute_household|
       qoute_household.update_attributes(:quote_benefit_group_id => qbg.id)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApplicationPolicy
   attr_reader :user, :record
 
@@ -39,23 +41,23 @@ class ApplicationPolicy
   end
 
   def read_all?
-    @user.has_role? :employer_staff or
-      @user.has_role? :employee or
-      @user.has_role? :broker or
-      @user.has_role? :broker_agency_staff or
-      @user.has_role? :consumer or
-      @user.has_role? :resident or
-      @user.has_role? :hbx_staff or
-      @user.has_role? :system_service or
-      @user.has_role? :web_service or
-      @user.has_role? :assister or
-      @user.has_role? :csr
+    @user.has_role?(:employer_staff) ||
+      @user.has_role?(:employee) ||
+      @user.has_role?(:broker) ||
+      @user.has_role?(:broker_agency_staff) ||
+      @user.has_role?(:consumer) ||
+      @user.has_role?(:resident) ||
+      @user.has_role?(:hbx_staff) ||
+      @user.has_role?(:system_service) ||
+      @user.has_role?(:web_service) ||
+      @user.has_role?(:assister) ||
+      @user.has_role?(:csr)
   end
 
   def update_all?
-    @user.has_role? :broker_agency_staff or
-      @user.has_role? :assister or
-      @user.has_role? :csr
+    @user.has_role?(:broker_agency_staff) ||
+      @user.has_role?(:assister) ||
+      @user.has_role?(:csr)
   end
 
   class Scope

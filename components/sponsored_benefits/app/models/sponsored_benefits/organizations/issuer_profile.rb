@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Organizations
     class IssuerProfile < Profile
@@ -6,12 +8,10 @@ module SponsoredBenefits
 
 
 
-      def benefit_products
-      end
+      def benefit_products; end
 
-      def benefit_products_by_effective_date(effective_date)
-      end
+      def benefit_products_by_effective_date(effective_date); end
 
-    end 
+    end
   end
 end

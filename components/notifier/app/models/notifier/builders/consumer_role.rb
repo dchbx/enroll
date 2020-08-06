@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Notifier
   module Builders
     class ConsumerRole
@@ -205,7 +206,7 @@ module Notifier
       end
 
       def incarcerated
-        merge_model.incarcerated = (payload['notice_params']['primary_member']['incarcerated'] == 'N' || payload['notice_params']['primary_member']['incarcerated'] == '') ? 'No' : 'Yes'
+        merge_model.incarcerated = payload['notice_params']['primary_member']['incarcerated'] == 'N' || payload['notice_params']['primary_member']['incarcerated'] == '' ? 'No' : 'Yes'
       end
 
       def irs_consent

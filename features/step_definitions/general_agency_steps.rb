@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^.+ visit the HBX General Agency Registration form$/) do
   visit '/'
   find(".interaction-click-control-general-agency-registration", wait: 10).click
@@ -101,7 +103,7 @@ end
 
 When(/^.+ visits? invitation url in email for staff$/) do
   invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  invitation_link.sub!(%r{http\://127\.0\.0\.1\:3000}, '')
   visit(invitation_link)
 end
 

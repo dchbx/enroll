@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -156,7 +158,7 @@ module BenefitSponsors
       end
     end
 
-    describe '.end_open_enrollment' do 
+    describe '.end_open_enrollment' do
       let(:sponsorship_state)               { :applicant }
       let(:business_policy) { double(success_results: [], fail_results: []) }
 
@@ -166,11 +168,11 @@ module BenefitSponsors
         allow_any_instance_of(::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService).to receive(:business_policy).and_return(business_policy)
       end
 
-      context  'For initial employers for whom open enrollment extended' do 
+      context 'For initial employers for whom open enrollment extended' do
         let(:initial_application_state)       { :enrollment_extended }
 
-        it "should close their open enrollment" do 
-          (april_sponsors).each do |sponsor|
+        it "should close their open enrollment" do
+          april_sponsors.each do |sponsor|
             benefit_application = sponsor.benefit_applications.first
 
             expect(sponsor.applicant?).to be_truthy
@@ -188,11 +190,11 @@ module BenefitSponsors
         end
       end
 
-      context  'For renewal employers for whom open enrollment extended' do 
+      context 'For renewal employers for whom open enrollment extended' do
         let(:renewal_application_state)       { :enrollment_extended }
 
-        it "should close their open enrollment" do 
-          (april_renewal_sponsors).each do |sponsor|
+        it "should close their open enrollment" do
+          april_renewal_sponsors.each do |sponsor|
             benefit_application = sponsor.benefit_applications.first
 
             expect(sponsor.active?).to be_truthy
@@ -211,24 +213,24 @@ module BenefitSponsors
       end
     end
 
-   describe ".update_fein" do
-    let(:benefit_sponsorship) { employer_organization.employer_profile.add_benefit_sponsorship }
-    let(:exisitng_org) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
-    let(:service_instance) { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: benefit_sponsorship)}
-    let(:legal_name) { exisitng_org.legal_name }
+    describe ".update_fein" do
+      let(:benefit_sponsorship) { employer_organization.employer_profile.add_benefit_sponsorship }
+      let(:exisitng_org) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site)}
+      let(:service_instance) { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: benefit_sponsorship)}
+      let(:legal_name) { exisitng_org.legal_name }
 
-    it "should update fein" do
-      service_instance.update_fein("048459845")
-      expect(benefit_sponsorship.organization.fein).to eq "048459845"
+      it "should update fein" do
+        service_instance.update_fein("048459845")
+        expect(benefit_sponsorship.organization.fein).to eq "048459845"
+      end
+
+      it "should not update fein" do
+        exisitng_org.update_attributes(fein: "098735672")
+        error_messages = service_instance.update_fein("098735672")
+        expect(error_messages[0]).to eq false
+        expect(error_messages[1].first).to eq "FEIN matches HBX ID #{exisitng_org.hbx_id}, #{exisitng_org.legal_name}"
+      end
     end
-
-     it "should not update fein" do
-      exisitng_org.update_attributes(fein: "098735672")
-      error_messages = service_instance.update_fein("098735672")
-      expect(error_messages[0]).to eq false
-      expect(error_messages[1].first).to eq ("FEIN matches HBX ID #{exisitng_org.hbx_id}, #{exisitng_org.legal_name}")
-     end
-   end
 
     describe ".transmit_renewal_carrier_drop_event" do
       let!(:benefit_market) { site.benefit_markets.first }

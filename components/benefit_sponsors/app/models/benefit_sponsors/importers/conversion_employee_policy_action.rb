@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers
     class ConversionEmployeePolicyAction < ::Importers::ConversionEmployeePolicyAction
@@ -11,13 +13,13 @@ module BenefitSponsors
         benefit_application = fetch_application_based_sponsored_kind
 
         if benefit_application
-          candidate_bgas = census_employee.benefit_group_assignments.where(:"benefit_package_id".in  => benefit_application.benefit_packages.map(&:id))
-          @found_benefit_group_assignment = candidate_bgas.sort_by(&:start_on).last
+          candidate_bgas = census_employee.benefit_group_assignments.where(:benefit_package_id.in => benefit_application.benefit_packages.map(&:id))
+          @found_benefit_group_assignment = candidate_bgas.max_by(&:start_on)
         end
       end
 
       def current_benefit_application(employer)
-        if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+        if employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion"
           employer.benefit_applications.where(:aasm_state => :imported).first
         else
           employer.benefit_applications.where(:aasm_state => :active).first
@@ -39,16 +41,16 @@ module BenefitSponsors
         return nil if found_employer.nil?
         benefit_sponsorship = found_employer.active_benefit_sponsorship
         candidate_employees = CensusEmployee.where({
-                                                       benefit_sponsors_employer_profile_id: found_employer.id,
-                                                       benefit_sponsorship_id: benefit_sponsorship.id,
+                                                     benefit_sponsors_employer_profile_id: found_employer.id,
+                                                     benefit_sponsorship_id: benefit_sponsorship.id,
                                                        # hired_on: {"$lte" => start_date},
-                                                       encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                     encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                    })
         non_terminated_employees = candidate_employees.reject do |ce|
-          (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+          !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
         end
 
-        @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+        @found_employee = non_terminated_employees.max_by(&:hired_on)
       end
 
       def find_plan
@@ -56,11 +58,11 @@ module BenefitSponsors
         return nil if hios_id.blank?
         clean_hios = hios_id.strip
 
-        if sponsored_benefit_kind == :dental
-          corrected_hios_id = clean_hios.split("-")[0]
-        else
-          corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
-        end
+        corrected_hios_id = if sponsored_benefit_kind == :dental
+                              clean_hios.split("-")[0]
+                            else
+                              (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
+                            end
 
         sponsor_benefit = find_sponsor_benefit
         return nil if sponsor_benefit.blank?
@@ -81,9 +83,9 @@ module BenefitSponsors
 
         if benefit_application
           benefit_package = benefit_application.benefit_packages.first
-          benefit_package.sponsored_benefits.unscoped.detect {|sponsored_benefit|
+          benefit_package.sponsored_benefits.unscoped.detect do |sponsored_benefit|
             sponsored_benefit.product_kind == sponsored_benefit_kind
-          }
+          end
         end
       end
 
@@ -108,17 +110,16 @@ module BenefitSponsors
             imported_states = BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES
             has_active_state = (published_states + imported_states).include?(benefit_application.aasm_state)
             employee.benefit_group_assignments << BenefitGroupAssignment.new({
-                                                                                 benefit_package_id: benefit_package.id,
-                                                                                 start_on: benefit_application.start_on,
-                                                                                 is_active: has_active_state})
+                                                                               benefit_package_id: benefit_package.id,
+                                                                               start_on: benefit_application.start_on,
+                                                                               is_active: has_active_state
+                                                                             })
             employee.save
           end
         end
 
         is_new = true
-        if employee_role.present? && find_enrollments(employee_role).present?
-          is_new = false
-        end
+        is_new = false if employee_role.present? && find_enrollments(employee_role).present?
 
         proxy = is_new ? BenefitSponsors::Importers::ConversionEmployeePolicy.new(@original_attributes) : ::Importers::ConversionEmployeePolicyUpdate.new(@original_attributes)
         result = proxy.save
@@ -143,10 +144,10 @@ module BenefitSponsors
         return [] if benefit_application.blank?
 
         hbx_enrollments = family.active_household.hbx_enrollments.where({
-                                                          :benefit_sponsorship_id => sponsor_ship.id,
-                                                          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
-                                                      })
-        sponsored_benefit_kind = (sponsored_benefit_kind == :health) ? "health" : "dental"
+                                                                          :benefit_sponsorship_id => sponsor_ship.id,
+                                                                          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
+                                                                        })
+        sponsored_benefit_kind = sponsored_benefit_kind == :health ? "health" : "dental"
 
         hbx_enrollments.by_coverage_kind(sponsored_benefit_kind)
       end

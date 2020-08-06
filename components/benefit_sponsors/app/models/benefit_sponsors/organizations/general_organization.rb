@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Organization type with strict data entry/validation policies used for S-Corp, C-Corp, LLC and similar where FEIN is assigned
 module BenefitSponsors
   module Organizations

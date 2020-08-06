@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportProfiles
@@ -29,11 +31,11 @@ module TransportProfiles
       it "places the list of all returned results in the context" do
         subject.execute(process_context)
         expect(process_context.get(:file_list)).to include(entry1_uri, entry2_uri)
-      end 
+      end
     end
 
     describe  "given a filter for xml files" do
-      subject do 
+      subject do
         ::TransportProfiles::Steps::ListEntries.new(:endpoint_1, :file_list, gateway) do |entries|
           entries.select do |entry|
             entry.name =~ /\.xml\Z/i
@@ -44,32 +46,32 @@ module TransportProfiles
       it "places the only the xml results in the context" do
         subject.execute(process_context)
         expect(process_context.get(:file_list)).to include(entry2_uri)
-      end 
+      end
     end
 
     describe  "given a filter for the most recent file" do
-      subject do 
+      subject do
         ::TransportProfiles::Steps::ListEntries.new(:endpoint_1, :file_list, gateway) do |entries|
-          entries.any? ? [entries.sort_by(&:mtime).last] : []
+          entries.any? ? [entries.max_by(&:mtime)] : []
         end
       end
 
       it "places the only the most recent result in the context" do
         subject.execute(process_context)
         expect(process_context.get(:file_list)).to include(entry1_uri)
-      end 
+      end
     end
 
-    describe  "given a filter to not re-upload the most recent file" do
+    describe "given a filter to not re-upload the most recent file" do
       let(:entry1_dupe_uri) { URI.parse("sftp://some_other_server/some_other_folder/some_file1.txt") }
 
       before :each do
         process_context.put(:already_uploaded_files, [entry1_dupe_uri])
       end
 
-      subject do 
+      subject do
         ::TransportProfiles::Steps::ListEntries.new(:endpoint_1, :file_list, gateway) do |entries, process_context|
-          most_recent_entries = entries.any? ? [entries.sort_by(&:mtime).last] : []
+          most_recent_entries = entries.any? ? [entries.max_by(&:mtime)] : []
           already_sent_entries = process_context.get(:already_uploaded_files)
           already_sent_file_names = already_sent_entries.map { |entry| File.basename(entry.path) }
           most_recent_entries.reject { |entry| already_sent_file_names.include?(File.basename(entry.uri.path)) }
@@ -79,7 +81,7 @@ module TransportProfiles
       it "does not choose any files" do
         subject.execute(process_context)
         expect(process_context.get(:file_list)).not_to include(entry1_uri)
-      end 
+      end
     end
   end
 end

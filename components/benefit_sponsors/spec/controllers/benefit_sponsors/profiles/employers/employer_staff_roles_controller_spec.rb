@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -15,48 +17,48 @@ module BenefitSponsors
     let(:new_benefit_sponsor) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { benefit_sponsor.employer_profile }
 
-    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryBot.create(:person, employer_staff_roles:[active_employer_staff_role]) }
+    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
     let!(:new_person_for_staff) { FactoryBot.create(:person) }
-    let(:applicant_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state:'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:applicant_person) { FactoryBot.create(:person,employer_staff_roles:[applicant_employer_staff_role]) }
+    let(:applicant_employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, aasm_state: 'is_applicant', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let!(:applicant_person) { FactoryBot.create(:person,employer_staff_roles: [applicant_employer_staff_role]) }
     let(:user) { FactoryBot.create(:user, :person => person)}
 
 
     describe "GET new" do
 
-        before do
-          sign_in user
-          get :new, xhr: true
-        end
+      before do
+        sign_in user
+        get :new, xhr: true
+      end
 
-        it "should render new template" do
-          expect(response).to render_template("new")
-        end
+      it "should render new template" do
+        expect(response).to render_template("new")
+      end
 
-        it "should initialize staff" do
-          expect(assigns(:staff).class).to eq staff_class
-        end
+      it "should initialize staff" do
+        expect(assigns(:staff).class).to eq staff_class
+      end
 
-        it "should return http success" do
-          expect(response).to have_http_status(:success)
-        end
+      it "should return http success" do
+        expect(response).to have_http_status(:success)
+      end
     end
 
     describe "POST create", dbclean: :after_each do
 
       context "creating staff role with existing person params" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              :profile_id => employer_profile.id,
-              :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob}
+            :profile_id => employer_profile.id,
+            :staff => {:first_name => new_person_for_staff.first_name, :last_name => new_person_for_staff.last_name, :dob => new_person_for_staff.dob}
           }
-        }
+        end
 
         before :each do
-            sign_in user
-            post :create, params: staff_params
+          sign_in user
+          post :create, params: staff_params
         end
 
         it "should initialize staff" do
@@ -68,7 +70,7 @@ module BenefitSponsors
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 
@@ -79,12 +81,12 @@ module BenefitSponsors
 
       context "creating staff role with non existing person params" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              :profile_id => employer_profile.id,
-              :staff => {:first_name => "first_name", :last_name => 'last_name', :dob => "10/10/1989"}
+            :profile_id => employer_profile.id,
+            :staff => {:first_name => "first_name", :last_name => 'last_name', :dob => "10/10/1989"}
           }
-        }
+        end
 
         before :each do
           sign_in user
@@ -96,7 +98,7 @@ module BenefitSponsors
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 
@@ -110,15 +112,15 @@ module BenefitSponsors
 
       context "approve applicant staff role" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              :id => employer_profile.id, :person_id => applicant_person.id
+            :id => employer_profile.id, :person_id => applicant_person.id
           }
-        }
+        end
 
         before :each do
           sign_in user
-          get  :approve, params: staff_params
+          get :approve, params: staff_params
         end
 
         it "should initialize staff" do
@@ -130,7 +132,7 @@ module BenefitSponsors
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 
@@ -147,24 +149,24 @@ module BenefitSponsors
 
       context "approving invalid staff role" do
 
-          let!(:staff_params) {
-            {
-                :id => employer_profile.id, :person_id => applicant_person.id
-            }
+        let!(:staff_params) do
+          {
+            :id => employer_profile.id, :person_id => applicant_person.id
           }
+        end
 
-          before :each do
-            sign_in user
-            applicant_employer_staff_role.update_attributes(aasm_state:'is_closed')
-            get  :approve, params: staff_params
-          end
+        before :each do
+          sign_in user
+          applicant_employer_staff_role.update_attributes(aasm_state: 'is_closed')
+          get :approve, params: staff_params
+        end
 
         it "should redirect" do
           expect(response).to have_http_status(:redirect)
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 
@@ -179,11 +181,11 @@ module BenefitSponsors
 
       context "should deactivate staff role" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              :id => employer_profile.id, :person_id => applicant_person.id
+            :id => employer_profile.id, :person_id => applicant_person.id
           }
-        }
+        end
 
         before :each do
           sign_in user
@@ -199,7 +201,7 @@ module BenefitSponsors
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 
@@ -216,11 +218,11 @@ module BenefitSponsors
 
       context "should not deactivate only staff role of employer" do
 
-        let!(:staff_params) {
+        let!(:staff_params) do
           {
-              :id => employer_profile.id, :person_id => person.id
+            :id => employer_profile.id, :person_id => person.id
           }
-        }
+        end
 
         before :each do
           applicant_employer_staff_role.update_attributes(benefit_sponsor_employer_profile_id: new_benefit_sponsor.employer_profile.id)
@@ -233,7 +235,7 @@ module BenefitSponsors
         end
 
         it "should redirect to edit page of benefit_sponsor" do
-          expect(response).to redirect_to(edit_profiles_registration_path(id:employer_profile.id))
+          expect(response).to redirect_to(edit_profiles_registration_path(id: employer_profile.id))
           expect(response.location.include?("edit")).to eq true
         end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeePolicyAction < ConversionEmployeePolicyCommon
 
@@ -17,17 +19,13 @@ module Importers
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer
-      if found_employer.nil?
-        errors.add(:fein, "does not exist")
-      end
+      errors.add(:fein, "does not exist") if found_employer.nil?
     end
 
     def validate_census_employee
       return true if subscriber_ssn.blank?
       found_employee = find_employee
-      if found_employee.nil?
-        errors.add(:subscriber_ssn, "no census employee found")
-      end
+      errors.add(:subscriber_ssn, "no census employee found") if found_employee.nil?
     end
 
     def validate_benefit_group_assignment
@@ -35,9 +33,7 @@ module Importers
       found_employee = find_employee
       return true unless find_employee
       found_bga = find_benefit_group_assignment
-      if found_bga.nil?
-        errors.add(:subscriber_ssn, "no benefit group assignment found")
-      end
+      errors.add(:subscriber_ssn, "no benefit group assignment found") if found_bga.nil?
     end
 
     def find_plan
@@ -46,17 +42,15 @@ module Importers
       clean_hios = hios_id.strip
       corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
       @plan = Plan.where({
-        active_year: plan_year.to_i,
-        hios_id: corrected_hios_id
-      }).first
+                           active_year: plan_year.to_i,
+                           hios_id: corrected_hios_id
+                         }).first
     end
 
     def validate_plan
       return true if hios_id.blank?
       found_plan = find_plan
-      if found_plan.nil?
-        errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}")
-      end
+      errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}") if found_plan.nil?
     end
 
     def find_employee
@@ -65,15 +59,15 @@ module Importers
       found_employer = find_employer
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
-        employer_profile_id: found_employer.id,
+                                                   employer_profile_id: found_employer.id,
         # hired_on: {"$lte" => start_date},
-        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
-      })
+                                                   encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                 })
       non_terminated_employees = candidate_employees.reject do |ce|
-        (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+        !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
       end
-    
-      @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+
+      @found_employee = non_terminated_employees.max_by(&:hired_on)
     end
 
     def find_employer
@@ -91,18 +85,17 @@ module Importers
 
       if find_benefit_group_assignment.blank?
         if plan_year = employer.plan_years.published_and_expired_plan_years_by_date(employer.registered_on).first
-          employee.benefit_group_assignments << BenefitGroupAssignment.new({ 
-            benefit_group: plan_year.benefit_groups.first, 
-            start_on: plan_year.start_on, 
-            is_active: PlanYear::PUBLISHED.include?(plan_year.aasm_state)})
+          employee.benefit_group_assignments << BenefitGroupAssignment.new({
+                                                                             benefit_group: plan_year.benefit_groups.first,
+                                                                             start_on: plan_year.start_on,
+                                                                             is_active: PlanYear::PUBLISHED.include?(plan_year.aasm_state)
+                                                                           })
           employee.save
         end
       end
 
       is_new = true
-      if employee_role.present? && find_enrollments(employee_role).present?
-        is_new = false
-      end
+      is_new = false if employee_role.present? && find_enrollments(employee_role).present?
       proxy = is_new ? ::Importers::ConversionEmployeePolicy.new(@original_attributes) : ::Importers::ConversionEmployeePolicyUpdate.new(@original_attributes)
       result = proxy.save
       propagate_warnings(proxy)
@@ -132,11 +125,11 @@ module Importers
       plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
       active_plan_year = plan_years.detect{|py| (PlanYear::PUBLISHED + ['expired']).include?(py.aasm_state.to_s)}
       return [] if active_plan_year.blank?
-      
+
       family.hbx_enrollments.where({
-        :benefit_group_id.in => active_plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
-        })
+                                     :benefit_group_id.in => active_plan_year.benefit_group_ids,
+                                     :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
+                                   })
     end
   end
 end

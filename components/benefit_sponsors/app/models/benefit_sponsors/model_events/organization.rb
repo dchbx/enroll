@@ -4,15 +4,12 @@
 module BenefitSponsors
   module ModelEvents
     module Organization
-
       REGISTERED_EVENTS = [
         :welcome_notice_to_employer
       ].freeze
 
       def notify_on_create
-        if self.employer_profile
-          is_welcome_notice_to_employer = true
-        end
+        is_welcome_notice_to_employer = true if self.employer_profile
 
         REGISTERED_EVENTS.each do |event|
           next unless (event_fired = instance_eval("is_" + event.to_s))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   class Rosters::Roster
     include Mongoid::Document

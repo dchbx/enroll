@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -35,21 +37,21 @@ module BenefitSponsors
 
     let(:benefit_package) do
       instance_double(
-       BenefitSponsors::BenefitPackages::BenefitPackage
+        BenefitSponsors::BenefitPackages::BenefitPackage
       )
-   end
+    end
 
-   let(:census_employee) do
-     instance_double(
-       CensusEmployee
-     )
-   end
+    let(:census_employee) do
+      instance_double(
+        CensusEmployee
+      )
+    end
 
     before :each do
       allow(
         BenefitSponsors::BenefitPackages::EmployeeRenewals::ParameterValidator
       ).to receive(
-        :new  
+        :new
       ).and_return(syntax_validator)
       allow(syntax_validator).to receive(
         :call
@@ -188,7 +190,7 @@ module BenefitSponsors
         allow(
           BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator
         ).to receive(
-          :new  
+          :new
         ).and_return(domain_validator)
         allow(domain_validator).to receive(
           :call
@@ -268,9 +270,9 @@ module BenefitSponsors
         )
       end
       let(:error) do
-        Exception.new(
+        Exception.new
 
-        )
+
       end
 
       before :each do
@@ -278,7 +280,7 @@ module BenefitSponsors
         allow(
           BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator
         ).to receive(
-          :new  
+          :new
         ).and_return(domain_validator)
         allow(domain_validator).to receive(
           :call
@@ -294,10 +296,10 @@ module BenefitSponsors
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
             :body => JSON.dump({
-              error: error.inspect,
-              message: error.message,
-              backtrace: []
-            }),
+                                 error: error.inspect,
+                                 message: error.message,
+                                 backtrace: []
+                               }),
             :correlation_id => correlation_id
           }
         )
@@ -326,10 +328,10 @@ module BenefitSponsors
             :benefit_package_id => benefit_package_id.to_s,
             :census_employee_id => census_employee_id.to_s,
             :body => JSON.dump({
-              error: error.inspect,
-              message: error.message,
-              backtrace: []
-            }),
+                                 error: error.inspect,
+                                 message: error.message,
+                                 backtrace: []
+                               }),
             :correlation_id => correlation_id
           }
         )

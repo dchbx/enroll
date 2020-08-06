@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeePolicyUpdate < ConversionEmployeePolicyCommon
 
@@ -12,17 +14,13 @@ module Importers
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer
-      if found_employer.nil?
-        errors.add(:fein, "does not exist")
-      end
+      errors.add(:fein, "does not exist") if found_employer.nil?
     end
 
     def validate_census_employee
       return true if subscriber_ssn.blank?
       found_employee = find_employee
-      if found_employee.nil?
-        errors.add(:subscriber_ssn, "no census employee found")
-      end
+      errors.add(:subscriber_ssn, "no census employee found") if found_employee.nil?
     end
 
     def validate_benefit_group_assignment
@@ -30,17 +28,13 @@ module Importers
       found_employee = find_employee
       return true unless find_employee
       found_bga = find_benefit_group_assignment
-      if found_bga.nil?
-        errors.add(:subscriber_ssn, "no benefit group assignment found")
-      end
+      errors.add(:subscriber_ssn, "no benefit group assignment found") if found_bga.nil?
     end
 
     def validate_plan
       return true if hios_id.blank?
       found_plan = find_plan
-      if found_plan.nil?
-        errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}")
-      end
+      errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}") if found_plan.nil?
     end
 
     def find_employee
@@ -49,26 +43,26 @@ module Importers
       found_employer = find_employer
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
-        employer_profile_id: found_employer.id,
+                                                   employer_profile_id: found_employer.id,
         # hired_on: {"$lte" => start_date},
-        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
-      })
+                                                   encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                 })
       non_terminated_employees = candidate_employees.reject do |ce|
-        (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+        !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
       end
-    
-      @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+
+      @found_employee = non_terminated_employees.max_by(&:hired_on)
     end
 
-    def find_plan 
+    def find_plan
       return @plan unless @plan.nil?
       return nil if hios_id.blank?
       clean_hios = hios_id.strip
       corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
       @plan = Plan.where({
-        active_year: plan_year.to_i,
-        hios_id: corrected_hios_id
-      }).first
+                           active_year: plan_year.to_i,
+                           hios_id: corrected_hios_id
+                         }).first
     end
 
     def find_employer
@@ -112,17 +106,17 @@ module Importers
         errors.add(:base, "plan year missing")
         return false
       end
-      
+
       enrollments = family.hbx_enrollments.where({
-        :benefit_group_id.in => plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
-        }).by_coverage_kind('health').order(created_at: :desc).to_a
+                                                   :benefit_group_id.in => plan_year.benefit_group_ids,
+                                                   :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + ["coverage_expired"]
+                                                 }).by_coverage_kind('health').order(created_at: :desc).to_a
 
       if enrollments.empty?
         errors.add(:base, "enrollment missing!")
         return false
       end
-  
+
       enrollment = enrollments.shift
 
       # if enrollments.size > 1
@@ -149,23 +143,24 @@ module Importers
       end
     end
 
-    def get_passively_renewed_coverage(employer, family)
+    def get_passively_renewed_coverage(employer, _family)
       renewed_plan_year = employer.renewing_published_plan_year
       if expired_plan_year = employer.plan_years.where(:aasm_state => 'expired').first
         renewed_plan_year = employer.plan_years.where({
-          :start_on => (expired_plan_year.start_on + 1.year), 
-          :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED}).first
+                                                        :start_on => (expired_plan_year.start_on + 1.year),
+                                                        :aasm_state.in => PlanYear::RENEWING_PUBLISHED_STATE + PlanYear::PUBLISHED
+                                                      }).first
       end
-    
+
       if renewed_plan_year.blank?
         warnings.add(:base, "renewed/renewing plan year missing")
         return true
       end
 
       enrollments = HbxEnrollment.where({
-        :benefit_group_id.in => renewed_plan_year.benefit_group_ids,
-        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
-        }).by_coverage_kind('health')
+                                          :benefit_group_id.in => renewed_plan_year.benefit_group_ids,
+                                          :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES + HbxEnrollment::RENEWAL_STATUSES
+                                        }).by_coverage_kind('health')
 
       if enrollments.empty?
         warnings.add(:base, "renewal enrollment missing!")
@@ -173,7 +168,7 @@ module Importers
       end
 
       renewal_enrollments = enrollments.select{|e| e.auto_renewing? || e.workflow_state_transitions.where(:to_state => 'auto_renewing').present?}
-      
+
       if (enrollments - renewal_enrollments).present?
         warnings.add(:base, "employee already made plan selection")
         return true
@@ -187,7 +182,7 @@ module Importers
       renewal_enrollments.first
     end
 
-    def update_coverage_dependents(family, enrollment, employer, plan)
+    def update_coverage_dependents(family, enrollment, employer, _plan)
       people = map_dependents.inject([]) do |people, dependent|
 
         matched = Person.match_by_id_info(ssn: dependent.ssn, dob: dependent.dob, last_name: dependent.last_name, first_name: dependent.first_name)
@@ -195,9 +190,7 @@ module Importers
 
         if matched.empty?
           alternate_member = alternate_family_member_record(family, dependent)
-          if dependent.ssn.present? && alternate_member.present? && alternate_member.person.ssn != dependent.ssn
-            alternate_member.person.update_attributes(ssn: dependent.ssn)
-          end
+          alternate_member.person.update_attributes(ssn: dependent.ssn) if dependent.ssn.present? && alternate_member.present? && alternate_member.person.ssn != dependent.ssn
           people << (alternate_member.present? ? alternate_member.person : Factories::EnrollmentFactory.initialize_dependent(family, primary, dependent))
         else
           person = matched.detect{|match| family.find_family_member_by_person(match).present? }
@@ -216,11 +209,11 @@ module Importers
       family.reload
       enrollment.reload
 
-      filter_people_for_removal = Proc.new{|enrollment, people|
-        enrollment.hbx_enrollment_members.inject([]){|people_to_delete, enrollment_member| 
+      filter_people_for_removal = proc do |enrollment, people|
+        enrollment.hbx_enrollment_members.inject([]) do |people_to_delete, enrollment_member|
           (people + [enrollment.subscriber.person]).include?(enrollment_member.person) ? people_to_delete : (people_to_delete << enrollment_member.person)
-        }
-      }
+        end
+      end
 
       people_for_removal = filter_people_for_removal.call(enrollment, people)
       if update_enrollment_members(family, enrollment, people)
@@ -256,18 +249,18 @@ module Importers
         enrollment_members = enrollment.hbx_enrollment_members
         enrollment_members.reject!{|em| em.family_member == family_member}
         enrollment_members << enrollment.hbx_enrollment_members.build({
-          applicant_id: alternate_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
-        })
+                                                                        applicant_id: alternate_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
+                                                                      })
 
         enrollment.hbx_enrollment_members = enrollment_members
         enrollment.save
       end
     end
 
-    def update_enrollment_members(family, enrollment, people, passive=false)
+    def update_enrollment_members(family, enrollment, people, passive = false)
       added = []
       dropped = []
-      enrollment_members = enrollment.hbx_enrollment_members.select{|em| em.is_subscriber? }
+      enrollment_members = enrollment.hbx_enrollment_members.select(&:is_subscriber?)
       hh = family.active_household
       ch = hh.immediate_family_coverage_household
 
@@ -279,18 +272,16 @@ module Importers
           family.save
 
           enrollment_member = enrollment.hbx_enrollment_members.build({
-            applicant_id: family_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
-          })
-          added << "#{family_member.person.full_name}"
+                                                                        applicant_id: family_member.id, eligibility_date: enrollment.effective_on, coverage_start_on: enrollment.effective_on
+                                                                      })
+          added << family_member.person.full_name.to_s
         end
 
         enrollment_members << enrollment_member if enrollment_member
       end
 
       enrollment.hbx_enrollment_members.each do |enrollment_member|
-        if !people.include?(enrollment_member.person) && !enrollment_member.is_subscriber?
-          dropped << "#{enrollment_member.person.full_name}(#{enrollment_member.person.ssn})"
-        end
+        dropped << "#{enrollment_member.person.full_name}(#{enrollment_member.person.ssn})" if !people.include?(enrollment_member.person) && !enrollment_member.is_subscriber?
       end
 
       enrollment.hbx_enrollment_members = enrollment_members
@@ -302,10 +293,10 @@ module Importers
         msg_str += "Added " + (added.join(',') + " to the #{'renewed' if passive} enrollment") if added.any?
         msg_str += "Dropped " + (dropped.join(',') + "from the #{'renewed' if passive} enrollment") if dropped.any?
         warnings.add(:base, msg_str) unless msg_str.blank?
-        return true
+        true
       else
         enrollment.errors.each{|attr, err| errors.add("family_" + attr.to_s, err)}
-        return false
+        false
       end
     end
 
@@ -317,9 +308,7 @@ module Importers
       dob = self.send("dep_#{dep_idx}_dob".to_sym)
       ssn = self.send("dep_#{dep_idx}_ssn".to_sym)
       gender = self.send("dep_#{dep_idx}_gender".to_sym)
-      if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
-        return nil
-      end
+      return nil if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
       attr_hash = {
         first_name: first_name,
         last_name: last_name,
@@ -327,9 +316,7 @@ module Importers
         employee_relationship: relationship,
         gender: gender
       }
-      unless middle_name.blank?
-        attr_hash[:middle_name] = middle_name
-      end
+      attr_hash[:middle_name] = middle_name unless middle_name.blank?
       unless ssn.blank?
         if ssn == subscriber_ssn
           warnings.add("dependent_#{dep_idx}_ssn", "ssn same as subscriber, blanking for import")
@@ -346,7 +333,7 @@ module Importers
       end.compact
     end
 
-    def update_plan_for_passive_renewal(family, renewing_plan_year, renewal_plan)
+    def update_plan_for_passive_renewal(_family, renewing_plan_year, renewal_plan)
       enrollments = HbxEnrollment.where(:benefit_group_id.in => renewing_plan_year.benefit_group_ids)
 
       if enrollments.enrolled.present?
@@ -356,58 +343,56 @@ module Importers
 
       if enrollments.renewing.size > 1
         errors.add(:base, "duplicate passive renewals found!")
-        return false        
+        return false
       end
 
       if enrollments.renewing.blank?
-        return true
+        true
       else
         if renewal_plan.blank?
           errors.add(:base, "renewal plan missing!")
-          return false  
+          return false
         end
         enrollments.renewing.first.update_attributes(plan_id: renewal_plan.id)
-        return true
+        true
       end
     end
 
     def save
-      begin
-        return false unless valid?
-        employer = find_employer
+      return false unless valid?
+      employer = find_employer
 
-        person = find_person
-        return false unless person
-        # puts '----processing ' + person.full_name
+      person = find_person
+      return false unless person
+      # puts '----processing ' + person.full_name
 
-        family = person.primary_family
-        enrollment = find_current_enrollment(family, employer)
-        return false unless enrollment
-        
-        plan = find_plan
-        return false unless update_coverage_dependents(family, enrollment, employer, plan)
-        
-        if enrollment.plan_id != plan.id
-          enrollment.update_attributes(plan_id: plan.id)
-          if renewing_plan_year = employer.plan_years.renewing.first
-            update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
-          end
-          return true
-        else
-          errors.add(:base, "already have coverage with same hios id")
-          return false
+      family = person.primary_family
+      enrollment = find_current_enrollment(family, employer)
+      return false unless enrollment
+
+      plan = find_plan
+      return false unless update_coverage_dependents(family, enrollment, employer, plan)
+
+      if enrollment.plan_id != plan.id
+        enrollment.update_attributes(plan_id: plan.id)
+        if renewing_plan_year = employer.plan_years.renewing.first
+          update_plan_for_passive_renewal(family, renewing_plan_year, plan.renewal_plan)
         end
-      rescue Exception => e
-        errors.add(:base, e.to_s)
-        return false
+        true
+      else
+        errors.add(:base, "already have coverage with same hios id")
+        false
       end
+    rescue Exception => e
+      errors.add(:base, e.to_s)
+      false
     end
 
     def cancel_other_enrollments_for_bga(bga)
       enrollments = HbxEnrollment.find_enrollments_by_benefit_group_assignment(bga)
       enrollments.each do |en|
         en.hbx_enrollment_members.each do |hen|
-           hen.coverage_end_on = hen.coverage_start_on
+          hen.coverage_end_on = hen.coverage_start_on
         end
         en.terminated_on = en.effective_on
         en.aasm_state = "coverage_canceled"

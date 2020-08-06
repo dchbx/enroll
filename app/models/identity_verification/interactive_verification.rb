@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IdentityVerification
   class InteractiveVerification
     class Response
@@ -28,9 +30,10 @@ module IdentityVerification
       def responses
         @responses ||= []
       end
+
       def responses_attributes=(vals)
         @responses = []
-        vals.each_pair do |k, v|
+        vals.each_pair do |_k, v|
           @responses << ::IdentityVerification::InteractiveVerification::Response.new(v)
         end
       end
@@ -45,9 +48,7 @@ module IdentityVerification
     validate :questions_have_responses
 
     def questions_have_responses
-      if questions.any?(&:unanswered?)
-        errors.add(:base, "You must answer all questions")
-      end
+      errors.add(:base, "You must answer all questions") if questions.any?(&:unanswered?)
     end
 
     def questions
@@ -56,7 +57,7 @@ module IdentityVerification
 
     def questions_attributes=(vals)
       @questions = []
-      vals.each_pair do |k, v|
+      vals.each_pair do |_k, v|
         @questions << ::IdentityVerification::InteractiveVerification::Question.new(v)
       end
     end

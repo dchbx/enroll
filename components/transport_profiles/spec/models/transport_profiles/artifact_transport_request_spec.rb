@@ -1,13 +1,13 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module TransportProfiles
   module Processes
     class TestingStubTransportProcess
-      def initialize(file_name, gateway, destination_file_name: nil, source_credentials: nil)
-      end
+      def initialize(file_name, gateway, destination_file_name: nil, source_credentials: nil); end
 
-      def execute
-      end
+      def execute; end
     end
   end
 
@@ -17,15 +17,15 @@ module TransportProfiles
     end
 
     it "requires file_name" do
-      expect(subject.errors.has_key?(:file_name)).to be_truthy
+      expect(subject.errors.key?(:file_name)).to be_truthy
     end
 
     it "requires transport_process" do
-      expect(subject.errors.has_key?(:transport_process)).to be_truthy
+      expect(subject.errors.key?(:transport_process)).to be_truthy
     end
 
     it "requires artifact_key" do
-      expect(subject.errors.has_key?(:artifact_key)).to be_truthy
+      expect(subject.errors.key?(:artifact_key)).to be_truthy
     end
   end
 
@@ -76,7 +76,7 @@ module TransportProfiles
       allow(TransportProfiles::WellKnownEndpoint).to receive(:find_by_endpoint_key).with("aca_internal_artifact_transport").and_return([source_endpoint])
     end
 
-    it "is valid" do 
+    it "is valid" do
       expect(subject.valid?).to be_truthy
     end
 

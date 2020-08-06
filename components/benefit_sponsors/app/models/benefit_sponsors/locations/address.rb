@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Locations
     class Address
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      KINDS = %W(home work mailing)
-      OFFICE_KINDS = %W(primary mailing branch)
+      KINDS = %w[home work mailing].freeze
+      OFFICE_KINDS = %w[primary mailing branch].freeze
 
       # The type of address
       field :kind, type: String
@@ -39,24 +41,24 @@ module BenefitSponsors
       validates :kind, presence: true # , unless: :plan_design_model?
 
       validates :kind,
-        inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
-        allow_blank:true
+                inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
+                allow_blank: true
 
       validates :address_1, presence: {message: "Please enter address_1"}
       validates :city, presence: {message: "Please enter city"}
 
       validates :zip,
-        allow_blank: false,
-        format: {
-            :with => /\A\d{5}(-\d{4})?\z/,
-            :message => "should be in the form: 12345 or 12345-1234"
-          }
+                allow_blank: false,
+                format: {
+                  :with => /\A\d{5}(-\d{4})?\z/,
+                  :message => "should be in the form: 12345 or 12345-1234"
+                }
       embedded_in :office_location
 
 
 
       # def plan_design_model?
-      #   _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
+      #   _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
       # end
 
       # @note Add support for GIS location
@@ -89,9 +91,9 @@ module BenefitSponsors
       # @return [ String ] the full address
       def to_html
         if address_2.blank?
-          "<div>#{address_1.strip()}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+          "<div>#{address_1.strip}</div><div>#{city}, #{state} #{zip}</div>".html_safe
         else
-          "<div>#{address_1.strip()}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+          "<div>#{address_1.strip}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
         end
       end
 
@@ -102,7 +104,7 @@ module BenefitSponsors
       #
       # @return [ String ] the full address
       def to_s
-        city.present? ? city_delim = city + "," : city_delim = city
+        city_delim = city.present? ? city + "," : city
         line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
         [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
       end
@@ -110,7 +112,7 @@ module BenefitSponsors
       def to_a
         [kind, address_1, address_2.to_s, city, state, zip]
       end
-    
+
       # Get the full address formatted as a string
       #
       # @example Get the full address formatted as a string
@@ -118,7 +120,7 @@ module BenefitSponsors
       #
       # @return [ String ] the full address
       def full_address
-        city.present? ? city_delim = city + "," : city_delim = city
+        city_delim = city.present? ? city + "," : city
         [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
       end
 
@@ -235,11 +237,7 @@ module BenefitSponsors
       # @return [ String ] The four digit zip code extension.
       def zip_extension
         return nil if zip.blank?
-        if zip =~ /-/
-          zip.split("-").last
-        else
-          nil
-        end
+        zip.split("-").last if zip =~ /-/
       end
 
       # Determine if this address is type: "mailing"
@@ -259,7 +257,7 @@ module BenefitSponsors
       #
       # @return [ true, false ] true if home type, false if not home type
       def home?
-        "home" == self.kind.to_s
+        self.kind.to_s == "home"
       end
 
       # Compare passed address with this address

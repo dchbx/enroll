@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 EnrollRegistry = ResourceRegistry::Registry.new
 
 EnrollRegistry.configure do |config|

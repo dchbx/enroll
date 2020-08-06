@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', dbclean: :after_each do
@@ -9,12 +11,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:model_instance)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { model_instance.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_eligible',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:benefit_application) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'enrollment_eligible',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
 
   describe "ModelEvent" do
     it "should trigger model event" do
@@ -47,7 +50,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employer_profile.notice_date",
         "employer_profile.account_number",
@@ -56,15 +59,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
         "employer_profile.coverage_month",
         "employer_profile.date_due"
       ]
-    }
+    end
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
         "event_object_id" => benefit_application.id
-    } }
+      }
+    end
 
     context "when notice event received" do
 
@@ -81,24 +86,24 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
       end
 
       it "should retrun account number" do
-        expect(merge_model.account_number).to eq (model_instance.organization.hbx_id)
+        expect(merge_model.account_number).to eq model_instance.organization.hbx_id
       end
 
       it "should retrun invoice number" do
-        expect(merge_model.invoice_number).to eq (model_instance.organization.hbx_id+DateTime.now.next_month.strftime('%m%Y'))
+        expect(merge_model.invoice_number).to eq (model_instance.organization.hbx_id + DateTime.now.next_month.strftime('%m%Y'))
       end
 
       it "should retrun invoice date" do
-        expect(merge_model.invoice_date).to eq (TimeKeeper.date_of_record.strftime("%m/%d/%Y"))
+        expect(merge_model.invoice_date).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
       end
 
       it "should retrun coverage month" do
-        expect(merge_model.coverage_month).to eq (TimeKeeper.date_of_record.next_month.strftime("%m/%Y"))
+        expect(merge_model.coverage_month).to eq TimeKeeper.date_of_record.next_month.strftime("%m/%Y")
       end
 
       it "should retrun due date" do
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        expect(merge_model.date_due).to eq (schedular.calculate_open_enrollment_date(benefit_application.is_renewing? ,TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y"))
+        expect(merge_model.date_due).to eq schedular.calculate_open_enrollment_date(benefit_application.is_renewing?,TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
       end
     end
   end

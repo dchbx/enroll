@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Commonly used email steps
 #
 # To add your own steps make a custom_email_steps.rb
@@ -60,7 +62,7 @@ Then /^(?:I|they|"([^"]*?)") should receive (an|no|\d+) emails? with subject "([
   unread_emails_for(address).select { |m| m.subject =~ Regexp.new(Regexp.escape(subject)) }.size.should == parse_email_count(amount)
 end
 
-Then /^(?:I|they|"([^"]*?)") should receive (an|no|\d+) emails? with subject \/([^"]*?)\/$/ do |address, amount, subject|
+Then %r{^(?:I|they|"([^"]*?)") should receive (an|no|\d+) emails? with subject /([^"]*?)/$} do |address, amount, subject|
   unread_emails_for(address).select { |m| m.subject =~ Regexp.new(subject) }.size.should == parse_email_count(amount)
 end
 
@@ -81,7 +83,7 @@ When /^(?:I|they|"([^"]*?)") opens? the email with subject "([^"]*?)"$/ do |addr
   open_email(address, :with_subject => subject)
 end
 
-When /^(?:I|they|"([^"]*?)") opens? the email with subject \/([^"]*?)\/$/ do |address, subject|
+When %r{^(?:I|they|"([^"]*?)") opens? the email with subject /([^"]*?)/$} do |address, subject|
   open_email(address, :with_subject => Regexp.new(subject))
 end
 
@@ -89,7 +91,7 @@ When /^(?:I|they|"([^"]*?)") opens? the email with text "([^"]*?)"$/ do |address
   open_email(address, :with_text => text)
 end
 
-When /^(?:I|they|"([^"]*?)") opens? the email with text \/([^"]*?)\/$/ do |address, text|
+When %r{^(?:I|they|"([^"]*?)") opens? the email with text /([^"]*?)/$} do |address, text|
   open_email(address, :with_text => Regexp.new(text))
 end
 
@@ -101,7 +103,7 @@ Then /^(?:I|they) should see "([^"]*?)" in the email subject$/ do |text|
   current_email.should have_subject(text)
 end
 
-Then /^(?:I|they) should see \/([^"]*?)\/ in the email subject$/ do |text|
+Then %r{^(?:I|they) should see /([^"]*?)/ in the email subject$} do |text|
   current_email.should have_subject(Regexp.new(text))
 end
 
@@ -109,7 +111,7 @@ Then /^(?:I|they) should see "([^"]*?)" in the email body$/ do |text|
   current_email.default_part_body.to_s.should include(text)
 end
 
-Then /^(?:I|they) should see \/([^"]*?)\/ in the email body$/ do |text|
+Then %r{^(?:I|they) should see /([^"]*?)/ in the email body$} do |text|
   current_email.default_part_body.to_s.should =~ Regexp.new(text)
 end
 
@@ -121,20 +123,20 @@ Then /^(?:I|they) should see "([^\"]*)" in the email "([^"]*?)" header$/ do |tex
   current_email.should have_header(name, text)
 end
 
-Then /^(?:I|they) should see \/([^\"]*)\/ in the email "([^"]*?)" header$/ do |text, name|
+Then %r{^(?:I|they) should see /([^\"]*)/ in the email "([^"]*?)" header$} do |text, name|
   current_email.should have_header(name, Regexp.new(text))
 end
 
 Then /^I should see it is a multi\-part email$/ do
-    current_email.should be_multipart
+  current_email.should be_multipart
 end
 
 Then /^(?:I|they) should see "([^"]*?)" in the email html part body$/ do |text|
-    current_email.html_part.body.to_s.should include(text)
+  current_email.html_part.body.to_s.should include(text)
 end
 
 Then /^(?:I|they) should see "([^"]*?)" in the email text part body$/ do |text|
-    current_email.text_part.body.to_s.should include(text)
+  current_email.text_part.body.to_s.should include(text)
 end
 
 #
@@ -168,7 +170,7 @@ Then /^all attachments should not be blank$/ do
 end
 
 Then /^show me a list of email attachments$/ do
-  EmailSpec::EmailViewer::save_and_open_email_attachments_list(current_email)
+  EmailSpec::EmailViewer.save_and_open_email_attachments_list(current_email)
 end
 
 #
@@ -190,17 +192,17 @@ end
 #
 
 Then /^save and open current email$/ do
-  EmailSpec::EmailViewer::save_and_open_email(current_email)
+  EmailSpec::EmailViewer.save_and_open_email(current_email)
 end
 
 Then /^save and open all text emails$/ do
-  EmailSpec::EmailViewer::save_and_open_all_text_emails
+  EmailSpec::EmailViewer.save_and_open_all_text_emails
 end
 
 Then /^save and open all html emails$/ do
-  EmailSpec::EmailViewer::save_and_open_all_html_emails
+  EmailSpec::EmailViewer.save_and_open_all_html_emails
 end
 
 Then /^save and open all raw emails$/ do
-  EmailSpec::EmailViewer::save_and_open_all_raw_emails
+  EmailSpec::EmailViewer.save_and_open_all_raw_emails
 end

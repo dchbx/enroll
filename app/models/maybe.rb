@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Maybe
   def initialize(obj)
     @value = obj

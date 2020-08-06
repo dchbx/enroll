@@ -3,7 +3,7 @@
 module Notify
   include Acapi::Notifiers
 
-  def notify_change_event(obj, monitored_objs={})
+  def notify_change_event(obj, monitored_objs = {})
     modal_name = obj.class.to_s.downcase
     monitored_objs.each do |name, attributes|
       attributes.each do |field|
@@ -14,7 +14,7 @@ module Notify
         end
       end
     end
-  rescue => e
+  rescue StandardError => e
     Rails.logger(e)
   end
 
@@ -26,7 +26,7 @@ module Notify
       if obj.send(field).is_a?(Array)
         # embeds_many
         return nil if obj.send(field).blank?
-        change_items = obj.send(field).select(&:changed?) 
+        change_items = obj.send(field).select(&:changed?)
         payload = case change_items.count
                   when 0
                     nil
@@ -38,30 +38,28 @@ module Notify
       else
         # embeds_one
         if obj.send(field).respond_to?(:new_record?)
-          if obj.send(field).new_record?
-            payload = {"status" => "created", field => obj.send(field)}
-          else
-            payload = {"status" => "changed", field => obj.send(field).changes}
-          end
+          payload = if obj.send(field).new_record?
+                      {"status" => "created", field => obj.send(field)}
+                    else
+                      {"status" => "changed", field => obj.send(field).changes}
+                    end
         else
           return nil
         end
       end
     else
       # field
-      if obj.send("#{field}_changed?")
-        payload = if obj.new_record?
+      payload = if obj.send("#{field}_changed?")
+                  if obj.new_record?
                     {"status" => "created", field => obj.send("#{field}_change")}
                   else
                     {"status" => "changed", field => obj.send("#{field}_change")}
-                  end
-      else
-        payload = nil
-      end
+                            end
+                end
     end
     payload
-  rescue => e
+  rescue StandardError => e
     Rails.logger(e)
-    return nil
+    nil
   end
 end

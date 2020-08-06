@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TaxHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -19,20 +21,20 @@ class TaxHouseholdMember
 
   validate :strictly_boolean
 
-  alias_method :family_member_id, :applicant_id
+  alias family_member_id applicant_id
 
   def eligibility_determinations
     return nil unless tax_household
     tax_household.eligibility_determinations
   end
 
-  def update_eligibility_kinds eligibility_kinds
+  def update_eligibility_kinds(eligibility_kinds)
     return if eligibility_kinds.blank?
     if convert_to_bool(eligibility_kinds['is_ia_eligible']) && convert_to_bool(eligibility_kinds['is_medicaid_chip_eligible'])
-      return false
+      false
     else
       self.update_attributes eligibility_kinds
-      return true
+      true
     end
   end
 
@@ -58,17 +60,11 @@ class TaxHouseholdMember
   end
 
   def strictly_boolean
-    unless is_ia_eligible.is_a? Boolean
-      self.errors.add(:base, "is_ia_eligible should be a boolean")
-    end
+    self.errors.add(:base, "is_ia_eligible should be a boolean") unless is_ia_eligible.is_a? Boolean
 
-    unless is_medicaid_chip_eligible.is_a? Boolean
-      self.errors.add(:base, "is_medicaid_chip_eligible should be a boolean")
-    end
+    self.errors.add(:base, "is_medicaid_chip_eligible should be a boolean") unless is_medicaid_chip_eligible.is_a? Boolean
 
-    unless is_subscriber.is_a? Boolean
-      self.errors.add(:base, "is_subscriber should be a boolean")
-    end
+    self.errors.add(:base, "is_subscriber should be a boolean") unless is_subscriber.is_a? Boolean
   end
 
   def person

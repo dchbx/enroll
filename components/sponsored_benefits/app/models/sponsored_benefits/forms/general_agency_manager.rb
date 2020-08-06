@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class GeneralAgencyManager
@@ -12,23 +14,23 @@ module SponsoredBenefits
       attribute :action_id
 
 
-      def self.for_assign(attrs={})
+      def self.for_assign(attrs = {})
         new(attrs)
       end
 
-      def self.for_fire(attrs={})
+      def self.for_fire(attrs = {})
         new(attrs)
       end
 
-      def self.for_index(attrs={})
+      def self.for_index(attrs = {})
         new(attrs)
       end
 
-      def self.for_default(attrs={})
+      def self.for_default(attrs = {})
         new(attrs)
       end
 
-      def self.for_clear(attrs={})
+      def self.for_clear(attrs = {})
         new(attrs)
       end
 

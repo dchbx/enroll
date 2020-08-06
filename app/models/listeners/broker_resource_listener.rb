@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Listeners
   class BrokerResourceListener < ::Acapi::Amqp::Client
     def initialize(ch, q)

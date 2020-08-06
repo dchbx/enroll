@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -16,7 +18,7 @@ module SponsoredBenefits
     let(:end_of_month) { Date.today.end_of_month }
     let(:initial_enrollment_period) { (beginning_of_next_month..(beginning_of_next_month + 1.year - 1.day)) }
 
-    let(:valid_attributes) {
+    let(:valid_attributes) do
       {
         title: 'A Proposal Title',
         effective_date: beginning_of_next_month.strftime("%Y-%m-%d"),
@@ -31,10 +33,10 @@ module SponsoredBenefits
           }
         }
       }
-    }
+    end
 
 
-    let(:invalid_attributes) {
+    let(:invalid_attributes) do
       {
         title: 'A Proposal Title',
         effective_date: beginning_of_next_month.strftime("%Y-%m-%d"),
@@ -49,7 +51,7 @@ module SponsoredBenefits
           }
         }
       }
-    }
+    end
 
     # This should return the minimal set of values that should be in the session
     # in order to pass any filters (e.g. authentication) defined in
@@ -101,9 +103,9 @@ module SponsoredBenefits
     describe "POST #create" do
       context "with valid params" do
         it "creates a new Organizations::PlanDesignProposal" do
-          expect {
+          expect do
             post :create, xhr: true, params: { plan_design_organization_id: plan_design_organization.to_param, forms_plan_design_proposal: valid_attributes }
-          }.to change { plan_design_organization.reload.plan_design_proposals.count }.by(1)
+          end.to change { plan_design_organization.reload.plan_design_proposals.count }.by(1)
         end
       end
 

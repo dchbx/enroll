@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -9,7 +11,7 @@ module BenefitSponsors
     let(:roster_entry) do
       ::BenefitSponsors::Members::MemberGroup.new(
         roster_members,
-        group_enrollment: group_enrollment,
+        group_enrollment: group_enrollment
       )
     end
 
@@ -64,12 +66,12 @@ module BenefitSponsors
       - with 'employee' and 'spouse' groups
       - where all groups offered coverage by the sponsor" do
 
-      let(:contribution_model) { 
+      let(:contribution_model) do
         instance_double(
           ::BenefitMarkets::ContributionModels::ContributionModel,
           contribution_units: [spouse_contribution_unit]
         )
-      }
+      end
 
       let(:spouse_contribution_unit) do
         instance_double(
@@ -190,36 +192,36 @@ module BenefitSponsors
 
       let(:contribution_model) do
         instance_double(
-      ::BenefitMarkets::ContributionModels::ContributionModel,
+          ::BenefitMarkets::ContributionModels::ContributionModel,
           contribution_units: [employee_contribution_unit, spouse_contribution_unit]
         )
       end
 
       let(:employee_contribution_unit) do
         instance_double(
-      ::BenefitMarkets::ContributionModels::ContributionUnit,
+          ::BenefitMarkets::ContributionModels::ContributionUnit,
           id: "employee_contribution_unit_id"
         )
       end
 
       let(:spouse_contribution_unit) do
         instance_double(
-      ::BenefitMarkets::ContributionModels::ContributionUnit,
+          ::BenefitMarkets::ContributionModels::ContributionUnit,
           id: "spouse_contribution_unit_id"
         )
       end
 
       let(:sponsor_contribution) do
         instance_double(
-      ::BenefitSponsors::SponsoredBenefits::SponsorContribution,
+          ::BenefitSponsors::SponsoredBenefits::SponsorContribution,
           id: "a sponsor_conribution_id",
-      contribution_levels: [employee_contribution_level, spouse_contribution_level]
+          contribution_levels: [employee_contribution_level, spouse_contribution_level]
         )
       end
 
       let(:employee_contribution_level) do
         instance_double(
-      ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
+          ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
           contribution_unit_id: "employee_contribution_unit_id",
           is_offered: true
         )
@@ -227,7 +229,7 @@ module BenefitSponsors
 
       let(:spouse_contribution_level) do
         instance_double(
-      ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
+          ::BenefitSponsors::SponsoredBenefits::ContributionLevel,
           contribution_unit_id: "spouse_contribution_unit_id",
           is_offered: false
         )

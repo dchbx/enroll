@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LegacyImporters
   class ShopPolicy
     attr_reader :errors
@@ -36,7 +38,7 @@ module LegacyImporters
       sc.call(@data_hash)
     end
 
-    def enrollment_properties_hash(bg, ce, plan, ch, member_props)
+    def enrollment_properties_hash(bg, ce, plan, _ch, member_props)
       e_on = member_props.map { |mp| mp[:coverage_start_on] }.min
       {
         :hbx_id => @hbx_id,
@@ -60,21 +62,17 @@ module LegacyImporters
           :coverage_start_on => Date.strptime(en["coverage_start"], "%Y%m%d"),
           :eligibility_date => Date.strptime(en["coverage_start"], "%Y%m%d")
         }
-        if !prop_hash["coverage_end"].blank?
-          prop_hash[:coverage_end_on] = Date.strptime(en["coverage_end"], "%Y%m%d")
-        end
+        prop_hash[:coverage_end_on] = Date.strptime(en["coverage_end"], "%Y%m%d") unless prop_hash["coverage_end"].blank?
         prop_hash
       end
     end
 
     def find_roster_entry(employer, person, bg)
       first_pass = CensusEmployee.by_benefit_group_ids([bg.id]).by_ssn(person.ssn).first
-      return first_pass if !first_pass.nil?
+      return first_pass unless first_pass.nil?
       CensusEmployee.roster_import_fallback_match(person.first_name, person.last_name, person.dob, bg.id).first.tap do |er|
         throw :missing_object, "Could not match employee for FEIN #{employer.fein}, SSN #{person.ssn}" if er.nil?
-        if !person.ssn.blank?
-          er.update_attributes!(:ssn => person.ssn, :aasm_state => "eligible")
-        end
+        er.update_attributes!(:ssn => person.ssn, :aasm_state => "eligible") unless person.ssn.blank?
       end
     end
 
@@ -101,7 +99,7 @@ module LegacyImporters
 
     def locate_head_of_family(data)
       Person.where(:hbx_id => data["subscriber_id"]).first.tap do |person|
-        throw :missing_object, "Could not find subscriber with hbx_id: #{data["subscriber_id"]}" if person.nil?
+        throw :missing_object, "Could not find subscriber with hbx_id: #{data['subscriber_id']}" if person.nil?
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GroupSelectionPrevaricationAdapter
   attr_accessor :person
   attr_accessor :family
@@ -62,9 +64,7 @@ class GroupSelectionPrevaricationAdapter
 
   def if_employee_role_unset_but_can_be_derived(e_role_value)
     return if e_role_value.present?
-    if @person.has_active_employee_role?
-      @person.active_employee_roles.first
-    end
+    @person.active_employee_roles.first if @person.has_active_employee_role?
   end
 
   def if_previous_enrollment_was_special_enrollment
@@ -121,7 +121,7 @@ class GroupSelectionPrevaricationAdapter
 
   def benefit_group_assignment_by_plan_year(employee_role, benefit_group, change_plan)
     benefit_group.plan_year.is_renewing? ?
-      employee_role.census_employee.renewal_benefit_group_assignment : (benefit_group.plan_year.aasm_state == "expired" && (change_plan == 'change_by_qle' or enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first : employee_role.census_employee.active_benefit_group_assignment
+      employee_role.census_employee.renewal_benefit_group_assignment : benefit_group.plan_year.aasm_state == "expired" && ((change_plan == 'change_by_qle') || (enrollment_kind == 'sep')) ? employee_role.census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first : employee_role.census_employee.active_benefit_group_assignment
   end
 
   def set_mc_variables
@@ -138,12 +138,12 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def disable_market_kinds(params)
-    if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
-      d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") ? "individual" : "shop"
+    if @change_plan == 'change_by_qle' || @enrollment_kind == 'sep'
+      d_market_kind = select_market(params) == "shop" || select_market(params) == "fehb" ? "individual" : "shop"
     else
       d_market_kind = 'individual' if (@person.consumer_role.present? || @person.resident_role.present?) && !is_under_ivl_open_enrollment?
 
-      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle?
+      d_market_kind = 'shop' unless @employee_role&.is_eligible_to_enroll_without_qle?
     end
 
     yield d_market_kind
@@ -174,37 +174,32 @@ class GroupSelectionPrevaricationAdapter
   def calculate_effective_on(market_kind:, employee_role:, benefit_group:)
     HbxEnrollment.calculate_effective_on_from(
       market_kind: market_kind,
-      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      qle: ((@change_plan == 'change_by_qle') || (@enrollment_kind == 'sep')),
       family: @family,
       employee_role: employee_role,
       benefit_group: benefit_group,
-      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship))
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+    )
   end
 
   def if_qle_with_date_option_selected(params)
-    if params[:effective_on_option_selected].present?
-      yield Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y')
-    end
+    yield Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
   end
 
-  def if_change_plan_selected(params)
-    if @change_plan == 'change_plan' && @previous_hbx_enrollment.present?
-      yield @previous_hbx_enrollment.effective_on
-    end
+  def if_change_plan_selected(_params)
+    yield @previous_hbx_enrollment.effective_on if @change_plan == 'change_plan' && @previous_hbx_enrollment.present?
   end
 
   def if_should_generate_coverage_family_members_for_cobra(params)
     if (select_market(params) == "shop" || select_market(params) == "fehb") && !(@change_plan == 'change_by_qle' || @enrollment_kind == 'sep') && possible_employee_role.present? && possible_employee_role.is_cobra_status?
-      hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect { |hbx| hbx.may_terminate_coverage? }
-      if hbx_enrollment.present?
-        yield(hbx_enrollment.hbx_enrollment_members.map(&:family_member))
-      end
+      hbx_enrollment = @family.active_household.hbx_enrollments.shop_market.enrolled_and_renewing.effective_desc.detect(&:may_terminate_coverage?)
+      yield(hbx_enrollment.hbx_enrollment_members.map(&:family_member)) if hbx_enrollment.present?
     end
   end
 
   def if_hbx_enrollment_unset_and_sep_or_qle_change_and_can_derive_previous_shop_enrollment(params, enrollment, new_effective_date)
     if (select_market(params) == 'shop' || select_market(params) == 'fehb') && (@change_plan == 'change_by_qle') && enrollment.blank?
-      
+
       prev_enrollment = find_previous_enrollment_for(params, new_effective_date)
       if prev_enrollment
         yield prev_enrollment
@@ -222,7 +217,7 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
-  def find_previous_enrollment_for(params, new_effective_date)
+  def find_previous_enrollment_for(_params, new_effective_date)
     @family.households.flat_map(&:hbx_enrollments).detect do |other_enrollment|
       (other_enrollment.employee_role_id == possible_employee_role.id) &&
         other_enrollment.active_during?(new_effective_date) &&
@@ -231,41 +226,39 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def is_qle?
-    (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    ((@change_plan == 'change_by_qle') || (@enrollment_kind == 'sep'))
   end
 
   def select_benefit_group(params)
     return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
-    if possible_employee_role.present?
-      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?)
-    end
+    assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?) if possible_employee_role.present?
 
     if @change_plan.present? && @previous_hbx_enrollment.present?
       possible_benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
       return possible_benefit_package if assigned_benefit_package && assigned_benefit_package.start_on != possible_benefit_package.start_on
     end
-    
+
     assigned_benefit_package
   end
 
   def renewal_enrollment(enrollments, employee_role)
     enrollments.where({
-      :"benefit_group_id" => employee_role.census_employee.renewal_published_benefit_group.try(:id),
-      :"aasm_state".in => HbxEnrollment::RENEWAL_STATUSES
-    }).first
+                        :benefit_group_id => employee_role.census_employee.renewal_published_benefit_group.try(:id),
+                        :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES
+                      }).first
   end
 
   def active_enrollment(enrollments, employee_role)
     enrollments.where({
-      :"benefit_group_id" => employee_role.census_employee.active_benefit_group.try(:id),
-      :"aasm_state".in => HbxEnrollment::ENROLLED_STATUSES
-    }).first
+                        :benefit_group_id => employee_role.census_employee.active_benefit_group.try(:id),
+                        :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES
+                      }).first
   end
 
   def select_market(params)
     return params[:market_kind] if params[:market_kind].present?
-    if params[:qle_id].present? && (!person.has_active_resident_role?)
+    if params[:qle_id].present? && !person.has_active_resident_role?
       qle = QualifyingLifeEventKind.find(params[:qle_id])
       return qle.market_kind
     end
@@ -277,8 +270,6 @@ class GroupSelectionPrevaricationAdapter
       'individual'
     elsif person.is_resident_role_active?
       'coverall'
-    else
-      nil
     end
   end
 
@@ -289,7 +280,7 @@ class GroupSelectionPrevaricationAdapter
   # SHOP enrollment creation adapters
   def build_shop_change_enrollment(
     controller_employee_role,
-    controller_change_plan,
+    _controller_change_plan,
     family_member_ids
   )
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
@@ -302,7 +293,8 @@ class GroupSelectionPrevaricationAdapter
   )
     build_new_shop_enrollment_for_family_members(
       controller_employee_role,
-      family_member_ids)
+      family_member_ids
+    )
   end
 
   def build_new_shop_waiver_enrollment(controller_employee_role, params)
@@ -312,7 +304,7 @@ class GroupSelectionPrevaricationAdapter
 
   def build_change_shop_waiver_enrollment(
     controller_employee_role,
-    controller_change_plan,
+    _controller_change_plan,
     params
   )
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
@@ -347,14 +339,11 @@ class GroupSelectionPrevaricationAdapter
     can_shop_individual?(person) && can_shop_shop?(person)
   end
 
-
   def is_eligible_for_dental?(employee_role, change_plan, enrollment)
     if change_plan == "change_by_qle"
       family = employee_role.person.primary_family
       benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
-      if benefit_package.blank?
-        benefit_package = employee_role.benefit_package(qle: true) || employee_role.census_employee.possible_benefit_package
-      end
+      benefit_package = employee_role.benefit_package(qle: true) || employee_role.census_employee.possible_benefit_package if benefit_package.blank?
       benefit_package.present? && benefit_package.is_offering_dental?
     else
       renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
@@ -381,10 +370,10 @@ class GroupSelectionPrevaricationAdapter
     benefit_group = get_benefit_group(@benefit_group, employee_role, qle)
 
     # Here we need to use the complex method to determine if this member is eligible to enroll
-    [ 
-      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start), 
+    [
+      eligibility_checker(benefit_group, :health).can_cover?(family_member, coverage_start),
       eligibility_checker(benefit_group, :dental).can_cover?(family_member, coverage_start)
-    ]
+]
   end
 
   def eligibility_checker(benefit_group, coverage_kind)
@@ -395,17 +384,13 @@ class GroupSelectionPrevaricationAdapter
     class_names = @person.active_employee_roles.inject([]) do |class_names, employee_role|
       is_health_coverage, is_dental_coverage = shop_health_and_dental_attributes(family_member, employee_role, coverage_start, qle)
 
-      if !is_health_coverage && !is_health_coverage.nil?
-        class_names << "ineligible_health_row_#{employee_role.id}"
-      end
+      class_names << "ineligible_health_row_#{employee_role.id}" if !is_health_coverage && !is_health_coverage.nil?
 
-      if !is_dental_coverage && !is_dental_coverage.nil?
-        class_names << "ineligible_dental_row_#{employee_role.id}"
-      end
+      class_names << "ineligible_dental_row_#{employee_role.id}" if !is_dental_coverage && !is_dental_coverage.nil?
       class_names
     end
 
-    class_names << "ineligible_ivl_row" if (!is_ivl_coverage.nil? && !is_ivl_coverage)
+    class_names << "ineligible_ivl_row" if !is_ivl_coverage.nil? && !is_ivl_coverage
     class_names << "is_primary" if family_member.is_primary_applicant?
 
     class_names.to_sentence.gsub("and", '').gsub(",", "")
@@ -445,11 +430,9 @@ class GroupSelectionPrevaricationAdapter
     health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
     dental_offered_relationship_benefits = nil
 
-    if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
-      dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
-    end
+    dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group) if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
 
-    return health_offered_relationship_benefits, dental_offered_relationship_benefits
+    [health_offered_relationship_benefits, dental_offered_relationship_benefits]
   end
 
   def health_relationship_benefits(benefit_group)
@@ -467,7 +450,7 @@ class GroupSelectionPrevaricationAdapter
   end
 
   def shop_eligibility_checkers
-    @shop_eligibility_checkers ||= Hash.new
+    @shop_eligibility_checkers ||= {}
   end
 
   def shop_benefit_eligibilty_checker_for(benefit_package, coverage_kind)

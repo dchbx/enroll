@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 class HbxEnrollmentExemption
   include Mongoid::Document
   include Mongoid::Timestamps
 
-  KINDS = %W[hardship health_care_ministry_member incarceration indian_tribe_member religious_conscience]
+  KINDS = %w[hardship health_care_ministry_member incarceration indian_tribe_member religious_conscience].freeze
 
   embedded_in :family_member
 
@@ -20,7 +22,7 @@ class HbxEnrollmentExemption
   validates :kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: KINDS}
 
 

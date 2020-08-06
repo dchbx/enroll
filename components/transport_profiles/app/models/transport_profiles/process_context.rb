@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   # Represents the context of a process, and the getting and setting of values during its execution.
   class ProcessContext
@@ -5,14 +7,14 @@ module TransportProfiles
 
     def initialize(transport_process)
       @process = transport_process
-      @context_values = Hash.new
+      @context_values = {}
       @resource_cleanup_list = []
     end
 
     # Place a value into the context for use later on in the process.
     # @raise [NameError] if the name is already in use
     def put(key, value)
-      raise NameError.new("name already exists in this context", key) if @context_values.has_key?(key.to_sym)
+      raise NameError.new("name already exists in this context", key) if @context_values.key?(key.to_sym)
       @context_values[key.to_sym] = value
     end
 
@@ -28,11 +30,11 @@ module TransportProfiles
     # @yieldparam context_value [Object] the current key value, or initial_value if unset
     # @yieldreturn [Object] the new value to place in the context
     def update(key, initial_value = nil)
-      if @context_values.has_key?(key.to_sym)
-        @context_values[key.to_sym] = yield @context_values[key.to_sym]
-      else
-        @context_values[key.to_sym] = yield initial_value
-      end
+      @context_values[key.to_sym] = if @context_values.key?(key.to_sym)
+                                      yield @context_values[key.to_sym]
+                                    else
+                                      yield initial_value
+                                    end
     end
 
     # Mark a resource to be removed on process completion.

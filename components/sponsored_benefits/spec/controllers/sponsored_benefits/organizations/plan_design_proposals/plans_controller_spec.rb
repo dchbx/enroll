@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits"
 
@@ -9,9 +11,11 @@ module SponsoredBenefits
 
     let(:plans) { FactoryBot.create_list(:plan, 5, :with_premium_tables, market: 'shop')}
 
-    let(:person) { FactoryBot.create(:person, :with_broker_role).tap do |person|
-      person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
-    end }
+    let(:person) do
+      FactoryBot.create(:person, :with_broker_role).tap do |person|
+        person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+      end
+    end
 
     let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
 
@@ -28,7 +32,7 @@ module SponsoredBenefits
       end
 
       it "should set plans instance variable" do
-        expect(assigns(:plans)).to eq ([plans.first])
+        expect(assigns(:plans)).to eq [plans.first]
       end
     end
   end

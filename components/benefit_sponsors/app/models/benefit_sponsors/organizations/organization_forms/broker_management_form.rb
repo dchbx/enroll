@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class OrganizationForms::BrokerManagementForm
@@ -32,21 +34,17 @@ module BenefitSponsors
       end
 
       def termination_date=(val)
-        begin
-          @termination_date = Date.strptime(val,"%m/%d/%Y")
-          return @termination_date
-        rescue
-          return nil
-        end
+        @termination_date = Date.strptime(val,"%m/%d/%Y")
+        @termination_date
+      rescue StandardError
+        nil
       end
 
       def direct_terminate=(val)
-        begin
-          @direct_terminate = true if val.downcase == 'true'
-          @direct_terminate = false if val.downcase == 'false'
-        rescue
-          return nil
-        end
+        @direct_terminate = true if val.downcase == 'true'
+        @direct_terminate = false if val.downcase == 'false'
+      rescue StandardError
+        nil
       end
 
       def terminate

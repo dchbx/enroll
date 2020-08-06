@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BenefitGroupCongress < BenefitGroup
 
   EFFECTIVE_ON_KINDS = EFFECTIVE_ON_KINDS << "newly_designated"
@@ -44,10 +46,10 @@ class BenefitGroupCongress < BenefitGroup
 
   def set_bounding_cost_plans
     plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-    if plans.size > 0
+    unless plans.empty?
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
-      self.lowest_cost_plan_id  = plans_by_cost.first.id
+      self.lowest_cost_plan_id = plans_by_cost.first.id
       @lowest_cost_plan = plans_by_cost.first
 
       self.highest_cost_plan_id = plans_by_cost.last.id
@@ -67,7 +69,7 @@ class BenefitGroupCongress < BenefitGroup
     write_attribute(:over_one_dependents_max_amt_in_cents, dollars_to_cents(new_over_one_dependents_max_amt_in_cents))
   end
 
-  # TODO may need to write custom self.find
+  # TODO: may need to write custom self.find
 
   def employee_cost_for_plan(ce, plan = reference_plan)
     pcd = decorated_plan(plan, ce)
@@ -88,9 +90,9 @@ class BenefitGroupCongress < BenefitGroup
   # employee > 1 dependent - employer pays 75% of total premium - ability to set max figure
 
   employer_contribution_max_2015 = {
-    "employee_only"       => 437.69,
-    "employee_plus_one"   => 971.90,
-    "employee_plus_many"  => 971.90
+    "employee_only" => 437.69,
+    "employee_plus_one" => 971.90,
+    "employee_plus_many" => 971.90
   }
 
   # In 2016, Congress Pays 75% of total premium up to the dollar maximum listed below
@@ -99,21 +101,21 @@ class BenefitGroupCongress < BenefitGroup
   # EE +2 or more family members: 1058.42
 
   employer_contribution_max_2016 = {
-    "employee_only"       => 462.30,
-    "employee_plus_one"   => 998.88,
-    "employee_plus_many"  => 1058.42
+    "employee_only" => 462.30,
+    "employee_plus_one" => 998.88,
+    "employee_plus_many" => 1058.42
   }
 
   employer_contribution_max_2017 = {
-    "employee_only"       => 480.29,
-    "employee_plus_one"   => 1030.88,
-    "employee_plus_many"  => 1094.64
+    "employee_only" => 480.29,
+    "employee_plus_one" => 1030.88,
+    "employee_plus_many" => 1094.64
   }
 
   employer_contribution_max_2018 = {
-    "employee_only"       => 496.71,
-    "employee_plus_one"   => 1063.83,
-    "employee_plus_many"  => 1130.09
+    "employee_only" => 496.71,
+    "employee_plus_one" => 1063.83,
+    "employee_plus_many" => 1130.09
   }
 
 end

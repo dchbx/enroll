@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 def people_for_cobra
   return @a if defined?(@a)
   @a = {
@@ -32,9 +34,9 @@ def people_for_cobra
     },
 
     "Hbx Admin" => {
-        email: 'admin@dc.gov',
-        password: 'aA1!aA1!aA1!'
-    },
+      email: 'admin@dc.gov',
+      password: 'aA1!aA1!aA1!'
+    }
   }
 end
 
@@ -228,14 +230,12 @@ Then(/^.+ should see my account page$/) do
   expect(page).to have_content('My Account')
 end
 
-When(/^(.*) login in for (.*)$/) do |named_person, role|
+When(/^(.*) login in for (.*)$/) do |named_person, _role|
   person = people_for_cobra[named_person]
   email_address = person[:email]
   password = person[:password]
 
-  if page.has_link?('Sign In Existing Account')
-    click_link "Sign In Existing Account"
-  end
+  click_link "Sign In Existing Account" if page.has_link?('Sign In Existing Account')
   expect(page).to have_content('Sign In')
 
   fill_in "user[login]", with: email_address
@@ -313,7 +313,7 @@ When(/^.+ cobra one employee$/) do
     element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
     element.all('a', :text => "Initiate Cobra").any?
   end
-    element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
+  element = all('table.effective-datatable tbody tr').detect { |ele| ele.all('a', :text => 'Employee Jr.').present? }
   element.find('a', :text => "Initiate Cobra", :wait => 3).click
   wait_for_ajax
 #   find('input.date-picker').set((TimeKeeper.date_of_record.next_month.beginning_of_month).to_s)
@@ -332,12 +332,12 @@ And(/^.+ should only see the status of Cobra Linked$/) do
 end
 
 Then(/^.+ should see cobra enrollment on my account page/) do
-  unless TimeKeeper.date_of_record.day == 1
-    expect(page).to have_content('Coverage Selected')
-    expect(page).to have_content('Coverage Termination Pending')
-  else
+  if TimeKeeper.date_of_record.day == 1
     expect(page).to have_content('Coverage Enrolled')
     expect(page).to have_content('Terminated')
+  else
+    expect(page).to have_content('Coverage Selected')
+    expect(page).to have_content('Coverage Termination Pending')
   end
 end
 
@@ -391,7 +391,7 @@ end
 def enter_plan_year_info
   wait_for_ajax(2,2)
   find(:xpath, "//p[@class='label'][contains(., 'SELECT START ON')]", :wait => 3).click
-  find(:xpath, "//li[@data-index='1'][contains(., '#{(effective_period.min).year}')]", :wait => 3).click
+  find(:xpath, "//li[@data-index='1'][contains(., '#{effective_period.min.year}')]", :wait => 3).click
   find('.interaction-field-control-fteemployee').click
   fill_in 'benefit_application[fte_count]', with: '3'
   fill_in 'benefit_application[pte_count]', with: '3'

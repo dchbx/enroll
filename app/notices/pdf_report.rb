@@ -1,21 +1,19 @@
+# frozen_string_literal: true
+
 class PdfReport < Prawn::Document
   include Prawn::Measurements
 
-  def initialize(options={ })
-    if options[:margin].nil?
-      options.merge!(:margin => [50, 70])
-    end
-    
+  def initialize(options = { })
+    options.merge!(:margin => [50, 70]) if options[:margin].nil?
+
     super(options)
-    
+
     font "Times-Roman"
     font_size 12
   end
-  
+
   def text(text, options = { })
-    if !options.has_key?(:align)
-      options.merge!({ :align => :justify })
-    end
+    options.merge!({ :align => :justify }) unless options.key?(:align)
 
     super text, options
   end

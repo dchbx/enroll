@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Type
   include HappyMapper
   tag 'type'
@@ -47,7 +49,7 @@ class BrokerPerson
   namespace 'ns1'
   element :surname, String
   element :given, String
-  
+
 end
 
 class Vcard
@@ -67,7 +69,7 @@ class BrokerParser
   namespace 'ns1'
   element :npn, String, :tag => "npn"
   has_one :vcard, Vcard
-  
+
   # has_one :broker_address, BrokerAddress, :tag => 'adr'
   # has_one :broker_phone, BrokerPhone, :tag => 'tel'
   # has_one :broker_email, BrokerEmail, :tag => 'email'

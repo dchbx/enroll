@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Documents
     class EmployerAttestationDocument < BenefitSponsors::Documents::Document
@@ -11,7 +13,7 @@ module BenefitSponsors
           "Document Not Required DOR-1 Form",
           "DOR-1 Form DoesNot Match Bussiness",
           "Other Reason"
-      ]
+      ].freeze
 
       field :aasm_state, type: String, default: "submitted"
       field :reason_for_rejection, type: String
@@ -72,7 +74,7 @@ module BenefitSponsors
 
       def add_reason_for_rejection(params)
         if params[:reason_for_rejection].present?
-          reason_for_reject = (params[:reason_for_rejection] == "Other Reason") ? params[:other_reason] : params[:reason_for_rejection]
+          reason_for_reject = params[:reason_for_rejection] == "Other Reason" ? params[:other_reason] : params[:reason_for_rejection]
           self.update(reason_for_rejection: reason_for_reject)
         end
       end

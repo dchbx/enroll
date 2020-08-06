@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class PlanDesignOrganizationMigration < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
 
-      Dir.mkdir("hbx_report") unless File.exists?("hbx_report")
-      file_name = "#{Rails.root}/hbx_report/plan_design_migration_status_#{TimeKeeper.datetime_of_record.strftime("%m_%d_%Y_%H_%M_%S")}.csv"
-      field_names = %w( plan_design_org_name plan_design_org_id status owner_profile_id sponsor_profile_id)
+      Dir.mkdir("hbx_report") unless File.exist?("hbx_report")
+      file_name = "#{Rails.root}/hbx_report/plan_design_migration_status_#{TimeKeeper.datetime_of_record.strftime('%m_%d_%Y_%H_%M_%S')}.csv"
+      field_names = %w[plan_design_org_name plan_design_org_id status owner_profile_id sponsor_profile_id]
 
       logger = Logger.new("#{Rails.root}/log/plan_design_migration_data.log") unless Rails.env.test?
       logger.info "Script Start - #{TimeKeeper.datetime_of_record}" unless Rails.env.test?
@@ -24,17 +26,15 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
     end
   end
 
-  def self.down
-  end
+  def self.down; end
 
   private
 
   def self.update_plan_design_organization(csv, logger)
-
     pdos = SponsoredBenefits::Organizations::PlanDesignOrganization.all
     emp_orgs = BenefitSponsors::Organizations::Organization.employer_profiles
     new_bk_orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles
-    old_bk_orgs =  Organization.has_broker_agency_profile
+    old_bk_orgs = Organization.has_broker_agency_profile
 
     #counters
     total = 0
@@ -43,25 +43,20 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
 
     pdos.batch_size(1000).no_timeout.all.each do |pdo|
 
-      next unless (pdo.owner_profile_class_name == "::BrokerAgencyProfile")
+      next unless pdo.owner_profile_class_name == "::BrokerAgencyProfile"
 
       total += 1
 
       begin
-
         emp_org = emp_orgs.employer_by_fein(pdo.fein).first
 
-        if pdo.sponsor_profile_id.present? && emp_org.present?
-          sponsor_profile_id = emp_org.employer_profile.id
-        end
+        sponsor_profile_id = emp_org.employer_profile.id if pdo.sponsor_profile_id.present? && emp_org.present?
 
         old_bk_org = old_bk_orgs.where(:"broker_agency_profile._id" => pdo.owner_profile_id).first
 
         if old_bk_org.present?
           new_org = new_bk_orgs.broker_by_hbx_id(old_bk_org.hbx_id).first
-          if new_org.present?
-            owner_profile_id = new_org.broker_agency_profile._id
-          end
+          owner_profile_id = new_org.broker_agency_profile._id if new_org.present?
         end
 
         if owner_profile_id.present?
@@ -84,7 +79,6 @@ class PlanDesignOrganizationMigration < Mongoid::Migration
           print 'S' unless Rails.env.test?
           csv << [pdo.legal_name, pdo.id, "skipped as no matching owner_profile_id present in new model", pdo.owner_profile_id, pdo.sponsor_profile_id]
         end
-
       rescue Exception => e
         failed += 1
         print 'F' unless Rails.env.test?

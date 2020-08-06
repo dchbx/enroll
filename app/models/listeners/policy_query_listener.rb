@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Listeners
   class PolicyQueryListener < ::Acapi::Amqp::Client
     include ::AmqpClientHelpers
@@ -14,11 +16,11 @@ module Listeners
       case criteria_name
       when "all_outstanding_shop"
         lambda do |exclusions|
-          all_outstanding_shop(exclusions)          
+          all_outstanding_shop(exclusions)
         end
       else
         throw :processing_failure, ProcessingFailure.new("422", "Invalid query name specified.")
-      end 
+      end
     end
 
     def extract_exclusions(headers, payload)
@@ -45,7 +47,7 @@ module Listeners
         end
         channel.acknowledge(delivery_info.delivery_tag, false)
       end
-      sc.and_then do |args|
+      sc.and_then do |_args|
         criteria = extract_criteria(headers)
         exclusions = extract_exclusions(headers, payload)
         policy_ids = criteria.call(exclusions)

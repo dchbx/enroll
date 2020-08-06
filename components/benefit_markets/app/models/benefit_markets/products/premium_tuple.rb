@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class Products::PremiumTuple
     include Mongoid::Document
@@ -11,7 +13,7 @@ module BenefitMarkets
 
     validates_presence_of :age, :cost
 
-    default_scope   ->{ order(:"age".asc) }
+    default_scope ->{ order(:age.asc) }
 
 
     def comparable_attrs

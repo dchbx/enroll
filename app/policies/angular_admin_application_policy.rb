@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AngularAdminApplicationPolicy < ApplicationPolicy
   def visit?
     return false unless user.has_hbx_staff_role?

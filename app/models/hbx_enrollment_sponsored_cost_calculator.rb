@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxEnrollmentSponsoredCostCalculator
   def initialize(original_enrollment)
     @member_group = original_enrollment.as_shop_member_group

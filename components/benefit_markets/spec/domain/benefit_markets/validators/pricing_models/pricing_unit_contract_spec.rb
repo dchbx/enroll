@@ -8,7 +8,7 @@ RSpec.describe BenefitMarkets::Validators::PricingModels::PricingUnitContract do
   let(:display_name)    { 'Employee Only' }
   let(:order)           { 1 }
 
-  let(:missing_params)   { {name: name1, display_name: display_name, _id: BSON::ObjectId.new,} }
+  let(:missing_params)   { {name: name1, display_name: display_name, _id: BSON::ObjectId.new} }
   let(:required_params)  { missing_params.merge({order: order}) }
   let(:invalid_params)   { missing_params.merge({order: 'one'})}
   let(:error_message1)   { {:order => ["is missing"]} }

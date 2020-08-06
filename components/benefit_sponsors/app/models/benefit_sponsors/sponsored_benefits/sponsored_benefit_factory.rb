@@ -1,14 +1,16 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class SponsoredBenefitFactory
 
       attr_accessor :package
- 
+
       def self.call(package, args)
         new(package, args).sponsored_benefit
       end
 
-      def self.validate(sponsored_benefit)
+      def self.validate(_sponsored_benefit)
         # TODO: Add validations if any
         true
       end
@@ -39,11 +41,10 @@ module BenefitSponsors
         sponsor_contribution.contribution_levels.each do |new_contribution_level|
           sponsor_contribution_attrs = attrs[:contribution_levels_attributes] if attrs.present?
 
-          if contribution_match = sponsor_contribution_attrs.detect{ |contribution| contribution[:display_name] == new_contribution_level.display_name}
-            contribution_level_attr = contribution_match.except(:id, :display_name)
-            contribution_level_attr[:is_offered] ||= false
-            new_contribution_level.assign_attributes(contribution_level_attr)
-          end
+          next unless contribution_match = sponsor_contribution_attrs.detect{ |contribution| contribution[:display_name] == new_contribution_level.display_name}
+          contribution_level_attr = contribution_match.except(:id, :display_name)
+          contribution_level_attr[:is_offered] ||= false
+          new_contribution_level.assign_attributes(contribution_level_attr)
         end
 
         sponsor_contribution

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployerPlanYear < Importers::ConversionEmployerPlanYear
 
     CARRIER_MAPPING = {
-      "bmc healthnet plan"=>"BMCHP", 
-      "fallon community health plan"=>"FCHP",
-      "health new england"=>"HNE",
+      "bmc healthnet plan" => "BMCHP",
+      "fallon community health plan" => "FCHP",
+      "health new england" => "HNE",
       "neighborhood health plan" => "NHP",
       "harvard pilgrim health care" => "HPHC",
       "boston medical center health plan" => "BMCHP",
@@ -13,24 +15,24 @@ module Importers::Mhc
       "tufts health direct" => "THPD",
       "ALTUS" => "ALT",
       "DELTA DENTAL" => "DDA"
-    }
+    }.freeze
 
     validate :validate_plan_selection, :validate_reference_plan
 
     attr_accessor :employee_only_rt_contribution,
-      :employee_only_rt_premium,
-      :employee_and_spouse_rt_offered,
-      :employee_and_spouse_rt_contribution,
-      :employee_and_spouse_rt_premium,
-      :employee_and_one_or_more_dependents_rt_offered,
-      :employee_and_one_or_more_dependents_rt_contribution,
-      :employee_and_one_or_more_dependents_rt_premium,
-      :family_rt_offered,
-      :family_rt_contribution,
-      :family_rt_premium,
-      :employer_domestic_partner_rt_contribution,
-      :employer_child_under_26_rt_contribution,
-      :sponsored_benefit_kind
+                  :employee_only_rt_premium,
+                  :employee_and_spouse_rt_offered,
+                  :employee_and_spouse_rt_contribution,
+                  :employee_and_spouse_rt_premium,
+                  :employee_and_one_or_more_dependents_rt_offered,
+                  :employee_and_one_or_more_dependents_rt_contribution,
+                  :employee_and_one_or_more_dependents_rt_premium,
+                  :family_rt_offered,
+                  :family_rt_contribution,
+                  :family_rt_premium,
+                  :employer_domestic_partner_rt_contribution,
+                  :employer_child_under_26_rt_contribution,
+                  :sponsored_benefit_kind
 
     def initialize(opts = {})
       super(opts)
@@ -51,14 +53,12 @@ module Importers::Mhc
         return
       end
 
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
-      select_reference_plan(available_plans, (calculated_coverage_start).year)
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, calculated_coverage_start.year).compact
+      select_reference_plan(available_plans, calculated_coverage_start.year)
     end
 
     def validate_plan_selection
-      if plan_selection != 'sole_source'
-        errors.add(:plan_selection, "invalid plan selection specified (not sole source)")
-      end
+      errors.add(:plan_selection, "invalid plan selection specified (not sole source)") if plan_selection != 'sole_source'
     end
 
     def service_area_plan_hios_ids(year)

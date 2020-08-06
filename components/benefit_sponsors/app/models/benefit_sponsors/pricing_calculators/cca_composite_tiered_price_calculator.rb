@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PricingCalculators
     class CcaCompositeTieredPriceCalculator < PricingCalculator
@@ -24,15 +26,13 @@ module BenefitSponsors
         end
 
         def add(member)
-          if member.is_primary_member?
-            @primary_member_id = member.member_id
-          end
+          @primary_member_id = member.member_id if member.is_primary_member?
           coverage_age = @age_calculator.calc_coverage_age_for(member, @product, @coverage_start_date, @eligibility_dates, @previous_product)
           relationship = member.is_primary_member? ? "self" : member.relationship
           rel = @pricing_model.map_relationship_for(relationship, coverage_age, member.is_disabled?)
           @member_ids << member.member_id
           @relationship_totals[rel.to_s] = @relationship_totals[rel.to_s] + 1
-          @member_totals = @member_totals + 1
+          @member_totals += 1
           self
         end
 
@@ -46,12 +46,12 @@ module BenefitSponsors
           @total = pricing_determination_tier.price
           members_total_price = 0.00
           @member_ids.each do |m_id|
-            member_price = BigDecimal.new((@total / @member_totals).to_s).floor(2)
-            members_total_price = BigDecimal.new((members_total_price + member_price).to_s).round(2)
+            member_price = BigDecimal((@total / @member_totals).to_s).floor(2)
+            members_total_price = BigDecimal((members_total_price + member_price).to_s).round(2)
             @member_pricing[m_id] = member_price
           end
-          member_discrepency = BigDecimal.new((@total - members_total_price).to_s).round(2)
-          @member_pricing[@primary_member_id] = BigDecimal.new((@member_pricing[@primary_member_id] + member_discrepency).to_s).round(2) 
+          member_discrepency = BigDecimal((@total - members_total_price).to_s).round(2)
+          @member_pricing[@primary_member_id] = BigDecimal((@member_pricing[@primary_member_id] + member_discrepency).to_s).round(2)
           self
         end
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class RegisterCcaEmployerForm
@@ -11,7 +13,7 @@ module BenefitSponsors
       # GeneralProfile
 
       def initialize(params)
-        build if params.blank? 
+        build if params.blank?
 
         self
       end

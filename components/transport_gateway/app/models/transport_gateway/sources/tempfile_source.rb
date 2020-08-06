@@ -1,12 +1,12 @@
+# frozen_string_literal: true
+
 module TransportGateway
   module Sources
     class TempfileSource
       attr_reader :stream, :size
 
       def initialize(stream)
-        if stream.closed?
-          stream.open
-        end
+        stream.open if stream.closed?
         @size = stream.size
         @stream = stream
         @stream.rewind

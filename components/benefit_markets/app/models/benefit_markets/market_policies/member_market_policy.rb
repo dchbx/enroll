@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   class MarketPolicies::MemberMarketPolicy < MarketPolicies::MarketPolicy
 
@@ -18,12 +20,12 @@ module BenefitMarkets
 
     field :age_range_policy,              type: Range,   default: 0..0
     field :child_age_off_policy,          type: Integer, default: 26
-    field :incarceration_status_policy,   type: Array,   default: [ :any ]   # => [:any, :unincarcerated],
-    field :citizenship_status_policy,     type: Array,   default: [ :any ]   # => [:any, :us_citizen :naturalized_citizen :alien_lawfully_present :lawful_permanent_resident]
-    field :residency_status_policy,       type: Array,   default: [ :any ]   # => [:any, :state_resident],
-    field :ethnicity_policy,              type: Array,   default: [ :any ]   # => [:any, :indian_tribe_member]
+    field :incarceration_status_policy,   type: Array,   default: [:any]   # => [:any, :unincarcerated],
+    field :citizenship_status_policy,     type: Array,   default: [:any]   # => [:any, :us_citizen :naturalized_citizen :alien_lawfully_present :lawful_permanent_resident]
+    field :residency_status_policy,       type: Array,   default: [:any]   # => [:any, :state_resident],
+    field :ethnicity_policy,              type: Array,   default: [:any]   # => [:any, :indian_tribe_member]
 
-    field :product_dependencies_policy,   type: Array,   default: [ :any ]   # => DC SHOP: must purchase health to purchase dental { dental: [ :health ] }
+    field :product_dependencies_policy,   type: Array,   default: [:any]   # => DC SHOP: must purchase health to purchase dental { dental: [ :health ] }
 
     field :cost_sharing_policy,           type: String,  default: ""
     field :lawful_presence_status_policy, type: String,  default: ""

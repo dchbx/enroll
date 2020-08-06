@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_sponsors_organizations_general_agency_profile, class: '::BenefitSponsors::Organizations::GeneralAgencyProfile' do
     market_kind { "shop" }
@@ -15,37 +17,33 @@ FactoryBot.define do
 
     after(:build) do |profile, evaluator|
       if profile.organization.blank?
-        if evaluator.assigned_site
-          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site )
-        else
-          profile.organization = FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
-        end
+        profile.organization = if evaluator.assigned_site
+                                 FactoryBot.build(:benefit_sponsors_organizations_general_organization, legal_name: evaluator.legal_name, site: evaluator.assigned_site)
+                               else
+                                 FactoryBot.build(:benefit_sponsors_organizations_general_organization, :with_site)
+                               end
       end
     end
 
     trait :with_organization_and_site do
       after(:build) do |profile, evaluator|
         site { nil }
-        if evaluator.site
-          site = evaluator.site
-        else
-          site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
-        end
+        site = evaluator.site || BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
         profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site) unless profile.organization
       end
     end
 
     trait :organization do
-      after(:build) do |profile, evaluator|
-          site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
+      after(:build) do |profile, _evaluator|
+        site = BenefitSponsors::Site.by_site_key(:cca).first || create(:benefit_sponsors_site, :as_hbx_profile, :with_benefit_market, :cca)
         profile.organization = build(:benefit_sponsors_organizations_general_organization, site: site) unless profile.organization
       end
     end
 
     trait :with_staff do
-      after :create do |benefit_sponsors_organizations_general_agency_profile, evaluator|
+      after :create do |benefit_sponsors_organizations_general_agency_profile, _evaluator|
         FactoryBot.create(:general_agency_staff_role,
-          benefit_sponsors_general_agency_profile_id: benefit_sponsors_organizations_general_agency_profile.id)
+                          benefit_sponsors_general_agency_profile_id: benefit_sponsors_organizations_general_agency_profile.id)
       end
     end
   end

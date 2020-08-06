@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_each do
@@ -22,7 +24,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
     employer_profile.fire_broker_agency
     employer_profile.save!
     broker_agency_profile.update_attributes(primary_broker_role_id: broker_role.id)
-    @broker_agency_account1 = employer_profile.broker_agency_accounts.unscoped.select{|br| br.is_active ==  false}.sort_by(&:created_at).last
+    @broker_agency_account1 = employer_profile.broker_agency_accounts.unscoped.select{|br| br.is_active == false}.max_by(&:created_at)
   end
 
   describe "when ER fires a broker" do
@@ -67,8 +69,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }
 
-    context "when broker_fired_confirmation_to_employer is triggered" do 
-      let(:data_elements) {
+    context "when broker_fired_confirmation_to_employer is triggered" do
+      let(:data_elements) do
         [
           "employer_profile.notice_date",
           "employer_profile.employer_name",
@@ -78,7 +80,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
           "employer_profile.broker.primary_first_name",
           "employer_profile.broker.organization"
         ]
-      }
+      end
       let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
       let(:payload) do
         {
@@ -125,8 +127,8 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
       end
     end
 
-    context "when broker_agency_fired_confirmation is triggered" do 
-      let(:data_elements) {
+    context "when broker_agency_fired_confirmation is triggered" do
+      let(:data_elements) do
         [
           "broker_profile.notice_date",
           "broker_profile.employer_name",
@@ -135,7 +137,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
           "broker_profile.termination_date",
           "broker_profile.broker_agency_name"
         ]
-      }
+      end
       let(:recipient) { "Notifier::MergeDataModels::BrokerProfile" }
       let(:payload) do
         {
@@ -183,7 +185,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
     end
 
     context "when broker_fired_confirmation_to_broker is triggered" do
-      let(:data_elements) {
+      let(:data_elements) do
         [
           "broker_agency_profile.notice_date",
           "broker_agency_profile.employer_name",
@@ -195,7 +197,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::BrokerFired', :dbclean => :after_e
           "broker_agency_profile.employer_poc_firstname",
           "broker_agency_profile.employer_poc_lastname"
         ]
-      }
+      end
       let(:recipient) { "Notifier::MergeDataModels::BrokerAgencyProfile" }
       let(:payload) do
         {

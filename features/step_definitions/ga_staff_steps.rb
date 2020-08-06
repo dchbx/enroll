@@ -71,7 +71,7 @@ When /^new ga staff visits the link received in the approval email$/ do
   expect(current_email.to).to eq([@staff_email])
 
   invitation_link = links_in_email(current_email).first
-  invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
+  invitation_link.sub!(%r{http\://127\.0\.0\.1\:3000}, '')
   visit(invitation_link)
 end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     module OrganizationForms
@@ -8,7 +10,7 @@ module BenefitSponsors
         def initialize(user, record)
           super
           @service = BenefitSponsors::Services::StaffRoleService.new(
-              profile_id: record.profile_id
+            profile_id: record.profile_id
           )
         end
 

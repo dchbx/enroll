@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxEnrollmentMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -19,8 +21,8 @@ class HbxEnrollmentMember
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
-  validates_presence_of :applicant_id, :is_subscriber, :eligibility_date,# :premium_amount,
-    :coverage_start_on
+  validates_presence_of :applicant_id, :is_subscriber, :eligibility_date, # :premium_amount,
+                        :coverage_start_on
 
   validate :check_primary_applicant_selected_during_enrollment
 
@@ -31,9 +33,9 @@ class HbxEnrollmentMember
   def family
     hbx_enrollment.family if hbx_enrollment.present?
   end
-  
+
   def covered?
-    (coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record) ? true : false
+    coverage_end_on.blank? || coverage_end_on >= TimeKeeper.date_of_record ? true : false
   end
 
   def family_member
@@ -64,7 +66,7 @@ class HbxEnrollmentMember
     return @age_on_effective_date unless @age_on_effective_date.blank?
     dob = person.dob
     return unless coverage_start_on.present?
-    
+
     age = calculate_age(coverage_start_on,dob)
     @age_on_effective_date = age
   end
@@ -78,7 +80,7 @@ class HbxEnrollmentMember
     else
       age -= 1 if calculation_date.month < dob.month
     end
-    return age
+    age
   end
 
   def is_subscriber?
@@ -116,15 +118,11 @@ class HbxEnrollmentMember
 
   def end_date_gt_start_date
     return unless coverage_end_on.present?
-    if coverage_end_on < coverage_start_on
-      self.errors.add(:coverage_end_on, "Coverage start date must preceed or equal end date")
-    end
+    self.errors.add(:coverage_end_on, "Coverage start date must preceed or equal end date") if coverage_end_on < coverage_start_on
   end
 
   def check_primary_applicant_selected_during_enrollment
     return true #FixMe
-    if self.hbx_enrollment.subscriber.nil?
-      self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.")
-    end
+    self.errors.add(:is_subscriber, "You must select the primary applicant to enroll in the healthcare plan.") if self.hbx_enrollment.subscriber.nil?
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GAWorld
   def general_agency(*traits)
     attributes = traits.extract_options!
@@ -135,9 +137,7 @@ And /^a broker exists$/ do
   person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({broker_agency_profile: broker_agency, aasm_state: 'active'})
   person.save
   user.roles << "broker" unless user.roles.include?("broker")
-  if !user.roles.include?("broker_agency_staff")
-    user.roles << "broker_agency_staff"
-  end
+  user.roles << "broker_agency_staff" unless user.roles.include?("broker_agency_staff")
   user.save
   broker_role = person.broker_role
   broker_role.approve
@@ -381,14 +381,14 @@ When /^the broker click the link of clear default ga$/ do
 end
 
 Then(/^he should be able to see the Assign link under his profile$/) do
- expect(page).to have_selector('#assign-tab')
+  expect(page).to have_selector('#assign-tab')
 end
 
 Then(/^he should not be able to see the Assign link under his profile$/) do
-expect(page).not_to have_selector('#assign-tab')
+  expect(page).not_to have_selector('#assign-tab')
 end
 
-When(/^the ga clicks on EDIT GENERAL AGENCY button\/link$/) do
+When(%r{^the ga clicks on EDIT GENERAL AGENCY button/link$}) do
   click_link "Edit General Agency"
 end
 

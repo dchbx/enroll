@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require_relative '../../../concerns/observable_spec.rb'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
@@ -18,17 +20,19 @@ module BenefitSponsors
 
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
 
-    let(:organization)      { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                  site: site,
-                                  hbx_id: hbx_id,
-                                  legal_name: legal_name,
-                                  dba: dba,
-                                  fein: fein,
-                                  entity_kind: entity_kind
-                                )}
+    let(:organization)      do
+      BenefitSponsors::Organizations::GeneralOrganization.new(
+        site: site,
+        hbx_id: hbx_id,
+        legal_name: legal_name,
+        dba: dba,
+        fein: fein,
+        entity_kind: entity_kind
+      )
+    end
 
     let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
-    let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+    let(:phone)           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let(:office_locations)  { [office_location] }
 
@@ -96,14 +100,16 @@ module BenefitSponsors
       let(:site)                { BenefitSponsors::Site.new(site_key: :cca) }
       let(:benefit_market)      { ::BenefitMarkets::BenefitMarket.new(:kind => :aca_shop, title: "MA Health Connector SHOP") }
       let(:legal_name)          { "MA Health Connector" }
-      let(:organization)        { BenefitSponsors::Organizations::GeneralOrganization.new(
-                                      site: site,
-                                      hbx_id: hbx_id,
-                                      legal_name: legal_name,
-                                      dba: dba,
-                                      entity_kind: entity_kind,
-                                      fein: "525285898",
-                                    )}
+      let(:organization)        do
+        BenefitSponsors::Organizations::GeneralOrganization.new(
+          site: site,
+          hbx_id: hbx_id,
+          legal_name: legal_name,
+          dba: dba,
+          entity_kind: entity_kind,
+          fein: "525285898"
+        )
+      end
       let(:profile)             { BenefitSponsors::Organizations::HbxProfile.new(organization: organization, office_locations: office_locations) }
 
       let(:tyrell_legal_name)   { "Tyrell Corporation" }
@@ -111,7 +117,7 @@ module BenefitSponsors
       let(:wallace_legal_name)  { "Wallace Corporation" }
       let(:wallace_fein)        { "200001001" }
       let(:address)             { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
-      let(:phone  )             { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
+      let(:phone)             { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location)     { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
       let(:office_locations)    { [office_location] }
       let(:sic_code)            { '1111' }
@@ -119,43 +125,51 @@ module BenefitSponsors
 
 
 
-      let(:tyrell_organization)           { BenefitSponsors::Organizations::GeneralOrganization.create(
-                                                site:         site,
-                                                legal_name:   tyrell_legal_name,
-                                                fein:         tyrell_fein,
-                                                entity_kind:  entity_kind,
-                                                profiles:     [tyrell_profile],
-                                              )}
+      let(:tyrell_organization)           do
+        BenefitSponsors::Organizations::GeneralOrganization.create(
+          site: site,
+          legal_name: tyrell_legal_name,
+          fein: tyrell_fein,
+          entity_kind: entity_kind,
+          profiles: [tyrell_profile]
+        )
+      end
 
-      let(:wallace_organization)          { BenefitSponsors::Organizations::GeneralOrganization.create(
-                                                site:         site,
-                                                legal_name:   wallace_legal_name,
-                                                fein:         wallace_fein,
-                                                entity_kind:  entity_kind,
-                                                profiles:     [wallace_profile],
-                                              )}
+      let(:wallace_organization)          do
+        BenefitSponsors::Organizations::GeneralOrganization.create(
+          site: site,
+          legal_name: wallace_legal_name,
+          fein: wallace_fein,
+          entity_kind: entity_kind,
+          profiles: [wallace_profile]
+        )
+      end
 
-      let!(:tyrell_profile)                { described_class.new(
-                                                office_locations: office_locations,
-                                                sic_code:         sic_code,
-                                            )}
+      let!(:tyrell_profile)                do
+        described_class.new(
+          office_locations: office_locations,
+          sic_code: sic_code
+        )
+      end
 
-      let!(:wallace_profile)               { described_class.new(
-                                                office_locations: office_locations,
-                                                sic_code: sic_code,
-                                            )}
+      let!(:wallace_profile)               do
+        described_class.new(
+          office_locations: office_locations,
+          sic_code: sic_code
+        )
+      end
 
-      before {
-          site.owner_organization = organization
-          site.site_organizations << organization
-          organization.profiles << profile
+      before do
+        site.owner_organization = organization
+        site.site_organizations << organization
+        organization.profiles << profile
 
-          site.save
-          organization.save
-          benefit_market.save
-          tyrell_organization.save
-          wallace_organization.save
-        }
+        site.save
+        organization.save
+        benefit_market.save
+        tyrell_organization.save
+        wallace_organization.save
+      end
 
       it "BenefitSponsorship should be findable" do
         tyrell_profile.add_benefit_sponsorship
@@ -166,8 +180,8 @@ module BenefitSponsors
         wallace_profile.add_benefit_sponsorship
         wallace_profile.save
 
-        expect((tyrell_profile.benefit_sponsorships).size).to eq 3
-        expect((wallace_profile.benefit_sponsorships).size).to eq 1
+        expect(tyrell_profile.benefit_sponsorships.size).to eq 3
+        expect(wallace_profile.benefit_sponsorships.size).to eq 1
       end
 
 

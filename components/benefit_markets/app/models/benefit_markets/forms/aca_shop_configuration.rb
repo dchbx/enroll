@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Forms
     class AcaShopConfiguration
@@ -7,7 +9,7 @@ module BenefitMarkets
       include ActiveModel::Model
       include ActiveModel::Validations
       include Virtus.model
-      
+
       attribute :ee_ct_max, Integer
       attribute :ee_ratio_min, Float
       attribute :ee_non_owner_ct_min, Integer
@@ -39,7 +41,7 @@ module BenefitMarkets
       attribute :rating_areas, Array
       attribute :initial_application_configuration, BenefitMarkets::Forms::AcaShopInitialApplicationConfiguration
       attribute :renewal_application_configuration, BenefitMarkets::Forms::AcaShopRenewalApplicationConfiguration
-      
+
     end
   end
 end

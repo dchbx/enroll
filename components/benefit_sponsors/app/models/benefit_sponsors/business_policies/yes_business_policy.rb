@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BusinessPolicies
     class YesBusinessPolicy
@@ -6,22 +8,22 @@ module BenefitSponsors
 
 
       rule :stubbed_rule_one,
-              validate: ->(model_instance) {
-                true
-              },
-              fail:     ->(model_instance) { "something went wrong!!" },
-              success:  ->(model_instance) { "validated successfully" }
+           validate: lambda { |_model_instance|
+             true
+           },
+           fail: ->(_model_instance) { "something went wrong!!" },
+           success: ->(_model_instance) { "validated successfully" }
 
       rule :stubbed_rule_two,
-              validate: ->(model_instance) {
-                true
-              },
-              fail:     ->(model_instance) { "something went wrong!!" },
-              success:  ->(model_instance) { "validated successfully" }
+           validate: lambda { |_model_instance|
+             true
+           },
+           fail: ->(_model_instance) { "something went wrong!!" },
+           success: ->(_model_instance) { "validated successfully" }
 
 
       business_policy :stubbed_policy,
-              rules: [ :stubbed_rule_one, :stubbed_rule_two ]
+                      rules: [:stubbed_rule_one, :stubbed_rule_two]
 
 
       def business_policies_for(_model_instance, _event_name)

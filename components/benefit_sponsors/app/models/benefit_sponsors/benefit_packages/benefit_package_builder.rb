@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackageBuilder
@@ -45,7 +47,7 @@ module BenefitSponsors
       def benefit_package_options(options)
         @benefit_package_attrs = options.symbolize_keys
       end
-        
+
       def add_title
         @benefit_package.title = benefit_package_attrs[:title]
       end
@@ -70,12 +72,9 @@ module BenefitSponsors
         @benefit_package.reference_plan_id = benefit_package_attrs[:reference_plan_id]
       end
 
-      def add_relationship_benefits
-      end
+      def add_relationship_benefits; end
 
-      def benefit_package
-        @benefit_package
-      end
+      attr_reader :benefit_package
     end
 
     class BenefitPackageBuilderError < StandardError; end

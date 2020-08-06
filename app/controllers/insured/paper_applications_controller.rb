@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::PaperApplicationsController < ApplicationController
   include ApplicationHelper
 
@@ -22,7 +24,7 @@ class Insured::PaperApplicationsController < ApplicationController
         flash[:error] = "Could not save file. " + @doc_errors.join(". ")
       end
     else
-        flash[:error] = "Could not save file"
+      flash[:error] = "Could not save file"
     end
     redirect_to upload_application_insured_families_path
   end
@@ -41,6 +43,7 @@ class Insured::PaperApplicationsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -72,7 +75,7 @@ class Insured::PaperApplicationsController < ApplicationController
 
   def update_paper_application(title, file_uri)
     application = @docs_owner.resident_role.paper_applications.build
-    success = application.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+    success = application.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
@@ -90,10 +93,10 @@ class Insured::PaperApplicationsController < ApplicationController
 
   def vlp_docs_clean(person)
     existing_documents = person.consumer_role.vlp_documents
-    person_consumer_role=Person.find(person.id).consumer_role
-    person_consumer_role.vlp_documents =[]
+    person_consumer_role = Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents = []
     person_consumer_role.save
-    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.vlp_documents = existing_documents.uniq
     person_consumer_role.save
   end

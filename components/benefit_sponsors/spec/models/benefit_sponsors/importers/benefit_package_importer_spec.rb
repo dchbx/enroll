@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -17,23 +19,22 @@ module BenefitSponsors::Importers
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
-    let(:benefit_group_params) {
+    let(:benefit_group_params) do
       { title: "Benefit Group Created for: First Prospect by TestAgency",
         description: "Sample benefit group",
         effective_on_kind: "first_of_month",
-        effective_on_offset: 0
-      }.merge(offerings)
-    }
+        effective_on_offset: 0}.merge(offerings)
+    end
 
     let(:offerings) { health_benefit_params }
 
-    let(:health_benefit_params) {
+    let(:health_benefit_params) do
       {
         plan_option_kind: "metal_level",
         relationship_benefits: relationship_benefits,
         reference_plan_hios_id: reference_plan.hios_id
       }
-    }
+    end
 
 
     let(:reference_plan) do
@@ -46,28 +47,28 @@ module BenefitSponsors::Importers
     let(:product_kinds)  { [:health, :dental] }
     let(:catalog_dental_package_kinds) { [:multi_product] }
 
-    let(:new_application) {
+    let(:new_application) do
       current_benefit_market_catalog
       application = benefit_sponsorship.benefit_applications.new(
         effective_period: (current_effective_date..current_effective_date.next_year.prev_day)
-        )
+      )
       application.pull_benefit_sponsorship_attributes
       application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(application.effective_period.begin)
       catalog = application.benefit_sponsor_catalog
       catalog.benefit_application = application
       catalog.save
       application
-    }
+    end
 
-    let(:relationship_benefits) {
+    let(:relationship_benefits) do
       [
-        {"premium_pct"=>90.0, "offered"=>true, "relationship"=>"employee"},
-        {"premium_pct"=>80.0, "offered"=>true, "relationship"=>"spouse"},
-        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"domestic_partner"},
-        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_under_26"},
-        {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"child_26_and_over"}
+        {"premium_pct" => 90.0, "offered" => true, "relationship" => "employee"},
+        {"premium_pct" => 80.0, "offered" => true, "relationship" => "spouse"},
+        {"premium_pct" => 0.0, "offered" => true, "relationship" => "domestic_partner"},
+        {"premium_pct" => 0.0, "offered" => true, "relationship" => "child_under_26"},
+        {"premium_pct" => 0.0, "offered" => true, "relationship" => "child_26_and_over"}
       ]
-    }
+    end
 
     subject { BenefitSponsors::Importers::BenefitPackageImporter.call(new_application, benefit_group_params) }
 
@@ -96,14 +97,14 @@ module BenefitSponsors::Importers
     describe "when both health and dental attributes given", dbclean: :after_each do
       let(:offerings) { health_benefit_params.merge(dental_benefit_params) }
 
-      let(:dental_benefit_params) {
+      let(:dental_benefit_params) do
         {
           dental_plan_option_kind: "single_plan",
           dental_reference_plan_hios_id: dental_reference_plan.hios_id,
           dental_relationship_benefits: dental_relationship_benefits,
           elected_dental_plan_hios_ids: dental_hios_ids
         }
-      }
+      end
 
       let(:dental_hios_ids) do
         BenefitMarkets::Products::Product.where(
@@ -120,15 +121,15 @@ module BenefitSponsors::Importers
         ).first
       end
 
-      let(:dental_relationship_benefits) {
+      let(:dental_relationship_benefits) do
         [
-          {"premium_pct"=>100.0, "offered"=>true, "relationship"=>"employee"},
-          {"premium_pct"=>0.0, "offered"=>true, "relationship"=>"spouse"},
-          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"domestic_partner"},
-          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"child_under_26"},
-          {"premium_pct"=>0.0, "offered"=>false, "relationship"=>"child_26_and_over"}
+          {"premium_pct" => 100.0, "offered" => true, "relationship" => "employee"},
+          {"premium_pct" => 0.0, "offered" => true, "relationship" => "spouse"},
+          {"premium_pct" => 0.0, "offered" => false, "relationship" => "domestic_partner"},
+          {"premium_pct" => 0.0, "offered" => false, "relationship" => "child_under_26"},
+          {"premium_pct" => 0.0, "offered" => false, "relationship" => "child_26_and_over"}
         ]
-      }
+      end
 
       context "will build benefit package with health and dental benefits" do
         it "should have both health and dental sponsored benefits" do

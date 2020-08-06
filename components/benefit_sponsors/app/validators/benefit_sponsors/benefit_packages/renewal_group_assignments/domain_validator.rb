@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
     module RenewalGroupAssignments
@@ -11,24 +13,20 @@ module BenefitSponsors
           bp_found = begin
                        bp = BenefitSponsors::BenefitPackages::BenefitPackage.find(values[:benefit_package_id])
                        bp.present?
-                     rescue
+                     rescue StandardError
                        false
                      end
-          unless bp_found
-            key.failure(:not_found)
-          end
+          key.failure(:not_found) unless bp_found
         end
 
         rule(:census_employee_id) do
           ce_found = begin
                       ce = CensusEmployee.find(values[:census_employee_id])
                       ce.present?
-                    rescue
-                      false
+                     rescue StandardError
+                       false
                     end
-          unless ce_found
-            key.failure(:not_found)
-          end
+          key.failure(:not_found) unless ce_found
         end
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::AcaHelper
   def aca_state_abbreviation
     Settings.aca.state_abbreviation
@@ -119,7 +121,6 @@ module Config::AcaHelper
     @offer_metal_level ||= Settings.aca.plan_options_available.include?("metal_level")
   end
 
-
   def metal_levels_explained
     response = ""
     metal_level_contributions = {
@@ -129,15 +130,14 @@ module Config::AcaHelper
       'platinum': '90%'
     }.with_indifferent_access
     enabled_metal_levels_for_single_carrier.each_with_index do |level, index|
-      if metal_level_contributions[level]
-        if index == 0
-          response << "#{level.capitalize} means the plan is expected to pay #{metal_level_contributions[level]} of expenses for an average population of consumers"
-        elsif (index == enabled_metal_levels_for_single_carrier.length - 2) # subtracting 2 because of dental
-          response << ", and #{level.capitalize} #{metal_level_contributions[level]}."
-        else
-          response << ", #{level.capitalize} #{metal_level_contributions[level]}"
-        end
-      end
+      next unless metal_level_contributions[level]
+      response << if index == 0
+                    "#{level.capitalize} means the plan is expected to pay #{metal_level_contributions[level]} of expenses for an average population of consumers"
+                  elsif index == enabled_metal_levels_for_single_carrier.length - 2 # subtracting 2 because of dental
+                    ", and #{level.capitalize} #{metal_level_contributions[level]}."
+                  else
+                    ", #{level.capitalize} #{metal_level_contributions[level]}"
+                  end
     end
     response
   end
@@ -157,7 +157,7 @@ module Config::AcaHelper
     else
       # For MA stakeholders requested a specific file format
       time_extract = TimeKeeper.datetime_of_record.try(:strftime, '%Y_%m_%d_%H_%M_%S')
-      File.expand_path("#{Rails.root}/public/CCA_#{ENV["RAILS_ENV"]}_#{task_name_MA}_#{time_extract}.csv")
+      File.expand_path("#{Rails.root}/public/CCA_#{ENV['RAILS_ENV']}_#{task_name_MA}_#{time_extract}.csv")
     end
   end
 
@@ -246,11 +246,11 @@ module Config::AcaHelper
   end
 
   def site_broker_quoting_enabled?
-   Settings.site.broker_quoting_enabled
+    Settings.site.broker_quoting_enabled
   end
 
   def site_broker_claim_quoting_enabled?
-   Settings.site.broker_claim_quoting_enabled
+    Settings.site.broker_claim_quoting_enabled
   end
 
   def calendar_is_enabled?

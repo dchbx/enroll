@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'net/http'
 
@@ -97,7 +99,7 @@ module TransportGateway
 
     describe "given:
       - an empty body
-      - a message source 
+      - a message source
       - a destination with a directory that exists
     " do
 
@@ -151,7 +153,7 @@ module TransportGateway
 
       before :each do
         allow(log_observer).to receive(:update) do |level,tag,blk|
-        end 
+        end
         subject.assign_providers(nil, nil)
         subject.add_observer(log_observer)
       end
@@ -165,7 +167,7 @@ module TransportGateway
           expect(level).to eq :error
           expect(tag).to eq "transport_gateway.file_adapter"
           expect(blk.call).to eq "source file not provided"
-        end 
+        end
         expect { subject.receive_message(message) }.to raise_error(ArgumentError, /source file not provided/)
       end
     end
@@ -180,7 +182,7 @@ module TransportGateway
       let(:to) { nil }
       let(:from) do
         to_uri = URI.parse("file:///")
-        to_uri.path = in_file_path 
+        to_uri.path = in_file_path
         to_uri
       end
 

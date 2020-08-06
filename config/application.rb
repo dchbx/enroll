@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.expand_path('../boot', __FILE__)
 
 # require 'rails/all'
@@ -35,14 +37,14 @@ module Enroll
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
 
-    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+    I18n::Backend::Simple.include I18n::Backend::Fallbacks
     config.i18n.fallbacks = {'am' => 'en', 'es' => 'en', 'ja' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
     config.autoload_paths += Dir["#{Rails.root}/app/api/api/*/*"]
 
     #Thanks to Wojtek Kruszewski: https://gist.github.com/WojtekKruszewski
     config.log_tags = [    #'-anything',
-      ->(req){
+      lambda { |req|
         SessionTaggedLogger.extract_session_id_from_request(req)
       }
     ]

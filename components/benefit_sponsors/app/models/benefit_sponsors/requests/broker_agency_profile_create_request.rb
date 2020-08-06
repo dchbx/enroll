@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dry-initializer'
 require 'dry-types'
 require 'mail'
@@ -29,7 +31,9 @@ module BenefitSponsors
 
     class UsDateCoercer
       def self.coerce(string)
-        Date.strptime(string, "%m/%d/%Y") rescue nil
+        Date.strptime(string, "%m/%d/%Y")
+      rescue StandardError
+        nil
       end
     end
 

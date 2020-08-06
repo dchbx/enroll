@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployeeSet
-    
+
     def headers
       default_headers = [
         "Action",
@@ -34,7 +36,7 @@ module Importers::Mhc
       dep_headers = []
       @dependents.times do |i|
         ["SSN", "DOB", "Gender", "First Name", "Middle Name", "Last Name", "Email", "Phone", "Address 1", "Address 2", "City", "State", "Zip", "Relationship"].each do |h|
-            dep_headers << "Dep#{i+1} #{h}"
+          dep_headers << "Dep#{i + 1} #{h}"
         end
       end
       default_headers + dep_headers + ["Import Status", "Import Details"]
@@ -73,7 +75,7 @@ module Importers::Mhc
       dep_rows = []
       @dependents.times do |i|
         ["ssn", "dob", "gender", "name_first", "name_middle", "name_last", "email", "phone", "address_1", "address_2", "city", "state", "zip", "relationship"].each do |r|
-            dep_rows << "dep_#{i+1}_#{r}".to_sym
+          dep_rows << "dep_#{i + 1}_#{r}".to_sym
         end
       end
       default_rows + dep_rows

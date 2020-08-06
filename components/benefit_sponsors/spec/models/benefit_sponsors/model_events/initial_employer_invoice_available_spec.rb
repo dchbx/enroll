@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', dbclean: :after_each do
@@ -9,20 +11,22 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_eligible',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:benefit_application) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'enrollment_eligible',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
 
-  let(:model_instance) {BenefitSponsors::Documents::Document.new({ title: "file_name_1", 
-    date: TimeKeeper.date_of_record, 
-    creator: "hbx_staff", 
-    subject: "initial_invoice", 
-    identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
-    format: "file_content_type" 
-  })}
+  let(:model_instance) do
+    BenefitSponsors::Documents::Document.new({ title: "file_name_1",
+                                               date: TimeKeeper.date_of_record,
+                                               creator: "hbx_staff",
+                                               subject: "initial_invoice",
+                                               identifier: "urn:openhbx:terms:v1:file_storage:s3:bucket:#bucket_name#key",
+                                               format: "file_content_type"})
+  end
 
   describe "ModelEvent" do
     context "when initial invoice is generated" do
@@ -60,7 +64,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employer_profile.notice_date",
         "employer_profile.employer_name",
@@ -71,15 +75,17 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
         "employer_profile.broker.email",
         "employer_profile.broker_present?"
       ]
-    }
+    end
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
         "event_object_id" => benefit_application.id
-    } }
+      }
+    end
 
     context "when notice event received" do
 
@@ -105,7 +111,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerInvoiceAvailable', 
 
       it "should return plan year start date" do
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        expect(merge_model.benefit_application.binder_payment_due_date).to eq ((schedular.map_binder_payment_due_date_by_start_on(false, benefit_application.start_on)).strftime("%m/%d/%Y"))
+        expect(merge_model.benefit_application.binder_payment_due_date).to eq schedular.map_binder_payment_due_date_by_start_on(false, benefit_application.start_on).strftime("%m/%d/%Y")
       end
 
       it "should return false when there is no broker linked to employer" do

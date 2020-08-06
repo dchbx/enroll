@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IdentityVerification
   class InteractiveVerificationResponse
     include HappyMapper
@@ -12,11 +14,11 @@ module IdentityVerification
 
     def successful?
       return false if verification_result.nil?
-      "urn:openhbx:terms:v1:interactive_identity_verification#SUCCESS" == response_code
+      response_code == "urn:openhbx:terms:v1:interactive_identity_verification#SUCCESS"
     end
 
     def failed?
-      "urn:openhbx:terms:v1:interactive_identity_verification#FAILURE" == response_code
+      response_code == "urn:openhbx:terms:v1:interactive_identity_verification#FAILURE"
     end
 
     def response_code

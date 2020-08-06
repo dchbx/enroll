@@ -1,4 +1,6 @@
-# Organization type with relaxed data entry/validation policies used for government agencies, 
+# frozen_string_literal: true
+
+# Organization type with relaxed data entry/validation policies used for government agencies,
 # embassies and other types where FEIN is not assigned/available
 module BenefitSponsors
   module Organizations

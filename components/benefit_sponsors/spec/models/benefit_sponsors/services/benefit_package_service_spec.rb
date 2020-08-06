@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::Services::BenefitPackageService do
@@ -29,7 +31,7 @@ RSpec.describe BenefitSponsors::Services::BenefitPackageService do
         ::BenefitSponsors::Services::SponsoredBenefitCostEstimationService
       )
     end
-    let(:benefit_application) do 
+    let(:benefit_application) do
       instance_double(
         ::BenefitSponsors::BenefitApplications::BenefitApplication,
         benefit_packages: benefit_packages_association_proxy
@@ -81,7 +83,8 @@ RSpec.describe BenefitSponsors::Services::BenefitPackageService do
         benefit_application,
         sponsored_benefit,
         reference_product,
-        product_package).and_return(costs)
+        product_package
+      ).and_return(costs)
       allow(sponsored_benefit_form).to receive(:employer_estimated_monthly_cost=).with(employer_estimated_exposure)
       allow(sponsored_benefit_form).to receive(:employer_estimated_min_monthly_cost=).with(employee_estimated_min_cost)
       allow(sponsored_benefit_form).to receive(:employer_estimated_max_monthly_cost=).with(employee_estimated_max_cost)

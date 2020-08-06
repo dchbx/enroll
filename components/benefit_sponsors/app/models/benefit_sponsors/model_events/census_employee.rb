@@ -4,7 +4,6 @@
 module BenefitSponsors
   module ModelEvents
     module CensusEmployee
-
       REGISTERED_EVENTS = [
         :employee_terminated_from_roster
       ].freeze

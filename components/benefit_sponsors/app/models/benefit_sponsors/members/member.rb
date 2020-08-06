@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class Members::Member
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    GENDER_KINDS          = [:male, :female]
+    GENDER_KINDS          = [:male, :female].freeze
     KINSHIP_MAP           = {
-        :self                       => :self,
-        :spouse                     => :spouse,
-        :domestic_partner           => :domestic_partner,
-        :child_under_26             => :child,
-        :disabled_child_26_and_over => :disabled_child,
-      }
+      :self => :self,
+      :spouse => :spouse,
+      :domestic_partner => :domestic_partner,
+      :child_under_26 => :child,
+      :disabled_child_26_and_over => :disabled_child
+    }.freeze
 
     field :hbx_id,              type: String
     field :sponsor_assigned_id, type: String
@@ -26,42 +28,38 @@ module BenefitSponsors
     field :dob,                 type: Date
 
 
-    embeds_one  :address, 
+    embeds_one  :address,
                 class_name: "BenefitSponsors::Locations::Address"
-    embeds_one  :email, 
+    embeds_one  :email,
                 class_name: "::Email"
 
-    accepts_nested_attributes_for :address, 
-                                  reject_if: :all_blank, 
+    accepts_nested_attributes_for :address,
+                                  reject_if: :all_blank,
                                   allow_destroy: true
 
-    accepts_nested_attributes_for :email, 
+    accepts_nested_attributes_for :email,
                                   allow_destroy: true
 
     validate :birth_date_range
 
     validates :gender,
-      allow_blank: true,
-      allow_nil: true,
-      inclusion: { in: GENDER_KINDS, message: "'%{value}' is not a valid gender kind" }
+              allow_blank: true,
+              allow_nil: true,
+              inclusion: { in: GENDER_KINDS, message: "'%{value}' is not a valid gender kind" }
 
     validates :kinship_to_primary_member,
-      presence: true,
-      allow_blank: true,
-      allow_nil:   true,
-      inclusion: {
-        in: KINSHIP_MAP.keys,
-        message: "'%{value}' is not a valid relationship kind"
-      }
+              presence: true,
+              allow_blank: true,
+              allow_nil: true,
+              inclusion: {
+                in: KINSHIP_MAP.keys,
+                message: "'%{value}' is not a valid relationship kind"
+              }
 
     def ssn=(new_ssn)
       if new_ssn.present?
         ssn_val = new_ssn.to_s.gsub(/\D/, '')
-        if is_ssn_valid?(ssn_val)
-          encrypted_ssn = encrypt(ssn_val) 
-        else
-          nil
-        end
+        encrypted_ssn = encrypt(ssn_val) if is_ssn_valid?(ssn_val)
       end
     end
 
@@ -71,12 +69,12 @@ module BenefitSponsors
 
     def age_on(date = TimeKeeper.date_of_record)
       return unless dob.present?
-      date.year - dob.year - ((date.month > dob.month || (date.month == dob.month && date.day >= dob.day)) ? 0 : 1)
+      date.year - dob.year - (date.month > dob.month || (date.month == dob.month && date.day >= dob.day) ? 0 : 1)
     end
 
     def full_name
       case name_sfx
-      when "ii" ||"iii" || "iv" || "v"
+      when "ii" || "iii" || "iv" || "v"
         [first_name.capitalize, last_name.capitalize, name_sfx.upcase].compact.join(" ")
       else
         [first_name.capitalize, last_name.capitalize, name_sfx].compact.join(" ")
@@ -95,7 +93,11 @@ module BenefitSponsors
       if new_dob.is_a?(Date) || new_dob.is_a?(Time)
         super(new_dob)
       elsif new_dob.is_a?(String)
-        transform_date = Date.strptime(new_dob, "%Y-%m-%d").to_date rescue nil
+        transform_date = begin
+                           Date.strptime(new_dob, "%Y-%m-%d").to_date
+                         rescue StandardError
+                           nil
+                         end
         super(transform_date)
       else
         super(nil)
@@ -136,10 +138,10 @@ module BenefitSponsors
       #   0000 in the serial number (last four digits)
 
       if ssn.present?
-        invalid_area_numbers = %w(000 666)
+        invalid_area_numbers = %w[000 666]
         invalid_area_range = 900..999
-        invalid_group_numbers = %w(00)
-        invalid_serial_numbers = %w(0000)
+        invalid_group_numbers = %w[00]
+        invalid_serial_numbers = %w[0000]
 
         return false if ssn.to_s.blank?
         return false if invalid_area_numbers.include?(ssn.to_s[0,3])
@@ -148,7 +150,7 @@ module BenefitSponsors
         return false if invalid_serial_numbers.include?(ssn.to_s[5,4])
       end
 
-      true    
+      true
     end
 
     def encrypt(value)
@@ -169,12 +171,8 @@ module BenefitSponsors
     def birth_date_range
       return unless dob.present?
 
-      if dob > TimeKeeper.date_of_record
-        errors.add(:dob, message: "future date: #{dob} is not valid for date of birth")
-      end
-      if (TimeKeeper.date_of_record.year - dob.year) > 110
-        errors.add(:dob, message: "date of birth cannot be more than 110 years ago")
-      end
+      errors.add(:dob, message: "future date: #{dob} is not valid for date of birth") if dob > TimeKeeper.date_of_record
+      errors.add(:dob, message: "date of birth cannot be more than 110 years ago") if (TimeKeeper.date_of_record.year - dob.year) > 110
     end
 
 

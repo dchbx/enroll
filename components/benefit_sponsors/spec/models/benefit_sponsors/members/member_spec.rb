@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -25,7 +27,7 @@ module BenefitSponsors
         gender: gender,
         dob: dob,
         kinship_to_primary_member: kinship_to_primary_member,
-        sponsor_assigned_id: sponsor_assigned_id,
+        sponsor_assigned_id: sponsor_assigned_id
 
         # TODO: add following parameters to spec
         # address: address,
@@ -122,7 +124,7 @@ module BenefitSponsors
       end
 
       context "dob more than 110 years ago" do
-        let(:old_dob) { 111.years.ago } 
+        let(:old_dob) { 111.years.ago }
 
         it "should be invalid" do
           member.dob = old_dob
@@ -141,7 +143,7 @@ module BenefitSponsors
           member.validate
           expect(member).to be_invalid
 
-          expect(member.errors[:dob].first[:message].to_s).to match(/future date: #{future_dob.to_s} is not valid for date of birth/)
+          expect(member.errors[:dob].first[:message].to_s).to match(/future date: #{future_dob} is not valid for date of birth/)
         end
       end
 

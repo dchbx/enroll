@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Organizations
     class OrganizationForms::OrganizationForm
@@ -18,8 +20,8 @@ module BenefitSponsors
       attribute :profile, OrganizationForms::ProfileForm
 
       validates :fein,
-        length: { is: 9, message: "%{value} is not a valid FEIN" },
-        numericality: true, if: :is_employer_profile?
+                length: { is: 9, message: "%{value} is not a valid FEIN" },
+                numericality: true, if: :is_employer_profile?
 
       validates_presence_of :entity_kind, :legal_name
       validates_presence_of :fein, if: :is_employer_profile?
@@ -35,7 +37,11 @@ module BenefitSponsors
 
       # Strip non-numeric characters
       def fein=(new_fein)
-        fein = new_fein.to_s.gsub(/\D/, '') rescue nil
+        fein = begin
+                 new_fein.to_s.gsub(/\D/, '')
+               rescue StandardError
+                 nil
+               end
         super fein
       end
 
@@ -52,7 +58,7 @@ module BenefitSponsors
       end
 
       def profile_attributes=(profile_params)
-        self.profile=(profile_params)
+        self.profile = profile_params
       end
 
       def profile=(val)

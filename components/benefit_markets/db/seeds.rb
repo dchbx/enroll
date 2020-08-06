@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 ## Populate namespaced seed content in this file
 ## To run:
 ##  1) In spec/dummy/db folder, create seed.rb file with following: BenefitMarkets::Engine.load_seed
@@ -7,12 +9,12 @@ require 'mongoid_rails_migrations'
 
 force_collection_drop = false
 
-puts "\n"*3
+puts "\n" * 3
 puts "Start of Engine BenefitMarkets seed"
-puts "*"*80
+puts "*" * 80
 
 ## Move these constants into <engine_name>/config folder
-DB_COLLECTION_NAMES = %w(
+DB_COLLECTION_NAMES = %w[
     benefit_markets_benefit_markets
     benefit_markets_benefit_market_catalogs
     benefit_markets_pricing_models_pricing_models
@@ -22,9 +24,9 @@ DB_COLLECTION_NAMES = %w(
     benefit_markets_locations_county_zips
     benefit_markets_products_products
     benefit_markets_products_actuarial_factors_actuarial_factors
-  )
+  ].freeze
 
-DB_COLLECTION_PRESERVE_NAMES = []
+DB_COLLECTION_PRESERVE_NAMES = [].freeze
 # DB_COLLECTION_PRESERVE_NAMES = %w(
 #     benefit_markets_locations_service_areas
 #     benefit_markets_locations_rating_areas
@@ -47,12 +49,12 @@ Mongoid.default_client.collections.each do |collection|
   end
 end
 
-puts "*"*80
-puts "*"*80
+puts "*" * 80
+puts "*" * 80
 
 ## Use DB_COLLECTION_PRESERVE_NAMES && force_collection_drop setting above to determine which
 ## seedfiles are run
 require File.join(File.dirname(__FILE__),'seedfiles', 'cca_seed')
 
 puts "End of Engine BenefitMarkets seed"
-puts "*"*80
+puts "*" * 80

@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Products
     class DentalProducts::DentalProduct < BenefitMarkets::Products::Product
 
-      PRODUCT_PACKAGE_KINDS = [:single_product, :multi_product, :single_issuer]
-      METAL_LEVEL_KINDS     = [:dental]
+      PRODUCT_PACKAGE_KINDS = [:single_product, :multi_product, :single_issuer].freeze
+      METAL_LEVEL_KINDS     = [:dental].freeze
 
       field :hios_id,                     type: String
       field :hios_base_id,                type: String
@@ -21,14 +23,14 @@ module BenefitMarkets
                   inverse_of: nil,
                   class_name: "BenefitMarkets::Products::DentalProducts::DentalProduct",
                   optional: true
-  
+
 
       validates :metal_level_kind,
                 presence: true,
                 inclusion: {in: METAL_LEVEL_KINDS, message: "%{value} is not a valid metal level kind"}
 
 
-      alias_method :is_standard_plan?, :is_standard_plan
+      alias is_standard_plan? is_standard_plan
 
       def metal_level
         dental_level.to_s

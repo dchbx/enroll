@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class ResidentCandidate
     include ActiveModel::Model
@@ -24,7 +26,11 @@ module Forms
     attr_reader :dob
 
     def dob=(val)
-      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      @dob = begin
+               Date.strptime(val, "%Y-%m-%d")
+             rescue StandardError
+               nil
+             end
     end
 
     def match_person
@@ -32,22 +38,22 @@ module Forms
         Person.where({
                        :dob => dob,
                        :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first || match_ssn_employer_person
+                     }).first || match_ssn_employer_person
       else
         Person.where({
                        :dob => dob,
                        :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                       :first_name => /^#{first_name}$/i
+                     }).first
       end
     end
 
     def match_ssn_employer_person
       potential_person = Person.where({
-                       :dob => dob,
-                       :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                                        :dob => dob,
+                                        :last_name => /^#{last_name}$/i,
+                                        :first_name => /^#{first_name}$/i
+                                      }).first
       return potential_person if potential_person.present? && potential_person.employer_staff_roles?
       nil
     end
@@ -58,7 +64,7 @@ module Forms
       if same_ssn.present? && same_ssn.first.try(:user)
         errors.add(:ssn_taken,
                   #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
-                  "The social security number you entered is affiliated with another account.")
+                   "The social security number you entered is affiliated with another account.")
       end
     end
 
@@ -68,8 +74,8 @@ module Forms
         if matched_person.user.present?
           if matched_person.user.id.to_s != self.user_id.to_s
             errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account."
+              :base,
+              "#{first_name} #{last_name} is already affiliated with another account."
             )
           end
         end
@@ -78,12 +84,12 @@ module Forms
     end
 
     def dob_not_in_future
-
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
-            :dob,
-            "#{dob} can't be in the future.")
-        self.dob=""
+          :dob,
+          "#{dob} can't be in the future."
+        )
+        self.dob = ""
       end
     end
 

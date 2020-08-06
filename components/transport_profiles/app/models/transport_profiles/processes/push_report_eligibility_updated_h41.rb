@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   module Processes
     class PushReportEligibilityUpdatedH41 < ::TransportProfiles::Processes::Process

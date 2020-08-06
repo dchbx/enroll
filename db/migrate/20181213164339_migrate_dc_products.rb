@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class MigrateDcProducts < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s.downcase == "dc"
 
       say_with_time("Updating network data for plans") do
         hios_ids = ["94506DC0350012-01", "94506DC0360001-01", "94506DC0350014-01", "94506DC0350015-01", "94506DC0350018-01", "94506DC0350019-01", "94506DC0360003-01", "94506DC0350028-01", "94506DC0350020-01", "94506DC0350022-01", "94506DC0350001-01", "94506DC0350016-01", "94506DC0350002-01", "94506DC0350017-01", "94506DC0350023-01", "94506DC0350010-01", "94506DC0350008-01", "94506DC0350011-01", "94506DC0350009-01", "94506DC0360002-01", "94506DC0350027-01"]
-        Plan.where(active_year: 2019, :hios_id.in=> hios_ids).update_all(dc_in_network: true, nationwide: false)
+        Plan.where(active_year: 2019, :hios_id.in => hios_ids).update_all(dc_in_network: true, nationwide: false)
       end
 
       say_with_time("Migrating plans for DC") do
@@ -35,7 +37,7 @@ class MigrateDcProducts < Mongoid::Migration
         say_with_time("Migrate primary plan data") do
           Plan.all.each do |plan|
             premium_table_cache = Hash.new do |h, k|
-              h[k] = Hash.new
+              h[k] = {}
             end
             plan.premium_tables.each do |pt|
               applicable_range = pt.start_on..pt.end_on
@@ -85,19 +87,19 @@ class MigrateDcProducts < Mongoid::Migration
               nationwide: plan.nationwide,
               dc_in_network: plan.dc_in_network
             }
-            # TODO Fix product_package_kinds for IVL products
+            # TODO: Fix product_package_kinds for IVL products
 
             if product_kind.to_s.downcase == "health"
               product_package_kinds = [:metal_level, :single_issuer, :single_product]
               hp = BenefitMarkets::Products::HealthProducts::HealthProduct.new({
-                health_plan_kind:  plan.plan_type? ? plan.plan_type.downcase : "hmo", # TODO 2014 plan issues, fix plan_type
+                health_plan_kind: plan.plan_type? ? plan.plan_type.downcase : "hmo", # TODO: 2014 plan issues, fix plan_type
                 metal_level_kind: plan.metal_level,
                 product_package_kinds: product_package_kinds,
                 ehb: plan.ehb,
                 is_standard_plan: plan.is_standard_plan,
                 rx_formulary_url: plan.rx_formulary_url,
                 hsa_eligibility: plan.hsa_eligibility,
-                network_information: plan.network_information,
+                network_information: plan.network_information
               }.merge(shared_attributes))
               if hp.valid?
                 hp.save
@@ -105,9 +107,9 @@ class MigrateDcProducts < Mongoid::Migration
                 raise "Health Product not saved #{hp.hios_id}."
               end
             else
-              # TODO Fix product_package_kinds for IVL dentals if any
+              # TODO: Fix product_package_kinds for IVL dentals if any
               dp = BenefitMarkets::Products::DentalProducts::DentalProduct.new({
-                dental_plan_kind: plan.try(:plan_type).try(:downcase),  # TODO 2014 plan issues, fix plan_type
+                dental_plan_kind: plan.try(:plan_type).try(:downcase),  # TODO: 2014 plan issues, fix plan_type
                 metal_level_kind: :dental,
                 ehb: plan.ehb,
                 is_standard_plan: plan.is_standard_plan,
@@ -155,14 +157,10 @@ class MigrateDcProducts < Mongoid::Migration
 
             renewal_product = if renewal_plan_hios_id.present?
                                 BenefitMarkets::Products::Product.where(hios_id: renewal_plan_hios_id, benefit_market_kind: product.benefit_market_kind).select{|product| product.application_period.first.year == plan.renewal_plan.active_year}.last
-                              else
-                                nil
                               end
 
             catastrophic_product = if catastrophic_plan_hios_id.present?
                                      BenefitMarkets::Products::Product.where(hios_id: catastrophic_plan_hios_id, benefit_market_kind: product.benefit_market_kind).select{|product| product.application_period.first.year == plan.cat_age_off_renewal_plan.active_year}.last
-                                   else
-                                     nil
                                    end
             product.renewal_product = renewal_product
             product.catastrophic_age_off_product = catastrophic_product unless plan.coverage_kind == "dental"
@@ -176,7 +174,6 @@ class MigrateDcProducts < Mongoid::Migration
     else
       say "Skipping for non-DC site"
     end
-
   end
 
   def self.down

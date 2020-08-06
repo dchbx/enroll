@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::UpdateBrokerAgencyService, type: :model, :dbclean => :after_each do
-    let(:params) {
+    let(:params) do
       {
-          :legal_name => broker_agency_profile.legal_name
+        :legal_name => broker_agency_profile.legal_name
       }
-    }
+    end
     let(:service_class) { BenefitSponsors::Services::UpdateBrokerAgencyService }
     let!(:broker_agency_account) {FactoryBot.build(:benefit_sponsors_accounts_broker_agency_account, broker_agency_profile: broker_agency_profile)}
 
@@ -16,10 +18,12 @@ module BenefitSponsors
     let(:site)                          { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
     let(:organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)              { organization.employer_profile }
-    let(:active_benefit_sponsorship)    { sponsor = employer_profile.add_benefit_sponsorship
-                                          sponsor.broker_agency_accounts << broker_agency_account
-                                          sponsor.organization.save
-                                          sponsor}
+    let(:active_benefit_sponsorship)    do
+      sponsor = employer_profile.add_benefit_sponsorship
+      sponsor.broker_agency_accounts << broker_agency_account
+      sponsor.organization.save
+      sponsor
+    end
 
     let!(:broker_organization)    { FactoryBot.build(:benefit_sponsors_organizations_general_organization, site: site)}
     let!(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
@@ -44,9 +48,11 @@ module BenefitSponsors
         person.broker_role.update_attributes!(benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id)
       end
 
-      let(:formed_params) { {
+      let(:formed_params) do
+        {
           hbx_id: person.hbx_id
-      }}
+        }
+      end
       let(:person) { FactoryBot.create(:person, :with_broker_role)}
       let!(:old_broker_agency_profile) { BenefitSponsors::Organizations::BrokerAgencyProfile.new }
       let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: old_broker_agency_profile.id, person: person) }
@@ -61,7 +67,7 @@ module BenefitSponsors
     describe "#update_broker_agency_attributes" do
       let(:service_obj) { service_class.new(params)}
 
-      it "should update corporate_npn"do
+      it "should update corporate_npn" do
         service_obj.update_broker_agency_attributes({corporate_npn: "12234234"})
         broker_agency_profile.reload
         expect(broker_agency_profile.corporate_npn).to eq "12234234"

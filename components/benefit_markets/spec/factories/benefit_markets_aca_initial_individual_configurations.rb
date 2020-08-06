@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_aca_initial_individual_configuration, class: 'BenefitMarkets::Configurations::AcaInitialIndividualConfiguration' do
 

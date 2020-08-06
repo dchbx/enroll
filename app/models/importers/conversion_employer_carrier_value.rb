@@ -1,12 +1,13 @@
+# frozen_string_literal: true
+
 module Importers
   module ConversionEmployerCarrierValue
-
-    def self.included(base) 
+    def self.included(base)
       base.class_eval do
         attr_reader :carrier
 
         validate :validate_carrier
-        validates_presence_of :carrier, :allow_blank => false 
+        validates_presence_of :carrier, :allow_blank => false
       end
     end
 
@@ -20,9 +21,7 @@ module Importers
 
     def validate_carrier
       found_carrier = find_carrier
-      if found_carrier.nil?
-        errors.add(:carrier, "invalid carrier specified (not one of #{self.class::CARRIER_MAPPING.keys.join(", ")})")
-      end
+      errors.add(:carrier, "invalid carrier specified (not one of #{self.class::CARRIER_MAPPING.keys.join(', ')})") if found_carrier.nil?
     end
 
     def find_carrier

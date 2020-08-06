@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::ContactCenterModelConcern
   extend ActiveSupport::Concern
 

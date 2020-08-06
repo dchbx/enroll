@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeneralAgencyAccount
   include Mongoid::Document
   include SetCurrentUser
@@ -22,7 +24,7 @@ class GeneralAgencyAccount
 
   # belongs_to general_agency_profile
   def general_agency_profile=(new_general_agency_profile)
-    raise ArgumentError.new("expected GeneralAgencyProfile") unless new_general_agency_profile.is_a?(GeneralAgencyProfile)
+    raise ArgumentError, "expected GeneralAgencyProfile" unless new_general_agency_profile.is_a?(GeneralAgencyProfile)
     self.general_agency_profile_id = new_general_agency_profile._id
     @general_agency_profile = new_general_agency_profile
   end
@@ -32,13 +34,11 @@ class GeneralAgencyAccount
     @general_agency_profile = GeneralAgencyProfile.find(self.general_agency_profile_id) unless self.general_agency_profile_id.blank?
   end
 
-
   def ga_name
     Rails.cache.fetch("general-agency-name-#{self.general_agency_profile_id}", expires_in: 12.hour) do
       legal_name
     end
   end
-
 
   def legal_name
     general_agency_profile.present? ? general_agency_profile.legal_name : ""
@@ -53,11 +53,9 @@ class GeneralAgencyAccount
   end
 
   def for_broker_agency_account?(ba_account)
-    return false unless (broker_role_id == ba_account.writing_agent_id)
+    return false unless broker_role_id == ba_account.writing_agent_id
     return false unless general_agency_profile.present?
-    if !ba_account.end_on.blank?
-      return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
-    end
+    return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on)) unless ba_account.end_on.blank?
     (start_on >= ba_account.start_on)
   end
 
@@ -78,7 +76,7 @@ class GeneralAgencyAccount
     end
 
     def all
-      orgs = Organization.exists(employer_profile: true).exists("employer_profile.general_agency_accounts"=> true).to_a
+      orgs = Organization.exists(employer_profile: true).exists("employer_profile.general_agency_accounts" => true).to_a
       list = []
       orgs.each do |org|
         list.concat(org.employer_profile.general_agency_accounts) if org.employer_profile.general_agency_accounts.present?

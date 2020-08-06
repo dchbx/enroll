@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportGateway
   class CredentialResolvers::SftpCredentialResolver
     RawSftpCredentials = Struct.new(:user, :password) do

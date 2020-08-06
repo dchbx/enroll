@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "sponsored_benefits/engine"
 
 require "mongoid"
@@ -31,13 +33,12 @@ module SponsoredBenefits
 
 
   # Ensure class type and integrity of date period ranges
-  def self.tidy_date_range(range_period, attribute = nil)
-
+  def self.tidy_date_range(range_period, _attribute = nil)
     return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
     case range_period.begin.class
     when Date
-      date_range  = range_period
+      date_range = range_period
     when String
       begin_on    = range_period.split("..")[0]
       end_on      = range_period.split("..")[1]
@@ -52,15 +53,14 @@ module SponsoredBenefits
     end
 
     if range_is_increasing?(date_range)
-      return date_range
+      date_range
     else
       # @errors.add(attribute.to_sym, "end date may not preceed begin date") if attribute.present?
-      return nil
+      nil
     end
   end
 
   def self.range_is_increasing?(range)
     range.begin < range.end
   end
-
 end

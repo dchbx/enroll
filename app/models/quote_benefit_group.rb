@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuoteBenefitGroup
   include Mongoid::Document
   include MongoidSupport::AssociationProxies
@@ -8,7 +10,7 @@ class QuoteBenefitGroup
     :domestic_partner,
     :child_under_26,
     :child_26_and_over
-  ]
+  ].freeze
 
   embedded_in :quote
 
@@ -77,7 +79,7 @@ class QuoteBenefitGroup
 
       # 'employee' relationship should be set to a min of 50%
       # initial_premium_pct = relationship.to_s == "employee" ? 50 : 0
-       self.quote_relationship_benefits.build(relationship: relationship, offered: true)
+      self.quote_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
@@ -85,12 +87,12 @@ class QuoteBenefitGroup
     return if self.quote_dental_relationship_benefits.present?
 
     self.quote_dental_relationship_benefits = PERSONAL_RELATIONSHIP_KINDS.map do |relationship|
-       self.quote_dental_relationship_benefits.build(relationship: relationship, offered: true)
+      self.quote_dental_relationship_benefits.build(relationship: relationship, offered: true)
     end
   end
 
   def reference_plan=(new_reference_plan)
-    raise ArgumentError.new("expected Plan") unless new_reference_plan.is_a? Plan
+    raise ArgumentError, "expected Plan" unless new_reference_plan.is_a? Plan
     self.reference_plan_id = new_reference_plan._id
   end
 
@@ -105,17 +107,17 @@ class QuoteBenefitGroup
 
   def set_bounding_cost_plans
     return if reference_plan_id.nil?
-    if quote.plan_option_kind == "single_plan"
-      plans = [reference_plan]
-    else
-      if quote.plan_option_kind == "single_carrier"
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
-      else
-        plans = Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
-      end
-    end
+    plans = if quote.plan_option_kind == "single_plan"
+              [reference_plan]
+            else
+              if quote.plan_option_kind == "single_carrier"
+                Plan.shop_health_by_active_year(reference_plan.active_year).by_carrier_profile(reference_plan.carrier_profile)
+              else
+                Plan.shop_health_by_active_year(reference_plan.active_year).by_health_metal_levels([reference_plan.metal_level])
+                      end
+            end
 
-    if plans.size > 0
+    unless plans.empty?
       plans_by_cost = plans.sort_by { |plan| plan.premium_tables.first.cost }
 
       self.lowest_cost_plan_id  = plans_by_cost.first.id
@@ -128,7 +130,7 @@ class QuoteBenefitGroup
     cost = 0
     self.quote_households.each do |hh|
       pcd = PlanCostDecoratorQuote.new(p, hh, self, p)
-      cost = cost + pcd.total_employee_cost.round(2)
+      cost += pcd.total_employee_cost.round(2)
     end
     cost.round(2)
   end
@@ -144,12 +146,12 @@ class QuoteBenefitGroup
   end
 
   def roster_cost_all_plans(coverage_kind = 'health')
-    @plan_costs= {}
+    @plan_costs = {}
     combined_family = flat_roster_for_premiums
     quote_collection = Plan.shop_plans coverage_kind, quote.plan_year
-    quote_collection.each {|plan|
+    quote_collection.each do |plan|
       @plan_costs[plan.id.to_s] = roster_premium(plan)
-    }
+    end
     @plan_costs
   end
 
@@ -174,7 +176,7 @@ class QuoteBenefitGroup
     cost = 0
     self.quote_households.each do |hh|
       pcd = PlanCostDecoratorQuote.new(p, hh, self, reference_plan)
-      cost = cost + pcd.total_employer_contribution.round(2)
+      cost += pcd.total_employer_contribution.round(2)
     end
     cost.round(2)
   end
@@ -192,15 +194,15 @@ class QuoteBenefitGroup
     self.quote.quote_households.each do |quote_household|
       return true if self.id == quote_household.quote_benefit_group_id
     end
-    return false
+    false
   end
 
   class << self
 
     def find(id)
       quotes = Quote.where("quote_benefit_groups._id" => BSON::ObjectId.from_string(id))
-      quotes.size > 0 ? quotes.first.quote_benefit_groups.where("_id" => BSON::ObjectId.from_string(id)).first : nil
-    rescue
+      !quotes.empty? ? quotes.first.quote_benefit_groups.where("_id" => BSON::ObjectId.from_string(id)).first : nil
+    rescue StandardError
       log("Can not find quote benefit group with id #{id}", {:severity => "error"})
       nil
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -18,13 +20,13 @@ module BenefitSponsors
     let(:aasm_state) { :active }
     let(:correlation_id) { "a correlation id" }
 
-    let(:payload) {
+    let(:payload) do
       double(:headers => {
-        benefit_sponsorship_id: benefit_sponsorship.id.to_s,
-        new_date: renewal_effective_date.strftime("%Y-%m-%d")
-        },
-        :correlation_id => correlation_id)
-    }
+               benefit_sponsorship_id: benefit_sponsorship.id.to_s,
+               new_date: renewal_effective_date.strftime("%Y-%m-%d")
+             },
+             :correlation_id => correlation_id)
+    end
 
     context "when benefit sponsorship exists" do
       context "when renewal success" do
@@ -42,13 +44,13 @@ module BenefitSponsors
 
     context "when benefit sponsorship not found" do
       let(:benefit_sponsorship_id) { BSON::ObjectId.new }
-      let(:payload) {
+      let(:payload) do
         double(:headers => {
-          benefit_sponsorship_id: benefit_sponsorship_id.to_s,
-          new_date: renewal_effective_date.strftime("%Y-%m-%d")
-          },
-          :correlation_id => correlation_id)
-      }
+                 benefit_sponsorship_id: benefit_sponsorship_id.to_s,
+                 new_date: renewal_effective_date.strftime("%Y-%m-%d")
+               },
+               :correlation_id => correlation_id)
+      end
       it "should notify the error" do
         expect(subject).to receive(:notify).with(
           "acapi.error.events.benefit_sponsorship.execute_benefit_renewal.benefit_sponsorship_not_found",
@@ -57,8 +59,8 @@ module BenefitSponsors
             :benefit_sponsorship_id => benefit_sponsorship_id.to_s,
             :new_date => renewal_effective_date.strftime("%Y-%m-%d"),
             :body => JSON.dump({
-              "benefit sponsorship" => ["can't be found"]
-            }),
+                                 "benefit sponsorship" => ["can't be found"]
+                               }),
             :correlation_id => correlation_id
           }
         )

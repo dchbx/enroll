@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -12,7 +14,7 @@ module BenefitMarkets
       end
 
       it "should return false if rates are not available from all carriers" do
-        expect(product_factory.new({date: TimeKeeper.date_of_record-1.year}).has_rates?).to eq false
+        expect(product_factory.new({date: TimeKeeper.date_of_record - 1.year}).has_rates?).to eq false
       end
     end
 

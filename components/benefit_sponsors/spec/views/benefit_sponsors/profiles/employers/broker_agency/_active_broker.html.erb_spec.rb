@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_broker.html.erb", :type => :view, dbclean: :after_each do
 
@@ -60,7 +62,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
     end
 
     it "should show the broker assignment date" do
-      expect(rendered).to match (broker_agency_account.start_on).strftime("%m/%d/%Y")
+      expect(rendered).to match broker_agency_account.start_on.strftime("%m/%d/%Y")
     end
 
     it "should see button of change broker" do

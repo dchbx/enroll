@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeePolicyDelete < ConversionEmployeePolicyCommon
 
@@ -11,17 +13,13 @@ module Importers
       return true if found_employer.nil?
       return true if subscriber_ssn.blank?
       found_employee = find_employee
-      if found_employee.nil?
-        errors.add(:subscriber_ssn, "unable to find employee")
-      end
+      errors.add(:subscriber_ssn, "unable to find employee") if found_employee.nil?
     end
 
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer
-      if found_employer.nil?
-        errors.add(:fein, "does not exist")
-      end
+      errors.add(:fein, "does not exist") if found_employer.nil?
     end
 
     def find_employer
@@ -39,7 +37,7 @@ module Importers
       # employee_role = found_employee.employee_role
       # if employee_role.blank?
       #   errors.add(:subscriber_ssn, "employee role missing")
-      #   return false 
+      #   return false
       # end
 
       # person = employee_role.person
@@ -55,16 +53,14 @@ module Importers
 
       if active_plan_year.present?
         bg_ids = active_plan_year.benefit_groups.map(&:id)
-        if (active_plan_year.start_on == TimeKeeper.date_of_record.beginning_of_month)
+        if active_plan_year.start_on == TimeKeeper.date_of_record.beginning_of_month
           employment_terminated_on = TimeKeeper.date_of_record.beginning_of_month
           hbx_enrollments.each do |hbx_enrollment|
-            if bg_ids.include?(hbx_enrollment.benefit_group_id) &&  hbx_enrollment.may_cancel_coverage?
-              hbx_enrollment.cancel_coverage!
-            end
+            hbx_enrollment.cancel_coverage! if bg_ids.include?(hbx_enrollment.benefit_group_id) && hbx_enrollment.may_cancel_coverage?
           end
         else
           hbx_enrollments.each do |hbx_enrollment|
-            if bg_ids.include?(hbx_enrollment.benefit_group_id) &&  hbx_enrollment.may_terminate_coverage?
+            if bg_ids.include?(hbx_enrollment.benefit_group_id) && hbx_enrollment.may_terminate_coverage?
               hbx_enrollment.update_attributes(:terminated_on => employment_terminated_on)
               hbx_enrollment.terminate_coverage!
             end
@@ -76,9 +72,7 @@ module Importers
       if renewing_plan_year.present?
         bg_ids = renewing_plan_year.benefit_groups.map(&:id)
         hbx_enrollments.each do |hbx_enrollment|
-          if bg_ids.include?(hbx_enrollment.benefit_group_id) &&  hbx_enrollment.may_cancel_coverage?
-            hbx_enrollment.cancel_coverage!
-          end
+          hbx_enrollment.cancel_coverage! if bg_ids.include?(hbx_enrollment.benefit_group_id) && hbx_enrollment.may_cancel_coverage?
         end
       end
 
@@ -109,15 +103,15 @@ module Importers
       found_employer = find_employer
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
-        employer_profile_id: found_employer.id,
+                                                   employer_profile_id: found_employer.id,
         # hired_on: {"$lte" => start_date},
-        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
-      })
+                                                   encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                 })
       non_terminated_employees = candidate_employees.reject do |ce|
-        (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+        !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
       end
-    
-      @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+
+      @found_employee = non_terminated_employees.max_by(&:hired_on)
     end
 
   end

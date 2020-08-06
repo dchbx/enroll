@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
   attr_accessor :family
 
@@ -5,7 +7,7 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
     args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
+    args[:recipient_document_store] = consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.header = "notices/shared/header_ivl.html.erb"
     super(args)
@@ -20,13 +22,9 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
     attach_taglines
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
     clear_tmp(notice_path)
   end
 
@@ -37,24 +35,24 @@ class IvlNotices::FinalCatastrophicPlanNotice < IvlNotice
     notice.primary_firstname = recipient.first_name || ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
-    else  
+    else
       # @notice.primary_address = nil
-      raise 'mailing address not present' 
+      raise 'mailing address not present'
     end
   end
 
   def append_address(primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
-      street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
-      city: primary_address.city.titleize,
-      state: primary_address.state,
-      zip: primary_address.zip
-      })
+                                                               street_1: capitalize_quadrant(primary_address.address_1.to_s.titleize),
+                                                               street_2: capitalize_quadrant(primary_address.address_2.to_s.titleize),
+                                                               city: primary_address.city.titleize,
+                                                               state: primary_address.state,
+                                                               zip: primary_address.zip
+                                                             })
   end
 
   def capitalize_quadrant(address_line)
-    address_line.split(/\s/).map do |x| 
+    address_line.split(/\s/).map do |x|
       x.strip.match(/^NW$|^NE$|^SE$|^SW$/i).present? ? x.strip.upcase : x.strip
     end.join(' ')
   end

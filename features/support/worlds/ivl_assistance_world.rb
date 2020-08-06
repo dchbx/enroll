@@ -20,7 +20,7 @@ module IvlAssistanceWorld
       effective_starting_on: TimeKeeper.date_of_record,
       is_eligibility_determined: true,
       submitted_at: TimeKeeper.date_of_record
-      )
+    )
     family.active_household.tax_households.destroy_all
     family.active_household.tax_households << tax_household
     family.active_household.save!
@@ -29,8 +29,8 @@ module IvlAssistanceWorld
       max_aptc: 100.00,
       csr_percent_as_integer: 100,
       determined_at: TimeKeeper.date_of_record
-      )
-    tax_household.eligibility_determinations.each { |ed| ed.save!}
+    )
+    tax_household.eligibility_determinations.each(&:save!)
     tax_household.save!
     family.save!
     tax_household
@@ -44,13 +44,13 @@ module IvlAssistanceWorld
       is_subscriber: true,
       is_ia_eligible: true,
       is_medicaid_chip_eligible: false
-      )
+    )
     tax_household.tax_household_members << TaxHouseholdMember.new(
       applicant_id: family.family_members[1].id,
       is_subscriber: false,
       is_ia_eligible: true,
       is_medicaid_chip_eligible: false
-      )
+    )
     tax_household.save!
     family.active_household.save!
     family.save!
@@ -64,13 +64,13 @@ module IvlAssistanceWorld
       is_subscriber: true,
       is_ia_eligible: true,
       is_medicaid_chip_eligible: false
-      )
+    )
     tax_household.tax_household_members << TaxHouseholdMember.new(
       applicant_id: family.family_members[1].id,
       is_subscriber: false,
       is_ia_eligible: false,
       is_medicaid_chip_eligible: true
-      )
+    )
     tax_household.save!
     family.active_household.save!
     family.save!

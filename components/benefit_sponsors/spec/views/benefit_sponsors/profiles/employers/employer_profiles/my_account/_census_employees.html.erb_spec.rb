@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -42,7 +44,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/employer_profiles/my_a
     end
 
     it 'should display for HBX admin' do
-      allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", updateable?: true, can_modify_employer?:true))
+      allow(view).to receive(:policy_helper).and_return(double("EmployerProfile", updateable?: true, can_modify_employer?: true))
       render template: "benefit_sponsors/profiles/employers/employer_profiles/my_account/_census_employees.html.erb"
       expect(rendered).to match(/Terminate Employee Roster Enrollments/)
     end

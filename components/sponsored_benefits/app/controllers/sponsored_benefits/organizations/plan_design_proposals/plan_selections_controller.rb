@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "sponsored_benefits/application_controller"
 
 module SponsoredBenefits
@@ -11,12 +13,11 @@ module SponsoredBenefits
       end
 
       private
+
       helper_method :plan_design_form, :plan_design_organization, :plan_design_proposal, :plan_design_proposal_benefit_group, :kind, :has_dental_benefits?
 
       def published_plans_are_view_only
-        if plan_design_proposal.published?
-          redirect_to organizations_plan_design_proposal_path(plan_design_proposal)
-        end
+        redirect_to organizations_plan_design_proposal_path(plan_design_proposal) if plan_design_proposal.published?
       end
 
       def plan_design_proposal

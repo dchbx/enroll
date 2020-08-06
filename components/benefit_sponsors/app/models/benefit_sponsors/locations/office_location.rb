@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Locations
     class OfficeLocation
@@ -8,18 +10,18 @@ module BenefitSponsors
 
       field :is_primary, type: Boolean, default: true
 
-      embeds_one :address, class_name:"BenefitSponsors::Locations::Address", cascade_callbacks: true, validate: true
+      embeds_one :address, class_name: "BenefitSponsors::Locations::Address", cascade_callbacks: true, validate: true
       accepts_nested_attributes_for :address, reject_if: :all_blank, allow_destroy: true
-      embeds_one :phone, class_name:"BenefitSponsors::Locations::Phone", cascade_callbacks: true, validate: true
+      embeds_one :phone, class_name: "BenefitSponsors::Locations::Phone", cascade_callbacks: true, validate: true
       accepts_nested_attributes_for :phone, reject_if: :all_blank, allow_destroy: true
 
-      validates_presence_of :address, class_name:"BenefitSponsors::Locations::Address"
-      validates_presence_of :phone, class_name:"BenefitSponsors::Locations::Phone", if: :primary_or_branch?
+      validates_presence_of :address, class_name: "BenefitSponsors::Locations::Address"
+      validates_presence_of :phone, class_name: "BenefitSponsors::Locations::Phone", if: :primary_or_branch?
 
 
       # validate :address_includes_county_for_employers_primary_location
 
-      alias_method :is_primary?, :is_primary
+      alias is_primary? is_primary
 
       # remove organization references?
 
@@ -53,7 +55,7 @@ module BenefitSponsors
         ['primary', 'branch'].include? address.kind if address.present?
       end
 
-      # TODO -- only one office location can be primary
+      # TODO: -- only one office location can be primary
       # def is_primary=(new_primary_value)
       #   if parent.present? && new_primary_value == true
       #     parent.office_locations.each { |loc| loc.is_primary == false unless loc == self }
@@ -69,5 +71,4 @@ module BenefitSponsors
       end
     end
   end
-
 end

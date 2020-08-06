@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PdfTemplates
   class EligibilityNotice
     include Virtus.model
@@ -20,7 +22,7 @@ module PdfTemplates
     end
 
     def broker?
-      return false
+      false
     end
 
     def employee_notice?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module TransportGateway
@@ -8,7 +10,7 @@ module TransportGateway
     attr_accessor :source_credentials, :destination_credentials
 
     #  @from
-    #  @to 
+    #  @to
     #  @body
 
     ## ACApi attributes
@@ -30,15 +32,15 @@ module TransportGateway
       @to = to_uri(options[:to])
     end
 
-    def log_inspect()
+    def log_inspect
       <<-LOGSTRING
-        From: #{from.to_s}
-        To: #{to.to_s}
+        From: #{from}
+        To: #{to}
         #{log_body}
       LOGSTRING
     end
 
-  private
+    private
 
     def log_body
       return("------- NIL BODY VALUE ------") if body.nil?

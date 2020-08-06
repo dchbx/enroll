@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     # Takes a 'naked' roster entry with possible coverage information and
@@ -67,7 +69,7 @@ module BenefitSponsors
             @member_dobs[member.member_id] = member.dob
             @member_ids << member.member_id
           else
-            @excluded_dependent_ids = @excluded_dependent_ids + [member.member_id]
+            @excluded_dependent_ids += [member.member_id]
           end
           self
         end
@@ -78,7 +80,7 @@ module BenefitSponsors
           end
           cu = @level_map[contribution_unit.id]
           return self if cu.is_offered
-          last_qualified_mix = mix_possibilities.sort.last
+          last_qualified_mix = mix_possibilities.max
           (@member_ids - last_qualified_mix.member_ids).each do |m_id|
             @excluded_dependent_ids << m_id
           end

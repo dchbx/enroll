@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::SpecialEnrollmentPeriod
     include Virtus.model
@@ -12,14 +14,14 @@ module Notifier
 
     def self.stubbed_object
       Notifier::MergeDataModels::SpecialEnrollmentPeriod.new({
-        title: 'Married',
-        qle_reported_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
-        start_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
-        end_on: (TimeKeeper.date_of_record + 20.days).strftime('%m/%d/%Y'),
-        submitted_at: (TimeKeeper.datetime_of_record).strftime('%m/%d/%Y'),
-        reporting_deadline: (TimeKeeper.datetime_of_record + 15.days).strftime('%m/%d/%Y'),
-        event_on: (TimeKeeper.datetime_of_record).strftime('%m/%d/%Y')
-      })
+                                                               title: 'Married',
+                                                               qle_reported_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
+                                                               start_on: (TimeKeeper.date_of_record - 10.days).strftime('%m/%d/%Y'),
+                                                               end_on: (TimeKeeper.date_of_record + 20.days).strftime('%m/%d/%Y'),
+                                                               submitted_at: TimeKeeper.datetime_of_record.strftime('%m/%d/%Y'),
+                                                               reporting_deadline: (TimeKeeper.datetime_of_record + 15.days).strftime('%m/%d/%Y'),
+                                                               event_on: TimeKeeper.datetime_of_record.strftime('%m/%d/%Y')
+                                                             })
     end
   end
 end

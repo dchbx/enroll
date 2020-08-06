@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -7,8 +9,10 @@ module BenefitMarkets
     let(:today)                     { Date.today }
 
     let(:title)                     { "Benefit Buddy's SHOP Employer Benefit Market" }
-    let(:description)               { "As an eligible employer, you may shop, select, and elect contribution amounts on \
-                                      benefit products that you make available for your employees to purchase." }
+    let(:description)               do
+      "As an eligible employer, you may shop, select, and elect contribution amounts on \
+                                      benefit products that you make available for your employees to purchase."
+    end
     let(:benefit_market)            { BenefitMarkets::BenefitMarket.new(kind: benefit_market_kind)  }
     let(:application_interval_kind) { :monthly }
     let(:application_period)        { Date.new(today.year, 1, 1)..Date.new(today.year, 12, 31) }
@@ -22,7 +26,7 @@ module BenefitMarkets
         application_period: application_period,
         probation_period_kinds: probation_period_kinds,
         title: title,
-        description: description,
+        description: description
       }
     end
 

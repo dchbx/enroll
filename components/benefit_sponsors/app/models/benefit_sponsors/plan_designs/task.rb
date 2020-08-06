@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module PlanDesigns
     class Task
@@ -6,7 +8,7 @@ module BenefitSponsors
 
       def initialize(sponsored_benefit)
         @sponsored_benefit = sponsored_benefit
-        
+
         # Pointer to traverse upward from child tasks
         # @parent = nil
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -16,18 +18,22 @@ module BenefitSponsors
     let!(:broker_agency_profile1) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile, organization: broker_organization, market_kind: 'shop', legal_name: 'Legal Name1') }
     let!(:person1) { FactoryBot.create(:person) }
     let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
-    let(:broker_management_form_create) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
-                                          employer_profile_id: employer_profile.id,
-                                          broker_agency_profile_id: broker_agency_profile1.id,
-                                          broker_role_id: broker_role1.id)
-                                        }
+    let(:broker_management_form_create) do
+      BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
+        employer_profile_id: employer_profile.id,
+        broker_agency_profile_id: broker_agency_profile1.id,
+        broker_role_id: broker_role1.id
+      )
+    end
 
-    let(:broker_management_form_terminate) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
-                                              employer_profile_id: employer_profile.id,
-                                              broker_agency_profile_id: broker_agency_profile1.id,
-                                              direct_terminate: 'true',
-                                              termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y'))
-                                            }
+    let(:broker_management_form_terminate) do
+      BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm.new(
+        employer_profile_id: employer_profile.id,
+        broker_agency_profile_id: broker_agency_profile1.id,
+        direct_terminate: 'true',
+        termination_date: TimeKeeper.date_of_record.strftime('%m/%d/%Y')
+      )
+    end
 
     before :each do
       active_benefit_sponsorship.save!

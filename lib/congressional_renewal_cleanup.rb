@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 class CongressionalRenewalCleanup
 
-  EMPLOYERS = [
-  ]
+  EMPLOYERS = [].freeze
 
   def families(benefit_groups = [])
     id_list = benefit_groups.collect(&:_id).uniq
@@ -9,15 +10,15 @@ class CongressionalRenewalCleanup
   end
 
   def found_active_coverage?(renewal, active_enrollments)
-    active_enrollments.any? {|enrollment|
+    active_enrollments.any? do |enrollment|
       enrollment.effective_on == renewal.effective_on && enrollment.coverage_kind == renewal.coverage_kind && enrollment.benefit_group.employer_profile == renewal.benefit_group.employer_profile
-    }
+    end
   end
 
   def found_other_er_active_coverage?(renewal, active_enrollments)
-    active_enrollments.any? {|enrollment|
+    active_enrollments.any? do |enrollment|
       enrollment.effective_on == renewal.effective_on && enrollment.coverage_kind == renewal.coverage_kind && enrollment.benefit_group.employer_profile != renewal.benefit_group.employer_profile
-    }
+    end
   end
 
   def format_date(date)
@@ -55,7 +56,7 @@ class CongressionalRenewalCleanup
 
       CSV.open("congressional_er_#{fein}_renewal_cancellations_multi_ers.csv", "w") do |csv|
         csv << headers
-       
+
         families = families(plan_year.benefit_groups)
         puts "Processing #{employer_profile.legal_name}---found #{families.size} families"
         bg_ids = plan_year.benefit_groups.map(&:id)
@@ -71,11 +72,11 @@ class CongressionalRenewalCleanup
 
           if passive_cancels.present?
             (active_enrollments + passive_cancels).each do |enrollment|
-              begin
-                csv << csv_row(enrollment)
-              rescue Exception => e
-                puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
-              end
+
+              csv << csv_row(enrollment)
+            rescue Exception => e
+              puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
+
             end
           end
 
@@ -91,7 +92,7 @@ class CongressionalRenewalCleanup
     EMPLOYERS.each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
       plan_year = employer_profile.active_plan_year
-      
+
       CSV.open("congressional_er_#{fein}_renewal_cancellations.csv", "w") do |csv|
         csv << headers
 
@@ -110,11 +111,11 @@ class CongressionalRenewalCleanup
 
           if passive_cancels.present?
             (active_enrollments + passive_cancels).each do |enrollment|
-              begin
-                csv << csv_row(enrollment)
-              rescue Exception => e
-                puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
-              end
+
+              csv << csv_row(enrollment)
+            rescue Exception => e
+              puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
+
             end
           end
 
@@ -130,7 +131,7 @@ class CongressionalRenewalCleanup
     EMPLOYERS.each do |fein|
       employer_profile = EmployerProfile.find_by_fein(fein)
       plan_year = employer_profile.active_plan_year
-      
+
       CSV.open("congressional_er_#{fein}_renewal_cancellations.csv", "w") do |csv|
         csv << headers
 
@@ -141,18 +142,18 @@ class CongressionalRenewalCleanup
         families.each do |family|
           enrollments =  family.active_household.hbx_enrollments.where(effective_on: (plan_year.start_on..plan_year.end_on)).shop_market
           passive_renewals = enrollments.where(:aasm_state.in => (HbxEnrollment::RENEWAL_STATUSES + ["renewing_waived"]), :benefit_group_id.in => bg_ids)
-     
-          passive_cancels = passive_renewals.reject{|passive| passive.benefit_group_assignment.blank?}.select{|renewal|
-           renewal.benefit_group_assignment.census_employee.employment_terminated_on.present? && renewal.benefit_group_assignment.census_employee.employment_terminated_on <= renewal.effective_on
-          }
+
+          passive_cancels = passive_renewals.reject{|passive| passive.benefit_group_assignment.blank?}.select do |renewal|
+            renewal.benefit_group_assignment.census_employee.employment_terminated_on.present? && renewal.benefit_group_assignment.census_employee.employment_terminated_on <= renewal.effective_on
+          end
 
           if passive_cancels.present?
             passive_cancels.each do |enrollment|
-              begin
-                csv << csv_row(enrollment)
-              rescue Exception => e
-                puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
-              end
+
+              csv << csv_row(enrollment)
+            rescue Exception => e
+              puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
+
             end
           end
 
@@ -187,11 +188,11 @@ class CongressionalRenewalCleanup
 
           if valid_passives.present?
             (active_enrollments + valid_passives).each do |enrollment|
-              begin
-                csv << csv_row(enrollment)
-              rescue Exception => e
-                puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
-              end
+
+              csv << csv_row(enrollment)
+            rescue Exception => e
+              puts "Failed #{enrollment.hbx_id} -- #{e.inspect}"
+
             end
           end
 

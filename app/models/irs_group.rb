@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IrsGroup
   include Mongoid::Document
   include SetCurrentUser
@@ -29,7 +31,8 @@ class IrsGroup
     self.is_active
   end
 
-private
+  private
+
   def set_effective_starting_on
     self.effective_starting_on = family.active_household.effective_starting_on if family.active_household
   end

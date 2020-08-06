@@ -15,14 +15,13 @@ module BenefitMarkets
         end
 
         rule(:pricing_units).each do
-          if key? && value
-            if ![::BenefitMarkets::Entities::PricingUnit, ::BenefitMarkets::Entities::RelationshipPricingUnit,  ::BenefitMarkets::Entities::TieredPricingUnit].include?(value.class)
-              if value.is_a?(Hash)
-                result = ::BenefitMarkets::Validators::PricingModels::PricingUnitContract.new.call(value)
-                key.failure(text: "invalid pricing unit for pricing model", error: result.errors.to_h) if result&.failure?
-              else
-                key.failure(text: "invalid pricing unit. Expected an hash or pricing unit entity")
-              end
+          next unless key? && value
+          unless [::BenefitMarkets::Entities::PricingUnit, ::BenefitMarkets::Entities::RelationshipPricingUnit,  ::BenefitMarkets::Entities::TieredPricingUnit].include?(value.class)
+            if value.is_a?(Hash)
+              result = ::BenefitMarkets::Validators::PricingModels::PricingUnitContract.new.call(value)
+              key.failure(text: "invalid pricing unit for pricing model", error: result.errors.to_h) if result&.failure?
+            else
+              key.failure(text: "invalid pricing unit. Expected an hash or pricing unit entity")
             end
           end
         end

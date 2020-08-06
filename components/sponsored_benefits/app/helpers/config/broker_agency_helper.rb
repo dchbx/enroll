@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config::BrokerAgencyHelper
   # Allows us to conditionally display General Agency related links and information
   # This can be enabled or disabled in config/settings.yml
@@ -8,7 +10,7 @@ module Config::BrokerAgencyHelper
   end
 
   def site_broker_quoting_enabled?
-   Settings.site.broker_quoting_enabled
+    Settings.site.broker_quoting_enabled
   end
 
   def employer_has_sic_enabled?
@@ -18,5 +20,4 @@ module Config::BrokerAgencyHelper
   def employer_has_county_validation?
     Settings.aca.employer_has_county_validation
   end
-
 end

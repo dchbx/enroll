@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployerPlanYearCreate < ConversionEmployerPlanYear
 
@@ -15,23 +17,23 @@ module Importers
     end
 
     def map_benefit_group(found_carrier)
-      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, (calculated_coverage_start).year).compact
+      available_plans = Plan.valid_shop_health_plans("carrier", found_carrier.id, calculated_coverage_start.year).compact
       begin
         reference_plan = select_reference_plan(available_plans)
-        elected_plan_ids = (plan_selection == "single_plan") ? [reference_plan.id] : available_plans.map(&:id)
+        elected_plan_ids = plan_selection == "single_plan" ? [reference_plan.id] : available_plans.map(&:id)
         benefit_group_properties = {
           :title => "Standard",
           :plan_option_kind => plan_selection,
-        :relationship_benefits => map_relationship_benefits,
-        :reference_plan_id => reference_plan.id,
-        :elected_plan_ids => elected_plan_ids
-      }
-      if !new_coverage_policy_value.blank?
-         benefit_group_properties[:effective_on_offset] = new_coverage_policy_value.offset
-         benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
-      end
-      BenefitGroup.new(benefit_group_properties)
-      rescue => e
+          :relationship_benefits => map_relationship_benefits,
+          :reference_plan_id => reference_plan.id,
+          :elected_plan_ids => elected_plan_ids
+        }
+        unless new_coverage_policy_value.blank?
+          benefit_group_properties[:effective_on_offset] = new_coverage_policy_value.offset
+          benefit_group_properties[:effective_on_kind] = new_coverage_policy_value.kind
+        end
+        BenefitGroup.new(benefit_group_properties)
+      rescue StandardError => e
         puts available_plans.inspect
         raise e
       end
@@ -40,10 +42,10 @@ module Importers
     def map_relationship_benefits
       BenefitGroup::PERSONAL_RELATIONSHIP_KINDS.map do |rel|
         RelationshipBenefit.new({
-          :relationship => rel,
-          :offered => true,
-          :premium_pct => 50.00
-        })
+                                  :relationship => rel,
+                                  :offered => true,
+                                  :premium_pct => 50.00
+                                })
       end
     end
 
@@ -61,7 +63,7 @@ module Importers
         end
         map_employees_to_benefit_groups(employer, record)
       end
-      return save_result
+      save_result
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 When(/^\w+ visits? the Insured portal during open enrollment$/) do
   visit "/"
   click_link 'Consumer/Family Portal'
@@ -94,7 +96,7 @@ Then(/Individual should see a form to enter personal information$/) do
 
   fill_in "person_addresses_attributes_0_address_1", :with => "4900 USAA BLVD"
   fill_in "person_addresses_attributes_0_address_2", :with => "212"
-  fill_in "person_addresses_attributes_0_city", :with=> "Washington"
+  fill_in "person_addresses_attributes_0_city", :with => "Washington"
   #find('.interaction-choice-control-state-id', text: 'SELECT STATE *').click
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
@@ -378,8 +380,8 @@ And(/^I click on continue button on group selection page$/) do
 end
 
 And(/I select a plan on plan shopping page/) do
-   screenshot("plan_shopping")
-   find_all('.plan-select')[0].click
+  screenshot("plan_shopping")
+  find_all('.plan-select')[0].click
 end
 
 And(/I click on purchase button on confirmation page/) do
@@ -452,7 +454,7 @@ end
 
 Then(/Second user creates an individual account$/) do
   @browser.button(class: /interaction-click-control-create-account/).wait_until_present
-  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email :email2)
+  @browser.text_field(class: /interaction-field-control-user-email/).set(@u.email(:email2))
   @browser.text_field(class: /interaction-field-control-user-password/).set("aA1!aA1!aA1!")
   @browser.text_field(class: /interaction-field-control-user-password-confirmation/).set("aA1!aA1!aA1!")
   screenshot("create_account")
@@ -463,12 +465,12 @@ Then(/^Second user goes to register as individual/) do
   step "user should see your information page"
   step "user goes to register as an individual"
   @browser.text_field(class: /interaction-field-control-person-first-name/).set("Second")
-  @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn :ssn2)
+  @browser.text_field(class: /interaction-field-control-person-ssn/).set(@u.ssn(:ssn2))
 end
 
 Then(/^Second user should see a form to enter personal information$/) do
   step "Individual should see a form to enter personal information"
-  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set(@u.email :email2)
+  @browser.text_field(class: /interaction-field-control-person-emails-attributes-0-address/).set(@u.email(:email2))
 end
 
 Then(/Individual asks for help$/) do
@@ -480,7 +482,7 @@ Then(/Individual asks for help$/) do
   wait_for_ajax(5,2.5)
   sleep(2)
   expect(page).to have_content "First Name"
-  #TODO bombs on help_first_name sometimes
+  #TODO: bombs on help_first_name sometimes
   fill_in "help_first_name", with: "Sherry"
   fill_in "help_last_name", with: "Buckner"
   sleep(2)
@@ -500,7 +502,7 @@ end
 When(/^a CSR exists/) do
   p = FactoryBot.create(:person, :with_csr_role, first_name: "Sherry", last_name: "Buckner")
   sleep 2 # Need to wait on factory
-  FactoryBot.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"] )
+  FactoryBot.create(:user, email: "sherry.buckner@dc.gov", password: "aA1!aA1!aA1!", password_confirmation: "aA1!aA1!aA1!", person: p, roles: ["csr"])
 end
 
 When(/^CSR accesses the HBX portal$/) do
@@ -585,7 +587,7 @@ end
 When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In Existing Account'
   fill_in 'user[login]', with: (@u.find 'email' + person)
-  find('#user_email').set(@u.find 'email' + person)
+  find('#user_email').set(@u.find('email' + person))
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   click_button 'Sign in'
 end
@@ -670,7 +672,7 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   household = person.primary_family.latest_household
 
   start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
-  future_start_on = Date.new(TimeKeeper.date_of_record.year+1, 1,1)
+  future_start_on = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
   current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
   future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
 

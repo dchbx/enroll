@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CsrRole
   include Mongoid::Document
   include SetCurrentUser
@@ -18,8 +20,8 @@ class CsrRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   def parent

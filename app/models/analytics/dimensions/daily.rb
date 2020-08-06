@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Analytics
   module Dimensions
     class Daily
@@ -30,17 +32,14 @@ module Analytics
         self
       end
 
-    private
+      private
+
       def pre_allocate_document
         self.build_hours_of_day unless hours_of_day.present?
 
-        if week_day.blank?
-          self.week_day = date.wday
-        end
+        self.week_day = date.wday if week_day.blank?
 
-        if minutes_of_hours.size == 0 
-          (0..23).map { |i| self.minutes_of_hours << Analytics::Dimensions::MinutesOfHour.new(hour: i) }
-        end
+        (0..23).map { |i| self.minutes_of_hours << Analytics::Dimensions::MinutesOfHour.new(hour: i) } if minutes_of_hours.empty?
       end
 
     end

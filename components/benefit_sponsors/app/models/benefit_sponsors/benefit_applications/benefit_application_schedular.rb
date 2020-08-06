@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitApplications
     class BenefitApplicationSchedular
@@ -20,9 +22,9 @@ module BenefitSponsors
       def calculate_start_on_dates(admin_datatable_action = false)
         current_date = TimeKeeper.date_of_record
         start_on = if !admin_datatable_action && (current_date.day > open_enrollment_minimum_begin_day_of_month(true))
-          current_date.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-        else
-          current_date.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+                     current_date.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+                   else
+                     current_date.prev_month.beginning_of_month + Settings.aca.shop_market.open_enrollment.maximum_length.months.months
         end
 
         end_on = (current_date - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months - Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days).beginning_of_month
@@ -35,7 +37,7 @@ module BenefitSponsors
 
       # Responsible for calculating all the possible dataes
       def start_on_options_with_schedule(is_renewing, admin_datatable_action = false)
-        possible_dates = Hash.new
+        possible_dates = {}
         calculate_start_on_dates(admin_datatable_action).each do |date|
           next if !admin_datatable_action && !is_start_on_valid?(date)
           possible_dates[date] = enrollment_schedule(date).merge(open_enrollment_dates(is_renewing, date, admin_datatable_action))
@@ -74,16 +76,16 @@ module BenefitSponsors
           # employer_initial_application_latest_submit_on: employer_initial_application_latest_submit_on,
           open_enrollment_period: open_enrollment_period,
           open_enrollment_period_minimum: open_enrollment_period_minimum,
-          binder_payment_due_on: binder_payment_due_on,
+          binder_payment_due_on: binder_payment_due_on
         }
       end
 
       def open_enrollment_minimum_begin_day_of_month(use_grace_period = false)
-        if use_grace_period
-          minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.days
-        else
-          minimum_length = Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
-        end
+        minimum_length = if use_grace_period
+                           Settings.aca.shop_market.open_enrollment.minimum_length.days
+                         else
+                           Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+                         end
 
         open_enrollment_end_on_day = Settings.aca.shop_market.open_enrollment.monthly_end_on
         minimum_day = open_enrollment_end_on_day - minimum_length
@@ -128,25 +130,21 @@ module BenefitSponsors
 
       def open_enrollment_period_by_effective_date(is_renewing, start_on, admin_datatable_action = nil)
         open_enrollment_start_on = (start_on - Settings.aca.shop_market.open_enrollment.maximum_length.months.months)
-        if start_on.future?
-          open_enrollment_start_on = [open_enrollment_start_on, TimeKeeper.date_of_record].max
-        end
+        open_enrollment_start_on = [open_enrollment_start_on, TimeKeeper.date_of_record].max if start_on.future?
 
         oe_min_days = Settings.aca.shop_market.open_enrollment.minimum_length.days
 
         oe_monthly_end_on = is_renewing ? Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on : Settings.aca.shop_market.open_enrollment.monthly_end_on
 
-        open_enrollment_end_on   = ("#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{oe_monthly_end_on}").to_date
+        open_enrollment_end_on = "#{start_on.prev_month.year}-#{start_on.prev_month.month}-#{oe_monthly_end_on}".to_date
 
-        if admin_datatable_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
-          open_enrollment_end_on = (open_enrollment_start_on + oe_min_days)
-        end
+        open_enrollment_end_on = (open_enrollment_start_on + oe_min_days) if admin_datatable_action && ((open_enrollment_end_on - open_enrollment_start_on) < oe_min_days)
         open_enrollment_start_on..open_enrollment_end_on
       end
 
       def renewal_open_enrollment_dates(start_on)
         open_enrollment_start_on = start_on - 2.months
-        open_enrollment_end_on =  Date.new((start_on - 1.month).year, (start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
+        open_enrollment_end_on = Date.new((start_on - 1.month).year, (start_on - 1.month).month, Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on)
         [open_enrollment_start_on, open_enrollment_end_on]
       end
 
@@ -170,10 +168,10 @@ module BenefitSponsors
         employer_initial_application_earliest_start_on = (effective_date + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.months.months + Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month.days)
         employer_initial_application_earliest_submit_on = employer_initial_application_earliest_start_on
         employer_initial_application_latest_submit_on   = "#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.initial_application.publish_due_day_of_month}".to_date
-        open_enrollment_earliest_start_on     = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
-        open_enrollment_latest_start_on       = ("#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}").to_date
-        open_enrollment_latest_end_on         = ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}").to_date
-        binder_payment_due_date               = first_banking_date_after ("#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}")
+        open_enrollment_earliest_start_on = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months
+        open_enrollment_latest_start_on = "#{prior_month.year}-#{prior_month.month}-#{HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth}".to_date
+        open_enrollment_latest_end_on = "#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.open_enrollment.monthly_end_on}".to_date
+        binder_payment_due_date = first_banking_date_after "#{prior_month.year}-#{prior_month.month}-#{Settings.aca.shop_market.binder_payment_due_on}"
 
 
         timetable = {
@@ -204,22 +202,22 @@ module BenefitSponsors
           result = "failure"
           msg = "must choose a start on date #{(TimeKeeper.date_of_record - HbxProfile::ShopOpenEnrollmentBeginDueDayOfMonth + Settings.aca.shop_market.open_enrollment.maximum_length.months.months).beginning_of_month} or later"
         end
-        
+
         {result: (result || "ok"), msg: (msg || "")}
       end
 
       ## TODO - add holidays
       def first_banking_date_prior(date_value)
         date = date_value.to_date
-        date = date - 1 if date.saturday?
-        date = date - 2 if date.sunday?
+        date -= 1 if date.saturday?
+        date -= 2 if date.sunday?
         date
       end
 
       def first_banking_date_after(date_value)
         date = date_value.to_date
-        date = date + 2 if date.saturday?
-        date = date + 1 if date.sunday?
+        date += 2 if date.saturday?
+        date += 1 if date.sunday?
         date
       end
 
@@ -228,8 +226,8 @@ module BenefitSponsors
         effective_period          = effective_date..(effective_date + 1.year - 1.day)
         open_enrollment_period    = open_enrollment_period_by_effective_date(is_renewing, effective_date)
         {
-            effective_period: effective_period,
-            open_enrollment_period: open_enrollment_period,
+          effective_period: effective_period,
+          open_enrollment_period: open_enrollment_period
         }
       end
     end

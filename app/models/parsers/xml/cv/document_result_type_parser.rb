@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class DocumentResultTypeParser
     include HappyMapper
@@ -24,23 +26,23 @@ module Parsers::Xml::Cv
 
     def to_hash
       {
-          case_number: case_number,
-          response_code: response_code,
-          response_description_text: response_description_text,
-          tds_response_description_text: tds_response_description_text,
-          entry_date: entry_date,
-          admitted_to_date: admitted_to_date,
-          admitted_to_text: admitted_to_text,
-          country_birth_code: country_birth_code,
-          country_citizen_code: country_citizen_code,
-          coa_code: coa_code,
-          eads_expire_date: eads_expire_date,
-          elig_statement_code: elig_statement_code,
-          elig_statement_txt: elig_statement_txt,
-          iav_type_code: iav_type_code,
-          iav_type_text: iav_type_text,
-          grant_date: grant_date,
-          grant_date_reason_code: grant_date_reason_code
+        case_number: case_number,
+        response_code: response_code,
+        response_description_text: response_description_text,
+        tds_response_description_text: tds_response_description_text,
+        entry_date: entry_date,
+        admitted_to_date: admitted_to_date,
+        admitted_to_text: admitted_to_text,
+        country_birth_code: country_birth_code,
+        country_citizen_code: country_citizen_code,
+        coa_code: coa_code,
+        eads_expire_date: eads_expire_date,
+        elig_statement_code: elig_statement_code,
+        elig_statement_txt: elig_statement_txt,
+        iav_type_code: iav_type_code,
+        iav_type_text: iav_type_text,
+        grant_date: grant_date,
+        grant_date_reason_code: grant_date_reason_code
       }
     end
   end

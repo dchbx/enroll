@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class DeactivateEmployerStaffRole < MongoidMigrationTask
   def migrate
-
-    organization = Organization.where(:'employer_profile'.exists => true, fein: ENV['fein']).first
-    person= Person.by_hbx_id(ENV['hbx_id']).first
+    organization = Organization.where(:employer_profile.exists => true, fein: ENV['fein']).first
+    person = Person.by_hbx_id(ENV['hbx_id']).first
 
     if organization.present? && person.present?
       poc_found = person.employer_staff_roles.detect{|role| role.employer_profile_id.to_s == organization.employer_profile.id.to_s && !role.is_closed?}

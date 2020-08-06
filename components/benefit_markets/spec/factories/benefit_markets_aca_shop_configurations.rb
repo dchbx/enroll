@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_aca_shop_configuration, class: 'BenefitMarkets::Configurations::AcaShopConfiguration' do
     ee_ct_max { 50 }

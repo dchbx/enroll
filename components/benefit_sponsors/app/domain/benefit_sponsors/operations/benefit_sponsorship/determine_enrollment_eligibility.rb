@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitSponsorship
-
       # Determines enrollment eligibility
       class DetermineEnrollmentEligibility
         # send(:include, Dry::Monads::Do.for(:call))
@@ -29,7 +28,6 @@ module BenefitSponsors
         private
 
         def validate_effective_date(effective_date)
-
           Success(effective_date)
         end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResidentRolePolicy < ApplicationPolicy
   def begin_resident_enrollment?
     return false unless role = user.person.hbx_staff_role

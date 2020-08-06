@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class TimeKeeper
     include ActiveModel::Model

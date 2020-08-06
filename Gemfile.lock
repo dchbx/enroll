@@ -83,6 +83,7 @@ PATH
     benefit_sponsors (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      browser (= 2.7.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -270,6 +271,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
+    browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
     bunny (1.7.1)
@@ -918,6 +920,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
@@ -1034,4 +1037,4 @@ RUBY VERSION
    ruby 2.5.1p57
 
 BUNDLED WITH
-   2.0.1
+   2.1.4

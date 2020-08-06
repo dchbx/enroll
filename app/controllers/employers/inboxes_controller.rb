@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Employers::InboxesController < InboxesController
 
   def new

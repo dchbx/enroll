@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   module SsnField
     def self.included(base)
@@ -5,9 +7,7 @@ module Forms
         attr_reader :ssn, :no_ssn
 
         def ssn=(new_ssn)
-          if !new_ssn.blank?
-            @ssn = new_ssn.to_s.gsub(/\D/, '')
-          end
+          @ssn = new_ssn.to_s.gsub(/\D/, '') unless new_ssn.blank?
         end
 
         def no_ssn=(no_ssn)

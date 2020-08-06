@@ -1,19 +1,21 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module CensusMembers
     class CensusDependent < SponsoredBenefits::CensusMembers::CensusMember
 
-      EMPLOYEE_RELATIONSHIP_KINDS = %W[spouse domestic_partner child_under_26  child_26_and_over disabled_child_26_and_over]
+      EMPLOYEE_RELATIONSHIP_KINDS = %w[spouse domestic_partner child_under_26 child_26_and_over disabled_child_26_and_over].freeze
 
       embedded_in :census_dependent, polymorphic: true
 
       validates :employee_relationship,
-        presence: true,
-        allow_blank: false,
-        allow_nil:   false,
-        inclusion: {
-          in: EMPLOYEE_RELATIONSHIP_KINDS,
-          message: "'%{value}' is not a valid employee relationship"
-        }
+                presence: true,
+                allow_blank: false,
+                allow_nil: false,
+                inclusion: {
+                  in: EMPLOYEE_RELATIONSHIP_KINDS,
+                  message: "'%{value}' is not a valid employee relationship"
+                }
     end
   end
 end

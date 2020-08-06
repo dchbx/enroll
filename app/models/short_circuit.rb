@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShortCircuit
   class NoActionSpecifiedError < StandardError; end
 
@@ -6,9 +8,7 @@ class ShortCircuit
   end
 
   def initialize(signal_name, &sc_blk)
-    if sc_blk.nil?
-      raise ::ShortCircuit::NoActionSpecifiedError.new("You must specify a short circuit action.")
-    end
+    raise ::ShortCircuit::NoActionSpecifiedError, "You must specify a short circuit action." if sc_blk.nil?
     @signal_name = signal_name
     @short_circuit_action = sc_blk
     @procs = []

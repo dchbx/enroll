@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadDcNoticeTemplate < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"
@@ -14,9 +16,7 @@ class UploadDcNoticeTemplate < Mongoid::Migration
     end
   end
 
-  def self.down
-
-  end
+  def self.down; end
 
   private
 
@@ -50,7 +50,6 @@ class UploadDcNoticeTemplate < Mongoid::Migration
       puts "Errors: #{@errors}"
       puts "Total Notice Template uploaded: #{Notifier::NoticeKind.all.count}"
     end
-
   end
 
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ResidentRole
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -17,7 +19,7 @@ class ResidentRole
   field :is_applicant, type: Boolean  # Consumer is applying for benefits coverage
   field :is_active, type: Boolean, default: true
   field :bookmark_url, type: String, default: nil
-  field :is_state_resident, type: Boolean, default:true
+  field :is_state_resident, type: Boolean, default: true
   field :residency_determined_at, type: DateTime
 
   field :contact_method, type: String, default: "Paper and Electronic communications"
@@ -37,20 +39,20 @@ class ResidentRole
 
   accepts_nested_attributes_for :person, :paper_applications
 
-  embeds_many :local_residency_responses, class_name:"EventResponse"
+  embeds_many :local_residency_responses, class_name: "EventResponse"
 
   after_initialize :setup_lawful_determination_instance
   after_create :create_initial_market_transition
 
-  alias_method :is_incarcerated?,   :is_incarcerated
+  alias is_incarcerated? is_incarcerated
 
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   def parent
@@ -90,9 +92,7 @@ class ResidentRole
   end
 
   def setup_lawful_determination_instance
-    unless self.lawful_presence_determination.present?
-      self.lawful_presence_determination = LawfulPresenceDetermination.new
-    end
+    self.lawful_presence_determination = LawfulPresenceDetermination.new unless self.lawful_presence_determination.present?
   end
 
   def lawful_presence_determination_instance
@@ -102,7 +102,7 @@ class ResidentRole
 
   def latest_active_tax_household_with_year(year, family)
     family.latest_household.latest_active_tax_household_with_year(year)
-  rescue => e
+  rescue StandardError => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
   end
@@ -117,7 +117,6 @@ class ResidentRole
     person.emails = []
     person.update_attributes(*args)
   end
-
 
   def find_paper_application_by_key(key)
     candidate_paper_applications = paper_applications
@@ -139,13 +138,14 @@ class ResidentRole
   end
 
   private
-  def mark_residency_denied(*args)
+
+  def mark_residency_denied(*_args)
     self.residency_determined_at = Time.now
     self.is_state_resident = false
   end
 
   def create_initial_market_transition
-    return if !person.individual_market_transitions.where(role_type:"resident").first.nil?
+    return unless person.individual_market_transitions.where(role_type: "resident").first.nil?
     transition = IndividualMarketTransition.new
     transition.role_type = "resident"
     transition.submitted_at = TimeKeeper.datetime_of_record
@@ -155,8 +155,7 @@ class ResidentRole
     self.person.individual_market_transitions << transition
   end
 
-
-  def mark_residency_authorized(*args)
+  def mark_residency_authorized(*_args)
     self.residency_determined_at = Time.now
     self.is_state_resident = true
   end
@@ -166,7 +165,7 @@ class ResidentRole
   end
 
   def residency_denied?
-    (!is_state_resident.nil?) && (!is_state_resident)
+    !is_state_resident.nil? && !is_state_resident
   end
 
   def residency_verified?

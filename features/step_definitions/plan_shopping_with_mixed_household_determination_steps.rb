@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^all plan shopping are of mixed determination$/) do
   create_mixed_eligibilty_for_the_family
 end

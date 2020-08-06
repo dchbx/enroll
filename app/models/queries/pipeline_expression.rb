@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Queries::PipelineExpression
   attr_reader :expression
 
@@ -28,7 +30,7 @@ class Queries::PipelineExpression
 
   def +(other_expression)
     exp_step = other_expression.respond_to?(:expression_step) ? other_expression.expression_step : "raw"
-    raise "Expression chain mismatch:\nTried to join #{expression_step} to #{exp_step}\n" if (exp_step != expression_step)
+    raise "Expression chain mismatch:\nTried to join #{expression_step} to #{exp_step}\n" if exp_step != expression_step
     join_expression(other_expression)
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class BenefitForm
@@ -65,7 +67,7 @@ module BenefitSponsors
         persist(update: true)
       end
 
-      def self.resolve_service(attrs={})
+      def self.resolve_service(attrs = {})
         @service = BenefitSponsors::Services::SponsoredBenefitService.new(attrs)
       end
 

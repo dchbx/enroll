@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencies::InboxesController < InboxesController
   include Acapi::Notifiers
 
@@ -13,7 +15,7 @@ class BrokerAgencies::InboxesController < InboxesController
     @inbox_provider = @broker_agency_provider
     @inbox_provider_name = @inbox_provider.try(:legal_name)
     @inbox_to_name = "HBX Admin"
-    log("#3969 and #3985 params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
+    log("#3969 and #3985 params: #{params}, request: #{request.env.inspect}", {:severity => "error"}) if @inbox_provider.blank?
     @new_message = @inbox_provider.inbox.messages.build
   end
 
@@ -47,16 +49,16 @@ class BrokerAgencies::InboxesController < InboxesController
   end
 
   def find_inbox_provider
-    id = params["id"]||params['profile_id']
+    id = params["id"] || params['profile_id']
     if Person.where(:id => params["id"]).present?
       @inbox_provider = Person.find(params["id"])
     else
       @broker_agency_provider = BrokerAgencyProfile.find(id)
-      if @broker_agency_provider.present?
-        @inbox_provider = @broker_agency_provider
-      else
-         @inbox_provider = Person.where(:id => id).first
-      end
+      @inbox_provider = if @broker_agency_provider.present?
+                          @broker_agency_provider
+                        else
+                          Person.where(:id => id).first
+                        end
     end
   end
 

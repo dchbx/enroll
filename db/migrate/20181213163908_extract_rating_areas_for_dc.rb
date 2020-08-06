@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExtractRatingAreasForDc < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "dc"

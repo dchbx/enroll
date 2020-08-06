@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PersonRelationship
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -5,15 +7,15 @@ class PersonRelationship
 
   embedded_in :person
 
-  MaleRelationships   = %W(father grandfather grandson uncle nephew adopted\ child stepparent
-                              foster\ child son-in-law brother-in-law father-in-law brother ward
-                              stepson child sponsored\ dependent dependent\ of\ a\ minor\ dependent
-                              guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+  MaleRelationships   = %W[father grandfather grandson uncle nephew adopted\ child stepparent
+                           foster\ child son-in-law brother-in-law father-in-law brother ward
+                           stepson child sponsored\ dependent dependent\ of\ a\ minor\ dependent
+                           guardian court\ appointed\ guardian collateral\ dependent life\ partner].freeze
 
-  FemaleRelationships = %W(mother grandmother granddaughter aunt niece adopted\ child stepparent
-                              foster\ child daughter-in-law sister-in-law mother-in-law sister ward
-                              stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
-                              guardian court\ appointed\ guardian collateral\ dependent life\ partner)
+  FemaleRelationships = %W[mother grandmother granddaughter aunt niece adopted\ child stepparent
+                           foster\ child daughter-in-law sister-in-law mother-in-law sister ward
+                           stepdaughter child sponsored\ dependent dependent\ of\ a\ minor\ dependent
+                           guardian court\ appointed\ guardian collateral\ dependent life\ partner].freeze
 
   Relationships = [
     "spouse",
@@ -44,7 +46,7 @@ class PersonRelationship
     "trustee", # no inverse
     "unrelated",
     "ward"
-  ]
+  ].freeze
 
   Relationships_UI = [
     "spouse",
@@ -57,7 +59,7 @@ class PersonRelationship
     "nephew_or_niece",
     "grandchild",
     "grandparent"
-  ]
+  ].freeze
 
   InverseMap = {
     "child" => "parent",
@@ -89,9 +91,9 @@ class PersonRelationship
     "foster_child" => "guardian",
     "court_appointed_guardian" => "ward",
     "adopted_child" => "parent"
-  }
+  }.freeze
 
-  SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self]
+  SymmetricalRelationships = %W[head\ of\ household spouse ex-spouse cousin ward trustee annuitant other\ relationship other\ relative self].freeze
 
   Kinds = SymmetricalRelationships | Relationships | BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
 
@@ -103,15 +105,15 @@ class PersonRelationship
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
   after_save :notify_updated
@@ -126,7 +128,7 @@ class PersonRelationship
   end
 
   def relative=(new_person)
-    raise ArgumentError.new("expected Person") unless new_person.is_a? Person
+    raise ArgumentError, "expected Person" unless new_person.is_a? Person
     self.relative_id = new_person._id
     @relative = new_person
   end

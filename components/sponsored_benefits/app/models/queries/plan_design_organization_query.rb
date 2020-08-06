@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class PlanDesignOrganizationQuery
     attr_reader :search_string, :custom_attributes
@@ -11,7 +13,7 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def build_scope()
+    def build_scope
       return plan_design_organizations if plan_design_organizations.blank?
       collection = plan_design_organizations.send(custom_attributes[:filters]) if custom_attributes[:filters]
       filtered_collection(collection || plan_design_organizations)

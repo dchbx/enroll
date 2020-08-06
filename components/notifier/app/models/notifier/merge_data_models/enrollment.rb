@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::Enrollment
     include Virtus.model
@@ -28,25 +30,25 @@ module Notifier
     def self.stubbed_object
       end_on = TimeKeeper.date_of_record.end_of_month
       enrollment = Notifier::MergeDataModels::Enrollment.new({
-        coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
-        coverage_end_on: end_on,
-        plan_name: 'Aetna GOLD',
-        employer_responsible_amount: '$250.0',
-        employee_responsible_amount: '$90.0',
-        premium_amount: '340.0',
-        enrolled_count: '2',
-        enrollment_kind: "special_enrollment",
-        coverage_kind: 'health',
-        employee_first_name: 'David',
-        employee_last_name: 'Finch',
-        coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
-        coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
-        waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
-        waiver_plan_name: 'Aetna GOLD',
-        waiver_enrolled_count: '2',
-        waiver_coverage_end_on: end_on
+                                                               coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
+                                                               coverage_end_on: end_on,
+                                                               plan_name: 'Aetna GOLD',
+                                                               employer_responsible_amount: '$250.0',
+                                                               employee_responsible_amount: '$90.0',
+                                                               premium_amount: '340.0',
+                                                               enrolled_count: '2',
+                                                               enrollment_kind: "special_enrollment",
+                                                               coverage_kind: 'health',
+                                                               employee_first_name: 'David',
+                                                               employee_last_name: 'Finch',
+                                                               coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
+                                                               coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
+                                                               waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
+                                                               waiver_plan_name: 'Aetna GOLD',
+                                                               waiver_enrolled_count: '2',
+                                                               waiver_coverage_end_on: end_on
 
-      })
+                                                             })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
       enrollment.dependents = [Notifier::MergeDataModels::Person.stubbed_object]
@@ -56,23 +58,23 @@ module Notifier
     def self.stubbed_object_dental
       end_on = TimeKeeper.date_of_record.end_of_month
       enrollment = Notifier::MergeDataModels::Enrollment.new({
-        coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
-        coverage_end_on: end_on,
-        plan_name: 'Delta Dental',
-        employer_responsible_amount: '$250.0',
-        employee_responsible_amount: '$90.0',
-        premium_amount: '340.0',
-        enrolled_count: '2',
-        employee_first_name: 'David',
-        employee_last_name: 'Finch',
-        coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
-        coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
-        waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
-        waiver_plan_name: 'Delta Dental',
-        waiver_enrolled_count: '2',
-        waiver_coverage_end_on: end_on
+                                                               coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
+                                                               coverage_end_on: end_on,
+                                                               plan_name: 'Delta Dental',
+                                                               employer_responsible_amount: '$250.0',
+                                                               employee_responsible_amount: '$90.0',
+                                                               premium_amount: '340.0',
+                                                               enrolled_count: '2',
+                                                               employee_first_name: 'David',
+                                                               employee_last_name: 'Finch',
+                                                               coverage_end_on_minus_60_days: (end_on - 60.days).strftime('%m/%d/%Y'),
+                                                               coverage_end_on_plus_60_days: (end_on + 60.days).strftime('%m/%d/%Y'),
+                                                               waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
+                                                               waiver_plan_name: 'Delta Dental',
+                                                               waiver_enrolled_count: '2',
+                                                               waiver_coverage_end_on: end_on
 
-      })
+                                                             })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
       enrollment.dependents = [Notifier::MergeDataModels::Person.stubbed_object]

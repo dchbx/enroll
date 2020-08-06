@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Transcripts
   module Base
-
     # class MethodNotImplementedError < StandardError; end
     # raise MethodNotImplementedError, 'Please implement this method in your class.'
 
@@ -28,7 +29,7 @@ module Transcripts
 
     def compare_instance
       return if @transcript[:other].blank?
-      differences    = HashWithIndifferentAccess.new
+      differences = HashWithIndifferentAccess.new
 
       if @transcript[:source_is_new]
         differences[:new] = {:new => {:ssn => @transcript[:other].ssn}}
@@ -46,10 +47,10 @@ module Transcripts
     end
 
     def build_association_differences(association)
-      differences     = HashWithIndifferentAccess.new
+      differences = HashWithIndifferentAccess.new
 
       enumeration_association = association[:association]
-      enumeration_field = association[:enumeration_field]      
+      enumeration_field = association[:enumeration_field]
       association_differences = []
 
       if association[:cardinality] == 'one'
@@ -126,7 +127,7 @@ module Transcripts
     end
 
     def compare(base_record:, compare_record:)
-      differences     = HashWithIndifferentAccess.new
+      differences = HashWithIndifferentAccess.new
 
       if base_record.present? && compare_record.present?
         attribute_names = base_record.is_a?(Hash) ? base_record.keys : base_record.attribute_names
@@ -134,7 +135,7 @@ module Transcripts
         all_keys = attribute_names.reject{|attr| @fields_to_ignore.include?(attr)}
         all_keys.each do |k|
           next if base_record[k].blank? && compare_record[k].blank?
-     
+
           if base_record[k].blank?
             differences[:add] ||= {}
             differences[:add][k] = (compare_record[k].is_a?(Money) ? compare_record[k].to_f : compare_record[k])
@@ -190,8 +191,7 @@ module Transcripts
     end
 
     # Return model instance using the transcript hash table values
-    def to_model
-    end
+    def to_model; end
 
     def copy_properties(from, to, properties)
       properties.each { |property| copy_property(from, to, property) }
@@ -205,21 +205,21 @@ module Transcripts
     def transcript_template
       {
         # Local data set values
-        source:         HashWithIndifferentAccess.new,
-        # External data set values 
-        other:          HashWithIndifferentAccess.new,
+        source: HashWithIndifferentAccess.new,
+        # External data set values
+        other: HashWithIndifferentAccess.new,
         # Result of comparing values of the "source" and "other" content
-        compare:        HashWithIndifferentAccess.new,
+        compare: HashWithIndifferentAccess.new,
         # Functional errors in the "source" data set
-        source_errors:  HashWithIndifferentAccess.new,
+        source_errors: HashWithIndifferentAccess.new,
         # Functional errors in the "other" data set
-        other_errors:   HashWithIndifferentAccess.new,
+        other_errors: HashWithIndifferentAccess.new,
         # "source" data set was generated from the "other" data set values?
-        source_is_new:  false,
+        source_is_new: false
       }
     end
 
-    def instance_with_all_attributes(class_name)
+    def instance_with_all_attributes(_class_name)
       klass.classify.constantize
       fields = klass.new.fields.inject({}){|data, (key, val)| data[key] = val.default_val; data }
       fields.delete_if{|key,_| @fields_to_ignore.include?(key)}
@@ -236,24 +236,24 @@ module Transcripts
       family.latest_household.hbx_enrollments << HbxEnrollment.new.fields.keys
 
       { family: family.attributes.merge({
-        family_members: [
-          family_member: family.family_members.first.attributes
-          ],
-          irs_groups: [
+                                          family_members: [
+                                            family_member: family.family_members.first.attributes
+                                            ],
+                                          irs_groups: [
             irs_group: family.irs_groups.first.attributes
             ],
-            households: [
+                                          households: [
               household: family.households.first.attributes.merge({
-                hbx_enrollments: [
-                  hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
-                ]
-                })
+                                                                    hbx_enrollments: [
+                                                                      hbx_enrollment: family.households.first.hbx_enrollments.first.attributes
+                                                                    ]
+                                                                  })
             ]
-            }),
-      people: [
+                                        }),
+        people: [
         person: person.attributes.merge({
-          consumer_role: person.consumer_role.attributes
-          })
+                                          consumer_role: person.consumer_role.attributes
+                                        })
         ] }
     end
   end

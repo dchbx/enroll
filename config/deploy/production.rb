@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 # Simple Role Syntax
 # ==================
 # Supports bulk-adding hosts to roles, the primary server in each group
 # is considered to be the first unless any hosts have the primary
 # property set.  Don't declare `role :all`, it's a meta role.
 
-role :app, %w{nginx@10.83.85.161}
-role :web, %w{nginx@10.83.85.161}
-role :db, %w{nginx@10.83.85.161}
+role :app, %w[nginx@10.83.85.161]
+role :web, %w[nginx@10.83.85.161]
+role :db, %w[nginx@10.83.85.161]
 
 
 # Extended Server Syntax

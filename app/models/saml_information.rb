@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlInformation
 
   class MissingKeyError < StandardError
@@ -25,7 +27,7 @@ class SamlInformation
     'account_recovery_url',
     'iam_login_url',
     'curam_broker_dashboard'
-  ]
+  ].freeze
 
   attr_reader :config
 
@@ -36,11 +38,9 @@ class SamlInformation
     ensure_configuration_values(@config)
   end
 
-  def ensure_configuration_values(conf)
+  def ensure_configuration_values(_conf)
     REQUIRED_KEYS.each do |k|
-      if @config[k].blank?
-        raise MissingKeyError.new(k)
-      end
+      raise MissingKeyError, k if @config[k].blank?
     end
   end
 
@@ -49,8 +49,8 @@ class SamlInformation
       config[key.to_s]
     end
     self.instance_eval(<<-RUBYCODE)
-      def self.#{key.to_s}
-        self.instance.#{key.to_s}
+      def self.#{key}
+        self.instance.#{key}
       end
     RUBYCODE
   end

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class RemoveDuplicateCensusDependents < MongoidMigrationTask
   def migrate
-
     # Remove these persons as they are duplicates, unable to update census employee because census employee object has duplicate census dependents.
     person_1 = Person.find("58472c2ff1244e786b00010b").destroy
     person_2 = Person.find("58472c4bfaca140cfa00009f").destroy
@@ -34,9 +35,9 @@ class RemoveDuplicateCensusDependents < MongoidMigrationTask
 
     # create the employee role
     employee_relationship = Forms::EmployeeCandidate.new({first_name: census_employee.first_name,
-                                                        last_name: census_employee.last_name,
-                                                        ssn: census_employee.ssn,
-                                                        dob: census_employee.dob.strftime("%Y-%m-%d")})
+                                                          last_name: census_employee.last_name,
+                                                          ssn: census_employee.ssn,
+                                                          dob: census_employee.dob.strftime("%Y-%m-%d")})
     person = employee_relationship.match_person if employee_relationship.present?
 
     return false if person.blank? || (person.present? &&

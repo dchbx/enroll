@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
-if !defined?($observable_shared_spec_defined)
+unless defined?($observable_shared_spec_defined)
   $observable_shared_spec_defined = 1
-  RSpec.shared_examples_for "observable" do |factory_name=nil, *traits|
+  RSpec.shared_examples_for "observable" do |factory_name = nil, *traits|
     let(:factory) { factory_name || described_class.to_s.underscore.gsub('/', '_').to_sym }
     let(:model) {create factory, *traits }
 

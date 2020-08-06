@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   class Members::MemberRoster
     include Enumerable
@@ -28,7 +30,6 @@ module BenefitSponsors
     def [](index)
       # @member_groups[index]
       @member_groups = index.each { |new_member_group| add_member(new_member_group) }
-      
     end
 
     def []=(index, new_member_group)

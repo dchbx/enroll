@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module SponsoredBenefits
     class SponsoredBenefit
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      SOURCE_KINDS  = [:benefit_sponsor_catalog, :conversion].freeze
+      SOURCE_KINDS = [:benefit_sponsor_catalog, :conversion].freeze
 
 
-      embedded_in :benefit_package, 
+      embedded_in :benefit_package,
                   class_name: "::BenefitSponsors::BenefitPackages::BenefitPackage",
                   inverse_of: :sponsored_benefits
 
@@ -17,10 +19,10 @@ module BenefitSponsors
 
       belongs_to :reference_product, class_name: "::BenefitMarkets::Products::Product", inverse_of: nil, optional: true
 
-      embeds_one  :sponsor_contribution, 
+      embeds_one  :sponsor_contribution,
                   class_name: "::BenefitSponsors::SponsoredBenefits::SponsorContribution"
 
-      embeds_many :pricing_determinations, 
+      embeds_many :pricing_determinations,
                   class_name: "::BenefitSponsors::SponsoredBenefits::PricingDetermination"
 
       delegate :contribution_model, to: :product_package, allow_nil: true
@@ -40,9 +42,7 @@ module BenefitSponsors
       default_scope { where(:source_kind.ne => :conversion) }
 
       def product_package_exists
-        if product_package.blank? && source_kind == :benefit_sponsor_catalog
-          self.errors.add(:base, "Unable to find mappable product package")
-        end
+        self.errors.add(:base, "Unable to find mappable product package") if product_package.blank? && source_kind == :benefit_sponsor_catalog
       end
 
       def product_kind
@@ -77,18 +77,18 @@ module BenefitSponsors
 
       def lowest_cost_product(effective_date)
         return @lowest_cost_product if defined? @lowest_cost_product
-        sponsored_products =  products(effective_date)
-        @lowest_cost_product = load_base_products(sponsored_products).min_by { |product|
+        sponsored_products = products(effective_date)
+        @lowest_cost_product = load_base_products(sponsored_products).min_by do |product|
           product.min_cost_for_application_period(effective_date)
-        }
+        end
       end
 
       def highest_cost_product(effective_date)
         return @highest_cost_product if defined? @highest_cost_product
         sponsored_products =  products(effective_date)
-        @highest_cost_product ||= load_base_products(sponsored_products).max_by { |product|
+        @highest_cost_product ||= load_base_products(sponsored_products).max_by do |product|
           product.max_cost_for_application_period(effective_date)
-        }
+        end
       end
 
       def load_base_products(sponsored_products)
@@ -117,7 +117,7 @@ module BenefitSponsors
       end
 
       def latest_pricing_determination
-        pricing_determinations.sort_by(&:created_at).last
+        pricing_determinations.max_by(&:created_at)
       end
 
       def renew(new_benefit_package)

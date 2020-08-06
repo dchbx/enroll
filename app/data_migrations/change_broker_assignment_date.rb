@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 class ChangeBrokerAssignmentDate < MongoidMigrationTask
   def migrate
     hbx_id = ENV['person_hbx_id']
     new_date = Date.strptime(ENV['new_date'].to_s, "%m/%d/%Y")
-    person = Person.where(hbx_id:hbx_id)
-    if person.size == 0
+    person = Person.where(hbx_id: hbx_id)
+    if person.empty?
       puts "No person found with the given hbx_id" unless Rails.env.test?
-      return
+      nil
     else
       primary_family = person.first.primary_family
       if primary_family.present? && primary_family.current_broker_agency.present?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class ContributionLevelForm
@@ -35,11 +37,10 @@ module BenefitSponsors
         return [] unless contribution_model
         contribution_model.contribution_units.inject([]) do |data, unit|
           data << { display_name: unit.display_name,
-            is_offered: true,
-            order: unit.order,
-            min_contribution_factor: unit.minimum_contribution_factor,
-            contribution_factor: unit.default_contribution_factor, 
-          }  
+                    is_offered: true,
+                    order: unit.order,
+                    min_contribution_factor: unit.minimum_contribution_factor,
+                    contribution_factor: unit.default_contribution_factor}
         end
       end
 

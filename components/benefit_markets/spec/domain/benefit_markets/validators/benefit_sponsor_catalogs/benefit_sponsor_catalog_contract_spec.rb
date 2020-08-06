@@ -34,7 +34,7 @@ RSpec.describe BenefitMarkets::Validators::BenefitSponsorCatalogs::BenefitSponso
 
     let(:required_params)     { missing_params.merge({probation_period_kinds: probation_period_kinds, product_packages: product_packages, service_area_ids: service_area_ids }) }
 
-    before do 
+    before do
       allow(product_package).to receive(:is_a?).with(BenefitMarkets::Entities::ProductPackage) { true }
     end
 

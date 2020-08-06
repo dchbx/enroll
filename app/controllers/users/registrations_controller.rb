@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Users::RegistrationsController < Devise::RegistrationsController
   include RecaptchaConcern
   layout 'bootstrap_4'
@@ -16,19 +18,17 @@ class Users::RegistrationsController < Devise::RegistrationsController
 #   Check for curam user email, if present then restrict the user.
     if CuramUser.match_unique_login(resource.oim_id).first.present?
       flash[:alert] = "An account with this username ( #{params[:user][:oim_id]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      render(:new) && return
     end
 
     if resource.email.strip.present? && CuramUser.match_unique_login(resource.email.strip).first.present?
       flash[:alert] = "An account with this email ( #{params[:user][:email]} ) already exists. #{view_context.link_to('Click here', SamlInformation.account_recovery_url)} if you've forgotten your password."
-      render :new and return
+      render(:new) && return
     end
 
     headless = User.where(email: /^#{Regexp.quote(resource.email)}$/i).first
 
-    if headless.present? && !headless.person.present?
-      headless.destroy
-    end
+    headless.destroy if headless.present? && !headless.person.present?
 
     resource.email = resource.oim_id if resource.email.blank? && resource.oim_id =~ Devise.email_regexp
     resource.handle_headless_records
@@ -55,9 +55,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     else
       clean_up_passwords resource
       @validatable = devise_mapping.validatable?
-      if @validatable
-        @minimum_password_length = resource_class.password_length.min
-      end
+      @minimum_password_length = resource_class.password_length.min if @validatable
       respond_with resource
     end
   end

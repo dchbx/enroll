@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Notifier
   module Builders::Enrollment
-
     def enrollment
       return @enrollment if defined? @enrollment
       if payload['event_object_kind'].constantize == HbxEnrollment
@@ -50,9 +51,7 @@ module Notifier
     end
 
     def dental_enrollment
-      if event_matched?
-        enrollments.by_coverage_kind("dental").max_by(&:created_at)
-      end
+      enrollments.by_coverage_kind("dental").max_by(&:created_at) if event_matched?
     end
 
     def event_matched?

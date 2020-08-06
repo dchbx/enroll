@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
@@ -6,30 +8,30 @@ module BenefitSponsors
     - with a domestic partner
     - a disabled child > age 26", :dbclean => :after_each do
 
-    let(:census_employee) do 
+    let(:census_employee) do
       double({
-        :id => "census_employee_id",
-        :dob => Date.new(1965, 12, 3),
-        :census_dependents => [domestic_partner, disabled_child],
-        :aasm_state => "eligible"
-      })
+               :id => "census_employee_id",
+               :dob => Date.new(1965, 12, 3),
+               :census_dependents => [domestic_partner, disabled_child],
+               :aasm_state => "eligible"
+             })
     end
     let(:domestic_partner) do
       double({
-        :id => "domestic_partner_id",
-        :dob => Date.new(1967, 3, 15),
-        :employee_relationship => "domestic_partner"
-      })
+               :id => "domestic_partner_id",
+               :dob => Date.new(1967, 3, 15),
+               :employee_relationship => "domestic_partner"
+             })
     end
     let(:disabled_child) do
       double({
-        :id => "disabled_child_id",
-        :dob => Date.new(1987, 1, 1),
-        :employee_relationship => "disabled_child_26_and_over"
-      })
+               :id => "disabled_child_id",
+               :dob => Date.new(1987, 1, 1),
+               :employee_relationship => "disabled_child_26_and_over"
+             })
     end
     let(:reference_product) { instance_double(::BenefitMarkets::Products::Product, :id => "reference_product_id") }
-    let(:sponsored_benefit) do 
+    let(:sponsored_benefit) do
       instance_double(
         ::BenefitSponsors::SponsoredBenefits::SponsoredBenefit,
         {

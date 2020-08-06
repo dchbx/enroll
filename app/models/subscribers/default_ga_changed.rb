@@ -1,15 +1,25 @@
+# frozen_string_literal: true
+
 module Subscribers
   class DefaultGaChanged < ::Acapi::Subscription
     def self.subscription_details
       ["acapi.info.events.broker.default_ga_changed"]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       stringed_key_payload = payload.stringify_keys
       hbx_id = stringed_key_payload["broker_id"]
-      pre_default_ga_id = BSON::ObjectId.from_string(stringed_key_payload["pre_default_ga_id"]) rescue ""
+      pre_default_ga_id = begin
+                            BSON::ObjectId.from_string(stringed_key_payload["pre_default_ga_id"])
+                          rescue StandardError
+                            ""
+                          end
       person = Person.by_hbx_id(hbx_id).last
-      broker_agency_profile = person.broker_role.broker_agency_profile rescue nil
+      broker_agency_profile = begin
+                                person.broker_role.broker_agency_profile
+                              rescue StandardError
+                                nil
+                              end
       if broker_agency_profile.present?
         if broker_agency_profile.default_general_agency_profile_id.present?
           #change

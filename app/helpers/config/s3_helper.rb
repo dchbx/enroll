@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Config
   module S3Helper
     def s3_template_bucket_key

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RenewalNotice < Notice
 
   def initialize(employee, args = {})

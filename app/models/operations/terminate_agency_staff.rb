@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Operations
   class TerminateAgencyStaff
 
@@ -7,18 +9,16 @@ module Operations
     end
 
     def call
-      begin
-        person = Person.find(@person_id)
-        role = person.broker_agency_staff_roles.select{ |role| role._id.to_s == @role_id }.first ||
-                 person.general_agency_staff_roles.select{ |role| role._id.to_s == @role_id }.first
-        return :no_role_found unless role
-        role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
-        :ok
-      rescue Mongoid::Errors::DocumentNotFound
-        :person_not_found
-      rescue
-        :error
-      end
+      person = Person.find(@person_id)
+      role = person.broker_agency_staff_roles.select{ |role| role._id.to_s == @role_id }.first ||
+             person.general_agency_staff_roles.select{ |role| role._id.to_s == @role_id }.first
+      return :no_role_found unless role
+      role.class.name == "BrokerAgencyStaffRole" ? role.broker_agency_terminate! : role.general_agency_terminate!
+      :ok
+    rescue Mongoid::Errors::DocumentNotFound
+      :person_not_found
+    rescue StandardError
+      :error
     end
 
     def policy_class

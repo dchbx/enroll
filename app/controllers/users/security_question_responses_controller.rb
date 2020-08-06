@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Users::SecurityQuestionResponsesController < ApplicationController
   include Config::ContactCenterConcern
 
@@ -45,6 +47,7 @@ class Users::SecurityQuestionResponsesController < ApplicationController
   end
 
   private
+
   helper_method :user_from_email, :challenge_question
 
   def challenge_question
@@ -56,10 +59,8 @@ class Users::SecurityQuestionResponsesController < ApplicationController
   end
 
   def user_from_email
-    begin
-      @user ||= User.find_by(email: params[:user][:email])
-    rescue => e
-      return
-    end
+    @user ||= User.find_by(email: params[:user][:email])
+  rescue StandardError => e
+    nil
   end
 end

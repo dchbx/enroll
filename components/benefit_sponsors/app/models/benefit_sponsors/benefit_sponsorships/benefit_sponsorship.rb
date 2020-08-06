@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # BenefitSponsorship
 # Manage benfit enrollment activity for a sponsoring Organization's Profile (e.g. EmployerProfile,
 # HbxProfile, etc.) Behavior is goverened by settings obtained from the BenefitMarkets::BenefitCatelog.
@@ -29,10 +31,10 @@ module BenefitSponsors
 
     ACTIVE_STATES   = [:applicant, :active].freeze
     INACTIVE_STATES = [:suspended, :ineligible, :teminated].freeze
-    ENROLLED_STATES = [:enrolled]
+    ENROLLED_STATES = [:enrolled].freeze
 
-    INVOICE_VIEW_INITIAL  ||= %w(published enrolling enrolled active suspended)
-    INVOICE_VIEW_RENEWING ||= %w(renewing_published renewing_enrolling renewing_enrolled renewing_draft)
+    INVOICE_VIEW_INITIAL  ||= %w[published enrolling enrolled active suspended].freeze
+    INVOICE_VIEW_RENEWING ||= %w[renewing_published renewing_enrolling renewing_enrolled renewing_draft].freeze
 
 
     # Origination of this BenefitSponsorship instance in association
@@ -54,10 +56,10 @@ module BenefitSponsors
     TERMINATION_KINDS         = [:voluntary, :involuntary].freeze
     TERMINATION_REASON_KINDS  = [:nonpayment, :ineligible, :fraud].freeze
 
-    NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request".freeze
-    NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request".freeze
-    NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request".freeze
-    NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request".freeze
+    NFP_ENROLLMENT_DATA_REQUEST = "acapi.info.events.employer.nfp_enrollment_data_request"
+    NFP_PAYMENT_HISTORY_REQUEST = "acapi.info.events.employer.nfp_payment_history_request"
+    NFP_PDF_REQUEST = "acapi.info.events.employer.nfp_pdf_request"
+    NFP_STATEMENT_SUMMARY_REQUEST = "acapi.info.events.employer.nfp_statement_summary_request"
 
     field :hbx_id,              type: String
     field :profile_id,          type: BSON::ObjectId
@@ -92,31 +94,31 @@ module BenefitSponsors
     delegate :legal_name,   :fein,          to: :organization
 
     belongs_to  :organization,
-      inverse_of: :benefit_sponsorships,
-      counter_cache: true,
-      class_name: "BenefitSponsors::Organizations::Organization",
-      optional: true
+                inverse_of: :benefit_sponsorships,
+                counter_cache: true,
+                class_name: "BenefitSponsors::Organizations::Organization",
+                optional: true
 
     embeds_many :benefit_applications,
-      class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
-      inverse_of: :benefit_sponsorship
+                class_name: "::BenefitSponsors::BenefitApplications::BenefitApplication",
+                inverse_of: :benefit_sponsorship
 
     has_many    :census_employees,
-      class_name: "::CensusEmployee"
+                class_name: "::CensusEmployee"
 
     belongs_to  :benefit_market,
-      counter_cache: true,
-      class_name: "::BenefitMarkets::BenefitMarket",
-      optional: true
+                counter_cache: true,
+                class_name: "::BenefitMarkets::BenefitMarket",
+                optional: true
 
     belongs_to  :rating_area,
-      counter_cache: true,
-      class_name: "::BenefitMarkets::Locations::RatingArea",
-      optional: true
+                counter_cache: true,
+                class_name: "::BenefitMarkets::Locations::RatingArea",
+                optional: true
 
     has_and_belongs_to_many :service_areas,
-      :inverse_of => nil,
-      class_name: "::BenefitMarkets::Locations::ServiceArea"
+                            :inverse_of => nil,
+                            class_name: "::BenefitMarkets::Locations::ServiceArea"
 
     embeds_many :broker_agency_accounts, class_name: "BenefitSponsors::Accounts::BrokerAgencyAccount",
                                          validate: true,
@@ -130,37 +132,37 @@ module BenefitSponsors
     embeds_one  :employer_attestation, class_name: "BenefitSponsors::Documents::EmployerAttestation"
 
     has_many    :documents,
-      inverse_of: :benefit_sponsorship_docs,
-      class_name: "BenefitSponsors::Documents::Document"
+                inverse_of: :benefit_sponsorship_docs,
+                class_name: "BenefitSponsors::Documents::Document"
 
     accepts_nested_attributes_for :benefit_sponsorship_account
 
     validates_presence_of :organization, :profile_id, :benefit_market, :source_kind
 
     validates :source_kind,
-      inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
-      allow_blank: false
+              inclusion: { in: SOURCE_KINDS, message: "%{value} is not a valid source kind" },
+              allow_blank: false
 
     # Workflow attributes
     scope :active,                      ->{ any_in(aasm_state: ACTIVE_STATES) }
     scope :inactive,                    ->{ any_in(aasm_state: INACTIVE_STATES) }
 
-    scope :by_broker_role,              ->( broker_role_id ){ where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
-    scope :by_broker_agency_profile,    ->( broker_agency_profile_id ) { where(:'broker_agency_accounts' => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
+    scope :by_broker_role,              ->(broker_role_id){ where(:broker_agency_accounts => {:$elemMatch => { is_active: true, writing_agent_id: broker_role_id} }) }
+    scope :by_broker_agency_profile,    ->(broker_agency_profile_id) { where(:broker_agency_accounts => {:$elemMatch => { is_active: true, benefit_sponsors_broker_agency_profile_id: broker_agency_profile_id} }) }
 
-    scope :may_begin_open_enrollment?,  -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_begin_open_enrollment?,  lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.min".lte => compare_date, :aasm_state => :approved }}
-      )
+              :$elemMatch => {:"open_enrollment_period.min".lte => compare_date, :aasm_state => :approved }
+            })
     }
 
-    scope :may_end_open_enrollment?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_end_open_enrollment?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :"aasm_state".in => [:enrollment_open, :enrollment_extended] }}
-      )
+              :$elemMatch => {:"open_enrollment_period.max".lt => compare_date, :aasm_state.in => [:enrollment_open, :enrollment_extended] }
+            })
     }
 
-    scope :may_begin_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_begin_benefit_coverage?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(
         :benefit_applications => {
           :$elemMatch => {:"effective_period.min".lte => compare_date, :aasm_state.in => [:enrollment_eligible, :binder_paid] }
@@ -168,13 +170,13 @@ module BenefitSponsors
       )
     }
 
-    scope :may_end_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_end_benefit_coverage?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :active }}
-      )
+              :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :active }
+            })
     }
 
-    scope :may_terminate_pending_benefit_coverage?, ->(compare_date = TimeKeeper.date_of_record) {
+    scope :may_terminate_pending_benefit_coverage?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(
         :benefit_applications => {
           :$elemMatch => {:"effective_period.max".lt => compare_date, :aasm_state => :termination_pending }
@@ -182,27 +184,27 @@ module BenefitSponsors
       )
     }
 
-    scope :may_renew_application?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_renew_application?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }}
-      )
+              :$elemMatch => {:"effective_period.max" => compare_date, :aasm_state => :active }
+            })
     }
 
-    scope :eligible_renewal_applications_on, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :eligible_renewal_applications_on, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {
-          :"effective_period.min" => compare_date,
-          :predecessor_id => {"$ne" => nil},
-          :aasm_state => {"$in" => [:enrollment_eligible, :active]}
-        }
-      })
+              :$elemMatch => {
+                :"effective_period.min" => compare_date,
+                :predecessor_id => {"$ne" => nil},
+                :aasm_state => {"$in" => [:enrollment_eligible, :active]}
+              }
+            })
     }
 
     # Fix Me: verify the state check...probably need to use termination_pending
-    scope :may_terminate_benefit_coverage?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_terminate_benefit_coverage?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"terminated_on" => compare_date, :aasm_state.in => [:active, :suspended] }}
-      )
+              :$elemMatch => {:terminated_on => compare_date, :aasm_state.in => [:active, :suspended] }
+            })
     }
 
     scope :may_transmit_initial_enrollment?, lambda { |compare_date = TimeKeeper.date_of_record, transition_at = nil|
@@ -229,37 +231,37 @@ module BenefitSponsors
       end
     }
 
-    scope :may_auto_submit_application?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_auto_submit_application?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }}
-      )
+              :$elemMatch => {:predecessor_id => { :$exists => true }, :"effective_period.min" => compare_date, :aasm_state => :draft }
+            })
     }
 
-    scope :may_transition_as_initial_ineligible?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_transition_as_initial_ineligible?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:predecessor_id => { :$exists => false }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_closed }}
-      )
+              :$elemMatch => {:predecessor_id => { :$exists => false }, :"effective_period.min" => compare_date, :aasm_state => :enrollment_closed }
+            })
     }
 
-    scope :may_cancel_ineligible_application?, -> (compare_date = TimeKeeper.date_of_record) {
+    scope :may_cancel_ineligible_application?, lambda { |compare_date = TimeKeeper.date_of_record|
       where(:benefit_applications => {
-        :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible] }}
-      )
+              :$elemMatch => {:"effective_period.min" => compare_date, :aasm_state.in => [:enrollment_closed, :enrollment_ineligible] }
+            })
     }
 
-    scope :benefit_application_find,     ->(ids) {
+    scope :benefit_application_find,     lambda { |ids|
       where(:"benefit_applications._id".in => [ids].flatten.collect{|id| BSON::ObjectId.from_string(id)})
     }
 
-    scope :benefit_package_find,         ->(id) {
+    scope :benefit_package_find,         lambda { |id|
       where(:"benefit_applications.benefit_packages._id" => BSON::ObjectId.from_string(id))
     }
 
-    scope :by_profile,                   ->(profile) {
+    scope :by_profile,                   lambda { |profile|
       where(:profile_id => profile._id)
     }
 
-    scope :benefit_application_start_on_or_after, ->(start_on) {
+    scope :benefit_application_start_on_or_after, lambda { |start_on|
       where(:"benefit_applications.effective_period.min".gte => start_on)
     }
 
@@ -272,10 +274,10 @@ module BenefitSponsors
     index({"benefit_applications.predecessor_id" => 1}, {name: "predecessor"})
     index({"benefit_applications.recorded_rating_area_id" => 1}, {name: "rating_area"})
     index({ "benefit_applications.aasm_state" => 1, "benefit_applications.effective_period.min" => 1, "benefit_applications.effective_period.max" => 1},
-            { name: "effective_period" })
+          { name: "effective_period" })
 
     index({ "benefit_applications.aasm_state" => 1, "benefit_applications.open_enrollment_period.min" => 1, "benefit_applications.open_enrollment_period.max" => 1},
-            { name: "open_enrollment_period" })
+          { name: "open_enrollment_period" })
 
     index({"benefit_applications.benefit_packages._id" => 1}, {name: "package_id"})
     index({"benefit_applications.benefit_packages.title" => 1}, {name: "package_title"})
@@ -333,11 +335,7 @@ module BenefitSponsors
     end
 
     def rating_area_on(a_date = ::TimeKeeper.date_of_record)
-      if has_primary_office_address?
-        ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address, during: a_date)
-      else
-        nil
-      end
+      ::BenefitMarkets::Locations::RatingArea.rating_area_for(primary_office_location.address, during: a_date) if has_primary_office_address?
     end
 
     def primary_office_rating_area
@@ -392,7 +390,7 @@ module BenefitSponsors
     end
 
     def predecessor=(benefit_sponsorship)
-      raise ArgumentError.new("expected BenefitSponsorship") unless benefit_sponsorship.is_a? BenefitSponsors::BenefitSponsorships::BenefitSponsorship
+      raise ArgumentError, "expected BenefitSponsorship" unless benefit_sponsorship.is_a? BenefitSponsors::BenefitSponsorships::BenefitSponsorship
       self.predecessor_id = benefit_sponsorship._id
       @predecessor = benefit_sponsorship
     end
@@ -442,11 +440,11 @@ module BenefitSponsors
     end
 
     def active_imported_benefit_application
-      benefit_applications.where(:"effective_period.max".gte => TimeKeeper.date_of_record).order_by(:"updated_at".desc).imported.first  if is_conversion?
+      benefit_applications.where(:"effective_period.max".gte => TimeKeeper.date_of_record).order_by(:updated_at.desc).imported.first  if is_conversion?
     end
 
     def imported_benefit_application
-      benefit_applications.order_by(:"updated_at".desc).imported.first if is_conversion?
+      benefit_applications.order_by(:updated_at.desc).imported.first if is_conversion?
     end
 
     def benefit_applications_by(ids)
@@ -463,8 +461,8 @@ module BenefitSponsors
 
     def overlapping_coverage_exists?(benefit_application)
       benefit_applications.approved_and_terminated
-       .by_overlapping_effective_period(benefit_application.effective_period)
-       .reject{|result| result == benefit_application}.present?
+                          .by_overlapping_effective_period(benefit_application.effective_period)
+                          .reject{|result| result == benefit_application}.present?
     end
 
     def oe_extended_applications
@@ -483,9 +481,7 @@ module BenefitSponsors
 
     def benefit_package_by(id)
       benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
-      if benefit_application
-        benefit_application.benefit_packages.unscoped.find(id)
-      end
+      benefit_application.benefit_packages.unscoped.find(id) if benefit_application
     end
 
     def is_attestation_eligible?
@@ -516,26 +512,26 @@ module BenefitSponsors
     end
 
     def renewal_benefit_application
-      benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewing? }
+      benefit_applications.order_by(:created_at.desc).detect(&:is_renewing?)
     end
 
     def active_benefit_application
-      benefit_applications.order_by(:"created_at".desc).detect {|application| application.active?}
+      benefit_applications.order_by(:created_at.desc).detect(&:active?)
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
+      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:updated_at.desc).non_imported.first
     end
 
-    def renewing_submitted_benefit_application # TODO -recheck
-      benefit_applications.order_by(:"created_at".desc).detect {|application| application.is_renewal_enrolling? }
+    def renewing_submitted_benefit_application # TODO: -recheck
+      benefit_applications.order_by(:created_at.desc).detect(&:is_renewal_enrolling?)
     end
 
-    alias_method :renewing_published_benefit_application, :renewing_submitted_benefit_application
-    alias_method :latest_benefit_application, :most_recent_benefit_application
+    alias renewing_published_benefit_application renewing_submitted_benefit_application
+    alias latest_benefit_application most_recent_benefit_application
 
     # TODO: pass in termination reason and kind
-    def terminate_enrollment(benefit_end_date)
+    def terminate_enrollment(_benefit_end_date)
       if self.may_terminate?
         self.terminate!
         self.update_attributes(effective_end_on: benefit_end_on, termination_kind: :voluntary, termination_reason: :nonpayment)
@@ -603,7 +599,7 @@ module BenefitSponsors
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
-      
+
       # event :approve_initial_application do
       #   transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
       # end
@@ -687,7 +683,7 @@ module BenefitSponsors
         benefit_applications.each do |benefit_application|
           benefit_application.benefit_sponsorship_event_subscriber(aasm)
         end
-      rescue
+      rescue StandardError
       end
     end
 
@@ -750,9 +746,8 @@ module BenefitSponsors
     end
 
     def active_broker_agency_account
-      broker_agency_accounts.detect { |baa| baa.is_active }
+      broker_agency_accounts.detect(&:is_active)
     end
-
 
     def self.find_by_feins(feins)
       organizations = BenefitSponsors::Organizations::Organization.where(fein: {:$in => feins})
@@ -769,9 +764,9 @@ module BenefitSponsors
     def validate_profile_organization
       if organization.present? && profile.present?
         if organization == profile.organization
-          return true
+          true
         else
-          return errors.add(:organization, "must be profile's organization")
+          errors.add(:organization, "must be profile's organization")
         end
       end
     end
@@ -785,12 +780,11 @@ module BenefitSponsors
     end
 
     def pull_organization_attributes
-      key = (organization &. is_a_fehb_profile?) ? :fehb : :aca_shop
+      key = organization &. is_a_fehb_profile? ? :fehb : :aca_shop
       self.benefit_market = organization.site.benefit_market_for(key) if organization.present?
     end
 
-    def pull_profile_attributes
-    end
+    def pull_profile_attributes; end
 
     def generate_hbx_id
       write_attribute(:hbx_id, BenefitSponsors::Organizations::HbxIdGenerator.generate_benefit_sponsorship_id) if hbx_id.blank?

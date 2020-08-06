@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.configuration.middleware.use Browser::Middleware do
   setting = Settings.site.block_ie_browser_after
   date = (setting.is_a? Date) ? setting : Date.strptime(setting, '%m/%d/%y')

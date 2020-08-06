@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Publishers
   class LegacyShopReportPublisher
     attr_reader :gateway

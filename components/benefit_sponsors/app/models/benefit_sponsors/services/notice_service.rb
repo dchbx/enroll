@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class NoticeService
@@ -24,11 +26,11 @@ module BenefitSponsors
         resource = ::Notifier::ApplicationEventMapper.map_resource(recipient.class)
         event_name = ::Notifier::ApplicationEventMapper.map_event_name(resource, notice_event)
         notify(event_name, {
-          resource.identifier_key => recipient.send(resource.identifier_method).to_s,
-          :event_object_kind => event_object.class.to_s,
-          :event_object_id   => event_object.id.to_s,
-          :notice_params => notice_params
-          })
+                 resource.identifier_key => recipient.send(resource.identifier_method).to_s,
+                 :event_object_kind => event_object.class.to_s,
+                 :event_object_id => event_object.id.to_s,
+                 :notice_params => notice_params
+               })
       end
 
       def can_be_proccessed_as_legacy?(recipient, notice_event)

@@ -1,41 +1,43 @@
+# frozen_string_literal: true
+
 Given(/^that the consumer has navigated to the AUTH & CONSENT page$/) do
-	visit 'insured/consumer_role/ridp_agreement'
+  visit 'insured/consumer_role/ridp_agreement'
 end
 
 When(/^the consumer selects “I Disagree”$/) do
-		find(:xpath, '//label[@for="agreement_disagree"]').click
+  find(:xpath, '//label[@for="agreement_disagree"]').click
 end
 
 When(/^the consumer clicks CONTINUE$/) do
-	click_link "Continue"
+  click_link "Continue"
 end
 
 Then(/^the consumer will be directed to the DOCUMENT UPLOAD page$/) do
-	expect(page).to have_content('Identity')
-	expect(page).to have_content('Application')
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
 end
 
 Given(/^that the consumer has “Disagreed” to AUTH & CONSENT$/) do
-	visit 'insured/consumer_role/ridp_agreement'
-	find(:xpath, '//label[@for="agreement_disagree"]').click
-	click_link "Continue"
+  visit 'insured/consumer_role/ridp_agreement'
+  find(:xpath, '//label[@for="agreement_disagree"]').click
+  click_link "Continue"
 end
 
 And(/^the consumer is on the DOCUMENT UPLOAD page$/) do
-	expect(page).to have_content('Identity')
-	expect(page).to have_content('Application')
+  expect(page).to have_content('Identity')
+  expect(page).to have_content('Application')
 end
 
 And(/^application verification is OUTSTANDING$/) do
-	person = Person.all.first
+  person = Person.all.first
   expect(person.consumer_role.application_validation).to eq('outstanding')
   expect(page).to have_content('Outstanding')
 end
 
 And(/^Identity verification is OUTSTANDING$/) do
-	person = Person.all.first
-	expect(person.consumer_role.identity_validation).to eq('outstanding')
-	expect(page).to have_content('Outstanding')
+  person = Person.all.first
+  expect(person.consumer_role.identity_validation).to eq('outstanding')
+  expect(page).to have_content('Outstanding')
 end
 
 Then(/^the CONTINUE button is functionally DISABLED$/) do
@@ -47,36 +49,36 @@ Then(/^visibly DISABLED$/) do
 end
 
 And(/^an uploaded application in REVIEW status is present$/) do
-  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
   find('#upload_application').click
-	within '#upload_application' do
-		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+  within '#upload_application' do
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
   wait_for_ajax(2)
-	expect(page).to have_content('File Saved')
-	expect(page).to have_content('In Review')
-	person = Person.all.first
-	expect(person.consumer_role.application_validation).to eq('pending')
+  expect(page).to have_content('File Saved')
+  expect(page).to have_content('In Review')
+  person = Person.all.first
+  expect(person.consumer_role.application_validation).to eq('pending')
 end
 
 And(/^an uploaded identity verification in REVIEW status is present$/) do
-  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
-	find('#upload_identity').click
-	find('#select_upload_identity').click
-	within '#select_upload_identity' do
-		attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible:false)
+  find('#upload_identity').click
+  find('#select_upload_identity').click
+  within '#select_upload_identity' do
+    attach_file("file[]", "#{Rails.root}/lib/pdf_templates/blank.pdf", visible: false)
   end
   wait_for_ajax(2)
-	expect(page).to have_content('File Saved')
-	expect(page).to have_content('In Review')
-	person = Person.all.first
-	expect(person.consumer_role.identity_validation).to eq('pending')
+  expect(page).to have_content('File Saved')
+  expect(page).to have_content('In Review')
+  person = Person.all.first
+  expect(person.consumer_role.identity_validation).to eq('pending')
 end
 
 And(/^an uploaded application in VERIFIED status is present$/) do

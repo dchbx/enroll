@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module SponsoredBenefits
@@ -5,7 +7,7 @@ module SponsoredBenefits
 
 
     # let(:employer_profile) { create(:sponsored_benefits_benefit_sponsorships_plan_design_employer_profile) }
-    
+
     let(:first_name){ "Lynyrd" }
     let(:middle_name){ "Rattlesnake" }
     let(:last_name){ "Skynyrd" }
@@ -18,7 +20,7 @@ module SponsoredBenefits
     let(:address) { Locations::Address.new(kind: "home", address_1: "221 R St, NW", city: "Washington", state: "DC", zip: "20001") }
     let(:autocomplete) { " lynyrd skynyrd" }
 
-    let(:valid_params){
+    let(:valid_params) do
       {
         # employer_profile: employer_profile,
         first_name: first_name,
@@ -32,7 +34,7 @@ module SponsoredBenefits
         is_business_owner: is_business_owner,
         address: address
       }
-    }
+    end
 
 
     let!(:subject) { CensusMembers::PlanDesignCensusEmployee.new(valid_params) }
@@ -40,7 +42,7 @@ module SponsoredBenefits
     context "given the minimal params" do
 
       it "builds a basic application" do
-  
+
         expect(subject).to be_kind_of(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
       end
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPublishPlanYear', dbclean: :around_each do
@@ -9,12 +11,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
   let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
   let!(:employer_profile)    { organization.employer_profile }
   let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
-  let!(:model_instance) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'draft',
-    :effective_period =>  start_on..(start_on + 1.year) - 1.day
-  )}
+  let!(:model_instance) do
+    FactoryBot.create(:benefit_sponsors_benefit_application,
+                      :with_benefit_package,
+                      :benefit_sponsorship => benefit_sponsorship,
+                      :aasm_state => 'draft',
+                      :effective_period => start_on..(start_on + 1.year) - 1.day)
+  end
   let!(:date_mock_object) { Date.new(start_on.year, start_on.prev_month.month, (Settings.aca.shop_market.initial_application.publish_due_day_of_month - 2))}
 
   describe "ModelEvent" do
@@ -56,28 +59,30 @@ RSpec.describe 'BenefitSponsors::ModelEvents::InitialEmployerFinalRemainderToPub
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
+    let(:data_elements) do
       [
         "employer_profile.notice_date",
         "employer_profile.employer_name",
         "employer_profile.benefit_application.current_py_start_date",
-        "employer_profile.benefit_application.initial_py_publish_due_date", 
+        "employer_profile.benefit_application.initial_py_publish_due_date",
         "employer_profile.broker.primary_fullname",
         "employer_profile.broker.organization",
         "employer_profile.broker.phone",
         "employer_profile.broker.email",
         "employer_profile.broker_present?"
       ]
-    }
+    end
 
     let(:merge_model) { subject.construct_notice_object }
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
+    let(:payload)   do
+      {
         "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
         "event_object_id" => model_instance.id
-    } }
+      }
+    end
 
     context "when notice event received" do
 

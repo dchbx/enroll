@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QuoteDemographic
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -18,27 +20,26 @@ class QuoteDemographic
   def provide_quote_roster
     return if average_household_size < 1
 
-    roster = Array.new
+    roster = []
     household_count = self.average_household_size.ceil
     count = 1
 
     if count == 1
       roster.push({:employee_relationship => "employee", :age => generate_random_age})
-      count = count + 1
+      count += 1
     end
 
     if household_count > 1 && count == 2
       roster.push({:employee_relationship => "spouse", :age => generate_random_age})
-      count = count + 1
+      count += 1
     end
 
-    while count <= household_count do
+    while count <= household_count
       roster.push({:employee_relationship => "child", :age => generate_random_age_children})
-      count = count + 1
+      count += 1
     end
 
     roster
-
   end
 
 end

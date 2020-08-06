@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv::Importers
   class EnrollmentParser
     include Parsers::Xml::Cv::Importers::Base
@@ -23,7 +25,7 @@ module Parsers::Xml::Cv::Importers
           active_year: e_plan.active_year,
           metal_level: metal_level,
           coverage_kind: coverage_type,
-          ehb: e_plan.ehb_percent.to_f,
+          ehb: e_plan.ehb_percent.to_f
           #plan_type: ,
         )
         product_class = coverage_type == "health" ? BenefitMarkets::Products::HealthProducts::HealthProduct : BenefitMarkets::Products::DentalProducts::DentalProduct
@@ -44,14 +46,26 @@ module Parsers::Xml::Cv::Importers
           is_subscriber: enrollee.is_subscriber == 'true',
           coverage_start_on: enrollee.benefit.begin_date,
           coverage_end_on: enrollee.benefit.end_date,
-          premium_amount: enrollee.benefit.premium_amount,
+          premium_amount: enrollee.benefit.premium_amount
           #applied_aptc_amount: , # can not find it in xml
         )
       end
-      coverage_type = enrollment.plan.coverage_type.strip.split('#').last rescue ''
+      coverage_type = begin
+                        enrollment.plan.coverage_type.strip.split('#').last
+                      rescue StandardError
+                        ''
+                      end
       enrollee = policy.enrollees.detect {|enrollee| enrollee.is_subscriber == 'true'}
-      effective_on = enrollee.benefit.begin_date rescue ''
-      terminated_on = enrollee.benefit.end_date rescue ''
+      effective_on = begin
+                       enrollee.benefit.begin_date
+                     rescue StandardError
+                       ''
+                     end
+      terminated_on = begin
+                        enrollee.benefit.end_date
+                      rescue StandardError
+                        ''
+                      end
       household = get_household_by_policy_xml(policy)
 
       HbxEnrollment.new(
@@ -73,35 +87,51 @@ module Parsers::Xml::Cv::Importers
         effective_on: effective_on,
         terminated_on: terminated_on,
         employee_role: get_employee_role_by_shop_market_xml(enrollment.shop_market),
-        broker: get_broker_role_by_broker_xml(policy.broker_link),
+        broker: get_broker_role_by_broker_xml(policy.broker_link)
       )
     end
 
     def get_broker_role_object
       return nil if policy && policy.broker_link.blank?
       broker = policy.broker_link
-      first_name = broker.name.split(' ').first rescue ''
-      last_name = broker.name.split(' ').last rescue ''
+      first_name = begin
+                     broker.name.split(' ').first
+                   rescue StandardError
+                     ''
+                   end
+      last_name = begin
+                    broker.name.split(' ').last
+                  rescue StandardError
+                    ''
+                  end
 
       BrokerRole.new(
         npn: broker.id,
         person: Person.new(
           first_name: first_name,
-          last_name: last_name,
+          last_name: last_name
         )
       )
     end
 
     def get_broker_role_by_broker_xml(broker)
       return nil if broker.blank?
-      first_name = broker.name.split(' ').first rescue ''
-      last_name = broker.name.split(' ').last rescue ''
+      first_name = begin
+                     broker.name.split(' ').first
+                   rescue StandardError
+                     ''
+                   end
+      last_name = begin
+                    broker.name.split(' ').last
+                  rescue StandardError
+                    ''
+                  end
 
       BrokerRole.new(
         npn: broker.id,
         person: Person.new(
           first_name: first_name,
-          last_name: last_name,
+          last_name: last_name
         )
       )
     end
@@ -109,7 +139,11 @@ module Parsers::Xml::Cv::Importers
     def get_employee_role_by_shop_market_xml(shop_market)
       return nil if shop_market.blank?
       employer = shop_market.employer_link
-      hbx_id = employer.id.strip.split('#').last rescue ''
+      hbx_id = begin
+                 employer.id.strip.split('#').last
+               rescue StandardError
+                 ''
+               end
       org = BenefitSponsors::Organizations::Organization.new(
         hbx_id: hbx_id,
         legal_name: employer.try(:name)
@@ -128,7 +162,7 @@ module Parsers::Xml::Cv::Importers
           id: member.id,
           is_primary_applicant: enrollee.is_subscriber == 'true',
           is_coverage_applicant: member.is_coverage_applicant == 'true',
-          person: get_person_object_by_enrollee_member_xml(member),
+          person: get_person_object_by_enrollee_member_xml(member)
         )
       end
       family = Family.new(family_members: family_members)

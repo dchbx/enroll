@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Serializers
     class InboxSerializer < ActiveModel::Serializer
@@ -17,7 +19,7 @@ module BenefitSponsors
       def attributes(*args)
         hash = super
         unless object.persisted?
-          
+
         end
         hash
       end

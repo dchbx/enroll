@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNotices::IvlTaxNotice < IvlNotice
   attr_accessor :family
 
@@ -6,7 +8,7 @@ class IvlNotices::IvlTaxNotice < IvlNotice
     args[:recipient] = consumer_role.person
     args[:notice] = PdfTemplates::ConditionalEligibilityNotice.new
     args[:market_kind] = 'individual'
-    args[:recipient_document_store]= consumer_role.person
+    args[:recipient_document_store] = consumer_role.person
     args[:to] = consumer_role.person.work_email_or_best
     self.header = 'notices/shared/ivl_tax_header.html.erb'
     super(args)
@@ -26,35 +28,31 @@ class IvlNotices::IvlTaxNotice < IvlNotice
     attach_1095a_form
     upload_and_send_secure_message
 
-    if recipient.consumer_role.can_receive_electronic_communication?
-      send_generic_notice_alert
-    end
+    send_generic_notice_alert if recipient.consumer_role.can_receive_electronic_communication?
 
-    if recipient.consumer_role.can_receive_paper_communication?
-      store_paper_notice
-    end
+    store_paper_notice if recipient.consumer_role.can_receive_paper_communication?
   end
 
   def build
-    notice.is_an_aqhp_cover_letter = (@true_or_false.present? && @true_or_false.to_s.downcase == "true") ? true : false
+    notice.is_an_aqhp_cover_letter = @true_or_false.present? && @true_or_false.to_s.downcase == "true" ? true : false
     notice.mpi_indicator = self.mpi_indicator
     family = recipient.primary_family
     notice.primary_fullname = ""
     if recipient.mailing_address
       append_address(recipient.mailing_address)
-    else  
+    else
       # @notice.primary_address = nil
-      raise 'mailing address not present' 
+      raise 'mailing address not present'
     end
   end
 
-  def append_address(primary_address)
+  def append_address(_primary_address)
     notice.primary_address = PdfTemplates::NoticeAddress.new({
-      street_1: "",
-      street_2: "",
-      city: "",
-      state: "",
-      zip: ""
-      })
+                                                               street_1: "",
+                                                               street_2: "",
+                                                               city: "",
+                                                               state: "",
+                                                               zip: ""
+                                                             })
   end
 end

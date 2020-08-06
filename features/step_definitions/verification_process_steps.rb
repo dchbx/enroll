@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module VerificationUser
   def user(*traits)
     attributes = traits.extract_options!
@@ -76,14 +78,14 @@ end
 Given(/^consumer has outstanding verification and unverified enrollments$/) do
   family = user.person.primary_family
   enr = FactoryBot.create(:hbx_enrollment,
-                           family: family,
-                           household: family.active_household,
-                           coverage_kind: "health",
-                           effective_on: TimeKeeper.date_of_record - 2.months,
-                           enrollment_kind: "open_enrollment",
-                           kind: "individual",
-                           submitted_at: TimeKeeper.date_of_record - 2.months,
-                           special_verification_period: TimeKeeper.date_of_record - 20.days)
+                          family: family,
+                          household: family.active_household,
+                          coverage_kind: "health",
+                          effective_on: TimeKeeper.date_of_record - 2.months,
+                          enrollment_kind: "open_enrollment",
+                          kind: "individual",
+                          submitted_at: TimeKeeper.date_of_record - 2.months,
+                          special_verification_period: TimeKeeper.date_of_record - 20.days)
   enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: family.active_family_members[0].id,
                                                         eligibility_date: TimeKeeper.date_of_record - 2.months,
                                                         coverage_start_on: TimeKeeper.date_of_record - 2.months)

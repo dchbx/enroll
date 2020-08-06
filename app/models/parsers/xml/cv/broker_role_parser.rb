@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Parsers::Xml::Cv
   class BrokerRoleParser
     include HappyMapper
@@ -13,7 +15,7 @@ module Parsers::Xml::Cv
       {
         id: id,
         npn: npn,
-        broker_agency: broker_agency.to_hash,
+        broker_agency: broker_agency.to_hash
       }
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidator do
@@ -34,9 +36,9 @@ RSpec.describe BenefitSponsors::BenefitPackages::EmployeeRenewals::DomainValidat
   describe "given a bogus ids" do
     let(:params) do
       base_valid_params.merge({
-        :benefit_package_id => benefit_package_id,
-        :census_employee_id => census_employee_id
-      })
+                                :benefit_package_id => benefit_package_id,
+                                :census_employee_id => census_employee_id
+                              })
     end
 
     before(:each) do

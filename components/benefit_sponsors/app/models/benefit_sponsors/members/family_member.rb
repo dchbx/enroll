@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Individual Market Primary Member
 module BenefitSponsors
   class Members::FamilyMember < Members::Member
@@ -18,5 +20,4 @@ module BenefitSponsors
       kinship_to_primary_member = :self
     end
   end
-
 end

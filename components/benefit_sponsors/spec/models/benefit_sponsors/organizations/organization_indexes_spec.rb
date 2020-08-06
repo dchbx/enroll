@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::Organizations::Organization, "with indexes", :dbclean => :after_each do

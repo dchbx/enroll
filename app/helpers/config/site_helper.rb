@@ -1,5 +1,6 @@
-module Config::SiteHelper
+# frozen_string_literal: true
 
+module Config::SiteHelper
   def site_redirect_on_timeout_route
     Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
   end
@@ -90,7 +91,7 @@ module Config::SiteHelper
 
   def site_registration_path(resource_name, params)
     if Settings.site.registration_path.present? && ENV['AWS_ENV'] == 'prod'
-       Settings.site.registration_path
+      Settings.site.registration_path
     else
       new_registration_path(resource_name, :invitation_id => params[:invitation_id])
     end
@@ -125,11 +126,11 @@ module Config::SiteHelper
   end
 
   def health_care_website
-      Settings.site.health_care_website
+    Settings.site.health_care_website
   end
 
   def health_care_website_url
-      Settings.site.health_care_website_url
+    Settings.site.health_care_website_url
   end
 
   def ivl_login_url
@@ -209,11 +210,10 @@ module Config::SiteHelper
   end
 
   def site_tufts_url
-     Settings.site.tufts_premier_url
+    Settings.site.tufts_premier_url
   end
 
   def site_tufts_premier_link
     link_to site_tufts_url, site_tufts_url
   end
-
 end

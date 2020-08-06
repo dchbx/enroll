@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
@@ -38,15 +40,15 @@ module BenefitSponsors
 
     let!(:permission)               { FactoryBot.create(:permission, :hbx_staff) }
     let!(:user_with_hbx_staff_role) { FactoryBot.create(:user, :with_hbx_staff_role) }
-    let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role )}
+    let!(:hbx_person)               { FactoryBot.create(:person, user: user_with_hbx_staff_role)}
     let(:organization_with_hbx_profile)  { site.owner_organization }
 
     let!(:person1) { FactoryBot.create(:person, :with_broker_role) }
-    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person1 ) }
+    let!(:user_with_broker_role) { FactoryBot.create(:user, person: person1) }
     let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
-    let!(:employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
-    let!(:person) { FactoryBot.create(:person, employer_staff_roles:[employer_staff_role]) }
+    let!(:employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: benefit_sponsorship.profile.id)}
+    let!(:person) { FactoryBot.create(:person, employer_staff_roles: [employer_staff_role]) }
     let!(:user) { FactoryBot.create_default :user, person: person}
 
     let(:organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -61,7 +63,8 @@ module BenefitSponsors
         organization: organization,
         profile_id: organization.profiles.first.id,
         benefit_market: site.benefit_markets[0],
-        employer_attestation: employer_attestation) 
+        employer_attestation: employer_attestation
+      )
     end
 
     let(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
@@ -70,7 +73,7 @@ module BenefitSponsors
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
 
-    let(:benefit_application_params) {
+    let(:benefit_application_params) do
 
       {
         :start_on => effective_period_start_on,
@@ -82,13 +85,13 @@ module BenefitSponsors
         :open_enrollment_end_on => open_enrollment_period_end_on,
         :benefit_sponsorship_id => benefit_sponsorship_id
       }
-    }
+    end
 
     shared_context "shared_stuff", :shared_context => :metadata do
       let(:effective_period)                { effective_period_start_on..effective_period_end_on }
       let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
 
-      let(:params) {
+      let(:params) do
         {
           recorded_rating_area: rating_area,
           recorded_service_areas: service_areas,
@@ -100,7 +103,7 @@ module BenefitSponsors
           benefit_sponsor_catalog_id: BSON::ObjectId.new
 
         }
-      }
+      end
 
       let(:ben_app)       { benefit_sponsorship.benefit_applications.build(params) }
     end
@@ -150,7 +153,7 @@ module BenefitSponsors
       it "should redirect" do
         [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
           sign_in_and_do_create(login_user)
-            expect(response).to have_http_status(:redirect)
+          expect(response).to have_http_status(:redirect)
         end
       end
 
@@ -172,8 +175,8 @@ module BenefitSponsors
 
         before do
           benefit_application_params.merge!({
-            open_enrollment_end_on: nil
-          })
+                                              open_enrollment_end_on: nil
+                                            })
         end
 
         it "should redirect to new" do
@@ -277,8 +280,8 @@ module BenefitSponsors
 
         before do
           benefit_application_params.merge!({
-            open_enrollment_end_on: nil
-          })
+                                              open_enrollment_end_on: nil
+                                            })
         end
 
         it "should redirect to edit" do
@@ -379,7 +382,7 @@ module BenefitSponsors
         it "should display warnings" do
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
-            post :submit_application, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id }#, :benefit_sponsorship_id => benefit_sponsorship_id
+            post :submit_application, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id } #, :benefit_sponsorship_id => benefit_sponsorship_id
             have_http_status(:success)
           end
         end
@@ -391,7 +394,7 @@ module BenefitSponsors
         it "should redirect with errors" do
           [user_with_hbx_staff_role, user, user_with_broker_role].each do |login_user|
             sign_in login_user
-            post :submit_application, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id }#, :benefit_sponsorship_id => benefit_sponsorship_id
+            post :submit_application, xhr: true, params: { benefit_sponsorship_id: benefit_sponsorship_id.to_s, benefit_application_id: benefit_application_id } #, :benefit_sponsorship_id => benefit_sponsorship_id
             expect(flash[:error]).to match(/Plan Year failed to publish/)
           end
         end

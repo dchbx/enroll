@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::VerificationDocumentsController < ApplicationController
   include ApplicationHelper
 
@@ -42,6 +44,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -75,7 +78,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def update_vlp_documents(title, file_uri)
     document = @verification_type.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
     @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save!
@@ -83,7 +86,7 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def update_paper_application(title, file_uri)
     document = @docs_owner.resident_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :verification_type => params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end
@@ -107,10 +110,10 @@ class Insured::VerificationDocumentsController < ApplicationController
 
   def vlp_docs_clean(person)
     existing_documents = person.consumer_role.vlp_documents
-    person_consumer_role=Person.find(person.id).consumer_role
-    person_consumer_role.vlp_documents =[]
+    person_consumer_role = Person.find(person.id).consumer_role
+    person_consumer_role.vlp_documents = []
     person_consumer_role.save
-    person_consumer_role=Person.find(person.id).consumer_role
+    person_consumer_role = Person.find(person.id).consumer_role
     person_consumer_role.vlp_documents = existing_documents.uniq
     person_consumer_role.save
   end

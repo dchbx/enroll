@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # @deprecated This is for the legacy method of dynamic credential resolution.
 class TransportProfiles::TransportCredential
   include Mongoid::Document
@@ -6,8 +8,6 @@ class TransportProfiles::TransportCredential
     case uri.scheme
     when "sftp","ftp"
       TransportProfiles::TransportCredentials::SftpTransportCredential.credentials_for_sftp(uri)
-    else
-      nil
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EnrollmentPeriod::Base
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -5,7 +7,7 @@ class EnrollmentPeriod::Base
   field :title, type: String
 
   # Date Enrollment Period starts
-  field :start_on, type: Date  
+  field :start_on, type: Date
 
   # Date Enrollment Period ends
   field :end_on, type: Date
@@ -29,7 +31,7 @@ class EnrollmentPeriod::Base
   end
 
 
-private
+  private
 
   def end_date_follows_start_date
     return false unless start_on.present? && end_on.present?

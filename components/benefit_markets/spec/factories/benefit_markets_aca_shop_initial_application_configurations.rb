@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_aca_shop_initial_application_configuration, class: 'BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration' do
     pub_due_dom { 6 }

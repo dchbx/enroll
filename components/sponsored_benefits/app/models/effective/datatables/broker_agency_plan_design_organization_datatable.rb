@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   module Datatables
     class BrokerAgencyPlanDesignOrganizationDatatable < ::Effective::MongoidDatatable
@@ -6,22 +8,22 @@ module Effective
       datatable do
 
         bulk_actions_column do
-           bulk_action 'Assign General Agency', "#", id: "bulk_action_assign"
-           bulk_action 'Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(broker_agency_profile_id: attributes[:profile_id]),
-            data: { confirm: 'Are you sure to clear general agency to the selected Employers?' }
+          bulk_action 'Assign General Agency', "#", id: "bulk_action_assign"
+          bulk_action 'Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(broker_agency_profile_id: attributes[:profile_id]),
+                      data: { confirm: 'Are you sure to clear general agency to the selected Employers?' }
         end
 
-        table_column :legal_name, :label => 'Legal Name', :proc => Proc.new { |row|
+        table_column :legal_name, :label => 'Legal Name', :proc => proc { |row|
           if row.broker_relationship_inactive?
             row.legal_name
           else
             (link_to row.legal_name, eval(benefit_sponsor_home_url(row)))
           end
         }, :sortable => false, :filter => false
-        table_column :fein, :label => 'FEIN', :proc => Proc.new { |row| er_fein(row) }, :sortable => false, :filter => false
-        table_column :ee_count, :label => 'EE Count', :proc => Proc.new { |row| ee_count(row) }, :sortable => false, :filter => false
-        table_column :er_state, :label => 'ER State', :proc => Proc.new { |row| er_state(row) }, :sortable => false, :filter => false
-        table_column :effective_date, :label => 'Effective Date', :proc => Proc.new { |row|
+        table_column :fein, :label => 'FEIN', :proc => proc { |row| er_fein(row) }, :sortable => false, :filter => false
+        table_column :ee_count, :label => 'EE Count', :proc => proc { |row| ee_count(row) }, :sortable => false, :filter => false
+        table_column :er_state, :label => 'ER State', :proc => proc { |row| er_state(row) }, :sortable => false, :filter => false
+        table_column :effective_date, :label => 'Effective Date', :proc => proc { |row|
 
           latest_plan_year = row.employer_profile.latest_plan_year if row.employer_profile.present?
           if latest_plan_year.blank?
@@ -31,33 +33,30 @@ module Effective
           end
         }, :sortable => false, :filter => false
 
-        table_column :broker, :label => 'Broker', :proc => Proc.new { |row| broker_name(row) }, :sortable => false, :filter => false
+        table_column :broker, :label => 'Broker', :proc => proc { |row| broker_name(row) }, :sortable => false, :filter => false
 
 
-        table_column :general_agency, :label => "General Agency", :proc => Proc.new { |row|
+        table_column :general_agency, :label => "General Agency", :proc => proc { |row|
           general_agency_account = row.general_agency_accounts.active.first
-          if general_agency_account
-            general_agency_account.legal_name
-          end
+          general_agency_account.legal_name if general_agency_account
         }, :sortable => false, :filter => false
 
-        table_column :actions, :width => '50px', :proc => Proc.new { |row|
+        table_column :actions, :width => '50px', :proc => proc { |row|
           dropdown = [
            # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row, profile_id: attributes[:profile_id]), 'ajax'],
             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row, profile_id: attributes[:profile_id]), 'static'],
             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row, profile_id: attributes[:profile_id]), edit_employer_link_type(row)],
             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
-                              remove_employer_link_type(row),
-                              "Are you sure you want to remove this employer?"],
-            ['Assign General Agency', sponsored_benefits.organizations_general_agency_profiles_path(id: row.id, broker_agency_profile_id: attributes[:profile_id], action_id: "plan_design_#{row.id.to_s}"), 'ajax'],
+             remove_employer_link_type(row),
+             "Are you sure you want to remove this employer?"],
+            ['Assign General Agency', sponsored_benefits.organizations_general_agency_profiles_path(id: row.id, broker_agency_profile_id: attributes[:profile_id], action_id: "plan_design_#{row.id}"), 'ajax'],
             ['Clear General Agency', sponsored_benefits.fire_organizations_general_agency_profiles_path(ids: [row.id], broker_agency_profile_id: attributes[:profile_id]),
-              'post ajax with confirm',
-              "Are you sure to clear General Agency for this Employer?"
-            ]
+             'post ajax with confirm',
+             "Are you sure to clear General Agency for this Employer?"]
           ]
 
-          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id.to_s}"}, formats: :html
+          render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "plan_design_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
 
@@ -65,7 +64,7 @@ module Effective
         if employer.is_prospect?
           'delete with confirm'
         else
-          return 'disabled'
+          'disabled'
         end
       end
 
@@ -94,7 +93,7 @@ module Effective
         row.fein
       end
 
-      def benefit_sponsor_home_url(row)
+      def benefit_sponsor_home_url(_row)
         "benefit_sponsors.profiles_employers_employer_profile_path(row.sponsor_profile_id, tab: 'home')"
       end
 
@@ -121,7 +120,7 @@ module Effective
 
       def nested_filter_definition
         {
-          filters:[
+          filters: [
                 { scope: 'all', label: 'All'},
                 { scope: 'active_sponsors', label: 'Active'},
                 { scope: 'inactive_sponsors', label: 'Inactive'},

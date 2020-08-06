@@ -1,17 +1,19 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module ClientOrganizationSpecHelpers
     module DC
       def general_organization_properties(site)
         org_id = BSON::ObjectId.new
-        legal_name  = "ACME Widgets, Inc."
-        dba         = "ACME Co."
+        legal_name = "ACME Widgets, Inc."
+        dba = "ACME Co."
         entity_kind = :c_corporation
         fein = Forgery('basic').text(
-                 :allow_lower   => false,
-                 :allow_upper   => false,
-                 :allow_numeric => true,
-                 :allow_special => false, :exactly => 9
-               )
+          :allow_lower => false,
+          :allow_upper => false,
+          :allow_numeric => true,
+          :allow_special => false, :exactly => 9
+        )
         ep_props = employer_profile_properties
         org_props = {
           _id: org_id,
@@ -49,7 +51,7 @@ module BenefitSponsors
             city: "Washington",
             state: "DC"
           },
-          phone:  {
+          phone: {
             _id: phone_id,
             kind: "work",
             area_code: "617",

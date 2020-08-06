@@ -1,6 +1,7 @@
-module SponsoredBenefits::CensusMembers::PlanDesignCensusEmployeesHelper
+# frozen_string_literal: true
 
-  def link_to_add_dependent_fields(name, f, association, classes='')
+module SponsoredBenefits::CensusMembers::PlanDesignCensusEmployeesHelper
+  def link_to_add_dependent_fields(name, f, association, classes = '')
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
 

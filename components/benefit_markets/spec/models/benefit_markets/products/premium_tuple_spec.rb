@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -9,8 +11,8 @@ module BenefitMarkets
 
     let(:params) do
       {
-        age:  age,
-        cost: cost,
+        age: age,
+        cost: cost
       }
     end
 

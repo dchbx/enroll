@@ -1,16 +1,16 @@
+# frozen_string_literal: true
+
 module Forms
   class EmployeeRole < SimpleDelegator
     WRAPPED_ATTRIBUTES = [
       "employee_role_id"
-    ]
+    ].freeze
 
     attr_accessor(*WRAPPED_ATTRIBUTES)
 
     def initialize(person, employee_role = nil)
       super(person)
-      if employee_role
-        self.employee_role_id = employee_role.id
-      end
+      self.employee_role_id = employee_role.id if employee_role
     end
 
     def self.model_name
@@ -23,7 +23,7 @@ module Forms
 
     def clean_attributes(hsh)
       atts = hsh.dup.stringify_keys
-      for_wrapper, for_person = atts.partition { |k, v| WRAPPED_ATTRIBUTES.include?(k) }
+      for_wrapper, for_person = atts.partition { |k, _v| WRAPPED_ATTRIBUTES.include?(k) }
       [Hash[for_wrapper], Hash[for_person]]
     end
 

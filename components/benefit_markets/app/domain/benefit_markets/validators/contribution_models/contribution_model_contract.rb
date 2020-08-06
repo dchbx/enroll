@@ -18,15 +18,14 @@ module BenefitMarkets
         end
 
         rule(:contribution_units).each do
-          if key? && value
-            contribution_units = [::BenefitMarkets::Entities::FixedPercentContributionUnit, ::BenefitMarkets::Entities::FixedDollarContributionUnit, ::BenefitMarkets::Entities::PercentWithCapContributionUnit]
-            if !contribution_units.include?(value.class)
-              if value.is_a?(Hash)
-                result = ::BenefitMarkets::Validators::ContributionModels::ContributionUnitContract.new.call(value)
-                key.failure(text: "invalid contribution unit", error: result.errors.to_h) if result&.failure?
-              else
-                key.failure(text: "invalid contribution_units. Expected a hash or contribution unit entity")
-              end
+          next unless key? && value
+          contribution_units = [::BenefitMarkets::Entities::FixedPercentContributionUnit, ::BenefitMarkets::Entities::FixedDollarContributionUnit, ::BenefitMarkets::Entities::PercentWithCapContributionUnit]
+          unless contribution_units.include?(value.class)
+            if value.is_a?(Hash)
+              result = ::BenefitMarkets::Validators::ContributionModels::ContributionUnitContract.new.call(value)
+              key.failure(text: "invalid contribution unit", error: result.errors.to_h) if result&.failure?
+            else
+              key.failure(text: "invalid contribution_units. Expected a hash or contribution unit entity")
             end
           end
         end

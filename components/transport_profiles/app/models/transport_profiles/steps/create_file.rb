@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   class Steps::CreateFile < Steps::Step
 
@@ -7,7 +9,7 @@ module TransportProfiles
       @contents = contents
     end
 
-    def execute(process_context)
+    def execute(_process_context)
       File.write(@path, @contents)
     end
 

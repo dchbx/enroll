@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class PersonSignup
     include ActiveModel::Validations
@@ -28,21 +30,19 @@ module Forms
         first_name: regex_for(first_name),
         last_name: regex_for(last_name),
         dob: dob
-        )
-      
-      if matched_people.count > 1
-        raise TooManyMatchingPeople.new
-      end
+      )
 
-      if matched_people.count == 1
-        self.person = matched_people.first
-      else
-        self.person = Person.new({
-          first_name: first_name,
-          last_name: last_name,
-          dob: dob
-          })
-      end
+      raise TooManyMatchingPeople if matched_people.count > 1
+
+      self.person = if matched_people.count == 1
+                      matched_people.first
+                    else
+                      Person.new({
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   dob: dob
+                                 })
+                    end
 
       self.person.add_work_email(email)
     end
@@ -52,7 +52,11 @@ module Forms
     end
 
     def dob=(val)
-      @dob = Date.strptime(val,"%Y-%m-%d") rescue nil
+      @dob = begin
+               Date.strptime(val,"%Y-%m-%d")
+             rescue StandardError
+               nil
+             end
     end
 
     def regex_for(str)

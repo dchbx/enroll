@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Forms
     class PlanDesignOrganizationSignup
@@ -58,14 +60,12 @@ module SponsoredBenefits
       end
 
       def office_locations_attributes
-        @office_locations.map do |office_location|
-          office_location.attributes
-        end
+        @office_locations.map(&:attributes)
       end
 
       def office_locations_attributes=(attrs)
         @office_locations = []
-        attrs.each_pair do |k, att_set|
+        attrs.each_pair do |_k, att_set|
           @office_locations << SponsoredBenefits::Organizations::OfficeLocation.new(att_set)
         end
         @office_locations

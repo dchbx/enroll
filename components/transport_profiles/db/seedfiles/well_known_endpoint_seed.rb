@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 endpoints = [
     { title: "House of Representatives member invoice outbound",   key: :hr_members_invoice_outbound,      site_key: :dchbx, market_kind: :aca_congress, uri: "sftp://blah.com/folder", credentials: [] },
     { title: "House of Representatives member statement outbound", key: :hr_members_statement_outbound,    site_key: :dchbx, market_kind: :aca_congress, uri: "sftp://blah.com/folder", credentials: [] },
@@ -26,13 +28,13 @@ endpoints = [
 
     { title: "Email outbound", key: :email_outbound, site_key: :cca,    market_kind: :any, uri: "smtp://blah.com/folder", credentials: [] },
     { title: "Email outbound", key: :email_outbound, site_key: :dchbx,  market_kind: :any, uri: "smtp://blah.com/folder", credentials: [] },
-    
+
     { title: "Report Eligibility Updated H41s archive", key: :cms_h41_uploads_archive, site_key: :dchbx, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
     { title: "Report Eligibility Updated H41s", key: :cms_h41_uploads, site_key: :dchbx, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
 
-    { title: "Legacy Data Extract Archive", key: :aca_legacy_data_extracts_archive , site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
+    { title: "Legacy Data Extract Archive", key: :aca_legacy_data_extracts_archive, site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
     { title: "Legacy Data Extracts", key: :aca_legacy_data_extracts, site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] },
-    
+
     { title: "Internal Artifact Transport", key: :aca_internal_artifact_transport, site_key: :cca, market_kind: :any, uri: "s3://bucket@whatever", credentials: [] }
 
   ]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Etl::Csv
   class Base
 
@@ -30,9 +32,9 @@ module Etl::Csv
       excel_file = Roo::Spreadsheet.open(@file)
 
       @sheet = excel_file.sheet(0)
-      # raise "Error: invalid header format." unless ((@header_row > 0) && header_valid?) 
+      # raise "Error: invalid header format." unless ((@header_row > 0) && header_valid?)
 
-      # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references 
+      # To match spreadsheet convention, Roo gem uses 1-based (rather than 0-based) references
       records = []
       documents = []
       @data_start_row = 2
@@ -63,12 +65,10 @@ module Etl::Csv
     end
 
     # Override this method with content-specific logic
-    def parse_row(row)
-    end
+    def parse_row(row); end
 
     # Override this method with content-specific logic
-    def map_attributes(record)
-    end
+    def map_attributes(record); end
 
 
   ## Common Parsers
@@ -76,7 +76,7 @@ module Etl::Csv
     def parse_ssn(cell)
       return nil unless cell.present?
       ssn = cell.to_s.gsub(/\D/, '')
-      
+
       raise ImportErrorValue, "invalid SSN length: #{ssn.size}" unless ssn.size == 9
       raise ImportErrorValue, "invalid SSN composition #{ssn}" unless is_ssn_composition_valid?(ssn)
     end
@@ -85,28 +85,26 @@ module Etl::Csv
       return nil if cell.blank?
 
       phone_number = cell.to_s.gsub(/\D/, '')
-      if phone_number.size < 10 || phone_number.size > 11
-        raise ImportErrorValue, "invalid phone number length (#{phone_number.size}): #{phone_number}"
-      end
+      raise ImportErrorValue, "invalid phone number length (#{phone_number.size}): #{phone_number}" if phone_number.size < 10 || phone_number.size > 11
       phone_number
     end
 
     def parse_employee_relationship(cell)
-      # defined? @last_employer_assigned_family_id ? 
+      # defined? @last_employer_assigned_family_id ?
       return nil if cell.blank?
       field_map = case parse_text(cell).downcase
-        when "employee"
-          "self"
-        when "spouse"
-          "spouse"
-        when "domestic partner"
-          "domestic_partner"
-        when "child"
-          "child"
-        when "disabled child"
-          "disabled_child"
-        else
-          nil[]
+                  when "employee"
+                    "self"
+                  when "spouse"
+                    "spouse"
+                  when "domestic partner"
+                    "domestic_partner"
+                  when "child"
+                    "child"
+                  when "disabled child"
+                    "disabled_child"
+                  else
+                    nil[]
       end
       field_map
     end
@@ -118,27 +116,47 @@ module Etl::Csv
     def parse_date(cell)
       return nil if cell.blank?
 
-      return DateTime.strptime(cell.sanitize_value, "%d/%m/%Y") rescue raise ImportErrorValue, cell if cell.class == String
-      return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
+      if cell.class == String
+        begin
+          return DateTime.strptime(cell.sanitize_value, "%d/%m/%Y")
+        rescue StandardError
+          raise ImportErrorValue, cell
+        end
+      end
+      if cell.class == String
+        begin
+          return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y")
+        rescue StandardError
+          raise ImportErrorDate, cell
+        end
+      end
       # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
       cell.blank? ? nil : cell
     end
 
     def parse_boolean(cell)
-      cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+      cell.blank? ? nil : !cell.match(/(true|t|yes|y|1)$/i).nil? ? "1" : "0"
     end
 
     def parse_boolean(cell)
-      cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+      cell.blank? ? nil : !cell.match(/(true|t|yes|y|1)$/i).nil? ? "1" : "0"
     end
 
     def parse_number(cell)
-      cell.blank? ? nil : (Float(cell) rescue raise ImportErrorValue, cell)
+      cell.blank? ? nil : (begin
+                             Float(cell)
+                           rescue StandardError
+                             raise ImportErrorValue, cell
+                           end)
     end
 
     def parse_integer(cell)
-      cell.blank? ? nil : (Integer(cell) rescue raise ImportErrorValue, cell)
+      cell.blank? ? nil : (begin
+                             Integer(cell)
+                           rescue StandardError
+                             raise ImportErrorValue, cell
+                           end)
     end
 
     def save
@@ -157,14 +175,14 @@ module Etl::Csv
 
     def open_spreadsheet
       case File.extname(file.original_filename)
-        when ".csv" then
-          Csv.new(file.path, nil, :ignore)
-        when ".xls" then
-          Excel.new(file.path, nil, :ignore)
-        when ".xlsx" then
-          Excelx.new(file.path, nil, :ignore)
-        else
-          raise "Unknown file type: #{file.original_filename}"
+      when ".csv"
+        Csv.new(file.path, nil, :ignore)
+      when ".xls"
+        Excel.new(file.path, nil, :ignore)
+      when ".xlsx"
+        Excelx.new(file.path, nil, :ignore)
+      else
+        raise "Unknown file type: #{file.original_filename}"
       end
     end
 
@@ -172,9 +190,10 @@ module Etl::Csv
       @imported_records.length
     end
 
-    alias_method :count, :length
+    alias count length
 
-  private
+    private
+
     def sanitize_value(value)
       value = value.to_s.split('.')[0] if value.is_a? Float
       value.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
@@ -187,10 +206,10 @@ module Etl::Csv
       #   00 in the group number (fourth and fifth digit); or
       #   0000 in the serial number (last four digits)
 
-      invalid_area_numbers = %w(000 666)
+      invalid_area_numbers = %w[000 666]
       invalid_area_range = 900..999
-      invalid_group_numbers = %w(00)
-      invalid_serial_numbers = %w(0000)
+      invalid_group_numbers = %w[00]
+      invalid_serial_numbers = %w[0000]
 
       return false if ssn.to_s.blank?
       return false if invalid_area_numbers.include?(ssn.to_s[0,3])
@@ -202,7 +221,6 @@ module Etl::Csv
     end
   end
 
-  class ImportErrorValue < Exception; end
-  class ImportErrorDate < Exception; end
-
+  class ImportErrorValue < RuntimeError; end
+  class ImportErrorDate < RuntimeError; end
 end

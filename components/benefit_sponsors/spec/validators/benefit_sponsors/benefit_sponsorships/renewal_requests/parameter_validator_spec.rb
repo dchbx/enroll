@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe BenefitSponsors::BenefitSponsorships::RenewalRequests::ParameterValidator do
@@ -31,8 +33,8 @@ RSpec.describe BenefitSponsors::BenefitSponsorships::RenewalRequests::ParameterV
   describe "given a bogus benefit sponsorship id" do
     let(:params) do
       base_valid_params.merge({
-        "benefit_sponsorship_id" => "sadfjkjkksef"
-      })
+                                "benefit_sponsorship_id" => "sadfjkjkksef"
+                              })
     end
 
     subject { validator.call(params) }
@@ -49,8 +51,8 @@ RSpec.describe BenefitSponsors::BenefitSponsorships::RenewalRequests::ParameterV
   describe "given a bogus date" do
     let(:params) do
       base_valid_params.merge({
-        "new_date" => "2019-51-01"
-      })
+                                "new_date" => "2019-51-01"
+                              })
     end
 
     subject { validator.call(params) }

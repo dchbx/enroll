@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 class IdpAccountManager
@@ -34,14 +36,14 @@ class IdpAccountManager
       account_role_val = account_role
     end
     provider.create_account({
-      :email => email,
-      :username => username,
-      :password => password,
-      :first_name => personish.first_name,
-      :last_name => personish.last_name,
-      :account_role => account_role_val,
-      :system_flag => system_flag
-    }, timeout)
+                              :email => email,
+                              :username => username,
+                              :password => password,
+                              :first_name => personish.first_name,
+                              :last_name => personish.last_name,
+                              :account_role => account_role_val,
+                              :system_flag => system_flag
+                            }, timeout)
   end
 
   def update_navigation_flag(lu, email, flag)
@@ -70,7 +72,7 @@ class IdpAccountManager
 
   class AmqpSource
     extend Acapi::Notifiers
-    def self.check_existing_account(fname,lname,ssn,dob, timeout = 5)
+    def self.check_existing_account(fname,lname,ssn,dob, _timeout = 5)
       found_users = CuramUser.search_for(
         fname,
         lname,
@@ -92,41 +94,36 @@ class IdpAccountManager
       notify("acapi.info.events.account_management.update_navigation_flag",{ :email => email, :flag => flag, :legacy_username => lu})
     end
 
-    def self.create_account(args, timeout = 5)
+    def self.create_account(args, _timeout = 5)
       notify("acapi.info.events.account_management.creation_requested", args)
     end
 
     def self.invoke_service(key, args, timeout = 5, &blk)
-      begin
-        request_result = Acapi::Requestor.request(key, args, timeout)
-        result_code = request_result.stringify_keys["return_status"].to_s
-        case result_code
-        when "503"
-          :service_unavailable
-        else
-          blk.call(result_code)
-        end
-      rescue Timeout::Error => e
+      request_result = Acapi::Requestor.request(key, args, timeout)
+      result_code = request_result.stringify_keys["return_status"].to_s
+      case result_code
+      when "503"
         :service_unavailable
+      else
+        blk.call(result_code)
       end
+    rescue Timeout::Error => e
+      :service_unavailable
     end
   end
 
   class SlugSource
-    def self.update_navigation_flag(legacy_username, email, flag)
-    end
+    def self.update_navigation_flag(legacy_username, email, flag); end
 
-    def self.create_account(args, timeout = 5)
+    def self.create_account(_args, _timeout = 5)
       :created
     end
 
-    def self.check_existing_account(fname, lname, ssn, dob, timeout = 5)
+    def self.check_existing_account(_fname, _lname, _ssn, _dob, _timeout = 5)
       :not_found
     end
   end
 end
 
 # Fix slug setting on request reload
-unless Rails.env.production?
-  IdpAccountManager.slug!
-end
+IdpAccountManager.slug! unless Rails.env.production?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^the table will expand displaying the Extend Open Enrollment table$/) do
   expect(page).to have_css('#extendable_applications_table')
   expect(page).to have_css('h4.heading-text', text: 'Extend Open Enrollment')

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
@@ -31,34 +33,36 @@ module BenefitMarkets
     let(:premium_q1_age_20)   { BenefitMarkets::Products::PremiumTuple.new(age: 20, cost: 201) }
     let(:premium_q1_age_30)   { BenefitMarkets::Products::PremiumTuple.new(age: 30, cost: 301) }
     let(:premium_q1_age_40)   { BenefitMarkets::Products::PremiumTuple.new(age: 40, cost: 401) }
-    let(:premium_table_q1)    { BenefitMarkets::Products::PremiumTable.new(
-                                  effective_period: quarter_1,
-                                  rating_area: rating_area,
-                                  premium_tuples: [premium_q1_age_20, premium_q1_age_30, premium_q1_age_40],
-                                ) }
+    let(:premium_table_q1)    do
+      BenefitMarkets::Products::PremiumTable.new(
+        effective_period: quarter_1,
+        rating_area: rating_area,
+        premium_tuples: [premium_q1_age_20, premium_q1_age_30, premium_q1_age_40]
+      )
+    end
     let(:premium_tables)      { [premium_table_q1] }
 
 
-    let(:params) do 
+    let(:params) do
       {
-        benefit_market_kind:      benefit_market_kind,
-        application_period:       application_period,
-        hbx_id:                   hbx_id,
+        benefit_market_kind: benefit_market_kind,
+        application_period: application_period,
+        hbx_id: hbx_id,
         # issuer_profile_urn:       issuer_profile_urn,
-        title:                    title,
-        description:              description,
-        service_area:             service_area,
-        premium_tables:           premium_tables,
+        title: title,
+        description: description,
+        service_area: service_area,
+        premium_tables: premium_tables,
 
-        hios_id:                  hios_id,
-        hios_base_id:             hios_base_id,
-        csr_variant_id:           csr_variant_id,
-        health_plan_kind:         health_plan_kind,
-        metal_level_kind:         metal_level_kind,
-        ehb:                      ehb,
-        is_standard_plan:         is_standard_plan,
-        provider_directory_url:   provider_directory_url,
-        rx_formulary_url: rx_formulary_url,
+        hios_id: hios_id,
+        hios_base_id: hios_base_id,
+        csr_variant_id: csr_variant_id,
+        health_plan_kind: health_plan_kind,
+        metal_level_kind: metal_level_kind,
+        ehb: ehb,
+        is_standard_plan: is_standard_plan,
+        provider_directory_url: provider_directory_url,
+        rx_formulary_url: rx_formulary_url
 
         # renewal_product: renewal_product,
         # catastrophic_age_off_product: catastrophic_age_off_product,

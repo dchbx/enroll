@@ -1,4 +1,6 @@
-class MigrateMaSicFactorSet< Mongoid::Migration
+# frozen_string_literal: true
+
+class MigrateMaSicFactorSet < Mongoid::Migration
   def self.up
     if Settings.site.key.to_s == "cca"
       old_carrier_profile_map = {}

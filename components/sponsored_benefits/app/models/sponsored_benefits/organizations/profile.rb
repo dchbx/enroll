@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Attributes, validations and constraints common to all Profile classes embedded in an Organization
 module SponsoredBenefits
   module Organizations
@@ -23,7 +25,7 @@ module SponsoredBenefits
 
       # Only one benefit_sponsorship may be active.  Enable many to support changes and history tracking
       embeds_many :benefit_sponsorships, as: :benefit_sponsorable, class_name: "SponsoredBenefits::BenefitSponsorships::BenefitSponsorship"
-      embeds_many :office_locations, class_name:"SponsoredBenefits::Organizations::OfficeLocation"
+      embeds_many :office_locations, class_name: "SponsoredBenefits::Organizations::OfficeLocation"
 
       def plan_design_organization
         plan_design_proposal.plan_design_organization if plan_design_proposal.present?

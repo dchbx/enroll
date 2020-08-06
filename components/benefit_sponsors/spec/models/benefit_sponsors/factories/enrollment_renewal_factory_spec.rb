@@ -28,10 +28,10 @@ module BenefitSponsors
 
     let(:census_employee) do
       census_employee = create(:census_employee, :with_active_assignment,
-             benefit_sponsorship: benefit_sponsorship,
-             employer_profile: benefit_sponsorship.profile,
-             benefit_group: current_benefit_package,
-             hired_on: hired_on)
+                               benefit_sponsorship: benefit_sponsorship,
+                               employer_profile: benefit_sponsorship.profile,
+                               benefit_group: current_benefit_package,
+                               hired_on: hired_on)
       census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, is_active: false)
       census_employee
     end

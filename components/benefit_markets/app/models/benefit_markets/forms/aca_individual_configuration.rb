@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Forms
     class AcaIndividualConfiguration
@@ -7,7 +9,7 @@ module BenefitMarkets
       include ActiveModel::Model
       include ActiveModel::Validations
       include Virtus.model
-      
+
       attribute :mm_enr_due_on, Integer
       attribute :vr_os_window, Integer
       attribute :vr_due, Integer

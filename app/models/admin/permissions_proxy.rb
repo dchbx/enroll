@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Admin
-  # Implements the nil object pattern around users who might not have 
+  # Implements the nil object pattern around users who might not have
   # people or permission objects.
   class PermissionsProxy
     attr_reader :permission_target

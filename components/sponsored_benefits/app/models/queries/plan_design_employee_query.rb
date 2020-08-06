@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class PlanDesignEmployeeQuery
     attr_reader :search_string, :custom_attributes
@@ -13,7 +15,7 @@ module Queries
       @benefit_sponsorship = SponsoredBenefits::BenefitSponsorships::BenefitSponsorship.find(@custom_attributes[:id])
     end
 
-    def build_scope()
+    def build_scope
       return [] if @benefit_sponsorship.blank?
       case @custom_attributes[:employees]
       when "active"

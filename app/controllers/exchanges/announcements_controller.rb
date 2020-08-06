@@ -1,9 +1,15 @@
+# frozen_string_literal: true
+
 class Exchanges::AnnouncementsController < ApplicationController
   before_action :check_hbx_staff_role, except: [:dismiss]
   before_action :updateable?, :only => [:create, :destroy]
   def dismiss
     if params[:content].present?
-      dismiss_announcements = JSON.parse(session[:dismiss_announcements] || "[]") rescue []
+      dismiss_announcements = begin
+                                JSON.parse(session[:dismiss_announcements] || "[]")
+                              rescue StandardError
+                                []
+                              end
       dismiss_announcements << params[:content].strip
       dismiss_announcements.uniq!
       session[:dismiss_announcements] = dismiss_announcements.to_json
@@ -46,8 +52,6 @@ class Exchanges::AnnouncementsController < ApplicationController
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Insured::EmployeeRolesHelper
   def employee_role_submission_options_for(model)
     if model.persisted?
@@ -7,24 +9,20 @@ module Insured::EmployeeRolesHelper
     end
   end
 
-  def coverage_relationship_check(offered_relationship_benefits=[], family_member, new_effective_on )
+  def coverage_relationship_check(offered_relationship_benefits = [], family_member, new_effective_on)
     return nil if offered_relationship_benefits.blank?
     relationship = PlanCostDecorator.benefit_relationship(family_member.primary_relationship)
-    if relationship == "child_under_26" && (calculate_age_by_dob(family_member.dob) > 26 || (new_effective_on.kind_of?(Date) && new_effective_on >= family_member.dob+26.years))
-      relationship = "child_over_26"
-    end
+    relationship = "child_over_26" if relationship == "child_under_26" && (calculate_age_by_dob(family_member.dob) > 26 || (new_effective_on.is_a?(Date) && new_effective_on >= family_member.dob + 26.years))
 
     offered_relationship_benefits.include? relationship
   end
 
-  def composite_relationship_check(offered_relationship_benefits=[], family_member, new_effective_on)
+  def composite_relationship_check(offered_relationship_benefits = [], family_member, new_effective_on)
     return nil if offered_relationship_benefits.blank?
     direct_realation_to_primary = family_member.primary_relationship
 
     relationship = CompositeRatedPlanCostDecorator.benefit_relationship(direct_realation_to_primary)
-    if direct_realation_to_primary == "child" && calculate_age_by_dob(family_member.dob) >= 26 && new_effective_on >= family_member.dob+26.years
-      relationship = "child_over_26"
-    end
+    relationship = "child_over_26" if direct_realation_to_primary == "child" && calculate_age_by_dob(family_member.dob) >= 26 && new_effective_on >= family_member.dob + 26.years
 
     offered_relationship_benefits.include? relationship
   end

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
@@ -12,7 +13,7 @@ class CancelDentalOfferingsFromPlanYear < MongoidMigrationTask
     end
     benefit_group_id_list = organizations.first.employer_profile.plan_years.where(aasm_state: state).first.benefit_groups.map(&:id).uniq
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => benefit_group_id_list)
-      families.each do |family|
+    families.each do |family|
       family.active_household.hbx_enrollments.where(coverage_kind: "dental").each do |enrollment|
         enrollment.update_attributes(aasm_state: "coverage_canceled")
         puts "canceling the enrollment" unless Rails.env.test?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 RSpec.describe do
@@ -11,32 +13,33 @@ RSpec.describe do
 
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:benefit_market)      { site.benefit_markets.first }
-    let(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-      benefit_market: benefit_market,
-      title: "SHOP Benefits for #{current_effective_date.year}",
-      application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-    }
+    let(:benefit_market_catalog) do
+      create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+             benefit_market: benefit_market,
+             title: "SHOP Benefits for #{current_effective_date.year}",
+             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+    end
     let(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let(:product_package_kind) { :single_product}
     let!(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind).first }
 
-    let(:attrs) {
-      { 
+    let(:attrs) do
+      {
         :product_package_kind => product_package_kind,
         :sponsor_contribution_attributes => {
           :contribution_levels_attributes => contribution_levels_attributes
         }
       }
-    }
+    end
 
-    let(:contribution_levels_attributes) {
+    let(:contribution_levels_attributes) do
       [
         {:is_offered => "true", :display_name => "Employee", :contribution_factor => "95" },
         {:is_offered => "true", :display_name => "Spouse", :contribution_factor => "85" },
         {:is_offered => "true", :display_name => "Domestic Partner", :contribution_factor => "75" },
         {:is_offered => "true", :display_name => "Child Under 26", :contribution_factor => "75" }
       ]
-    }
+    end
 
     context "when kind is dental" do
 
@@ -44,8 +47,8 @@ RSpec.describe do
 
       before :each do
         attrs.merge!({
-          kind: "dental"
-        })
+                       kind: "dental"
+                     })
       end
 
       it "should initialize dental sponsored benefit" do

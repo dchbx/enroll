@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeeCreate < ConversionEmployeeCommon
 
@@ -9,11 +11,8 @@ module Importers
       (1..8).to_a.each do |num|
         dep_ln = "dep_#{num}_name_last".to_sym
         dep_rel = "dep_#{num}_relationship".to_sym
-        unless self.send(dep_ln).blank?
-          if self.send(dep_rel).blank?
-            errors.add("dep_#{num}_relationship", "invalid.  must be one of: #{RELATIONSHIP_MAP.keys.join(", ")}")
-          end
-        end
+        next if self.send(dep_ln).blank?
+        errors.add("dep_#{num}_relationship", "invalid.  must be one of: #{RELATIONSHIP_MAP.keys.join(', ')}") if self.send(dep_rel).blank?
       end
     end
 
@@ -31,36 +30,28 @@ module Importers
       state = subscriber_state
       zip = subscriber_zip
       attr_hash = {
-          first_name: first_name,
-          last_name: last_name,
-          dob: dob,
-          gender: gender
+        first_name: first_name,
+        last_name: last_name,
+        dob: dob,
+        gender: gender
       }
-      if hire_date.blank?
-        attr_hash[:hired_on] = default_hire_date
-      else
-        attr_hash[:hired_on] = hire_date
-      end
-      unless middle_name.blank?
-        attr_hash[:middle_name] = middle_name
-      end
-      unless ssn.blank?
-        attr_hash[:ssn] = ssn
-      end
-      unless email.blank?
-        attr_hash[:email] = Email.new(:kind => "work", :address => email)
-      end
+      attr_hash[:hired_on] = if hire_date.blank?
+                               default_hire_date
+                             else
+                               hire_date
+                             end
+      attr_hash[:middle_name] = middle_name unless middle_name.blank?
+      attr_hash[:ssn] = ssn unless ssn.blank?
+      attr_hash[:email] = Email.new(:kind => "work", :address => email) unless email.blank?
       unless address_1.blank?
         addy_attr = {
-            kind: "home",
-            city: city,
-            state: state,
-            address_1: address_1,
-            zip: zip
+          kind: "home",
+          city: city,
+          state: state,
+          address_1: address_1,
+          zip: zip
         }
-        unless address_2.blank?
-          addy_attr[:address_2] = address_2
-        end
+        addy_attr[:address_2] = address_2 unless address_2.blank?
         attr_hash[:address] = Address.new(addy_attr)
       end
       CensusEmployee.new(attr_hash)
@@ -74,19 +65,15 @@ module Importers
       dob = self.send("dep_#{dep_idx}_dob".to_sym)
       ssn = self.send("dep_#{dep_idx}_ssn".to_sym)
       gender = self.send("dep_#{dep_idx}_gender".to_sym)
-      if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
-        return nil
-      end
+      return nil if [first_name, last_name, middle_name, relationship, dob, ssn, gender].all?(&:blank?)
       attr_hash = {
-          first_name: first_name,
-          last_name: last_name,
-          dob: dob,
-          employee_relationship: relationship,
-          gender: gender
+        first_name: first_name,
+        last_name: last_name,
+        dob: dob,
+        employee_relationship: relationship,
+        gender: gender
       }
-      unless middle_name.blank?
-        attr_hash[:middle_name] = middle_name
-      end
+      attr_hash[:middle_name] = middle_name unless middle_name.blank?
       unless ssn.blank?
         if ssn == subscriber_ssn
           warnings.add("dependent_#{dep_idx}_ssn", "ssn same as subscriber, blanking for import")
@@ -106,9 +93,7 @@ module Importers
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer
-      if found_employer.nil?
-        errors.add(:fein, "does not exist")
-      end
+      errors.add(:fein, "does not exist") if found_employer.nil?
     end
 
     def find_employer
@@ -123,10 +108,8 @@ module Importers
       census_employee.employer_profile = find_employer
       census_employee.census_dependents = map_dependents
       save_result = census_employee.save
-      unless save_result
-        propagate_errors(census_employee)
-      end
-      return save_result
+      propagate_errors(census_employee) unless save_result
+      save_result
     end
 
     def propagate_errors(census_employee)

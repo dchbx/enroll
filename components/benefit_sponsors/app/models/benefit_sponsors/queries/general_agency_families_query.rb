@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Queries
     class GeneralAgencyFamiliesQuery
@@ -52,15 +54,13 @@ module BenefitSponsors
             ]
           }
         end
-        if @order_by
-          return Family.unscoped.where(criteria).order_by(@order_by)
-        end
+        return Family.unscoped.where(criteria).order_by(@order_by) if @order_by
         Family.unscoped.where(criteria)
       end
 
       def census_employee_ids
         @census_member_ids ||= CensusMember.collection.aggregate([
-          { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, benefit_sponsors_employer_profile_id: {"$in" => employer_ids}}},
+          { "$match" => {aasm_state: {"$in" => CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, benefit_sponsors_employer_profile_id: {"$in" => employer_ids}}},
           { "$group" => {"_id" => "$_id"}}
         ]).map { |rec| rec["_id"] }
       end

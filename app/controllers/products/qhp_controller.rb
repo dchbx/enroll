@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Products::QhpController < ApplicationController
   include ContentType
   include Aptc
@@ -45,7 +47,6 @@ class Products::QhpController < ApplicationController
     end
   end
 
-
   def summary
     @standard_component_ids = [] << @new_params[:standard_component_id]
     @active_year = params[:active_year]
@@ -77,14 +78,14 @@ class Products::QhpController < ApplicationController
     if @hbx_enrollment.blank?
       error_message = {
         :error => {
-          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person && @person.try(:id)}",
-        },
+          :message => "qhp_controller: HbxEnrollment missing: #{hbx_enrollment_id} for person #{@person&.try(:id)}"
+        }
       }
       log(JSON.dump(error_message), {:severity => 'critical'})
       render file: 'public/500.html', status: 500
       return
     end
-    @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
+    @enrollment_kind = params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment" ? "sep" : ''
     @market_kind = if params[:market_kind] == "fehb"
                      "fehb"
                    elsif params[:market_kind] == "shop" || @hbx_enrollment.is_shop?
@@ -94,9 +95,9 @@ class Products::QhpController < ApplicationController
                    end
 
     @coverage_kind = if @hbx_enrollment.product.present?
-      @hbx_enrollment.product.kind.to_s
-    else
-      (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
+                       @hbx_enrollment.product.kind.to_s
+                     else
+                       (params[:coverage_kind].present? ? params[:coverage_kind] : @hbx_enrollment.coverage_kind)
     end
 
 

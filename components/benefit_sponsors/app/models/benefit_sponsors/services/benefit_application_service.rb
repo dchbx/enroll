@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class BenefitApplicationService
@@ -64,7 +66,7 @@ module BenefitSponsors
       end
 
       def cancel_draft_and_ineligible_applications(benefit_application)
-        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
+        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.reject{|existing_application| existing_application == benefit_application}
         applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
 
         applications_for_cancel.each do |application|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module ContributionModels
     class ContributionModel
@@ -21,8 +23,8 @@ module BenefitMarkets
       field :many_simultaneous_contribution_units, type: Boolean, default: false
 
       # Indicates the set of product multiplicities that are compatible
-      # with this contribution model.  Should be some subset of 
-      # :multiple, :single. 
+      # with this contribution model.  Should be some subset of
+      # :multiple, :single.
       field :product_multiplicities, type: Array, default: [:multiple, :single]
 
       embeds_many :contribution_units, class_name: "::BenefitMarkets::ContributionModels::ContributionUnit"
@@ -71,11 +73,11 @@ module BenefitMarkets
 
       def contribution_units=(params)
         params.each do |param|
-          if param.is_a?(BenefitMarkets::ContributionModels::ContributionUnit)
-            contribution_units << param
-          else
-            contribution_units << contribution_unit_class.new(param)
-          end
+          contribution_units << if param.is_a?(BenefitMarkets::ContributionModels::ContributionUnit)
+                                  param
+                                else
+                                  contribution_unit_class.new(param)
+                                end
         end
       end
 

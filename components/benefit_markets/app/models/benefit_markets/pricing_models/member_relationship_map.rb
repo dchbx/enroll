@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module PricingModels
     class MemberRelationshipMap
@@ -17,9 +19,7 @@ module BenefitMarkets
       validate :has_mappable_relationship
 
       def has_mappable_relationship
-        if display_relationship_name.blank?
-          errors.add(:relationship_name, "does not match a member relationship in the contribution model")
-        end
+        errors.add(:relationship_name, "does not match a member relationship in the contribution model") if display_relationship_name.blank?
       end
 
       def display_relationship_name

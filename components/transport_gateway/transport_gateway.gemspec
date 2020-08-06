@@ -1,4 +1,6 @@
-$:.push File.expand_path("../lib", __FILE__)
+# frozen_string_literal: true
+
+$LOAD_PATH.push File.expand_path("../lib", __FILE__)
 
 # Maintain your gem's version:
 require "transport_gateway/version"
@@ -10,8 +12,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Dan Thomas"]
   s.email       = ["dan@ideacrew.com"]
   s.homepage    = "https://github.com/dchbx"
-  s.summary     = %q{A gateway for receiving and forwarding messages over various protocols}
-  s.description = %q{A gateway that abstracts and transmits message payloads over SMTP, SFTP, HTTP, file and other protocols}
+  s.summary     = 'A gateway for receiving and forwarding messages over various protocols'
+  s.description = 'A gateway that abstracts and transmits message payloads over SMTP, SFTP, HTTP, file and other protocols'
   s.license     = "MIT"
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::EmployeeRolesController < ApplicationController
   before_action :check_employee_role, only: [:new, :privacy, :welcome, :search]
   before_action :check_employee_role_permissions_edit, only: [:edit]
@@ -5,11 +7,9 @@ class Insured::EmployeeRolesController < ApplicationController
   include ErrorBubble
   include EmployeeRoles
 
-  def welcome
-  end
+  def welcome; end
 
-  def privacy
-  end
+  def privacy; end
 
   def search
     @no_previous_button = true
@@ -26,7 +26,7 @@ class Insured::EmployeeRolesController < ApplicationController
     @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
-      @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
+      @found_census_employees = @employee_candidate.match_census_employees.select(&:is_active?)
       if @found_census_employees.empty?
         full_name = @person_params[:first_name] + " " + @person_params[:last_name]
         # @person = Factories::EnrollmentFactory.construct_consumer_role(params.permit!, current_user)
@@ -63,7 +63,7 @@ class Insured::EmployeeRolesController < ApplicationController
                          end
                        end
 
-    census_employees.each { |ce| ce.construct_employee_role_for_match_person }
+    census_employees.each(&:construct_employee_role_for_match_person)
     if @employee_role.present? && @employee_role.census_employee.present? && (current_user.has_hbx_staff_role? || @employee_role.census_employee.is_linked?)
       @person = Forms::EmployeeRole.new(@employee_role.person, @employee_role)
       session[:person_id] = @person.id
@@ -74,9 +74,9 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       end
     else
-        log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity=>'error')
-        flash[:alert] = "You can not enroll as another employee. Please reach out to customer service for assistance"
-        redirect_back(fallback_location: root_path)
+      log("Refs #19220 We have an SSN collision for the employee belonging to employer #{@employment_relationship.census_employee.employer_profile.parent.legal_name}", :severity => 'error')
+      flash[:alert] = "You can not enroll as another employee. Please reach out to customer service for assistance"
+      redirect_back(fallback_location: root_path)
     end
   end
 
@@ -90,7 +90,7 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def update
-    save_and_exit =  params['exit_after_method'] == 'true'
+    save_and_exit = params['exit_after_method'] == 'true'
     person = Person.find(params.require(:id))
     object_params = params.require(:person).permit(*person_parameters_list)
     @employee_role = person.employee_roles.detect { |emp_role| emp_role.id.to_s == object_params[:employee_role_id].to_s }
@@ -105,10 +105,8 @@ class Insured::EmployeeRolesController < ApplicationController
         # set_employee_bookmark_url
         # @employee_role.census_employee.trigger_notices("employee_eligibility_notice")
         redirect_path = insured_family_members_path(employee_role_id: @employee_role.id)
-        if @person.primary_family && @person.primary_family.active_household
-          if @person.primary_family.active_household.hbx_enrollments.any?
-            redirect_path = insured_root_path
-          end
+        if @person.primary_family&.active_household
+          redirect_path = insured_root_path if @person.primary_family.active_household.hbx_enrollments.any?
         end
         respond_to do |format|
           format.html { redirect_to redirect_path }
@@ -187,8 +185,8 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def show
     #PATH REACHED FOR UNKNOWN REASONS, POSSIBLY DUPLICATE PERSONS SO USER, URL ARE LOGGED
-    message={}
-    message[:message] ="insured/employee_role/show is not a valid route, "
+    message = {}
+    message[:message] = "insured/employee_role/show is not a valid route, "
     message[:user] = current_user.oim_id
     message[:url] = request.original_url
     log(message, severity: 'error')
@@ -222,6 +220,6 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def employment_relationship_params
     params.require(:employment_relationship).permit(:first_name, :last_name, :middle_name,
-      :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
+                                                    :name_pfx, :name_sfx, :gender, :hired_on, :eligible_for_coverage_on, :census_employee_id, :employer_name, :no_ssn)
   end
 end

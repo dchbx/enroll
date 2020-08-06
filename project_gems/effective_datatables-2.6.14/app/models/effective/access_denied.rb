@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 unless defined?(Effective::AccessDenied)
   module Effective
     class AccessDenied < StandardError

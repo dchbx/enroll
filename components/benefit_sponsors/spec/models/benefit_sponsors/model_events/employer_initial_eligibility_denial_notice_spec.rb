@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNotice', dbclean: :after_each  do
   let(:notice_event) { "employer_initial_eligibility_denial_notice" }
 
-  let(:start_on) { (TimeKeeper.date_of_record).beginning_of_month }
+  let(:start_on) { TimeKeeper.date_of_record.beginning_of_month }
   let(:open_enrollment_start_on) {(TimeKeeper.date_of_record - 1.month).beginning_of_month}
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:prior_month_open_enrollment_start)  { TimeKeeper.date_of_record.beginning_of_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - Settings.aca.shop_market.open_enrollment.minimum_length.days - 1.day}
@@ -20,12 +22,13 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNo
   end
   let(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site) }
   let!(:benefit_market) { site.benefit_markets.first }
-  let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
-                                  benefit_market: benefit_market,
-                                  title: "SHOP Benefits for #{current_effective_date.year}",
-                                  issuer_profile: issuer_profile,
-                                  application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
-                                }
+  let!(:benefit_market_catalog) do
+    create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+           benefit_market: benefit_market,
+           title: "SHOP Benefits for #{current_effective_date.year}",
+           issuer_profile: issuer_profile,
+           application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
+  end
 
   let!(:model_instance) do
     application = FactoryBot.create(
@@ -77,25 +80,27 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInitialEligibilityDenialNo
 
   describe "NoticeBuilder" do
 
-    let(:data_elements) {
-      [ 
-        "employer_profile.notice_date", 
+    let(:data_elements) do
+      [
+        "employer_profile.notice_date",
         "employer_profile.employer_name",
-        "employer_profile.broker.primary_fullname", 
-        "employer_profile.broker.organization", 
-        "employer_profile.broker.phone", 
-        "employer_profile.broker.email", 
+        "employer_profile.broker.primary_fullname",
+        "employer_profile.broker.organization",
+        "employer_profile.broker.phone",
+        "employer_profile.broker.email",
         "employer_profile.broker_present?"
-      ]
-    }
+]
+    end
 
     let(:recipient) { "Notifier::MergeDataModels::EmployerProfile" }
     let(:template)  { Notifier::Template.new(data_elements: data_elements) }
 
-    let(:payload)   { {
-      "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
-      "event_object_id" => model_instance.id
-    } }
+    let(:payload)   do
+      {
+        "event_object_kind" => "BenefitSponsors::BenefitApplications::BenefitApplication",
+        "event_object_id" => model_instance.id
+      }
+    end
 
     let(:subject) { Notifier::NoticeKind.new(template: template, recipient: recipient) }
     let(:merge_model) { subject.construct_notice_object }

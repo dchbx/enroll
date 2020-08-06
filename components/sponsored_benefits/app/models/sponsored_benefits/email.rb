@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   class Email
     include Mongoid::Document
@@ -9,7 +11,7 @@ module SponsoredBenefits
     embedded_in :office_location
     embedded_in :census_member, class_name: "CensusMember"
 
-    KINDS = %W(home work)
+    KINDS = %w[home work].freeze
 
     field :kind, type: String
     field :address, type: String
@@ -19,7 +21,7 @@ module SponsoredBenefits
     validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid email type", allow_blank: true
 
     def plan_design_model?
-      _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee) 
+      _parent.is_a?(SponsoredBenefits::CensusMembers::PlanDesignCensusEmployee)
     end
 
     def blank?

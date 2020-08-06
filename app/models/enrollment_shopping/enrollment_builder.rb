@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EnrollmentShopping
   class EnrollmentBuilder
     def initialize(c_household, e_role, c_kind)
@@ -40,9 +42,7 @@ module EnrollmentShopping
 
       enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
 
-      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
-        member.is_subscriber?
-      end
+      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select(&:is_subscriber?)
 
       benefit_package ||= benefit_package_for(previous_enrollment: previous_enrollment, employee_role: @employee_role, effective_date: enrollment.effective_on)
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
@@ -87,9 +87,7 @@ module EnrollmentShopping
 
       enrollment.rebuild_members_by_coverage_household(coverage_household: @coverage_household)
 
-      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select do |member|
-        member.is_subscriber?
-      end
+      enrollment.hbx_enrollment_members = enrollment.hbx_enrollment_members.select(&:is_subscriber?)
 
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
       set_benefit_information(enrollment, sponsored_benefit, benefit_package)
@@ -166,7 +164,7 @@ module EnrollmentShopping
         end
         enrollment.enrollment_kind = "special_enrollment"
         enrollment.special_enrollment_period_id = enrollment.family.current_sep.id
-        # TODO: Assign sep        
+        # TODO: Assign sep
       else
         enrollment.effective_on = previous_enrollment.effective_on
         enrollment.enrollment_kind = "open_enrollment"
@@ -206,7 +204,7 @@ module EnrollmentShopping
       end
     end
 
-    def check_for_affected_enrollment(enrollment, sponsored_benefit)
+    def check_for_affected_enrollment(enrollment, _sponsored_benefit)
       aef = AffectedEnrollmentFinder.new
       affected_enrollments = aef.for_enrollment(enrollment)
       if affected_enrollments.any?
@@ -219,17 +217,13 @@ module EnrollmentShopping
     def copy_member_coverage_dates(old_hem, new_hem)
       old_hem.hbx_enrollment_members.each do |old_member|
         new_hem.hbx_enrollment_members.each do |new_member|
-          if old_member.applicant_id == new_member.applicant_id
-            new_member.coverage_start_on = old_member.coverage_start_on
-          end
+          new_member.coverage_start_on = old_member.coverage_start_on if old_member.applicant_id == new_member.applicant_id
         end
       end
     end
 
     def benefit_package_for(previous_enrollment: nil, employee_role: nil, effective_date: nil)
-      if employee_role.present?
-        assigned_benefit_package = employee_role.benefit_package_for_date(effective_date)
-      end
+      assigned_benefit_package = employee_role.benefit_package_for_date(effective_date) if employee_role.present?
 
       if previous_enrollment.present?
         possible_benefit_package = previous_enrollment.sponsored_benefit_package

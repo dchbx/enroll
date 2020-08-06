@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require 'active_model_serializers'
 require 'slim'
 require 'effective_datatables'

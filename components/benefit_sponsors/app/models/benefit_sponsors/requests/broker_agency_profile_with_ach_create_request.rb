@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'dry-initializer'
 require 'dry-types'
 require 'mail'
@@ -13,7 +15,7 @@ module BenefitSponsors
       option :ach_routing_confirmation, Dry::Types['coercible.string'], optional: true
     end
 
-    class BrokerAgencyProfileWithAchCreateRequest <  BrokerAgencyProfileCreateRequest
+    class BrokerAgencyProfileWithAchCreateRequest < BrokerAgencyProfileCreateRequest
       option :ach_information, ->(args) { ::BenefitSponsors::Requests::AchInformation.new(args) }, optional: true
     end
   end

@@ -6,7 +6,6 @@ require 'dry/monads/do'
 module BenefitMarkets
   module Operations
     module ContributionModels
-
       class Assign
         # include Dry::Monads::Do.for(:call)
         include Dry::Monads[:result, :do]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class Pipeline
     def initialize(step_list = [])

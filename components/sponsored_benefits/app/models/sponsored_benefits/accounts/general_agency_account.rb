@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Accounts
     class GeneralAgencyAccount
@@ -36,105 +38,105 @@ module SponsoredBenefits
 
         # belongs_to general_agency_profile
 
-        def general_agency_profile=(profile)
-          raise ArgumentError.new("expected GeneralAgencyProfile") unless profile.class.to_s.match(/GeneralAgencyProfile/)
-          if profile.kind_of?(GeneralAgencyProfile)
-            self.general_agency_profile_id = profile._id
-          else
-            self.benefit_sponsrship_general_agency_profile_id = profile._id
-          end
-          @general_agency_profile = profile
+      def general_agency_profile=(profile)
+        raise ArgumentError, "expected GeneralAgencyProfile" unless profile.class.to_s.match(/GeneralAgencyProfile/)
+        if profile.is_a?(GeneralAgencyProfile)
+          self.general_agency_profile_id = profile._id
+        else
+          self.benefit_sponsrship_general_agency_profile_id = profile._id
         end
+        @general_agency_profile = profile
+      end
 
-        def general_agency_profile
-          return @general_agency_profile if defined? @general_agency_profile
-          if benefit_sponsrship_general_agency_profile_id.blank?
-            @general_agency_profile = GeneralAgencyProfile.find(self.general_agency_profile_id)
-          else
-            @general_agency_profile =  BenefitSponsors::Organizations::GeneralAgencyProfile.find(benefit_sponsrship_general_agency_profile_id)
-          end
+      def general_agency_profile
+        return @general_agency_profile if defined? @general_agency_profile
+        @general_agency_profile = if benefit_sponsrship_general_agency_profile_id.blank?
+                                    GeneralAgencyProfile.find(self.general_agency_profile_id)
+                                  else
+                                    BenefitSponsors::Organizations::GeneralAgencyProfile.find(benefit_sponsrship_general_agency_profile_id)
+                                  end
+      end
+
+      def broker_agency_profile=(profile)
+        raise ArgumentError, "expected BrokerAgencyProfile" unless profile.class.to_s.match(/BrokerAgencyProfile/)
+        if profile.is_a?(BrokerAgencyProfile)
+          self.broker_agency_profile_id = profile._id
+        else
+          self.benefit_sponsrship_broker_agency_profile_id = profile._id
         end
+        @broker_agency_profile = profile
+      end
 
-        def broker_agency_profile=(profile)
-          raise ArgumentError.new("expected BrokerAgencyProfile") unless profile.class.to_s.match(/BrokerAgencyProfile/)
-          if profile.kind_of?(BrokerAgencyProfile)
-            self.broker_agency_profile_id = profile._id
-          else
-            self.benefit_sponsrship_broker_agency_profile_id = profile._id
-          end
-          @broker_agency_profile = profile
+      def broker_agency_profile
+        return @broker_agency_profile if defined? @broker_agency_profile
+        @broker_agency_profile = if benefit_sponsrship_broker_agency_profile_id.blank?
+                                   BrokerAgencyProfile.find(self.broker_agency_profile_id)
+                                 else
+                                   BenefitSponsors::Organizations::BrokerAgencyProfile.find(benefit_sponsrship_broker_agency_profile_id)
+                                 end
+      end
+
+      def ga_name
+        Rails.cache.fetch("general-agency-name-#{benefit_sponsrship_general_agency_profile_id}", expires_in: 12.hour) do
+          legal_name
         end
+      end
 
-        def broker_agency_profile
-          return @broker_agency_profile if defined? @broker_agency_profile
-          if benefit_sponsrship_broker_agency_profile_id.blank?
-            @broker_agency_profile = BrokerAgencyProfile.find(self.broker_agency_profile_id)
-          else
-            @broker_agency_profile =  BenefitSponsors::Organizations::BrokerAgencyProfile.find(benefit_sponsrship_broker_agency_profile_id)
-          end
+      def legal_name
+        general_agency_profile.present? ? general_agency_profile.legal_name : ""
+      end
+
+      def broker_role
+        broker_role_id.present? ? ::BrokerRole.find(broker_role_id) : nil
+      end
+
+      def broker_role_name
+        broker_role.present? ? broker_role.person.full_name : ""
+      end
+
+      def for_broker_agency_account?(ba_account)
+        return false unless broker_role_id == ba_account.writing_agent_id
+        return false unless general_agency_profile.present?
+        return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on)) unless ba_account.end_on.blank?
+        (start_on >= ba_account.start_on)
+      end
+
+
+      aasm do
+        state :active, initial: true
+        state :inactive
+
+        event :terminate, after: :record_transition, before: :set_termination_date do
+          transitions from: :active, to: :inactive
         end
+      end
 
-        def ga_name
-          Rails.cache.fetch("general-agency-name-#{benefit_sponsrship_general_agency_profile_id}", expires_in: 12.hour) do
-            legal_name
-          end
-        end
+      def record_transition(*_args)
+        workflow_state_transitions << WorkflowStateTransition.new(
+          from_state: aasm.from_state,
+          to_state: aasm.to_state,
+          event: aasm.current_event,
+          user_id: SAVEUSER[:current_user_id]
+        )
+      end
 
-        def legal_name
-          general_agency_profile.present? ? general_agency_profile.legal_name : ""
-        end
+      def set_termination_date
+        self.end_on = TimeKeeper.datetime_of_record
+      end
 
-        def broker_role
-          broker_role_id.present? ? ::BrokerRole.find(broker_role_id) : nil
-        end
+      class << self
+        def find(id)
+          pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
+            :"general_agency_accounts._id" => BSON::ObjectId.from_string(id)
+          ).first
 
-        def broker_role_name
-          broker_role.present? ? broker_role.person.full_name : ""
-        end
-
-        def for_broker_agency_account?(ba_account)
-          return false unless (broker_role_id == ba_account.writing_agent_id)
-          return false unless general_agency_profile.present?
-          if !ba_account.end_on.blank?
-            return((start_on >= ba_account.start_on) && (start_on <= ba_account.end_on))
-          end
-          (start_on >= ba_account.start_on)
-        end
-
-
-        aasm do
-          state :active, initial: true
-          state :inactive
-
-          event :terminate, after: :record_transition, before: :set_termination_date do
-            transitions from: :active, to: :inactive
-          end
-        end
-
-        def record_transition(*args)
-          workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: aasm.from_state,
-            to_state: aasm.to_state,
-            event: aasm.current_event,
-            user_id: SAVEUSER[:current_user_id]
-          )
-        end
-
-        def set_termination_date
-          self.end_on = TimeKeeper.datetime_of_record
-        end
-
-        class << self
-          def find(id)
-            pdo = SponsoredBenefits::Organizations::PlanDesignOrganization.where(
-              :"general_agency_accounts._id" => BSON::ObjectId.from_string(id)
-            ).first
-
+          if pdo.present?
             pdo.general_agency_accounts.where(
-              :"_id" => BSON::ObjectId.from_string(id)
-            ).first if pdo.present?
-          end
+              :_id => BSON::ObjectId.from_string(id)
+            ).first
+            end
         end
+      end
     end
   end
 end

@@ -57,10 +57,10 @@ RSpec.describe BenefitSponsors::Operations::EnrollmentEligibility::Determine, db
     end
 
     let(:benefit_sponsorship_params) do
-        sponsorship_params = benefit_sponsorship.as_json.symbolize_keys.except(:benefit_applications)
-        sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.as_json.symbolize_keys.except(:benefit_packages)}
-        sponsorship_params[:market_kind] = benefit_sponsorship.market_kind
-        (sponsorship_params)
+      sponsorship_params = benefit_sponsorship.as_json.symbolize_keys.except(:benefit_applications)
+      sponsorship_params[:benefit_applications] = benefit_sponsorship.benefit_applications.collect{|ba| ba.as_json.symbolize_keys.except(:benefit_packages)}
+      sponsorship_params[:market_kind] = benefit_sponsorship.market_kind
+      sponsorship_params
     end
 
     let(:benefit_sponsorship_entity) {BenefitSponsors::Operations::BenefitSponsorship::Create.new.call(params: benefit_sponsorship_params).value!}

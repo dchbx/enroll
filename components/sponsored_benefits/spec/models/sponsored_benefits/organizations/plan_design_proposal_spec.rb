@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module SponsoredBenefits
@@ -7,9 +9,9 @@ module SponsoredBenefits
 
     describe "#instance methods" do
       let(:organization){ SponsoredBenefits::Organizations::PlanDesignOrganization.new }
-      let(:plan_design_proposals){
+      let(:plan_design_proposals) do
         [organization.plan_design_proposals.build({title: "new proposal for new client", profile: profile})]
-      }
+      end
       let(:plan_design_proposal){ plan_design_proposals[0] }
 
       context "when instantiated" do

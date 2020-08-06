@@ -2,7 +2,7 @@
 
 class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
   attr_accessor :enrollment, :renewal_coverage_start, :assisted, :aptc_values
-  CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"]
+  CAT_AGE_OFF_HIOS_IDS = ["94506DC0390008", "86052DC0400004"].freeze
 
   def initialize
     @logger = Logger.new("#{Rails.root}/log/ivl_open_enrollment_begin_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
@@ -164,8 +164,8 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     if child_relations.include?(member.family_member.relationship)
       return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
 
-      @dependent_age_off = true unless @dependent_age_off
-      return false
+      @dependent_age_off ||= true
+      false
     else
       true
     end
@@ -179,7 +179,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
 
   def clone_enrollment_members
     old_enrollment_members = eligible_enrollment_members
-    raise  "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
+    raise "unable to generate enrollment with hbx_id #{@enrollment.hbx_id} due to no enrollment members not present" if old_enrollment_members.blank?
 
     old_enrollment_members.inject([]) do |members, hbx_enrollment_member|
       members << HbxEnrollmentMember.new({ applicant_id: hbx_enrollment_member.applicant_id,

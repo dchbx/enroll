@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module BenefitProducts
     class BenefitProduct
       include Mongoid::Document
       include Mongoid::Timestamps
 
-      BENEFIT_PRODUCT_KINDS = [:health, :dental]
+      BENEFIT_PRODUCT_KINDS = [:health, :dental].freeze
 
       has_and_belongs_to_many :benefit_market_service_periods, class_name: "SponsoredBenefits::BenefitMarketservicePeriod"
 
@@ -18,30 +20,28 @@ module SponsoredBenefits
 
       validates_presence_of :issuer_profile_id, :benefit_product_kind, :purchase_period
       validates :benefit_product_kind,
-        inclusion: { in: BENEFIT_PRODUCT_KINDS, message: "%{value} is not a valid benefit market" }
+                inclusion: { in: BENEFIT_PRODUCT_KINDS, message: "%{value} is not a valid benefit market" }
 
       index(issuer_profile_id: 1)
       index(:"purchase_period.max" =>  1, :"purchase_period.min" => 1)
 
 
       scope :by_issuer_profile,   ->(issuer_profile){where(:"issuer_profile._id" => issuer_profile._id)}
-      scope :by_effective_date,   ->(effective_date = Timekeeper.DateOfRecord) {
-                                                          where(
-                                                            :"purchase_period.min" => {:$gte => effective_date}, 
-                                                            :"purchase_period.max" => {:$lte => effective_date}
-                                                            )
-                                                          }
+      scope :by_effective_date,   lambda { |effective_date = Timekeeper.DateOfRecord|
+                                    where(
+                                      :"purchase_period.min" => {:$gte => effective_date},
+                                      :"purchase_period.max" => {:$lte => effective_date}
+                                    )
+                                  }
 
 
       def issuer_profile
         SponsoredBenefits::Organizations::IssuerProfile.find(issuer_profile_id)
       end
 
-      def sponsor_eligibility_policies
-      end
+      def sponsor_eligibility_policies; end
 
-      def member_eligibility_policies
-      end
+      def member_eligibility_policies; end
 
       # builders: sponsor (rating area, sic), effective_date
 

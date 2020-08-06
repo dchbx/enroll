@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Concerns::Observable
     extend ActiveSupport::Concern
 
     included do
-      def notify_observers(args={})
+      def notify_observers(args = {})
         if self.class.observer_peers.any?
           self.class.observer_peers.each do |k, events|
             events.each do |event|
@@ -20,16 +22,12 @@ module BenefitSponsors
     end
 
     class_methods do
-      def add_observer(observer, func=:update)
+      def add_observer(observer, func = :update)
         @observer_peers ||= {}
         func = Array.wrap(func)
-        unless func.all? {|event| observer.respond_to? event}
-          raise NoMethodError, "observer does not respond to '#{func.to_s}'"
-        end
+        raise NoMethodError, "observer does not respond to '#{func}'" unless func.all? {|event| observer.respond_to? event}
 
-        if @observer_peers.none?{|k, v| k.is_a?(observer.class)}
-          @observer_peers[observer] = func
-        end
+        @observer_peers[observer] = func if @observer_peers.none?{|k, _v| k.is_a?(observer.class)}
         @observer_peers
       end
 

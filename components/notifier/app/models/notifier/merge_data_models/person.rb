@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Notifier
   class MergeDataModels::Person
     include Virtus.model
@@ -7,9 +9,9 @@ module Notifier
 
     def self.stubbed_object
       Notifier::MergeDataModels::Person.new({
-        first_name: "John",
-        last_name: "Adams"
-        })
+                                              first_name: "John",
+                                              last_name: "Adams"
+                                            })
     end
   end
 end

@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class FixEmployerAttestation< MongoidMigrationTask
+class FixEmployerAttestation < MongoidMigrationTask
   def migrate
-
     organizations = BenefitSponsors::Organizations::Organization.where(:"profiles.employer_attestation.aasm_state" => 'unsubmitted')
 
     organizations.each do |organization|

@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BrokerAgencyRegistration
     module CreateRequestWithAchValidators
-
       class PARAMS < ::BenefitSponsors::BrokerAgencyRegistration::CreateRequestValidators::PARAMS
         define do
           required(:ach_information).schema do

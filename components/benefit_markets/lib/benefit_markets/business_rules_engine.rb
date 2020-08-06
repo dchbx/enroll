@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A Rules Engine that builds Business Policies comprised of Rules that define criteria to verified
 # To use, include it in any class where you want to define:
 #   include BenefitMarkets::BusinessRulesEngine
@@ -33,23 +35,23 @@ module BenefitMarkets
 
     module ClassMethods
       def assert_business_policies(names = [])
-        if names.size == 0
-          business_policies.each do |business_policy_name, business_policy|
+        if names.empty?
+          business_policies.each do |_business_policy_name, business_policy|
             business_policy.send(:process_rules)
           end
         else
-          business_policies[name].send(:process_rules) if business_policies.has_key?(name)
+          business_policies[name].send(:process_rules) if business_policies.key?(name)
         end
       end
 
       def register_business_policy(name, business_policy)
-        raise Error, "business_policy #{name} already exists" if business_policies.has_key?(name)
+        raise Error, "business_policy #{name} already exists" if business_policies.key?(name)
         business_policies[name] = business_policy
         business_policy
       end
 
-      def business_policy(name, options={})
-        if options[:rules].present? and options[:rules].size > 0
+      def business_policy(name, options = {})
+        if options[:rules].present? && !options[:rules].empty?
           options[:rules] = options[:rules].reduce([]) do |list, rule|
             if rule.is_a? BusinessRulesEngine::Rule
               list << rule
@@ -79,7 +81,7 @@ module BenefitMarkets
       #   business_policies[name] if business_policies.has_key?(name)
       # end
 
-      def rule(name, options={})
+      def rule(name, options = {})
         rule_instance = BusinessRulesEngine::Rule.new(name, options)
         self.rules << rule_instance
         rule_instance
@@ -107,7 +109,7 @@ module BenefitMarkets
       attr_accessor :name
       attr_accessor :fail_results, :success_results
 
-      def initialize(name, options={})
+      def initialize(name, options = {})
         @name = name
         @rules = options[:rules] || []
         @commands = options[:commands] || []
@@ -138,7 +140,7 @@ module BenefitMarkets
           @rules << new_rule
           new_rule
         else
-         raise Error, "must be type: BusinessRulesEngine::Rule"
+          raise Error, "must be type: BusinessRulesEngine::Rule"
         end
       end
 
@@ -154,7 +156,7 @@ module BenefitMarkets
         @rules << new_rule
       end
 
-      def drop_rule(rule, &blk)
+      def drop_rule(rule)
         @rules.delete(rule)
       end
 
@@ -174,9 +176,7 @@ module BenefitMarkets
         @commands || []
       end
 
-      def policy_result
-        @policy_result
-      end
+      attr_reader :policy_result
 
       def reset_rules
         @rules = []
@@ -194,7 +194,7 @@ module BenefitMarkets
       end
 
       def inspect
-        "<#{self.class.name} name: #{name}, rules: #{rules.each {|rule| rule.inspect} }, errors: #{errors} >"
+        "<#{self.class.name} name: #{name}, rules: #{rules.each(&:inspect)}, errors: #{errors} >"
       end
     end
 
@@ -213,9 +213,9 @@ module BenefitMarkets
       # if invalid
       attr_accessor :fail
 
-      NO_OP = lambda { |o| true }
+      NO_OP = ->(_o) { true }
 
-      def initialize(name = nil, options={})
+      def initialize(name = nil, options = {})
         self.name(name) if name.present?
         self.params   = options[:params]    || {}
         self.validate = options[:validate]  || NO_OP
@@ -225,7 +225,7 @@ module BenefitMarkets
       end
 
       def name(name = nil)
-        @name = name if (name && ! @name)
+        @name = name if name && !@name
         @name if defined?(@name)
       end
 
@@ -233,7 +233,7 @@ module BenefitMarkets
         if validate.call(data)
           [true, success.call(data)]
         else
-          [false, fail.call(data)]
+          [false, raise.call(data)]
         end
       end
 

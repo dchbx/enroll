@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class SortExpression < PipelineExpression
     def expression_step

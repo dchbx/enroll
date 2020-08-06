@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :after_each do
   include BenefitSponsors::ApplicationHelper
 
   describe '.profile_unread_messages_count', dbclean: :after_each do
-    let(:inbox) { double('inbox', unread_messages: [1], unread_messages_count: 2 )}
+    let(:inbox) { double('inbox', unread_messages: [1], unread_messages_count: 2)}
     let(:profile) { double('Profile', inbox: inbox)}
 
     context 'when profile is an instance of BenefitSponsors::Organizations::Profile then' do

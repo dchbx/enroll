@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
-class DelinkBrokerAgency< MongoidMigrationTask
+class DelinkBrokerAgency < MongoidMigrationTask
   def migrate
     hbx_id = ENV['person_hbx_id']
-    person = Person.where(hbx_id:hbx_id)
-    if person.size == 0
+    person = Person.where(hbx_id: hbx_id)
+    if person.empty?
       puts "No person found with the given hbx_id" unless Rails.env.test?
-      return
+      nil
     else
       primary_family = person.first.primary_family
       if primary_family.present?

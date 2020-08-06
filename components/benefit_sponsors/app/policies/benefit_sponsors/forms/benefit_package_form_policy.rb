@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class BenefitPackageFormPolicy < ApplicationPolicy
@@ -11,8 +13,8 @@ module BenefitSponsors
 
       def updateable?
         return false unless user.present?
-        return true if (is_broker_for_employer? || is_general_agency_staff_for_employer?)
-        return true unless role = user && user.person && user.person.hbx_staff_role
+        return true if is_broker_for_employer? || is_general_agency_staff_for_employer?
+        return true unless role = user&.person && user.person.hbx_staff_role
         role.permission.modify_employer
       end
 
@@ -26,7 +28,7 @@ module BenefitSponsors
 
       # TODO: FIX ME
       def is_general_agency_staff_for_employer?
-        return false
+        false
       end
     end
   end

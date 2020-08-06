@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^.+ should see a welcome page with successful sign in message$/) do
   Watir::Wait.until(30) { @browser.text.include?(/Signed in successfully./) }
   screenshot("employer_portal_sign_in_welcome")
@@ -25,7 +27,7 @@ Then(/^.+ should see an initial fieldset to enter my name, ssn and dob$/) do
   @browser.button(value: /Search Person/).fire_event("onclick")
 end
 
-Then(/^(.*?) should be able to set up benefit aplication$/) do |legal_name|
+Then(/^(.*?) should be able to set up benefit aplication$/) do |_legal_name|
   wait_for_ajax
   click_button "OK"
 end
@@ -37,7 +39,7 @@ Then(/^(.*?) Employer visit the benefits page$/) do |legal_name|
 end
 
 Then(/^.+ uploads an attestation document/) do
-  if (Settings.aca.enforce_employer_attestation.to_s == "true")
+  if Settings.aca.enforce_employer_attestation.to_s == "true"
     find('.interaction-click-control-documents').click
     wait_for_ajax
     find('.interaction-click-control-upload').click
@@ -311,7 +313,7 @@ end
 
 When(/^I go to the Profile tab$/) do
   find('.interaction-click-control-update-business-info').click
-  find('.interaction-click-control-cancel').clickfeatures/employers/step_definitions/cobra_steps.rb
+  find('.interaction-click-control-cancel').clickfeatures / employers / step_definitions / cobra_steps.rb
 
   expect(page).to have_content('Business Info')
 end
@@ -319,12 +321,12 @@ end
 
 When(/^(.*?) go[es]+ to the benefits tab I should see plan year information$/) do |legal_name|
   profile = @organization[legal_name].employer_profile
-  visit  benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab=>'benefits')
+  visit benefit_sponsors.profiles_employers_employer_profile_path(profile.id, :tab => 'benefits')
 end
 
 When(/^I go to MY Health Connector tab$/) do
- find('.interaction-click-control-my-health-connector').click
- wait_for_ajax
+  find('.interaction-click-control-my-health-connector').click
+  wait_for_ajax
   expect(page).to have_content('My Health Benefits Program')
 end
 
@@ -529,7 +531,7 @@ Given /^the employer has draft plan year$/ do
 end
 
 Given /^the employer has broker agency profile$/ do
-  employer.employer_profile.hire_broker_agency(FactoryBot.create :broker_agency_profile)
+  employer.employer_profile.hire_broker_agency(FactoryBot.create(:broker_agency_profile))
   employer.employer_profile.save!
 end
 
@@ -720,7 +722,7 @@ And /^employer clicks on linked employee with address$/ do
   click_link @census_employees.first.full_name
 end
 
-Then /^ER should land on (.*) EE tab$/ do |val|
+Then /^ER should land on (.*) EE tab$/ do |_val|
   expect(page.html).to match /val/
 end
 
@@ -845,8 +847,8 @@ end
 #   expect(page).to have_content status
 # end
 
-And /^employer clicks on (.*) button with date as (.*)$/ do |status, date|
-  date = date == 'pastdate' ? TimeKeeper.date_of_record - 1.day  : TimeKeeper.date_of_record - 3.months
+And /^employer clicks on (.*) button with date as (.*)$/ do |_status, date|
+  date = date == 'pastdate' ? TimeKeeper.date_of_record - 1.day : TimeKeeper.date_of_record - 3.months
   find('input.text-center.date-picker').set date
   divs = page.all('div')
   home_div = divs.detect { |div| div[:id] == 'home' }
@@ -897,7 +899,7 @@ end
 
 Then(/^the employer enters claim code for his quote$/) do
   person = FactoryBot.create(:person, :with_broker_role)
-  @quote=FactoryBot.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
+  @quote = FactoryBot.create(:quote,:with_household_and_members, :claim_code => "TEST-NG12", :broker_role_id => person.broker_role.id)
   @quote.publish!
   fill_in "claim_code", :with => @quote.claim_code
 end
@@ -917,7 +919,7 @@ When(/^.+ go(?:es)? to the documents tab directly$/) do
 end
 
 When(/^.+ go(?:es)? to the documents tab$/) do
-   find('.interaction-click-control-documents').click
+  find('.interaction-click-control-documents').click
   #interaction-click-control-documents
   #visit employers_employer_profile_path(employer.employer_profile) + "?tab=documents"
 end
@@ -929,7 +931,6 @@ end
 When(/^the employer clicks upload button$/) do
   find('.interaction-click-control-upload').click
 end
-#
 Then(/^.+ should see model box with file upload$/) do
   expect(page).to have_content('SELECT FILE TO UPLOAD')
   expect(page).to have_content('Employer Attestation ')
@@ -950,7 +951,7 @@ Then(/^.+ fill the document form$/) do
 end
 
 Then(/^the employer clicks the upload button in popup/) do
-   click_button('Upload')
+  click_button('Upload')
 end
 
 Then(/^the employer should see the document list/) do
@@ -1004,12 +1005,12 @@ And(/^employer should see (.*?) to remove text$/) do |text|
   expect(page).to have_content(text)
 end
 
-And(/^employer clicks on Actions drop down for one of (.*?) employee$/) do |status|
+And(/^employer clicks on Actions drop down for one of (.*?) employee$/) do |_status|
   census_id = @census_employees.first.id.to_s
   find(:xpath, "//*[@id='dropdown_for_census_employeeid_#{census_id}']").click
 end
 
-When(/^employer clicks on button terminated for datatable$/)do
+When(/^employer clicks on button terminated for datatable$/) do
   find(:xpath, "//*[@id='Tab:terminated']").click
 end
 
@@ -1076,7 +1077,7 @@ end
 
 And(/^employer sets cobra start date to two months after termination date$/) do
   date = @census_employees.first.employment_terminated_on + 2.months
-  page.execute_script("$('.datepicker').val(#{date.to_s})")
+  page.execute_script("$('.datepicker').val(#{date})")
 end
 
 And(/^employer sets cobra start date to two months before termination date$/) do

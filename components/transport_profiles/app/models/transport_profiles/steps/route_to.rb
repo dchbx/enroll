@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 
 module TransportProfiles
@@ -32,17 +34,17 @@ module TransportProfiles
 
     # @!visibility private
     def resolve_source_credentials(source_credentials)
-      return source_credentials unless source_credentials.kind_of?(Symbol)
+      return source_credentials unless source_credentials.is_a?(Symbol)
       endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(source_credentials)
-      raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
+      raise ::TransportProfiles::EndpointNotFoundError if endpoints.empty?
       raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
       endpoints.first
     end
 
     # @!visibility private
     def resolve_message_sources(process_context)
-      found_name = @file_name.kind_of?(Symbol) ? process_context.get(@file_name) : @file_name
-      if found_name.kind_of?(Array)
+      found_name = @file_name.is_a?(Symbol) ? process_context.get(@file_name) : @file_name
+      if found_name.is_a?(Array)
         found_name.map do |fn|
           fn.respond_to?(:scheme) ? fn : URI.parse(fn)
         end
@@ -54,7 +56,7 @@ module TransportProfiles
     # @!visibility private
     def execute(process_context)
       endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(@endpoint_key)
-      raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
+      raise ::TransportProfiles::EndpointNotFoundError if endpoints.empty?
       raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
       source_uris = resolve_message_sources(process_context)
 
@@ -66,9 +68,7 @@ module TransportProfiles
         message = ::TransportGateway::Message.new(from: file_uri, to: uri, destination_credentials: endpoint, source_credentials: @source_credentials)
 
         @gateway.send_message(message)
-        if @on_success_callback
-          @on_success_callback.call(file_uri,uri,process_context)
-        end
+        @on_success_callback&.call(file_uri,uri,process_context)
       end
     end
 
@@ -83,10 +83,8 @@ module TransportProfiles
         random_portion = SecureRandom.uuid.gsub("-", "").reverse
         URI.join(endpoint.uri, random_portion + "_" + base_name)
       when 'sftp'
-        URI.join(endpoint.uri, base_name) 
+        URI.join(endpoint.uri, base_name)
       end
     end
   end
-
-
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Support product import from SERFF, CSV templates, etc
 
 # Effective dates during which sponsor may purchase this product at this price
@@ -38,7 +40,7 @@ module BenefitMarkets
     field :nationwide, type: Boolean # Nationwide
     field :dc_in_network, type: Boolean # DC In-Network or not
     embeds_one  :sbc_document, as: :documentable,
-                :class_name => "::Document"
+                               :class_name => "::Document"
 
     embeds_many :premium_tables,
                 class_name: "BenefitMarkets::Products::PremiumTable"
@@ -54,45 +56,37 @@ module BenefitMarkets
     index({ service_area_id: 1}, {name: "products_service_area_index"})
 
     index({ "application_period.min" => 1,
-            "application_period.max" => 1,
-            },
-            {name: "products_application_period_index"}
-          )
+            "application_period.max" => 1},
+          {name: "products_application_period_index"})
 
     index({ "benefit_market_kind" => 1,
             "kind" => 1,
-            "product_package_kinds" => 1
-            },
-            {name: "product_market_kind_product_package_kind_index"}
-          )
+            "product_package_kinds" => 1},
+          {name: "product_market_kind_product_package_kind_index"})
 
     index({ "premium_tables.effective_period.min" => 1,
             "premium_tables.effective_period.max" => 1 },
-            {name: "products_premium_tables_effective_period_index"}
-          )
+          {name: "products_premium_tables_effective_period_index"})
 
     index({ "benefit_market_kind" => 1,
             "kind" => 1,
             "product_package_kinds" => 1,
             "application_period.min" => 1,
-            "application_period.max" => 1,
-            },
-            {name: "products_product_package_date_search_index"}
-          )
+            "application_period.max" => 1},
+          {name: "products_product_package_date_search_index"})
 
     index({ "premium_tables.rating_area" => 1,
             "premium_tables.effective_period.min" => 1,
             "premium_tables.effective_period.max" => 1 },
-            {name: "products_premium_tables_search_index"}
-          )
+          {name: "products_premium_tables_search_index"})
 
-    scope :by_product_package,    ->(product_package) { 
-              where(
-                :"benefit_market_kind"          => product_package.benefit_kind,
-                :"kind"                         => product_package.product_kind,
-                :"product_package_kinds".in     => [product_package.package_kind]
-              ).by_application_period(product_package.application_period)
-            }
+    scope :by_product_package,    lambda { |product_package|
+                                    where(
+                                      :benefit_market_kind => product_package.benefit_kind,
+                                      :kind => product_package.product_kind,
+                                      :product_package_kinds.in => [product_package.package_kind]
+                                    ).by_application_period(product_package.application_period)
+                                  }
 
     scope :aca_shop_market,             ->{where(benefit_market_kind: :aca_shop) }
     scope :aca_individual_market,       ->{ where(benefit_market_kind: :aca_individual) }
@@ -117,30 +111,34 @@ module BenefitMarkets
     }
 =end
     scope :by_metal_level_kind,         ->(metal_level){ where(metal_level_kind: /#{metal_level}/i) }
-    scope :by_state,                    ->(state) {where(
-      :"issuer_profile_id".in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
-    )}
+    scope :by_state,                    lambda { |state|
+                                          where(
+                                            :issuer_profile_id.in => BenefitSponsors::Organizations::Organization.issuer_profiles.where(:"profiles.issuer_state" => state).map(&:issuer_profile).map(&:id)
+                                          )
+                                        }
 
-    scope :effective_with_premiums_on,  ->(effective_date){ where(:"premium_tables.effective_period.min".lte => effective_date,
-                                                                  :"premium_tables.effective_period.max".gte => effective_date) }
+    scope :effective_with_premiums_on,  lambda { |effective_date|
+                                          where(:"premium_tables.effective_period.min".lte => effective_date,
+                                                :"premium_tables.effective_period.max".gte => effective_date)
+                                        }
 
     # input: application_period type: :Date
     # ex: application_period --> [2018-02-01 00:00:00 UTC..2019-01-31 00:00:00 UTC]
     #     BenefitProduct avilable for both 2018 and 2019
     # output: might pull multiple records
-    scope :by_application_period,       ->(application_period){ 
+    scope :by_application_period,       lambda { |application_period|
       where(
         "$or" => [
           {"application_period.min" => {"$lte" => application_period.max, "$gte" => application_period.min}},
           {"application_period.max" => {"$lte" => application_period.max, "$gte" => application_period.min}},
           {"application_period.min" => {"$lte" => application_period.min}, "application_period.max" => {"$gte" => application_period.max}}
-        ])
+        ]
+      )
     }
 
     scope :by_year, lambda {|year|
       where('$and' => [{'application_period.min' => {'$lte' => Date.new(year.to_i)}},
-                       {'application_period.max' => {'$gte' => Date.new(year.to_i).end_of_year}}
-      ])
+                       {'application_period.max' => {'$gte' => Date.new(year.to_i).end_of_year}}])
     }
 
     scope :with_premium_tables, ->{ where(:premium_tables.exists => true) }
@@ -153,8 +151,8 @@ module BenefitMarkets
     }
 
     #Products retrieval by type
-    scope :health_products,            ->{ where(:"_type" => /.*HealthProduct$/) }
-    scope :dental_products,            ->{ where(:"_type" => /.*DentalProduct$/)}
+    scope :health_products,            ->{ where(:_type => /.*HealthProduct$/) }
+    scope :dental_products,            ->{ where(:_type => /.*DentalProduct$/)}
 
     # Highly nested scopes don't behave in a way I entirely understand with
     # respect to the $elemMatch operator.  Since we are only invoking this
@@ -163,7 +161,7 @@ module BenefitMarkets
     # only be evaluated once.
     def self.by_coverage_date(collection, coverage_date)
       collection.select do |product|
-        product.premium_tables.any? do |pt| 
+        product.premium_tables.any? do |pt|
           (pt.effective_period.min <= coverage_date) && (pt.effective_period.max >= coverage_date)
         end
       end
@@ -171,11 +169,11 @@ module BenefitMarkets
 
     def service_area_id=(val)
       write_attribute(:service_area_id, val)
-      if val.nil?
-        @service_area = nil
-      else
-        @service_area = ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
-      end
+      @service_area = if val.nil?
+                        nil
+                      else
+                        ::BenefitMarkets::Locations::ServiceArea.find(service_area_id)
+                      end
     end
 
     def service_area=(val)
@@ -203,7 +201,7 @@ module BenefitMarkets
 
     def ehb
       percent = read_attribute(:ehb)
-      (percent && percent > 0) ? percent : 1
+      percent && percent > 0 ? percent : 1
     end
 
     def service_area
@@ -224,7 +222,7 @@ module BenefitMarkets
       if premium_tables.any?
         p_tables.flat_map(&:premium_tuples).select do |pt|
           pt.age == premium_ages.min
-        end.min_by { |pt| pt.cost }.cost
+        end.min_by(&:cost).cost
       end
     end
 
@@ -233,7 +231,7 @@ module BenefitMarkets
       if premium_tables.any?
         p_tables.flat_map(&:premium_tuples).select do |pt|
           pt.age == premium_ages.min
-        end.max_by { |pt| pt.cost }.cost
+        end.max_by(&:cost).cost
       end
     end
 
@@ -242,7 +240,7 @@ module BenefitMarkets
       if premium_tables.any?
         p_tables.flat_map(&:premium_tuples).select do |pt|
           pt.age == premium_ages.min
-        end.min_by { |pt| pt.cost }.cost
+        end.min_by(&:cost).cost
       end
     end
 
@@ -257,7 +255,7 @@ module BenefitMarkets
     end
 
     def product_kind
-      kind_string = (self.class.to_s.demodulize.sub!('Product','').downcase)
+      kind_string = self.class.to_s.demodulize.sub!('Product','').downcase
       kind_string.present? ? kind_string.to_sym : :product_base_class
     end
 
@@ -317,7 +315,7 @@ module BenefitMarkets
       raise InvalidEffectivePeriodError unless is_valid_premium_table_effective_period?(new_premium_table)
 
       if premium_table_effective_on(new_premium_table.effective_period.min).present? ||
-          premium_table_effective_on(new_premium_table.effective_period.max).present?
+         premium_table_effective_on(new_premium_table.effective_period.max).present?
         raise DuplicatePremiumTableError, "effective_period may not overlap existing premium_table"
       else
         premium_tables << new_premium_table
@@ -340,7 +338,7 @@ module BenefitMarkets
       return false unless application_period.present? && compare_premium_table.effective_period.present?
 
       if application_period.cover?(compare_premium_table.effective_period.min) &&
-          application_period.cover?(compare_premium_table.effective_period.max)
+         application_period.cover?(compare_premium_table.effective_period.max)
         true
       else
         false
@@ -358,7 +356,7 @@ module BenefitMarkets
 
     def create_copy_for_embedding
       self.class.new(self.attributes.except(:premium_tables)).tap do |new_product|
-        new_product.premium_tables = self.premium_tables.map { |pt| pt.create_copy_for_embedding }
+        new_product.premium_tables = self.premium_tables.map(&:create_copy_for_embedding)
       end
     end
 
@@ -372,7 +370,7 @@ module BenefitMarkets
 
     def is_same_plan_by_hios_id_and_active_year?(product)
       #a combination of hios_id and active_year has to be considered as a Primary Key as hios_id alone cannot be considered as primary
-      ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year )
+      ((self.hios_id.split("-")[0] == product.hios_id.split("-")[0]) && self.active_year == product.active_year)
     end
 
     # private
@@ -380,7 +378,7 @@ module BenefitMarkets
     # def attrs_without_tuples
     #   attributes.inject({}) do |attrs, (key, val)|
     #     if key == "premium_tables"
-    #       attrs[key] = val.map do |pt| 
+    #       attrs[key] = val.map do |pt|
     #         pt.tap {|t| t.delete("premium_tuples") }
     #       end
     #     elsif key == "sbc_document"

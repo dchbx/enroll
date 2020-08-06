@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :benefit_markets_benefit_market, class: 'BenefitMarkets::BenefitMarket' do
     site_urn { 'acme' }
@@ -15,20 +17,20 @@ FactoryBot.define do
     end
 
     trait :with_site do
-      after :build do |benefit_market, evaluator|
+      after :build do |benefit_market, _evaluator|
         build(:benefit_sponsors_site, :with_owner_exempt_organization, benefit_markets: [benefit_market])
       end
     end
 
     trait :with_benefit_catalog do
-      after :build do |benefit_market, evaluator|
+      after :build do |benefit_market, _evaluator|
         benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_market_catalog))
       end
     end
 
     trait :with_benefit_catalog_and_product_packages do
 
-      after :build do |benefit_market, evaluator|
+      after :build do |benefit_market, _evaluator|
         benefit_market.add_benefit_market_catalog(build(:benefit_markets_benefit_market_catalog, :with_product_packages))
       end
     end

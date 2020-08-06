@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 require File.join(File.dirname(__FILE__), "../../../../../transport_gateway/spec/lint/credentials/sftp_credentials")
@@ -21,16 +23,16 @@ describe TransportProfiles::TransportCredentials::SftpTransportCredential, ".cre
   end
 
   describe "given a uri for same user and host name as an existing record" do
-    let(:username) { "user#($&#$&:;\"{)_#@^" }
+    let(:username) { "user#($&#{$&}:;\"{)_#@^" }
     let(:credential_uri) { URI.parse("sftp://#{ERB::Util.url_encode(username)}@host1.com") }
     let!(:credential) do
       TransportProfiles::TransportCredentials::SftpTransportCredential.create!({
-        :user => username,
-        :host => "host1.com",
-        :password => "NOTHING"
-      })
+                                                                                 :user => username,
+                                                                                 :host => "host1.com",
+                                                                                 :password => "NOTHING"
+                                                                               })
     end
-   
+
     after :each do
       credential.destroy
     end
@@ -41,16 +43,16 @@ describe TransportProfiles::TransportCredentials::SftpTransportCredential, ".cre
   end
 
   describe "given a uri for same user and a DIFFERENT host name as an existing record" do
-    let(:username) { "user#($&#$&:;\"{)_#@^" }
+    let(:username) { "user#($&#{$&}:;\"{)_#@^" }
     let(:no_credential_uri) { URI.parse("sftp://#{ERB::Util.url_encode(username)}@host2.com") }
     let!(:credential) do
       TransportProfiles::TransportCredentials::SftpTransportCredential.create!({
-        :user => username,
-        :host => "host1.com",
-        :password => "NOTHING"
-      })
+                                                                                 :user => username,
+                                                                                 :host => "host1.com",
+                                                                                 :password => "NOTHING"
+                                                                               })
     end
-   
+
     after :each do
       credential.destroy
     end
@@ -71,27 +73,27 @@ describe TransportProfiles::TransportCredentials::SftpTransportCredential, "give
   let(:host) { "host1" }
   let(:sftp_credentials) do
     TransportProfiles::TransportCredentials::SftpTransportCredential.new({
-      :user => expected_user,
-      :password => expected_password,
-      :host => host
-    })
+                                                                           :user => expected_user,
+                                                                           :password => expected_password,
+                                                                           :host => host
+                                                                         })
   end
   it_behaves_like "sftp credentials, using a password"
 end
 
 describe TransportProfiles::TransportCredentials::SftpTransportCredential, "given:
 - a user
-- a key pem 
+- a key pem
 " do
   let(:expected_user) { "user1" }
   let(:expected_key_pem) { "98273498712983740983742(*&34043" }
   let(:host) { "host1" }
   let(:sftp_credentials) do
     TransportProfiles::TransportCredentials::SftpTransportCredential.new({
-      :user => expected_user,
-      :key_pem => expected_key_pem,
-      :host => host
-    })
+                                                                           :user => expected_user,
+                                                                           :key_pem => expected_key_pem,
+                                                                           :host => host
+                                                                         })
   end
   it_behaves_like "sftp credentials, using a key pem"
 end

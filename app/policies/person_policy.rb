@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PersonPolicy < ApplicationPolicy
   def updateable?
     return true unless role = user.person.hbx_staff_role

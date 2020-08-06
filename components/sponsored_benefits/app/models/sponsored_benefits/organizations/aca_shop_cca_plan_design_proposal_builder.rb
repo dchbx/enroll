@@ -1,15 +1,16 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Organizations
     class AcaShopCcaPlanDesignProposalBuilder < PlanDesignProposalBuilder
 
 
 
-      def initialize(plan_design_organization, effective_date, options={})
+      def initialize(_plan_design_organization, _effective_date, options = {})
         super()
         @plan_design_proposal = AcaShopCcaPlanDesignProposal.new
         @benefit_market = :aca_shop_cca
-        @sic_code = options[:sic_code] 
-
+        @sic_code = options[:sic_code]
       end
 
       def add_plan_design_profile(new_plan_design_profile, sic_code)
@@ -26,9 +27,7 @@ module SponsoredBenefits
       #   fail NotImplementedError, 'abstract'
       # end
 
-      def add_employer_attestation(new_employer_attestation)
-      end
-
+      def add_employer_attestation(new_employer_attestation); end
 
       def plan_design_proposal
         raise ArgumentError, "must provide sic_code" unless @sic_code.present?

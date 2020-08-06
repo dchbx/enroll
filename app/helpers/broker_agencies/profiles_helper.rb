@@ -1,14 +1,14 @@
+# frozen_string_literal: true
+
 module BrokerAgencies::ProfilesHelper
   def fein_display(broker_agency_profile)
-    (broker_agency_profile.organization.is_fake_fein? && !current_user.has_broker_agency_staff_role?)|| (broker_agency_profile.organization.is_fake_fein? && current_user.has_hbx_staff_role?) || !broker_agency_profile.organization.is_fake_fein?
+    (broker_agency_profile.organization.is_fake_fein? && !current_user.has_broker_agency_staff_role?) || (broker_agency_profile.organization.is_fake_fein? && current_user.has_hbx_staff_role?) || !broker_agency_profile.organization.is_fake_fein?
   end
 
   def get_commission_statements_for_year(statements, year)
     results = []
     statements.each do |statement|
-      if statement.date.year == year.to_i
-        results << statement
-      end
+      results << statement if statement.date.year == year.to_i
     end
     results
   end
@@ -18,7 +18,9 @@ module BrokerAgencies::ProfilesHelper
   end
 
   def commission_statement_coverage_period(date)
-    "#{date.prev_month.beginning_of_month.strftime('%b %Y')}" rescue nil
+    date.prev_month.beginning_of_month.strftime('%b %Y').to_s
+  rescue StandardError
+    nil
   end
 
   def can_show_destroy_for_brokers?(broker_staff_member, total_broker_staff_count)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A collection of members, typically a family, who operate as a unit for purposes of benefit coverage
 module BenefitSponsors
   class Members::MemberGroup
@@ -10,13 +12,13 @@ module BenefitSponsors
 
     def initialize(collection = [], group_id: nil, group_enrollment: nil)
       self.members = collection
-      @group_id         = group_id
+      @group_id = group_id
       @group_enrollment = group_enrollment
     end
 
     def members=(member_list)
       @members = member_list
-      @primary_member = @members.detect { |member| member.is_primary_member? }
+      @primary_member = @members.detect(&:is_primary_member?)
     end
 
     def <<(new_member)
@@ -40,7 +42,7 @@ module BenefitSponsors
       self.members = @members
     end
 
-    def drop_member(member, &blk)
+    def drop_member(member)
       members.delete(member)
     end
 
@@ -72,11 +74,11 @@ module BenefitSponsors
       )
     end
 
-    def as_json(params = {})
+    def as_json(_params = {})
       {
         members: members.as_json,
         group_id: group_id,
-        group_enrollment: group_enrollment.as_json,
+        group_enrollment: group_enrollment.as_json
       }
     end
 
@@ -84,32 +86,26 @@ module BenefitSponsors
 
     def discard_member_enrollments(removed_members)
       unless group_enrollment.nil?
-        if removed_members.any?
-          group_enrollment.remove_members_by_id!(removed_members.map(&:member_id))
-        end
+        group_enrollment.remove_members_by_id!(removed_members.map(&:member_id)) if removed_members.any?
       end
     end
 
     def has_primary_member?
-      @members.detect { |member| member.is_primary_member? }
+      @members.detect(&:is_primary_member?)
     end
 
     def has_spouse_relationship?
-      @members.detect { |member| member.is_spouse_relationship? }
+      @members.detect(&:is_spouse_relationship?)
     end
 
     def has_survivor_member?
-      @members.detect { |member| member.is_survivor_member? }
+      @members.detect(&:is_survivor_member?)
     end
 
     def is_duplicate_role?(new_member)
-      if new_member.is_primary_member? && has_primary_member?
-        raise DuplicatePrimaryMemberError, "may have only one primary member"
-      end
+      raise DuplicatePrimaryMemberError, "may have only one primary member" if new_member.is_primary_member? && has_primary_member?
 
-      if new_member.is_spouse_relationship? && has_spouse_relationship?
-        raise MultipleSpouseRelationshipError, "primary member may have only one spouse relationship"
-      end
+      raise MultipleSpouseRelationshipError, "primary member may have only one spouse relationship" if new_member.is_spouse_relationship? && has_spouse_relationship?
 
       false
     end

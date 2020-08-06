@@ -21,7 +21,7 @@ module BenefitMarkets
 
         rule(:assigned_contribution_model) do
           if key? && value
-            if !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+            unless value.is_a?(::BenefitMarkets::Entities::ContributionModel)
               if value.is_a?(Hash)
                 result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
                 key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?

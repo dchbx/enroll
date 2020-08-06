@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Forms
     class SponsoredBenefitForm
@@ -10,7 +12,7 @@ module BenefitSponsors
       attribute :product_option_choice, String
       attribute :product_package_kind, String, default: Settings.aca.default_dental_option_kind
       attribute :elected_product_choices, Array # used for dental choice model
-      
+
       # for employee cost details
       attribute :employees_cost, Array[EmployeeCostForm]
 
@@ -62,7 +64,7 @@ module BenefitSponsors
         service.load_form_meta_data(self)
       end
 
-      def self.resolve_service(attrs={})
+      def self.resolve_service(attrs = {})
         @service = BenefitSponsors::Services::SponsoredBenefitService.new(attrs)
       end
 
@@ -135,7 +137,7 @@ module BenefitSponsors
       end
 
       def self.kinds
-        %w(health)
+        %w[health]
         # get kinds from catalog based on products/product packages
       end
 

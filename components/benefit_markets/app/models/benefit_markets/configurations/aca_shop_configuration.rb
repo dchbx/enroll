@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module BenefitMarkets
   module Configurations
     # AcaShopConfiguration settings
     class AcaShopConfiguration < BenefitMarkets::Configurations::Configuration
 
-      TRANSMIT_DAYS = %w(Monday Tuesday Wednesday Thursday Friday Saturday Sunday)
+      TRANSMIT_DAYS = %w[Monday Tuesday Wednesday Thursday Friday Saturday Sunday].freeze
       embeds_one :initial_application_configuration,  class_name: "BenefitMarkets::Configurations::AcaShopInitialApplicationConfiguration",
-        autobuild: true
+                                                      autobuild: true
       embeds_one :renewal_application_configuration,  class_name: "BenefitMarkets::Configurations::AcaShopRenewalApplicationConfiguration",
-        autobuild: true
+                                                      autobuild: true
 
       field :ee_ct_max,           as: :employee_count_max, type: Integer, default: 50
       field :ee_ratio_min,        as: :employee_participation_ratio_min, type: Float, default: 0.66

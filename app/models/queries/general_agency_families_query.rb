@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class GeneralAgencyFamiliesQuery
     attr_reader :search_string
@@ -40,19 +42,17 @@ module Queries
         criteria = {
           "$and" => [
             { 'family_members.person_id' => {"$in" => person_id} },
-            criteria 
+            criteria
           ]
         }
       end
-      if @order_by
-        return Family.unscoped.where(criteria).order_by(@order_by)
-      end
+      return Family.unscoped.where(criteria).order_by(@order_by) if @order_by
       Family.unscoped.where(criteria)
     end
 
     def census_employee_ids
       @census_member_ids ||= CensusMember.collection.aggregate([
-        { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+        { "$match" => {aasm_state: {"$in" => CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
         { "$group" => {"_id" => "$_id"}}
       ]).map { |rec| rec["_id"] }
     end

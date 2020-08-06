@@ -1,39 +1,40 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
-
   RSpec.describe Organizations::OrganizationForms::OfficeLocationForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Organizations::OrganizationForms::OfficeLocationForm }
 
     describe "model attributes" do
 
-      let!(:params) {
+      let!(:params) do
         {
           address:
            {
-              address_1: "new address",
-              kind: "primary",
-              address_2:"",
-              city: "ma_city",
-              state:"MA",
-              zip:"01001",
-              county: "Hampden"
+             address_1: "new address",
+             kind: "primary",
+             address_2: "",
+             city: "ma_city",
+             state: "MA",
+             zip: "01001",
+             county: "Hampden"
            }
         }
-      }
+      end
 
-      let(:phone) {
-         {
-           kind: "work",
-           area_code:"222", number:"2221111",
-           extension:""
-         }
-      }
+      let(:phone) do
+        {
+          kind: "work",
+          area_code: "222", number: "2221111",
+          extension: ""
+        }
+      end
 
       it "should have all the attributes" do
         [:id, :is_primary, :address, :phone].each do |key|
-          expect(subject.new.attributes.has_key?(key)).to be_truthy
+          expect(subject.new.attributes.key?(key)).to be_truthy
         end
       end
 
@@ -42,20 +43,20 @@ module BenefitSponsors
       end
 
       it "new form should be valid" do
-        new_form = subject.new params.merge({:phone=>phone})
+        new_form = subject.new params.merge({:phone => phone})
         new_form.validate
         expect(new_form).to be_valid
       end
 
       it "new form should not be valid" do
         params[:address][:address_1] = ''
-        new_form = subject.new params.merge!({:phone=>phone})
+        new_form = subject.new params.merge!({:phone => phone})
         new_form.validate
         expect(new_form).to_not be_valid
       end
 
       it "should set is_primary form attribute to true when address is primary" do
-        new_form = subject.new params.merge!({:phone=>phone})
+        new_form = subject.new params.merge!({:phone => phone})
         address = new_form.address
         new_form.set_is_primary_field(address)
         expect(new_form.is_primary).to eq true
@@ -63,7 +64,7 @@ module BenefitSponsors
 
       it "should set is_primary form attribute to false when address is mailing" do
         params[:address][:kind] = 'mailing'
-        new_form = subject.new params.merge!({:phone=>phone})
+        new_form = subject.new params.merge!({:phone => phone})
         address = new_form.address
         new_form.set_is_primary_field(address)
         expect(new_form.is_primary).to eq false

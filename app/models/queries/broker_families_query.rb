@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Queries
   class BrokerFamiliesQuery
 
@@ -8,7 +10,7 @@ module Queries
     end
 
     def build_base_scope
-      ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch=> {broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
+      ivl_broker_agency_criteria = { broker_agency_accounts: {:$elemMatch => {broker_agency_profile_id: @broker_agency_profile_id, is_active: true}} }
       shop_broker_agency_criteria = { "family_members.person_id" => {"$in" => employee_person_ids }}
       { "$or" => [
         ivl_broker_agency_criteria,
@@ -45,7 +47,7 @@ module Queries
 
     def census_employee_ids
       @census_member_ids ||= CensusMember.collection.aggregate([
-        { "$match" => {aasm_state: {"$in"=> CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
+        { "$match" => {aasm_state: {"$in" => CensusEmployee::EMPLOYMENT_ACTIVE_STATES}, employer_profile_id: {"$in" => employer_ids}}},
         { "$group" => {"_id" => "$_id"}}
       ]).map { |rec| rec["_id"] }
     end

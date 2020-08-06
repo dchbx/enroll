@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Then(/^Hbx Admin should see the list of primary applicants and Action buttons$/) do
   within('.effective-datatable') do
     expect(page).to have_css('.dropdown-toggle', count: 2)
@@ -29,7 +31,7 @@ Then(/^the reset password email should be sent to the user$/) do
 end
 
 Then(/^there are (\d+) preloaded user accounts without email$/) do |num|
-  (0...num.to_i).each do |int|
+  (0...num.to_i).each do |_int|
     FactoryBot.create(:user, :without_email, :with_family)
   end
 end

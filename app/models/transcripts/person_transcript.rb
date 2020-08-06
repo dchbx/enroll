@@ -1,5 +1,6 @@
-module Transcripts
+# frozen_string_literal: true
 
+module Transcripts
   class PersonError < StandardError; end
 
   class PersonTranscript
@@ -9,9 +10,9 @@ module Transcripts
 
     def initialize
       @transcript = transcript_template
-      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity', 
-        'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
-        "no_dc_address_reason", "tribal_id"]
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'encrypted_ssn', 'ethnicity',
+                             'updated_by', 'no_ssn', 'location_state_code', 'updated_by_id', 'is_incarcerated', 'no_dc_address',
+                             "no_dc_address_reason", "tribal_id"]
 
       @custom_templates = []
     end
@@ -41,7 +42,6 @@ module Transcripts
       @transcript[:other]   = @transcript[:other].serializable_hash
     end
 
-
     def self.enumerated_associations
       [
         {association: "addresses", enumeration_field: "kind", cardinality: "many", enumeration: ["branch"]},
@@ -49,24 +49,22 @@ module Transcripts
         {association: "person_relationships", enumeration_field: "kind", cardinality: "one", enumeration: ["self", "spouse", "life_partner"]},
         {association: "person_relationships", enumeration_field: "kind", cardinality: "many", enumeration: ["child", "adopted_child", "foster_child", "grandchild", "parent", "grandparent"]},
         {association: "phones", enumeration_field: "kind", cardinality: "one", enumeration: Phone::KINDS },
-        {association: "emails", enumeration_field: "kind", cardinality: "one", enumeration: Email::KINDS },
+        {association: "emails", enumeration_field: "kind", cardinality: "one", enumeration: Email::KINDS }
       ]
     end
 
     private
 
     def match_instance(person)
-      if person.hbx_id.present?
-        matched_people = ::Person.where(hbx_id: person.hbx_id)
-      end
+      matched_people = ::Person.where(hbx_id: person.hbx_id) if person.hbx_id.present?
 
       if matched_people.blank?
         matched_people = ::Person.match_by_id_info(
-            ssn: person.ssn,
-            dob: person.dob,
-            last_name: person.last_name,
-            first_name: person.first_name
-          )
+          ssn: person.ssn,
+          dob: person.dob,
+          last_name: person.last_name,
+          first_name: person.first_name
+        )
       end
 
       matched_people

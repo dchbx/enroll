@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers
   class ConversionEmployeePolicy < ConversionEmployeePolicyCommon
 
@@ -12,17 +14,13 @@ module Importers
     def validate_fein
       return true if fein.blank?
       found_employer = find_employer
-      if found_employer.nil?
-        errors.add(:fein, "does not exist")
-      end
+      errors.add(:fein, "does not exist") if found_employer.nil?
     end
 
     def validate_census_employee
       return true if subscriber_ssn.blank?
       found_employee = find_employee
-      if found_employee.nil?
-        errors.add(:subscriber_ssn, "no census employee found")
-      end
+      errors.add(:subscriber_ssn, "no census employee found") if found_employee.nil?
     end
 
     def validate_benefit_group_assignment
@@ -30,17 +28,13 @@ module Importers
       found_employee = find_employee
       return true unless find_employee
       found_bga = find_benefit_group_assignment
-      if found_bga.nil?
-        errors.add(:subscriber_ssn, "no benefit group assignment found")
-      end
+      errors.add(:subscriber_ssn, "no benefit group assignment found") if found_bga.nil?
     end
 
     def validate_plan
       return true if hios_id.blank?
       found_plan = find_plan
-      if found_plan.nil?
-        errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}")
-      end
+      errors.add(:hios_id, "no plan found with hios_id #{hios_id} and active year #{plan_year}") if found_plan.nil?
     end
 
     def find_plan
@@ -49,9 +43,9 @@ module Importers
       clean_hios = hios_id.strip
       corrected_hios_id = (clean_hios.end_with?("-01") ? clean_hios : clean_hios + "-01")
       @plan = Plan.where({
-        active_year: plan_year.to_i,
-        hios_id: corrected_hios_id
-      }).first
+                           active_year: plan_year.to_i,
+                           hios_id: corrected_hios_id
+                         }).first
     end
 
     def find_employee
@@ -60,19 +54,19 @@ module Importers
       found_employer = find_employer
       return nil if found_employer.nil?
       candidate_employees = CensusEmployee.where({
-        employer_profile_id: found_employer.id,
+                                                   employer_profile_id: found_employer.id,
         # hired_on: {"$lte" => start_date},
-        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
-      })
+                                                   encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
+                                                 })
       non_terminated_employees = candidate_employees.reject do |ce|
-        (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+        !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= Date.today
       end
-    
-      @found_employee = non_terminated_employees.sort_by(&:hired_on).last
+
+      @found_employee = non_terminated_employees.max_by(&:hired_on)
     end
 
     def current_benefit_application(employer)
-      if (employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion")
+      if employer.organization.active_benefit_sponsorship.source_kind.to_s == "conversion"
         employer.benefit_applications.where(:aasm_state => :imported).first
       else
         employer.benefit_applications.where(:aasm_state => :active).first
@@ -95,9 +89,7 @@ module Importers
           (employee.last_name.downcase.strip == sr.last_name.downcase.strip)
       end
 
-      if staff_roles_to_merge.empty?
-        return true
-      end
+      return true if staff_roles_to_merge.empty?
 
       if staff_roles_to_merge.count > 1
         errors.add(:base, "this employee has the same personal data as multiple points of contact")
@@ -115,14 +107,14 @@ module Importers
       if existing_people.empty?
         begin
           merge_staff.update_attributes!(:dob => employee.dob, :ssn => employee.ssn, :gender => employee.gender)
-        rescue Exception  => e
+        rescue Exception => e
           errors.add(:base, e.to_s)
         end
         return true
       end
 
       existing_person = existing_people.first
-      
+
       merge_poc_and_employee_person(merge_staff, existing_person, employer)
       true
     end
@@ -130,8 +122,8 @@ module Importers
     def merge_poc_and_employee_person(poc_person, employee_person, employer)
       return true if poc_person.id == employee_person.id
       staff_role_to_migrate = poc_person.employer_staff_roles.detect do |sr|
-        (sr.employer_profile_id == employer.id) && 
-          (sr.is_active?)
+        (sr.employer_profile_id == employer.id) &&
+          sr.is_active?
       end
       poc_person.employer_staff_roles.delete(staff_role_to_migrate)
       poc_person.save!
@@ -139,13 +131,13 @@ module Importers
       employee_person.save!
       poc_user = poc_person.user
       emp_user = employee_person.user
-      unless poc_user.nil? 
+      unless poc_user.nil?
         poc_person.unset(:user_id)
         if emp_user.nil?
           employee_person.set(:user_id => poc_user.id)
         else
           poc_user.destroy!
-        end 
+        end
       end
     end
 
@@ -159,13 +151,11 @@ module Importers
 
     def save
       return false unless valid?
-      employer = find_employer      
+      employer = find_employer
       employee = find_employee
       benefit_sponsorship = employer.active_benefit_sponsorship
 
-      unless examine_and_maybe_merge_poc(employer, employee)
-        return false
-      end
+      return false unless examine_and_maybe_merge_poc(employer, employee)
 
       plan = find_plan
       benefit_application = fetch_application_based_sponsored_kind
@@ -176,7 +166,7 @@ module Importers
       if bga.blank?
         plan_years = employer.plan_years.select{|py| py.coverage_period_contains?(start_date) }
 
-        if plan_years.any?{|py| py.conversion_expired? }
+        if plan_years.any?(&:conversion_expired?)
           errors.add(:base, "ER migration expired!")
           return false
         end
@@ -219,25 +209,25 @@ module Importers
         house_hold = family.active_household
         coverage_household = house_hold.immediate_family_coverage_household
 
-        benefit_package   = bga.benefit_package
+        benefit_package = bga.benefit_package
 
 
-        sponsored_benefit = benefit_package.sponsored_benefits.unscoped.detect{|sponsored_benefit|
+        sponsored_benefit = benefit_package.sponsored_benefits.unscoped.detect do |sponsored_benefit|
           sponsored_benefit.product_kind == sponsored_benefit_kind
-        }
+        end
 
         # for regular conversions we are setting flag to true and mid_year_conversions to false
         set_external_enrollments = @mid_year_conversion ? false : true
 
         en = house_hold.new_hbx_enrollment_from({
-          coverage_household: coverage_household,
-          employee_role: role,
-          benefit_group: bga.benefit_group,
-          benefit_group_assignment: bga,
-          coverage_start: start_date,
-          enrollment_kind: "open_enrollment",
-          external_enrollment: set_external_enrollments
-          })
+                                                  coverage_household: coverage_household,
+                                                  employee_role: role,
+                                                  benefit_group: bga.benefit_group,
+                                                  benefit_group_assignment: bga,
+                                                  coverage_start: start_date,
+                                                  enrollment_kind: "open_enrollment",
+                                                  external_enrollment: set_external_enrollments
+                                                })
 
         en.external_enrollment = set_external_enrollments
         en.hbx_enrollment_members.each do |mem|
@@ -259,18 +249,18 @@ module Importers
 
         unless employer.is_a?(EmployerProfile)
           en_attributes.merge!({
-            benefit_sponsorship_id: benefit_sponsorship.id,
-            sponsored_benefit_package_id: benefit_package.id,
-            sponsored_benefit_id: sponsored_benefit.id,
-            rating_area_id: rating_area_id
-          })
+                                 benefit_sponsorship_id: benefit_sponsorship.id,
+                                 sponsored_benefit_package_id: benefit_package.id,
+                                 sponsored_benefit_id: sponsored_benefit.id,
+                                 rating_area_id: rating_area_id
+                               })
         end
 
         en.update_attributes!(en_attributes)
         true
       rescue Exception => e
         errors.add(:base, e.to_s)
-        return false
+        false
       end
     end
 
@@ -280,7 +270,7 @@ module Importers
 
       enrollments.each do |en|
         en.hbx_enrollment_members.each do |hen|
-           hen.coverage_end_on = hen.coverage_start_on
+          hen.coverage_end_on = hen.coverage_start_on
         end
         en.terminated_on = en.effective_on
         en.aasm_state = "coverage_canceled"

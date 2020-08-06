@@ -30,14 +30,14 @@ Then(/^there is (\d+) questions available in the list$/) do |num|
 end
 
 When(/^Hbx Admin clicks on (.*?) Question link$/) do |link|
-  link_title =  if link.eql?('Security')
-                  'Security Question'
-                elsif link.eql?('New')
-                  'New Question'
-                elsif link.eql?('Edit')
-                  'Edit'
-                elsif link.eql?('Delete')
-                  'Delete'
+  link_title = if link.eql?('Security')
+                 'Security Question'
+               elsif link.eql?('New')
+                 'New Question'
+               elsif link.eql?('Edit')
+                 'Edit'
+               elsif link.eql?('Delete')
+                 'Delete'
                 end
   click_link(link_title)
 end
@@ -66,7 +66,7 @@ When(/^Hbx Admin submit the question form$/) do
   page.find_button('submit').click
 end
 
-Then(/^there (is|are) (\d+) preloaded security questions$/) do |text, num|
+Then(/^there (is|are) (\d+) preloaded security questions$/) do |_text, num|
   (0..num.to_i).each do |int|
     FactoryBot.create(:security_question, title: "Security Question #{int.to_i + 1}")
   end

@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Importers
     class BenefitPackageImporter
 
-      # Service accepts following atttributes along with benefit application to this service. 
+      # Service accepts following atttributes along with benefit application to this service.
       # It would construct benefit_package along with sponsored_benefits.
       #
-      # { :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset, :is_default, 
-      #   :plan_option_kind, :reference_plan_hios_id, :relationship_benefits, :dental_reference_plan_hios_id, :dental_relationship_benefits 
+      # { :title, :description, :created_at, :updated_at, :is_active, :effective_on_kind, :effective_on_offset, :is_default,
+      #   :plan_option_kind, :reference_plan_hios_id, :relationship_benefits, :dental_reference_plan_hios_id, :dental_relationship_benefits
       # }
 
       attr_accessor :benefit_package
@@ -33,26 +35,26 @@ module BenefitSponsors
 
       # TODO: Enhance this to handle Dental Sponsored Benefits
       def construct_sponsored_benefit(benefit_package, sponsored_benefit_attrs)
-        if sponsored_benefit_attrs[:product_kind] == :health
-          sponsored_benefit  = BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
-        else
-          sponsored_benefit  = BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
-        end
+        sponsored_benefit = if sponsored_benefit_attrs[:product_kind] == :health
+                              BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit.new
+                            else
+                              BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new
+                            end
 
         package_kind = sponsored_benefit_attrs[:product_kind] == :dental && sponsored_benefit_attrs[:plan_option_kind] == "single_plan" ? :multi_product : map_product_package_kind(sponsored_benefit_attrs[:plan_option_kind])
         sponsored_benefit.product_package_kind = package_kind
         sponsored_benefit.benefit_package = benefit_package
-        
+
         if sponsored_benefit.product_package.present?
           sponsored_benefit.reference_product = sponsored_benefit.product_package.products.where(hios_id: sponsored_benefit_attrs[:reference_plan_hios_id]).first
           raise StandardError, "Unable find reference product" if sponsored_benefit.reference_product.blank?
           sponsored_benefit.product_option_choice = product_package_choice_for(sponsored_benefit)
 
-          if sole_source? && sponsored_benefit_attrs[:product_kind] == :health
-            sponsor_contribution_attrs = sponsored_benefit_attrs[:composite_tier_contributions]
-          else
-            sponsor_contribution_attrs = sponsored_benefit_attrs[:relationship_benefits]
-          end
+          sponsor_contribution_attrs = if sole_source? && sponsored_benefit_attrs[:product_kind] == :health
+                                         sponsored_benefit_attrs[:composite_tier_contributions]
+                                       else
+                                         sponsored_benefit_attrs[:relationship_benefits]
+                                       end
 
           if sponsored_benefit_attrs[:product_kind] == :dental && sponsored_benefit.product_package_kind == :multi_product
             sponsored_benefit.elected_product_choices = sponsored_benefit.product_package.products.where(:hios_id => {"$in" => sponsored_benefit_attrs[:elected_dental_plan_hios_ids]}).map(&:_id)
@@ -68,9 +70,7 @@ module BenefitSponsors
       def build_sponsor_contribution(sponsored_benefit, sponsor_contribution_attrs)
         sponsored_benefit.sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(sponsored_benefit.product_package)
 
-        if sponsored_benefit.sponsor_contribution.blank?
-          raise StandardError, "Sponsor Contribution construction failed!!"
-        end
+        raise StandardError, "Sponsor Contribution construction failed!!" if sponsored_benefit.sponsor_contribution.blank?
 
         sponsored_benefit.sponsor_contribution.contribution_levels.each do |new_contribution_level|
           profile = @benefit_application.sponsor_profile
@@ -80,7 +80,7 @@ module BenefitSponsors
             new_contribution_level.contribution_factor = 0.75
             new_contribution_level.contribution_cap = congress_contribution_cap(new_contribution_level.contribution_unit.name, @benefit_application.start_on.year)
           else
-            contribution_match = sponsor_contribution_attrs.detect{|contribution| (((contribution[:relationship] == "child_under_26") ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
+            contribution_match = sponsor_contribution_attrs.detect{|contribution| ((contribution[:relationship] == "child_under_26" ? "dependent" : contribution[:relationship]) == new_contribution_level.contribution_unit.name)}
             if contribution_match.present?
               new_contribution_level.is_offered = contribution_match[:offered]
               new_contribution_level.contribution_factor = (contribution_match[:premium_pct].to_f / 100)
@@ -109,9 +109,9 @@ module BenefitSponsors
         price_determination_tiers = pricing_model.pricing_units.inject([]) do |pd_tiers, pricing_unit|
           pd_tiers << BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new(
             pricing_unit_id: pricing_unit.id
-            )
+          )
         end
-        
+
         sponsored_benefit.pricing_determinations.build(pricing_determination_tiers: price_determination_tiers)
 
         pricing_determination = sponsored_benefit.pricing_determinations.first
@@ -128,7 +128,7 @@ module BenefitSponsors
       def copy_tier_contributions(pricing_determination, sponsor_contribution_attrs, attribute_to_copy)
         pricing_determination.pricing_determination_tiers.each do |tier|
           # During Migration, we are checking for composite_rating_tier field value
-          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| (tier_contribution[:relationship] ? tier_contribution[:relationship]: tier_contribution[:composite_rating_tier]) == tier.pricing_unit.name }
+          matched_tier = sponsor_contribution_attrs.detect{ |tier_contribution| (tier_contribution[:relationship] || tier_contribution[:composite_rating_tier]) == tier.pricing_unit.name }
           tier.price = matched_tier[attribute_to_copy].to_f
         end
       end
@@ -158,14 +158,14 @@ module BenefitSponsors
       def probation_period_kind_for(effective_on_kind, effective_on_offset)
         if effective_on_kind == 'first_of_month'
           case effective_on_offset
-            when 0
-              :first_of_month
-            when 1
-              :first_of_month_following
-            when 30
-              :first_of_month_after_30_days
-            when 60
-              :first_of_month_after_60_days
+          when 0
+            :first_of_month
+          when 1
+            :first_of_month_following
+          when 30
+            :first_of_month_after_30_days
+          when 60
+            :first_of_month_after_60_days
           end
         elsif effective_on_kind == 'date_of_hire'
           :date_of_hire

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PlanSelection
   attr_reader :plan, :hbx_enrollment
 
@@ -23,17 +25,15 @@ class PlanSelection
     if can_apply_aptc?(shopping_tax_household, elected_aptc)
       decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment, elected_aptc, shopping_tax_household)
       hbx_enrollment.update_hbx_enrollment_members_premium(decorated_plan)
-      hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc/max_aptc)
+      hbx_enrollment.update_attributes!(applied_aptc_amount: decorated_plan.total_aptc_amount, elected_aptc_pct: elected_aptc / max_aptc)
     end
   end
 
   # FIXME: Needs to deactivate the parent enrollment, also, we set the sep here? WAT
-  def select_plan_and_deactivate_other_enrollments(previous_enrollment_id, market_kind)
+  def select_plan_and_deactivate_other_enrollments(_previous_enrollment_id, market_kind)
     hbx_enrollment.update_attributes!(product_id: plan.id, issuer_profile_id: plan.issuer_profile_id)
     qle = hbx_enrollment.is_special_enrollment?
-    if qle
-      hbx_enrollment.special_enrollment_period_id = hbx_enrollment.earlier_effective_sep_by_market_kind.try(:id)
-    end
+    hbx_enrollment.special_enrollment_period_id = hbx_enrollment.earlier_effective_sep_by_market_kind.try(:id) if qle
 
     hbx_enrollment.aasm_state = 'actively_renewing' if hbx_enrollment.is_active_renewal_purchase?
 
@@ -45,9 +45,9 @@ class PlanSelection
   def enrollment_members_verification_status(market_kind)
     members = hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role)
     if market_kind == "individual"
-      return  (members.compact.present? && (members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)))
+      (members.compact.present? && (members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)))
     else
-      return false
+      false
     end
   end
 
@@ -81,11 +81,11 @@ class PlanSelection
   def build_hbx_enrollment_members
     hbx_enrollment.hbx_enrollment_members.collect do |hbx_enrollment_member|
       HbxEnrollmentMember.new({
-        applicant_id: hbx_enrollment_member.applicant_id,
-        eligibility_date: hbx_enrollment.effective_on,
-        coverage_start_on: hbx_enrollment.effective_on,
-        is_subscriber: hbx_enrollment_member.is_subscriber
-      })
+                                applicant_id: hbx_enrollment_member.applicant_id,
+                                eligibility_date: hbx_enrollment.effective_on,
+                                coverage_start_on: hbx_enrollment.effective_on,
+                                is_subscriber: hbx_enrollment_member.is_subscriber
+                              })
     end
   end
 
@@ -98,16 +98,13 @@ class PlanSelection
   end
 
   def set_enrollment_member_coverage_start_dates(enrollment_obj = hbx_enrollment)
-
     if existing_coverage.present?
       previous_enrollment_members = existing_coverage.hbx_enrollment_members
 
       enrollment_obj.hbx_enrollment_members.each do |member|
         matched = previous_enrollment_members.detect{|enrollment_member| enrollment_member.hbx_id == member.hbx_id}
 
-        if matched
-          member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on
-        end
+        member.coverage_start_on = matched.coverage_start_on || existing_coverage.effective_on if matched
       end
     end
 

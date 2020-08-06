@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module TransportGateway
@@ -8,7 +10,7 @@ module TransportGateway
       let(:message) { TransportGateway::Message.new(to: nil, from: "something", body: "somebody") }
 
       it "raises an error" do
-        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /destination not provided/) 
+        expect{ subject.send_message(message) }.to raise_error(ArgumentError, /destination not provided/)
       end
     end
   end

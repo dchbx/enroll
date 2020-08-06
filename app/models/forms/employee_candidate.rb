@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class EmployeeCandidate
     include ActiveModel::Model
@@ -28,10 +30,14 @@ module Forms
     attr_reader :dob
 
     def dob=(val)
-      @dob = val.class == Date ? val : Date.strptime(val, "%Y-%m-%d") rescue nil
+      @dob = begin
+               val.class == Date ? val : Date.strptime(val, "%Y-%m-%d")
+             rescue StandardError
+               nil
+             end
     end
 
-    # TODO fix and use as the only way to match census employees for the employee flow or blow this away
+    # TODO: fix and use as the only way to match census employees for the employee flow or blow this away
     def match_census_employees
       if no_ssn == "1"
         CensusEmployee.matchable_by_dob_lname_fname(dob, first_name, last_name).to_a
@@ -45,22 +51,22 @@ module Forms
         Person.where({
                        :dob => dob,
                        :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first || match_ssn_employer_person
+                     }).first || match_ssn_employer_person
       else
         Person.where({
                        :dob => dob,
                        :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                       :first_name => /^#{first_name}$/i
+                     }).first
       end
     end
 
     def match_ssn_employer_person
       potential_person = Person.where({
-                       :dob => dob,
-                       :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                                        :dob => dob,
+                                        :last_name => /^#{last_name}$/i,
+                                        :first_name => /^#{first_name}$/i
+                                      }).first
       if potential_person.present?
         potential_person.update(gender: gender) if potential_person.gender.blank?
         potential_person.update(ssn: ssn) if potential_person.ssn.blank?
@@ -75,8 +81,8 @@ module Forms
         if matched_person.user.present?
           if matched_person.user.id.to_s != self.user_id.to_s
             errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account"
+              :base,
+              "#{first_name} #{last_name} is already affiliated with another account"
             )
           end
         end
@@ -87,9 +93,10 @@ module Forms
     def dob_not_in_future
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
-            :dob,
-            "#{dob} can't be in the future.")
-        self.dob=""
+          :dob,
+          "#{dob} can't be in the future."
+        )
+        self.dob = ""
       end
     end
 

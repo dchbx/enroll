@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Notifier
   module Services::TokenBuilder
-  
     def placeholders
       placeholders = []
 
@@ -12,18 +13,17 @@ module Notifier
           type: 'loop'
         }
 
-        if merge_model = model_builder.class.attribute_set.detect{|e| e.name == collection.to_sym}
-          get_editor_attributes(merge_model.type.member_type).each do |attribute|
-            placeholders << {
-              title: "&nbsp;&nbsp; #{attribute.to_s.humanize}",
-              target: [collection.singularize, attribute.to_s].join('.'),
-            }
-          end
+        next unless merge_model = model_builder.class.attribute_set.detect{|e| e.name == collection.to_sym}
+        get_editor_attributes(merge_model.type.member_type).each do |attribute|
+          placeholders << {
+            title: "&nbsp;&nbsp; #{attribute.to_s.humanize}",
+            target: [collection.singularize, attribute.to_s].join('.')
+          }
         end
       end
 
       model_builder.conditions.each do |condition|
-         placeholders << {
+        placeholders << {
           title: "Condition: #{condition.humanize}",
           target: [parent_data_model, condition].join('.'),
           type: 'condition'
@@ -37,9 +37,7 @@ module Notifier
       editor_attributes.inject([]) do |data, (virtus_model_name, virtus_attributes)|
         virtus_attributes.each do |attribute|
           method_name = "#{virtus_model_name}.#{attribute}"
-          if virtus_model_name != parent_data_model
-            method_name = [parent_data_model, method_name].join('.')
-          end
+          method_name = [parent_data_model, method_name].join('.') if virtus_model_name != parent_data_model
           data << ["#{virtus_model_name.to_s.humanize} - #{attribute.to_s.humanize}", method_name]
         end
         data
@@ -47,7 +45,7 @@ module Notifier
     end
 
     def get_editor_attributes(virtus_model)
-      virtus_model.attribute_set.select{|set| !set.is_a?(Virtus::Attribute::EmbeddedValue)}.collect(&:name)
+      virtus_model.attribute_set.reject{|set| set.is_a?(Virtus::Attribute::EmbeddedValue)}.collect(&:name)
     end
 
     def editor_attributes

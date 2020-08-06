@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class GeneralAgencyProfile
   include Mongoid::Document
   include SetCurrentUser
@@ -7,13 +9,13 @@ class GeneralAgencyProfile
   include Config::AcaModelConcern
 
   # for market_kind
-  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  MARKET_KINDS = individual_market_is_enabled? ? %w[individual shop both] : %w[shop]
   ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both - Individual & Family AND Small Business Marketplaces" => "both"
-  }
-  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
+  }.freeze
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |_k,v| MARKET_KINDS.include? v }
 
 
   field :entity_kind, type: String
@@ -42,14 +44,14 @@ class GeneralAgencyProfile
   validates_presence_of :market_kind, :entity_kind
 
   validates :corporate_npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: true
+            numericality: {only_integer: true},
+            length: { minimum: 1, maximum: 10 },
+            uniqueness: true,
+            allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
-    allow_blank: false
+            inclusion: { in: ->(_val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
+            allow_blank: false
 
   embeds_many :documents, as: :documentable
   embeds_one  :inbox, as: :recipient, cascade_callbacks: true
@@ -75,7 +77,7 @@ class GeneralAgencyProfile
 
   def languages
     if languages_spoken.any?
-      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+      languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
     end
   end
 
@@ -101,7 +103,9 @@ class GeneralAgencyProfile
   end
 
   def current_staff_state
-    primary_staff.current_state rescue ""
+    primary_staff.current_state
+  rescue StandardError
+    ""
   end
 
   def current_state
@@ -113,11 +117,9 @@ class GeneralAgencyProfile
   end
 
   def general_agency_hired_notice(employer_profile)
-    begin
-      ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
-    rescue Exception => e
-      (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
-    end
+    ShopNoticesNotifierJob.perform_later(self.id.to_s, "general_agency_hired_notice", employer_profile_id: employer_profile.id.to_s)
+  rescue Exception => e
+    (Rails.logger.error {"Unable to deliver general_agency_hired_notice to General Agency: #{self.legal_name} due to #{e}"}) unless Rails.env.test?
   end
 
   class << self
@@ -129,8 +131,12 @@ class GeneralAgencyProfile
       list_embedded Organization.exists(general_agency_profile: true).order_by([:legal_name]).to_a
     end
 
-    def all_by_broker_role(broker_role, options={})
-      favorite_general_agency_ids = broker_role.favorite_general_agencies.map(&:general_agency_profile_id) rescue []
+    def all_by_broker_role(broker_role, options = {})
+      favorite_general_agency_ids = begin
+                                      broker_role.favorite_general_agencies.map(&:general_agency_profile_id)
+                                    rescue StandardError
+                                      []
+                                    end
       all_ga = if options[:approved_only]
                  all.select{|ga| ga.aasm_state == 'is_approved'}
                else
@@ -154,16 +160,16 @@ class GeneralAgencyProfile
 
     def find(id)
       organizations = Organization.where("general_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-      organizations.size > 0 ? organizations.first.general_agency_profile : nil
+      !organizations.empty? ? organizations.first.general_agency_profile : nil
     end
 
-    def filter_by(status="is_applicant")
+    def filter_by(status = "is_applicant")
       if status == 'all'
         all
       else
         list_embedded Organization.exists(general_agency_profile: true).where(:'general_agency_profile.aasm_state' => status).order_by([:legal_name]).to_a
       end
-    rescue
+    rescue StandardError
       []
     end
   end
@@ -192,7 +198,8 @@ class GeneralAgencyProfile
     end
   end
 
-private
+  private
+
   def build_nested_models
     build_inbox if inbox.nil?
   end

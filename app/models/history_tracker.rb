@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class HistoryTracker
   include Mongoid::History::Tracker
 
   after_create :check_history_trackers
 
-  TRACK_HISTORY_ON = %w- consumer_role -
+  TRACK_HISTORY_ON = %w[consumer_role].freeze
 
 
   def check_history_trackers
@@ -48,11 +50,11 @@ class HistoryTracker
 
   def tracking_node(model)
     case model
-      when "Person"
-        Person.all_consumer_roles.where(id: association_chain.first["id"])
-      when "Family"
+    when "Person"
+      Person.all_consumer_roles.where(id: association_chain.first["id"])
+    when "Family"
         # takes only families from IVL market
-        Family.by_enrollment_individual_market.where(id: association_chain.first["id"])
+      Family.by_enrollment_individual_market.where(id: association_chain.first["id"])
     end
   end
 
@@ -72,7 +74,7 @@ class HistoryTracker
       if last_chain_element == "hbx_enrollments"
         family = Family.where("households.hbx_enrollments._id" => association_chain.last["id"]).first
         if family && family.active_household.hbx_enrollments.any?
-          enrollment = family.active_household.hbx_enrollments.find_by(id:association_chain.last["id"])
+          enrollment = family.active_household.hbx_enrollments.find_by(id: association_chain.last["id"])
           enrollment.hbx_enrollment_members.each do |enrollment_member|
             person = enrollment_member.family_member.person
             person.consumer_role.history_action_trackers << create_history_element if person.consumer_role
@@ -80,7 +82,6 @@ class HistoryTracker
         end
       end
     end
-
   end
 
   def first_chain_element
@@ -94,10 +95,10 @@ class HistoryTracker
   def add_tracking_record(collection)
     if collection == "consumer_role"
       case first_chain_element
-        when "Person"
-          record_consumer_element
-        when "Family"
-          record_enrollment_element
+      when "Person"
+        record_consumer_element
+      when "Family"
+        record_enrollment_element
       end
     end
   end

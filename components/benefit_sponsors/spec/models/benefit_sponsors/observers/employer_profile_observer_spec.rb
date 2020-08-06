@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -27,7 +29,7 @@ module BenefitSponsors
         end
 
         it 'sends a notification' do
-          expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id=> employer_profile.hbx_id, :event_name=>"address_changed"})
+          expect(subject).to have_received(:notify).with('acapi.info.events.employer.address_changed', {:employer_id => employer_profile.hbx_id, :event_name => "address_changed"})
         end
       end
 

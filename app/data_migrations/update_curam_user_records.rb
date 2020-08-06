@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCuramUserRecords < MongoidMigrationTask
@@ -15,7 +17,7 @@ class UpdateCuramUserRecords < MongoidMigrationTask
                when 'user_name'
                  CuramUser.where(username: user_name).first
                else
-                 raise StandardError.new('Invalid param')
+                 raise StandardError, 'Invalid param'
                end
       if action.blank?
         puts "Please give input. Check your query" unless Rails.env.test?
@@ -30,8 +32,8 @@ class UpdateCuramUserRecords < MongoidMigrationTask
       elsif action.eql?("update_ssn")
         update_ssn(record)
       end
-    rescue => e
-      puts "#{e.message}"
+    rescue StandardError => e
+      puts e.message.to_s
     end
   end
 

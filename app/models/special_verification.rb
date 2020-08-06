@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 class SpecialVerification
   include Mongoid::Document
   include Mongoid::Timestamps
 
   embedded_in :consumer_role
 
-  TYPES = %w(admin notice)
+  TYPES = %w[admin notice].freeze
 
   field :due_date, type: Date
   field :verification_type

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NoticeTrigger
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -23,7 +25,8 @@ class NoticeTrigger
     end
   end
 
-private
+  private
+
   def initialize_dependent_models
     build_notice_trigger_element_group if notice_trigger_element_group.nil?
   end

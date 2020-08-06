@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 
 module BenefitSponsors
   RSpec.describe BenefitSponsors::SponsoredBenefits::FixedPercentSponsorContribution, :dbclean => :after_each do
     describe "given a contribution level with no contribution factor" do
-      let(:contribution_level) {
+      let(:contribution_level) do
         {
           :display_name => "Employee Only",
           :order => 1,
           :contribution_unit_id => 1
         }
-      }
+      end
 
       subject do
         SponsoredBenefits::FixedPercentSponsorContribution.new(

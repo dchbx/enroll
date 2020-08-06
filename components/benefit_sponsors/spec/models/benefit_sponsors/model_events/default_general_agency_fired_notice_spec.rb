@@ -39,7 +39,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GeneralAgencyFiredNotice', dbclean
       end
 
       it "should trigger notice" do
-        broker_agency_profile.class.observer_peers.keys.each do |observer|
+        broker_agency_profile.class.observer_peers.each_key do |observer|
           expect(observer).to receive(:process_broker_agency_profile_events) do |_instance, model_event|
             expect(model_event).to be_an_instance_of(BenefitSponsors::ModelEvents::ModelEvent)
             expect(model_event).to have_attributes(:event_key => :default_general_agency_fired, :klass_instance => broker_agency_profile, :options => {:old_general_agency_profile_id => general_agency_profile.id.to_s})

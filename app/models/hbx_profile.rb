@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxProfile
   include Config::AcaModelConcern
   include Config::SiteModelConcern
@@ -29,20 +31,16 @@ class HbxProfile
 
   after_initialize :build_nested_models
 
-  def advance_day
-  end
+  def advance_day; end
 
-  def advance_month
-  end
+  def advance_month; end
 
-  def advance_quarter
-  end
+  def advance_quarter; end
 
-  def advance_year
-  end
+  def advance_year; end
 
   def under_open_enrollment?
-    (benefit_sponsorship.present? && benefit_sponsorship.is_coverage_period_under_open_enrollment?) ?  true : false
+    benefit_sponsorship.present? && benefit_sponsorship.is_coverage_period_under_open_enrollment? ? true : false
   end
 
   def active_employers
@@ -107,7 +105,7 @@ class HbxProfile
         hbx_ids << empr.hbx_id
         empr.update_attribute(:xml_transmitted_timestamp, Time.now.utc)
       end
-      notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids } )
+      notify("acapi.info.events.employer.group_files_requested", { body: hbx_ids })
     end
 
     def search_random(search_param)
@@ -229,6 +227,7 @@ class HbxProfile
   # BinderPaymentDueDate -- 15th or earliest banking day prior
 
   private
+
   def build_nested_models
     build_inbox if inbox.nil?
   end

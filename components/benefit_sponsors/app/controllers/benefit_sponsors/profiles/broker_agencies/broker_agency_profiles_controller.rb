@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_dependency "benefit_sponsors/application_controller"
 
 module BenefitSponsors
@@ -18,11 +20,11 @@ module BenefitSponsors
         layout 'single_column'
 
         EMPLOYER_DT_COLUMN_TO_FIELD_MAP = {
-          "2"     => "legal_name",
-          "4"     => "employer_profile.aasm_state",
-          "5"     => "employer_profile.plan_years.start_on"
-        }
-        
+          "2" => "legal_name",
+          "4" => "employer_profile.aasm_state",
+          "5" => "employer_profile.plan_years.start_on"
+        }.freeze
+
         def create
           json = request.body.read
           body_json = JSON.parse(json)
@@ -46,7 +48,7 @@ module BenefitSponsors
           set_flash_by_announcement
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @provider = current_user.person
-          @id=params[:id]
+          @id = params[:id]
         end
 
         def staff_index
@@ -55,14 +57,14 @@ module BenefitSponsors
           @staff = eligible_brokers
           @page_alphabets = page_alphabets(@staff, "last_name")
           page_no = cur_page_no(@page_alphabets.first)
-          if @q.nil?
-            @staff = @staff.where(last_name: /^#{page_no}/i)
-          else
-            @staff = @staff.where(last_name: /^#{@q}/i)
-          end
+          @staff = if @q.nil?
+                     @staff.where(last_name: /^#{page_no}/i)
+                   else
+                     @staff.where(last_name: /^#{@q}/i)
+                   end
         end
 
-        # TODO need to refactor for cases around SHOP broker agencies
+        # TODO: need to refactor for cases around SHOP broker agencies
         def family_datatable
           authorize self
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
@@ -106,9 +108,7 @@ module BenefitSponsors
             return
           end
           documents = @broker_agency_profile.documents
-          if documents
-            @statements = get_commission_statements(documents)
-          end
+          @statements = get_commission_statements(documents) if documents
           collect_and_sort_commission_statements
           respond_to do |format|
             format.js
@@ -116,18 +116,18 @@ module BenefitSponsors
         end
 
         def show_commission_statement
-          options={}
+          options = {}
           options[:filename] = @commission_statement.title
           options[:type] = 'application/pdf'
           options[:disposition] = 'inline'
-          send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+          send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
         def download_commission_statement
-          options={}
+          options = {}
           options[:content_type] = @commission_statement.type
           options[:filename] = @commission_statement.title
-          send_data Aws::S3Storage.find(@commission_statement.identifier) , options
+          send_data Aws::S3Storage.find(@commission_statement.identifier), options
         end
 
         def general_agency_index
@@ -148,19 +148,18 @@ module BenefitSponsors
           end
         end
 
-        def agency_messages
-        end
+        def agency_messages; end
 
         def inbox
           @sent_box = true
-          id = params["id"]||params['profile_id']
+          id = params["id"] || params['profile_id']
           @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
           @folder = (params[:folder] || 'Inbox').capitalize
-          if current_user.person._id.to_s == id
-            @provider = current_user.person
-          else
-            @provider = @broker_agency_provider
-          end
+          @provider = if current_user.person._id.to_s == id
+                        current_user.person
+                      else
+                        @broker_agency_provider
+                      end
         end
 
         def email_guide
@@ -194,16 +193,14 @@ module BenefitSponsors
           end
         end
 
-        def send_general_agency_assign_msg(general_agency, employer_profile, status)
-        end
+        def send_general_agency_assign_msg(general_agency, employer_profile, status); end
 
         def eligible_brokers
-          broker_profile_ids= BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
+          broker_profile_ids = BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
           Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id".in => broker_profile_ids, :"broker_role.aasm_state" => "active")
         end
 
-        def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)
-        end
+        def update_ga_for_employers(broker_agency_profile, old_default_ga = nil); end
 
         def person_market_kind
           if @person.has_active_consumer_role?
@@ -213,24 +210,20 @@ module BenefitSponsors
           end
         end
 
-        def check_general_agency_profile_permissions_assign
-        end
+        def check_general_agency_profile_permissions_assign; end
 
-        def check_general_agency_profile_permissions_set_default
-        end
+        def check_general_agency_profile_permissions_set_default; end
 
         def get_commission_statements(documents)
           commission_statements = []
           documents.each do |document|
             # grab only documents that are commission statements by checking the bucket in which they are placed
-            if document.identifier.include?("commission-statements")
-              commission_statements << document
-            end
+            commission_statements << document if document.identifier.include?("commission-statements")
           end
           commission_statements
         end
 
-        def collect_and_sort_commission_statements(sort_order='ASC')
+        def collect_and_sort_commission_statements(_sort_order = 'ASC')
           @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
           @statements.sort_by!(&:date).reverse!
         end

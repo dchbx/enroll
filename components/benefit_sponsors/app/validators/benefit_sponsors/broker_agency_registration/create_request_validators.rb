@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BrokerAgencyRegistration
     module CreateRequestValidators
@@ -30,16 +32,16 @@ module BenefitSponsors
           required(:request).value(:filled?)
         end
 
-          rule(:user, :request) do |user, request|
-            key(:broker_person_identity_available).failure(:broker_person_identity_available) unless BenefitSponsors::Services::BrokerRegistrationService.may_claim_broker_identity?(values[:user], values[:request])
-          end
+        rule(:user, :request) do |_user, _request|
+          key(:broker_person_identity_available).failure(:broker_person_identity_available) unless BenefitSponsors::Services::BrokerRegistrationService.may_claim_broker_identity?(values[:user], values[:request])
+        end
 
-          rule(:request) do
-            too_many_mailing_addresses = value.office_locations.many? do |ol|
-              ol.kind == "mailing"
-            end
-            key(:only_one_mailing_office_location).failure(:only_one_mailing_office_location) if too_many_mailing_addresses
+        rule(:request) do
+          too_many_mailing_addresses = value.office_locations.many? do |ol|
+            ol.kind == "mailing"
           end
+          key(:only_one_mailing_office_location).failure(:only_one_mailing_office_location) if too_many_mailing_addresses
+        end
       end
     end
   end

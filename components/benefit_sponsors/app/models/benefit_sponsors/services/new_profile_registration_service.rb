@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Services
     class NewProfileRegistrationService
@@ -5,7 +7,7 @@ module BenefitSponsors
       attr_reader :organization, :profile, :representative
       attr_accessor :profile_type, :profile_id, :factory_class
 
-      def initialize(attrs={})
+      def initialize(attrs = {})
         @profile_id = attrs[:profile_id]
         @factory_class = BenefitSponsors::Organizations::Factories::ProfileFactory
         @profile_type = attrs[:profile_type] || pluck_profile_type(@profile_id)
@@ -27,13 +29,13 @@ module BenefitSponsors
         attributes_to_form_params(organization, staff_roles)
       end
 
-      def attributes_to_form_params(obj, staff_roles=nil)
+      def attributes_to_form_params(obj, staff_roles = nil)
         {
-          :"profile_type" => profile_type,
-          :"profile_id" => profile_id,
-          :"staff_roles" => staff_role_params(staff_roles),
-          :"organization" => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
-            :"profile" => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash
+          :profile_type => profile_type,
+          :profile_id => profile_id,
+          :staff_roles => staff_role_params(staff_roles),
+          :organization => Serializers::OrganizationSerializer.new(obj).to_hash.merge(
+            :profile => Serializers::ProfileSerializer.new(pluck_profile(obj)).to_hash
           )
         }
       end
@@ -47,11 +49,11 @@ module BenefitSponsors
 
       def form_attributes_to_params(form)
         {
-          :"current_user_id" => form.current_user_id,
-          :"profile_type" => (form.profile_type || profile_type),
-          :"profile_id" => form.profile_id,
-          :"staff_roles_attributes" => staff_roles_form_to_params(form.staff_roles),
-          :"organization" => organization_form_to_params(form.organization)
+          :current_user_id => form.current_user_id,
+          :profile_type => (form.profile_type || profile_type),
+          :profile_id => form.profile_id,
+          :staff_roles_attributes => staff_roles_form_to_params(form.staff_roles),
+          :organization => organization_form_to_params(form.organization)
         }
       end
 
@@ -83,15 +85,15 @@ module BenefitSponsors
 
       def organization_form_to_params(form)
         organization_attributes(form).merge({
-          :profiles_attributes => profiles_form_to_params(form.profile)
-        })
+                                              :profiles_attributes => profiles_form_to_params(form.profile)
+                                            })
       end
 
       def profiles_form_to_params(profile)
         [profile].each_with_index.inject({}) do |result, (form, index_val)|
           result[index_val] = sanitize_params(profile_attributes(form)).merge({
-            :office_locations_attributes =>  office_locations_form_to_params(form.office_locations)
-          })
+                                                                                :office_locations_attributes => office_locations_form_to_params(form.office_locations)
+                                                                              })
           result
         end
       end
@@ -99,10 +101,12 @@ module BenefitSponsors
       def office_locations_form_to_params(locations)
         locations.each_with_index.inject({}) do |result, (form, index_val)|
           attributes = sanitize_params(form.attributes.slice(:is_primary, :id, :_destroy))
-          attributes.merge!({
-            :phone_attributes =>  phone_form_to_params(form.phone),
-            :address_attributes =>  address_form_to_params(form.address)
-          }) unless (attributes[:_destroy] == "true")
+          unless attributes[:_destroy] == "true"
+            attributes.merge!({
+                                :phone_attributes => phone_form_to_params(form.phone),
+                                :address_attributes => address_form_to_params(form.address)
+                              })
+          end
           result[index_val] = attributes
           result
         end
@@ -118,8 +122,8 @@ module BenefitSponsors
         sanitize_params attrs
       end
 
-      def sanitize_params attrs
-        (profile_id.blank? || attrs[:id].blank?) ? attrs.except(:id) : attrs
+      def sanitize_params(attrs)
+        profile_id.blank? || attrs[:id].blank? ? attrs.except(:id) : attrs
       end
 
       def organization_attributes(form)
@@ -130,7 +134,7 @@ module BenefitSponsors
         if is_broker_profile?
           form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken, :working_hours, :ach_routing_number, :ach_account_number)
         elsif is_general_agency_profile?
-        form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken)
+          form.attributes.slice(:id, :market_kind, :home_page, :accept_new_clients, :languages_spoken)
         elsif is_sponsor_profile?
           if is_cca_sponsor_profile?
             form.attributes.slice(:contact_method, :id, :sic_code, :referred_by, :referred_reason)
@@ -143,7 +147,7 @@ module BenefitSponsors
       def staff_role_params(staff_roles)
         return [{}] if staff_roles.blank?
         [staff_roles].flatten.inject([]) do |result, role|
-          result << Serializers::StaffRoleSerializer.new(role, profile_id:profile_id, profile_type: profile_type).to_hash
+          result << Serializers::StaffRoleSerializer.new(role, profile_id: profile_id, profile_type: profile_type).to_hash
           result
         end
       end
@@ -170,7 +174,7 @@ module BenefitSponsors
 
       def site
         return @site if defined? @site
-        @site = BenefitSponsors::ApplicationController::current_site
+        @site = BenefitSponsors::ApplicationController.current_site
       end
 
       def site_key
@@ -185,7 +189,7 @@ module BenefitSponsors
           return return_type
         end
         return_type = form.profile_id.present? ? [true, factory_obj.redirection_url_on_update] : [true, factory_obj.redirection_url(factory_obj.pending, true)]
-        return return_type
+        return_type
       end
 
       def map_errors_for(factory_obj, onto:)
@@ -202,7 +206,7 @@ module BenefitSponsors
         if is_broker_profile?
           organization.profiles.where(_type: /BrokerAgencyProfile/).first
         elsif is_general_agency_profile?
-        organization.profiles.where(_type: /GeneralAgencyProfile/).first
+          organization.profiles.where(_type: /GeneralAgencyProfile/).first
         elsif is_sponsor_profile?
           organization.profiles.where(_type: /EmployerProfile/).first
         end
@@ -240,7 +244,7 @@ module BenefitSponsors
         true
       end
 
-      def is_broker_for_employer?(user, form)
+      def is_broker_for_employer?(user, _form)
         person = user.person
         staff_roles = person.broker_agency_staff_roles
         return false unless person.broker_role || person.broker_agency_staff_roles.present?
@@ -253,7 +257,7 @@ module BenefitSponsors
         end
       end
 
-      def is_general_agency_staff_for_employer?(user, form)
+      def is_general_agency_staff_for_employer?(user, _form)
         person = user.person
         staff_roles = person.active_general_agency_staff_roles
         return false unless staff_roles.present?
@@ -288,7 +292,7 @@ module BenefitSponsors
         staff_roles.any? {|role| role.benefit_sponsor_employer_profile_id == profile.id }
       end
 
-      def is_staff_for_agency?(user, form)
+      def is_staff_for_agency?(user, _form)
         profile = load_profile
         has_employer_staff_role_for_profile?(user, profile) || has_broker_role_for_profile?(user, profile) || has_broker_agency_staff_role_for_profile(user, profile) || has_general_agency_staff_role_for_profile?(user, profile)
       end

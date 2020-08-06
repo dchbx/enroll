@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Importers::Mhc
   class ConversionEmployerPlanYearSet
     def headers
@@ -45,9 +47,9 @@ module Importers::Mhc
 
        # different headers for health and dental
       @sponsored_benefit_kind ||= :health
-      sponsored_headers = (@sponsored_benefit_kind == :dental) ? dental_benefit_headers : health_benefit_headers
+      sponsored_headers = @sponsored_benefit_kind == :dental ? dental_benefit_headers : health_benefit_headers
 
-      combined_headers =(common_headers.push sponsored_headers).flatten!
+      combined_headers = (common_headers.push sponsored_headers).flatten!
 
       combined_headers
     end
@@ -82,7 +84,7 @@ module Importers::Mhc
     end
 
     def row_mapping
-      common_mapping= [
+      common_mapping = [
       :action,
       :fein,
       :ignore,
@@ -125,11 +127,10 @@ module Importers::Mhc
       ]
 
       @sponsored_benefit_kind ||= :health
-      sponsored_mapping = (@sponsored_benefit_kind ==  :dental) ? dental_benefit_mapping : health_benefit_mapping
+      sponsored_mapping = @sponsored_benefit_kind == :dental ? dental_benefit_mapping : health_benefit_mapping
       combined_mapping = (common_mapping.push sponsored_mapping).flatten!
       combined_mapping
     end
-
 
     def dental_benefit_mapping
       [

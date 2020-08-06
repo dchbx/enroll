@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class InsuredEligibleForBenefitRule
 
   # Insured role can be: EmployeeRole, ConsumerRole, ResidentRole
@@ -42,18 +44,16 @@ class InsuredEligibleForBenefitRule
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
-        if @market_kind == "shop" && !("#{element}" == "active_consumer")
-          if self.public_send("is_#{element}_satisfied?")
-            true && eligible
-          end
+        if @market_kind == "shop" && element.to_s != "active_consumer"
+          true && eligible if self.public_send("is_#{element}_satisfied?")
         elsif self.public_send("is_#{element}_satisfied?")
           true && eligible
         else
-          if "#{element}" == "active_consumer"
-             @errors << ["eligibility failed on market kind"]
-          else
-            @errors << ["eligibility failed on #{element}"]
-          end
+          @errors << if element.to_s == "active_consumer"
+                       ["eligibility failed on market kind"]
+                     else
+                       ["eligibility failed on #{element}"]
+                     end
           false
         end
       end
@@ -67,7 +67,7 @@ class InsuredEligibleForBenefitRule
   def set_status_and_error_if_not_applying_coverage
     status = false
     @errors = ["Did not apply for coverage."]
-    return status
+    status
   end
 
   def is_applying_coverage_status_satisfied?
@@ -75,13 +75,13 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_age_range_satisfied_for_catastrophic?
-     if @benefit_package.age_range == (0..30)
-       benefit_end_on = @benefit_package.benefit_coverage_period.end_on
-       age = age_on_benefit_end_on(@role.dob, benefit_end_on)
-       @benefit_package.age_range.cover?(age)
-     else
-       return true
-     end
+    if @benefit_package.age_range == (0..30)
+      benefit_end_on = @benefit_package.benefit_coverage_period.end_on
+      age = age_on_benefit_end_on(@role.dob, benefit_end_on)
+      @benefit_package.age_range.cover?(age)
+    else
+      true
+    end
   end
 
   def is_cost_sharing_satisfied?
@@ -108,11 +108,11 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_child_age_satisfied?
-    unless @new_effective_on.nil?
-      relation_ship_with_primary_applicant == 'child' && @new_effective_on.kind_of?(Date) && @new_effective_on < @role.dob+26.years ? true : false
-    else
+    if @new_effective_on.nil?
       age = age_on_next_effective_date(@role.dob)
       relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true
+    else
+      relation_ship_with_primary_applicant == 'child' && @new_effective_on.is_a?(Date) && @new_effective_on < @role.dob + 26.years ? true : false
     end
   end
 
@@ -137,14 +137,12 @@ class InsuredEligibleForBenefitRule
       person = @role.person
       return true if person.is_dc_resident?
 
-      #TODO person can have more than one families
+      #TODO: person can have more than one families
       @family.family_members.active.each do |family_member|
-        if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
-          return true
-        end
+        return true if age_on_next_effective_date(family_member.dob) >= 19 && family_member.is_dc_resident?
       end
     end
-    return false
+    false
   end
 
   def is_incarceration_status_satisfied?
@@ -179,15 +177,15 @@ class InsuredEligibleForBenefitRule
   #   end
   # end
 
-  def age_on_benefit_end_on(dob, end_on=TimeKeeper.date_of_record)
+  def age_on_benefit_end_on(dob, end_on = TimeKeeper.date_of_record)
     # calculate method depend on 6710
-    end_on.year - dob.year - ((end_on.month > dob.month || (end_on.month == dob.month && end_on.day >= dob.day)) ? 0 : 1)
+    end_on.year - dob.year - (end_on.month > dob.month || (end_on.month == dob.month && end_on.day >= dob.day) ? 0 : 1)
   end
 
   def age_on_next_effective_date(dob)
     today = TimeKeeper.date_of_record
-    today.day <= 15 ? age_on = today.end_of_month + 1.day : age_on = (today + 1.month).end_of_month + 1.day
-    age_on.year - dob.year - ((age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day)) ? 0 : 1)
+    age_on = today.day <= 15 ? today.end_of_month + 1.day : (today + 1.month).end_of_month + 1.day
+    age_on.year - dob.year - (age_on.month > dob.month || (age_on.month == dob.month && age_on.day >= dob.day) ? 0 : 1)
   end
 
   private
@@ -198,15 +196,15 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_person_vlp_verified?
-    @role.aasm_state == "fully_verified" ? true : false
+    @role.aasm_state == "fully_verified"
   end
 
   def primary_applicant
-    @family.family_members.select {|s| s.is_primary_applicant}.first || nil
+    @family.family_members.select(&:is_primary_applicant).first || nil
   end
 
   def relation_ship_with_primary_applicant
-    primary_applicant.person.person_relationships.select {|r|r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
+    primary_applicant.person.person_relationships.select {|r| r.relative_id.to_s == @role.person.id.to_s}.first.try(:kind) || nil
   # @role.person.person_relationships.select {|r| r.person.id.to_s == primary_applicant.person_id.to_s }.first.try(:kind) || nil
   end
 

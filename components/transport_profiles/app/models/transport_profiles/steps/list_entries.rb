@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 module TransportProfiles
   # List the entries of a remote resource and store the results in a process context, optionally filtering them.
   class Steps::ListEntries < Steps::Step
-    
+
     # Iniitialize the listing step.
     # @param endpoint_key [Symbol] a key representing the name of the endpoint to query
     # @param result_key [Symbol] the name to use to store the results in the process context
@@ -20,13 +22,13 @@ module TransportProfiles
     # @!visibility private
     def execute(process_context)
       endpoints = ::TransportProfiles::WellKnownEndpoint.find_by_endpoint_key(@endpoint_key)
-      raise ::TransportProfiles::EndpointNotFoundError unless endpoints.size > 0
+      raise ::TransportProfiles::EndpointNotFoundError if endpoints.empty?
       raise ::TransportProfiles::AmbiguousEndpointError, "More than one matching endpoint found" if endpoints.size > 1
       endpoint = endpoints.first
       query = TransportGateway::ResourceQuery.new({
-        from: URI.parse(endpoint.uri),
-        source_credentials: endpoint
-      })
+                                                    from: URI.parse(endpoint.uri),
+                                                    source_credentials: endpoint
+                                                  })
       entries = @gateway.list_entries(query)
       matching_entries = if !@transform_blk.nil?
                            @transform_blk.call(entries, process_context)

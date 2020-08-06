@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -17,7 +19,7 @@ module BenefitSponsors
         end
 
         it 'should not notify' do
-          expect(subject).not_to have_received(:notify).with("acapi.info.events.employer.contact_changed", {employer_id: staff_role.hbx_id , event_name: "contact_changed"})
+          expect(subject).not_to have_received(:notify).with("acapi.info.events.employer.contact_changed", {employer_id: staff_role.hbx_id, event_name: "contact_changed"})
         end
       end
 
@@ -25,14 +27,14 @@ module BenefitSponsors
       context 'when staff role changed' do
         before do
           staff_role.assign_attributes({
-            is_active: false
-          })
+                                         is_active: false
+                                       })
 
           subject.contact_changed?(staff_role)
         end
 
         it 'should notify' do
-          expect(subject).to have_received(:notify).with("acapi.info.events.employer.contact_changed", {employer_id: staff_role.hbx_id , event_name: "contact_changed"})
+          expect(subject).to have_received(:notify).with("acapi.info.events.employer.contact_changed", {employer_id: staff_role.hbx_id, event_name: "contact_changed"})
         end
       end
     end

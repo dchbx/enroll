@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Events
   class SsaVerificationRequestsController < ::ApplicationController
     include Acapi::Notifiers
@@ -6,7 +8,7 @@ module Events
       [LawfulPresenceDetermination::SSA_VERIFICATION_REQUEST_EVENT_NAME]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       individual = payload.stringify_keys["person"]
       event_payload = render_to_string "events/lawful_presence/ssa_verification_request", :formats => ["xml"], :locals => { :individual => individual }
       event_request_record = EventRequest.new({requested_at: Time.now, body: event_payload})
@@ -19,9 +21,10 @@ module Events
                                       event_request_record_id: event_request_record.id)
       end
       notify("acapi.info.events.lawful_presence.ssa_verification_request", {
-          :body => event_payload,
-          :individual_id => individual.hbx_id,
-          :retry_deadline => (Time.now + 24.hours).to_i})
+               :body => event_payload,
+               :individual_id => individual.hbx_id,
+               :retry_deadline => (Time.now + 24.hours).to_i
+             })
     end
 
     def self.subscribe

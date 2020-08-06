@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitSponsors
@@ -22,24 +24,24 @@ module BenefitSponsors
     let!(:broker_role1) { FactoryBot.create(:broker_role, aasm_state: 'active', benefit_sponsors_broker_agency_profile_id: broker_agency_profile1.id, person: person1) }
 
 
-    let(:create_params) {
+    let(:create_params) do
       {
         :broker_agency_id => broker_agency_profile1.id.to_s,
         :broker_role_id => broker_role1.id.to_s,
         :employer_profile_id => employer_profile.id.to_s
       }
-    }
+    end
 
     let(:broker_management_form_create) { broker_management_form_class.for_create(create_params) }
 
-    let(:terminate_params) {
+    let(:terminate_params) do
       {
         :direct_terminate => "true",
         :termination_date => TimeKeeper.date_of_record.strftime('%m/%d/%Y'),
         :employer_profile_id => employer_profile.id.to_s,
         :broker_agency_id => broker_agency_profile1.id.to_s
-       }
-    }
+      }
+    end
 
     let(:broker_management_form_terminate) { broker_management_form_class.for_terminate(terminate_params) }
 
