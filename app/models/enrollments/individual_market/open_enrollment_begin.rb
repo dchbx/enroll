@@ -86,15 +86,12 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       end
 
       if enrollments.present?
-        if enrollments.first.can_renew_coverage?(renewal_benefit_coverage_period)
+        if enrollments.first.can_renew_coverage?(renewal_benefit_coverage_period.start_on)
           count += 1
-          enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-          enrollment_renewal.enrollment = enrollments.first
-          enrollment_renewal.assisted = coverage_period_tax_household.present? ? true : false
-          enrollment_renewal.aptc_values = aptc_values
-          enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
-
-          enrollment_renewal.renew
+          result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollments.first,
+                                                                      effective_on: renewal_benefit_coverage_period.start_on,
+                                                                      aptc_values: aptc_values)
+          result.failure? ? result.failure : result.success
         end
       else
         @logger.info "Unable to find valid assisted enrollment for Person: #{hbx_id}"
@@ -114,11 +111,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
 
     @logger.info "Families count #{family_ids.count}"
 
-    enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
-    enrollment_renewal.renewal_coverage_start = renewal_benefit_coverage_period.start_on
-    enrollment_renewal.assisted = false
-    enrollment_renewal.aptc_values = {}
-
     count = 0
     family_ids.each do |family_id|
       family = Family.find(family_id.to_s)
@@ -130,15 +122,16 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         enrollments.each do |enrollment|
           next if @assisted_individuals.key?(primary_hbx_id) && enrollment.coverage_kind == 'health'
 
-          next unless enrollment.can_renew_coverage?(renewal_benefit_coverage_period)
+          next unless enrollment.can_renew_coverage?(renewal_benefit_coverage_period.start_on)
 
           count += 1
           @logger.info "Found #{count} enrollments" if count % 100 == 0
 
           # puts "#{enrollment.hbx_id}--#{enrollment.kind}--#{enrollment.aasm_state}--#{enrollment.coverage_kind}--#{enrollment.effective_on}--#{enrollment.product.renewal_product.try(:active_year)}"
-
-          enrollment_renewal.enrollment = enrollment
-          enrollment_renewal.renew
+          result = ::Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
+                                                                      effective_on: renewal_benefit_coverage_period.start_on,
+                                                                      aptc_values: {})
+          result.failure? ? result.failure : result.success
         end
       rescue Exception => e
         @logger.info "Failed ECaseId: #{family.e_case_id} Primary: #{primary_hbx_id} Exception: #{e.inspect}"

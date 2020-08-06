@@ -481,13 +481,13 @@ class HbxEnrollment
   end
 
   # checks possibility of coverage renewal for ivl enrollments
-  def can_renew_coverage?(renewal_benefit_coverage_period)
+  def can_renew_coverage?(new_effective_on)
     return false unless is_ivl_by_kind?
 
     enrollments = family.active_household.hbx_enrollments.where(
       {:coverage_kind => coverage_kind,
        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ['auto_renewing', 'renewing_coverage_selected']),
-       :effective_on.gte => renewal_benefit_coverage_period.start_on,
+       :effective_on.gte => new_effective_on,
        :kind => kind}
     )
     return true if enrollments.empty?
