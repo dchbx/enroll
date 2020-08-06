@@ -51,18 +51,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
   #   end
   # end
 
-  def can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
-    enrollments = family.active_household.hbx_enrollments.where(
-      { :coverage_kind => enrollment.coverage_kind,
-        :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + ["auto_renewing", "renewing_coverage_selected"]),
-        :effective_on.gte => renewal_benefit_coverage_period.start_on,
-        :kind => enrollment.kind}
-    )
-    return true if enrollments.empty?
-
-    enrollments.none?{|e| enrollment.subscriber.blank? || enrollment.subscriber.hbx_id == e.subscriber.hbx_id }
-  end
-
   def kollection(kind, coverage_period)
     {
       :kind.in => ['individual', 'coverall'],
@@ -98,7 +86,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       end
 
       if enrollments.present?
-        if can_renew_enrollment?(enrollments.first, family, renewal_benefit_coverage_period)
+        if enrollments.first.can_renew_coverage?(renewal_benefit_coverage_period)
           count += 1
           enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
           enrollment_renewal.enrollment = enrollments.first
@@ -142,7 +130,7 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
         enrollments.each do |enrollment|
           next if @assisted_individuals.key?(primary_hbx_id) && enrollment.coverage_kind == 'health'
 
-          next unless can_renew_enrollment?(enrollment, family, renewal_benefit_coverage_period)
+          next unless enrollment.can_renew_coverage?(renewal_benefit_coverage_period)
 
           count += 1
           @logger.info "Found #{count} enrollments" if count % 100 == 0
