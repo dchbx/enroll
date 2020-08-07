@@ -75,19 +75,18 @@ def ivl_qualifying_life_events
   end
 end
 
-def  shop_qualifying_life_events
-  shop_qle_covid = FactoryBot.create(:qualifying_life_event_kind,
-                                     title: 'Covid-19',
-                                     reason: 'covid-19',
-                                     market_kind: "shop",
-                                     post_event_sep_in_days: 1,
-                                     effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
-                                     ordinal_position: 1,
-                                     qle_event_date_kind: :submitted_at,
-                                     start_on: sep_type_start_on,
-                                     end_on: sep_type_end_on)
-  shop_qle = FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
-  @shop_qualifying_life_events ||= [shop_qle_covid, shop_qle]
+def shop_qualifying_life_events
+  FactoryBot.create(:qualifying_life_event_kind,
+                    title: 'Covid-19',
+                    reason: 'covid-19',
+                    market_kind: "shop",
+                    post_event_sep_in_days: 1,
+                    effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
+                    ordinal_position: 1,
+                    qle_event_date_kind: :submitted_at,
+                    start_on: sep_type_start_on,
+                    end_on: sep_type_end_on)
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
 end
 
 def fehb_qualifying_life_events
@@ -136,9 +135,9 @@ end
 Then(/^\w+ should see listed Individual market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active individual market SEP Types on datatable"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
-  expect(birth_ivl['data-ordinal_position']).to eq('1')
+  expect(birth_ivl['data-ordinal_position']).to eq '1'
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
-  expect(marraige_ivl['data-ordinal_position']).to eq('2')
+  expect(marraige_ivl['data-ordinal_position']).to eq '2'
 end
 
 When("Admin sorts Individual SEP Types by drag and drop") do
@@ -148,12 +147,11 @@ When("Admin sorts Individual SEP Types by drag and drop") do
 end
 
 And("listed Individual SEP Types ordinal postions should change") do
-  expect(page).to have_content('Married')
+  step "Admin should see listed Active individual market SEP Types on datatable"
   marraige_ivl = page.all('div').detect { |div| div[:id] == 'marriage_individual'}
-  expect(marraige_ivl['data-ordinal_position']).to eq('1')
-  expect(page).to have_content('Had a baby')
+  expect(marraige_ivl['data-ordinal_position']).to eq '1'
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
-  expect(birth_ivl['data-ordinal_position']).to eq('2')
+  expect(birth_ivl['data-ordinal_position']).to eq '2'
 end
 
 When("Admin clicks on Shop tab") do
@@ -162,10 +160,10 @@ end
 
 Then(/^\w+ should see listed Shop market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
-  birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  expect(birth_shop['data-ordinal_position']).to eq('1')
+  covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
+  expect(covid19_shop['data-ordinal_position']).to eq '3'
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  expect(marraige_shop['data-ordinal_position']).to eq('2')
+  expect(marraige_shop['data-ordinal_position']).to eq '4'
 end
 
 When("Admin sorts Shop SEP Types by drag and drop") do
@@ -175,12 +173,11 @@ When("Admin sorts Shop SEP Types by drag and drop") do
 end
 
 Then("listed Shop SEP Types ordinal postions should change") do
-  expect(page).to have_content('Married')
+  step "Admin should see listed Active shop market SEP Types on datatable"
   marraige_shop = page.all('div').detect { |div| div[:id] == 'marriage_shop'}
-  expect(marraige_shop['data-ordinal_position']).to eq('1')
-  expect(page).to have_content('Covid-19')
-  birth_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
-  expect(birth_shop['data-ordinal_position']).to eq('2')
+  expect(marraige_shop['data-ordinal_position']).to eq '3'
+  covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
+  expect(covid19_shop['data-ordinal_position']).to eq '4'
 end
 
 When("Admin clicks on Congress tab") do
@@ -189,10 +186,10 @@ end
 
 Then(/^\w+ should see listed Congress market SEP Types with ascending ordinal positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
-  birth_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  expect(birth_fehb['data-ordinal_position']).to eq('1')
-  marraige_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  expect(marraige_fehb['data-ordinal_position']).to eq('2')
+  latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
+  expect(latm_fehb['data-ordinal_position']).to eq '5'
+  adoption_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
+  expect(adoption_fehb['data-ordinal_position']).to eq '6'
 end
 
 When("Admin sorts Congress SEP Types by drag and drop") do
@@ -202,12 +199,11 @@ When("Admin sorts Congress SEP Types by drag and drop") do
 end
 
 Then("listed Congress SEP Types ordinal postions should change") do
-  expect(page).to have_content('Adopted a child')
-  marraige_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
-  expect(marraige_fehb['data-ordinal_position']).to eq('1')
-  expect(page).to have_content('Losing other health insurance')
-  birth_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
-  expect(birth_fehb['data-ordinal_position']).to eq('2')
+  step "Admin should see listed Active fehb market SEP Types on datatable"
+  adoption_fehb = page.all('div').detect { |div| div[:id] == 'adoption_fehb'}
+  expect(adoption_fehb['data-ordinal_position']).to eq '5'
+  latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
+  expect(latm_fehb['data-ordinal_position']).to eq '6'
 end
 
 Then(/^Admin should see successful message after sorting$/) do

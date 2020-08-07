@@ -90,7 +90,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Shop tab
-    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
+    Then Admin should see listed Active shop market SEP Types on datatable
     And Hbx Admin logs out
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
@@ -109,6 +109,9 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
+    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    When Admin sorts Individual SEP Types by drag and drop
+    Then Admin should see successful message after sorting
     When Admin clicks on Shop tab
     Then Admin should see listed Shop market SEP Types with ascending ordinal positions
     When Admin sorts Shop SEP Types by drag and drop
