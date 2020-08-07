@@ -11,7 +11,7 @@ module Operations
       def call(hbx_enrollment:, effective_on:, aptc_values: {})
         validated_enrollment = yield validate(hbx_enrollment, effective_on)
         aptc_values          = yield fetch_aptc_values(validated_enrollment, effective_on, aptc_values)
-        renewal_enrollment   = yield renew_enrollment(validated_enrollment, aptc_values, effective_on)
+        renewal_enrollment   = yield renew_enrollment(validated_enrollment, effective_on, aptc_values)
 
         Success(renewal_enrollment)
       end
@@ -41,7 +41,7 @@ module Operations
         Success(data || {})
       end
 
-      def renew_enrollment(enrollment, aptc_values, effective_on)
+      def renew_enrollment(enrollment, effective_on, aptc_values)
         enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
         enrollment_renewal.enrollment = enrollment
         enrollment_renewal.assisted = aptc_values.present? ? true : false
