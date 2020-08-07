@@ -132,7 +132,7 @@ Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |m
   end
 end
 
-Then(/^\w+ should see listed Individual market SEP Types with ascending ordinal positions$/) do
+Then(/^\w+ should see listed Individual market SEP Types with ascending positions$/) do
   step "Admin should see listed Active individual market SEP Types on datatable"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
   expect(birth_ivl['data-ordinal_position']).to eq '1'
@@ -158,7 +158,7 @@ When("Admin clicks on Shop tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[2]/a').click
 end
 
-Then(/^\w+ should see listed Shop market SEP Types with ascending ordinal positions$/) do
+Then(/^\w+ should see listed Shop market SEP Types with ascending positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
   covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
   expect(covid19_shop['data-ordinal_position']).to eq '3'
@@ -184,7 +184,7 @@ When("Admin clicks on Congress tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[3]/a').click
 end
 
-Then(/^\w+ should see listed Congress market SEP Types with ascending ordinal positions$/) do
+Then(/^\w+ should see listed Congress market SEP Types with ascending positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
   latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
   expect(latm_fehb['data-ordinal_position']).to eq '5'
