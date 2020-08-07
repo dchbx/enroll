@@ -2,16 +2,14 @@
 
 module Operations
   module Individual
-    # This class is invoked when an enrollment is purchased by reporting a SEP
-    # and we want to renew this enrollment for next year.
 
     class RenewEnrollment
       include Dry::Monads[:result, :do]
 
-      def call(hbx_enrollment:, effective_on:, aptc_values: {})
+      def call(hbx_enrollment:, effective_on:, eligibility_values: {})
         validated_enrollment = yield validate(hbx_enrollment, effective_on)
-        aptc_values          = yield fetch_aptc_values(validated_enrollment, effective_on, aptc_values)
-        renewal_enrollment   = yield renew_enrollment(validated_enrollment, effective_on, aptc_values)
+        eligibility_values   = yield fetch_eligibility_values(validated_enrollment, effective_on, eligibility_values)
+        renewal_enrollment   = yield renew_enrollment(validated_enrollment, effective_on, eligibility_values)
 
         Success(renewal_enrollment)
       end
@@ -26,8 +24,8 @@ module Operations
         Success(enrollment)
       end
 
-      def fetch_aptc_values(enrollment, effective_on, aptc_values)
-        return Success(aptc_values) if aptc_values.present?
+      def fetch_eligibility_values(enrollment, effective_on, eligibility_values)
+        return Success(eligibility_values) if eligibility_values.present?
 
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
@@ -41,11 +39,11 @@ module Operations
         Success(data || {})
       end
 
-      def renew_enrollment(enrollment, effective_on, aptc_values)
+      def renew_enrollment(enrollment, effective_on, eligibility_values)
         enrollment_renewal = Enrollments::IndividualMarket::FamilyEnrollmentRenewal.new
         enrollment_renewal.enrollment = enrollment
-        enrollment_renewal.assisted = aptc_values.present? ? true : false
-        enrollment_renewal.aptc_values = aptc_values
+        enrollment_renewal.assisted = eligibility_values.present? ? true : false
+        enrollment_renewal.aptc_values = eligibility_values
         enrollment_renewal.renewal_coverage_start = effective_on
         renewed_enrollment = enrollment_renewal.renew
         if renewed_enrollment.is_a?(HbxEnrollment)
