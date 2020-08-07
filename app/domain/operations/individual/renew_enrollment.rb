@@ -4,8 +4,6 @@ module Operations
   module Individual
     # This class is invoked when an enrollment is purchased by reporting a SEP
     # and we want to renew this enrollment for next year.
-    # Constaint for assisted renewals:
-    # Cancel passive renewals before calling this class to be able to passive renew enrollment.
 
     class RenewEnrollment
       include Dry::Monads[:result, :do]
