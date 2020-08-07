@@ -10,22 +10,22 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And the Admin will see the Manage SEP Types under admin dropdown
     And Admin can click Manage SEP Types link
 
-  Scenario: Admin has ability to sort the SEP Types and saves the ordinal positions to the database
+  Scenario: Admin has ability to sort the SEP Types and saves the positions to the database
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    Then Admin should see listed Individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Individual SEP Types ordinal postions should change
     When Admin clicks on Shop tab
-    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
+    Then Admin should see listed Shop market SEP Types with ascending positions
     When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Shop SEP Types ordinal postions should change
     When Admin clicks on Congress tab
-    Then Admin should see listed Congress market SEP Types with ascending ordinal positions
+    Then Admin should see listed Congress market SEP Types with ascending positions
     When Admin sorts Congress SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Congress SEP Types ordinal postions should change
@@ -38,7 +38,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    Then Admin should see listed Individual market SEP Types with ascending positions
     And Hbx Admin logs out
     Given Individual has not signed up as an HBX user
     When Individual with known qles visits the Insured portal outside of open enrollment
@@ -73,7 +73,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    Then Admin should see listed Individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Individual SEP Types ordinal postions should change
@@ -109,11 +109,11 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    Then Admin should see listed Individual market SEP Types with ascending ordinal positions
+    Then Admin should see listed Individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     When Admin clicks on Shop tab
-    Then Admin should see listed Shop market SEP Types with ascending ordinal positions
+    Then Admin should see listed Shop market SEP Types with ascending positions
     When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Shop SEP Types ordinal postions should change
