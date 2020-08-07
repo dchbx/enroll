@@ -340,6 +340,7 @@ GEM
     cliver (0.3.2)
     cocaine (0.6.0)
       terrapin (= 0.6.0)
+    coderay (1.1.3)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
     coffee-rails (4.2.2)
@@ -629,6 +630,14 @@ GEM
       capybara (>= 2.1, < 4)
       cliver (~> 0.3.1)
       websocket-driver (>= 0.2.0)
+    pry (0.12.2)
+      coderay (~> 1.1.0)
+      method_source (~> 0.9.0)
+    pry-nav (0.3.0)
+      pry (>= 0.9.10, < 0.13.0)
+    pry-remote (0.1.8)
+      pry (~> 0.9)
+      slop (~> 3.0)
     public_suffix (4.0.3)
     puma (3.12.4)
     pundit (2.1.0)
@@ -817,6 +826,7 @@ GEM
       actionpack (>= 3.1)
       railties (>= 3.1)
       slim (>= 3.0, < 5.0)
+    slop (3.6.0)
     sneakers (1.1.2)
       bunny (>= 1.7.0, <= 2.0.0)
       serverengine (~> 1.5.5)
@@ -980,6 +990,9 @@ DEPENDENCIES
   parallel_tests (~> 2.26.2)
   poltergeist (~> 1.18.0)
   prawn!
+  pry
+  pry-nav
+  pry-remote
   puma (~> 3.12.4)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
