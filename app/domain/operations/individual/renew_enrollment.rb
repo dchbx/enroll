@@ -2,7 +2,6 @@
 
 module Operations
   module Individual
-
     class RenewEnrollment
       include Dry::Monads[:result, :do]
 
