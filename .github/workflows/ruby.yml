@@ -1,10 +1,35 @@
 name: Rspec and Cucumbers
 on: push
 
-env: # https://stackoverflow.com/questions/59867124/how-can-i-access-github-action-environment-variables-within-a-bash-script-run-by
+env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
 
 jobs:
+  rubocop:
+    name: Rubocop
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "2.5.1"
+      - name: Cache Gems
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+      - name: bundle install
+        run: |
+          gem update --system
+          gem install bundler -v '2.0.1'
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+      - name: Run rubocop
+        run: |
+          git fetch --no-tags origin
+          bundle exec rubocop-git origin/master
   testing_matrix:
     name: ${{matrix.command_configs.name}}
     runs-on: ${{ matrix.os }}
@@ -152,14 +177,16 @@ jobs:
       - name: Set up Ruby 2.5.1
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.5.1
+          ruby-version: "2.5.1"
       - name: Setup Node.js for use with actions
         uses: actions/setup-node@v1
+        if: matrix.command_configs.skip_js != 'true'
         with:
           # Version Spec of the version to use.  Examples: 10.x, 10.15.1, >=10.15.0, lts
           node-version: 10.16.3
       - name: Launch MongoDB
         uses: wbari/start-mongoDB@v0.2
+        if: matrix.command_configs.skip_js != 'true'
         with:
           mongoDBVersion: ${{ matrix.mongodb-version }}
       - uses: actions/checkout@v2
@@ -175,6 +202,7 @@ jobs:
             ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
       - name: Cache Node Modules
         id: npm-cache
+        if: matrix.command_configs.skip_js != 'true'
         uses: actions/cache@v1
         with:
           path: node_modules
@@ -189,10 +217,11 @@ jobs:
           bundle install --jobs 4 --retry 3
           gem install treye-semaphore_test_boosters --version '2.5.1'
       - name: yarn install
-        if: steps.npm-cache.outputs.cache-hit != 'true'
+        if: matrix.command_configs.skip_js != 'true' && steps.npm-cache.outputs.cache-hit != 'true'
         run: |
           yarn install
       - name: run webpack
+        if: matrix.command_configs.skip_js != 'true'
         run: |
           NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: run tests
