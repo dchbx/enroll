@@ -26,6 +26,7 @@ MANAGE_SEP_TYPES_TRANSLATIONS = {
   "en.datatables.sep_type_data_table.state" => "State",
   "en.datatables.sep_type_data_table.publish" => "Publish",
   "en.datatables.sep_type_data_table.expire" => "Expire",
+  "en.datatables.sep_type_data_table.clone" => "Clone",
   "en.datatables.sep_type_data_table.all" => "All",
   "en.datatables.sep_type_data_table.shop_qles" => "Shop",
   "en.datatables.sep_type_data_table.fehb_qles" => "Congress",
