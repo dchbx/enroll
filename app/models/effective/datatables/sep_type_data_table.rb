@@ -14,6 +14,11 @@ module Effective
               [l10n("datatables.sep_type_data_table.expire"), sep_type_to_expire_exchanges_manage_sep_types_path(qle_id: row.id, qle_action_id: "sep_type_actions_#{row.id}"),
                can_expire_sep_type?(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?))]
           ]
+          if can_clone_sep_type?(row, pundit_allow(QualifyingLifeEventKind, :can_manage_qles?))
+            dropdown += [
+              [l10n("datatables.sep_type_data_table.clone"), clone_exchanges_manage_sep_types_path(id: row.id), 'static']
+            ]
+          end
           render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: "sep_type_actions_#{row.id}"}, formats: :html
         }, :filter => false, :sortable => false
       end
@@ -30,6 +35,10 @@ module Effective
       def can_expire_sep_type?(qle, allow)
         return 'disabled' unless allow
         [:active, :expire_pending].include?(qle.aasm_state) ? 'ajax' : 'disabled'
+      end
+
+      def can_clone_sep_type?(qle, allow)
+        allow && [:active, :expire_pending, :expired].include?(qle.aasm_state)
       end
 
       def nested_filter_definition
