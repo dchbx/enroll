@@ -51,15 +51,19 @@ module Forms
     end
 
     def self.for_edit(params)
-      qlek_params = fetch_qlek_data(params[:id])
-      edit_params = default_keys_hash.merge(qlek_params.symbolize_keys)
-      self.new(edit_params)
+      self.params(fetch_qlek_data(params[:id]))
+    end
+
+    def self.for_clone(params)
+      self.params(fetch_qlek_data(params[:id]).except(:_id, :start_on, :end_on, :ordinal_position))
     end
 
     def self.for_update(params)
-      qlek_params = fetch_qlek_data(params[:_id], params)
-      update_params = default_keys_hash.merge(qlek_params.symbolize_keys)
-      self.new(update_params)
+      self.params(fetch_qlek_data(params[:_id], params))
+    end
+
+    def self.params(qlek_params)
+      self.new(default_keys_hash.merge(qlek_params.symbolize_keys))
     end
 
     class << self
