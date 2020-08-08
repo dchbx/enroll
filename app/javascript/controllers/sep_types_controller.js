@@ -76,17 +76,20 @@ export default class extends Controller {
     for (var termination_on_kind of termination_on_kinds){
       termination_on_kind.disabled = false
       termination_on_kind.checked = false
+        //TODO: fix this
       termination_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
     }
     if (market.value == "individual"){
       for (var termination_on_kind of termination_on_kinds){
         termination_on_kind.disabled = true
         termination_on_kind.checked = false
+          //TODO: fix this
         termination_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
       }
     }else {
       for (var termination_on_kind of termination_on_kinds) {
         termination_on_kind.disabled = false
+          //TODO: fix this
         termination_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
       }
     }
