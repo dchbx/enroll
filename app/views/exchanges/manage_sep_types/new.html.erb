@@ -11,8 +11,8 @@
         data-fehb-kinds="<%= @qle.fehb_effective_kinds%>"
         data-qle-reason="<%= @qle.reason%>"
         data-qle-market="<%= @qle.market_kind%>"
-        data-termination-kinds="<%= @qle.termination_on_kinds%>"
-        data-effective-kinds="<%= @qle.effective_on_kinds%>">
+        data-termination-kinds="<%= @qle.termination_on_kinds || []%>"
+        data-effective-kinds="<%= @qle.effective_on_kinds || []%>">
       <% if @failure.present? %>
         <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
           <% @failure[0].errors.to_h.each do |name, message| %>
