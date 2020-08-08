@@ -92,6 +92,7 @@ Rails.application.routes.draw do
           get 'sep_type_to_expire'
           post 'publish_sep_type'
           post 'expire_sep_type'
+          get 'clone'
         end
       end
     end

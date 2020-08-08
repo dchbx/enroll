@@ -7,8 +7,8 @@ module Exchanges
     include ::L10nHelper
 
     before_action :updateable?
-    layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types]
-    layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types]
+    layout 'single_column', except: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
+    layout 'bootstrap_4', only: [:new, :edit, :create, :update, :sorting_sep_types, :clone]
 
     def new
       @qle = Forms::QualifyingLifeEventKindForm.for_new
@@ -50,6 +50,11 @@ module Exchanges
         end
       end
       redirect_to sep_types_dt_exchanges_manage_sep_types_path
+    end
+
+    def clone
+      @qle = Forms::QualifyingLifeEventKindForm.for_clone(params.permit(:id).to_h)
+      render :new
     end
 
     def sep_type_to_expire
