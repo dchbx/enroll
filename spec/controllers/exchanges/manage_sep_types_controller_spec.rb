@@ -377,6 +377,43 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       end
     end
 
+    context 'for clone' do
+      before do
+        sign_in(current_user)
+        get :clone, params: {id: q1.id}
+      end
+
+      it 'should be a success' do
+        expect(response).to have_http_status(:success)
+      end
+
+      it 'should render the new template' do
+        expect(response).to render_template('new')
+      end
+
+      it 'should assign instance variable' do
+        expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
+      end
+
+      context 'updateable?' do
+        before do
+          person.hbx_staff_role.permission.update_attributes!(can_manage_qles: false)
+          sign_in(current_user)
+          get :edit, params: {id: q1.id}
+        end
+
+        context 'NotAuthorized to access page' do
+          it 'should redirect to enroll app root path' do
+            expect(response).to redirect_to(root_path)
+          end
+
+          it 'should have success flash message' do
+            expect(flash[:error]).to eq 'Not Authorized To Access Manage SEP Type Page.'
+          end
+        end
+      end
+    end
+
     context "for expire", :dbclean => :after_each do
 
       before :each do
