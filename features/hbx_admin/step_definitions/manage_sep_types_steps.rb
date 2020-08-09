@@ -71,7 +71,7 @@ end
 
 def ivl_qualifying_life_events
   {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map do |event_trait, ordinal_position|
-    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, event_kind_label: "event kind label", market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
   end
 end
 
@@ -80,6 +80,7 @@ def shop_qualifying_life_events
                     title: 'Covid-19',
                     reason: 'covid-19',
                     market_kind: "shop",
+                    event_kind_label: "event kind label",
                     post_event_sep_in_days: 1,
                     effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
                     ordinal_position: 1,
@@ -91,7 +92,7 @@ end
 
 def fehb_qualifying_life_events
   {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map do |event_trait, ordinal_position|
-    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", event_kind_label: 'event kind label', post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
   end
 end
 
@@ -231,15 +232,17 @@ Then("Employee should land on home page") do
   step "I should land on home page"
 end
 
-Given(/expired Qualifying life events of (.*) market is present$/) do |market_kind|
-  FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: 'expired', reason: 'domestic partnership')
+Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, market_kind|
+  qlek = FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, event_kind_label: 'event kind label', post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: state, reason: 'domestic partnership')
   if market_kind == "individual"
     reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.const_set('IndividualQleReasons', Types::Coercible::String.enum(*reasons))
   elsif market_kind == 'shop'
+    qlek.update_attributes(effective_on_kinds: ['first_of_this_month'])
     reasons = QualifyingLifeEventKind.by_market_kind('shop').non_draft.pluck(:reason).uniq
     Types.const_set('ShopQleReasons', Types::Coercible::String.enum(*reasons))
   else
+    qlek.update_attributes(effective_on_kinds: ['fixed_first_of_next_month'])
     reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.const_set('FehbQleReasons', Types::Coercible::String.enum(*reasons))
   end
@@ -254,8 +257,53 @@ Then("Admin navigates to Create SEP Type page") do
 end
 
 When("Admin fills Create SEP Type form with start and end dates") do
+  sleep 1
   fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
+end
+
+When("Admin should see Title field filled with title") do
+  expect(find('#title').value.present?).to eq true
+end
+
+When("Admin should see Event label field filled with event label") do
+  expect(find('#event_kind_label').value.present?).to eq true
+end
+
+When("Admin should see Tool Tip field filled with tool tip") do
+  expect(find('#tool_tip').value.present?).to eq true
+end
+
+When("Admin should see Reason field filled with reason") do
+  expect(find('#reason').value.present?).to eq true
+end
+
+When(/Admin should see (.*) market radio button selected$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(find(:xpath, '//input[@value="individual"]').value.present?).to eq true
+  elsif market_kind == 'shop'
+    expect(find(:xpath, '//input[@value="shop"]').value.present?).to eq true
+  else
+    expect(find(:xpath, '//input[@value="fehb"]').value.present?).to eq true
+  end
+end
+
+When("Admin should see Pre Event Sep In Days field filled with days") do
+  expect(find('#pre_event_sep_in_days').value.present?).to eq true
+end
+
+When("Admin should see Post Event Sep In Days field filled with days") do
+  expect(find('#post_event_sep_in_days').value.present?).to eq true
+end
+
+When(/Admin should see effective on kinds checked based on (.*)$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']")).to be_checked
+  elsif market_kind == 'shop'
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']")).to be_checked
+  else
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='fixed_first_of_next_month']")).to be_checked
+  end
 end
 
 When("Admin fills Create SEP Type form with start on date greater than end on date") do
@@ -358,27 +406,48 @@ And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind
     filter_divs = page.all('div')
     if market_kind == 'individual'
       ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
+      sleep 1
       ivl_draft_filter.click
     elsif market_kind == 'shop'
       shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
+      sleep 1
       shop_draft_filter.click
     else
       fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
+      sleep 1
       fehb_draft_filter.click
     end
   elsif state == 'Active'
     filter_divs = page.all('div')
     if market_kind == 'individual'
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
+      sleep 1
       ivl_active_filter.click
     elsif market_kind == 'shop'
       shop_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:shop_qles-shop_active_qles' }
+      sleep 1
       shop_active_filter.click
     else
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
+      sleep 1
       fehb_active_filter.click
     end
-    sleep 2
+  elsif state == 'Inactive'
+    filter_divs = page.all('div')
+    if market_kind == 'individual'
+      ivl_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:ivl_qles-ivl_inactive_qles' }
+      sleep 1
+      ivl_active_filter.click
+    elsif market_kind == 'shop'
+      shop_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:shop_qles-shop_inactive_qles' }
+      sleep 1
+      shop_active_filter.click
+    else
+      fehb_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:fehb_qles-fehb_inactive_qles' }
+      sleep 1
+      fehb_active_filter.click
+    end
+    sleep 3
   end
 end
 
@@ -432,8 +501,20 @@ Then("Admin should see Expire dropdown button") do
   expect(page).to have_content('Expire')
 end
 
+Then(/Admin (.*) see Clone button$/) do |action|
+  if action == 'cannot'
+    expect(page).not_to have_content('Clone')
+  else
+    expect(page).to have_content('Clone')
+  end
+end
+
 When("Admin clicks on Expire button of an Active SEP Type") do
   find_link('Expire').click
+end
+
+When("Admin clicks on Clone button of an Active SEP Type") do
+  find_link('Clone').click
 end
 
 When("Admin changes the end on date of an Active SEP Type to expire") do
