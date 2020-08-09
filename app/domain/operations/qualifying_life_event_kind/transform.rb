@@ -36,8 +36,8 @@ module Operations
           Failure([qlek, 'Start on cannot be empty'])
         elsif qlek.start_on > end_on
           Failure([qlek, "End on: #{end_on} must be after start on date"])
-        elsif end_on < TimeKeeper.date_of_record
-          Failure([qlek, "End Date: SEP Type can be expired with current or future date"])
+        elsif end_on < TimeKeeper.date_of_record - 1.day
+          Failure([qlek, "End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}"])
         else
           Success('')
         end
