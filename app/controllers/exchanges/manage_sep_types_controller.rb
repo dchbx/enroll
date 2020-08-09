@@ -72,7 +72,8 @@ module Exchanges
         @qle.assign_attributes({end_on: params[:qualifying_life_event_kind][:end_on]})
         respond_to { |format| format.js { render 'sep_type_to_expire' } }
       else
-        respond_to { |format| format.js { render 'expire_sep_type' } }
+        flash[:success] = l10n("controller.manage_sep_type.#{@result.success[1]}")
+        redirect_to sep_types_dt_exchanges_manage_sep_types_path
       end
     end
 
