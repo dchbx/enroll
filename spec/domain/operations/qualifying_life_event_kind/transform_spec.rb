@@ -57,6 +57,25 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
         expect(@result.failure).to eq([qlek, "End on: #{@end_on} must be after start on date"])
       end
     end
+
+    context 'with past end date' do
+      before :each do
+        qlek.update_attributes!(aasm_state: :active,
+                                start_on: (TimeKeeper.date_of_record - 10.days),
+                                end_on: (TimeKeeper.date_of_record - 4.days))
+        @end_on = TimeKeeper.date_of_record - 3.days
+        @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: @end_on.strftime("%Y-%m-%d")})
+        qlek.reload
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_a(Dry::Monads::Result::Failure)
+      end
+
+      it 'should return failure message' do
+        expect(@result.failure).to eq([qlek, "End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}"])
+      end
+    end
   end
 
   context 'for expired case with future date' do
@@ -100,6 +119,28 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
 
     it 'should tranform the qlek object to expire_pending state' do
       expect(qlek.aasm_state).to eq(:expire_pending)
+    end
+  end
+
+  context 'for expire case with current date - 1.day' do
+    before :each do
+      qlek.update_attributes!(aasm_state: :active,
+                              start_on: (TimeKeeper.date_of_record - 30.days),
+                              end_on: (TimeKeeper.date_of_record - 10.days))
+      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 1.day).strftime("%Y-%m-%d")})
+      qlek.reload
+    end
+
+    it 'should return success' do
+      expect(@result).to be_a(Dry::Monads::Result::Success)
+    end
+
+    it 'should return qlek object' do
+      expect(@result.success).to eq([qlek, 'expire_success'])
+    end
+
+    it 'should tranform the qlek object to expired state' do
+      expect(qlek.aasm_state).to eq(:expired)
     end
   end
 end
