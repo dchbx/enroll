@@ -63,3 +63,22 @@ Feature: Admin has ability to Expire the Active SEP Type
       | individual  |
       | shop        |
       | fehb        |
+
+  Scenario Outline: Admin should able to expire Active <market_kind> market SEP type with yesterday date
+    Given Admin can navigate to the Manage SEP Types screen
+    And expired Qualifying life events of <market_kind> market is present
+    When Admin clicks <market_kind> filter on SEP Types datatable
+    And Admin clicks on Active filter of <market_kind> market filter
+    When Hbx Admin clicks Action button
+    Then Admin should see Expire dropdown button
+    When Admin clicks on Expire button of an Active SEP Type
+    And Admin fills end on with yesterday date
+    And Admin clicks on Expire button
+    Then Admin should see a Expired successful message
+    And Hbx Admin logs out
+
+    Examples:
+      | market_kind |
+      | individual  |
+      | shop        |
+      | fehb        |
