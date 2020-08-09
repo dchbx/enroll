@@ -526,6 +526,10 @@ When("Admin fills end on date earlier than start on date of an Active SEP Type")
 end
 
 When("Admin fills end on with past date") do
+  fill_in "end_on", with: (TimeKeeper.date_of_record - 2.days).to_s
+end
+
+When("Admin fills end on with yesterday date") do
   fill_in "end_on", with: TimeKeeper.date_of_record.yesterday.to_s
 end
 
@@ -537,12 +541,16 @@ Then("Admin should see a successful message of an Expire") do
   expect(page).to have_content('Expiration Date Set On Sep Type Successfully')
 end
 
+Then("Admin should see a Expired successful message") do
+  expect(page).to have_content('Sep Type Expired Successfully')
+end
+
 Then("Admin should see a failure reason of an Expire") do
   expect(page).to have_content("End on: #{TimeKeeper.date_of_record.prev_year.end_of_month} must be after start on date")
 end
 
 Then("Admin should see failure reason for past date of an Expire") do
-  expect(page).to have_content("End Date: SEP Type can be expired with current or future date")
+  expect(page).to have_content("End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}")
 end
 
 Then("Admin should see a failure reason of an Update") do
