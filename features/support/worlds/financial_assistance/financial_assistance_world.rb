@@ -27,13 +27,13 @@ module FinancialAssistance
       benefit_package = hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     end
     
-    def assign_benchmark_plan_id(application)
-      hbx_profile = HbxProfile.all.first
-      plan = Plan.all.first
-      coverage_period = hbx_profile.benefit_sponsorship.current_benefit_coverage_period
-      coverage_period.update_attributes!(slcsp_id: plan.id, slcsp: plan.id)
-      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)    
-    end
+    # def assign_benchmark_plan_id(application)
+      # hbx_profile = HbxProfile.all.first
+      # plan = Plan.all.first
+      # coverage_period = hbx_profile.benefit_sponsorship.current_benefit_coverage_period
+      # coverage_period.update_attributes!(slcsp_id: plan.id, slcsp: plan.id)
+      # application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)
+    # end
 
     def create_dummy_eligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
