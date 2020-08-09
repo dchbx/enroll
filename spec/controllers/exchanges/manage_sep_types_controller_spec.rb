@@ -446,8 +446,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
             }, format: :js, xhr: true
           end
 
-          it 'should render expire_sep_type template' do
-            expect(response).to render_template('exchanges/manage_sep_types/expire_sep_type')
+          it 'should redirect to sep types dt' do
+            expect(response).to redirect_to(sep_types_dt_exchanges_manage_sep_types_path)
           end
 
           it 'should assign row' do
