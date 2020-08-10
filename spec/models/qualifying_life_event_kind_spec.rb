@@ -346,28 +346,6 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
     end
   end
 
-  context 'aasm states' do
-    context 'update_qle_reason_types' do
-      context 'for adding a reason' do
-        let!(:qlek) do
-          FactoryBot.create(:qualifying_life_event_kind,
-                            aasm_state: :draft,
-                            reason: 'add reason')
-        end
-
-        before do
-          allow(qlek).to receive(:has_valid_reason?).and_return(true)
-          allow(qlek).to receive(:has_valid_title?).and_return(true)
-          qlek.publish!
-        end
-
-        it 'should include new reason in the ShopQleReasons type' do
-          expect(::Types::ShopQleReasons.values).to include(qlek.reason)
-        end
-      end
-    end
-  end
-
   context "qualifying_life_event_kind#event", dbclean: :after_each do
 
     context "publish", dbclean: :after_each do

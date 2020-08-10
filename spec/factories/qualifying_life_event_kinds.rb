@@ -13,6 +13,7 @@ FactoryBot.define do
     post_event_sep_in_days { 30 }
     is_self_attested { true }
     is_visible { true }
+    event_kind_label {"event kind label"}
     ordinal_position { 15 }
     is_active { true }
     aasm_state {:active}
