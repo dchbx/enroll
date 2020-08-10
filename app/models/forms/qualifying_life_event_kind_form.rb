@@ -27,15 +27,8 @@ module Forms
     attribute :is_visible, Types::Bool
     attribute :termination_on_kinds, Types::Array.of(Types::String)
     attribute :date_options_available, Types::Bool
-
     attribute :reason, Types::String
-    attribute :other_reason, Types::String
     attribute :draft, Types::Bool
-
-    attribute :ivl_reasons, Types::Array.of(Types::String)
-    attribute :shop_reasons, Types::Array.of(Types::String)
-    attribute :fehb_reasons, Types::Array.of(Types::String)
-
     attribute :ivl_effective_kinds, Types::Array.of(Types::String)
     attribute :shop_effective_kinds, Types::Array.of(Types::String)
     attribute :fehb_effective_kinds, Types::Array.of(Types::String)
@@ -68,19 +61,9 @@ module Forms
 
     class << self
       def fetch_additional_params
-        { ivl_reasons: market_reasons('individual'),
-          shop_reasons: market_reasons('shop'),
-          fehb_reasons: market_reasons('fehb'),
-          ivl_effective_kinds: ::Types::IndividualEffectiveOnKinds.values,
+        { ivl_effective_kinds: ::Types::IndividualEffectiveOnKinds.values,
           shop_effective_kinds: ::Types::ShopEffectiveOnKinds.values,
           fehb_effective_kinds: ::Types::FehbEffectiveOnKinds.values }
-      end
-
-      def market_reasons(market_kind)
-        reasons = "Types::#{market_kind.humanize}QleReasons".constantize.values
-        reasons.inject([]) do |options_select, reason|
-          options_select << [reason.titleize, reason]
-        end
       end
 
       def fetch_qlek_data(id, update_params = nil)

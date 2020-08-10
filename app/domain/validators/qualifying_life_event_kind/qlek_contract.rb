@@ -17,7 +17,6 @@ module Validators
         required(:market_kind).filled(:string)
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
-        optional(:other_reason).maybe(:string)
         optional(:_id).maybe(:string)
         optional(:coverage_effective_on).maybe(:date)
         optional(:coverage_end_on).maybe(:date)
@@ -31,9 +30,7 @@ module Validators
           result_hash = result.to_h
           other_params = {}
           other_params[:ordinal_position] = 0 if result_hash[:ordinal_position].nil?
-          result_hash[:reason] = "" if result_hash[:reason] == 'Choose...'
-          other_params[:reason] = result_hash[:other_reason] if result_hash[:reason] == 'other'
-          other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason].parameterize.underscore
+          other_params[:reason] = result_hash[:reason].parameterize.underscore
           other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' || result_hash[:termination_on_kinds].nil?
           result_hash.merge(other_params)
         end
@@ -59,8 +56,8 @@ module Validators
 
       rule(:title) do
         if values[:publish].present? && values[:publish] == 'Publish'
-          reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
-          key.failure(l10n("validators.qualifying_life_event_kind.title")) if reasons.include?(value.parameterize)
+          titles = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
+          key.failure(l10n("validators.qualifying_life_event_kind.title")) if titles.include?(value.parameterize)
         end
       end
 

@@ -6,10 +6,6 @@ export default class extends Controller {
 
   initialize() {
     this.metadata = {
-      ivl_reasons:  JSON.parse(this.metadataTarget.dataset.ivlReasons),
-      shop_reasons: JSON.parse(this.metadataTarget.dataset.shopReasons),
-      fehb_reasons: JSON.parse(this.metadataTarget.dataset.fehbReasons),
-      other_reason: this.metadataTarget.dataset.otherReason,
       ivl_kinds:    JSON.parse(this.metadataTarget.dataset.ivlKinds),
       shop_kinds:   JSON.parse(this.metadataTarget.dataset.shopKinds),
       fehb_kinds:   JSON.parse(this.metadataTarget.dataset.fehbKinds),
@@ -17,19 +13,8 @@ export default class extends Controller {
       market:       this.metadataTarget.dataset.qleMarket
     }
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
-    var other_reason = this.metadata.other_reason
-    this.initializeReasons(market)
     this.initializeEffectiveKinds(market)
     this.disableTerminationkinds(market)
-    if (other_reason != ""){
-      document.getElementById("other_reason").setAttribute("type", "show");
-      document.getElementById("other_reasonHelpBlock").style.display = "block";
-      document.querySelector("label[for='other_reason']").style.display = "block";
-    }else{
-      document.getElementById("other_reason").setAttribute("type", "hidden");
-      document.getElementById("other_reasonHelpBlock").style.display = "none";
-      document.querySelector("label[for='other_reason']").style.display = "none";
-    }
   }
 
   initializeEffectiveKinds(market){
@@ -98,88 +83,10 @@ export default class extends Controller {
     }
   }
 
-  initializeReasons(market){
-    var ivl_reasons = this.metadata.ivl_reasons
-    var shop_reasons = this.metadata.shop_reasons
-    var fehb_reasons = this.metadata.fehb_reasons
-    var id = this.metadata.id
-
-    var items ;
-    if (market.value == "individual") {
-      items = ivl_reasons
-      if (this.metadata.reason != undefined){
-        this.setSelectedReason(items, "individual")
-      }
-    }
-    else if (market.value == "shop"){
-      items = shop_reasons
-      if (this.metadata.reason != undefined){
-        this.setSelectedReason(items, "shop")
-      }
-    }
-    else if (market.value == "fehb"){
-      items = fehb_reasons
-      if (this.metadata.reason != undefined){
-        this.setSelectedReason(items, "fehb")
-      }
-    }
-    var str = "<option>" + "Choose..." + "</option>"
-    for (var item of items) {
-      str += "<option value='" + item[1] + "'>" + item[0] + "</option>"
-    }
-    if (items.length != 0){
-      str += "<option value='other'>"+ "Other" + "</option>"
-    }
-    document.getElementById("reason").innerHTML = str;
-    if (this.metadata.reason != undefined){
-      this.checkSelectedReason()
-    }
-  }
-
-  reasonChange(event) {
-    var reason = document.getElementById("reason").value
-    if (reason == "other"){
-      document.getElementById("other_reason").setAttribute("type", "show");
-      document.getElementById("other_reasonHelpBlock").style.display = "block";
-      document.querySelector("label[for='other_reason']").style.display = "block";
-    }else{
-      document.getElementById("other_reason").setAttribute("type", "hidden");
-      document.querySelector("label[for='other_reason']").style.display = "none";
-      document.getElementById("other_reasonHelpBlock").style.display = "none";
-    }
-  }
-
   marketChange(event) {
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
-    this.initializeReasons(market);
     this.initializeEffectiveKinds(market);
     this.disableTerminationkinds(market);
-    document.getElementById("other_reason").setAttribute("type", "hidden");
-    document.querySelector("label[for='other_reason']").style.display = "none";
-    document.getElementById("other_reasonHelpBlock").style.display = "none";
-  }
-
-  setSelectedReason(reasons, market){
-    var reason = this.metadata.reason
-    var sele_market = this.metadata.market
-    var other_reason = this.metadata.other_reason
-    if (reason == "Choose..." ) return;
-    var sele_reason = reason == "other" && other_reason ? "other" : reason
-    if (sele_market == market && sele_reason.length != 0 && reasons.flat(1).includes(sele_reason) == false){
-        reasons.push([sele_reason.toUpperCase(), sele_reason])
-    }
-  }
-
-  checkSelectedReason(){
-    var reason = this.metadata.reason
-    var other_reason = this.metadata.other_reason
-    var reasons = document.getElementById("reason").options
-    var sele_reason = reason == "other" && other_reason ? "other" : reason
-    for (var reason of reasons){
-      if (sele_reason == reason.value) {
-        reason.selected = true
-      }
-    }
   }
 
   checkSelectedTerminationKinds(){

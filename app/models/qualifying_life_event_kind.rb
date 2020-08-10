@@ -235,7 +235,7 @@ class QualifyingLifeEventKind
     state :expire_pending
     state :expired
 
-    event :publish, :after => [:record_transition, :update_qle_reason_types] do
+    event :publish, :after => [:record_transition] do
       transitions from: :draft, to: :active, :guard => [:has_valid_reason?, :has_valid_title?], :after => [:activate_qle, :set_ordinal_position]
     end
 
@@ -243,11 +243,11 @@ class QualifyingLifeEventKind
       transitions from: [:active, :expire_pending], to: :expire_pending, :guard => :can_be_expire_pending?, :after => :update_end_date
     end
 
-    event :expire, :after => [:record_transition, :update_qle_reason_types] do
+    event :expire, :after => [:record_transition] do
       transitions from: [:active, :expire_pending], to: :expired, :guard => :can_be_expired?, :after => [:update_end_date, :deactivate_qle]
     end
 
-    event :advance_date, :after => [:record_transition, :update_qle_reason_types] do
+    event :advance_date, :after => [:record_transition] do
       transitions from: [:active, :expire_pending], to: :expired, :after => [:deactivate_qle]
     end
   end
@@ -348,13 +348,6 @@ class QualifyingLifeEventKind
 
   def has_valid_title?
     self.class.by_market_kind(market_kind).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
-  end
-
-  def update_qle_reason_types
-    const_name = "#{market_kind.humanize}QleReasons"
-    reasons = self.class.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
-    Types.send(:remove_const, const_name)
-    Types.const_set(const_name, Types::Coercible::String.enum(*reasons))
   end
 
   def update_end_date(end_date = TimeKeeper.date_of_record)
