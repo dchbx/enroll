@@ -1313,6 +1313,27 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(subject.eligibility_event_kind).to eq "unknown_sep"
       end
     end
+
+    describe "and given a special enrollment period, with a new reason of 'test_reason'", dbclean: :after_each do
+      let(:qle_on) {Date.today}
+
+      before :each do
+        allow(subject).to receive(:special_enrollment_period).and_return(
+                              SpecialEnrollmentPeriod.new(
+                                  :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "test_reason", is_active: true),
+                                  :qle_on => qle_on
+                              )
+                          )
+      end
+
+      it "should have the eligibility event date of the qle_on" do
+        expect(subject.eligibility_event_date).to eq qle_on
+      end
+
+      it "should have eligibility_event_kind of 'unknown_sep'" do
+        expect(subject.eligibility_event_kind).to eq "unknown_sep"
+      end
+    end
   end
 
   describe HbxEnrollment, "given an enrollment kind of 'open_enrollment'", dbclean: :around_each do
