@@ -4,10 +4,14 @@ module Operations
   module Individual
     class RenewEnrollment
       include Dry::Monads[:result, :do]
+      # Read aptc values from CSVs for IVL renewals during OE begin.
+      # Cancel auto_renewing enrollments asscoaited subscriber within this class.
+      # Should be able to renew any IVL enrollments.
+      # Pass in effective_on, aptc_value
 
-      def call(hbx_enrollment:, effective_on:, eligibility_values: {})
+      def call(hbx_enrollment:, effective_on:)
         validated_enrollment = yield validate(hbx_enrollment, effective_on)
-        eligibility_values   = yield fetch_eligibility_values(validated_enrollment, effective_on, eligibility_values)
+        eligibility_values   = yield fetch_eligibility_values(validated_enrollment, effective_on)
         renewal_enrollment   = yield renew_enrollment(validated_enrollment, effective_on, eligibility_values)
 
         Success(renewal_enrollment)
@@ -23,12 +27,11 @@ module Operations
         Success(enrollment)
       end
 
-      def fetch_eligibility_values(enrollment, effective_on, eligibility_values)
-        return Success(eligibility_values) if eligibility_values.present?
-
+      def fetch_eligibility_values(enrollment, effective_on)
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
+          #TODO: Pick correct applied_percentage and applied_aptc from the current year's enrollment.
           data = { applied_percentage: 1,
                    applied_aptc: tax_household.current_max_aptc.to_f,
                    max_aptc: tax_household.current_max_aptc.to_f,
