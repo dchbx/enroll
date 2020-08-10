@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :qualifying_life_event_kind do
 
@@ -29,6 +31,15 @@ FactoryBot.define do
       reason {"adoption"}
       edi_code {"05-ADOPTION"}
       tool_tip {"Enroll or add a family member due to adoption"}
+    end
+
+    trait :domestic_partnership do
+      title { "Entered into a legal domestic partnership" }
+      reason {"domestic_partnership"}
+      edi_code {"33-ENTERING DOMESTIC PARTNERSHIP"}
+      tool_tip {"Entering a domestic partnership as permitted or recognized by the #{aca_state_name}"}
+      effective_on_kinds {["first_of_next_month"]}
+      ordinal_position { 3 }
     end
 
     trait :effective_on_first_of_month do
