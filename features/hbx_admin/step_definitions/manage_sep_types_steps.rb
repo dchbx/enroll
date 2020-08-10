@@ -87,12 +87,12 @@ def shop_qualifying_life_events
                     qle_event_date_kind: :submitted_at,
                     start_on: sep_type_start_on,
                     end_on: sep_type_end_on)
-  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", post_event_sep_in_days: 90, ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
 end
 
 def fehb_qualifying_life_events
   {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map do |event_trait, ordinal_position|
-    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", event_kind_label: 'event kind label', post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
   end
 end
 
@@ -118,6 +118,10 @@ end
 
 Then("I should see listed Individual market SEP Types") do
   step "Admin should see listed Active individual market SEP Types on datatable"
+end
+
+Then("I should see listed Shop market SEP Types") do
+  step "Admin should see listed Active shop market SEP Types on datatable"
 end
 
 Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |market_kind|
@@ -233,7 +237,7 @@ Then("Employee should land on home page") do
 end
 
 Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, market_kind|
-  qlek = FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date, market_kind: market_kind, event_kind_label: 'event kind label', post_event_sep_in_days: 90, ordinal_position: 3, aasm_state: state, reason: 'domestic partnership')
+  qlek = FactoryBot.create(:qualifying_life_event_kind, :domestic_partnership, market_kind: market_kind, aasm_state: state, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), reason: 'domestic partnership')
   if market_kind == "individual"
     reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
     Types.const_set('IndividualQleReasons', Types::Coercible::String.enum(*reasons))
@@ -365,7 +369,6 @@ And(/Admin (.*) select termination on kinds for (.*) SEP Type$/) do |action, mar
   end
 end
 
-
 And(/Admin (.*) termination on kinds for (.*) market$/) do |action, _market_kind|
   find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[termination_on_kinds][]'][value='end_of_event_month']").set(true) if action == 'selected'
 end
@@ -373,6 +376,14 @@ end
 And("Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates") do
   fill_in "Pre Event SEP( In Days )", with: "0"
   fill_in "Post Event SEP( In Days )", with: "30"
+end
+
+When(/Admin selects (.*) visibility radio button for (.*) market$/) do |user, _market_kind|
+  if user == 'Customer & Admin'
+    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[1]/div/div/input').click
+  else
+    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[2]/div/div/input').click
+  end
 end
 
 And("Admin clicks on Create Draft button") do
@@ -555,4 +566,16 @@ end
 
 Then("Admin should see a failure reason of an Update") do
   expect(page).to have_content("End on: End on must be after start on date")
+end
+
+And(/Admin clicks name of a (.*) family person on the family datatable$/) do |market_kind|
+  if market_kind == 'shop'
+    find('a', :text => /Patrick*/i).click
+  else
+    step "I click on the name of a person of family list"
+  end
+end
+
+And(/I should not see the (.*) at the bottom of the (.*) qle list$/) do |qle_event, _market_kind|
+  expect(page).not_to have_content(qle_event)
 end

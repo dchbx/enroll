@@ -1,18 +1,19 @@
-Given (/a matched Employee exists with only employee role/) do
+# frozen_string_literal: true
+
+Given("a matched Employee exists with only employee role") do
   FactoryBot.create(:user)
   person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
   org = FactoryBot.create :organization, :with_active_plan_year
   @benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
   bga = FactoryBot.build :benefit_group_assignment, benefit_group: @benefit_group
   @employee_role = person.employee_roles[0]
-  ce =  FactoryBot.build(:census_employee,
-          first_name: person.first_name, 
-          last_name: person.last_name, 
-          dob: person.dob, 
-          ssn: person.ssn, 
-          employee_role_id: @employee_role.id,
-          employer_profile: org.employer_profile
-        )
+  ce = FactoryBot.build(:census_employee,
+                        first_name: person.first_name,
+                        last_name: person.last_name,
+                        dob: person.dob,
+                        ssn: person.ssn,
+                        employee_role_id: @employee_role.id,
+                        employer_profile: org.employer_profile)
 
   ce.benefit_group_assignments << bga
   ce.link_employee_role!
@@ -20,7 +21,7 @@ Given (/a matched Employee exists with only employee role/) do
   @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
 end
 
-Given (/(.*) has a matched employee role/) do |name|
+Given(/(.*) has a matched employee role/) do |_name|
   steps %{
     When Patrick Doe creates an HBX account
     When Employee goes to register as an employee
@@ -35,46 +36,45 @@ end
 def employee_by_legal_name(legal_name, person)
   org = org_by_legal_name(legal_name)
   employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: org.employer_profile.id)
-  ce = FactoryBot.create(:census_employee,
-    first_name: person.first_name,
-    last_name: person.last_name,
-    ssn: person.ssn,
-    dob: person.dob,
-    employer_profile: org.employer_profile,
-    benefit_sponsorship: benefit_sponsorship(org),
-    employee_role_id: employee_role.id
-  )
+  FactoryBot.create(:census_employee,
+                    first_name: person.first_name,
+                    last_name: person.last_name,
+                    ssn: person.ssn,
+                    dob: person.dob,
+                    employer_profile: org.employer_profile,
+                    benefit_sponsorship: benefit_sponsorship(org),
+                    employee_role_id: employee_role.id)
 end
 
-Given (/a person exists with dual roles/) do
+Given(/a person exists with dual roles/) do
   FactoryBot.create(:user)
   FactoryBot.create(:person, :with_employee_role, :with_consumer_role, :with_family, first_name: "Dual Role Person", last_name: "E", user: user)
 end
 
-Then (/(.*) sign in to portal/) do |name|
-  user = Person.where(first_name: "#{name}").first.user
+Then(/(.*) sign in to portal/) do |per_name|
+  user = Person.where(first_name: per_name).first.user
   login_as user
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   visit "/families/home"
 end
 
-And (/Employee should see a button to enroll in ivl market/) do
+And(/Employee should see a button to enroll in ivl market/) do
   expect(page).to have_content "Enroll in health or dental coverage on the District of Columbia's individual market"
   expect(page).to have_link "Enroll"
 end
 
-Then (/Dual Role Person should not see any button to enroll in ivl market/) do
+Then(/Dual Role Person should not see any button to enroll in ivl market/) do
   expect(page).not_to have_content "Enroll in health or dental coverage on the District of Columbia's individual market"
   expect(page).not_to have_link "Enroll"
 end
 
-And (/Employee clicks on Enroll/) do
+And(/Employee clicks on Enroll/) do
   within ".shop-for-plans-widget" do
     click_link "Enroll"
   end
 end
 
-Then (/Employee redirects to ivl flow/) do
+Then(/Employee redirects to ivl flow/) do
   expect(page).to have_content("Personal Information")
 end
 
@@ -97,13 +97,16 @@ Given(/^Covid QLE present with top ordinal position$/) do
   FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 30,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], ordinal_position: 5, qle_event_date_kind: :submitted_at)
 end
 
-Then(/^\w+ should see the "(.*?)" at the top of the (.*?) qle list$/) do |qle_event, _market_kind|
-  expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[0]).to have_content(qle_event)
+Then(/^\w+ should see the "(.*?)" at the (.*) of the (.*?) qle list$/) do |qle_event, position, _market_kind|
+  if position == 'top'
+    expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op')[0]).to have_content(qle_event)
+  else
+    expect(find('.qles-panel #carousel-qles .item.active').find_all('p.no-op').last).to have_content(qle_event)
+  end
 end
 
 And(/Employee should see today date and clicks continue/) do
   screenshot("current_qle_date")
-  
   expect(find('#qle_date').value).to eq TimeKeeper.date_of_record.strftime("%m/%d/%Y")
   expect(find('#qle_date')['readonly']).to eq 'true'
   expect(find('input#qle_date', style: {'pointer-events': 'none'})).to be_truthy
