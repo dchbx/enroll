@@ -1880,7 +1880,7 @@ class HbxEnrollment
     if (enrollment_kind == "special_enrollment")
       return "unknown_sep" if special_enrollment_period.blank?
       qle_reason = special_enrollment_period.qualifying_life_event_kind.reason
-      return qle_reason == 'covid-19' ? "unknown_sep" : qle_reason
+      return QualifyingLifeEventKind::REASON_KINDS.include?(qle_reason) ? qle_reason : "unknown_sep"
     end
 
     return "open_enrollment" if !is_shop?
