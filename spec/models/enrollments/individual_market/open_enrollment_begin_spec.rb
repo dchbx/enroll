@@ -251,7 +251,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             end
 
             it 'should generate assisted renewal enrollment' do
-              expect(@enrollments[1].applied_aptc_amount.to_f).to eq(BigDecimal((@enrollments[1].total_premium * @enrollments[1].product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN)).round(2)
+              expect(@enrollments[1].applied_aptc_amount.to_f).to eq(BigDecimal((@enrollments[1].total_premium * @enrollments[1].product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN).round(2))
             end
           end
 
