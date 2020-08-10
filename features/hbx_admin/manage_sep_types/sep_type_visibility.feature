@@ -17,8 +17,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Admin fills Create SEP Type form with Event label
     And Admin fills Create SEP Type form with Tool Tip
     And Admin selects individual market radio button
-    And Admin clicks reason drop down on Create SEP type form
-    And Admin selects expired reason from drop down on Create SEP type form
+    And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
     And Admin cannot select termination on kinds for individual SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
@@ -84,8 +83,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Admin fills Create SEP Type form with Event label
     And Admin fills Create SEP Type form with Tool Tip
     And Admin selects shop market radio button
-    And Admin clicks reason drop down on Create SEP type form
-    And Admin selects expired reason from drop down on Create SEP type form
+    And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
     And Admin cannot select termination on kinds for shop SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
