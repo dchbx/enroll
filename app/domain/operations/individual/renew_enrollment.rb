@@ -4,10 +4,6 @@ module Operations
   module Individual
     class RenewEnrollment
       include Dry::Monads[:result, :do]
-      # Read aptc values from CSVs for IVL renewals during OE begin.
-      # Cancel auto_renewing enrollments asscoaited subscriber within this class.
-      # Should be able to renew any IVL enrollments.
-      # Pass in effective_on, aptc_value
 
       def call(hbx_enrollment:, effective_on:)
         validated_enrollment = yield validate(hbx_enrollment, effective_on)
