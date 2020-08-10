@@ -239,16 +239,11 @@ end
 Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, market_kind|
   qlek = FactoryBot.create(:qualifying_life_event_kind, :domestic_partnership, market_kind: market_kind, aasm_state: state, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), reason: 'domestic partnership')
   if market_kind == "individual"
-    reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
-    Types.const_set('IndividualQleReasons', Types::Coercible::String.enum(*reasons))
+    # do nothing
   elsif market_kind == 'shop'
     qlek.update_attributes(effective_on_kinds: ['first_of_this_month'])
-    reasons = QualifyingLifeEventKind.by_market_kind('shop').non_draft.pluck(:reason).uniq
-    Types.const_set('ShopQleReasons', Types::Coercible::String.enum(*reasons))
   else
     qlek.update_attributes(effective_on_kinds: ['fixed_first_of_next_month'])
-    reasons = QualifyingLifeEventKind.by_market_kind(market_kind).non_draft.pluck(:reason).uniq
-    Types.const_set('FehbQleReasons', Types::Coercible::String.enum(*reasons))
   end
 end
 
@@ -302,7 +297,7 @@ end
 
 When(/Admin should see effective on kinds checked based on (.*)$/) do |market_kind|
   if market_kind == 'individual'
-    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']")).to be_checked
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_next_month']")).to be_checked
   elsif market_kind == 'shop'
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']")).to be_checked
   else
@@ -338,22 +333,18 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
   end
 end
 
-And("Admin clicks reason drop down on Create SEP type form") do
-  find(:xpath, '//select[@id="reason"]', :wait => 10).click
+And("Admin fills Create SEP Type form with Reason") do
+  fill_in "Reason", with: "domestic partnership'"
 end
 
-And("Admin selects expired reason from drop down on Create SEP type form") do
-  find("option[value='domestic partnership']").click
-end
-
-And(/Admin selects active reason from drop down for (.*) SEP type form$/) do |market_kind|
+And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
-    find("option[value='birth']").click
+    fill_in "Reason", with: "birth'"
   elsif market_kind == 'shop'
-    find("option[value='marriage']").click
+    fill_in "Reason", with: "marriage'"
   else
-    find("option[value='adoption']").click
+    fill_in "Reason", with: "adoption'"
   end
 end
 

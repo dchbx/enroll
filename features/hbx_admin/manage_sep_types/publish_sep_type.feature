@@ -17,8 +17,7 @@ Feature: Admin has ability to update a Draft SEP Type
     And Admin fills Create SEP Type form with Event label
     And Admin fills Create SEP Type form with Tool Tip
     And Admin selects <market_kind> market radio button
-    And Admin clicks reason drop down on Create SEP type form
-    And Admin selects expired reason from drop down on Create SEP type form
+    And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
     And Admin <action> select termination on kinds for <market_kind> SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
@@ -51,8 +50,7 @@ Feature: Admin has ability to update a Draft SEP Type
     And Admin fills Create SEP Type form with Event label
     And Admin fills Create SEP Type form with Tool Tip
     And Admin selects <market_kind> market radio button
-    And Admin clicks reason drop down on Create SEP type form
-    And Admin selects active reason from drop down for <market_kind> SEP type form
+    And Admin fills active reason for <market_kind> SEP type form
     And Admin selects effective on kinds for Create SEP Type
     And Admin <action> select termination on kinds for <market_kind> SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
