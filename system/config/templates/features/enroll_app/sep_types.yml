@@ -94,19 +94,9 @@ registry:
             item: <%= ENV['reason'] %>
             meta:
               label: Reason
-              content_type: :select
-              enum: []
-              default: ''
-              description: Select Reason
-              is_required: true
-              is_visible: true
-          - key: :other_reason
-            item: <%= ENV['other_reason'] %>
-            meta:
-              label: Other Reason
               content_type: :text_field
               default: ''
-              description: Enter Other Reason
+              description: Enter Reason
               is_required: true
               is_visible: true
           - key: :effective_on_kinds

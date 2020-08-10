@@ -2,10 +2,6 @@
   <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
     <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;" data-controller="sep-types">
       <meta data-target='sep-types.metadata'
-        data-ivl-reasons="<%= @qle.ivl_reasons%>"
-        data-shop-reasons="<%= @qle.shop_reasons%>"
-        data-fehb-reasons="<%= @qle.fehb_reasons%>"
-        data-other-reason="<%= @qle.other_reason || ''%>"
         data-ivl-kinds="<%= @qle.ivl_effective_kinds%>"
         data-shop-kinds="<%= @qle.shop_effective_kinds%>"
         data-fehb-kinds="<%= @qle.fehb_effective_kinds%>"
@@ -48,9 +44,8 @@
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
           </div>
 
-          <div class="col-6" data-action='change->sep-types#reasonChange'>
+          <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
           </div>
 
           <div class="col-6">
