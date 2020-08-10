@@ -408,49 +408,40 @@ And(/Admin clicks on (.*) filter of (.*) market filter$/) do |state, market_kind
     filter_divs = page.all('div')
     if market_kind == 'individual'
       ivl_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:ivl_qles-ivl_draft_qles' }
-      sleep 1
       ivl_draft_filter.click
     elsif market_kind == 'shop'
       shop_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:shop_qles-shop_draft_qles' }
-      sleep 1
       shop_draft_filter.click
     else
       fehb_draft_filter = filter_divs.detect { |div| div.text == 'Draft' && div[:id] == 'Tab:fehb_qles-fehb_draft_qles' }
-      sleep 1
       fehb_draft_filter.click
     end
   elsif state == 'Active'
     filter_divs = page.all('div')
     if market_kind == 'individual'
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:ivl_qles-ivl_active_qles' }
-      sleep 1
       ivl_active_filter.click
     elsif market_kind == 'shop'
       shop_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:shop_qles-shop_active_qles' }
-      sleep 1
       shop_active_filter.click
     else
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Active' && div[:id] == 'Tab:fehb_qles-fehb_active_qles' }
-      sleep 1
       fehb_active_filter.click
     end
   elsif state == 'Inactive'
     filter_divs = page.all('div')
     if market_kind == 'individual'
       ivl_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:ivl_qles-ivl_inactive_qles' }
-      sleep 1
       ivl_active_filter.click
     elsif market_kind == 'shop'
       shop_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:shop_qles-shop_inactive_qles' }
-      sleep 1
       shop_active_filter.click
     else
       fehb_active_filter = filter_divs.detect { |div| div.text == 'Inactive' && div[:id] == 'Tab:fehb_qles-fehb_inactive_qles' }
-      sleep 1
       fehb_active_filter.click
     end
-    sleep 3
   end
+  sleep 2
 end
 
 Then("Admin should see newly created SEP Type title on Datatable") do
@@ -504,6 +495,7 @@ Then("Admin should see Expire dropdown button") do
 end
 
 Then(/Admin (.*) see Clone button$/) do |action|
+  sleep 2
   if action == 'cannot'
     expect(page).not_to have_content('Clone')
   else
