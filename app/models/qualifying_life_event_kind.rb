@@ -65,7 +65,26 @@ class QualifyingLifeEventKind
     "exceptional_circumstances_civic_service",
     "exceptional_circumstances",
     "eligibility_failed_or_documents_not_received_by_due_date",
-    "eligibility_documents_provided"
+    "eligibility_documents_provided",
+    "open_enrollment",
+    "cobra",
+    "foster_care",
+    "location_change",
+    "citizen_status_change",
+    "eligibility_change_assistance",
+    "exceptional_circumstances_hardship_exemption",
+    "medical_coverage_order",
+    "add_child_due_to_marriage",
+    "entering_domestic_partnership",
+    "employer_cobra_non_payment",
+    "voluntary_dropping_cobra",
+    "release_from_incarceration",
+    "drop_person_due_to_divorce",
+    "termination_of_domestic_partnership",
+    "drop_self_due_to_new_eligibility",
+    "drop_family_member_due_to_new_eligibility",
+    "new_hire",
+    "passive_renewal"
   ]
 
   QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
