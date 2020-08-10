@@ -48,8 +48,16 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
       end
 
-      it 'should load ivl_reasons on to the form object' do
-        expect(assigns(:qle).ivl_reasons).to include(['Marriage', 'marriage'])
+      it 'should load ivl_effective_kinds on to the form object' do
+        expect(assigns(:qle).ivl_effective_kinds).to eq(["date_of_event", "exact_date", "first_of_month", "first_of_next_month", "fixed_first_of_next_month"])
+      end
+
+      it 'should load shop_effective_kinds on to the form object' do
+        expect(assigns(:qle).shop_effective_kinds).to eq(["date_of_event", "first_of_next_month", "first_of_this_month", "fixed_first_of_next_month"])
+      end
+
+      it 'should load fehb_effective_kinds on to the form object' do
+        expect(assigns(:qle).fehb_effective_kinds).to eq(["date_of_event", "first_of_next_month", "first_of_this_month", "fixed_first_of_next_month"])
       end
 
       context 'updateable?' do
@@ -193,8 +201,16 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
       end
 
-      it 'should load ivl_reasons on to the form object' do
-        expect(assigns(:qle).ivl_reasons).to include(['Marriage', 'marriage'])
+      it 'should load ivl_effective_kinds on to the form object' do
+        expect(assigns(:qle).ivl_effective_kinds).to eq(QualifyingLifeEventKind::IVL_EFFECTIVE_ON_KINDS)
+      end
+
+      it 'should load shop_effective_kinds on to the form object' do
+        expect(assigns(:qle).shop_effective_kinds).to eq(QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS)
+      end
+
+      it 'should load fehb_effective_kinds on to the form object' do
+        expect(assigns(:qle).fehb_effective_kinds).to eq(QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS)
       end
 
       it 'should load qlek id data on to the form object' do
@@ -634,8 +650,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     end
 
     def invoke_dry_types_script
-      consts = ['IndividualQleReasons', 'ShopQleReasons',
-                'FehbQleReasons', 'IndividualEffectiveOnKinds',
+      consts = ['IndividualEffectiveOnKinds',
                 'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
       types_module_constants = Types.constants(false)
       consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}

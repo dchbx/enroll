@@ -20,19 +20,15 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     end
 
     it 'should set some effective kinds for ivl' do
-      expect(@qlek_form.ivl_effective_kinds).to eq(['date_of_event', 'exact_date', 'first_of_month', 'first_of_next_month', 'fixed_first_of_next_month'])
+      expect(@qlek_form.ivl_effective_kinds).to eq(QualifyingLifeEventKind::IVL_EFFECTIVE_ON_KINDS)
     end
 
     it 'should set some effective kinds for shop' do
-      expect(@qlek_form.shop_effective_kinds).to eq(['date_of_event', 'first_of_next_month', 'first_of_this_month', 'fixed_first_of_next_month'])
+      expect(@qlek_form.shop_effective_kinds).to eq(QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS)
     end
 
     it 'should set some effective kinds for fehb' do
-      expect(@qlek_form.fehb_effective_kinds).to eq(['date_of_event', 'first_of_next_month', 'first_of_this_month', 'fixed_first_of_next_month'])
-    end
-
-    it 'should set reasons for shop' do
-      expect(@qlek_form.shop_reasons).to include(['Marriage', 'marriage'])
+      expect(@qlek_form.fehb_effective_kinds).to eq(QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS)
     end
   end
 
@@ -154,8 +150,7 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
   end
 
   def invoke_dry_types_script
-    consts = ['IndividualQleReasons', 'ShopQleReasons',
-              'FehbQleReasons', 'IndividualEffectiveOnKinds',
+    consts = ['IndividualEffectiveOnKinds',
               'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
     types_module_constants = Types.constants(false)
     consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}

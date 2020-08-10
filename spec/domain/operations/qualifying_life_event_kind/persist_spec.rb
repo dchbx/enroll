@@ -174,7 +174,6 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'pre_event_sep_in_days' => '10',
           'is_self_attested' => 'true',
           'reason' => 'lost_access_to_mec',
-          'other_reason' => '',
           'post_event_sep_in_days' => '88',
           'market_kind' => 'individual',
           'effective_on_kinds' => ['date_of_event'],
