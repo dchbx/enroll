@@ -39,7 +39,7 @@ FactoryBot.define do
       reason {"domestic_partnership"}
       edi_code {"33-ENTERING DOMESTIC PARTNERSHIP"}
       tool_tip {"Entering a domestic partnership as permitted or recognized by the #{aca_state_name}"}
-      effective_on_kinds {["first_of_next_month"]}
+      effective_on_kinds {["date_of_event"]}
       ordinal_position { 3 }
     end
 

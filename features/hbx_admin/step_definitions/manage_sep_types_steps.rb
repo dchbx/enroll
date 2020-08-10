@@ -297,7 +297,7 @@ end
 
 When(/Admin should see effective on kinds checked based on (.*)$/) do |market_kind|
   if market_kind == 'individual'
-    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_next_month']")).to be_checked
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']")).to be_checked
   elsif market_kind == 'shop'
     expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']")).to be_checked
   else
