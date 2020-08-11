@@ -255,7 +255,7 @@ Then("Admin navigates to Create SEP Type page") do
   expect(page).to have_content('Create SEP Type')
 end
 
-When(/Admin fills Create SEP Type form with (.*) start and end dates$/) do |date|
+When(/Admin fills Create SEP Type form with(?: (.*))? start and end dates$/) do |date|
   sleep 1
   if date == 'future'
     fill_in "Start Date", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
@@ -350,6 +350,17 @@ And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
     fill_in "Reason", with: "marriage'"
   else
     fill_in "Reason", with: "adoption'"
+  end
+end
+
+And(/Admin fills active title for (.*) SEP type form$/) do |market_kind|
+  sleep(2)
+  if market_kind == 'individual'
+    fill_in "Title", with: "Had a baby"
+  elsif market_kind == 'shop'
+    fill_in "Title", with: "Married"
+  else
+    fill_in "Title", with: "Adopted a child"
   end
 end
 
@@ -466,16 +477,34 @@ Then("Admin should see newly created SEP Type title on Datatable") do
   expect(page).to have_content('Entered into a legal domestic partnership')
 end
 
+Then(/Admin should see newly created SEP Type with Active SEP Type title for (.*) on Datatable$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(page).to have_content('Had a baby')
+  elsif market_kind == 'shop'
+    expect(page).to have_content('Married')
+  else
+    expect(page).to have_content('Adopted a child')
+  end
+end
+
 Then("Admin should see failure reason while creating a new SEP Type") do
   expect(page).to have_content('End on must be after start on date')
 end
 
-Then("Admin should see failure reason while publishing a new SEP Type") do
-  expect(page).to have_content('Active SEP type exists with same reason')
+Then("Admin should see failure title while publishing a new SEP Type") do
+  expect(page).to have_content('Active SEP type exists with same title')
 end
 
-When("Admin clicks on newly created SEP Type") do
-  find_link('Entered into a legal domestic partnership').click
+When(/Admin clicks on newly created SEP Type(?: for (.*))?/) do |market_kind|
+  if market_kind == 'individual'
+    find_link('Had a baby').click
+  elsif market_kind == 'shop'
+    find_link('Married').click
+  elsif market_kind == 'fehb'
+    find_link('Adopted a child').click
+  else
+    find_link('Entered into a legal domestic partnership').click
+  end
 end
 
 Then("Admin should navigate to update SEP Type page") do
