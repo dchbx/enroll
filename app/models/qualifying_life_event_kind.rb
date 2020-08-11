@@ -236,7 +236,7 @@ class QualifyingLifeEventKind
     state :expired
 
     event :publish, :after => [:record_transition] do
-      transitions from: :draft, to: :active, :guard => [:has_valid_reason?, :has_valid_title?], :after => [:activate_qle, :set_ordinal_position]
+      transitions from: :draft, to: :active, :guard => [:has_valid_title?], :after => [:activate_qle, :set_ordinal_position]
     end
 
     event :schedule_expiration, :after => :record_transition do
@@ -340,10 +340,6 @@ class QualifyingLifeEventKind
 
   def can_be_expired?(end_date = TimeKeeper.date_of_record)
     [:active, :expire_pending].include?(aasm_state) && TimeKeeper.date_of_record > end_date
-  end
-
-  def has_valid_reason?
-    self.class.by_market_kind(market_kind).active_by_state.pluck(:reason).uniq.exclude?(reason)
   end
 
   def has_valid_title?
