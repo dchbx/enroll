@@ -148,11 +148,11 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-      previous_url: financial_assistance_application_applicant_incomes_path(@application, @applicant),
-      next_url: financial_assistance_application_applicant_deductions_path(@application, @applicant)
+      previous_url: application_applicant_incomes_path(@application, @applicant),
+      next_url: application_applicant_deductions_path(@application, @applicant)
     } %>
 </div>
-<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+<%= render './ui-components/v1/modals/help_with_plan' %>
 </div>
 
 <%= render partial: '/financial_assistance/shared/to_previous_modal' %>

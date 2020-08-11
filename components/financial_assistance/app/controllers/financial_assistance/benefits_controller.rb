@@ -132,7 +132,8 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      raw_support_text = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      raw_support_text = YAML.load(File.read(file_path)).with_indifferent_access 
       @support_texts = set_support_text_placeholders raw_support_text
     end
 
