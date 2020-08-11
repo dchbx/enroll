@@ -1,6 +1,6 @@
 <% if object.errors.any? %>
 	<div class="alert alert-danger">
-		<h4>The following <%= pluralize(object.errors.size, "error") %> require your attention:</h4>
+		<h4>You need to correct the following errors:</h4>
 		<ul>
 			<% object.errors.full_messages.each do |msg| %>
 				<li><%= msg %></li>
