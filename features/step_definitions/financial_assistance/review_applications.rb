@@ -8,7 +8,11 @@ And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
   visit financial_assistance.applications_path
 end
 
+<<<<<<< HEAD
 When(/^the user clicks the “Action” dropdown corresponding to the .*? application$/) do
+=======
+When(/^the user clicks the “Action” dropdown corresponding to the (.*?) application$/) do |state|
+>>>>>>> 0d9d5e0... review applications feature
   # draft, submitted, determination_response_error, determined
   find(".dropdown-toggle", :text => "Actions").click
 end
