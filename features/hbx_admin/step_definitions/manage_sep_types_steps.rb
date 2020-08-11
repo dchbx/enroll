@@ -255,10 +255,15 @@ Then("Admin navigates to Create SEP Type page") do
   expect(page).to have_content('Create SEP Type')
 end
 
-When("Admin fills Create SEP Type form with start and end dates") do
+When(/Admin fills Create SEP Type form with (.*) start and end dates$/) do |date|
   sleep 1
-  fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
-  fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
+  if date == 'future'
+    fill_in "Start Date", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
+    fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
+  else
+    fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
+    fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
+  end
 end
 
 When("Admin should see Title field filled with title") do
