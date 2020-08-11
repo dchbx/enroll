@@ -82,6 +82,8 @@ end
 
 Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
+  expect(page).to have_css("#no_ssn_tooltip")
+  expect(page).to have_css("#gender_tooltip")
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
@@ -103,7 +105,7 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-
+  expect(page).to have_css("#home_address_tooltip")
   sleep 2
   screenshot("personal_form")
 end
