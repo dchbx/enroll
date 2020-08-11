@@ -626,7 +626,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  expect(page).to have_selector('.selectric', text: Settings.aca.shop_market.employee.default_contact_method)
+  expect(page).to have_selector('.selectric', text: 'Only electronic communications')
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 

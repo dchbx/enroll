@@ -30,6 +30,11 @@
                   </button>
                 </div>
               </div>
+              <% if kind == 'home' %>
+                 <span>
+                  <i class='fa fa-question-circle no-pd'  style='margin-top:20px;' data-toggle="tooltip" title="<%=l10n("insured.home_address_tooltip")%>"></i>
+                </span>
+              <% end %>
               <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
             </div>
           </div>
