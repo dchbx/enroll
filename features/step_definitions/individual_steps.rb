@@ -343,6 +343,7 @@ And(/consumer clicked on continue for plan shopping/) do
 end
 
 Then(/I should land on home page$/) do
+  sleep 1
   expect(page).to have_content "My #{Settings.site.short_name}"
 end
 

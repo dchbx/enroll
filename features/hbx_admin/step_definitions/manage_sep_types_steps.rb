@@ -116,11 +116,11 @@ When("Admin clicks on Individual tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
 end
 
-Then(/^\w+ should see listed Individual market SEP Types$/) do
+Then(/(.*) should see listed Individual market SEP Types$/) do |_user|
   step "Admin should see listed Active individual market SEP Types on datatable"
 end
 
-Then("I should see listed Shop market SEP Types") do
+Then(/(.*) should see listed Shop market SEP Types$/) do |_user|
   step "Admin should see listed Active shop market SEP Types on datatable"
 end
 
