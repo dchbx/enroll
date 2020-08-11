@@ -25,7 +25,7 @@ module SepAll
     @start_on = special_enrollment_period.start_on
     @end_on = special_enrollment_period.end_on
     @effective_on = special_enrollment_period.effective_on
-    @self_attested = qle.is_self_attested  # TODO: check here
+    @self_attested = qle.is_self_attested
     @date_options = qle.date_options_available
   end
 
