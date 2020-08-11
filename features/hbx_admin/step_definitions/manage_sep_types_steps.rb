@@ -334,7 +334,7 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
 end
 
 And("Admin fills Create SEP Type form with Reason") do
-  fill_in "Reason", with: "domestic partnership'"
+  fill_in "Reason", with: "domestic partnership"
 end
 
 And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
@@ -374,6 +374,14 @@ When(/Admin selects (.*) visibility radio button for (.*) market$/) do |user, _m
     find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[1]/div/div/input').click
   else
     find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[2]/div/div/input').click
+  end
+end
+
+When(/Admin selects (.*) self attestation radio button for (.*) market$/) do |user, _market_kind|
+  if user == 'Self Service'
+    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[3]/div[1]/div/div/input').click
+  else
+    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[3]/div[2]/div/div/input').click
   end
 end
 
@@ -559,6 +567,19 @@ And(/Admin clicks name of a (.*) family person on the family datatable$/) do |ma
   end
 end
 
-And(/I should not see the (.*) at the bottom of the (.*) qle list$/) do |qle_event, _market_kind|
+And(/(.*) should not see the (.*) at the bottom of the (.*) qle list$/) do |_user, qle_event, _market_kind|
   expect(page).not_to have_content(qle_event)
+end
+
+When(/(.*) click on the (.*) Sep Type$/) do |_user, _qle|
+  find('.qles-panel #carousel-qles .item.active').find_all('p.no-op').last.click
+end
+
+Then(/(.*) should (.*) input field to enter the Sep Type date$/) do |_user, action|
+  if action == 'see'
+    expect(page).to have_content("Date of domestic partnership")
+  else
+    expect(page).not_to have_content("Date of domestic partnership")
+    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period")
+  end
 end
