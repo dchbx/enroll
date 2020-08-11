@@ -49,7 +49,6 @@ class Enrollments::IndividualMarket::OpenEnrollmentBegin
       primary_hbx_id = family.primary_applicant.person.hbx_id
       begin
         enrollments = family.active_household.hbx_enrollments.where(query).order(:"effective_on".desc)
-        enrollments = enrollments.select{|en| current_bcp.contains?(en.effective_on)}
         enrollments.each do |enrollment|
           count += 1
           @logger.info "Found #{count} enrollments" if count % 100 == 0
