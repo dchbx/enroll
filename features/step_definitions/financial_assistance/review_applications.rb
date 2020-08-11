@@ -9,10 +9,14 @@ And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
 end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 When(/^the user clicks the “Action” dropdown corresponding to the .*? application$/) do
 =======
 When(/^the user clicks the “Action” dropdown corresponding to the (.*?) application$/) do |state|
 >>>>>>> a4614f6... review applications feature
+=======
+When(/^the user clicks the “Action” dropdown corresponding to the (.*?) application$/) do
+>>>>>>> 41a8b2b... rubucop errors
   # draft, submitted, determination_response_error, determined
   find(".dropdown-toggle", :text => "Actions").click
 end
