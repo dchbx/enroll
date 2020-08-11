@@ -31,6 +31,7 @@ class ApplicationController < ActionController::Base
 
   # for current_user
   before_action :set_current_user
+  before_action :set_raven_context
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
@@ -48,6 +49,16 @@ class ApplicationController < ActionController::Base
     }
 
     log(JSON.dump(error_message), {:severity => 'critical'})
+  end
+
+  def set_raven_context
+    return unless current_user
+
+    Raven.user_context(
+      id: current_user.id.to_s,
+      email: current_user.email,
+      username: current_user.try(:person).try(:hbx_id)
+    )
   end
 
   def access_denied

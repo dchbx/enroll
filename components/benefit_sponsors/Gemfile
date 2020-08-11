@@ -19,6 +19,7 @@ gem "sponsored_benefits", path: "../sponsored_benefits"
 gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'master'
 gem 'webpacker', '~> 4.0.2'
+gem 'sentry-raven'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
 # gem 'resource_registry',  git: '../../../resource_registry'
 

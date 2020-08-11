@@ -35,6 +35,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'dry-validation'
   s.add_dependency 'dry-struct'
   s.add_dependency 'dry-monads'
+  s.add_dependency 'sentry-raven'
 
 
   # s.add_development_dependency 'bundler-audit',             '~> 0.6'

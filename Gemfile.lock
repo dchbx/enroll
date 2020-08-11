@@ -83,6 +83,7 @@ PATH
     benefit_sponsors (0.0.1)
       aasm (~> 4.8)
       active_model_serializers (~> 0.10)
+      browser (= 2.7.0)
       config (~> 2.0)
       devise (~> 4.5)
       dry-auto_inject (= 0.6.1)
@@ -102,6 +103,7 @@ PATH
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
       roo (~> 2.1)
+      sentry-raven
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
@@ -270,6 +272,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
+    browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
     bunny (1.7.1)
@@ -468,6 +471,8 @@ GEM
       railties (>= 3.0.0)
     fakeredis (0.7.0)
       redis (>= 3.2, < 5.0)
+    faraday (1.0.1)
+      multipart-post (>= 1.2, < 3)
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffi (1.9.25)
@@ -592,6 +597,7 @@ GEM
     multi_json (1.14.1)
     multi_test (0.1.2)
     multi_xml (0.6.0)
+    multipart-post (2.1.1)
     mustermann (1.1.1)
       ruby2_keywords (~> 0.0.1)
     net-scp (2.0.0)
@@ -789,6 +795,8 @@ GEM
     selenium-webdriver (3.142.7)
       childprocess (>= 0.5, < 4.0)
       rubyzip (>= 1.2.2)
+    sentry-raven (3.0.0)
+      faraday (>= 1.0)
     serverengine (1.5.11)
       sigdump (~> 0.2.2)
     sexp_processor (4.14.1)
@@ -918,6 +926,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
   capistrano-rails (= 1.4)
@@ -1003,6 +1012,7 @@ DEPENDENCIES
   sass-rails (~> 5)
   sassc (~> 1.12)
   sdoc (~> 1.0)
+  sentry-raven
   shoulda-matchers (~> 3)
   simple_calendar!
   simplecov (~> 0.14)

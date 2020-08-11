@@ -2,6 +2,8 @@ module BenefitSponsors
   class ApplicationController < ActionController::Base
     protect_from_forgery with: :exception
     before_action :set_last_portal_visited
+    before_action :set_raven_context
+
     include Pundit
 
     helper BenefitSponsors::Engine.helpers
@@ -19,6 +21,16 @@ module BenefitSponsors
     end
 
     protected
+
+    def set_raven_context
+      return unless current_user
+
+      Raven.user_context(
+        id: current_user.id.to_s,
+        email: current_user.email,
+        username: current_user.try(:person).try(:hbx_id)
+      )
+    end
 
     def set_current_person(required: true)
       if current_user.try(:person).try(:agent?) && session[:person_id].present?

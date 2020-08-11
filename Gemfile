@@ -112,6 +112,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
+gem "sentry-raven"
 
 group :doc do
   gem 'sdoc',                   '~> 1.0'
@@ -123,7 +124,6 @@ group :development do
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
-
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
