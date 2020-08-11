@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^that a family has a Financial Assistance application in the (.*?) state$/) do |state|
-application.update_attributes(aasm_state: state)
+  application.update_attributes(aasm_state: state)
 end
 
 And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
