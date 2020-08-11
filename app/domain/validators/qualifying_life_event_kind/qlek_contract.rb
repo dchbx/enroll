@@ -47,13 +47,6 @@ module Validators
         key.failure(l10n("validators.qualifying_life_event_kind.pre_event_sep_in_days")) unless value >= 0
       end
 
-      rule(:reason) do
-        if values[:publish].present? && values[:publish] == 'Publish'
-          reasons = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:reason).uniq
-          key.failure(l10n("validators.qualifying_life_event_kind.reason")) if reasons.include?(value)
-        end
-      end
-
       rule(:title) do
         if values[:publish].present? && values[:publish] == 'Publish'
           titles = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).active_by_state.pluck(:title).map(&:parameterize).uniq
