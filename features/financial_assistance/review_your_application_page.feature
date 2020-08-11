@@ -11,7 +11,7 @@ Feature: Review your application page functionality
 
   Scenario: Editing Income Adjustments
     Given the pencil icon displays for each instance of deductions
-    And the user clicks the pencil icon for Income Adjustments
+    And the user clicks the pencil icon for INCOME ADJUSTMENTS
     Then the user should navigate to the Income Adjustments page
 
   Scenario: Editing Wages & Salaries
