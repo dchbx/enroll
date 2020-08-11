@@ -34,7 +34,7 @@
         .form-group
           .row.pl-3.pr-3
             .col-8.p-0
-              = f.label :password_confirmation, "Password Confirmation"
+              = f.label :password_confirmation, l10n(".password_confirmation")
             .col-4.p-0
               .float-right
                 span#pass_match
@@ -45,7 +45,9 @@
         .form-group.d-none#optionalEmail
           = f.label :email
           small.pl-2.text-muted
-            | (Optional)
+            | (
+            = l10n(".optional")
+            | )
           = f.text_field :email, class: "form-control", data: {action: "focus->signup#hideTooltips click->signup#hideTooltips blur->signup#validateEmailFormat", target: 'signup.optionalEmail'}
           = f.hidden_field :invitation_id
         .recaptcha-error.alert-error
