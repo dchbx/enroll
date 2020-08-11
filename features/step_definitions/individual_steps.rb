@@ -54,6 +54,8 @@ end
 
 And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
+  expect(page).to have_content("View Privacy Act statement")
+  expect(page).to have_content("By selecting CONTINUE")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
   sleep 5
