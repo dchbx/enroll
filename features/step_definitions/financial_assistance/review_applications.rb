@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Given(/^that a family has a Financial Assistance application in the (.*?) state$/) do |state|
-  application.update_attributes(aasm_state: state)
+application.update_attributes(aasm_state: state)
 end
 
 And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
@@ -9,10 +9,14 @@ And(/^the user navigates to the “Help Paying For Coverage” portal$/) do
 end
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 When(/^the user clicks the “Action” dropdown corresponding to the .*? application$/) do
 =======
 When(/^the user clicks the “Action” dropdown corresponding to the (.*?) application$/) do |state|
 >>>>>>> 0d9d5e0... review applications feature
+=======
+When(/^the user clicks the “Action” dropdown corresponding to the (.*?) application$/) do
+>>>>>>> 8619695... rubucop errors
   # draft, submitted, determination_response_error, determined
   find(".dropdown-toggle", :text => "Actions").click
 end
