@@ -13,7 +13,7 @@ module DeviseHelper
     <div class="alert alert-error module registration-rules" role="alert">
       <div class="text-center">
         <strong>
-          Password Requirements
+          You need to correct the following errors to create an account:
         </strong>
       </div>
       <br/>
