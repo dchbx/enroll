@@ -116,7 +116,7 @@ When("Admin clicks on Individual tab") do
   find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
 end
 
-Then("I should see listed Individual market SEP Types") do
+Then(/^\w+ should see listed Individual market SEP Types$/) do
   step "Admin should see listed Active individual market SEP Types on datatable"
 end
 
@@ -239,7 +239,7 @@ end
 Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, market_kind|
   qlek = FactoryBot.create(:qualifying_life_event_kind, :domestic_partnership, market_kind: market_kind, aasm_state: state, start_on: Date.new(2019,1,1), end_on: Date.new(2019,12,31), reason: 'domestic partnership')
   if market_kind == "individual"
-    # do nothing
+    qlek.update_attributes(effective_on_kinds: ['date_of_event'])
   elsif market_kind == 'shop'
     qlek.update_attributes(effective_on_kinds: ['first_of_this_month'])
   else
@@ -388,6 +388,11 @@ When(/Admin selects (.*) self attestation radio button for (.*) market$/) do |us
   else
     find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[3]/div[2]/div/div/input').click
   end
+end
+
+When("Admin fills Create SEP Type form with eligibility start and end dates") do
+  fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+  fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
 And("Admin clicks on Create Draft button") do
@@ -580,11 +585,92 @@ When(/(.*) click on the (.*) Sep Type$/) do |_user, _qle|
   find('.qles-panel #carousel-qles .item.active').find_all('p.no-op').last.click
 end
 
-Then(/(.*) should (.*) input field to enter the Sep Type date$/) do |_user, action|
+Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
   if action == 'see'
     expect(page).to have_content("Date of domestic partnership")
   else
     expect(page).not_to have_content("Date of domestic partnership")
-    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period")
+    expect(page).to have_content("Based on the information you entered, you may be eligible for a special enrollment period. Please call us at 1-855-532-5465 to give us more information so we can see if you qualify.")
   end
+end
+
+
+And(/^\w+ fill in QLE date (.*) the range eligiblity date period$/) do |date|
+  if date == 'outside'
+    fill_in "qle_date", with: (TimeKeeper.date_of_record - 3.months).strftime('%m/%d/%Y').to_s
+  else
+    fill_in "qle_date", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
+  end
+end
+
+And(/^\w+ should see QLE date filled and clicks continue$/) do
+  expect(find('#qle_date').value.present?).to eq true
+  within '#qle-date-chose' do
+    find('.interaction-click-control-continue').click
+  end
+end
+
+
+Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
+  if action == 'see'
+    expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
+  else
+    expect(page).to have_content "The date you submitted does not qualify for special enrollment.\nPlease double check the date or contact DC Health Link's Customer Care Center: 1-855-532-5465.\n\nShop for health and dental plans"
+  end
+end
+
+Given("Hbx Admin Creates and Publish Individual market SEP Type") do
+  step "Qualifying life events of all markets are present"
+  step "the Admin will see the Manage SEP Types under admin dropdown"
+  step "Admin can click Manage SEP Types link"
+  step "Admin can navigate to the Manage SEP Types screen"
+  step "expired Qualifying life events of individual market is present"
+  step "Admin clicks on the Create SEP Type button"
+  step "Admin navigates to Create SEP Type page"
+  step "Admin fills Create SEP Type form with start and end dates"
+  step "Admin fills Create SEP Type form with Title"
+  step "Admin fills Create SEP Type form with Event label"
+  step "Admin fills Create SEP Type form with Tool Tip"
+  step "Admin selects individual market radio button"
+  step "Admin fills Create SEP Type form with Reason"
+  step "Admin selects effective on kinds for Create SEP Type"
+  step "Admin cannot select termination on kinds for individual SEP Type"
+  step "Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates"
+  step "Admin selects Self Service self attestation radio button for individual market"
+  step "Admin fills Create SEP Type form with eligibility start and end dates"
+  step "Admin clicks on Create Draft button"
+  step "Admin should see SEP Type Created Successfully message"
+  step "Admin navigates to SEP Types List page"
+  step "Admin clicks individual filter on SEP Types datatable"
+  step "Admin clicks on Draft filter of individual market filter"
+  step "Admin should see newly created SEP Type title on Datatable"
+  step "Admin clicks on newly created SEP Type"
+  step "Admin should navigate to update SEP Type page"
+  step "Admin clicks on Publish button"
+  step "Admin should see Successfully publish message"
+end
+
+Given("Individual creates account and on home page") do
+  step "Individual has not signed up as an HBX user"
+  step "Individual with known qles visits the Insured portal outside of open enrollment"
+  step "Individual creates a new HBX account"
+  step "I should see a successful sign up message"
+  step "user should see your information page"
+  step "user goes to register as an individual"
+  step "user clicks on continue button"
+  step "user should see heading labeled personal information"
+  step "Individual should click on Individual market for plan shopping"
+  step "Individual should see a form to enter personal information"
+  step "Individual clicks on Save and Exit"
+  step "Individual resumes enrollment"
+  step "Individual click on sign in existing account"
+  step "I signed in"
+  step "Individual sees previously saved address"
+  step "Individual agrees to the privacy agreeement"
+  step "Individual should see identity verification page and clicks on submit"
+  step "Individual should see the dependents form"
+  step "I click on continue button on household info form"
+  step "I click on none of the situations listed above apply checkbox"
+  step "I click on back to my account button"
+  step "I should land on home page"
 end
