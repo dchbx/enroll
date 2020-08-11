@@ -2643,6 +2643,31 @@ describe HbxEnrollment, type: :model, :dbclean => :around_each do
   end
 end
 
+describe '#has_at_least_one_aptc_eligible_member?' do
+  let(:person) { FactoryBot.create(:person, :with_consumer_role)}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:household) { family.active_household}
+  let!(:tax_household) {FactoryBot.create(:tax_household,  effective_ending_on: nil, household: household)}
+  let!(:tax_household_member) {FactoryBot.create(:tax_household_member, tax_household: tax_household)}
+  let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, effective_on: TimeKeeper.date_of_record.beginning_of_year, family: person.primary_family)}
+  let!(:eligibility_kinds1) {{"is_ia_eligible" => true}}
+  let!(:eligibility_kinds2) {{"is_ia_eligible" => false}}
+  let(:effective_on_year) {hbx_enrollment.effective_on.year}
+  context 'aptc eligible member on tax household' do
+    it 'should return true' do
+      tax_household_member.update_attributes(eligibility_kinds1)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.has_at_least_one_aptc_eligible_member?(effective_on_year)).to eq true
+    end
+  end
+  context 'no aptc eligible member on tax household' do
+    it 'should return false' do
+      tax_household_member.update_attributes(eligibility_kinds2)
+      hbx_enrollment.reload
+      expect(hbx_enrollment.has_at_least_one_aptc_eligible_member?(effective_on_year)).to eq false
+    end
+  end
+end
 
   describe "#notify_enrollment_cancel_or_termination_event", :dbclean => :after_each do
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}

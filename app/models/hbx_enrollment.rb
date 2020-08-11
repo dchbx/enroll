@@ -481,7 +481,7 @@ class HbxEnrollment
   end
 
   def has_at_least_one_aptc_eligible_member?(year)
-    tax_households = family.active_household.tax_households.tax_household_with_year(year)
+    tax_households = family.active_household.tax_households.tax_household_with_year(year).active_tax_household
     return false if tax_households.blank?
     tax_households.first.tax_household_members.any?(&:is_ia_eligible?)
   end
