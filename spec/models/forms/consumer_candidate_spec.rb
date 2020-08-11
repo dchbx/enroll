@@ -160,6 +160,7 @@ describe Forms::ConsumerCandidate, "ssn validations" do
       allow(subject).to receive(:no_ssn).and_return("0")
       subject.ssn_or_checkbox
       expect(subject.errors.messages.present?).to eq true
+      expect(subject.errors[:base]).to eq ["Enter a valid social security number or select 'I don't have an SSN'"]
     end
 
     it "doesnt add errors when SSN is present" do

@@ -12,7 +12,7 @@
             %h2.darkblue
               = l10n("personal_information")
             %p
-              = "First, we need to verify whether you're new to #{site_short_name} or affiliated with another account. Please enter your personal information. When you're finished, select CONTINUE."
+              = l10n("insured.consumer_roles.search.enter_personal_info_msg")
             %p.memo * = required field
             = render 'insured/consumer_roles/remote_search_form', f: f
           .col-lg-3.col-md-3.col-sm-3.col-xs-12
