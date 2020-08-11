@@ -383,11 +383,6 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
           expect(qlek.may_publish?).to eq false
         end
 
-        it "reason guard" do
-          qlek.update_attributes(reason: 'test_reason')
-          expect(qlek.may_publish?).to eq false
-        end
-
         it "should raise error for invalid transition" do
           qlek.update_attributes(aasm_state: :active)
           expect { qlek.publish! }.to raise_error AASM::InvalidTransition

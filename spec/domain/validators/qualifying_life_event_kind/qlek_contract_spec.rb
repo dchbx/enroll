@@ -179,29 +179,6 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
     end
 
-    context 'duplicate reason' do
-      let!(:qlek) do
-        FactoryBot.create(:qualifying_life_event_kind, reason: 'lost_access_to_mec', market_kind: 'individual')
-      end
-
-      before  do
-        contract_params.merge!({publish: 'Publish'})
-        @result = subject.call(contract_params)
-      end
-
-      it 'should return failure' do
-        expect(@result.failure?).to be_truthy
-      end
-
-      it 'should have any errors' do
-        expect(@result.errors.empty?).to be_falsy
-      end
-
-      it 'should return error message if reason already exists' do
-        expect(@result.errors.messages.first.text).to eq('Active SEP type exists with same reason')
-      end
-    end
-
     context 'duplicate title' do
       let!(:qlek) do
         FactoryBot.create(:qualifying_life_event_kind, reason: 'lost_access_to_mec', market_kind: 'individual')
