@@ -1,5 +1,8 @@
 name: Rspec and Cucumbers
-on: push
+on:
+  push:
+    branches:
+      - master
 
 env:
   TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN: "{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb"
