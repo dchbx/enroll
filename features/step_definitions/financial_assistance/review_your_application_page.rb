@@ -1,6 +1,6 @@
-# And(/^is logged in$/) do
-#   login_as user
-# end
+And(/^is logged in$/) do
+  login_as user
+end
 #
 # And(/^a benchmark plan exists$/) do
 #   hbx_profile = FactoryBot.create(:hbx_profile)
