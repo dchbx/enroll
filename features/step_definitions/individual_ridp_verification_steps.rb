@@ -63,7 +63,6 @@ And(/^an uploaded application in REVIEW status is present$/) do
 end
 
 And(/^an uploaded identity verification in REVIEW status is present$/) do
-  binding.pry
   doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
