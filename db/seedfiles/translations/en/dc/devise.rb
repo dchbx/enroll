@@ -11,4 +11,6 @@ DEVISE_TRANSLATIONS = {
   "en.devise.shared.links.create_account" => "Create account",
   "en.devise.shared.links.did_not_receive_confirmation_instructions" => "Didn't receive confirmation instructions",
   "en.devise.shared.links.sign_in_with_provider" => "Sign in with %{provider}",
+  "en.devise.registrations.new.optional" => "optional",
+  "en.devise.registrations.new.password_confirmation" => "Password confirmation",
 }
