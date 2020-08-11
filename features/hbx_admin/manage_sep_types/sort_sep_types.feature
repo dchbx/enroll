@@ -85,6 +85,37 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then I should see the "Married" at the top of the ivl qle list
     Then Individual logs out
 
+  Scenario: Admin will create a new Individual market SEP type with future date and try to sort the Sep Type
+    Given Admin can navigate to the Manage SEP Types screen
+    And expired Qualifying life events of individual market is present
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with future start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects individual market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin cannot select termination on kinds for individual SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin clicks on Create Draft button
+    Then Admin should see SEP Type Created Successfully message
+    When Admin navigates to SEP Types List page
+    When Admin clicks individual filter on SEP Types datatable
+    And Admin clicks on Draft filter of individual market filter
+    Then Admin should see newly created SEP Type title on Datatable
+    When Admin clicks on newly created SEP Type
+    Then Admin should navigate to update SEP Type page
+    When Admin clicks on Publish button
+    Then Admin should see Successfully publish message
+    When Admin clicks on the Sorting SEP Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Individual tab
+    And Admin should see listed Individual market SEP Types
+    And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
+    And Hbx Admin logs out
+
   Scenario: Admin will sort Shop market SEP Types and it will reflect the same order on the employee home page qle carousel
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
@@ -123,3 +154,34 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Employee should land on home page
     And Employee should see the "Married" at the top of the shop qle list
     Then Employee logs out
+
+  Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
+    Given Admin can navigate to the Manage SEP Types screen
+    And expired Qualifying life events of shop market is present
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with future start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects shop market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin cannot select termination on kinds for shop SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin clicks on Create Draft button
+    Then Admin should see SEP Type Created Successfully message
+    When Admin navigates to SEP Types List page
+    When Admin clicks shop filter on SEP Types datatable
+    And Admin clicks on Draft filter of shop market filter
+    Then Admin should see newly created SEP Type title on Datatable
+    When Admin clicks on newly created SEP Type
+    Then Admin should navigate to update SEP Type page
+    When Admin clicks on Publish button
+    Then Admin should see Successfully publish message
+    When Admin clicks on the Sorting SEP Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on Shop tab
+    And Admin should see listed Shop market SEP Types
+    And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
+    And Hbx Admin logs out
