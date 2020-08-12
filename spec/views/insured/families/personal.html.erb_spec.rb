@@ -23,7 +23,7 @@ RSpec.describe "insured/families/personal.html.erb" do
     end
 
     it "should display notice of action title " do
-      expect(rendered).to have_selector('p', text: "Please indicate preferred method to receive notices (OPTIONAL)")
+      expect(rendered).to have_selector('p', text: "How would you like to receive information? (OPTIONAL)")
     end
   end
 
@@ -48,7 +48,7 @@ RSpec.describe "insured/families/personal.html.erb" do
     it_should_behave_like 'display_heading'
 
     it 'should display contact method dropdown' do
-      expect(rendered).to have_select('person[employee_roles_attributes][0][contact_method]', :selected => Settings.aca.shop_market.employee.default_contact_method)
+      expect(rendered).to have_select('person[employee_roles_attributes][0][contact_method]', :selected => 'Only electronic communications')
     end
 
     it 'should display language preference dropdown' do
@@ -72,7 +72,7 @@ RSpec.describe "insured/families/personal.html.erb" do
       it_should_behave_like "display_heading"
 
       it "should display contact method dropdown " do
-        expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Paper and Electronic communications")
+        expect(rendered).to have_select("person[consumer_role_attributes][contact_method]", :selected => "Both electronic and paper communications")
       end
 
       it "should display language preference dropdown " do
