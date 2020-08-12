@@ -167,7 +167,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And Admin selects shop market radio button
     And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
-    And Admin cannot select termination on kinds for shop SEP Type
+    And Admin can select termination on kinds for shop SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin clicks on Create Draft button
     Then Admin should see SEP Type Created Successfully message

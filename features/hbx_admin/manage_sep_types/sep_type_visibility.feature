@@ -151,7 +151,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Admin selects shop market radio button
     And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
-    And Admin cannot select termination on kinds for shop SEP Type
+    And Admin can select termination on kinds for shop SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin selects <user_visibility> visibility radio button for shop market
     And Admin clicks on Create Draft button
@@ -202,7 +202,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And Admin selects shop market radio button
     And Admin fills Create SEP Type form with Reason
     And Admin selects effective on kinds for Create SEP Type
-    And Admin cannot select termination on kinds for shop SEP Type
+    And Admin can select termination on kinds for shop SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin selects <user_visibility> visibility radio button for shop market
     And Admin clicks on Create Draft button
