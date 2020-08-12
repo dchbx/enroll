@@ -29,7 +29,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for new' do
       before do
         q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
-        allow(q1).to receive(:has_valid_reason?).and_return(true)
         allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
@@ -182,7 +181,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for edit' do
       before do
         q1.update_attributes!(market_kind: 'individual', is_self_attested: true, aasm_state: :draft)
-        allow(q1).to receive(:has_valid_reason?).and_return(true)
         allow(q1).to receive(:has_valid_title?).and_return(true)
         q1.publish!
         sign_in(current_user)
@@ -368,7 +366,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
           end
 
           it 'should have error message' do
-            expect(response.body).to have_content("Active SEP type exists with same reason")
             expect(response.body).to have_content("Active SEP type exists with same title")
           end
         end
