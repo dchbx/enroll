@@ -37,9 +37,9 @@ describe "insured/family_members/_dependent_form.html.erb" do
     context "when individual market is enabled" do
       let(:individual_market_is_enabled) { true }
       it "should have consumer_fields area" do
-        expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
+        expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US citizen or US national?')
         expect(rendered).to have_selector("div#consumer_fields")
-        expect(rendered).to match(/Are you a US Citizen or US National/)
+        expect(rendered).to match(/Are you a US citizen or US national/)
       end
 
       it "should have show tribal_container" do
