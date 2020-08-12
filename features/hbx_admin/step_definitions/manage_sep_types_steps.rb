@@ -513,11 +513,11 @@ When("Admin should see Event label field disabled") do
 end
 
 When("Admin should see Tool Tip field disabled") do
- expect(find('#tool_tip').disabled?).to eq true
+  expect(find('#tool_tip').disabled?).to eq true
 end
 
 When("Admin should see Reason field disabled") do
- expect(find('#reason').disabled?).to eq true
+  expect(find('#reason').disabled?).to eq true
 end
 
 When(/Admin should see (.*) market radio button disabled$/) do |market_kind|
