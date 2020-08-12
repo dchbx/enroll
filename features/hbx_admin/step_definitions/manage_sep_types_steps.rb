@@ -487,6 +487,67 @@ Then(/Admin should see newly created SEP Type with Active SEP Type title for (.*
   end
 end
 
+Then("Admin navigates to SEP Type Details page") do
+  expect(page).to have_content('SEP Type Details')
+end
+
+Then(/Admin clicks on Active SEP Type title for (.*) on Datatable$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(page).to have_content('Had a baby')
+    find_link('Had a baby').click
+  elsif market_kind == 'shop'
+    expect(page).to have_content('Married')
+    find_link('Married').click
+  else
+    expect(page).to have_content('Adopted a child')
+    find_link('Adopted a child').click
+  end
+end
+
+When("Admin should see Title field disabled") do
+  expect(find('#title').disabled?).to eq true
+end
+
+When("Admin should see Event label field disabled") do
+  expect(find('#event_kind_label').disabled?).to eq true
+end
+
+When("Admin should see Tool Tip field disabled") do
+ expect(find('#tool_tip').disabled?).to eq true
+end
+
+When("Admin should see Reason field disabled") do
+ expect(find('#reason').disabled?).to eq true
+end
+
+When(/Admin should see (.*) market radio button disabled$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(find(:xpath, '//input[@value="individual"]').disabled?).to eq true
+  elsif market_kind == 'shop'
+    expect(find(:xpath, '//input[@value="shop"]').disabled?).to eq true
+  else
+    expect(find(:xpath, '//input[@value="fehb"]').disabled?).to eq true
+  end
+end
+
+When("Admin should see Pre Event Sep In Days field disabled") do
+  expect(find('#pre_event_sep_in_days').disabled?).to eq true
+end
+
+When("Admin should see Post Event Sep In Days field disabled") do
+  expect(find('#post_event_sep_in_days').disabled?).to eq true
+end
+
+When(/Admin should see effective on kinds disabled for (.*)$/) do |market_kind|
+  if market_kind == 'individual'
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='date_of_event']").disabled?).to eq true
+  elsif market_kind == 'shop'
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='first_of_this_month']").disabled?).to eq true
+  else
+    expect(find("input[type='checkbox'][name='forms_qualifying_life_event_kind_form[effective_on_kinds][]'][value='fixed_first_of_next_month']").disabled?).to eq true
+  end
+end
+
 Then("Admin should see failure reason while creating a new SEP Type") do
   expect(page).to have_content('End on must be after start on date')
 end
