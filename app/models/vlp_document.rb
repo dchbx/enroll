@@ -172,6 +172,35 @@ class VlpDocument < Document
     }
   end
 
+  def self.immigration_document_types
+    options = []
+    VLP_DOCUMENT_KINDS.each do |document|
+      options << [self.document_types_to_display[document], document]
+    end
+
+    options
+  end
+
+  def self.document_types_to_display
+    {
+      'I-327 (Reentry Permit)' => 'I-327 – Reentry permit',
+      'I-551 (Permanent Resident Card)' => 'I-551 – Permanent resident card',
+      'I-571 (Refugee Travel Document)' => 'I-571 – Refugee travel document',
+      'I-766 (Employment Authorization Card)' => 'I-766 – Employment authorization card',
+      'Certificate of Citizenship' => 'Certificate of citizenship',
+      'Naturalization Certificate' => 'Naturalization certificate',
+      'Machine Readable Immigrant Visa (with Temporary I-551 Language)' => 'Machine-readable immigrant visa (with temporary I-551 language)”',
+      'Temporary I-551 Stamp (on passport or I-94)' => 'Temporary I-551 stamp (on passport or I-94)',
+      'I-94 (Arrival/Departure Record)' => 'I-94 – Arrival/departure record',
+      'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport' => 'I-94 – Arrival/departure record in unexpired foreign passport',
+      'Unexpired Foreign Passport' => 'Unexpired foreign passport',
+      'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' => 'I-20 – Certificate of eligibility for nonimmigrant student (F-1) status',
+      'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' => 'DS-2019 Certificate of eligibility for exchange visitor (J-1) status',
+      'Other (With Alien Number)' => 'Other (with alien number)',
+      'Other (With I-94 Number)' => 'Other (with I-94 number)'
+    }
+  end
+
   private
   def document_required_fields
      required_fields[self.subject.to_sym].each do |field|
