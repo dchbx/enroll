@@ -88,7 +88,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.families.verification.complete_verification_for_enrollment_confirm' => "Click OK if you would like confirm verification for this family.",
   :'en.insured.families.verification.send_documents_for_review' => "Send documents for review",
   :'en.insured.families.verification.send_documents_for_review_confirm' => "Click OK if you would like to send all your documents for review.",
-  :'en.insured.families.verification.documents_FAQ' => "Documents FAQ",
+  :'en.insured.families.verification.documents_FAQ' => "Documents We Accept",
   :'en.delete' => "Delete",
   :'en.deleted' => "Deleted",
   :'en.insured.families.medicaid_and_tax_credits' => "Medicaid & Tax Credits",
