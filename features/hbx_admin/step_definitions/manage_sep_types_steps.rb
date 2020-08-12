@@ -401,7 +401,7 @@ When(/Admin selects (.*) self attestation radio button for (.*) market$/) do |us
   end
 end
 
-When("Admin fills Create SEP Type form with eligibility start and end dates") do
+When("Admin fills eligibility start and end dates") do
   fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
   fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
 end
@@ -666,7 +666,7 @@ Given("Hbx Admin Creates and Publish Individual market SEP Type") do
   step "Admin cannot select termination on kinds for individual SEP Type"
   step "Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates"
   step "Admin selects Self Service self attestation radio button for individual market"
-  step "Admin fills Create SEP Type form with eligibility start and end dates"
+  step "Admin fills eligibility start and end dates"
   step "Admin clicks on Create Draft button"
   step "Admin should see SEP Type Created Successfully message"
   step "Admin navigates to SEP Types List page"

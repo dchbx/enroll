@@ -45,6 +45,3 @@ Feature: Qualifying life of event kind based on eligibity dates
     And Admin should see QLE date filled and clicks continue
     Then Admin should not see sucess confirmation text
     And Admin logs out
-
-
-
