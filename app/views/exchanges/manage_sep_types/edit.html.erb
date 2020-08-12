@@ -8,7 +8,8 @@
         data-qle-reason="<%= @qle.reason%>"
         data-termination-kinds="<%= @qle.termination_on_kinds%>"
         data-effective-kinds="<%= @qle.effective_on_kinds%>"
-        data-qle-market="<%= @qle.market_kind%>">
+        data-qle-market="<%= @qle.market_kind%>"
+        data-qle-draft="<%= @qle.draft%>">
       <% if @failure.present? %>
         <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
           <% @failure[0].errors.to_h.each do |name, message| %>

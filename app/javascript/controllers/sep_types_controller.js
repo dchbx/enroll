@@ -10,11 +10,11 @@ export default class extends Controller {
       shop_kinds:   JSON.parse(this.metadataTarget.dataset.shopKinds),
       fehb_kinds:   JSON.parse(this.metadataTarget.dataset.fehbKinds),
       reason:       this.metadataTarget.dataset.qleReason,
-      market:       this.metadataTarget.dataset.qleMarket
+      market:       this.metadataTarget.dataset.qleMarket,
+      draft:       this.metadataTarget.dataset.qleDraft
     }
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
-    this.initializeEffectiveKinds(market)
-    this.disableTerminationkinds(market)
+    this.disableOrEnable(market)
   }
 
   initializeEffectiveKinds(market){
@@ -117,4 +117,28 @@ export default class extends Controller {
     }
   }
 
+  disableOrEnable(market){
+    if(this.metadata.draft == "false") {
+      var inputs = document.getElementsByTagName("input");
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].disabled = true;
+      }
+      var checkbox = document.querySelectorAll('input[type=checkbox]');
+      for (var i = 0; i < checkbox.length; i++) {
+        checkbox[i].disabled = true;
+
+      }
+    }else{
+      var inputs = document.getElementsByTagName("input");
+      for (var i = 0; i < inputs.length; i++) {
+        inputs[i].disabled = false;
+      }
+      var checkbox = document.querySelectorAll('input[type=checkbox]');
+      for (var i = 0; i < checkbox.length; i++) {
+        checkbox[i].disabled = false;
+      }
+      this.initializeEffectiveKinds(market)
+      this.disableTerminationkinds(market)
+    }
+  }
 }
