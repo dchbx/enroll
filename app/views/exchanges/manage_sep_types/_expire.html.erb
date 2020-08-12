@@ -20,8 +20,9 @@
         <td><%= @qle.market_kind %></td>
         <td><%= @qle.aasm_state %></td>
         <td><%= @qle.start_on %></td>
-        <td><%= build_option_field(EnrollRegistry[:expire_sep_type].setting(:end_on), f) %></td>
+        <td onClick="getElementById('end_on').min = getElementById('min_date').value;"><%= build_option_field(EnrollRegistry[:expire_sep_type].setting(:end_on), f) %></td>
         <%= hidden_field_tag :qle_id, @qle.id %>
+        <%= hidden_field_tag :min_date, TimeKeeper.date_of_record.yesterday.strftime("%Y-%m-%d") %>
         <%= hidden_field_tag :qle_action_id, @row %>
       </tr>
       <tr><td colspan = "7"><br /></td></tr>
