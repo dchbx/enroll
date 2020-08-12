@@ -33,7 +33,7 @@ Feature: Consumer verification process
     And consumer has outstanding verification and unverified enrollments
     When the consumer visits verification page
     Then consumer should see Verification Due date label
-    And consumer should see Documents FAQ link
+    And consumer should see Documents We Accept link
     And the consumer should see documents verification page
 
   Scenario: Consumer is fully_verified should see verification types
