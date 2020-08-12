@@ -149,7 +149,7 @@ end
 
 Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", match: :prefer_exact, wait: 10).click
+  find('li', :text => "I-94 – Arrival/departure record in unexpired foreign passport", match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
   fill_in 'Visa number', with: 'V1234567'
@@ -158,7 +158,7 @@ end
 
 Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'Other (With I-94 Number)', match: :prefer_exact, wait: 10).click
+  find('li', :text => 'Other (with I-94 number)', match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
   fill_in 'Document Description', with: 'Other With I94 Number'
@@ -184,7 +184,7 @@ end
 
 Then(/select I-551 doc and fill details/) do
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
+  find('li', :text => 'I-551 – Permanent resident card', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
   fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
