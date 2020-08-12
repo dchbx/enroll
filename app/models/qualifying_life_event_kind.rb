@@ -236,7 +236,7 @@ class QualifyingLifeEventKind
     state :expired
 
     event :publish, :after => [:record_transition] do
-      transitions from: :draft, to: :active, :guard => [:has_valid_title?], :after => [:activate_qle, :set_ordinal_position]
+      transitions from: :draft, to: :active, :guard => :has_valid_title?, :after => [:activate_qle, :set_ordinal_position]
     end
 
     event :schedule_expiration, :after => :record_transition do
