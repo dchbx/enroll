@@ -27,10 +27,12 @@ module Operations
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
-          #TODO: Pick correct applied_percentage and applied_aptc from the current year's enrollment.
-          data = { applied_percentage: 1,
-                   applied_aptc: tax_household.current_max_aptc.to_f,
-                   max_aptc: tax_household.current_max_aptc.to_f,
+          max_aptc = tax_household.current_max_aptc.to_f
+          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : 0.85
+          applied_aptc = max_aptc * applied_percentage
+          data = { applied_percentage: applied_percentage,
+                   applied_aptc: applied_aptc,
+                   max_aptc: max_aptc,
                    csr_amt: tax_household.current_csr_percent_as_integer }
         end
 
