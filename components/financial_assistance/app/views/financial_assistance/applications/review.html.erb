@@ -179,12 +179,12 @@
         </div>
         <br>
       <% end %>
-      <div class=""> <%= link_to "View my Applications", financial_assistance_applications_path, class: "btn btn-small btn-primary" %> </div>
+      <div class=""> <%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %> </div>
     </div>
   <div class='col-md-3'>
       <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-          previous_url: financial_assistance_applications_path,
-          next_url: find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+          previous_url: applications_path,
+          next_url: main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
         } %>
     </div>
   </div>
