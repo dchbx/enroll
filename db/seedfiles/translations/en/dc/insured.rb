@@ -1,14 +1,16 @@
 # DC Insured Translations
 INSURED_TRANSLATIONS = {
   :'en.insured.consumer_roles.docs_shared.alien_number' => "Alien Number",
-  :'en.insured.consumer_roles.docs_shared.alien_number_req' => "When entering an Alien Number, only include the numbers. Do not enter the 'A' or any other characters or letters. For example: If your Alien Number is 'A123456789' then please enter '123456789'. -li- You must enter exactly 9 digits into the Alien Number field. For Alien Numbers with fewer than 9 digits, add one zero (0) to the beginning of an 8-digit Alien Number and two zeroes (00) to the beginning of a 7-digit Alien Number. For example: If your Alien Number is 'A1234567' then please enter '001234567'. -li- Pre-1956 certificates do not contain an Alien Number. In this case, enter '999999999' for the Alien Number. (check for 9 digit numbers).",
+  :'en.insured.consumer_roles.docs_shared.alien_number_req' => "Enter 9 numbers. Do not enter the ‘A’, or any other characters, letters, or spaces. -li- If you have an 8-digit alien number, add one zero (0) to the beginning of it. -li- If you have a 7-digit alien number, add two zeros (00) to the beginning of it.",
+  :'en.insured.consumer_roles.docs_shared.certificate_alien_number_req' => "Enter 9 numbers. Do not enter the ‘A’, or any other characters, letters, or spaces. -li- If you have an 8-digit alien number, add one zero (0) to the beginning of it. -li- If you have a 7-digit alien number, add two zeros (00) to the beginning of it. \
+-li- Pre-1956 certificates do not have an alien number. In this case, enter 9 nines (999999999)",
   :'en.insured.consumer_roles.docs_shared.card_number' => "Card Number",
-  :'en.insured.consumer_roles.docs_shared.card_number_req' => "Please enter the Card Number. The Card Number is exactly 13 letters and numbers. You must enter three letters followed by 10 numbers. You may not enter any special characters. -li- If you have a Resident Alien Card issued prior to December 1997, it does not contain a Card Number. In that case please enter three ‘A’s followed by 10 zeroes (i.e., 'AAA0000000000') so that you enter exactly 13 characters. \
--li- How to find the Card Number: The document number, also called a Card Number, is printed on the back of the current version of the card. Previous versions of the card featured the document number and expiration date on the front of the card.",
+  :'en.insured.consumer_roles.docs_shared.card_number_req' => "The card number is 13 letters and numbers. Enter 3 letters followed by 10 numbers. -li- Do not enter any other characters or spaces. \
+-li- Cards issued prior to December 1997 do not have a number. In this case, enter AAA0000000000.",
+  :'en.insured.consumer_roles.docs_shared.i_766_card_number_req' => "The card number is 13 letters and numbers. Enter 3 letters followed by 10 numbers. -li- Do not enter any other characters or spaces.",
   :'en.insured.consumer_roles.docs_shared.citizenship_number' => "Certificate Number",
-  :'en.insured.consumer_roles.docs_shared.citizenship_number_req' => "When entering a Citizenship Certification Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Certification number entered must have between 6 and 12 characters. \
--li- How to find Citizenship Certification Number: The Certificate of Citizenship certification number is most often in the upper right hand corner of the Certificate. \
-The Certificate of Citizenship certification number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
+  :'en.insured.consumer_roles.docs_shared.citizenship_number_req' => "The naturalization number has 6-12 numbers and letters. Do not enter any other characters or spaces. -li- This number is usually in the upper-right hand corner of the naturalization certificate. \
+-li- It’s printed in red on all naturalization certificates issued since September 27, 1906.",
   :'en.insured.consumer_roles.docs_shared.country_of_citizenship' => "Country of Citizenship",
   :'en.insured.consumer_roles.docs_shared.document_description' => "Document Description",
   :'en.insured.consumer_roles.docs_shared.document_description_req' => "Enter the type of document, using no more than 35 characters.",
@@ -24,8 +26,8 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.docs_shared.sevis_id' => "SEVIS ID",
   :'en.insured.consumer_roles.docs_shared.sevis_id_req' => "When entering a SEVIS ID, only include the numbers. Do not enter the 'N' or any other characters or letters. For example: If your SEVIS ID is 'N1234567891' then please enter '1234567891'. -li- The SEVIS ID entered must have 10 digits. \
 -li- How to find the SEVIS ID: On the DS-2019, the number is on the top right hand side of the page in the box above the barcode.",
-  :'en.insured.consumer_roles.docs_shared.visa_number' => "Visa number",
-  :'en.insured.consumer_roles.docs_shared.visa_number_req' => "Please enter the Visa Number exactly as it appears on the document. -li- You must enter exactly eight letters and numbers. -li- You may not enter any special characters.",
+  :'en.insured.consumer_roles.docs_shared.visa_number' => "Visa Number",
+  :'en.insured.consumer_roles.docs_shared.visa_number_req' => "Enter 8-12 numbers. -li- Do not enter any other characters or spaces.",
   :'en.personal_information' => "Personal Information",
   :'en.insured.consumer_roles.help_question_info' => "Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.",
   :'en.required_field' => "required field",

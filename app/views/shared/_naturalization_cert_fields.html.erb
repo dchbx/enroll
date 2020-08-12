@@ -4,6 +4,6 @@
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
     <%= render :partial => "insured/consumer_roles/docs_shared/naturalization_number", locals: {v: v} %>
-    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v, name: 'naturalization_certificate'} %>
   <% end %>
 </div>
