@@ -83,7 +83,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           let(:qlek_publish_params) do
             { 'start_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.month}-01",
               'end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
-              'title': 'test title',
+              'title': q1.title,
               'tool_tip': 'test tooltip',
               'pre_event_sep_in_days': '10',
               'is_self_attested': 'true',
@@ -109,7 +109,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           end
 
           it 'should return error message' do
-            expect(@result.failure[1]).to eq(['Active SEP type exists with same reason'])
+            expect(@result.failure[1]).to eq(['Active SEP type exists with same title'])
           end
 
           it 'should not publish qlek objects' do
