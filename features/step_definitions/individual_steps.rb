@@ -152,7 +152,7 @@ Then(/selects i94 unexpired foreign passport document and fills required details
   find('li', :text => "I-94 – Arrival/departure record in unexpired foreign passport", match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
-  fill_in 'Visa number', with: 'V1234567'
+  fill_in 'Visa Number', with: 'V1234567'
   step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
@@ -205,7 +205,7 @@ When(/click eligible immigration status yes/) do
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
+  find('.label', :text => 'I-551 – Permanent resident card', wait: 10)
 end
 
 And(/should find alien number/) do
