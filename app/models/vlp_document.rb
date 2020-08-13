@@ -189,7 +189,7 @@ class VlpDocument < Document
       'I-766 (Employment Authorization Card)' => 'I-766 – Employment authorization card',
       'Certificate of Citizenship' => 'Certificate of citizenship',
       'Naturalization Certificate' => 'Naturalization certificate',
-      'Machine Readable Immigrant Visa (with Temporary I-551 Language)' => 'Machine-readable immigrant visa (with temporary I-551 language)”',
+      'Machine Readable Immigrant Visa (with Temporary I-551 Language)' => 'Machine-readable immigrant visa (with temporary I-551 language)',
       'Temporary I-551 Stamp (on passport or I-94)' => 'Temporary I-551 stamp (on passport or I-94)',
       'I-94 (Arrival/Departure Record)' => 'I-94 – Arrival/departure record',
       'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport' => 'I-94 – Arrival/departure record in unexpired foreign passport',
