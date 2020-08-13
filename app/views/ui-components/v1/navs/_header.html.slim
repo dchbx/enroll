@@ -34,7 +34,7 @@
                   | &nbsp;
                   | &nbsp;
                   span
-                    | My ID
+                    | ID
                     | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 9, omission: '')}
   - if user_signed_in?
   javascript:

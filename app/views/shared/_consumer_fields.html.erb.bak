@@ -4,7 +4,7 @@
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-      <label>Are you a US Citizen or US National? *</label>
+      <label>Is this person a US Citizen or US National? *</label>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -27,7 +27,7 @@
 
   <div class="row row-form-wrapper no-buffer" id="naturalized_citizen_container" style="display: <%= (f.object.us_citizen.present? and f.object.us_citizen) ? 'block' : 'none' %>">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-      <label>Are you a naturalized citizen? *</label>
+      <label>Is this person a naturalized citizen? *</label>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
@@ -123,7 +123,7 @@
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
+      <label>Is this person a member of an American Indian or Alaskan Native tribe? *</label>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
@@ -153,7 +153,7 @@
 
   <div class="row row-form-wrapper no-buffer", style:"vertical-align: text-bottom">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <label class="required no-pd">Are you currently incarcerated? *</label>
+      <label class="required no-pd">Is this person currently incarcerated? *</label>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">

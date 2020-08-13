@@ -20,7 +20,7 @@ registry:
           - key: :policies_url
             item: "https://dchealthlink.com/"
           - key: :faqs_url
-            item: "https://www.dchealthlink.com/Frequently-Asked-Questions"
+            item: "https://dchealthlink.com/help"
           - key: :help_url
             item: "https://www.dchealthlink.com/help"
           - key: :business_resource_center_url

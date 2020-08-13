@@ -177,7 +177,7 @@ function validationForIndianTribeMember() {
       return true;
     }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-      alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
+      alert("Please select the option for 'Is this person a member of an American Indian or Alaskan Native tribe?'");
       e.preventDefault && e.preventDefault();
       return false;
     };
@@ -212,7 +212,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you a US Citizen or US National?');
+      alert('Please provide an answer for question: Is this person a US Citizen or US National?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -222,7 +222,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you currently incarcerated?');
+      alert('Please provide an answer for question: Is this person currently incarcerated?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -232,7 +232,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you a naturalized citizen?');
+      alert('Please provide an answer for question: Is this person a naturalized citizen?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
