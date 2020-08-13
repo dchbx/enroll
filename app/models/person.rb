@@ -1141,6 +1141,10 @@ class Person
     @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
   end
 
+  def format_citizen
+    citizen_status.humanize if ::ConsumerRole::CITIZEN_STATUS_KINDS.include?(citizen_status)
+  end
+
   def indian_tribe_member
     return @indian_tribe_member unless @indian_tribe_member.nil?
     return nil if citizen_status.blank?
