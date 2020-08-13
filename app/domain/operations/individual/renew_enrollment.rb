@@ -2,9 +2,16 @@
 
 module Operations
   module Individual
+    # This class is invoked when we want to generate a passive renewal for an active enrollment.
+    # It will validate the incoming enrollment if it can be renewed and call a different class
+    # to generate the renewal enrollment.
+    # For assisted renewals, it will fetch eligibility values from the DB for renewing enrollment.
     class RenewEnrollment
       include Dry::Monads[:result, :do]
 
+      # @param [ HbxEnrollment ] hbx_enrollment Enrollment that needs to be renewed.
+      # @param [ Date ] effective_on Effective Date of the renewal enrollment.
+      # @return [ HbxEnrollment ] renewal_enrollment.
       def call(hbx_enrollment:, effective_on:)
         validated_enrollment = yield validate(hbx_enrollment, effective_on)
         eligibility_values   = yield fetch_eligibility_values(validated_enrollment, effective_on)
@@ -28,7 +35,8 @@ module Operations
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
           max_aptc = tax_household.current_max_aptc.to_f
-          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : 0.85
+          default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+          applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
           applied_aptc = max_aptc * applied_percentage
           data = { applied_percentage: applied_percentage,
                    applied_aptc: applied_aptc,

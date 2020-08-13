@@ -16,3 +16,8 @@ registry:
         settings:
           - key: :demographic_attributes
             item: ['first_name', 'last_name', 'ssn', 'us_citizen', 'naturalized_citizen', 'eligible_immigration_status', 'dob']
+      - key: :aca_individual_assistance_benefits
+        is_enabled: true
+        settings:
+          - key: :default_applied_aptc_percentage
+            item: 0.85
