@@ -32,7 +32,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
     expect(rendered).to match(/#{person.consumer_role.language_preference}/)
     expect(rendered).to match(/#{person.gender}/)
     expect(rendered).to match(/#{person.emails.last.address}/mi)
-    expect(rendered).to match(/Please answer the following questions, provide your address/)
+    expect(rendered).to match(/Enter your personal information and answer the following questions/)
     #expect(rendered).to have_selector('h3', text: 'Enroll - let\'s get you signed up for healthcare')
     #expect(rendered).to have_selector('h5', text: 'Please indicate preferred method to receive notices (OPTIONAL)')
   end
