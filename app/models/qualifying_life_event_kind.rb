@@ -96,7 +96,7 @@ class QualifyingLifeEventKind
   field :effective_on_kinds, type: Array, default: []
   field :reason, type: String
   field :edi_code, type: String
-  field :market_kind, type: String # Deprecated
+  field :market_kind, type: String
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
   field :is_self_attested, type: Mongoid::Boolean # is_self_attested set to true QLE can be claimed by Consumer/EE.
@@ -108,11 +108,12 @@ class QualifyingLifeEventKind
   field :is_active, type: Boolean, default: false
   field :event_on, type: Date
   field :qle_event_date_kind, type: Symbol, default: :qle_on
-  field :coverage_effective_on, type: Date
+  field :coverage_effective_on, type: Date # Deprecated
   field :start_on, type: Date
   field :end_on, type: Date
   field :is_visible, type: Mongoid::Boolean  # is_visible set to true QLE's will be displayed to Consumer/EE in carousel
   field :termination_on_kinds, type: Array, default: []
+  field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
 
   index({action_kind: 1})

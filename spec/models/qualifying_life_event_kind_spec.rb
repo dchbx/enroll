@@ -27,6 +27,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
     it { is_expected.to have_field(:is_visible).of_type(Mongoid::Boolean)}
     it { is_expected.to have_field(:termination_on_kinds).of_type(Array).with_default_value_of([])}
     it { is_expected.to have_field(:coverage_end_on).of_type(Date)}
+    it { is_expected.to have_field(:coverage_start_on).of_type(Date)}
     it { is_expected.to embed_many(:workflow_state_transitions)}
   end
 
