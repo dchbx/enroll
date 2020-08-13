@@ -102,8 +102,9 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
             expect(@result.success).to be_a(HbxEnrollment)
           end
 
-          it 'should assign aptc value to the enrollment which is 0.85 times of max_aptc' do
-            expect(@result.success.applied_aptc_amount.to_f).to eq((eligibilty_determination.max_aptc * 0.85).to_f)
+          it 'should assign aptc value to the enrollment which is default_percentage times of max_aptc' do
+            default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
+            expect(@result.success.applied_aptc_amount.to_f).to eq((eligibilty_determination.max_aptc * default_percentage).to_f)
           end
 
           it 'should assign aptc value to the enrollment which is not same as ehb_premium' do
