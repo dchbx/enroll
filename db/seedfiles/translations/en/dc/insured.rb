@@ -29,7 +29,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.consumer_roles.docs_shared.visa_number' => "Visa Number",
   :'en.insured.consumer_roles.docs_shared.visa_number_req' => "Enter 8-12 numbers. -li- Do not enter any other characters or spaces.",
   :'en.personal_information' => "Personal Information",
-  :'en.insured.consumer_roles.help_question_info' => "Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.",
+  :'en.insured.consumer_roles.help_question_info' => "Enter your personal information and answer the following questions. When you're finished, select CONTINUE.",
   :'en.required_field' => "required field",
   :'en.required_field_plural' => "required fields",
   :'en.insured.consumer_roles.select_doc_type' => "Select document type",

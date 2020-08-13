@@ -25,7 +25,7 @@ How to find the SEVIS ID: On the DS-2019, the number is on the top right hand si
   :'en.insured.consumer_roles.docs_shared.visa_number' => "Visa number",
   :'en.insured.consumer_roles.docs_shared.visa_number_title' => "Please enter the Visa Number exactly as it appears on the document. You must enter exactly eight letters and numbers. You may not enter any special characters.",
   :'en.personal_information' => "Personal Information",
-  :'en.insured.consumer_roles.help_question_info' => "Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.",
+  :'en.insured.consumer_roles.help_question_info' => "Enter your personal information and answer the following questions. When you're finished, select CONTINUE.",
   :'en.required_field' => "required field",
   :'en.required_field_plural' => "required fields",
   :'en.insured.consumer_roles.select_doc_type' => "Select document type",

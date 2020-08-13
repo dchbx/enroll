@@ -117,7 +117,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Are you a naturalized citizen?*
+                  text: Is this person a naturalized citizen?*
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
@@ -165,7 +165,7 @@
             - cells:
                 - gutter: 6
                   type: text
-                  text: Are you currently incarcerated?*
+                  text: Is this person currently incarcerated?*
                   classNames: 'span-text'
                 - gutter: 1
                   type: label_radio
