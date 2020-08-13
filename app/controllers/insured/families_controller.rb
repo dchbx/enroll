@@ -151,10 +151,10 @@ class Insured::FamiliesController < FamiliesController
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
 
-    @qualified_date = if @qle && @qle.coverage_effective_on.present? && @qle.coverage_end_on.present?
-                        @qle.coverage_effective_on <= @qle_date && @qle_date <= @qle.coverage_end_on ? true : false
+    @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
+                        (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
                       else
-                        start_date <= @qle_date && @qle_date <= end_date ? true : false
+                        (start_date..end_date).cover?(@qle_date)
                       end
 
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)

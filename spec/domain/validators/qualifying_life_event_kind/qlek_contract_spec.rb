@@ -24,7 +24,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       :market_kind => 'individual',
       :effective_on_kinds => ['date_of_event'],
       :ordinal_position => 1,
-      coverage_effective_on: TimeKeeper.date_of_record,
+      coverage_start_on: TimeKeeper.date_of_record,
       coverage_end_on: (TimeKeeper.date_of_record + 25.days),
       event_kind_label: 'event kind label',
       is_visible: true,
@@ -79,9 +79,9 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
     end
 
-    context 'for coverage_effective_on being optional' do
+    context 'for coverage_start_on being optional' do
       before do
-        contract_params.merge!({coverage_effective_on: nil})
+        contract_params.merge!({coverage_start_on: nil})
         @result = subject.call(contract_params)
       end
 

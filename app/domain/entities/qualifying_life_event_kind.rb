@@ -15,7 +15,7 @@ module Entities
     attribute :market_kind, Types::String
     attribute :effective_on_kinds, Types::Array.of(Types::String)
     attribute :ordinal_position, Types::Integer
-    attribute :coverage_effective_on, Types::Date.optional
+    attribute :coverage_start_on, Types::Date.optional
     attribute :coverage_end_on, Types::Date.optional
     attribute :event_kind_label, Types::String
     attribute :is_visible, Types::Bool

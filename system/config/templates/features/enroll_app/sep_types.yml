@@ -119,8 +119,8 @@ registry:
               description: Select Termination Effective Type
               is_required: false
               is_visible: true
-          - key: :coverage_effective_on
-            item: <%= ENV['coverage_effective_on'] %>
+          - key: :coverage_start_on
+            item: <%= ENV['coverage_start_on'] %>
             meta:
               label: Eligibility Start Date
               content_type: :date

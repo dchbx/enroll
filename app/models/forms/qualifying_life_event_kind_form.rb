@@ -21,7 +21,7 @@ module Forms
     attribute :effective_on_kinds, Types::Array.of(Types::String)
     attribute :ordinal_position, Types::Integer.default(0)
     attribute :_id, Types::String.optional
-    attribute :coverage_effective_on, Types::Date
+    attribute :coverage_start_on, Types::Date
     attribute :coverage_end_on, Types::Date
     attribute :event_kind_label, Types::String
     attribute :is_visible, Types::Bool

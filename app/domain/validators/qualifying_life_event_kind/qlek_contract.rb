@@ -18,7 +18,7 @@ module Validators
         required(:effective_on_kinds).array(:string)
         optional(:ordinal_position).filled(:integer)
         optional(:_id).maybe(:string)
-        optional(:coverage_effective_on).maybe(:date)
+        optional(:coverage_start_on).maybe(:date)
         optional(:coverage_end_on).maybe(:date)
         required(:event_kind_label).filled(:string)
         required(:is_visible).filled(:bool)
@@ -82,9 +82,9 @@ module Validators
         key.failure(l10n("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
       end
 
-      rule(:coverage_effective_on) do
-        if values[:coverage_effective_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_effective_on].is_a?(Date)
+      rule(:coverage_start_on) do
+        if values[:coverage_start_on].present?
+          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_start_on].is_a?(Date)
         end
       end
 
