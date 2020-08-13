@@ -23,3 +23,8 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :aca_individual_assistance_benefits
+        is_enabled: true
+        settings:
+          - key: :default_applied_aptc_percentage
+            item: 0.85
