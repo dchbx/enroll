@@ -7,7 +7,7 @@
   </div>
 
   <div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg <%= 'hidden_field' unless show_naturalization_doc_type(f.object) %>" id="naturalization_doc_type_select">
-    <%= select_tag :naturalization_doc_type, options_for_select(ConsumerRole.naturalization_document_types, selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
+    <%= select_tag :naturalization_doc_type, options_for_select([['Certificate of citizenship','Certificate of Citizenship'], ['Naturalization certificate', 'Naturalization Certificate']], selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
   </div>
 
   <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
