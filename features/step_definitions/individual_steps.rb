@@ -106,7 +106,7 @@ Then(/Individual should see a form to enter personal information$/) do
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
   expect(page).to have_css("#home_address_tooltip")
   expect(page).to have_content("Enter your personal information and answer the following questions")
-  expect(page).to have_content("Is this person a US Citizen or US National")
+  expect(page).to have_content("Is this person a US citizen or US national")
   expect(page).to have_content("Is this person a naturalized citizen")
   expect(page).to have_content("Is this person a member of an American Indian")
   expect(page).to have_content("Is this person currently incarcerated")
