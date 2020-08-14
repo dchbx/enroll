@@ -66,7 +66,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
           tax_household.tax_household_members.first.update_attributes!(applicant_id: family_member.id)
         end
 
-        context 'ehb premium is less than the max aptc' do
+        context 'ehb premium is less than the selected aptc' do
           before do
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
           end
@@ -88,7 +88,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
           end
         end
 
-        context 'ehb premium is greater than the max aptc' do
+        context 'ehb premium is greater than the selected aptc' do
           before do
             eligibilty_determination.update_attributes!(max_aptc: 100.00)
             @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
