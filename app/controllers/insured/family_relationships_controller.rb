@@ -3,8 +3,8 @@
 module Insured
   class FamilyRelationshipsController < ApplicationController
     before_action :set_current_person, :set_family
-    # rubocop:disable Metrics/CyclomaticComplexity
     # rubocop:disable Metrics/AbcSize
+    # rubocop:disable Metrics/CyclomaticComplexity
     def index
       if params[:resident_role_id].present? && params[:resident_role_id]
         @type = "resident"
@@ -33,6 +33,8 @@ module Insured
 
       render layout: 'financial_assistance'
     end
+    # rubocop:enable Metrics/AbcSize
+    # rubocop:enable Metrics/CyclomaticComplexity
 
     def create
       @application = @family.application_in_progress
