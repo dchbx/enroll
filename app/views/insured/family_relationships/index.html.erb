@@ -1,0 +1,24 @@
+<% content_for :horizontal_status do %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if @person.has_resident_role? || @person.has_active_employee_role? %>
+<% end %>
+
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+    <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
+    <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, resident_role_id: @resident_role.try(:id)) %>
+    <% redirect_url = build_button(@person.consumer_role, @family, find_sep_url, @all_relationships).first %>
+    <% if @resident_role.present? %>
+        <% redirect_url = (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url) %>
+    <% end %>
+    <div id="family-matrix">
+      <%= render partial: 'form', locals: {form_remote: false, all_relationships: @all_relationships, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: redirect_url} %>
+    </div>
+  </div>
+
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+        previous_url: @family.application_in_progress.present? ? edit_financial_assistance_application_path(@family.application_in_progress) : insured_family_members_path(consumer_role_id: @consumer_role.id),
+        next_url: @family.application_in_progress.present? ? review_and_submit_financial_assistance_application_path(@family.application_in_progress) : find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)
+    } %>
+  </div>
+</div>
