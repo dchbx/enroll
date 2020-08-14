@@ -74,7 +74,7 @@ Then(/(.*) selects Certificate of Citizenship document and fills required detail
 end
 
 Then("Individual should see the Certificate of Citizenship document text") do
-  expect(page).to have_content("The naturalization number has 6-12 numbers and letters. Do not enter any other characters or spaces.")
+  expect(page).to have_content("The citizenship number has 6-12 numbers and letters. Do not enter any other characters or spaces.")
   expect(page).to have_content("This number is usually in the upper-right hand corner of the naturalization certificate.")
   expect(page).to have_content("It’s printed in red on all naturalization certificates issued since September 27, 1906.")
 end
@@ -86,8 +86,9 @@ Then(/(.*) selects Naturalization Certificate document and fills required detail
 end
 
 Then("Individual should see the Naturalization Certificate document text") do
-  expect(page).to have_content("When entering a Naturalization Number, include all numbers and letters. Do not enter any other characters or spaces.")
-  expect(page).to have_content("The Naturalization Number entered must have between 6 and 12 numbers and letters. How to find the Naturalization Number: The Naturalization Certificate Number is most often in the upper right hand corner of the Certificate. The Naturalization Certificate Number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.")
+  expect(page).to have_content("The naturalization number has 6-12 numbers and letters. Do not enter any other characters or spaces.")
+  expect(page).to have_content("This number is usually in the upper-right hand corner of the naturalization certificate.")
+  expect(page).to have_content("It’s printed in red on all naturalization certificates issued since September 27, 1906.")
 end
 
 Then(/(.*) selects Machine Readable Immigrant Visa document and fills required details (.*)$/) do |text, correct_or_incorrect|

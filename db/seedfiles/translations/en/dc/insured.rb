@@ -9,7 +9,7 @@ INSURED_TRANSLATIONS = {
 -li- Cards issued prior to December 1997 do not have a number. In this case, enter AAA0000000000.",
   :'en.insured.consumer_roles.docs_shared.i_766_card_number_req' => "The card number is 13 letters and numbers. Enter 3 letters followed by 10 numbers. -li- Do not enter any other characters or spaces.",
   :'en.insured.consumer_roles.docs_shared.citizenship_number' => "Certificate Number",
-  :'en.insured.consumer_roles.docs_shared.citizenship_number_req' => "The naturalization number has 6-12 numbers and letters. Do not enter any other characters or spaces. -li- This number is usually in the upper-right hand corner of the naturalization certificate. \
+  :'en.insured.consumer_roles.docs_shared.citizenship_number_req' => "The citizenship number has 6-12 numbers and letters. Do not enter any other characters or spaces. -li- This number is usually in the upper-right hand corner of the naturalization certificate. \
 -li- It’s printed in red on all naturalization certificates issued since September 27, 1906.",
   :'en.insured.consumer_roles.docs_shared.country_of_citizenship' => "Country of Citizenship",
   :'en.insured.consumer_roles.docs_shared.document_description' => "Document Description",
@@ -20,7 +20,8 @@ INSURED_TRANSLATIONS = {
 -li- How to find the I-94 Number: \
 The I-94 number is also called the admissions number. It is an 11 character sequence found printed on Arrival/Departure records (For I-94 or Form I-94A.) It can also be found on the form I-9.",
   :'en.insured.consumer_roles.docs_shared.naturalization_number' => "Naturalization Number",
-  :'en.insured.consumer_roles.docs_shared.naturalization_number_req' => "When entering a Naturalization Number, include all numbers and letters. Do not enter any  other characters or spaces. -li- The Naturalization Number entered must have between 6 and 12 numbers and letters. How to find the Naturalization Number: The Naturalization Certificate Number is most often in the upper right hand corner of the Certificate. The Naturalization Certificate Number is printed in red on all US Certificates of Citizenship issued since September 27, 1906.",
+  :'en.insured.consumer_roles.docs_shared.naturalization_number_req' => "The naturalization number has 6-12 numbers and letters. Do not enter any other characters or spaces. -li- This number is usually in the upper-right hand corner of the naturalization certificate. \
+-li- It’s printed in red on all naturalization certificates issued since September 27, 1906.",
   :'en.insured.passport_number' => "Passport Number",
   :'en.insured.passport_number_req' => "When entering a Passport Number, include all numbers and letters. Do not enter any other characters or spaces. -li- The Passport Number that you enter must have between 6 and 12 numbers and letters.",
   :'en.insured.consumer_roles.docs_shared.sevis_id' => "SEVIS ID",
