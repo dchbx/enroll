@@ -33,8 +33,11 @@ module Insured
 
       render layout: 'financial_assistance'
     end
+<<<<<<< HEAD
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/CyclomaticComplexity
+=======
+>>>>>>> ca846f2... refs#other_question_feature Added other questions page feature
 
     def create
       @application = @family.application_in_progress
