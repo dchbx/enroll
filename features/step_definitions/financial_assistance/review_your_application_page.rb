@@ -4,10 +4,10 @@ And(/^all applicants are in Info Completed state with all types of income$/) do
   application.update_attributes!(aasm_state: "draft", attestation_terms: true, parent_living_out_of_home_terms: true, medicaid_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true, report_change_terms: true)
   application.primary_applicant.update_attributes(is_former_foster_care: false, has_daily_living_help: false, need_help_paying_bills: false, is_ssn_applied: true, is_required_to_file_taxes: true, is_claimed_as_tax_dependent: false, has_job_income: true, has_deductions: true, has_eligible_health_coverage: true, has_self_employment_income: false, has_other_income: false, has_enrolled_health_coverage: false, is_pregnant: false, is_self_attested_blind: false, is_post_partum_period: false)
 
-  application.primary_applicant.incomes.create(title: "Income", amount: 40000, kind: "wages_and_salaries", frequency_kind: "yearly", start_on: TimeKeeper.date_of_record - 1.year).save
-  application.primary_applicant.incomes.first.employer_address = Address.new(kind: "work", address_1: "123 fake st", city: "Washington", state: "DC", zip: 20002)
-  application.primary_applicant.incomes.first.employer_phone = Phone.new(kind: "work", area_code: 123, number: 4567890, full_phone_number: "123-456-7890", extension: "+1" )
-  
+  application.primary_applicant.incomes.create(title: "Income", amount: 40_000, kind: "wages_and_salaries", frequency_kind: "yearly", start_on: TimeKeeper.date_of_record - 1.year).save
+  application.primary_applicant.incomes.first.employer_address = Address.new(kind: "work", address_1: "123 fake st", city: "Washington", state: "DC", zip: '20002')
+  application.primary_applicant.incomes.first.employer_phone = Phone.new(kind: "work", area_code: '123', number: '4567890', full_phone_number: "123-456-7890", extension: "+1")
+
   application.primary_applicant.benefits.create(title: "Benefit", kind: "is_eligible", insurance_kind: "medicaid").save
   application.primary_applicant.deductions.create(title: "Deduction", amount: 4000, kind: "health_savings_account", frequency_kind: "yearly", start_on: TimeKeeper.date_of_record - 1.year).save
 end
