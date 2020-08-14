@@ -260,7 +260,22 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       end
 
       it 'should return failure with message' do
-        expect(@result.failure).to eq('There exists active enrollments for given family in the year with renewal_benefit_coverage_period')
+        expect(@result.failure).to eq('There exists active enrollments for the subscriber in the year with given effective_on')
+      end
+    end
+
+    context 'with non active enrollment by aasm state' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'shopping')
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return failure' do
+        expect(@result).to be_a(Dry::Monads::Result::Failure)
+      end
+
+      it 'should return failure with message' do
+        expect(@result.failure).to eq('Given enrollment is not an active enrollment by aasm_state')
       end
     end
   end
