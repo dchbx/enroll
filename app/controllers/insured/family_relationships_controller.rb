@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Insured
+module Insured
   class FamilyRelationshipsController < ApplicationController
     before_action :set_current_person, :set_family
     # rubocop:disable Metrics/CyclomaticComplexity
