@@ -1,0 +1,52 @@
+<h1 class="darkblue">Family Relationships</h1>
+<p>We need to understand how members of your household are related. Select the relationship for each person listed
+  below. Then select CONTINUE.</p>
+<%= form_tag "/insured/family_relationships", remote: form_remote do %>
+    <%= hidden_field_tag :family_id, family.id %>
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id].present? ? params[:consumer_role_id] : family.primary_applicant.person.consumer_role.id %>
+    <%= hidden_field_tag :resident_role_id, params[:resident_role_id] %>
+    <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+    <%= hidden_field_tag :redirect_url, redirect_url %>
+    <% all_relationships.each do |er| %>
+        <% house_hold_class = er[:relation].present? ? "household" : "household missing_relation" %>
+        <div class="<%= house_hold_class %>" id="<%= "#{er[:predecessor] }_#{er[:successor]}" %>">
+          <div class="usercard">
+            <div class="row card-detail-titles">
+              <div class="col-lg-3">Name</div>
+              <div class="col-lg-5">Relationship</div>
+              <div class="col-lg-4">Household Member</div>
+            </div>
+            <div class="row">
+              <div class="col-lg-3"><%= member_name_by_id(er[:predecessor]) %></div>
+              <div class="col-lg-5">
+                <div class="select-positioning"> is</div>
+                <div class="select-relation rs_selection">
+                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), include_blank: true, required: true, class: 'selected_relationship', "data-predecessor": er[:predecessor], "data-successor": er[:successor] %>
+                </div>
+                <div style="float:left; margin-right: 10px;"> of</div>
+                <div class="icon-rel">
+                  <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                  <i class="fa fa-link" aria-hidden="true"></i>
+                  <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <%= member_name_by_id(er[:successor]) %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br/>
+    <% end %>
+<% end %>
+<%= submit_tag "", class: "" , :style => "display: none;" %>
+
+<script >
+  $(function() {
+    if(<%= missing_relationships.present? %>){
+      $('#btn-continue').addClass('disabled');
+    } else {
+      $('#btn-continue').removeClass('disabled');
+    }
+  });
+</script>
