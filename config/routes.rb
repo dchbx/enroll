@@ -322,6 +322,7 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :family_relationships
   end
 
   namespace :employers do
