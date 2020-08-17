@@ -249,6 +249,7 @@ end
 Then(/^\w+ agrees? to the privacy agreeement/) do
   wait_for_ajax
   expect(page).to have_content('Authorization and Consent')
+  expect(page).to have_content('US Department of Health and Human Services (HHS).')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
   sleep 2
@@ -262,6 +263,7 @@ end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content('Verify Identity')
+  expect(page).to have_content("When you're finished, select SUBMIT.")
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
   screenshot("identify_verification")
