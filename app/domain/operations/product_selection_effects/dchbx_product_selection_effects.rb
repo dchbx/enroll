@@ -31,7 +31,8 @@ module Operations
           benefit_group_assignment.save
         end
 
-        renew_ivl_if_is_open_enrollment(enrollment)
+        try_to_renew = renew_ivl_if_is_open_enrollment(enrollment)
+        return try_to_renew if try_to_renew
         Success(:ok)
       end
 
@@ -39,7 +40,12 @@ module Operations
         return nil if enrollment.is_shop?
         bp = BenefitPackage.find(enrollment.benefit_package_id)
         bcp = bp.benefit_coverage_period
-        raise "THERE IS CURRENTLY NO SERVICE TO EXECUTE A SINGLE IVL RENEWAL" if in_open_enrollment_before_plan_year_start?(bcp)
+        return nil unless in_open_enrollment_before_plan_year_start?(bcp)
+        sbcp = bcp.successor
+        Operations::Individual::RenewEnrollment.new.call(
+          hbx_enrollment: enrollment,
+          effective_on: sbcp.start_on
+        )
       end
 
       def in_open_enrollment_before_plan_year_start?(benefit_coverage_period)
