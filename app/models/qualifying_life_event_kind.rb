@@ -140,7 +140,8 @@ class QualifyingLifeEventKind
   validate :qle_date_guards
   embeds_many :workflow_state_transitions, as: :transitional
 
-  scope :active_by_state, ->{ where(:aasm_state.in => [:active, :expire_pending]) }
+  scope :active_by_state, ->{ where(is_active: true, :aasm_state.in => [:active, :expire_pending]).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+
   scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
   scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
