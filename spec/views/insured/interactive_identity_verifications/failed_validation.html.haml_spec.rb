@@ -21,7 +21,7 @@ describe "insured/interactive_identity_verifications/failed_validation" do
   it "should show a message about the user failing validation and providing contact info" do
     render :template => "insured/interactive_identity_verifications/failed_validation.html.haml"
     expect(rendered).to include("Experian, the third-party service we use to verify your identity, could not confirm your information. For your security, you won’t be able to continue your application until you resolve this issue.")
-    expect(rendered).to include("Provide your reference number:  the_transaction_id")
+    expect(rendered).to include("Provide your reference number: the_transaction_id")
     expect(rendered).to include("Answer Experian’s questions to verify your identity.")
   end
 
