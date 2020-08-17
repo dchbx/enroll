@@ -160,7 +160,7 @@ When(/^Experian is unable to verify Identity for the consumer$/) do
 end
 
 When(/^an Experian Error screen appears for the consumer$/) do
-  expect(page).to have_content('Your identity could not be confirmed by Experian')
+  expect(page).to have_content('Experian, the third-party service we use to verify your identity, could not confirm your information.')
 end
 
 When(/^an uploaded Identity verification in VERIFIED status is present on failed experian screen$/) do
