@@ -1,5 +1,19 @@
 # frozen_string_literal: true
 
+Given(/^that the user is on FAA Household Info: Family Members page$/) do
+  login_as consumer, scope: :user
+  visit root_path
+  click_link 'Assisted Consumer/Family Portal'
+  click_link 'Continue'
+  # Security Questions
+  step 'the user answers all the VERIFY IDENTITY  questions'
+  click_button 'Submit'
+  click_link "Continue Application"
+  page.all('label').detect { |l| l.text == 'Yes' }.click
+  click_button 'CONTINUE'
+  click_link 'Continue'
+end
+
 When(/^at least one applicant is in the Info Needed state$/) do
   expect(application.incomplete_applicants?).to be true
   expect(page).to have_content('Info Needed')

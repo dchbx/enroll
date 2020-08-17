@@ -349,3 +349,36 @@ end
 And(/^they should be taken back to the application's details page for deduction$/) do
   page.should have_content("Income Adjustments for #{consumer.person.first_name}")
 end
+
+Given(/^the FAA feature configuration is disabled$/) do
+  disable_feature :financial_assistance
+end
+
+Given(/^the FAA feature configuration is enabled$/) do
+  enable_feature :financial_assistance
+end
+
+Then(/^the consumer will not see the Cost Savings link$/) do
+  expect(page).to have_no_link('Cost Savings')
+end
+
+And(/^the Cost Savings link is visible$/) do
+  expect(page).to have_link('Cost Savings')
+end
+
+When(/^the consumer manually enters the "Cost Savings" url in the browser search bar$/) do
+  visit financial_assistance.applications_path
+end
+
+Then(/^the consumer will not have access to the Cost Savings page$/) do
+  expect(page).not_to have_selector('h1', text: 'Cost Savings Applications')
+  expect(page).to have_content("The page you were looking for doesn't exist.")
+end
+
+When(/^the consumer clicks the Cost Savings link$/) do
+  find_link('Cost Savings').click
+end
+
+Then(/^the consumer will navigate to the Cost Savings page$/) do
+  expect(page).to have_selector('h1', text: 'Cost Savings Applications')
+end

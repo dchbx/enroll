@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class ApplicationsController < ApplicationController
+  class ApplicationsController < ::FinancialAssistance::ApplicationController
 
     before_action :set_current_person
     before_action :set_primary_family
+
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
     before_action :init_cfl_service, only: :review_and_submit
     before_action :family_relationships, only: :review_and_submit
@@ -219,7 +220,7 @@ module FinancialAssistance
     end
 
     def call_service
-      if Settings.financial_assistance.ext_service.aceds_curam
+      if EnrollRegistry[:faa_ext_service].setting(:aceds_curam).item
         person = FinancialAssistance::Factories::AssistanceFactory.new(@person)
         @assistance_status, @message = person.search_existing_assistance
       else

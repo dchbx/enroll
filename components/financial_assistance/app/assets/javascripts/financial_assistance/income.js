@@ -21,7 +21,7 @@ function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
 
-$(document).ready(function() {
+document.addEventListener("turbolinks:load", function() {
   var faWindow = $('.incomes');
   if ($('.incomes-list, .other-incomes-list').length) {
     $(faWindow).bind('beforeunload', function(e) {

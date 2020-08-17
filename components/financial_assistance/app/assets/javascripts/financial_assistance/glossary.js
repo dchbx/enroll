@@ -1,7 +1,7 @@
 // page:change accounts for turbolinks affecting JS on document ready
 // ajax:success accounts for glossary terms in consumer forms after document ready
 // Rails 5 event: 'turbolinks:load' instead of 'page:change'
-$(document).on("page:change ajax:success", function() {
+document.addEventListener("turbolinks:load", function() {
   if ($('.run-glossary').length) {
     // Certain glossary terms have been rearranged to avoid a smaller word being given a popover instead of the
     // full glossary term (e.g. Premium/ Premium Tax Credit)

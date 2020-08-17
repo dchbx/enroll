@@ -23,7 +23,7 @@ function afterDestroyHide(selector_id, kind){
   $(".benefits #"+selector_id+" .add-more-link-"+kind).addClass('hidden');
 };
 
-$(document).ready(function() {
+document.addEventListener("turbolinks:load", function() {
   if ($('.benefit-kinds').length) {
     $(window).bind('beforeunload', function(e) {
       if (!currentlyEditing() || $('#unsavedBenefitChangesWarning:visible').length)

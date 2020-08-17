@@ -403,10 +403,6 @@ style:
   qle_header_color: '#333333'
   primary_header_font: "'Open Sans', serif"
 
-financial_assistance:
-  ext_service:
-    aceds_curam: false
-
 external_applications:
   admin:
     url: <%= ENV['ANGULAR_ADMIN_APPLICATION_URL'] %>

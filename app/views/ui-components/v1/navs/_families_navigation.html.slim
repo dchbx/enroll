@@ -11,6 +11,10 @@ nav
           = l10n("documents")
           - if enrollment_group_unverified?(@person)
             span.badge.message-unread = l10n("action_needed")
+    - if @person.has_consumer_role? && EnrollRegistry.feature_enabled?(:financial_assistance)
+      li
+        = link_to financial_assistance.applications_path(tab: 'cost_savings') do
+          = l10n("cost_savings")
     - if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members)
       li
         = link_to upload_application_insured_families_path(tab: 'verification') do

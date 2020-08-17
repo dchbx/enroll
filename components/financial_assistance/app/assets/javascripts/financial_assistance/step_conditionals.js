@@ -1,4 +1,4 @@
-$(document).ready(function() {
+document.addEventListener("turbolinks:load", function() {
   $('.step-tabs, .interaction-click-control-my-household').on('click', function(e) {
     //Leave without saving for all side nav items - this gathers all items 
     $('.btn.btn-primary').click(function() {

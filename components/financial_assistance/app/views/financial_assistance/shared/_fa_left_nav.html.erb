@@ -105,14 +105,15 @@
         <% end %>
       </li>
 
-      <% if @application.present? && @application.incomplete_applicants? %>
-        <% if @application.active_applicants.count > 1 %>
+      <% if @application && @application.incomplete_applicants? %>
+        <% if @application.family.family_members.count > 1 %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable'>
             <a class="cna">Family Relationships</a>
           </li>
         <% end %>
       <% else %>
-        <% if @application.present? && @application.active_applicants.count > 1 && @application.is_draft? %>
+        <% if @application && @application.active_applicants.count > 1 && @applicant.application.is_draft?%>
+          <%# TODO: The familiy relationships files need to be moved over %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable global-nav'>
             <%= link_to 'Family Relationships', insured_family_relationships_path%>
           </li>

@@ -683,8 +683,8 @@ module FinancialAssistance
           errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnency?' should be answered") if is_enrolled_on_medicaid.nil?
         end
       else
-        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.nil?
-        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.nil?
+        errors.add(:is_post_partum_period, "' Was this person pregnant in the last 60 days?' should be answered") if is_post_partum_period.present?
+        errors.add(:pregnancy_end_on, "' Pregnency End on date' should be answered") if is_post_partum_period.present? && pregnancy_end_on.blank?
       end
 
       if age_of_applicant > 18 && age_of_applicant < 26
