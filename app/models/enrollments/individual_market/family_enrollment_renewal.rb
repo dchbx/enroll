@@ -24,7 +24,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       @dependent_age_off = nil
       save_renewal_enrollment(renewal_enrollment)
     rescue Exception => e
-      puts "#{enrollment.hbx_id}---#{e.inspect}" unless Rails.env.test?
+      puts "#{enrollment.hbx_id}---#{e.inspect}" # unless Rails.env.test?
       @logger.info "Enrollment renewal failed for #{enrollment.hbx_id} with Exception: #{e.backtrace}"
     end
   end

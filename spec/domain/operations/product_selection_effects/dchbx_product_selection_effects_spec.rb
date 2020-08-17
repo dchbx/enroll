@@ -105,14 +105,31 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:product) do
     BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first)
   end
+  let(:renewal_benefit_coverage_period) do
+    benefit_coverage_period.successor
+  end
+  let(:renewal_benefit_package) do
+    renewal_benefit_coverage_period.benefit_packages.first
+  end
+
+  let(:renewal_product) do
+    r_product = BenefitMarkets::Products::Product.find(renewal_benefit_package.benefit_ids.first)
+    product.renewal_product_id = r_product.id
+    product.save!
+    product.reload
+    r_product
+  end
   let(:ivl_enrollment) do
     FactoryBot.create(
       :hbx_enrollment,
       :individual_unassisted,
+      :with_enrollment_members,
+      enrollment_members: family.family_members,
       household: family.active_household,
       effective_on: Date.new(coverage_year, 11, 1),
       family: family,
-      benefit_package_id: benefit_package.id
+      benefit_package_id: benefit_package.id,
+      product: product
     )
   end
 
@@ -127,13 +144,21 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
 
   subject do
+    renewal_product
     product_selection
     Operations::ProductSelectionEffects::DchbxProductSelectionEffects
   end
 
-  it "does not create a renewal after purchase" # do
-#     subject
-#    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(coverage_year, 11, 15))
-#    subject.call(product_selection)
-#  end
+  it "does creates a renewal after purchase" do
+    subject
+    allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(coverage_year, 11, 15))
+    subject.call(product_selection)
+    family.reload
+    enrollments = family.hbx_enrollments.sort_by(&:effective_on)
+    expect(enrollments.length).to eq 2
+    renewal_enrollment = enrollments.last
+    renewal_start_date = renewal_enrollment.effective_on
+    expect(renewal_benefit_coverage_period.start_on).to eq renewal_start_date
+    expect(renewal_enrollment.product_id).to eq renewal_product.id
+  end
 end
