@@ -39,10 +39,17 @@
               <strong><%= hbx_enrollment.effective_on %></strong>
             </div>
             <% if hbx_enrollment.is_shop? %>
-              <div>
-                <label><%= l10n("termination_date") %>: </label>
-                <strong><%= @family.terminate_date_for_shop_by_enrollment(hbx_enrollment) %></strong>
-              </div>
+              <label><%= l10n("termination_date") %>: </label>
+              <% if @family.latest_shop_sep_termination_kinds.present? %>
+                <br>
+                <div class="col-lg-4">
+                  <%= select_tag :terminated_on, options_for_select(@termination_date_options, selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on'} %>
+                </div>
+              <% else %>
+                <div>
+                  <strong><%= @family.terminate_date_for_shop_by_enrollment(hbx_enrollment) %></strong>
+                </div>
+              <% end %>
             <% end %>
           </div>
           <div class="col-xs-4">

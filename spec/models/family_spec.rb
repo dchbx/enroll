@@ -531,6 +531,48 @@ describe Family, dbclean: :around_each do
       end
     end
   end
+
+  context 'for options_for_termination_dates' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    before do
+      @termination_dates = family10.options_for_termination_dates
+    end
+
+    it 'should include sep qle_on' do
+      expect(@termination_dates).to include(sep10.qle_on)
+    end
+
+    it 'should include end_of_month of sep qle_on' do
+      expect(@termination_dates).to include(sep10.qle_on.end_of_month)
+    end
+  end
+
+  context 'for latest_shop_sep_termination_kinds' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    before do
+      @termination_kinds = family10.latest_shop_sep_termination_kinds
+    end
+
+    it 'should include exact_date' do
+      expect(@termination_kinds).to include('exact_date')
+    end
+
+    it 'should include end_of_event_month' do
+      expect(@termination_kinds).to include('end_of_event_month')
+    end
+  end
 end
 
 describe "special enrollment periods" do

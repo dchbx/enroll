@@ -437,6 +437,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       hbx_enrollment.reload
       expect(hbx_enrollment.terminate_reason).to eq "Because"
     end
+
+    context 'for terminate_date' do
+      let(:terminate_date) { TimeKeeper.date_of_record.next_month.end_of_month }
+
+      before do
+        post :terminate, params: {id: 'hbx_id',
+                                  terminate_reason: 'Because',
+                                  terminate_date: terminate_date.to_s}
+      end
+
+      it 'terminated on date should be terminate_date' do
+        expect(hbx_enrollment.terminated_on).to eq terminate_date
+      end
+    end
   end
 
   context "GET waive", :dbclean => :around_each do

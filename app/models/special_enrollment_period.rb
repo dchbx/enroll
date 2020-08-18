@@ -168,6 +168,28 @@ class SpecialEnrollmentPeriod
     family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
   end
 
+  def termination_dates
+    termination_kinds = qualifying_life_event_kind.termination_on_kinds
+    termination_kinds.inject([]) do |dates, termination_kind|
+      dates << fetch_termiation_date(termination_kind)
+    end
+  end
+
+  def fetch_termiation_date(termination_kind)
+    case termination_kind
+    when 'end_of_event_month'
+      qle_on.end_of_month
+    when 'date_before_event'
+      qle_on - 1.day
+    when 'end_of_last_month_of_reporting'
+      submitted_at.prev_month.end_of_month
+    when 'end_of_reporting_month'
+      submitted_at.end_of_month
+    when 'exact_date'
+      qle_on
+    end
+  end
+
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?

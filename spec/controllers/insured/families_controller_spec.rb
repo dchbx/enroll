@@ -1082,7 +1082,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         allow(person).to receive(:primary_family).and_return(family)
         allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
         sign_in(user)
-        get :purchase, params: {id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+        get :purchase, params: { id: family.id,
+                                 hbx_enrollment_id: hbx_enrollment.id,
+                                 terminate: 'terminate',
+                                 terminate_date: TimeKeeper.date_of_record.to_s}
       end
 
       it "should get hbx_enrollment" do
@@ -1091,6 +1094,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should get terminate" do
         expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it 'should assign terminate_date same as params terminate_date' do
+        expect(assigns(:terminate_date)).to eq(TimeKeeper.date_of_record)
       end
 
       it "should get plan" do

@@ -761,4 +761,59 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
     end
   end
+
+  context 'for termination_dates' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    before do
+      @termination_dates = sep10.termination_dates
+    end
+
+    it 'should include sep qle_on' do
+      expect(@termination_dates).to include(sep10.qle_on)
+    end
+
+    it 'should include end_of_month of sep qle_on' do
+      expect(@termination_dates).to include(sep10.qle_on.end_of_month)
+    end
+  end
+
+  context 'for fetch_termiation_date' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    it 'should return end_of_month of sep qle_on' do
+      expect(sep10.fetch_termiation_date('end_of_event_month')).to eq(sep10.qle_on.end_of_month)
+    end
+
+
+    it 'should return end_of_month of sep qle_on' do
+      expect(sep10.fetch_termiation_date('end_of_event_month')).to eq(sep10.qle_on.end_of_month)
+    end
+
+    it 'should return day before qle_on' do
+      expect(sep10.fetch_termiation_date('date_before_event')).to eq(sep10.qle_on - 1.day)
+    end
+
+    it 'should return end_of_month of previous month of sep submitted_at date' do
+      expect(sep10.fetch_termiation_date('end_of_last_month_of_reporting')).to eq(sep10.submitted_at.prev_month.end_of_month)
+    end
+
+    it 'should return end_of_month of sep submitted_at date' do
+      expect(sep10.fetch_termiation_date('end_of_reporting_month')).to eq(sep10.submitted_at.end_of_month)
+    end
+
+    it 'should return sep qle_on date' do
+      expect(sep10.fetch_termiation_date('exact_date')).to eq(sep10.qle_on)
+    end
+  end
 end

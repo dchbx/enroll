@@ -600,6 +600,18 @@ class Family
     special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
+  def options_for_termination_dates
+    latest_sep = latest_shop_sep || latest_fehb_sep
+    return [] unless latest_sep
+
+    latest_sep.termination_dates
+  end
+
+  def latest_shop_sep_termination_kinds
+    latest_sep = latest_shop_sep || latest_fehb_sep
+    latest_sep.qualifying_life_event_kind.termination_on_kinds
+  end
+
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
     latest_sep = latest_shop_sep || latest_fehb_sep
     if latest_sep.present?

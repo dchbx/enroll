@@ -213,7 +213,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
-      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_date = params[:terminate_date] ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
