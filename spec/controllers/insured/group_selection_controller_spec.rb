@@ -777,7 +777,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
 
       it 'should assign termination_date_options' do
-        expect(assigns(:termination_date_options)).to eq([@shop_sep.qle_on])
+        expect(assigns(:termination_date_options)).to eq({ hbx_enrollment.id.to_s => [@shop_sep.qle_on] })
       end
     end
   end

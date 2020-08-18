@@ -771,7 +771,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
 
     before do
-      @termination_dates = sep10.termination_dates
+      @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record - 20.days)
     end
 
     it 'should include sep qle_on' do
@@ -780,6 +780,20 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     it 'should include end_of_month of sep qle_on' do
       expect(@termination_dates).to include(sep10.qle_on.end_of_month)
+    end
+
+    context 'effective_on_date is greater than qle_on' do
+      before do
+        @termination_dates = sep10.termination_dates(TimeKeeper.date_of_record)
+      end
+
+      it 'should not include qle_on for exact_date' do
+        expect(@termination_dates).not_to include(sep10.qle_on)
+      end
+
+      it 'should include given date and not qle_on' do
+        expect(@termination_dates).to include(TimeKeeper.date_of_record)
+      end
     end
   end
 

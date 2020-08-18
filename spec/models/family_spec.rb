@@ -539,17 +539,18 @@ describe Family, dbclean: :around_each do
       sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
       sep
     end
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
 
     before do
-      @termination_dates = family10.options_for_termination_dates
+      @termination_dates = family10.options_for_termination_dates([enrollment])
     end
 
     it 'should include sep qle_on' do
-      expect(@termination_dates).to include(sep10.qle_on)
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on)
     end
 
     it 'should include end_of_month of sep qle_on' do
-      expect(@termination_dates).to include(sep10.qle_on.end_of_month)
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on.end_of_month)
     end
   end
 

@@ -168,10 +168,15 @@ class SpecialEnrollmentPeriod
     family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
   end
 
-  def termination_dates
+  def termination_dates(effective_on_date)
     termination_kinds = qualifying_life_event_kind.termination_on_kinds
     termination_kinds.inject([]) do |dates, termination_kind|
-      dates << fetch_termiation_date(termination_kind)
+      term_date = fetch_termiation_date(termination_kind)
+      dates << if term_date < effective_on_date
+                 effective_on_date
+               else
+                 term_date
+               end
     end
   end
 

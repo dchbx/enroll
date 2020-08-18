@@ -40,7 +40,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       assign :employee_role, employee_role
       assign :person, person
       assign :family, family
-      assign :termination_date_options, ['end_of_event_month']
+      assign :termination_date_options, { hbx_enrollment.id.to_s => ['end_of_event_month']}
       render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
     end
 

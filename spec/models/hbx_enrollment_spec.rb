@@ -983,6 +983,33 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       end
     end
 
+    context 'terminate_coverage' do
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+      let!(:hbx_enrollment) do
+        FactoryBot.create(:hbx_enrollment,
+                          household: family.active_household,
+                          family: family,
+                          aasm_state: 'coverage_termination_pending',
+                          terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      before do
+        hbx_enrollment.terminate_coverage!(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should update terminated_on date for given hbx_enrollment' do
+        expect(hbx_enrollment.terminated_on).to eq(TimeKeeper.date_of_record - 10.days)
+      end
+
+      it 'should not have same terminated_on date' do
+        expect(hbx_enrollment.terminated_on).not_to eq(TimeKeeper.date_of_record.next_month.end_of_month)
+      end
+
+      it 'should also transition the hbx_enrollment to terminated' do
+        expect(hbx_enrollment.aasm_state).to eq('coverage_terminated')
+      end
+    end
+
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}

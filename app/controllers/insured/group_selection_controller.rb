@@ -164,7 +164,7 @@ class Insured::GroupSelectionController < ApplicationController
 
   def terminate_selection
     @hbx_enrollments = @family.enrolled_hbx_enrollments.select{|pol| pol.may_terminate_coverage? } || []
-    @termination_date_options = @family.options_for_termination_dates
+    @termination_date_options = @family.options_for_termination_dates(@hbx_enrollments)
   end
 
   def terminate_confirm

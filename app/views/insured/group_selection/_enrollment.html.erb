@@ -43,7 +43,7 @@
               <% if @family.latest_shop_sep_termination_kinds.present? %>
                 <br>
                 <div class="col-lg-4">
-                  <%= select_tag :terminated_on, options_for_select(@termination_date_options, selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on'} %>
+                  <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on'} %>
                 </div>
               <% else %>
                 <div>

@@ -251,7 +251,7 @@ end
 
 When(/^.+ submits termination reason in modal$/) do
   waiver_modal = find('.terminate_confirm')
-  find('.selectric').click
+  find('.selectric', text: 'Please select terminate reason').click
   find('li', :text => 'I have coverage through Medicare').click
   waiver_modal.find('.terminate_reason_submit').click
 end

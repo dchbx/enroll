@@ -213,7 +213,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
-      @terminate_date = params[:terminate_date] ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_date = fetch_terminate_date(params[:terminate_date]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
@@ -323,6 +323,17 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def fetch_terminate_date(terminate_date)
+    term_date = @family.terminate_date_for_shop_by_enrollment(@enrollment)
+    return term_date unless terminate_date.present?
+
+    begin
+      Date.strptime(:terminate_date, "%m/%d/%Y")
+    rescue StandardError
+      term_date
+    end
+  end
 
   def can_view_entire_family_enrollment_history?
     authorize Family, :can_view_entire_family_enrollment_history?
