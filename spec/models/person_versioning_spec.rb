@@ -126,8 +126,9 @@ describe Person, :dbclean => :after_each do
   end
 
   context 'of a person relationship' do
+    let(:family) { FactoryBot.create(:family, :with_nuclear_family, person: person) }
     let(:relative) { FactoryBot.create :person }
-    subject { person.person_relationships.create! kind: 'spouse', relative_id: relative.id }
+    subject { person.person_relationships.create! kind: 'spouse', relative_id: relative.id, family_id: family.id, predecessor_id: person.id, successor_id: relative.id }
 
     include_examples 'tracked history', 'kind', 'child'
   end

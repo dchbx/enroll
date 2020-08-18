@@ -4,19 +4,19 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse)  { 
+    let!(:spouse)  {
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "spouse")
       p.save; p
     }
 
-    let!(:child1)  { 
+    let!(:child1)  {
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "child")
       p.save; p
     }
 
-    let!(:child2)  { 
+    let!(:child2)  {
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "child")
       p.save; p
@@ -29,7 +29,7 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
     context "Family already exists" do
 
-      let!(:source_family) { 
+      let!(:source_family) {
         family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
         family.family_members.build(is_primary_applicant: true, person: person)
         family.family_members.build(is_primary_applicant: false, person: spouse)
@@ -57,9 +57,9 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
       end
 
       def build_person_relationships
-        person.person_relationships.build(relative: spouse, kind: "spouse")
-        person.person_relationships.build(relative: child1, kind: "child")
-        person.person_relationships.build(relative: child2, kind: "child")
+        person.person_relationships.build(relative: spouse, kind: "spouse", predecessor_id: person.id, successor_id: spouse.id, family_id: source_family.id)
+        person.person_relationships.build(relative: child1, kind: "child", predecessor_id: person.id, successor_id: child1.id, family_id: source_family.id)
+        person.person_relationships.build(relative: child2, kind: "child", predecessor_id: person.id, successor_id: child2.id, family_id: source_family.id)
         person.save!
       end
 

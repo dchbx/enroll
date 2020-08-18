@@ -30,6 +30,8 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 59, 'R-DC001').and_return(814.85)
       allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, hbx_enrollment.effective_on, 61, 'R-DC001').and_return(879.8)
+      person.person_relationships.first.update_attributes(predecessor_id: person.id, successor_id: family.family_members[1].id, family_id: family.id)
+      person.person_relationships.last.update_attributes(predecessor_id: person.id, successor_id: family.family_members[2].id, family_id: family.id)
       person.update_attributes!(dob: (hbx_enrollment.effective_on - 61.years))
       family.family_members[1].person.update_attributes!(dob: (hbx_enrollment.effective_on - 59.years))
 
