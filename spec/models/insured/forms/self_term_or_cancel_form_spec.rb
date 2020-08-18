@@ -67,6 +67,8 @@ module Insured
       let(:applied_aptc_amount) { 120.78 }
 
       before(:each) do
+        person.person_relationships.first.update_attributes!(predecessor_id: person.id, successor_id: family.family_members[1].id, family_id: family.id)
+        person.person_relationships.last.update_attributes!(predecessor_id: person.id, successor_id: family.family_members[2].id, family_id: family.id)
         @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
         @product.update_attributes(ehb: 0.9844)
         premium_table = @product.premium_tables.first
