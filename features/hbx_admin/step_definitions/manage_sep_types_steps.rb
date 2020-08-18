@@ -112,7 +112,7 @@ Then("Admin should see three tabs Individual, Shop and Congress markets") do
   expect(page).to have_content('Congress')
 end
 
-When(/Admin clicks on (.*) tab$/) do |market_kind|
+When(/^Admin clicks on (.*) tab$/) do |market_kind|
   if market_kind == 'individual'
     find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
   elsif market_kind == 'shop'
