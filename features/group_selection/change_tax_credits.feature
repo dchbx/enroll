@@ -5,7 +5,6 @@ Background:
   And the consumer is logged in
   And consumer has a dependent in child relationship with age greater than 26
   And consumer has a dependent in spouse relationship with age greater than 26
-  And generate family relationship matrix
   And consumer also has a health enrollment with primary person covered
   And the family has an active tax household
   And consumer has successful ridp
