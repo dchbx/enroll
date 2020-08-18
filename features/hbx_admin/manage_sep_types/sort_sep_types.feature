@@ -14,18 +14,18 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending positions
+    When Admin clicks on individual tab
+    Then Admin should see listed individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Individual SEP Types ordinal postions should change
-    When Admin clicks on Shop tab
-    Then Admin should see listed Shop market SEP Types with ascending positions
+    When Admin clicks on shop tab
+    Then Admin should see listed shop market SEP Types with ascending positions
     When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Shop SEP Types ordinal postions should change
-    When Admin clicks on Congress tab
-    Then Admin should see listed Congress market SEP Types with ascending positions
+    When Admin clicks on congress tab
+    Then Admin should see listed congress market SEP Types with ascending positions
     When Admin sorts Congress SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Congress SEP Types ordinal postions should change
@@ -37,8 +37,8 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending positions
+    When Admin clicks on individual tab
+    Then Admin should see listed individual market SEP Types with ascending positions
     And Hbx Admin logs out
     Given Individual has not signed up as an HBX user
     When Individual with known qles visits the Insured portal outside of open enrollment
@@ -62,7 +62,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     When I click on none of the situations listed above apply checkbox
     And I click on back to my account button
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should see the "Had a baby" at the top of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
@@ -72,8 +72,8 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Individual tab
-    Then Admin should see listed Individual market SEP Types with ascending positions
+    When Admin clicks on individual tab
+    Then Admin should see listed individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Individual SEP Types ordinal postions should change
@@ -111,8 +111,8 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Admin should see Successfully publish message
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Individual tab
-    And Admin should see listed Individual market SEP Types
+    When Admin clicks on individual tab
+    And Admin should see listed individual market SEP Types
     And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Hbx Admin logs out
 
@@ -120,7 +120,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Shop tab
+    When Admin clicks on shop tab
     Then Admin should see listed Active shop market SEP Types on datatable
     And Hbx Admin logs out
     Given a CCA site exists with a benefit market
@@ -140,11 +140,11 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Given Admin can navigate to the Manage SEP Types screen
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    Then Admin should see listed Individual market SEP Types with ascending positions
+    Then Admin should see listed individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
     Then Admin should see successful message after sorting
-    When Admin clicks on Shop tab
-    Then Admin should see listed Shop market SEP Types with ascending positions
+    When Admin clicks on shop tab
+    Then Admin should see listed shop market SEP Types with ascending positions
     When Admin sorts Shop SEP Types by drag and drop
     Then Admin should see successful message after sorting
     And listed Shop SEP Types ordinal postions should change
@@ -181,7 +181,44 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Admin should see Successfully publish message
     When Admin clicks on the Sorting SEP Types button
     Then Admin should see three tabs Individual, Shop and Congress markets
-    When Admin clicks on Shop tab
-    And Admin should see listed Shop market SEP Types
+    When Admin clicks on shop tab
+    And Admin should see listed shop market SEP Types
     And Admin should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Hbx Admin logs out
+
+  Scenario Outline: Admin will create a new <market_kind> SEP type and publish it
+    Given Admin can navigate to the Manage SEP Types screen
+    And expired Qualifying life events of <market_kind> market is present
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with future start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects <market_kind> market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin <action> select termination on kinds for <market_kind> SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin clicks on Create Draft button
+    Then Admin should see SEP Type Created Successfully message
+    When Admin navigates to SEP Types List page
+    When Admin clicks <market_kind> filter on SEP Types datatable
+    And Admin clicks on Draft filter of <market_kind> market filter
+    Then Admin should see newly created SEP Type title on Datatable
+    When Admin clicks on newly created SEP Type
+    Then Admin should navigate to update SEP Type page
+    When Admin clicks on Publish button
+    Then Admin should see Successfully publish message
+    When Admin clicks on the Sorting SEP Types button
+    Then Admin should see three tabs Individual, Shop and Congress markets
+    When Admin clicks on <market_kind> tab
+    Then Admin should see listed <market_kind> market SEP Types
+    And Admin should see the Entered into a legal domestic partnership in the <market_kind> qle list
+    And Hbx Admin logs out
+
+  Examples:
+    | market_kind | action |
+    | individual  | cannot |
+    | shop        |  can   |
+    | fehb        |  can   |

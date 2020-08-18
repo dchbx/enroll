@@ -8,7 +8,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
     And Hbx Admin logs out
     Given Individual creates account and on home page
-    And Individual should see listed Individual market SEP Types
+    And Individual should see listed individual market SEP Types
     And Individual should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     When Individual click on the "Entered into a legal domestic partnership" Sep Type
     And Individual should see input field to enter the Sep Type date
@@ -32,7 +32,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a ivl family person on the family datatable
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     When I click on the "Entered into a legal domestic partnership" Sep Type
     And I should see input field to enter the Sep Type date
@@ -80,7 +80,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a shop family person on the family datatable
     Then I should land on home page
-    And I should see listed Shop market SEP Types
+    And I should see listed shop market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     When I click on the "Entered into a legal domestic partnership" Sep Type
     And I should see input field to enter the Sep Type date

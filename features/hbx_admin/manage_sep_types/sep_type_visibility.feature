@@ -55,7 +55,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     When I click on none of the situations listed above apply checkbox
     And I click on back to my account button
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should <action> the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
@@ -64,7 +64,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a ivl family person on the family datatable
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
 
@@ -121,7 +121,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     When I click on none of the situations listed above apply checkbox
     And I click on back to my account button
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
@@ -130,7 +130,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a ivl family person on the family datatable
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
 
@@ -181,7 +181,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a shop family person on the family datatable
     Then I should land on home page
-    And I should see listed Shop market SEP Types
+    And I should see listed shop market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Admin logs out
 
@@ -232,7 +232,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a shop family person on the family datatable
     Then I should land on home page
-    And I should see listed Shop market SEP Types
+    And I should see listed shop market SEP Types
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Admin logs out
 

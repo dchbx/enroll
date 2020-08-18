@@ -7,7 +7,7 @@ Feature: Admin has ability to update a Draft SEP Type
     And the Admin will see the Manage SEP Types under admin dropdown
     And Admin can click Manage SEP Types link
 
-  Scenario Outline: Admin will create a new <market_kind> SEP type and updates it
+  Scenario Outline: Admin will create a new <market_kind> SEP type and publish it
     Given Admin can navigate to the Manage SEP Types screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button

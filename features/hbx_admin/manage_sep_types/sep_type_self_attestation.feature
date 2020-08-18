@@ -55,7 +55,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     When I click on none of the situations listed above apply checkbox
     And I click on back to my account button
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     When I click on the "Entered into a legal domestic partnership" Sep Type
     Then I should <action> input field to enter the Sep Type date
@@ -66,7 +66,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a ivl family person on the family datatable
     Then I should land on home page
-    And I should see listed Individual market SEP Types
+    And I should see listed individual market SEP Types
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     When I click on the "Entered into a legal domestic partnership" Sep Type
     Then I should <action> input field to enter the Sep Type date
@@ -121,7 +121,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then the Admin is navigated to the Families screen
     And Admin clicks name of a shop family person on the family datatable
     Then I should land on home page
-    And I should see listed Shop market SEP Types
+    And I should see listed shop market SEP Types
     And Admin should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     When Admin click on the "Entered into a legal domestic partnership" Sep Type
     Then Admin should <action> input field to enter the Sep Type date

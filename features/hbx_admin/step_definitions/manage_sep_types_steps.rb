@@ -112,16 +112,24 @@ Then("Admin should see three tabs Individual, Shop and Congress markets") do
   expect(page).to have_content('Congress')
 end
 
-When("Admin clicks on Individual tab") do
-  find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
+When(/Admin clicks on (.*) tab$/) do |market_kind|
+  if market_kind == 'individual'
+    find(:xpath, '//div[2]/div[2]/ul/li[1]/a').click
+  elsif market_kind == 'shop'
+    find(:xpath, '//div[2]/div[2]/ul/li[2]/a').click
+  else
+    find(:xpath, '//div[2]/div[2]/ul/li[3]/a').click
+  end
 end
 
-Then(/(.*) should see listed Individual market SEP Types$/) do |_user|
-  step "Admin should see listed Active individual market SEP Types on datatable"
-end
-
-Then(/(.*) should see listed Shop market SEP Types$/) do |_user|
-  step "Admin should see listed Active shop market SEP Types on datatable"
+Then(/(.*) should see listed (.*) market SEP Types$/) do |_user, market_kind|
+  if market_kind == 'individual'
+    step "Admin should see listed Active individual market SEP Types on datatable"
+  elsif market_kind == 'shop'
+    step "Admin should see listed Active shop market SEP Types on datatable"
+  else
+    step "Admin should see listed Active fehb market SEP Types on datatable"
+  end
 end
 
 Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |market_kind|
@@ -137,7 +145,7 @@ Then(/Admin should see listed Active (.*) market SEP Types on datatable$/) do |m
   end
 end
 
-Then(/^\w+ should see listed Individual market SEP Types with ascending positions$/) do
+Then(/^\w+ should see listed individual market SEP Types with ascending positions$/) do
   step "Admin should see listed Active individual market SEP Types on datatable"
   birth_ivl = page.all('div').detect { |div| div[:id] == 'birth_individual'}
   expect(birth_ivl['data-ordinal_position']).to eq '1'
@@ -159,11 +167,7 @@ And("listed Individual SEP Types ordinal postions should change") do
   expect(birth_ivl['data-ordinal_position']).to eq '2'
 end
 
-When("Admin clicks on Shop tab") do
-  find(:xpath, '//div[2]/div[2]/ul/li[2]/a').click
-end
-
-Then(/^\w+ should see listed Shop market SEP Types with ascending positions$/) do
+Then(/^\w+ should see listed shop market SEP Types with ascending positions$/) do
   step "Admin should see listed Active shop market SEP Types on datatable"
   covid19_shop = page.all('div').detect { |div| div[:id] == 'covid-19_shop'}
   expect(covid19_shop['data-ordinal_position']).to eq '3'
@@ -185,11 +189,7 @@ Then("listed Shop SEP Types ordinal postions should change") do
   expect(covid19_shop['data-ordinal_position']).to eq '4'
 end
 
-When("Admin clicks on Congress tab") do
-  find(:xpath, '//div[2]/div[2]/ul/li[3]/a').click
-end
-
-Then(/^\w+ should see listed Congress market SEP Types with ascending positions$/) do
+Then(/^\w+ should see listed congress market SEP Types with ascending positions$/) do
   step "Admin should see listed Active fehb market SEP Types on datatable"
   latm_fehb = page.all('div').detect { |div| div[:id] == 'lost_access_to_mec_fehb'}
   expect(latm_fehb['data-ordinal_position']).to eq '5'
@@ -669,6 +669,10 @@ end
 
 And(/(.*) should not see the (.*) at the bottom of the (.*) qle list$/) do |_user, qle_event, _market_kind|
   expect(page).not_to have_content(qle_event)
+end
+
+And(/(.*) should see the (.*) in the (.*) qle list$/) do |_user, qle_event, _market_kind|
+  expect(page).to have_content(qle_event)
 end
 
 When(/(.*) click on the (.*) Sep Type$/) do |_user, _qle|
