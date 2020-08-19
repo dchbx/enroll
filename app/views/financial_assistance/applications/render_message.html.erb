@@ -1,0 +1,25 @@
+<%= form_tag(uqhp_flow_financial_assistance_applications_path, method: :get) do %>
+    <div class="container">
+      <div id="new_person_wrapper">
+        <div class="row">
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render :partial => 'shared/left_nav.html.erb' %>
+          </div>
+          <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+          <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+            <div class="bottom-pd">
+              <div id="help_paying_coverage" class="focus_effect module alert alert-danger">
+                <p>
+                  <%= l10n(decode_msg(@message)).to_s %>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+            <%= render partial: 'shared/individual_progress', locals: {key: "help_paying_coverage"} %>
+          </div>
+        </div>
+      </div>
+    </div>
+<% end %>
+

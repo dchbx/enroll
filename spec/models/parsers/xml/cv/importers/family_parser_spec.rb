@@ -20,7 +20,7 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         expect(family.family_members.class).to eq Array
         expect(family.family_members.length).to eq 2
       end
-      
+
       it "should get is_primary_applicant by family_members" do
         family_member = subject.get_family_object.family_members.first
         expect(family_member.is_primary_applicant).to eq true
@@ -33,7 +33,7 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
 
       it "should get relationship by person" do
         person = subject.get_family_object.family_members.last.person
-        expect(person.person_relationships.first.kind).to eq 'child'
+        expect(person.person_relationships.first.kind).to eq 'parent'
       end
 
       it "should get person info by family_members" do
@@ -70,7 +70,7 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
 
       it "should get relationship by family_members" do
         family_members = subject.get_family_object.family_members
-        expect(family_members.map(&:primary_relationship)).to eq ['self', 'child']
+        expect(family_members.map(&:primary_relationship)).to eq ['self', 'parent']
       end
 
       it "person should have relationships" do

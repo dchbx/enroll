@@ -54,6 +54,17 @@ class ConsumerRole
       indian_tribe_member
   )
 
+  CITIZEN_KINDS = {
+    us_citizen: "US citizen",
+    naturalized_citizen: "Naturalized citizen",
+    alien_lawfully_present: "Alien lawfully present",
+    lawful_permanent_resident: "Lawful permanent resident",
+    undocumented_immigrant: "Undocumented immigrant",
+    not_lawfully_present_in_us: "Not lawfully present in US",
+    non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
+    ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
+    non_native_citizen: "Non-native citizen"
+  }
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record
@@ -132,6 +143,7 @@ class ConsumerRole
   delegate :tribal_id,          :tribal_id=,         to: :person, allow_nil: true
 
   embeds_many :documents, as: :documentable
+
   embeds_many :ridp_documents, as: :documentable
   embeds_many :vlp_documents, as: :documentable do #move to verification type
     def uploaded
@@ -211,7 +223,7 @@ class ConsumerRole
   #list of the collections we want to track under consumer role model
   COLLECTIONS_TO_TRACK = %w- Person consumer_role vlp_documents lawful_presence_determination hbx_enrollments -
 
-  def ivl_coverage_selected
+  def trigger_hub_call
     if unverified?
       coverage_purchased!(verification_attr)
     end
@@ -747,8 +759,8 @@ class ConsumerRole
     end
   end
 
-  def latest_active_tax_household_with_year(year, family)
-    family.latest_household.latest_active_tax_household_with_year(year)
+  def latest_active_tax_households_with_year(year, family)
+    family.latest_household.latest_active_tax_households_with_year(year)
   rescue => e
     log("#4287 person_id: #{person.try(:id)}", {:severity => 'error'})
     nil
@@ -1080,7 +1092,7 @@ class ConsumerRole
 
   def update_verification_type(v_type, update_reason, *authority)
     status = authority.first == "curam" ? "curam" : "verified"
-    self.verification_types.find(v_type).update_attributes(:validation_status => status, :update_reason => update_reason)
+    v_type.update_attributes(:validation_status => status, :update_reason => update_reason)
     if v_type.type_name == "DC Residency"
       update_attributes(:is_state_resident => true, :residency_determined_at => TimeKeeper.datetime_of_record)
     elsif ["Citizenship", "Immigration status"].include? v_type.type_name

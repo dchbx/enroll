@@ -2,10 +2,11 @@ class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
   include ErrorBubble
+  include NavigationHelper
 
   before_action :check_consumer_role, only: [:search, :match]
   before_action :find_consumer_role, only: [:edit, :update]
-  #before_action :authorize_for, except: [:edit, :update]
+  before_filter :load_support_texts, only: [:edit, :search, :match, :update]
 
   def ssn_taken
   end
@@ -195,6 +196,10 @@ class Insured::ConsumerRolesController < ApplicationController
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+    respond_to do |format|
+      format.js
+      format.html
+    end
   end
 
   def update
@@ -204,19 +209,13 @@ class Insured::ConsumerRolesController < ApplicationController
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
       @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage])
       @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
+      @consumer_role.trigger_hub_call
       if save_and_exit
         respond_to do |format|
           format.html {redirect_to destroy_user_session_path}
         end
       else
-        if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
-          redirect_to upload_ridp_document_insured_consumer_role_index_path
-        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
-          @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-        else
-          redirect_to ridp_agreement_insured_consumer_role_index_path
-        end
+        check_redirection_path
       end
     else
       if save_and_exit
@@ -238,7 +237,7 @@ class Insured::ConsumerRolesController < ApplicationController
     set_current_person
     consumer = @person.consumer_role
     if @person.completed_identity_verification? || consumer.identity_verified?
-      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : help_paying_coverage_financial_assistance_applications_path
     else
       set_consumer_bookmark_url
     end
@@ -256,7 +255,7 @@ class Insured::ConsumerRolesController < ApplicationController
     @person.primary_family.update_attributes(application_type: application_type)
     if @person.primary_family.has_curam_or_mobile_application_type?
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      redirect_to help_paying_coverage_financial_assistance_applications_path
     else
       redirect_to :back
     end
@@ -308,7 +307,8 @@ class Insured::ConsumerRolesController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :is_applying_coverage
     ]
   end
@@ -338,6 +338,21 @@ class Insured::ConsumerRolesController < ApplicationController
       return "Date of birth cannot be more than 110 years ago"
     else
       return message
+    end
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
+  end
+
+  def check_redirection_path
+    if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
+      redirect_to upload_ridp_document_insured_consumer_role_index_path
+    elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
+      @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
+      redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : help_paying_coverage_financial_assistance_applications_path
+    else
+      redirect_to ridp_agreement_insured_consumer_role_index_path
     end
   end
 

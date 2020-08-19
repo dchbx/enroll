@@ -147,7 +147,7 @@ Then(/^the broker enters Employer Contribution percentages for health plan$/) do
   page.execute_script(" QuoteSliders.slider_listeners()")
   page.execute_script("$('#pct_employee').bootstrapSlider({})")
   sleep(1)
-  find(:xpath, "//div[contains(@class, 'health')]//*[@id='employee_slide_input']").set("80")
+  find_all(:xpath, "//div[contains(@class, 'health')]//*[@id='employee_slide_input']").first.set("80")
   page.execute_script("$('#pct_employee').bootstrapSlider('setValue', employee_value= 80)")
   sleep(1)
   page.execute_script("$('#pct_employee').trigger('slideStop')")
@@ -164,8 +164,8 @@ Then(/^the broker enters Employer Contribution percentages for dental plan$/) do
 end
 
 Then(/^the broker filters health plans$/) do
-  find(:xpath, "//*[@id='quote-plan-list']/label[1]").trigger("click")
-  find(:xpath, "//*[@id='quote-plan-list']/label[2]").trigger("click")
+  find_all(:xpath, "//*[@id='quote-plan-list']/label[1]").first.trigger("click")
+  find_all(:xpath, "//*[@id='quote-plan-list']/label[2]").first.trigger("click")
 end
 
 Then(/^the broker filters dental plans$/) do
@@ -174,7 +174,7 @@ Then(/^the broker filters dental plans$/) do
 end
 
 Then(/^the broker clicks Compare Costs for health plans$/) do
-  find('#CostComparison').trigger 'click'
+  find_all('#CostComparison').first.trigger('click')
 end
 
 Then(/^the broker clicks Compare Costs for dental plans$/) do
@@ -201,5 +201,5 @@ Then(/^the broker sees that the Quote is published$/) do
 end
 
 When(/^the broker clicks Dental Features$/) do
-  find('.interaction-click-control-dental-features-and-cost-criteria').trigger 'click'
+  find_all('.interaction-click-control-dental-features-and-cost-criteria').first.trigger('click')
 end

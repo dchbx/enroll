@@ -3,30 +3,21 @@ require 'rails_helper'
 describe "insured/family_members/_dependent.html.erb" do
   let(:person) { FactoryGirl.create(:person) }
   let(:user) { FactoryGirl.create(:user, person: person) }
-  let(:family) { Family.new }
-  let(:family_member) { family.family_members.new }
-  let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
-  let(:employee_role) { FactoryGirl.build(:employee_role) }
-  let(:address) {FactoryGirl.build(:address)}
+  let(:person1) {FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:dependent) {FactoryGirl.build(:family_member, family: family, is_primary_applicant: false, is_active: true, person: person1)}
 
   before :each do
     sign_in user
     allow(view).to receive(:edit_insured_family_member_path).and_return "#"
   end
 
-  it "should have name" do
-    render "insured/family_members/dependent", dependent: dependent, person: person
-    expect(rendered).to have_selector("label", text: 'FIRST NAME')
-    expect(rendered).to have_selector("label", text: 'LAST NAME')
+  it "should have name age gender relationship for dependent" do
+    render "insured/family_members/dependent", dependent: dependent, person: person1
+    expect(rendered).to have_selector("label", text: 'NAME')
+    expect(rendered).to have_selector("label", text: 'AGE')
+    expect(rendered).to have_selector("label", text: 'GENDER')
+    expect(rendered).to have_selector("label", text: 'RELATIONSHIP')
   end
 
-  it "should have address" do
-    allow(view).to receive(:get_address_from_dependent).with(dependent).and_return [address]
-    render "insured/family_members/dependent", dependent: dependent, person: person
-    expect(rendered).to have_selector("label", text: 'ADDRESS LINE 1')
-    expect(rendered).to have_selector("label", text: 'ADDRESS LINE 2')
-    expect(rendered).to have_selector("label", text: 'CITY')
-    expect(rendered).to have_selector("label", text: 'STATE')
-    expect(rendered).to have_selector("label", text: 'ZIP')
-  end
 end

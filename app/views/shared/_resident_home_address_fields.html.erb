@@ -37,12 +37,7 @@
 
         <% if kind == 'home' %>
           <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <%= f.check_box :no_dc_address, {id: 'no_dc_address'}, "true", "false" %>
             <% target = f.object.class.to_s.downcase %>
-            <label for="no_dc_address">
-              <span class='no_dc_address'>&nbsp;NO DC ADDRESS</span>
-            </label>
-            <span><i class='fa fa-question-circle' data-toggle="tooltip" title="Check this box if you’re homeless, stay in a shelter, have no fixed address or are temporarily living outside the District but consider yourself a District resident and intend to return."></i></span>
           </div>
         <% end %>
       </div>
@@ -75,18 +70,18 @@
       <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
         <% style="display:none;" %>
       <% end %>
-      <div style="<%= style %>" class="row no-buffer address-row <%= div_class %> no-dc-address-reasons">
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-          <div class="radio">
-            <%= f.radio_button :no_dc_address_reason, "I am homeless", id: 'radio_homeless' %>
-            <label for="radio_homeless"><span>Select this option if you are a homeless DC resident</span></label>
+      <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
+        <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+          <div class="address_checkbox">
+            <%= f.check_box :is_homeless %>
+            <label for="checkbox"><span>A homeless DC resident.</span></label>
           </div>
         </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-          <div class="radio">
-            <%= f.radio_button :no_dc_address_reason, "I am temporarily living outside of DC", id: 'radio_outside' %>
-            <label for="radio_outside">
-              <span>Select this option if you're living outside of DC temporarily and intend to return</span>
+        <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+          <div class="address_checkbox">
+            <%= f.check_box :is_temporarily_out_of_state %>
+            <label for="checkbox">
+              <span>Currently living outside of DC temporarily and plan to return.</span>
             </label>
           </div>
         </div>

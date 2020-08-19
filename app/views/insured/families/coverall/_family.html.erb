@@ -1,12 +1,20 @@
 <div class="row row-form-wrapper no-buffer">
   <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
-    <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+    <div class="col-md-4 col-sm-6 no-pd form-group form-group-lg no-pd">
       <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
       <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
     </div>
-    <div class="col-md-6 col-sm-6 no-pd form-group form-group-lg no-pd">
+    <div class="col-md-2 col-sm-6 no-pd form-group form-group-lg no-pd">
+      <label class="static_label label-floatlabel" for="relation">AGE</label>
+      <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= "#{@person.age_on(Date.today)}" %></span>
+    </div>
+    <div class="col-md-3 col-sm-6 no-pd form-group form-group-lg no-pd">
+      <label class="static_label label-floatlabel" for="relation">GENDER</label>
+      <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= "#{@person.gender.humanize}" %> </span>
+    </div>
+    <div class="col-md-3 col-sm-6 no-pd form-group form-group-lg no-pd">
       <label class="static_label label-floatlabel" for="relation"><%= l10n("relation").to_s.upcase %></label>
-      <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= l10n("self") %></span>
+      <span class="field_value floatlabel form-control active-floatlabel" id="relation">self</span>
     </div>
   </div>
 </div>

@@ -117,9 +117,9 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:consumer_role_id] = consumer_role.id
       allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
-      allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
-      allow(consumer_role3).to receive(:latest_active_tax_household_with_year).and_return nil
+      allow(consumer_role).to receive(:latest_active_tax_households_with_year).and_return nil
+      allow(consumer_role2).to receive(:latest_active_tax_households_with_year).and_return nil
+      allow(consumer_role3).to receive(:latest_active_tax_households_with_year).and_return nil
       allow(person2).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(person3).to receive(:current_individual_market_transition).and_return(individual_market_transition)
       allow(individual_market_transition).to receive(:role_type).and_return('consumer')

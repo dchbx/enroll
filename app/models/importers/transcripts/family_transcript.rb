@@ -128,7 +128,7 @@ module Importers::Transcripts
 
                   if (key == 'add' || key == 'update')
                     if relationships.detect{|pair| pair.include?(v['relationship']) && pair.include?(family_member.relationship)}
-                      @family.primary_applicant.person.ensure_relationship_with(family_member.person, v['relationship'])
+                      @family.primary_applicant.person.ensure_relationship_with(family_member.person, v['relationship'], @family.id)
                     else
                       log_ignore(:update, section, identifier)
                     end

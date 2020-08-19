@@ -1,0 +1,40 @@
+%immigration_information
+  - if person.consumer_role.alien_number
+    %alien_number= person.consumer_role.alien_number
+  - if person.consumer_role.i94_number
+    %i94_number= person.consumer_role.i94_number
+  - if person.consumer_role.citizenship_number
+    %citizenship_number= person.consumer_role.citizenship_number
+  - if person.consumer_role.visa_number
+    %visa_number= person.consumer_role.visa_number
+  - if person.consumer_role.sevis_id
+    %sevis_id= person.consumer_role.sevis_id
+  - if person.consumer_role.naturalization_number
+    %naturalization_number= person.consumer_role.naturalization_number
+  %documents
+    %has_document_I327= person.consumer_role.has_i327?
+    %has_document_I571= person.consumer_role.has_i571?
+    %has_document_cert_of_citizenship= person.consumer_role.has_cert_of_citizenship?
+    %has_document_cert_of_naturalization= person.consumer_role.has_cert_of_naturalization?
+    %has_document_temp_I551= person.consumer_role.has_temp_i551?
+    %has_document_I94= person.consumer_role.has_i94?
+    %has_document_I20= person.consumer_role.has_i20?
+    %has_document_DS2019= person.consumer_role.has_ds2019?
+    - if person.consumer_role.i551
+      %document_I551_receipt_number= person.consumer_role.i551.receipt_number
+    - if person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-766 (Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_.present? }.size > 0
+      %document_I766
+      = render :partial => "events/lawful_presence/receipt_document", :collection => person.consumer_role.vlp_documents.select{|doc| doc.subject == "I-7Employment Authorization Card)" && doc.receipt_number.present? && doc.expiration_date.present? }, as: :receipt_document
+    - if person.consumer_role.mac_read_i551
+      %document_mac_read_I551
+      = render :partial => "events/lawful_presence/passport_information", :object => person.consumer_role.mac_read_i551, as: :passport_information
+    - if person.consumer_role.foreign_passport_i94
+      %document_foreign_passport_I94
+      = render :partial => "events/lawful_presence/passport_information", :object => person.consumer_role.foreign_passport_i94, as: :passport_information
+    - if person.consumer_role.foreign_passport
+      %document_foreign_passport
+      = render :partial => "events/lawful_presence/passport_information", :object => person.consumer_role.foreign_passport, as: :passport_information
+    - if person.consumer_role.case1
+      %other_case_1_document_description= person.consumer_role.case1.alien_number
+    - if person.consumer_role.case2
+      %other_case_2_document_description= person.consumer_role.case2.i94_number

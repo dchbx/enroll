@@ -125,6 +125,12 @@ FactoryGirl.define do
       end
     end
 
+    trait :with_nuclear_family do
+      before :create do |person|
+        family = FactoryGirl.create :family, :with_nuclear_family, person: person
+      end
+    end
+
     factory :male, traits: [:male]
     factory :female, traits: [:female]
 

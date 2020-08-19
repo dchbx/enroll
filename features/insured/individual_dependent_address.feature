@@ -16,6 +16,8 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     Then Individual edits a dependents address
     Then Individual fills in the form

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
 RSpec.describe DocumentsController, :type => :controller do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+  let!(:user) { FactoryGirl.create(:user, person: person) }
   let(:consumer_role) {FactoryGirl.build(:consumer_role)}
   let(:document) {FactoryGirl.build(:vlp_document)}
-  let(:family)  {FactoryGirl.create(:family, :with_primary_family_member)}
+  let!(:family)  {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:hbx_enrollment) { FactoryGirl.build(:hbx_enrollment) }
   let(:ssn_type) { FactoryGirl.build(:verification_type, type_name: 'Social Security Number') }
   let(:dc_type) { FactoryGirl.build(:verification_type, type_name: 'DC Residency') }
@@ -21,7 +21,7 @@ RSpec.describe DocumentsController, :type => :controller do
   describe "destroy" do
     before :each do
       person.verification_types.each{|type| type.vlp_documents << document}
-      delete :destroy, person_id: person.id, id: document.id, verification_type: citizenship_type.id
+      delete :destroy, person_id: person.id, family_member_id: family.primary_applicant.id, id: document.id, verification_type: citizenship_type.id
     end
     it "redirects_to verification page" do
       expect(response).to redirect_to verification_insured_families_path
@@ -39,7 +39,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
     context 'Call Hub for SSA verification' do
       it 'should redirect if verification type is SSN or Citozenship' do
-        post :fed_hub_request, verification_type: ssn_type.id, person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: ssn_type.id, person_id: person.id, id: document.id, family_member_id: family.primary_applicant.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to FedHub.')
       end
@@ -47,7 +47,7 @@ RSpec.describe DocumentsController, :type => :controller do
     context 'Call Hub for Residency verification' do
       it 'should redirect if verification type is Residency' do
         person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
-        post :fed_hub_request, verification_type: dc_type.id, person_id: person.id, id: document.id
+        post :fed_hub_request, verification_type: dc_type.id, person_id: person.id, id: document.id, family_member_id: family.primary_applicant.id
         expect(response).to redirect_to :back
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
@@ -74,7 +74,8 @@ RSpec.describe DocumentsController, :type => :controller do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: send(type).id,
                                           verification_reason: reason,
-                                          admin_action: admin_action}
+                                          admin_action: admin_action,
+                                          family_member_id: family.primary_applicant.id}
         person.reload
         if attribute == "validation"
           expect(person.verification_types.find(send(type).id).validation_status).to eq(result)
@@ -106,7 +107,7 @@ RSpec.describe DocumentsController, :type => :controller do
     end
 
     it 'updates verification type if verification reason is expired' do
-      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency'}
+      params = { person_id: person.id, verification_type: citizenship_type.id, verification_reason: 'Expired', admin_action: 'return_for_deficiency', family_member_id: family.primary_applicant.id}
       put :update_verification_type, params
       person.reload
 
@@ -125,7 +126,8 @@ RSpec.describe DocumentsController, :type => :controller do
         post :update_verification_type, { person_id: person.id,
                                           verification_type: citizenship_type.id,
                                           verification_reason: "",
-                                          admin_action: "verify"}
+                                          admin_action: "verify",
+                                          family_member_id: family.primary_applicant.id}
         person.reload
         expect(person.consumer_role.lawful_presence_update_reason).to eq nil
       end
@@ -165,6 +167,70 @@ RSpec.describe DocumentsController, :type => :controller do
       it "should redirect to back" do
         post :update_ridp_verification_type, person_id: person.id
         expect(response).to redirect_to :back
+      end
+    end
+
+    #TODO: Needs refactor after assisted_verification structure is refactored
+    # context "assisted verification reason inputs" do
+    #
+    #   before :each do
+    #     allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+    #     assisted_verification.assisted_verification_documents << [FactoryGirl.build(:assisted_verification_document)]
+    #   end
+    #
+    #   let!(:application) { FactoryGirl.create(:application, family: family) }
+    #   let!(:applicant) { FactoryGirl.create(:applicant, application: application, family_member_id: family.primary_applicant.id) }
+    #   let!(:assisted_verification) { FactoryGirl.create(:assisted_verification, applicant: applicant, verification_type: "MEC") }
+    #
+    #
+    #   it "should not update verification attributes without verification reason" do
+    #     post :update_verification_type, { person_id: person.id,
+    #                                       verification_type: "MEC",
+    #                                       verification_reason: "",
+    #                                       family_member_id: family.primary_applicant.id }
+    #     applicant.reload
+    #     expect(applicant.assisted_income_reason).to eq nil
+    #   end
+    #
+    #   (VlpDocument::VERIFICATION_REASONS + AssistedVerificationDocument::VERIFICATION_REASONS).uniq.each do |reason|
+    #     it "should update verification attributes for #{reason} type" do
+    #       post :update_verification_type, { person_id: person.id,
+    #                                         verification_type: "MEC",
+    #                                         verification_reason: reason,
+    #                                         family_member_id: family.primary_applicant.id }
+    #       applicant.reload
+    #       expect(applicant.assisted_mec_reason).to eq (reason)
+    #     end
+    #   end
+    # end
+  end
+
+  describe '#find_docs_owner' do
+
+    include_examples 'draft application with 2 applicants'
+    before do
+      sign_in user
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+      application.submit!
+    end
+
+    context 'find docs owner if FAA application is not present' do
+      let(:params) {{family_member_id: family_member_not_on_application.id, type_name: "Citizenship"}}
+
+      it 'should return person object as a docs owner' do
+        allow_any_instance_of(DocumentsController).to receive(:params).and_return params
+        response = subject.send(:find_docs_owner)
+        expect(response.class).to eq Person
+      end
+    end
+
+    context 'find docs owner if FAA application is present' do
+      let(:params) {{family_member_id: second_family_member.id, type_name: "Income"}}
+
+      it 'should return applicant object as a docs owner' do
+        allow_any_instance_of(DocumentsController).to receive(:params).and_return params
+        response = subject.send(:find_docs_owner)
+        expect(response.class).to eq FinancialAssistance::Applicant
       end
     end
   end

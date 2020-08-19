@@ -6,5 +6,8 @@ $("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');
 $("#dependent_buttons").addClass('hidden');
 semantic_class();
 applyJQDatePickers();
-applyListeners();
+
+// Had to extensively call this function because this is being called only on Document load.
+// FAA specific case For Dependent Demographic fields conditional edit.
+demographicValidations();
 isApplyingCoverage("dependent");

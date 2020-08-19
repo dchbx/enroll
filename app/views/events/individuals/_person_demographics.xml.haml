@@ -6,10 +6,29 @@
   - else
     %sex= "urn:openhbx:terms:v1:gender##{person_demographics.gender}"
   %birth_date= simple_date_for(person_demographics.dob)
+  - if person_demographics.date_of_death
+    %death_date=simple_date_for(person_demographics.date_of_death)
   - if !person_demographics.is_incarcerated.present?
     %is_incarcerated= "false"
   - else
     %is_incarcerated= person_demographics.is_incarcerated.to_s
+  - if person_demographics.is_homeless.present?
+    %is_homeless= person_demographics.is_homeless.to_s
+  - if person_demographics.is_temporarily_out_of_state.present?
+    %is_temporarily_out_of_state= person_demographics.is_temporarily_out_of_state.to_s
   - if !person_demographics.race.blank?
     %race= person_demographics.race
+  - if person_demographics.consumer_role && person_demographics.consumer_role.birth_location
+    %birth_location= person_demographics.consumer_role.birth_location
+  - if person_demographics.consumer_role && person_demographics.consumer_role.marital_status
+    %marital_status= "urn:openhbx:terms:v1:marital_status##{person_demographics.consumer_role.marital_status}"
+  - if person_demographics.consumer_role && person_demographics.consumer_role.citizen_status
+    %citizen_status= "urn:openhbx:terms:v1:citizen_status##{person_demographics.consumer_role.citizen_status}"
+  - if person_demographics.consumer_role && person_demographics.consumer_role.is_state_resident
+    %is_state_resident= person_demographics.consumer_role.is_state_resident
+  - if person_demographics.consumer_role && person_demographics.consumer_role.lawful_presence_determination.qualified_non_citizenship_result
+    %qualified_non_citizen_code= person_demographics.consumer_role.lawful_presence_determination.qualified_non_citizenship_result
+  - if person_demographics.indian_tribe_member
+    %tribal_info
+      %tribal_id= person_demographics.tribal_id
   = render :partial => "events/shared/versioned_resource", :object => person_demographics

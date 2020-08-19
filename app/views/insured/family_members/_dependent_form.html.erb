@@ -3,6 +3,9 @@
 
     <%= form_for dependent, employee_dependent_submission_options_for(dependent) do |f| %>
 
+    <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
+    <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
+
       <% if dependent.errors.any? %>
         <div class="alert alert-error">
           <h4>
@@ -16,7 +19,36 @@
         </div>
       <% end %>
 
-      <%= token_tag form_authenticity_token %>
+    <%if
+      @dependent.first_name &&
+      @dependent.last_name &&
+      @dependent.dob &&
+      @dependent.gender &&
+      @dependent.relationship
+    %>
+      <div class="row row-form-wrapper no-buffer">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+          <div class="col-md-4 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.first_name} #{@dependent.middle_name} #{@dependent.last_name}" %></span>
+          </div>
+          <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name">AGE</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(Date.today)}" %></span>
+          </div>
+          <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="name">GENDER</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.gender.humanize}" %></span>
+          </div>
+          <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+            <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
+            <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.relationship.capitalize}" %></span>
+          </div>
+        </div>
+      </div>
+    <%end %>
+
+    <%= token_tag form_authenticity_token %>
 
       <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
         <div class="dependent_notice_div_<%= dependent.id%>"></div>
@@ -48,6 +80,16 @@
               </div>
             </div>
           </div>
+        </div>
+
+        <div class="row row-form-wrapper no-buffer">
+          <% if @person.has_active_consumer_role? %>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+              <label id="is_applying_coverage_value_dep">Does <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> need coverage?</label>
+            </div>
+            <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
+            <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+          <% end %>
         </div>
 
         <div class="row row-form-wrapper no-buffer">
@@ -99,18 +141,31 @@
         </div>
 
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group-lg no-pd">
-            <%= f.select :relationship, relationship_options(f.object, request.referer), {include_blank: "#{l10n("this_person_is_name", name: @person.first_name)} *"} %>
-          </div>
-
-
           <% if has_active_consumer_dependent?(@person,@dependent) %>
-            <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-              <span id="is_applying_coverage_value_dep">Is <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %> applying for coverage?</span>
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
+              <label class="static_label label-floatlabel mt-label">NAME</label>
+              <label id="is_applying_coverage_value_dep_1" class= "ml-label">
+                <%= @dependent.try(:family_member).try(:person).present? ? @dependent.try(:family_member).try(:person).try(:first_name) : "this person" %>
+              </label>
             </div>
-            <% first_checked, second_checked = is_applying_coverage_value_dependent(dependent) %>
-            <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
           <% end %>
+          <div class="col-md-5 mt18">
+            <div class="select-positioning ml-label"> <label>is</label> </div>
+            <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+            <div class="select-relation rs_selection">
+              <%= f.select :relationship, relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
+            </div>
+            <label class="position-left"> of</label>
+            <div class="icon-rel">
+              <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+              <i class="fa fa-link" aria-hidden="true"></i>
+              <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="col-lg-4 mt18 static-font">
+            <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
+            <span class="position-full-name"> <%= @person.full_name %> </span>
+          </div>
         </div>
 
         <% if has_active_consumer_dependent?(@person,@dependent) %>
@@ -173,7 +228,8 @@
       };
       $("#dependent_first_name").change(function() {
         var text = $("#dependent_first_name").val() == '' ? "this person" : $("#dependent_first_name").val()
-        $("#is_applying_coverage_value_dep").text("Is "+ text +" applying for coverage?");
+        $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage?");
+        $("#is_applying_coverage_value_dep_1").text(text);
       });
     });
   </script>

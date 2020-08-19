@@ -45,6 +45,7 @@
 //= require responsive
 //= require effective_datatables
 //= require jquery.steps
+//= jquery.priceformat
 //= require ../../../components/sponsored_benefits/app/assets/javascripts/sponsored_benefits/plan_design_proposals
 //= require_tree .
 
@@ -536,6 +537,16 @@ $(document).ready(function () {
   $(".floatlabel, .selectric-wrapper").focusin(function() { $(this).closest('.employee-info').css("opacity","1") });
   $(".floatlabel, .selectric-wrapper").blur(function() { $(this).closest('.employee-info').css("opacity","0.5") });
 
+  $(document).on('keypress', '.floatlabel', function(e) {
+    $(this).siblings('.label-floatlabel').css("opacity", 1).css('display', 'block');
+  });
+
+  $(document).on('keyup', '.floatlabel', function(e) {
+    if (!this.value) {
+      $(this).siblings('.label-floatlabel').css("opacity", 0).css('display', 'none');
+    }
+  });
+
   $(document).on('click', '.return_to_home', function() {
     $('#add_home_action').html('');
     $('#main-home').show();
@@ -773,7 +784,7 @@ $(document).on('click', '#address_info + span.form-action', function(){
   $(document).ready(function(){
     $("#person_first_name").change(function() {
       var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()
-      $("#is_applying_coverage_value").text("Is "+ text +" applying for coverage?");
+      $("#is_applying_coverage_value").text("Does "+ text +" need coverage?");
     });
 
     $('a.interaction-click-control-download-notices').click(function(e) {

@@ -11,7 +11,8 @@ RSpec.describe "events/individuals/created.haml.erb" do
         download_vocabularies
       end
 
-      let(:individual) { FactoryGirl.build_stubbed :generative_individual }
+      let(:individual) { FactoryGirl.create(:person)}
+      let(:family) { FactoryGirl.create(family, :with_primary_family_member, person: person)}
 
       before :each do
         render :template => "events/individuals/created", :locals => { :individual => individual}

@@ -39,7 +39,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
   let(:hbx_enrollments) { double("HbxEnrollment") }
   let(:user) { FactoryGirl.create(:user) }
-  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, no_dc_address_reason: "" , is_consumer_role_active?: false, has_active_employee_role?: true) }
+  let(:person) { double("Person", id: "test", addresses: [], no_dc_address: false, is_homeless: false, is_temporarily_out_of_state: false, has_active_consumer_role?: false, has_active_employee_role?: true, no_dc_address_reason: "" , is_consumer_role_active?: false) }
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family") }
   let(:household) { double("HouseHold", hbx_enrollments: hbx_enrollments) }
   let(:addresses) { [double] }
@@ -487,7 +487,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "with a person with an address" do
-      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
+      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, is_homeless: false, is_temporarily_out_of_state: false) }
 
       it "should be a success" do
         expect(response).to have_http_status(:success)
@@ -912,6 +912,33 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
   end
 
+  describe "GET family_member_matrix" do
+    let(:person) { FactoryGirl.create(:person) }
+    let(:user) { FactoryGirl.create(:user, person: person) }
+    let(:person1) {FactoryGirl.create(:person)}
+    let(:family1) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let(:family_members) {FactoryGirl.build(:family_member, family: family1, is_primary_applicant: false, is_active: true, person: person1)}
+
+    before :each do
+      controller.instance_variable_set(:@family, family1)
+      allow(family).to receive(:active_family_members).and_return([family_members])
+      allow(family).to receive(:build_relationship_matrix).and_return(family1.build_relationship_matrix)
+      allow(family).to receive(:family_members).and_return(family1.family_members)
+      matrix = family1.build_relationship_matrix
+      allow(family).to receive(:find_missing_relationships).and_return({:rspec => "mock"})
+      allow(family).to receive(:find_all_relationships).and_return({:rspec => "parent"})
+      get :family_relationships_matrix, tab: "123"
+    end
+
+    it "should be a success" do
+      expect(response).to have_http_status(:success)
+    end
+
+    it "should render my account page" do
+      expect(response).to render_template("family_relationships_matrix")
+    end
+  end
+
   describe "POST transition_family_members_update" do
 
     before :each do
@@ -995,7 +1022,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
     end
   end
-
 end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do

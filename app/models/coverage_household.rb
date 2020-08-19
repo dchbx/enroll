@@ -151,15 +151,21 @@ class CoverageHousehold
   def self.update_individual_eligibilities_for(consumer_role)
     found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
-      ff.households.each do |hh|
-        hh.coverage_households.each do |ch|
-          ch.evaluate_individual_market_eligiblity
-        end
-        hh.hbx_enrollments.each do |he|
-          he.evaluate_individual_market_eligiblity
-        end
+      update_eligibility_for_family(ff)
+    end
+  end
+
+  def self.update_eligibility_for_family(family)
+    family.households.each do |hh|
+      hh.coverage_households.each do |ch|
+        ch.evaluate_individual_market_eligiblity
+      end
+      hh.hbx_enrollments.each do |he|
+        he.evaluate_individual_market_eligiblity
       end
     end
+
+    family.save!
   end
 
   def evaluate_individual_market_eligiblity

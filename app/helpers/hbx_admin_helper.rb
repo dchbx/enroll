@@ -16,7 +16,7 @@ module HbxAdminHelper
   	max_aptc_for_enrollment = 0
     hbx = find_enrollment(hbx_id)
   	hbx_enrollment_members = hbx.hbx_enrollment_members
-  	aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
+  	aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_households.first.aptc_ratio_by_member
   	hbx_enrollment_members.each do |hem|
     	max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
   	end
@@ -55,6 +55,6 @@ module HbxAdminHelper
   end
 
   def active_eligibility?(family)
-    family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
+    family.active_household.latest_active_tax_households_with_year(TimeKeeper.date_of_record.year) ? 'Yes' : 'No'
   end
 end

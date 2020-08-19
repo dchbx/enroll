@@ -1,6 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
   let(:user) { FactoryGirl.create(:user) }
   let(:person) { FactoryGirl.build(:person, :with_consumer_role) }
   let(:consumer_role) { {consumer_role: ''} }
@@ -49,7 +52,7 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).and_return(file_path)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).and_return("sample-filename")
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params_clean_vlp_documents).and_return(cleaned_params)
-        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with(cleaned_params, "sample-filename", doc_id).and_return(true)
+        allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_id).and_return(true)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
         post :upload, params
@@ -61,14 +64,16 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
 
     describe "file upload" do
       let(:file) { [:temp_file] }
-      let(:person) { FactoryGirl.create(:person, :with_consumer_role) }
+      let(:person) { FactoryGirl.create(:person, :with_family, :with_consumer_role) }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: person.consumer_role}, file: file} }
+      let(:params) { {person: {consumer_role: person.consumer_role},family_member: person.primary_family.primary_applicant.id.to_s, file: file} }
       let(:bucket_name) { 'id-verification' }
       let(:doc_uri) { "doc_uri" }
       let(:file_path) { 'temp_file' } # a sample file path
-      let(:family) { double("Family", :update_family_document_status! => true)}
+      let!(:tax_household1) { FactoryGirl.create(:tax_household, household: person.primary_family.households.first) }
+      let!(:applicant) { FactoryGirl.create(:applicant, application: application, tax_household_id: tax_household1.id, family_member_id: person.primary_family.primary_applicant.id) }
+      let!(:application) { FactoryGirl.create(:application, family: person.primary_family, aasm_state: "submitted") }
 
       before do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:find_docs_owner).and_return(person)
@@ -77,12 +82,11 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:set_current_person).and_return(person)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:person_consumer_role)
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_uri)
-
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_path).with('temp_file').and_return(file_path)
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:file_name).with('temp_file').and_return("sample-filename")
         allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:update_vlp_documents).with("sample-filename", doc_uri).and_return(true)
-
-        controller.instance_variable_set(:"@family", family)
+        allow(person.primary_family).to receive(:update_family_document_status!).and_return(true)
+        controller.instance_variable_set(:"@family", person.primary_family)
         sign_in user
         post :upload, params
 
@@ -118,6 +122,36 @@ RSpec.describe Insured::VerificationDocumentsController, :type => :controller do
         get :download, key:"sample-key"
         expect(flash[:error]).to be_nil
         expect(response.status).to eq(200)
+      end
+    end
+
+    describe '#find_docs_owner' do
+
+      include_examples 'draft application with 2 applicants'
+      before do
+        sign_in user
+        allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+        application.submit!
+      end
+
+      context 'find docs owner if FAA application is not present' do
+        let(:params) {{docs_owner: family_member_not_on_application.id, type_name: "Citizenship"}}
+
+        it 'should return person object as a docs owner' do
+          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params).and_return params
+          response = subject.send(:find_docs_owner)
+          expect(response.class).to eq Person
+        end
+      end
+
+      context 'find docs owner if FAA application is present' do
+        let(:params) {{docs_owner: second_family_member.id, type_name: "Income"}}
+
+        it 'should return applicant object as a docs owner' do
+          allow_any_instance_of(Insured::VerificationDocumentsController).to receive(:params).and_return params
+          response = subject.send(:find_docs_owner)
+          expect(response.class).to eq FinancialAssistance::Applicant
+        end
       end
     end
 

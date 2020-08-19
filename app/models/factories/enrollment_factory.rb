@@ -259,7 +259,7 @@ module Factories
 
       if person.present? && person.persisted?
         relationship = person_relationship_for(dependent.employee_relationship)
-        primary.ensure_relationship_with(person, relationship)
+        primary.ensure_relationship_with(person, relationship, family.id)
         family.add_family_member(person) unless family.find_family_member_by_person(person)
       end
       person
@@ -357,7 +357,7 @@ module Factories
       family ||= Family.new
       applicant = family.primary_applicant
       applicant ||= initialize_primary_applicant(family, person)
-      person.relatives.each do |related_person|
+      person.relatives(family.id).each do |related_person|
         family.add_family_member(related_person)
       end
       dependents.each do |dependent|

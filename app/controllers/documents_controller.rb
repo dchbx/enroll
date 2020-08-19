@@ -1,7 +1,7 @@
 class DocumentsController < ApplicationController
+  before_action :set_verification_type, :set_family_member_and_family
   before_action :updateable?, except: [:show_docs, :download]
   before_action :set_document, only: [:destroy, :update]
-  before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
 
@@ -36,13 +36,17 @@ class DocumentsController < ApplicationController
   def update_verification_type
     update_reason = params[:verification_reason]
     admin_action = params[:admin_action]
-    family_member = FamilyMember.find(params[:family_member_id]) if params[:family_member_id].present?
-    reasons_list = VlpDocument::VERIFICATION_REASONS + VlpDocument::ALL_TYPES_REJECT_REASONS + VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS
-    if (reasons_list).include? (update_reason)
-      verification_result = @person.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
+
+    if params[:verification_reason].present?
+      if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(@verification_type.type_name)
+        verification_result = @docs_owner.admin_verification_action(admin_action, @verification_type, update_reason)
+      else
+        verification_result = @docs_owner.consumer_role.admin_verification_action(admin_action, @verification_type, update_reason)
+      end
+
       message = (verification_result.is_a? String) ? verification_result : "Person verification successfully approved."
       flash_message = { :success => message}
-      update_documents_status(family_member) if family_member
+      #update_documents_status(family_member) if family_member   #TODO: Update document status on family
     else
       flash_message = { :error => "Please provide a verification reason."}
     end
@@ -70,26 +74,26 @@ class DocumentsController < ApplicationController
   end
 
   def enrollment_verification
-     family = @person.primary_family
-     if family.active_household.hbx_enrollments.verification_needed.any?
-       family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
-         enrollment.evaluate_individual_market_eligiblity
-       end
-       family.save!
-       respond_to do |format|
-         format.html {
-           flash[:success] = "Enrollment group was completely verified."
-           redirect_to :back
-         }
-       end
-     else
-       respond_to do |format|
-         format.html {
-           flash[:danger] = "Family does not have any active Enrollment to verify."
-           redirect_to :back
-         }
-       end
+    family = @person.primary_family
+    if family.active_household.hbx_enrollments.verification_needed.any?
+     family.active_household.hbx_enrollments.verification_needed.each do |enrollment|
+       enrollment.evaluate_individual_market_eligiblity
      end
+     family.save!
+     respond_to do |format|
+       format.html {
+         flash[:success] = "Enrollment group was completely verified."
+         redirect_to :back
+       }
+     end
+    else
+     respond_to do |format|
+       format.html {
+         flash[:danger] = "Family does not have any active Enrollment to verify."
+         redirect_to :back
+       }
+     end
+    end
   end
 
   def fed_hub_request
@@ -120,7 +124,6 @@ class DocumentsController < ApplicationController
   end
 
   def extend_due_date
-    @family_member = FamilyMember.find(params[:family_member_id])
     enrollment = @family_member.family.enrollments.verification_needed.where(:"hbx_enrollment_members.applicant_id" => @family_member.id).first
     if enrollment.present?
       new_date = @verification_type.verif_due_date + 30.days
@@ -191,17 +194,42 @@ class DocumentsController < ApplicationController
   end
 
   def set_document
-    set_verification_type
     @document = @verification_type.vlp_documents.find(params[:id])
+  end
+
+  def find_docs_owner
+    return unless params[:family_member_id].present?
+    fm_id = params[:family_member_id]
+    family_member = FamilyMember.find(fm_id)
+    if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(params[:type_name])
+      application_in_context = family_member.application_for_verifications
+      applicant = application_in_context.active_applicants.where(family_member_id: params[:family_member_id]).first if application_in_context
+      @docs_owner = applicant
+    else
+      @docs_owner = family_member.person
+    end
   end
 
   def set_person
     @person = Person.find(params[:person_id]) if params[:person_id]
   end
 
+  def set_family
+    @family = @person.primary_family
+  end
+
+  def set_family_member_and_family
+    return unless params[:family_member_id].present?
+    @family_member = FamilyMember.find(params[:family_member_id])
+    @family = @family_member.family
+  end
+
   def set_verification_type
     set_person
-    @verification_type = @person.verification_types.active.find(params[:verification_type]) if params[:verification_type]
+    return unless params[:verification_type].present?
+    set_family_member_and_family
+    find_docs_owner
+    @verification_type = @docs_owner.verification_types.find(params[:verification_type])
   end
 
   def verification_attr

@@ -464,7 +464,7 @@ module ApplicationHelper
     relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.family_member.try(:relationship))
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})
@@ -695,8 +695,26 @@ module ApplicationHelper
     end
   end
 
+  def human_boolean(boolean)
+    if boolean
+      'Yes'
+    elsif boolean == false
+      'No'
+    else
+      'N/A'
+    end
+  end
+
+  def current_year
+    TimeKeeper.date_of_record.year
+  end
+
   def is_new_paper_application?(current_user, app_type)
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def humanize_relationships
+    PersonRelationship::Relationships_UI.map{|r| [r.to_s.humanize, r.to_s] }
   end
 
   def previous_year

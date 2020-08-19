@@ -30,7 +30,7 @@ Feature: Employee Sign Up when Employer exists and has a matching roster employe
     When Employee accepts the matched employer
     When Employee completes the matched employee form for Soren White
     Then Employee should see the dependents page
-    When Employee clicks Add Member
+    When Employee clicks Add New Person
     Then Employee should see the new dependent form
     When Employee enters the dependent info of Sorens daughter
     When Employee clicks confirm member

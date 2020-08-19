@@ -1,6 +1,9 @@
 = pundit_span Family, :updateable?
 - step = (defined? step) ? step.to_i : 1
 - ridp = (defined? ridp) ? ridp : false
+- enabled = (defined? enabled) ? enabled : true
+- page = (defined? page) ? page : ""
+- application_checklist = (defined? application_checklist) ? application_checklist : false
 - next_link = (defined? next_link) ? next_link : false
 - identity_verified = (defined? identity_verified) ? identity_verified : false
 - application_verified = (defined? application_verified) ? application_verified : false
@@ -8,33 +11,32 @@
 
 - percent_complete = 0
 - percent_complete = step == 1 ? 15 : (step == 2) ? 35 : ((step == 3) ? 50 : ((step == 4) ? 75 : ((step == 5) ? 90 : (step == 6 ? 100 : 0))))
-
-%h3= "#{percent_complete}% Complete"
-%ul.list-unstyled.progress-wrapper.hidden-xs
-  %li{class: add_progress_class(1, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Personal Info
-  %li{class: add_progress_class(2, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Verify Identity
-  %li{class: add_progress_class(3, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Household Info
-  %li{class: add_progress_class(4, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Choose Plan
-  %li{class: add_progress_class(5, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Confirm
-  %li{class: add_progress_class(6, step)}
-    %span.circle-progress
-    .vertical-line-progress
-    Complete
+- if show_component(request.path)
+  %ul.list-unstyled.progress-wrapper.hidden-xs
+    %li{class: add_progress_class(1, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Personal Info
+    %li{class: add_progress_class(2, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Verify Identity
+    %li{class: add_progress_class(3, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Household Info
+    %li{class: add_progress_class(4, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Choose Plan
+    %li{class: add_progress_class(5, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Confirm
+    %li{class: add_progress_class(6, step)}
+      %span.circle-progress
+      .vertical-line-progress
+      Complete
 - if step == 1 && search_page == true
   = link_to "Continue", insured_consumer_role_index_path(person: @person_params), method: :post, class: 'btn btn-lg btn-primary  btn-block'
 - elsif step == 1
@@ -42,6 +44,12 @@
   %button.btn.btn-lg.btn-primary.btn-br.btn-block.interaction-click-control-continue.hidden{type: 'submit'}
     CONTINUE
 - elsif ridp == true && step == 2
+  -#= link_to "Continue", new_insured_interactive_identity_verification_path, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => true
+  -#  - elsif step == 2 && application_checklist == true
+  -#  = link_to 'Continue', insured_family_members_path(consumer_role_id: @person.consumer_role.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: !enabled
+  -#  - elsif step == 2
+  -#  - elsif step == 7 && defined? url
+  -#  = link_to 'Continue', url, class: "btn btn-lg btn-primary #{css_class} btn-block", id: 'btn-continue'
   - if next_link.present?  && current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Phone" || @person.primary_family.application_type == "Paper")
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => (application_verified || identity_verified) ? false : true
   - elsif next_link.present?
@@ -65,6 +73,8 @@
   = link_to purchase_or_confirm, checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => 'btn btn-lg btn-primary  btn-block disabled', id: 'btn-continue', :method => :post, :disabled => !@enrollable
 - elsif step == 6
   = link_to 'GO TO MY ACCOUNT', family_account_path, class: 'btn btn-primary ', id: 'btn-continue', style: 'width: 100%;'
+- elsif page == 'confirm'
+  = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - else
   %button.btn.btn-lg.btn-primary.btn-block#btn-continue{type: 'submit'}
     CONTINUE

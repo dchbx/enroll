@@ -150,8 +150,8 @@ class IvlNotices::FinalEligibilityNoticeUqhp < IvlNotice
   end
 
   def is_dc_resident(person)
-    return false if person.no_dc_address == true && person.no_dc_address_reason.blank?
-    return true if person.no_dc_address == true && person.no_dc_address_reason.present?
+    return false if person.no_dc_address == true && (person.is_homeless? || person.is_temporarily_out_of_state?)
+    return true if person.no_dc_address == true && (person.is_homeless? || person.is_temporarily_out_of_state?)
 
     address_to_use = person.addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     if person.addresses.present?

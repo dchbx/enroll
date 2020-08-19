@@ -46,13 +46,15 @@ describe UpdateFamilyMembersIndex do
     let(:husband) { FactoryGirl.create(:person, first_name: "hubby")}
     let(:family) { FactoryGirl.build(:family) }
     let!(:husbands_family) do
-      husband.person_relationships << PersonRelationship.new(relative_id: husband.id, kind: "self")
-      husband.person_relationships << PersonRelationship.new(relative_id: wife.id, kind: "spouse")
-      husband.save
+      husband.person_relationships << PersonRelationship.new(kind: "spouse", relative_id: wife.id, family_id: family.id, successor_id: wife.id, predecessor_id: husband.id )
+      husband.save!
+
+      wife.person_relationships << PersonRelationship.new(kind: "spouse", relative_id: husband.id, family_id: family.id, successor_id: husband.id, predecessor_id: wife.id )
+      wife.save!
 
       family.add_family_member(wife)
       family.add_family_member(husband, is_primary_applicant: true)
-      family.save
+      family.save!
       family
     end
 

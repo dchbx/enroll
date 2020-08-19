@@ -7,6 +7,7 @@ RSpec.describe "insured/consumer_roles/edit.html.erb" do
   before :each do
     assign(:person, person)
     assign(:consumer_role, consumer_role)
+    assign(:support_texts, {support_text_key: "support-text-description"})
     allow(consumer_role).to receive(:person).and_return person
     allow(person).to receive(:consumer_role).and_return consumer_role
     allow(consumer_role).to receive(:citizen_status)

@@ -72,9 +72,10 @@ describe Person do
           expect(person.valid?).to be_truthy
         end
 
-        it "should known its relationship is self" do
-          expect(person.find_relationship_with(person)).to eq "self"
-        end
+        # We are no more saving self relationship.
+        # it "should known its relationship is self" do
+        #   expect(person.find_relationship_with(person)).to eq "self"
+        # end
 
         it "unread message count is accurate" do
           expect(person.inbox).to be nil
@@ -684,17 +685,18 @@ describe Person do
     end
   end
 
-  describe '#person_relationships' do
-    it 'accepts associated addresses' do
-      # setup
-      person = FactoryGirl.build(:person)
-      relationship = person.person_relationships.build({kind: "self", relative: person})
+  #old_code
+  # describe '#person_relationships' do
+  #   it 'accepts associated addresses' do
+  #     # setup
+  #     person = FactoryGirl.build(:person)
+  #     relationship = person.person_relationships.build({kind: "self", relative: person})
 
-      expect(person.save).to eq true
-      expect(person.person_relationships.size).to eq 1
-      expect(relationship.invert_relationship.kind).to eq "self"
-    end
-  end
+  #     expect(person.save).to eq true
+  #     expect(person.person_relationships.size).to eq 1
+  #     expect(relationship.invert_relationship.kind).to eq "self"
+  #   end
+  # end
 
   describe '#full_name' do
     it 'returns the concatenated name attributes' do
@@ -707,7 +709,7 @@ describe Person do
       person = Person.new
       person.phones.build({kind: 'home', area_code: '202', number: '555-1212'})
 
-      # expect(person.phones.first.number).to eq '5551212'
+      expect(person.phones.first.number).to eq '5551212'
     end
   end
 
@@ -860,19 +862,22 @@ describe Person do
 
     it "should false" do
       person.no_dc_address = false
-      person.no_dc_address_reason = ""
+      person.is_homeless = ""
+      person.is_temporarily_out_of_state = ""
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should false" do
       person.no_dc_address = true
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should true" do
       person.no_dc_address = true
-      person.no_dc_address_reason = "I am Homeless"
+      person.is_homeless = true
+      person.is_temporarily_out_of_state = true
       expect(person.residency_eligible?).to be_truthy
     end
   end
@@ -893,13 +898,23 @@ describe Person do
     context "when no_dc_address is true" do
       let(:person) { Person.new(no_dc_address: true) }
 
-      it "return false with no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+      it "return false with no_dc_address_reason as is_homeless?" do
+        allow(person).to receive(:is_homeless?).and_return true
         expect(person.is_dc_resident?).to eq true
       end
 
-      it "return true without no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return ""
+      it "return false with no_dc_address_reason as is_temporarily_out_of_state?" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        expect(person.is_dc_resident?).to eq true
+      end
+
+      it "return true without no_dc_address_reason as is_homeless?" do
+        allow(person).to receive(:is_homeless?).and_return false
+        expect(person.is_dc_resident?).to eq false
+      end
+
+      it "return true without no_dc_address_reason as is_temporarily_out_of_state?" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return false
         expect(person.is_dc_resident?).to eq false
       end
     end
@@ -955,15 +970,14 @@ describe Person do
       let(:person1) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:person2) {FactoryGirl.create(:person, :with_consumer_role)}
       let(:family1)  {FactoryGirl.create(:family, :with_primary_family_member)}
-      let(:household) {FactoryGirl.create(:household, family: family1)}
-      let(:tax_household) {FactoryGirl.create(:tax_household, household: household) }
+      let!(:household) { family1.households.first }
+      let!(:tax_household) {FactoryGirl.create(:tax_household, household: household) }
       let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
 
       before :each do
-        family1.households.first.tax_households<<tax_household
-        family1.save
         @person_aqhp = family1.primary_applicant.person
       end
+
       it "creates person with status verification_pending" do
         expect(person.consumer_role.aasm_state).to eq("unverified")
       end
@@ -1258,17 +1272,17 @@ describe Person do
     let(:consumer_role) { ConsumerRole.new }
     let(:subject) { Person.new(:consumer_role => consumer_role) }
 
-    it "delegates #ivl_coverage_selected to consumer role" do
-      expect(consumer_role).to receive(:ivl_coverage_selected)
-      subject.ivl_coverage_selected
+    it "delegates #trigger_hub_call to consumer role" do
+      expect(consumer_role).to receive(:trigger_hub_call)
+      subject.trigger_hub_call
     end
   end
 
   describe "without a consumer role" do
     let(:subject) { Person.new }
 
-    it "delegates #ivl_coverage_selected to nowhere" do
-      expect { subject.ivl_coverage_selected }.not_to raise_error
+    it "delegates #trigger_hub_call to nowhere" do
+      expect { subject.trigger_hub_call }.not_to raise_error
     end
   end
 
@@ -1646,4 +1660,71 @@ describe Person do
   end
 
 
+end
+
+describe Person, "given a relationship to update", dbclean: :after_each do
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:primary_person) {family.primary_applicant.person}
+  let(:relationship) { "spouse" }
+  let(:person) { FactoryGirl.build(:person) }
+  subject { FactoryGirl.build(:family_member, person: person, family: family).person }
+  let(:family_member2) {FactoryGirl.create(:family_member, :family => family).person}
+  let(:family_member3) {FactoryGirl.create(:family_member, :family => family).person}
+
+  it "should update the direct relationship from the context of both persons" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+    rel = subject.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
+    expect(rel).to eq relationship
+    expect(subject.person_relationships.size).to eq 1
+  end
+
+  it "should create the relationships" do
+    subject.save
+    subject.add_relationship(primary_person, relationship, family.id)
+    primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
+
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+
+    family_member3.add_relationship(primary_person, "child", family.id)
+    primary_person.add_relationship(family_member3, PersonRelationship::InverseMap["child"], family.id)
+
+    family.build_relationship_matrix
+    expect(primary_person.person_relationships.size).to eq 3
+    family_member2.add_relationship(primary_person, "unrelated", family.id) #Test for updating the exisiting relationship
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["unrelated"], family.id)
+
+    expect(primary_person.person_relationships.size).to eq 3
+    expect(family_member2.person_relationships.size).to eq 1
+    unr_relationship = family_member2.person_relationships.where(successor_id: primary_person.id, predecessor_id: family_member2.id).first.kind
+    expect(unr_relationship).to eq "unrelated"
+  end
+
+  it "should build relationship" do
+    family_member2.build_relationship(primary_person, "spouse", family.id)
+    primary_person.build_relationship(family_member2, PersonRelationship::InverseMap["spouse"], family.id)
+    expect(primary_person.person_relationships.size).to eq 1
+  end
+
+  it "should destroy relationships associated to removed family member" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.person_relationships.size).to eq 1
+    family_member2.remove_relationship(family.id)
+    expect(family_member2.person_relationships.size).to eq 0
+  end
+
+  it "should return true if same successor exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).to eq true
+  end
+
+  it "should not return true if same successor does not exists" do
+    family_member2.add_relationship(primary_person, "parent", family.id)
+    primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
+    expect(family_member2.same_successor_exists?(primary_person, family.id)).not_to eq false
+  end
 end

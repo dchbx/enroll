@@ -15,7 +15,7 @@
       <% @enrollment.hbx_enrollment_members.each do |member| %>
         <tr>
           <td><%= member.person.full_name %></td>
-          <td><%= member.primary_relationship %></td>
+          <td><%= PersonRelationship::InverseMap[member.primary_relationship] %></td>
           <td><%= dob_in_words(member.person.age_on(TimeKeeper.date_of_record), member.person.dob) %></td>
           <td class="text-right"><%= number_to_currency(@plan.premium_for(member)) %></td>
           <% if calculate %>

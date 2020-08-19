@@ -1,0 +1,11 @@
+%benchmark_plan
+  %id
+    %id= financial_assistance_application.benchmark_plan.hios_id
+  %name= financial_assistance_application.benchmark_plan.name
+  %active_year= financial_assistance_application.benchmark_plan.active_year
+  %is_dental_only= financial_assistance_application.benchmark_plan.is_dental_only?
+  = render :partial=> "events/shared/carrier", :object=> financial_assistance_application.benchmark_plan.carrier_profile, as: :carrier
+  %metal_level= "urn:openhbx:terms:v1:plan_metal_level##{financial_assistance_application.benchmark_plan.metal_level}"
+  %coverage_type= "urn:openhbx:terms:v1:qhp_benefit_coverage##{financial_assistance_application.benchmark_plan.coverage_kind}"
+  - if financial_assistance_application.benchmark_plan.ehb
+    %ehb_percent= financial_assistance_application.benchmark_plan.ehb*100

@@ -85,6 +85,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     let!(:hbx_enrollment_member2) { FactoryGirl.create(:hbx_enrollment_member, applicant_id: family10.family_members[1].id, eligibility_date: (TimeKeeper.date_of_record - 10.days), hbx_enrollment: hbx_enrollment10) }
     let!(:plan) { FactoryGirl.create(:plan) }
     let!(:tax_household10) { FactoryGirl.create(:tax_household, household: family10.active_household) }
+    let!(:thhs) {family10.active_household.tax_households}
     let!(:eligibility_determination) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household10) }
     let!(:tax_household_member1) { tax_household10.tax_household_members.create(applicant_id: family10.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)}
     let!(:tax_household_member2) { tax_household10.tax_household_members.create(applicant_id: family10.family_members[1].id, is_ia_eligible: true ) }
@@ -96,7 +97,7 @@ RSpec.describe UnassistedPlanCostDecorator, dbclean: :after_each do
     end
 
     context "for aptc_amount" do
-      let(:unassisted_plan_cost_decorator1) { UnassistedPlanCostDecorator.new(plan, hbx_enrollment10, 100.00, tax_household10) }
+      let(:unassisted_plan_cost_decorator1) { UnassistedPlanCostDecorator.new(plan, hbx_enrollment10, 100.00, thhs) }
       let(:unassisted_plan_cost_decorator2) { UnassistedPlanCostDecorator.new(plan, hbx_enrollment10) }
 
       before :each do

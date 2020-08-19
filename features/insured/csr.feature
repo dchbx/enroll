@@ -24,6 +24,8 @@ Feature: CSR finishes shopping for Individual
       Then CSR clicks on Resume Application via phone
       Then CSR agrees to the privacy agreeement
       Then CSR should see identity verification page and clicks on submit
+      Then CSR should be on the Help Paying for Coverage page
+      Then CSR does not apply for assistance and clicks continue
       Then CSR should see the dependents form
       And I click on the header link to return to CSR page
       Then CSR should see the Agent Portal

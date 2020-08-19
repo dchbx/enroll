@@ -73,20 +73,16 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
 
   find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div/div[2]").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
 
   find(:xpath, "/html/body/div[2]/div[3]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div/div[2]").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
 
   expect(page).to have_content('Application successfully verified.')
   find('.btn', text: 'CONTINUE').click
-end
-
-Then(/^the Admin can navigate to the next page and finish the application$/) do
-  expect(page).to have_content('Household Info: Family Members')
 end

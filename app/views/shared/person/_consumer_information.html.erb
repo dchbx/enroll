@@ -21,6 +21,14 @@
   </div>
 
   <div class="row row-form-wrapper no-buffer">
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+      <label id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage?</label>
+    </div>
+    <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
+    <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
+  </div>
+
+  <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
                                                  :'data-date-min' => "-110y", :'data-date-max' => "+0",
@@ -50,14 +58,6 @@
         <label class="female" for="radio_female"><span>FEMALE</span></label>
       </div>
     </div>
-  </div>
-
-  <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-      <span id="is_applying_coverage_value">Is <%= @person.first_name.present? ? @person.first_name : "this person" %> applying for coverage?</span>
-    </div>
-    <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
-    <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
   </div>
 </div>
 

@@ -141,7 +141,9 @@ class PeopleController < ApplicationController
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
         if member.save && @dependent.save
-          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          @dependent.person.add_relationship(@family.primary_applicant.person, params[:family_member][:primary_relationship], true)
+          @family.primary_applicant.person.add_relationship(@dependent.person, PersonRelationship::InverseMap[params[:family_member][:primary_relationship]])
+          # @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id) #old_code
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
@@ -169,8 +171,10 @@ class PeopleController < ApplicationController
     if !@dependent.nil?
       @family_member_id = @dependent._id
       if !@dependent.is_primary_applicant
-        @dependent.destroy
-        @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        if @dependent.destroy
+          @dependent.remove_relationship
+        end
+        # @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
         @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
         @flash = "Family Member Removed"
       else
@@ -207,8 +211,13 @@ class PeopleController < ApplicationController
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
         end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present?
-        format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
+        if params[:page].eql? "from_registration"
+          format.js
+          format.html{redirect_to :back}
+        else
+          format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
+          format.json { head :no_content }
+        end
       else
         @person.addresses = @old_addresses
         if @person.is_consumer_role_active?
@@ -376,6 +385,8 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :no_dc_address_reason,
       :id,
       :consumer_role,

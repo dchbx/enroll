@@ -49,8 +49,6 @@ describe RemoveInvalidBrokerAgencyAccountsForEmployer, dbclean: :after_each do
         subject.migrate
         expect(employer_profile.broker_agency_accounts.unscoped.count).to eq 2
       end
-
     end
-
   end
 end

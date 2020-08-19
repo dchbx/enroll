@@ -75,11 +75,13 @@ And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role,
     dependent = FactoryGirl.create :person, :with_consumer_role, :with_active_consumer_role, dob: dob
   end
   fm = FactoryGirl.create :family_member, family: @family, person: dependent
-  user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id)
+  user.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: dependent.id, family_id: @family.id, successor_id: dependent.id, predecessor_id: user.person.id )
+  fm.person.person_relationships << PersonRelationship.new(kind: kind, relative_id: user.person.id, family_id: @family.id, successor_id: user.person.id, predecessor_id: dependent.id )
   ch = @family.active_household.immediate_family_coverage_household
   ch.coverage_household_members << CoverageHouseholdMember.new(family_member_id: fm.id)
   ch.save
   user.person.save
+  fm.save
 end
 
 And(/(.*) also has a health enrollment with primary person covered/) do |role|

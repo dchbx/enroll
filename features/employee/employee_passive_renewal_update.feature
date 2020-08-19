@@ -11,7 +11,7 @@ Feature: Passive renewal should be updated when EE updates his current coverage
       And Employee select a past qle date
       Then Employee should see confirmation and clicks continue
       Then Employee should see the dependents page
-      When Employee clicks Add Member
+      When Employee clicks Add New Person
       Then Employee should see the new dependent form
       When Employee enters the dependent info of Sorens daughter
       When Employee clicks confirm member

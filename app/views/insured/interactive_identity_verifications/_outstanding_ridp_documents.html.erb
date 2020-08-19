@@ -47,7 +47,7 @@
                       <% end %>
                     </div>
                   </div>
-                  
+
                   <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
                       <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
                   <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
@@ -72,7 +72,7 @@
                                             <i class="fa fa-trash-o fa-lg pull-right" title="Delete"></i>
                                         <% end %>
                                       </span>
-                                    <% end %>  
+                                    <% end %>
                                   </div>
                                 </div>
                               </div>
@@ -84,21 +84,17 @@
             </div>
           </div>
         </div>
+      <% end %>
   </div>
 </div>
 
 <div class="row">
   <div class="col-xs-12">
-    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" data-toggle="collapse" href="#docs-verification-faq" role="button" id="document-faq">
+    <a aria-controls="docs-verification-faq" aria-expanded="false" class="btn btn-default btn-small pull-right" href="https://www.dchealthlink.com/submit-docs" target="_blank" role="button" id="document-faq">
       Documents FAQ
     </a>
   </div>
 </div>
-
-<div class="collapse" id="docs-verification-faq">
-  <%= render partial: "insured/interactive_identity_verifications/ridp_document_list" %>
-</div>
-<% end %>
 
 <script>
     $(document).ready(function() {

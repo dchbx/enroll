@@ -35,11 +35,16 @@
 
     <div class="content <%= controller_name %> content-bottom">
       <%= render_flash %>
+
       <div class="container">
         <%= yield :horizontal_status %>
-
       </div>
+
+      <% if content_for? :content %>
+        <%= yield :content %>
+      <% else %>
         <%= yield %>
+      <% end %>
     </div>
 
     <%= render 'layouts/footer' %>

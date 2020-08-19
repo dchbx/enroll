@@ -141,3 +141,7 @@ group :production do
   gem 'unicorn', '~> 4.8.3'
 end
 
+path 'components' do
+  # rename this to workflow (smh)
+  gem 'ui_helpers'
+end

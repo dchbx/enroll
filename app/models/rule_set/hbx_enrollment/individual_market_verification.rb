@@ -16,6 +16,12 @@ module RuleSet
         hbx_enrollment.hbx_enrollment_members.map(&:person).map(&:consumer_role).compact
       end
 
+      def applicants_for_determination
+        application = hbx_enrollment.family.latest_applicable_submitted_application
+        return [] if !application
+        application.applicants
+      end
+
       def determine_next_state
         return true, :move_to_enrolled! if (any_outstanding? || verification_ended?) && hbx_enrollment.may_move_to_enrolled?
         member_outstanding = any_outstanding? || verification_ended?
@@ -28,7 +34,7 @@ module RuleSet
       end
 
       def any_outstanding?
-        roles_for_determination.any?(&:verification_outstanding?)
+        roles_for_determination.any?(&:verification_outstanding?) || applicants_for_determination.any?(&:verification_outstanding?)
       end
 
       def verification_ended?
@@ -36,7 +42,10 @@ module RuleSet
       end
 
       def any_pending?
-        roles_for_determination.any?(&:ssa_pending?) || roles_for_determination.any?(&:dhs_pending?) || roles_for_determination.any?(&:sci_verified?)
+        roles_for_determination.any?(&:ssa_pending?) ||
+          roles_for_determination.any?(&:dhs_pending?) ||
+          roles_for_determination.any?(&:sci_verified?) ||
+          applicants_for_determination.any?(&:verification_pending?)
       end
     end
   end

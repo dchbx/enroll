@@ -51,14 +51,26 @@ RSpec.describe Factories::ShopEnrollmentRenewalFactory, :type => :model do
           ce.update_attributes({employee_role: employee_role})
           employee_role
         }
-       
-        let!(:family) { FactoryGirl.create(:family, :with_family_members, person: person, people: family_members) }
-        let(:person) { FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name, person_relationships: family_relationships) }
+
+        let!(:person) { FactoryGirl.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
+        let!(:family) {
+                      family = FactoryGirl.create(:family, :with_primary_family_member, person: person)
+                      FactoryGirl.create(:family_member, family: family, person: spouse )
+                      FactoryGirl.create(:family_member, family: family, person: child )
+                      person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+                      person.person_relationships.create(predecessor_id: person.id, successor_id: child.id, kind: "parent", family_id: family.id)
+                      spouse.person_relationships.create(predecessor_id: spouse.id, successor_id: person.id, kind: "spouse", family_id: family.id)
+                      child.person_relationships.create(predecessor_id: child.id, successor_id: person.id, kind: "child", family_id: family.id)
+                      person.save!
+                      spouse.save!
+                      child.save!
+                      family.save!
+                      family }
+
         let(:ce) { renewing_employees[0] }
-        let(:family_members) { [person, spouse, child]}
+        let(:family_members) { family.family_members.map(:person).to_a }
         let(:spouse) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 50.years) }
         let(:child)  { FactoryGirl.create(:person, dob: child_age) }
-        let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
 
         let!(:enrollment) {
           FactoryGirl.create(:hbx_enrollment,:with_enrollment_members,

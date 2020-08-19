@@ -16,6 +16,8 @@ describe "insured/family_members/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:is_consumer_role_active?).and_return true
       assign :person, person
+      assign :dependent, dependent
+      assign(:support_texts, {support_text_key: "support-text-description"})
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -29,7 +31,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should display the is_applying_coverage field option" do
-      expect(rendered).to match /Is this person applying for coverage?/
+      expect(rendered).to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do
@@ -61,10 +63,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should have required indicator for fields" do
+
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
   end
 
@@ -75,6 +78,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       allow(person).to receive(:is_consumer_role_active?).and_return false
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign :person, person
+      assign :dependent, dependent
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -97,11 +101,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
 
     it "should not display the is_applying_coverage field option" do
-      expect(rendered).not_to match /Is this person applying for coverage?/
+      expect(rendered).not_to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do

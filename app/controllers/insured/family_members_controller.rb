@@ -2,13 +2,13 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
 
   before_action :set_current_person, :set_family
+  before_filter :load_support_texts, only: [:new, :edit, :create, :index]
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
   def index
     set_bookmark_url
     set_admin_bookmark_url
     @type = (params[:employee_role_id].present? && params[:employee_role_id] != 'None') ? "employee" : "consumer"
-
     if (params[:resident_role_id].present? && params[:resident_role_id])
       @type = "resident"
       @resident_role = ResidentRole.find(params[:resident_role_id])
@@ -54,7 +54,9 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
-
+    @source = session[:source_fa] = params[:source]
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
   end
 
   def new
@@ -67,10 +69,13 @@ class Insured::FamilyMembersController < ApplicationController
 
   def create
     @dependent = Forms::FamilyMember.new(params.require(:dependent).permit!)
-
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
       if @dependent.save
         @created = true
+        @matrix = @dependent.family.build_relationship_matrix
+        @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
+        @relationship_kinds = PersonRelationship::Relationships_UI
+         @missing_relation_url = insured_family_relationships_path(resident_role_id: @dependent.family_member.person.resident_role.id)
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
@@ -81,13 +86,30 @@ class Insured::FamilyMembersController < ApplicationController
 
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
+      @missing_relation_url = insured_family_relationships_path(consumer_role_id: params[:consumer_role_id], employee_role_id: params[:employee_role_id])
+      @matrix = @dependent.family.build_relationship_matrix
+      @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
+      @relationship_kinds = PersonRelationship::Relationships_UI
+      @dependent.copy_finanacial_assistances_application
+      financial_application = @dependent.family_member.family.application_in_progress
+      @application = financial_application if financial_application.present?
+      consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
+      consumer_role.trigger_hub_call if consumer_role
+
       respond_to do |format|
-        format.html { render 'show' }
-        format.js { render 'show' }
+        if session[:source_fa].present?
+          session[:source_fa] = nil
+          format.js { render js: "window.location = '#{insured_family_members_path}'"}
+        else
+          format.html { render 'show' }
+          format.js { render 'show' }
+        end
       end
     else
       @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@dependent.family_member.try(:person).try(:consumer_role))
       init_address_for_dependent
+      @dependent.copy_finanacial_assistances_application
+
       respond_to do |format|
         format.html { render 'new' }
         format.js { render 'new' }
@@ -97,6 +119,10 @@ class Insured::FamilyMembersController < ApplicationController
 
   def destroy
     @dependent.destroy!
+    @dependent.copy_finanacial_assistances_application
+    financial_application = @dependent.family_member.family.application_in_progress
+    @application = financial_application if financial_application.present?
+
     respond_to do |format|
       format.html { render 'index' }
       format.js { render 'destroyed' }
@@ -104,6 +130,12 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show
+    @dependent = Forms::FamilyMember.find(params.require(:id))
+    @application = @dependent.family_member.family.application_in_progress
+    @matrix = @dependent.family.build_relationship_matrix
+    @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
+    @relationship_kinds = PersonRelationship::Relationships_UI
+
     respond_to do |format|
       format.html
       format.js
@@ -121,6 +153,12 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
+
+    @application = @dependent.family_member.family.application_in_progress
+    if @application.present?
+      load_support_texts
+    end
+
     if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
       if @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
@@ -133,6 +171,7 @@ class Insured::FamilyMembersController < ApplicationController
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
     if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+      @family.reload
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present?
@@ -176,6 +215,9 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_intractive_identity = false
       @prev_url_include_consumer_role_id = false
     end
+
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
   end
 
   def new_resident_dependent
@@ -203,8 +245,13 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
 private
+
   def set_family
     @family = @person.try(:primary_family)
+  end
+
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
   end
 
   def init_address_for_dependent

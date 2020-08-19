@@ -59,11 +59,13 @@ module Services
         @hbx_enrollment.effective_on.year
       end
 
+      #Revisit this code to check the functionailty for multiple THH cases
       def csr_value
-        active_tax_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
+        active_tax_households = @hbx_enrollment.household.latest_active_tax_households_with_year(enrollment_year)
+        active_tax_household = active_tax_households.first if active_tax_households.present?
 
-        if active_tax_house_hold
-          case active_tax_house_hold.valid_csr_kind(hbx_enrollment)
+        if active_tax_household
+          case active_tax_household.valid_csr_kind(hbx_enrollment)
           when 'csr_100'
             '-01'
           when 'csr_94'
@@ -82,12 +84,13 @@ module Services
         end
       end
 
+      #Revisit this code to check the functionailty for multiple THH cases
       def aptc_value
-        active_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
-        if active_house_hold.nil?
+        active_tax_households = @hbx_enrollment.household.latest_active_tax_households_with_year(enrollment_year)
+        if active_tax_households.nil?
           return "NULL"
         else
-          active_house_hold.latest_eligibility_determination.max_aptc.to_i
+          active_tax_households.latest_eligibility_determination.max_aptc.to_i
         end
       end
 

@@ -42,6 +42,7 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -70,20 +71,29 @@ class Insured::VerificationDocumentsController < ApplicationController
   end
 
   def find_docs_owner
-    @docs_owner = Person.find(params[:docs_owner]) if params[:docs_owner]
+    return unless params[:docs_owner].present?
+    fm_id = params[:docs_owner]
+    family_member = FamilyMember.find(fm_id)
+    if ::VerificationType::ASSISTED_VERIFICATION_TYPES.include?(params[:type_name])
+      application_in_context = family_member.application_for_verifications
+      applicant = application_in_context.active_applicants.where(family_member_id: params[:docs_owner]).first if application_in_context
+      @docs_owner = applicant
+    else
+      @docs_owner = family_member.person
+    end
   end
 
   def update_vlp_documents(title, file_uri)
     document = @verification_type.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded"})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded"})
     @verification_type.update_attributes(:rejected => false, :validation_status => "review", :update_reason => "document uploaded")
-    @doc_errors = document.errors.full_messages unless success
-    @docs_owner.save!
+    @doc_errors = @document.errors.full_messages unless success
+    @docs_owner.save
   end
 
   def update_paper_application(title, file_uri)
     document = @docs_owner.resident_role.vlp_documents.build
-    success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :verification_type=>params[:verification_type]})
+    success = document.update_attributes({:identifier => file_uri, :subject => title, :title => title, :status => "downloaded", :verification_type => params[:verification_type]})
     @doc_errors = document.errors.full_messages unless success
     @docs_owner.save
   end

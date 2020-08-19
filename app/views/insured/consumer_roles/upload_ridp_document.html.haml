@@ -9,4 +9,4 @@
         .outstanding-ridp-documents
         = render partial: 'insured/interactive_identity_verifications/outstanding_ridp_documents'
       .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
-        = render  partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : insured_family_members_path(consumer_role_id: @person.consumer_role.id), identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?}
+        = render  partial: 'shared/individual_progress', locals: {step: '2', next_link: ridp_redirection_link(@person).present? ? ridp_redirection_link(@person) : help_paying_coverage_financial_assistance_applications_path, identity_verified: @person.consumer_role.identity_verified?, application_verified: @person.consumer_role.application_verified?}

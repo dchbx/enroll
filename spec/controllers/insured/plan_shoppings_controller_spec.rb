@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: :after_each do
-  before do
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
     DatabaseCleaner.clean
   end
 
@@ -9,6 +10,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "width standard plan present" do
       let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
       let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+      let(:application) { FactoryGirl.create(:application, family: family) }
       let(:person) { FactoryGirl.build_stubbed(:person) }
       let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
       let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -17,6 +19,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       before :each do
         sign_in user
         allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_approved_application).and_return(application)
         allow(person.primary_family).to receive(:active_household).and_return(household)
       end
 
@@ -33,9 +36,9 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   describe "not eligible for cost sharing or aptc / normal user", dbclean: :after_each do
-
     let(:household) { FactoryGirl.build_stubbed(:household, family: family) }
     let(:family) { FactoryGirl.build_stubbed(:family, :with_primary_family_member, person: person )}
+    let(:application) { FactoryGirl.create(:application, family: family) }
     let(:person) { FactoryGirl.build_stubbed(:person) }
     let(:user) { FactoryGirl.build_stubbed(:user, person: person) }
     let(:hbx_enrollment_one) { FactoryGirl.build_stubbed(:hbx_enrollment, household: household) }
@@ -50,15 +53,22 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         allow(family).to receive(:currently_enrolled_plans).and_return([])
         allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
         sign_in user
+        allow(person).to receive_message_chain("primary_family.enrolled_hbx_enrollments").and_return([hbx_enrollment_one])
+        allow(person.primary_family).to receive(:active_approved_application).and_return(application)
       end
 
       it "returns http success" do
-        xhr :get, :plans, id: "hbx_id", format: :js
+        allow(person).to receive(:consumer_role).and_return nil
+        allow(person).to receive(:employee_roles).and_return []
+        xhr :get, :plans, id: "hbx_id", family_member_ids: [], market_kind: 'individual', format: :js
         expect(response).to have_http_status(:success)
       end
     end
 
     describe "Eligibility determined and not_csr_100 user" do
+      let!(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+      let(:family_member_ids) {family.family_members.map(&:id)}
+      let!(:person) { FactoryGirl.create(:person,  :with_consumer_role) }
       let!(:tax_household) { FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year, 1, 1), is_eligibility_determined: true, effective_ending_on: nil) }
       let(:eligibility_determination) {FactoryGirl.create(:eligibility_determination, tax_household: tax_household)}
 
@@ -70,14 +80,13 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(family).to receive(:active_household).and_return(household)
           allow(family).to receive(:currently_enrolled_plans).and_return([])
           allow(HbxEnrollment).to receive(:find).and_return(hbx_enrollment_one)
-          allow(household).to receive(:latest_active_tax_household).and_return tax_household
           sign_in user
         end
 
         it "returns http success" do
           tax_household.eligibility_determinations = [eligibility_determination]
           person.primary_family.latest_household.tax_households << tax_household
-          xhr :get, :plans, id: "hbx_id", format: :js
+          xhr :get, :plans, id: "hbx_id", family_member_ids: family_member_ids, format: :js
           expect(response).to have_http_status(:success)
         end
       end
@@ -170,7 +179,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "GET receipt" do
-
     let(:user) { double("User") }
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double), applied_aptc_amount: 0) }
     let(:plan) { double("Plan") }
@@ -213,7 +221,6 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
   end
 
   context "GET thankyou" do
-
     let(:enrollment) { double("HbxEnrollment", effective_on: double("effective_on", year: double)) }
     let(:plan) { double("Plan") }
     let(:benefit_group) { double("BenefitGroup", is_congress: false) }
@@ -224,6 +231,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let (:individual_market_transition) { double ("IndividualMarketTransition") }
 
     before do
+      allow(family).to receive(:application_in_progress).and_return(false)
       allow(user).to receive(:person).and_return(person)
       allow(HbxEnrollment).to receive(:find).with("id").and_return(enrollment)
       allow(Plan).to receive(:find).with("plan_id").and_return(plan)
@@ -552,6 +560,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     #let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: consumer_person) }
 
     before :each do
+      allow(family).to receive(:application_in_progress).and_return(false)
       allow(HbxEnrollment).to receive(:find).with("hbx_id").and_return(hbx_enrollment)
       allow(hbx_enrollment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group).to receive(:reference_plan).and_return(reference_plan)
@@ -561,6 +570,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       allow(hbx_enrollment).to receive(:consumer_role).and_return(consumer_person.consumer_role)
       allow(household).to receive(:family).and_return(family)
       allow(family).to receive(:family_members).and_return(family_members)
+      allow(controller).to receive(:get_tax_households_from_family_members).and_return []
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:primary_family).and_return(family)
       allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
@@ -585,7 +595,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       before :each do
         allow(plan3).to receive(:total_employee_cost).and_return(3333)
         allow(plan3).to receive(:deductible).and_return("$998")
-        get :show, id: "hbx_id", market_kind: "shop"
+        get :show, family_member_ids: [], id: "hbx_id", market_kind: "shop"
       end
 
       it "should be success" do
@@ -621,7 +631,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         allow(person).to receive(:primary_family).and_return(family)
         allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return(false)
-        get :show, id: "hbx_id"
+        get :show, family_member_ids: [], id: "hbx_id"
       end
 
       it "should not be waivable" do
@@ -638,7 +648,7 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
           allow(person).to receive(:primary_family).and_return(family)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
         end
-        get :show, id: "hbx_id"
+        get :show, family_member_ids: [], id: "hbx_id"
       end
 
       it "should get max_total_employee_cost and return 0" do
@@ -653,25 +663,33 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     context "when user has_active_consumer_role" do
       let(:tax_household) {double("TaxHousehold")}
       let(:family) { FactoryGirl.build(:individual_market_family) }
-      let(:person) {double("Person",primary_family: family, is_consumer_role_active?: true)}
-      let(:user) {double("user",person: person)}
+      let!(:person) { FactoryGirl.create(:person, :with_active_consumer_role, :with_consumer_role) }
+      let!(:user)  { FactoryGirl.create(:user, person: person) }
 
       before do
         allow(hbx_enrollment).to receive(:coverage_kind).and_return('health')
         allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
         allow(hbx_enrollment).to receive(:is_coverall?).and_return(false)
         allow(hbx_enrollment).to receive(:decorated_elected_plans).and_return([])
+
+        allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
+        allow(person).to receive(:active_employee_roles).and_return []
+        allow(person).to receive(:consumer_role).and_return nil
+        allow(person).to receive(:employee_roles).and_return []
+
       end
 
       context "with tax_household" do
         before :each do
           allow(family).to receive(:latest_household).and_return(household)
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+          allow(household).to receive(:latest_active_tax_households_with_year).and_return tax_household
           allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
+          allow(person).to receive(:consumer_role).and_return nil
           allow(hbx_enrollment).to receive(:kind).and_return 'individual'
-          get :show, id: "hbx_id"
+          allow(controller).to receive(:get_tax_households_from_family_members).and_return [tax_household]
+          get :show, family_member_ids: [], id: "hbx_id", market_kind: 'individual'
         end
 
         it "should get max_aptc" do
@@ -685,10 +703,12 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       context "without tax_household" do
         before :each do
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
+          allow(household).to receive(:latest_active_tax_households_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
-          get :show, id: "hbx_id"
+          allow(person).to receive(:consumer_role).and_return nil
+          allow(person).to receive(:employee_roles).and_return []
+          get :show, family_member_ids: [], id: "hbx_id", market_kind: 'individual'
         end
 
         it "should get max_aptc" do
@@ -702,12 +722,14 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       context "without tax_household when has aptc session" do
         before :each do
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return nil
+          allow(household).to receive(:latest_active_tax_households_with_year).and_return nil
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
           allow(person).to receive(:active_employee_roles).and_return []
           session[:max_aptc] = 100
           session[:elected_aptc] = 80
-          get :show, id: "hbx_id"
+          allow(person).to receive(:consumer_role).and_return nil
+          allow(person).to receive(:employee_roles).and_return []
+          get :show, family_member_ids: [], id: "hbx_id", market_kind: 'individual'
         end
 
         it "should get max_aptc" do
@@ -721,13 +743,15 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       context "with tax_household and plan shopping in shop market" do
         before :each do
-          allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
-          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(family).to receive(:enrolled_hbx_enrollments).and_return([])
-          allow(person).to receive(:active_employee_roles).and_return []
+          allow(household).to receive(:latest_active_tax_households_with_year).and_return tax_household
+          allow(tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return(111)
           allow(hbx_enrollment).to receive(:coverage_kind).and_return 'health'
-          allow(hbx_enrollment).to receive(:kind).and_return 'shop'
-          get :show, id: "hbx_id"
+          allow(hbx_enrollment).to receive(:kind).and_return 'individual'
+          allow(person).to receive(:consumer_role).and_return nil
+          allow(person).to receive(:employee_roles).and_return []
+          allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("http://temp.url")
+          get :show, family_member_ids: [], id: "hbx_id", market_kind: 'individual'
         end
 
         it "should get max_aptc" do
@@ -780,30 +804,29 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
     let!(:new_hbx_enrollment) {
       FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, household: household, plan: plan, effective_on: Date.new(TimeKeeper.date_of_record.year, 5, 1), kind: 'individual', aasm_state: 'shopping')
     }
-
     let(:benefit_coverage_period) { hbx_profile.benefit_sponsorship.current_benefit_period }
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 4, 10))
       allow(HbxProfile).to receive(:current_hbx).and_return(hbx_profile)
       allow(benefit_coverage_period).to receive(:elected_plans_by_enrollment_members).and_return(individual_plans)
-
+      allow(person).to receive(:consumer_role).and_return nil
+      allow(person).to receive(:employee_roles).and_return []
       sign_in user
     end
 
     context "when plan is same as existing coverage plan" do
-
       let(:previous_age) {
         person.age_on(previous_hbx_enrollment.effective_on)
       }
 
       it "should calculate premium from previous enrollment effective date" do
         Caches::PlanDetails.load_record_cache!
-        xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
-
+        allow(person).to receive(:consumer_role).and_return nil
+        allow(person).to receive(:employee_roles).and_return []
+        xhr :get, :plans, id: new_hbx_enrollment.id, market_kind: 'individual', format: :js
         matching_plan = assigns(:plans).detect{|e| e.id == new_hbx_enrollment.plan_id }
         premium = plan.premium_tables.where(:age => previous_age).first.cost
-
         expect(matching_plan.total_premium).to eq premium
       end
     end
@@ -816,11 +839,11 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
 
       it "should calculate premium from new enrollment effective date" do
         Caches::PlanDetails.load_record_cache!
-        xhr :get, :plans, id: new_hbx_enrollment.id, format: :js
-
+        allow(person).to receive(:consumer_role).and_return nil
+        allow(person).to receive(:employee_roles).and_return []
+        xhr :get, :plans, id: new_hbx_enrollment.id, market_kind: 'individual', format: :js
         non_matching_plans = assigns(:plans).select{|e| e.id != new_hbx_enrollment.plan_id }
         premiums = non_matching_plans.collect{|plan| plan.premium_tables.where(:age => current_age).first.cost }
-
         expect(non_matching_plans.collect{|p| p.total_premium}).to eq premiums
       end
     end

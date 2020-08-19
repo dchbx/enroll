@@ -33,6 +33,8 @@ RSpec.describe "shared/plan_shoppings/_more_plan_details.html.erb" do
 
   context "with a primary subscriber and one dependent" do
     before :each do
+      allow(hbx_enrollment_member_one).to receive(:family).and_return(family)
+      allow(hbx_enrollment_member_two).to receive(:family).and_return(family)
       allow(hbx_enrollment_member_one).to receive(:person).and_return(person)
       allow(hbx_enrollment_member_two).to receive(:person).and_return(person_two)
       allow(hbx_enrollment_member_one).to receive(:is_subscriber).and_return(true)

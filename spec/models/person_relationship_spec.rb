@@ -1,11 +1,17 @@
 require 'rails_helper'
 
 describe PersonRelationship, dbclean: :after_each do
-  it { should validate_presence_of :relative_id }
+  it { should validate_presence_of :predecessor_id }
+  it { should validate_presence_of :successor_id }
   it { should validate_presence_of :kind }
+  it { should validate_presence_of :family_id }
 
   let(:kind) {"spouse"}
   let(:person) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
+  let(:person_2) {FactoryGirl.create(:person, gender: "male", dob: "10/10/1975", ssn: "123456780" )}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member) }
+  let(:family_member1) { FactoryGirl.create(:family_member, person: person, family: family, is_primary_applicant: true) }
+  let(:family_member2) { FactoryGirl.create(:family_member, person: person_2, family: family) }
 
   describe "class methods" do
     context "shop_display_relationship_kinds" do
@@ -16,8 +22,10 @@ describe PersonRelationship, dbclean: :after_each do
   describe ".new" do
     let(:valid_params) do
       { kind: kind,
-        relative: person,
-        person: person
+        person: person,
+        predecessor_id: person_2.id,
+        successor_id: person.id,
+        family_id: family.id
       }
     end
 
@@ -80,7 +88,8 @@ describe PersonRelationship, dbclean: :after_each do
       "stepparent",
       "trustee",
       "unrelated",
-      "ward"
+      "ward",
+      "stepson_or_stepdaughter"
     ] }
 
     context "consumer relationship dropdown list(family member page)" do
@@ -119,14 +128,6 @@ describe PersonRelationship, dbclean: :after_each do
       end
     end
 
-    context "with no relative" do
-      let(:params) {valid_params.except(:relative)}
-
-      it "should fail validation " do
-        expect(PersonRelationship.create(**params).errors[:relative_id].any?).to be_truthy
-      end
-    end
-
     context "with all valid arguments" do
       let(:params) {valid_params}
       it "should save" do
@@ -141,6 +142,13 @@ describe PersonRelationship, dbclean: :after_each do
           params[:kind] = rkind
           expect(PersonRelationship.new(**params).save).to be_truthy
         end
+      end
+    end
+
+    context "test for validation, with same successor and predecessor" do
+      let(:params) {valid_params.except(:predecessor_id).deep_merge!({predecessor_id: person.id})}
+      it "should not save on failed validation" do
+        expect(PersonRelationship.new(**params).save).not_to be_truthy
       end
     end
   end

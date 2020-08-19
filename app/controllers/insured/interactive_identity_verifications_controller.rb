@@ -1,5 +1,6 @@
 module Insured
   class InteractiveIdentityVerificationsController < ApplicationController
+    include NavigationHelper
     before_action :set_current_person
 
     def new
@@ -87,6 +88,7 @@ module Insured
     def process_successful_interactive_verification(service_response)
       consumer_role = @person.consumer_role
       consumer_user = @person.user
+      session[:person_id] = @person.id
       #TODO TREY KEVIN JIM There is no user when CSR creates enroooment
       if consumer_user
         consumer_user.identity_final_decision_code = User::INTERACTIVE_IDENTITY_VERIFICATION_SUCCESS_CODE
@@ -97,7 +99,7 @@ module Insured
         consumer_user.save!
       end
       consumer_role.move_identity_documents_to_verified
-      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => consumer_role.id)
+      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : help_paying_coverage_financial_assistance_applications_path
     end
 
     def render_session_start
@@ -111,5 +113,6 @@ module Insured
     def render_verification_override(transaction_id)
       render_to_string "events/identity_verification/interactive_verification_override", :formats => ["xml"], :locals => { :transaction_id => transaction_id }
     end
+
   end
 end

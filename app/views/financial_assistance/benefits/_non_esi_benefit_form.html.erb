@@ -1,0 +1,27 @@
+<%= benefit_form_for @application, @applicant, benefit do |f| %>
+  <div class="focus_effect_module">
+    <%= f.hidden_field :kind, value: kind %>
+    <%= f.hidden_field :insurance_kind, value: insurance_kind %>
+      <div class="row row-form-wrapper no-buffer row-height row-edit-border">
+        <div class="col-md-6">
+          <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{benefit.id}", class: "datepicker-js floatlabel" %>
+        </div>
+        <div class="col-md-6">
+          <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{benefit.id}", class: "datepicker-js floatlabel" %>
+        </div>
+      </div>
+    <div class="row">
+      <div class="col-md-3 pull-right">
+        <a class="btn btn-default benefit-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-danger' %>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<script>
+  $( function() {
+    $( "#financial_assistance_benefit_start_on" ).datepicker();
+    $( "#financial_assistance_benefit_end_on" ).datepicker();
+  } );
+</script>

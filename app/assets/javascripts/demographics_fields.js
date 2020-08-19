@@ -338,6 +338,10 @@ var PersonValidations = (function(window, undefined) {
 })(window);
 
 $(document).ready(function() {
+  demographicValidations();
+});
+
+function demographicValidations(){
   applyListeners();
   validationForIndianTribeMember();
 
@@ -350,4 +354,4 @@ $(document).ready(function() {
   });
 
   isApplyingCoverage("person");
-});
+}

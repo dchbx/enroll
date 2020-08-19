@@ -69,7 +69,7 @@ describe Subscribers::FamilyApplicationCompleted do
         it "updates the tax household with aptc from the payload on the primary persons family" do
           if tax_household_db
             expect(tax_household_db).to be_truthy
-            expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+            expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_households.first
             expect(tax_household_db.primary_applicant.family_member.person).to eq person
             expect(tax_household_db.allocated_aptc).to eq 0
             expect(tax_household_db.is_eligibility_determined).to be_truthy
@@ -115,7 +115,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "should have a new tax household with the same aptc data" do
           if tax_household_db
-            updated_tax_household = tax_household_db.household.latest_active_tax_household
+            updated_tax_household = tax_household_db.household.latest_active_tax_households.first
             expect(updated_tax_household).to be_truthy
             expect(updated_tax_household.primary_applicant.family_member.person).to eq person
             expect(updated_tax_household.allocated_aptc).to eq 0

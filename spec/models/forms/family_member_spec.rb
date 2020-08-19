@@ -78,20 +78,24 @@ describe Forms::FamilyMember do
       expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
-    it "with same no_dc_address but without smae no_dc_address_reason" do
+    it "with same no_dc_address but without smae no_dc_address_reasons" do
       allow(person).to receive(:no_dc_address).and_return true
       allow(primary).to receive(:no_dc_address).and_return true
-      allow(person).to receive(:no_dc_address_reason).and_return "reason1"
-      allow(primary).to receive(:no_dc_address_reason).and_return "reason2"
+      allow(person).to receive(:is_homeless?).and_return true
+      allow(primary).to receive(:is_homeless?).and_return false
+      allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+      allow(primary).to receive(:is_temporarily_out_of_state?).and_return false
       expect(Forms::FamilyMember.compare_address_with_primary(family_member)).to eq false
     end
 
-    context "with same no_dc_address and no_dc_address_reason" do
+    context "with same no_dc_address and no_dc_address_reasons" do
       before :each do
         allow(person).to receive(:no_dc_address).and_return true
         allow(primary).to receive(:no_dc_address).and_return true
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
-        allow(primary).to receive(:no_dc_address_reason).and_return "reason"
+        allow(person).to receive(:is_homeless?).and_return true
+        allow(primary).to receive(:is_homeless?).and_return true
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        allow(primary).to receive(:is_temporarily_out_of_state?).and_return true
       end
 
       it "has same address for compare_keys" do
@@ -132,10 +136,12 @@ describe Forms::FamilyMember do
 
       it "update person's attributes" do
         allow(primary).to receive(:no_dc_address).and_return true
-        allow(primary).to receive(:no_dc_address_reason).and_return "no reason"
+        allow(primary).to receive(:is_homeless).and_return false
+        allow(primary).to receive(:is_temporarily_out_of_state).and_return false
         employee_dependent.assign_person_address(person)
         expect(person.no_dc_address).to eq true
-        expect(person.no_dc_address_reason).to eq "no reason"
+        expect(person.is_homeless).to eq false
+        expect(person.is_temporarily_out_of_state).to eq false
       end
 
       it "add new address if address present" do
@@ -226,17 +232,18 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :middle_name => "ccc",
       :name_pfx => "ddd",
       :name_sfx => "eee",
-      :ssn => "123456778",
-      :no_ssn => '',
       :gender => "male",
       :dob => dob,
+      :ssn => "123456778",
+      :no_ssn => '',
       :race => "race",
       :ethnicity => ["ethnicity"],
       :language_code => "english",
       :is_incarcerated => "no",
       :tribal_id => "test",
       :no_dc_address => nil,
-      :no_dc_address_reason => nil
+      :is_homeless => false,
+      :is_temporarily_out_of_state => false
     }
   }
 
@@ -282,19 +289,27 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
   end
 
   describe "for a new person" do
+    let(:primary_person) {family.primary_applicant}
     let(:new_family_member_id) { double }
     let(:new_family_member) { instance_double(::FamilyMember, :id => new_family_member_id, :save! => true) }
     let(:new_person) { double(:save => true, :errors => double(:has_key? => false)) }
+    let(:new_person2) { double(:save => true, :errors => double(:has_key? => false)) }
 
     before do
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(new_person).to receive(:add_relationship).and_return nil
       allow(family).to receive(:relate_new_member).with(new_person, relationship).and_return(new_family_member)
       allow(family).to receive(:save!).and_return(true)
+      allow(new_family_member).to receive(:person).and_return new_person
+      allow(subject).to receive(:assign_person_address).and_return true
+      allow(subject).to receive(:relationship).and_return relationship
       allow(subject).to receive(:assign_person_address).and_return true
     end
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(family).to receive(:build_relationship_matrix).and_return(true)
       subject.save
     end
 
@@ -320,6 +335,7 @@ describe "checking validations on family member object" do
       "no_ssn"=>"1",
       "gender"=>"male",
       "relationship"=>"child",
+      "citizen_status" => "",
       "tribal_id"=>"",
       "ethnicity"=>["", "", "", "", "", "", ""],
       "is_consumer_role"=>"true",
@@ -403,9 +419,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :middle_name => "ccc",
       :name_pfx => "ddd",
       :name_sfx => "eee",
-      :ssn => "123456778",
       :gender => "male",
       :dob => Date.strptime(dob, "%Y-%m-%d"),
+      :ssn => "123456778",
       :race => "race",
       :ethnicity => ["ethnicity"],
       :language_code => "english",
@@ -431,6 +447,10 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     allow(family_member).to receive(:indian_tribe_member)
     allow(person).to receive(:has_mailing_address?).and_return(false)
     allow(subject).to receive(:valid?).and_return(true)
+    allow(Family).to receive(:find).and_return family
+    allow(family).to receive(:primary_applicant).and_return family_member
+    allow(person).to receive(:add_relationship).and_return nil
+    allow(family).to receive(:build_relationship_matrix).and_return true
   end
 
   it "should be considered persisted" do
@@ -455,40 +475,29 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
-      expect(family_member).to receive(:update_relationship).with(relationship)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :no_dc_address_reason=>nil}))
-      allow(family_member).to receive(:update_relationship).with(relationship)
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :no_dc_address=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
       allow(person).to receive(:consumer_role).and_return FactoryGirl.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
   end
 
-  context "it should create the coverage household member record if found a inactive family member record" do
-    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-    let(:new_family_member) { FactoryGirl.create(:family_member, family: family, :is_active => false)}
-    before do
-      allow(family).to receive(:find_matching_inactive_member).and_return new_family_member
-      new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }.each { |chm| chm.destroy! }
-      subject.instance_variable_set(:@family, family)
-      allow(family).to receive(:all_family_member_relations_defined).and_return true
-      subject.save
-      family.reload
-    end
+  describe "update existing relationship" do
+    let(:dependent_person) {FactoryGirl.create(:family_member, family: test_family).person}
+    let(:primary_person) {test_family.primary_applicant.person}
+    let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
 
-    it "should create a coverage household member record for the existing inactive family member" do
-      chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }
-      expect(chm.size).to eq 1
-    end
-
-    it "should set the inactive family_member as active" do
-      expect(new_family_member.is_active).to eq true
+    it "should the old relationship from spouse to child" do
+      primary_person.person_relationships.create(predecessor_id: primary_person.id, :successor_id => dependent_person.id, :kind => "spouse", family_id: test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "spouse"
+      primary_person.add_relationship(dependent_person, "child", test_family.id)
+      expect(primary_person.person_relationships.first.kind).to eq "child"
     end
   end
 end
@@ -562,6 +571,36 @@ describe Forms::FamilyMember, "relationship validation" do
 
       expect(dependent.valid?).to be true
       expect(dependent.errors[:base].any?).to be_falsey
+    end
+  end
+
+  context "it should create the coverage household member record if found a inactive family member record" do
+    let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
+    let(:person1) { family.primary_applicant.person }
+    let(:household) { family.active_household }
+    let(:new_family_member) { FactoryGirl.create(:family_member, family: family, :is_active => false)}
+    let(:person2) { new_family_member.person }
+
+    before do
+      person1.add_relationship(person2, "spouse", family.id)
+      person2.add_relationship(person1, "spouse", family.id)
+      allow(family).to receive(:find_matching_inactive_member).and_return new_family_member
+      new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }.each { |chm| chm.destroy! }
+      subject.instance_variable_set(:@family, family)
+      new_family_member.reactivate!("spouse")
+      allow(family).to receive(:all_family_member_relations_defined).and_return true
+      subject.save
+      family.reload
+    end
+
+    it "should create a coverage household member record for the existing inactive family member" do
+      household.add_household_coverage_member(new_family_member)
+      chm = new_family_member.family.active_household.coverage_households.flat_map(&:coverage_household_members).select { |chm| chm.family_member_id == new_family_member.id }
+      expect(chm.size).to eq 1
+    end
+
+    it "should set the inactive family_member as active" do
+      expect(new_family_member.is_active).to eq true
     end
   end
 end

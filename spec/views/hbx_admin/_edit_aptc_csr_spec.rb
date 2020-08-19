@@ -20,7 +20,7 @@ RSpec.describe "hbx_admin/_edit_aptc_csr", :dbclean => :after_each do
       tax_household = FactoryGirl.create(:tax_household, household: active_household )
       eligibility_determination = FactoryGirl.create(:eligibility_determination, tax_household: tax_household)
       allow(family).to receive(:active_household).and_return active_household
-      allow(active_household).to receive(:latest_active_tax_household).and_return tax_household
+      allow(active_household).to receive(:latest_active_tax_households).and_return [tax_household]
       allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination
       allow(active_household).to receive(:hbx_enrollments).and_return hbx_enrollments   
     end

@@ -80,17 +80,17 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
 end
 
 And(/^an uploaded application in VERIFIED status is present$/) do
-	login_as hbx_admin, scope: :user
-	visit exchanges_hbx_profiles_root_path
-	find(:xpath, "//li[contains(., '#{"Families"}')]", :wait => 10).click
+  login_as hbx_admin, scope: :user
+  visit exchanges_hbx_profiles_root_path
+  find(:xpath, "//li[contains(., 'Families')]", :wait => 10).click
   find(:xpath,'//*[@id="myTab"]/li[2]/ul/li[1]/a/span[1]', :wait => 10).trigger('click')
   wait_for_ajax(10,2)
-	family_member = find('a', :text => /First/)
-	family_member.trigger("click")
-	expect(page).to have_content('Application')
+  family_member = find('a', :text => /First/)
+  family_member.trigger("click")
+  expect(page).to have_content('Application')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[5]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
@@ -107,7 +107,7 @@ And(/^an uploaded Identity verification in VERIFIED status is present$/) do
   expect(page).to have_content('Identity')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[2]/div/div/div/div[2]/div[1]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
@@ -175,7 +175,7 @@ When(/^an uploaded Identity verification in VERIFIED status is present on failed
   expect(page).to have_content('Identity')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[1]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Identity successfully verified.')
@@ -192,7 +192,7 @@ When(/^an uploaded application in VERIFIED status is present on failed experian 
   expect(page).to have_content('Application')
   find(:xpath, "/html/body/div[2]/div[2]/div/div/div[1]/div[3]/div[1]/div/div/div/div[2]/div[5]/div/div[4]/div").click
   find('.interaction-choice-control-verification-reason-1').click
-  find('.interaction-choice-control-verification-reason', :text => /\ASelect Reason\z/).click
+  find(:xpath, '//*[@id="verification_reason"]').trigger('click')
   select('Document in EnrollApp', :from => 'verification_reason')
   find('.v-type-confirm-button').click
   expect(page).to have_content('Application successfully verified.')
@@ -201,6 +201,11 @@ end
 Then(/^HBX admin should see the dependents form$/) do
   expect(page).to have_content('Add Member')
   screenshot("dependents")
+end
+
+And(/^HBX admin answers "No" on help paying for coverage page and clicks continue$/) do
+  find(:xpath, '//*[@id="help_paying_coverage"]/div/div[3]/label').click
+  find(:xpath, "//*[@id='btn-continue']").click
 end
 
 And(/^HBX admin click on continue button on household info form$/) do

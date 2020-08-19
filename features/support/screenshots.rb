@@ -18,6 +18,10 @@ module Screenshots
       page.save_screenshot "tmp/#{@feature_name}/#{@scenario_name}/#{@count += 1} - #{name}.png", full: true
     end
   end
+
+  def screenshot_and_post_to_slack(name, options={})
+    page.save_screenshot "tmp/slack/#{options[:channel]}/#{@feature_name}/#{name}.png", full: true
+  end
 end
 
 World(Screenshots)

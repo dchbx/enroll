@@ -8,6 +8,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
     before(:each) do
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
       assign(:person, person)
+      assign(:support_texts, {support_text_key: "support-text-description"})
       person.addresses.build(kind: 'home')
       #controller.request.path_parameters[:employer_profile_id] = employer_profile.id
       #stub_template "shared/_reference_plans_list.html.erb" => ""
@@ -31,7 +32,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       end
 
       it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
+        expect(rendered).to match /Does #{person.first_name} need coverage?/
       end
 
       it "should display the affirmative message" do
@@ -41,7 +42,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       it "should have no-dc-address-reasons area" do
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
-        expect(rendered).to match /living outside of DC temporarily and intend to return/
+        expect(rendered).to match /Currently living outside of DC temporarily and plan to return./
       end
     end
 
@@ -61,7 +62,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       end
 
       it "should not display the is_applying_coverage field option" do
-        expect(rendered).not_to match /Is this person applying for coverage?/
+        expect(rendered).not_to match /Does #{person.first_name} need coverage?/
       end
 
       it "should display the affirmative message" do
@@ -119,6 +120,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb" do
       allow(person).to receive(:is_consumer_role_active?).and_return true
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign(:person, person)
+      assign(:support_texts, {support_text_key: "support-text-description"})
       render :template => "people/landing_pages/_personal.html.erb"
     end
 

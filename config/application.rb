@@ -62,6 +62,8 @@ module Enroll
       config.acapi.add_async_subscription("Subscribers::DefaultGaChanged")
       config.acapi.add_async_subscription("Subscribers::ShopBinderEnrollmentsTransmissionAuthorized")
       config.acapi.add_async_subscription("Subscribers::ShopRenewalTransmissionAuthorized")
+      config.acapi.add_async_subscription("Subscribers::FinancialAssistanceApplicationEligibilityResponse")
+      config.acapi.add_async_subscription("Subscribers::FinancialAssistanceApplicationOutstandingVerification")
       config.acapi.add_async_subscription("Subscribers::ShopInitialEmployerQuietPeriodEnded")
       config.acapi.add_async_subscription("Subscribers::PolicyTerminationsSubscriber")
       config.acapi.add_async_subscription("Subscribers::EmployeeEnrollmentInvitationsSubscriber")

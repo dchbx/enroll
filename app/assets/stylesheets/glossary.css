@@ -1,0 +1,7 @@
+span.glossary {
+  border-bottom: 1px dashed #007bc4;
+}
+span.glossary:hover {
+  cursor: pointer;
+  color: #007bc4;
+}

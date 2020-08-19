@@ -16,6 +16,8 @@ Feature: Consumer verification process
     * Individual click continue button
     * Individual agrees to the privacy agreeement
     * Individual should see identity verification page and clicks on submit
+    * Individual should be on the Help Paying for Coverage page
+    * Individual does not apply for assistance and clicks continue
     * Individual should see the dependents form
     * I click on continue button on household info form
     * I click on continue button on group selection page

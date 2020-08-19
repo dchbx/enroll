@@ -1,0 +1,14 @@
+<nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
+  <ul class="nav nav-stacked" id="left-navigation">
+    <li class="activer list-box step-tabs global-nav no-hover indent-w <%= 'active' if account_registration_active? %>" >
+      <a>Account Registration</a>
+    </li>
+    <li class="list-box step-tabs no-hover-disable indent-w <%= 'activer' if tell_us_about_yourself_active? %> global-nav <%= 'active' if tell_us_about_yourself_current_step? %>">
+      <a class="<%= 'cna disabled' unless tell_us_about_yourself_active? or tell_us_about_yourself_current_step? %>">Tell Us About Yourself</a>
+    </li>
+
+    <li class="list-box step-tabs no-hover-disable indent-w <%= 'activer' if family_members_index_active? %> global-nav <%= 'active' if family_members_index_current_step? %>">
+      <a class="<%= 'cna disabled' unless family_members_index_active? or family_members_index_current_step? %>">Household Info</a>
+    </li>
+  </ul>
+</nav>

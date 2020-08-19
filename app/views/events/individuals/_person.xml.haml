@@ -11,3 +11,10 @@
   - if person.phones.any?
     %phones
       = render :partial => "events/phones/phone", :collection => person.phones
+  - if person.created_at
+    %created_at= person.created_at.strftime('%Y-%m-%dT%H:%M:%S')
+  - if person.updated_at
+    %modified_at= person.updated_at.strftime('%Y-%m-%dT%H:%M:%S')
+  - if person.version
+    %version= person.version
+

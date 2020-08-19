@@ -51,7 +51,7 @@
          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
     <% else %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a basic silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
+       contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan. The value of your tax credit is $0, because a silver plan will cost you less than what the federal government expects you to spend each month on health insurance."],
          heading: '', sub_heading: "<strong>Advance Premium Tax Credit Savings:</strong> $#{thh.max_aptc}/month"} %>
     <% end %>
   <% end %>
@@ -142,7 +142,7 @@
   <% end %>
 
   <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
-   contents: ["#{Settings.site.short_name} certified Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
+   contents: ["#{Settings.site.short_name} registered Brokers are available (at no cost to you) to help you find the right plan that meets your needs and budget. To search for a Broker near you, go to: <a href='www.dchealthlink.com/find-expert'>dchealthlink.com/find-expert</a>.", "You can also use our Plan Match tool to compare plans on your own. With Plan Match, you can see plan features, benefits, and costs side-by-side. You’ll see total estimated costs for services (not just premiums or deductibles). You can also see which plans include your doctors, prescription drugs, and more. To use Plan Match, go to the Individual & Family section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>."],
      heading: 'Get Help Choosing a Plan', sub_heading: '', top_margin: '12px'} %>
 <% end %>
 
@@ -176,4 +176,18 @@ content: "If you have questions or concerns, we’re here to help.<br></br>The #
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ["<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:",
-  "<i>Exchange Regulations</i>","General eligibility etandards for exchange participation and affordability programs: 45 CFR § 155.305","Premium tax credit calculations:  26 CFR § 1.36B-3","Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)","Annual open enrollment period: 45 CFR § 155.155.410(e)","Special enrollment periods: 45 CFR § 155.420","Requirement to report changes: 45 CFR § 155.3330(b)","<i>Medicaid Regulations</i>","State residence: 42 CFR § 435.403","Citizenship and non-nitizenship eligibility: 42 CFR § 435.406","Medicaid use of modified adjusted gross income:  42 CFR § 435.603","Medicaid determination of eligibility: 42 CFR § 435.911","Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)","Verification of other non-financial information: 42 CFR § 435.956","Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>
+  "<i>Exchange Regulations</i>",
+  "General eligibility standards for exchange participation and affordability programs: 45 CFR § 155.305",
+  "Premium tax credit calculations:  26 CFR § 1.36B-3",
+  "Eligibility appeals: 45 CFR §§ 155.505(b) & 520(b)(1)",
+  "Annual open enrollment period: 45 CFR § 155.155.410(e)",
+  "Special enrollment periods: 45 CFR § 155.420",
+  "Requirement to report changes: 45 CFR § 155.330(b)",
+  "<i>Medicaid Regulations</i>",
+  "State residence: 42 CFR § 435.403",
+  "Citizenship and non-citizenship eligibility: 42 CFR § 435.406",
+  "Medicaid use of modified adjusted gross income:  42 CFR § 435.603",
+  "Medicaid determination of eligibility: 42 CFR § 435.911",
+  "Eligibility for medical assistance programs: 42 C.F.R. § 435.945(a) and (b)",
+  "Verification of other non-financial information: 42 CFR § 435.956",
+  "Non-citizen eligibility for federal benefits: 8 USCS 1 § 1611, § 1612, and § 1613"]} %>

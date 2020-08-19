@@ -1,15 +1,17 @@
 require 'rails_helper'
 
 RSpec.describe Products::QhpController, :type => :controller do
+
   let(:user) { double("User", person: person) }
-  let(:person) { double("Person", primary_family: family, is_consumer_role_active?: true)}
+  let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let(:hbx_enrollment){double("HbxEnrollment", is_shop?: true, kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
   let(:plan) { double("Plan") }
   let(:benefit_group){double("BenefitGroup")}
   let(:reference_plan){double("Plan")}
   let(:tax_household) {double}
-  let(:household) {double(latest_active_tax_household_with_year: tax_household)}
-  let(:family) {double(latest_household: household)}
+  let(:household) {double(latest_active_tax_households_with_year: tax_household)}
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
+
   context "GET comparison" do
     before do
       allow(user).to receive(:person).and_return(person)

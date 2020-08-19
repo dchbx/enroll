@@ -13,7 +13,8 @@ class HbxAdminController < ApplicationController
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs) if @hbxs.present?
     @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs)
     @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
-    @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+    active_tax_households_for_current_year = @family.active_household.latest_active_tax_households_with_year(@current_year)
+    @active_tax_household_for_current_year = active_tax_households_for_current_year.first if active_tax_households_for_current_year.present?
     @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
     @year_options = Admin::Aptc::years_with_tax_household(@family)
@@ -52,7 +53,8 @@ class HbxAdminController < ApplicationController
     @household_members = Admin::Aptc.build_household_members(@current_year, @family, params[:max_aptc].to_f)
     @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs, params[:applied_aptcs_array])
     @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
-    @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
+    active_tax_households_for_current_year = @family.active_household.latest_active_tax_households_with_year(@current_year)
+    @active_tax_household_for_current_year = active_tax_households_for_current_year.first if active_tax_households_for_current_year.present?
     @max_aptc = ( params[:max_aptc]=="NaN" ? params[:max_aptc] : '%.2f' % params[:max_aptc] ) || @family.active_household.tax_households.tax_household_with_year(@current_year).last.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = params[:csr_percentage] || @family.active_household.tax_households.tax_household_with_year(@current_year).last.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
     @year_options = Admin::Aptc::years_with_tax_household(@family)

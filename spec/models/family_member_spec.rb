@@ -23,9 +23,27 @@ describe FamilyMember, "given a person" do
   let(:person) { Person.new }
   subject { FamilyMember.new(:person => person) }
 
-  it "delegates #ivl_coverage_selected to person" do
-    expect(person).to receive(:ivl_coverage_selected)
-    subject.ivl_coverage_selected
+  it "delegates #trigger_hub_call to person" do
+    expect(person).to receive(:trigger_hub_call)
+    subject.trigger_hub_call
+  end
+end
+
+describe "application_for_verifications" do
+  include_examples 'draft application with 2 applicants'
+
+  before do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+    allow(family).to receive(:application_applicable_year).and_return application.assistance_year
+    application.submit!
+  end
+
+  it 'should return application if family member is present' do
+    expect(second_family_member.application_for_verifications).to eq application
+  end
+
+  it 'should not return application if family member is not present' do
+    expect(family_member_not_on_application.application_for_verifications).to eq nil
   end
 end
 
@@ -180,24 +198,27 @@ describe FamilyMember, dbclean: :after_each do
   end
 end
 
-describe FamilyMember, "which is inactive" do
-  it "can be reactivated with a specified relationship"
-end
+# describe FamilyMember, "which is inactive" do
+#   it "can be reactivated with a specified relationship"
+# end
 
-describe FamilyMember, "given a relationship to update" do
-  let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
-  let(:relationship) { "spouse" }
-  let(:person) { FactoryGirl.build(:person) }
-  subject { FactoryGirl.build(:family_member, person: person, family: family) }
+describe "for families with financial assistance application" do
+  let(:person) { FactoryGirl.create(:person)}
+  let(:person1) { FactoryGirl.create(:person)}
+  let(:family) { FactoryGirl.create(:family, :with_primary_family_member,person: person) }
 
-  it "should do nothing if the relationship is the same" do
-    subject.update_relationship(subject.primary_relationship)
+  before(:each) do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
   end
 
-  it "should update the relationship if different" do
-    expect(subject.primary_relationship).not_to eq relationship
-    subject.update_relationship(relationship)
-    expect(subject.primary_relationship).to eq relationship
+  context "family_member added when application is in progress" do
+    it "should create an applicant with the family_member_id of the added member" do
+      family.applications.create!
+      expect(family.application_in_progress.active_applicants.count).to eq 0
+      fm = family.family_members.create!({person_id: person1.id, is_primary_applicant: false, is_coverage_applicant: true})
+      expect(family.application_in_progress.active_applicants.count).to eq 1
+      expect(family.application_in_progress.active_applicants.first.family_member_id).to eq fm.id
+    end
   end
 end
 

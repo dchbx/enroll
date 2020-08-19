@@ -199,11 +199,8 @@ end
 
 When(/(.*) enters termination reason/) do |named_person|
   wait_for_ajax
-
-  waiver_modal = find('.terminate_confirm')
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric')][p[contains(text(), 'Please select terminate reason')]]").click
-  waiver_modal.find(:xpath, "//div[contains(@class, 'selectric-scroll')]/ul/li[contains(text(), 'I do not have other coverage')]").click
-  waiver_modal.find('.terminate_reason_submit').click
+  page.find(:css, "select#terminate_reason").find(:xpath, 'option[2]').select_option
+  page.find('.terminate_reason_submit').click
 end
 
 Then(/(.*) should see termination confirmation/) do |named_person|

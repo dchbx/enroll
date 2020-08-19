@@ -32,7 +32,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     get_aptc_info_from_session(plan_selection.hbx_enrollment)
-    plan_selection.apply_aptc_if_needed(@shopping_tax_household, @elected_aptc, @max_aptc)
+    plan_selection.apply_aptc_if_needed(@shopping_tax_households, @elected_aptc, @max_aptc)
     previous_enrollment_id = session[:pre_hbx_enrollment_id]
 
     plan_selection.verify_and_set_member_coverage_start_dates
@@ -45,16 +45,16 @@ class Insured::PlanShoppingsController < ApplicationController
   def receipt
     @enrollment = HbxEnrollment.find(params.require(:id))
     plan = @enrollment.plan
-
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile
     else
-      @shopping_tax_household = get_shopping_tax_household_from_person(@person, @enrollment.effective_on.year)
+      family = @person.primary_family
+      @shopping_tax_households = get_shopping_tax_households_from_person(@person, @enrollment.effective_on.year) if family.present? && !family.application_in_progress.present?
       applied_aptc = @enrollment.applied_aptc_amount if @enrollment.applied_aptc_amount > 0
       @market_kind = "individual"
     end
 
-    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_household: @shopping_tax_household)
+    @plan = @enrollment.build_plan_premium(qhp_plan: plan, apply_aptc: applied_aptc.present?, elected_aptc: applied_aptc, tax_households: @shopping_tax_households)
 
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
@@ -77,7 +77,7 @@ class Insured::PlanShoppingsController < ApplicationController
     end
 
     @enrollment.reset_dates_on_previously_covered_members(@plan)
-    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_household: @shopping_tax_household)
+    @plan = @enrollment.build_plan_premium(qhp_plan: @plan, apply_aptc: can_apply_aptc?(@plan), elected_aptc: @elected_aptc, tax_households: @shopping_tax_households)
     @family = @person.primary_family
 
     #FIXME need to implement can_complete_shopping? for individual
@@ -166,11 +166,15 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    @family_member_ids = params[:family_member_ids]
+    year = HbxEnrollment.find(hbx_enrollment_id).effective_on.year
+    @family_member_ids = @family_member_ids.collect { |k,v| v}
+    shopping_tax_households = get_tax_households_from_family_members(@person, @family_member_ids, year) if !@person.primary_family.application_in_progress.present?
+  
     set_plans_by(hbx_enrollment_id: hbx_enrollment_id)
-    shopping_tax_household = get_shopping_tax_household_from_person(@person, @hbx_enrollment.effective_on.year)
-    if shopping_tax_household.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
-      @tax_household = shopping_tax_household
-      @max_aptc = @tax_household.total_aptc_available_amount_for_enrollment(@hbx_enrollment)
+    if shopping_tax_households.present? && @hbx_enrollment.coverage_kind == "health" && @hbx_enrollment.kind == 'individual'
+      @tax_households = shopping_tax_households
+      @max_aptc = total_aptc_on_tax_households(shopping_tax_households, @hbx_enrollment)
       session[:max_aptc] = @max_aptc
       @elected_aptc = session[:elected_aptc] = @max_aptc * 0.85
     else
@@ -215,12 +219,13 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def plans
+    @family_member_ids = params[:family_member_ids]
     set_consumer_bookmark_url(family_account_path)
     set_admin_bookmark_url
     set_plans_by(hbx_enrollment_id: params.require(:id))
-    @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
-    if @tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person, @tax_household)
+    application = @person.primary_family.active_approved_application
+    if (application.present? && application.tax_households.present?) || @person.primary_family.active_household.latest_active_tax_households.present?
+      if is_eligibility_determined_and_not_csr_100?(@person, params[:family_member_ids])
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -250,9 +255,43 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person, tax_household)
-    valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
-    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
+  def is_eligibility_determined_and_not_csr_100?(person, family_member_ids)
+    primary_family = person.primary_family
+    csr_kinds = []
+
+    if primary_family.application_in_progress.present?
+      csr_kinds << "csr_100"
+    else
+      if !primary_family.active_household.latest_active_tax_households.map(&:application_id).include?(nil)
+        if primary_family.active_approved_application.present?
+          family_member_ids.each do |member_id|
+            applicant = primary_family.active_approved_application.active_applicants.where(family_member_id: member_id).first
+
+            if applicant.non_ia_eligible?
+              return false
+            end
+            tax_household = primary_family.active_approved_application.tax_household_for_family_member(member_id)
+            csr_kind = primary_family.active_approved_application.current_csr_eligibility_kind(tax_household.id)
+            csr_kinds << csr_kind if EligibilityDetermination::CSR_KINDS.include? csr_kind
+          end
+        end
+      else
+        family_member_ids.each do |member_id|
+          primary_family.active_household.latest_active_tax_households.each do |thh|
+            tax_household_member = thh.tax_household_members.where(applicant_id: member_id).first
+            if tax_household_member.present?
+              if tax_household_member.non_ia_eligible?
+                return false
+              end
+              csr_kind = thh.current_csr_eligibility_kind
+              csr_kinds << csr_kind if EligibilityDetermination::CSR_KINDS.include? csr_kind
+            end
+          end
+        end
+      end
+    end
+
+    !csr_kinds.include? "csr_100"
   end
 
   def send_receipt_emails
@@ -271,6 +310,20 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def set_plans_by(hbx_enrollment_id:)
+    if @person.nil?
+      @enrolled_hbx_enrollment_plan_ids = []
+    else
+      covered_plan_year = @person.active_employee_roles.first.employer_profile.plan_years.detect { |py| (py.start_on.beginning_of_day..py.end_on.end_of_day).cover?(@person.primary_family.current_sep.try(:effective_on))} if @person.active_employee_roles.first.present?
+      if covered_plan_year.present?
+        id_list = covered_plan_year.benefit_groups.map(&:id)
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.active_household.hbx_enrollments.where(:benefit_group_id.in => id_list).effective_desc.map(&:plan).compact.map(&:id)
+      else
+        @enrolled_hbx_enrollment_plan_ids = @person.primary_family.enrolled_hbx_enrollments.map(&:plan).map(&:id)
+      end
+    end
+
+    family_member_ids = @family_member_ids
+
     Caches::MongoidCache.allocate(CarrierProfile)
     @hbx_enrollment = HbxEnrollment.find(hbx_enrollment_id)
     @enrolled_hbx_enrollment_plan_ids = @hbx_enrollment.family.currently_enrolled_plans_ids(@hbx_enrollment)
@@ -346,8 +399,8 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def get_aptc_info_from_session(hbx_enrollment)
-    @shopping_tax_household = get_shopping_tax_household_from_person(@person, hbx_enrollment.effective_on.year) if @person.present?
-    if @shopping_tax_household.present?
+    @shopping_tax_households = get_shopping_tax_households_from_person(@person, hbx_enrollment.effective_on.year) if @person.present? && @person.primary_family.present? && !@person.primary_family.application_in_progress.present?
+    if @shopping_tax_households.present?
       @max_aptc = session[:max_aptc].to_f
       @elected_aptc = session[:elected_aptc].to_f
     else
@@ -357,7 +410,7 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   def can_apply_aptc?(plan)
-    @shopping_tax_household.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
+    @shopping_tax_households.present? and @elected_aptc > 0 and plan.present? and plan.can_use_aptc?
   end
 
   def set_elected_aptc_by_params(elected_aptc)

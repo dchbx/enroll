@@ -8,6 +8,8 @@ class EligibilityDetermination
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73)
 
+  SOURCE_KINDS  = %w(Admin Curam Haven)
+
   #   csr_0:   "02", # Native Americans
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {
@@ -26,6 +28,18 @@ class EligibilityDetermination
   # Premium tax credit assistance eligibility.
   # Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)
   field :max_aptc, type: Money, default: 0.00
+
+  ## Remove after data Cleanup ##
+  field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
+  field :magi_medicaid_monthly_allowable_limit_income, type: Money, default: 0.00
+  field :csr_household_income, type: Money, default: 0.00
+  field :csr_allowable_limit_income, type: Money, default: 0.00
+  ##
+
+  field :aptc_csr_annual_household_income, type: Money, default: 0.00
+  field :aptc_annual_income_limit, type: Money, default: 0.00
+  field :csr_annual_income_limit, type: Money, default: 0.00
+
   field :premium_credit_strategy_kind, type: String
 
   # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising
@@ -39,7 +53,7 @@ class EligibilityDetermination
   # DEPRECATED - use determined_at
   field :determined_on, type: DateTime
 
-  # Source will tell who determined / redetermined eligibility. Eg: Curam or Admin
+  # Source of the Eligibility Determination. Admin, Curam or Haven
   field :source, type: String
 
   before_validation :set_premium_credit_strategy, :set_determined_at
@@ -60,6 +74,8 @@ class EligibilityDetermination
       message: "%{value} is not a valid cost sharing eligibility kind"
     }
 
+  validate :source_kind
+
   def csr_percent_as_integer=(new_csr_percent)
     super
     self.csr_eligibility_kind = case csr_percent_as_integer
@@ -75,7 +91,6 @@ class EligibilityDetermination
   end
 
   def family
-    return nil unless tax_household
     tax_household.family
   end
 
@@ -113,15 +128,30 @@ class EligibilityDetermination
     end
   end
 
+  def application
+    return nil unless tax_household.application_id.present?
+    tax_household.application
+  end
+
 private
+
+  def source_kind
+    unless source.nil?
+      errors.add(:source, " Can't be other than Curam Haven Admin ") unless SOURCE_KINDS.include?source
+    end
+  end
+
   def set_premium_credit_strategy
     self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
   end
 
   def set_determined_at
-    if tax_household && tax_household.submitted_at.present?
-      self.determined_at ||= tax_household.submitted_at
+    if application && application.submitted_at.present?
+      self.determined_at ||= application.submitted_at
+    else
+      if tax_household && tax_household.submitted_at.present?
+        self.determined_at ||= tax_household.submitted_at
+      end
     end
   end
-
 end

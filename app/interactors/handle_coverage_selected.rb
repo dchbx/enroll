@@ -6,7 +6,7 @@ class HandleCoverageSelected
     enrollment = context.hbx_enrollment
     if !enrollment.is_shop?
       enrollment.hbx_enrollment_members.each do |hem|
-        hem.ivl_coverage_selected
+        hem.trigger_hub_call
       end
       notify(HbxEnrollment::ENROLLMENT_CREATED_EVENT_NAME, {policy_id: enrollment.hbx_id})
       enrollment.update_attributes!(:published_to_bus_at => Time.now)

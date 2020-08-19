@@ -104,6 +104,14 @@ FactoryGirl.define do
       effective_on {Date.new(active_year,5,1)}
     end
 
+    trait :older_effective_date do 
+      effective_on {Date.new(active_year,4,1)}
+    end
+
+    trait :newer_effective_date do 
+      effective_on {Date.new(active_year,5,1)}
+    end
+
     factory :individual_qhp_enrollment,          traits: [:individual_unassisted, :health_plan]
     factory :individual_qdp_enrollment,          traits: [:individual_unassisted, :dental_plan]
     factory :individual_assisted_qhp_enrollment, traits: [:individual_assisted, :health_plan]

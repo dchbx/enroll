@@ -110,7 +110,6 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
       assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       assign(:hbx_enrollment, hbx_enrollment)
-
     end
 
     it "should display metal level filters if plan_option_kind is single_carrier" do
@@ -153,7 +152,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
       assign(:market_kind, 'individual')
-      assign(:tax_household, true)
+      assign(:tax_households, true)
       assign(:coverage_kind, "health")
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
@@ -208,7 +207,7 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:max_deductible, 998)
       assign(:max_aptc, 330)
       assign(:market_kind, 'shop')
-      assign(:tax_household, true)
+      assign(:tax_households, true)
       assign(:benefit_group, benefit_group)
       assign(:selected_aptc_pct, 0.85)
       assign(:elected_aptc, 280.50)
@@ -236,9 +235,8 @@ RSpec.describe "insured/_plan_filters.html.erb" do
       assign(:carriers, Array.new)
       assign(:market_kind, 'shop')
       assign(:max_total_employee_cost, 1000)
-      assign(:hbx_enrollment, hbx_enrollment)
       assign(:benefit_group, benefit_group)
-      assign(:tax_household, nil)
+      assign(:tax_households, nil)
       assign(:dc_individual_checkbook_url, "http://dc_individual_checkbook_url/")
       assign(:dc_individual_checkbook_previous_year, "http://dc_individual_checkbook_url/")
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_carrier")

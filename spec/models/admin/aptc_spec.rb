@@ -6,7 +6,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
   # Household
   let(:family)       { FactoryGirl.create(:family, :with_primary_family_member) }
   let(:household) {FactoryGirl.create(:household, family: family)}
-  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
+  let(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil, is_eligibility_determined: true)}
   let(:sample_max_aptc_1) {511.78}
   let(:sample_max_aptc_2) {612.33}
   let(:sample_csr_percent_1) {87}
@@ -26,7 +26,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
 
     before(:each) do
       allow(family).to receive(:active_household).and_return household
-      allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(household).to receive(:latest_active_tax_households_with_year).and_return [tax_household]
       allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
       allow(eligibility_determination_2).to receive(:tax_household).and_return tax_household
       allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1, eligibility_determination_2]
@@ -108,7 +108,8 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
 
     it "should create a new enrollment with a new hbx_id" do
       allow(family).to receive(:active_household).and_return household
-      allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(household).to receive(:latest_active_tax_households_with_year).and_return [tax_household]
+      allow(household).to receive(:latest_active_tax_households).and_return [tax_household]
       allow(tax_household).to receive(:latest_eligibility_determination).and_return eligibility_determination_1
       enrollment_count = family.active_household.hbx_enrollments.count
       last_enrollment = family.active_household.hbx_enrollments.last
@@ -144,11 +145,13 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
       end
 
       it "should return array with next year added as it is under_open_enrollment" do
+        tax_household10.update_attributes!(effective_starting_on: past_date )
         allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
         expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year, past_date.year + 1 ]
       end
 
       it "should return array without next year added as it is not under_open_enrollment" do
+        tax_household10.update_attributes!(effective_starting_on: past_date )
         allow(HbxProfile).to receive(:current_hbx).and_return(false)
         expect(Admin::Aptc.years_with_tax_household(family10)).to eq [past_date.year]
       end

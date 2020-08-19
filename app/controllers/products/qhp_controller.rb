@@ -22,13 +22,14 @@ class Products::QhpController < ApplicationController
         qhp[:total_employee_cost] =  @benefit_group.decorated_plan(qhp.plan, @hbx_enrollment, @reference_plan).total_employee_cost
       end
     else
-      tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
+      person = current_user.person
+      tax_households = get_shopping_tax_households_from_person(person, @hbx_enrollment.effective_on.year)
       @plans = @hbx_enrollment.decorated_elected_plans(@coverage_kind)
       @qhps = find_qhp_cost_share_variances
 
       @qhps = @qhps.each do |qhp|
         qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.plan, @hbx_enrollment, session[:elected_aptc], tax_households).total_employee_cost
       end
 
     end

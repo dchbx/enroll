@@ -3,6 +3,9 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 
 } else {
   $("#new_employee_dependent_form").replaceWith("<%= escape_javascript(render 'resident_dependent', dependent: @dependent,person: @person) %>");
+  <% if @missing_relationships.present? %>
+    $("#btn-continue").attr('href', '<%= @missing_relation_url %>' );
+  <% end %>
 }
 
 <% if @created %>

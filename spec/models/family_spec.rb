@@ -67,7 +67,7 @@ describe Family, type: :model, dbclean: :after_each do
   let(:spouse)  { FactoryGirl.create(:person)}
   let(:person) do
     p = FactoryGirl.build(:person)
-    p.person_relationships.build(relative: spouse, kind: "spouse")
+    p.person_relationships.build(predecessor_id: p.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
     p.save
     p
   end
@@ -163,14 +163,15 @@ describe Family, type: :model, dbclean: :after_each do
               family.valid?
             end
 
-            it "should not be valid" do
-              expect(family.errors[:family_members].any?).to be_truthy
-            end
-
             context "and the non-related person is a responsible party" do
               it "to be added for IVL market"
             end
           end
+
+          #old_code
+          # it "should not be valid" do
+          #   expect(family.errors[:family_members].any?).to be_truthy
+          # end
 
           context "and one of the same family members is added again" do
             before do
@@ -186,7 +187,7 @@ describe Family, type: :model, dbclean: :after_each do
           context "and a second primary applicant is added" do
             let(:bob) do
               p = FactoryGirl.create(:person, first_name: "Bob")
-              person.person_relationships << PersonRelationship.new(relative: p, kind: "child")
+              person.person_relationships << PersonRelationship.new(relative: p, kind: "parent")
               p
             end
 
@@ -221,7 +222,7 @@ describe Family, type: :model, dbclean: :after_each do
               let(:second_family_member_person) { FamilyMember.new(person: person) }
 
               before do
-                spouse.person_relationships.build(:relative_id => person.id, :kind => "spouse")
+                spouse.person_relationships.build(predecessor_id: spouse.id, :successor_id => person.id, :kind => "spouse", family_id: second_family.id)
                 second_family.family_members = [second_family_member_person, second_family_member_spouse]
               end
 
@@ -529,21 +530,45 @@ end
 
 describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :after_each do
 
+  let(:family1) { FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:family2) {
+    f = FactoryGirl.create(:family, :with_primary_family_member)
+    s_mem = f.add_family_member(spouse)
+    spouse.build_relationship(f.primary_applicant.person, "spouse", f.id)
+    f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
+    f.active_household.add_household_coverage_member(s_mem)
+    c_mem = f.add_family_member(child)
+    child.build_relationship(f.primary_applicant.person, "child", f.id)
+    f.primary_applicant.person.build_relationship(child, "parent", f.id)
+    f.active_household.add_household_coverage_member(c_mem)
+    f.save
+    f
+  }
+  let(:family3) {
+    f = FactoryGirl.create(:family, :with_primary_family_member)
+    s_mem = f.add_family_member(spouse)
+    spouse.build_relationship(f.primary_applicant.person, "spouse", f.id)
+    f.primary_applicant.person.build_relationship(spouse, "spouse", f.id)
+    f.active_household.add_household_coverage_member(s_mem)
+    c_mem = f.add_family_member(child)
+    child.build_relationship(f.primary_applicant.person, "child", f.id)
+    f.primary_applicant.person.build_relationship(child, "parent", f.id)
+    f.active_household.add_household_coverage_member(c_mem)
+    g_mem = f.add_family_member(grandpa)
+    grandpa.build_relationship(f.primary_applicant.person, "parent", f.id)
+    f.primary_applicant.person.build_relationship(grandpa, "child", f.id)
+    f.active_household.add_household_coverage_member(g_mem)
+    f.save
+    f
+  }
   let(:submitted_at)  { DateTime.current}
   let(:spouse)        { FactoryGirl.create(:person, last_name: "richards", first_name: "denise") }
   let(:child)         { FactoryGirl.create(:person, last_name: "sheen", first_name: "sam") }
   let(:grandpa)       { FactoryGirl.create(:person, last_name: "sheen", first_name: "martin") }
 
-  let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
-                                 PersonRelationship.new(relative: child, kind: "child")] }
-  let(:family_relationships)  {  married_relationships <<
-      PersonRelationship.new(relative: grandpa, kind: "grandparent") }
-
-  let(:single_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "tigerblood") }
-  let(:married_dude)  { FactoryGirl.create(:person, last_name: "sheen", first_name: "chuck",
-                                           person_relationships: married_relationships ) }
-  let(:family_dude)   { FactoryGirl.create(:person, last_name: "sheen", first_name: "charles",
-                                           person_relationships: family_relationships ) }
+  let(:single_dude)   { family1.primary_applicant.person }
+  let(:married_dude)  { family2.primary_applicant.person }
+  let(:family_dude)   { family3.primary_applicant.person }
 
   let(:single_employee_role)    { FactoryGirl.create(:employee_role, person: single_dude) }
   let(:married_employee_role)   { FactoryGirl.create(:employee_role, person: married_dude) }
@@ -585,7 +610,6 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
       it "and all family_members are members of this coverage_household" do
         expect(married_family.family_members.size).to eq 3
         expect(married_family.households.first.coverage_households.first.coverage_household_members.size).to eq 3
-
         expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[0]._id)).not_to be_nil
         expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[1]._id)).not_to be_nil
         expect(married_family.households.first.coverage_households.first.coverage_household_members.where(family_member_id: married_family.family_members[2]._id)).not_to be_nil
@@ -618,7 +642,6 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
 
     it "should return the family for this employee_role"
   end
-
 end
 
 describe Family, "given an inactive member" ,:dbclean => :after_all do
@@ -674,8 +697,8 @@ describe Family, "with a primary applicant", :dbclean => :after_all do
     }
 
     before(:each) do
-      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse")
-      allow(primary_applicant).to receive(:find_relationship_with).with(dependent).and_return(nil)
+      allow(primary_applicant).to receive(:ensure_relationship_with).with(dependent, "spouse", subject.id)
+      allow(primary_applicant).to receive(:find_relationship_with).with(dependent, subject.id).and_return(nil)
     end
 
     it "should relate the person and create the family member" do
@@ -1157,8 +1180,8 @@ describe Family, "with 2 households a person and 2 extended family members", :db
   before(:each) do
     f_id = family.id
     family.add_family_member(primary, is_primary_applicant: true)
-    family.relate_new_member(family_member_person_1, "unknown")
-    family.relate_new_member(family_member_person_2, "unknown")
+    family.relate_new_member(family_member_person_1, "unrelated")
+    family.relate_new_member(family_member_person_2, "unrelated")
     family.save!
   end
 
@@ -1353,6 +1376,157 @@ describe Family, ".begin_coverage_for_ivl_enrollments", dbclean: :after_each do
   end
 end
 
+describe Family, "given a primary applicant and 2 dependents with unrelated relationships", dbclean: :after_each do
+  let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:mike_person) {test_family.primary_applicant.person}
+  let(:carol) {FactoryGirl.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+  let(:mary) {FactoryGirl.create(:family_member, :family => test_family, is_primary_applicant: false).person}
+
+  before do
+    carol.add_relationship(mike_person, "unrelated", test_family.id)
+    mike_person.add_relationship(carol, "unrelated", test_family.id)
+    mary.add_relationship(mike_person, "unrelated", test_family.id)
+    mike_person.add_relationship(mary, "unrelated", test_family.id)
+  end
+
+  it "should have some defined relationships" do
+    matrix = test_family.build_relationship_matrix
+    relationships = mike_person.person_relationships
+    missing_rel = test_family.find_missing_relationships(matrix)
+    expect(matrix.count).to eq 3
+    expect(relationships.size).to eq 2
+    expect(missing_rel.count).to eq 1
+  end
+
+  it "should not have wrong number defined relationships" do
+    matrix = test_family.build_relationship_matrix
+    relationships = mike_person.person_relationships
+    missing_rel = test_family.find_missing_relationships(matrix)
+    expect(matrix.count).not_to eq 13
+    expect(relationships.count).not_to eq 10
+    expect(missing_rel.count).not_to eq 0
+  end
+
+  it "should find correct relation" do
+    relation = test_family.find_existing_relationship(mike_person.id, carol.id, test_family.id)
+    expect(relation).to eq "unrelated"
+  end
+
+  it "should not find wrong relation" do
+    relation = test_family.find_existing_relationship(mike_person.id, carol.id, test_family.id)
+    expect(relation).not_to eq "spouse"
+  end
+
+  it "should return relationship kind if the relationship exists" do
+    expect(test_family.find_existing_relationship(carol.id, mike_person.id, test_family.id)).to eq "unrelated"
+  end
+
+  it "should not return any relationship kind if the relationship doesnot exists" do
+    expect(test_family.find_existing_relationship(carol.id, mike_person.id, test_family.id)).not_to eq "spouse"
+  end
+end
+
+describe Family, "given a primary applicant and 2 dependents with valid relationships", dbclean: :after_each do
+  let(:test_family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:mike) {test_family.primary_applicant.person}
+  let(:carol_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:mary_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:jan_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:greg_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+  let(:cindy_person) {FactoryGirl.create(:family_member, :family => test_family).person}
+
+
+  before do
+    carol_person.add_relationship(mike, "spouse", test_family.id)
+    mike.add_relationship(carol_person, "spouse", test_family.id)
+    mary_person.add_relationship(mike, "child", test_family.id)
+    mike.add_relationship(mary_person, "parent", test_family.id)
+    jan_person.add_relationship(mike, "unrelated", test_family.id)
+    mike.add_relationship(jan_person, "unrelated", test_family.id)
+    greg_person.add_relationship(mike, "child", test_family.id)
+    mike.add_relationship(greg_person, "parent", test_family.id)
+    cindy_person.add_relationship(mike, "parent", test_family.id)
+    mike.add_relationship(cindy_person, "child", test_family.id)
+  end
+
+  it "should have some defined raltionships" do
+    matrix = test_family.build_relationship_matrix
+    missing_rel = test_family.find_missing_relationships(matrix)
+    relationships = mike.person_relationships
+    expect(matrix.count).to eq 6
+    expect(relationships.size).to eq 5
+    expect(missing_rel.count).to eq 10
+  end
+
+  it "should not have wrong number defined raltionships" do
+    matrix = test_family.build_relationship_matrix
+    missing_rel = test_family.find_missing_relationships(matrix)
+    relationships = mike.person_relationships
+    expect(matrix.count).not_to eq 13
+    expect(relationships.count).not_to eq 10
+    expect(missing_rel.count).not_to eq 19
+  end
+
+  it "should update relationships based on rules" do
+    matrix = test_family.build_relationship_matrix
+    silbling_rule_relation = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
+    expect(silbling_rule_relation).to eq "sibling"
+
+    grandparent_rule_relation = test_family.find_existing_relationship(cindy_person.id, mary_person.id, test_family.id)
+    expect(grandparent_rule_relation).to eq "grandparent"
+
+    jan_person.add_relationship(carol_person, "child", test_family.id)
+    carol_person.add_relationship(jan_person, "parent", test_family.id)
+    mary_person.add_relationship(carol_person, "child", test_family.id)
+    carol_person.add_relationship(mary_person, "parent", test_family.id)
+    test_family.build_relationship_matrix
+    spouse_rule_relation = test_family.find_existing_relationship(greg_person.id, jan_person.id, test_family.id)
+    expect(spouse_rule_relation).to eq "sibling"
+
+    relation2 = test_family.find_existing_relationship(greg_person.id, mary_person.id, test_family.id)
+    expect(relation2).to eq "sibling"
+    relation3 = test_family.find_existing_relationship(mary_person.id, jan_person.id, test_family.id)
+    expect(relation3).to eq "sibling"
+  end
+
+  it "should not find wrong relation" do
+    relation = test_family.find_existing_relationship(mike.id, carol_person.id, test_family.id)
+    expect(relation).not_to eq "unrelated"
+  end
+end
+
+describe Family, "#application_applicable_year" do
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
+  let(:current_year) { Date.new(oe_start_year, 10, 10) }
+  let(:future_year) { Date.new(oe_start_year + 1 , 10, 10) }
+  let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+  let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
+  let(:current_hbx_not_under_open_enrollment) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: false)}
+
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+
+  it "returns future year if open enrollment start year is same as current year" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(current_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+    expect(family.application_applicable_year).to eq(future_year.year)
+  end
+
+  it "returns TimeKeeper year when next year added and it is under open enrollment" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(future_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+    expect(family.application_applicable_year).to eq(future_year.year)
+  end
+
+  it "returns current year if not under open enrollment" do
+    allow(TimeKeeper).to receive(:date_of_record).and_return(current_year)
+    allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_not_under_open_enrollment)
+    expect(family.application_applicable_year).to eq(current_year.year)
+  end
+end
+
 describe Family, "#check_dep_consumer_role", dbclean: :after_each do
   let(:person_consumer) { FactoryGirl.create(:person, :with_consumer_role) }
   let(:family) { FactoryGirl.create(:family, :with_primary_family_member, :person => person_consumer) }
@@ -1363,6 +1537,63 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
     allow(family).to receive(:dependents).and_return([family_member_dependent])
     family.send(:create_dep_consumer_role)
     expect(family.dependents.first.person.consumer_role?).to be_truthy
+  end
+end
+
+describe Family, "#has_financial_assistance_verification", dbclean: :after_each do
+  let(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+  let(:benefit_sponsorship) {double("benefit sponsorship", earliest_effective_date: TimeKeeper.date_of_record.beginning_of_year)}
+  let(:current_hbx) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: false)}
+  let(:current_hbx_under_open_enrollment) {double("current hbx", benefit_sponsorship: benefit_sponsorship, under_open_enrollment?: true)}
+  before :each do
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
+  end
+
+  context "when there is at least one application in a 'submitted' state for the current year" do
+    let!(:submitted_application) { FactoryGirl.create(:application, family: family, aasm_state: "submitted", assistance_year: TimeKeeper.date_of_record.year) }
+    let!(:determined_application) { FactoryGirl.create(:application, family: family, aasm_state: "determined", assistance_year: TimeKeeper.date_of_record.year) }
+    let!(:draft_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year) }
+
+    it "should return true if not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      allow(family).to receive(:application_applicable_year).and_return (TimeKeeper.date_of_record.year)
+      expect(family.has_financial_assistance_verification?).to be_truthy
+    end
+
+    it "should return false if under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      allow(family).to receive(:application_applicable_year).and_return (TimeKeeper.date_of_record.year+1)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+  end
+
+  context "when there is at least one application in a 'submitted' state for the next year" do
+    let!(:submitted_application_for_next_year) { FactoryGirl.create(:application, family: family, aasm_state: "submitted", assistance_year: TimeKeeper.date_of_record.year + 1) }
+
+    it "should return true under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      allow(family).to receive(:application_applicable_year).and_return (TimeKeeper.date_of_record.year+1)
+      expect(family.has_financial_assistance_verification?).to be_truthy
+    end
+
+    it "should return false when not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+  end
+
+  context "when there is no application in a 'submitted' state" do
+    let!(:draft_application) { FactoryGirl.create(:application, family: family, aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year) }
+
+    it "should return false when not under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
+
+    it "should return false when under open enrollment" do
+      allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx_under_open_enrollment)
+      expect(family.has_financial_assistance_verification?).to be_falsey
+    end
   end
 end
 

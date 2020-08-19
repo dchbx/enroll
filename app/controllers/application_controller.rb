@@ -288,6 +288,11 @@ class ApplicationController < ActionController::Base
       end
     end
 
+    def save_faa_bookmark person, url
+      return if person.consumer_role.blank?
+      person.consumer_role.update_attribute(:bookmark_url, url) if person.consumer_role.identity_verified?
+    end
+
     def set_bookmark_url(url=nil)
       set_current_person
       bookmark_url = url || request.original_url

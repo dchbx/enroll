@@ -266,7 +266,8 @@ module Insured::FamiliesHelper
     end
   end
 
-  def build_consumer_role(person, family)
+  #changing name from build_consumer_role to build_consumer to avoid conflict
+  def build_consumer(person, family)
     if family.primary_applicant.person == person
       person.build_consumer_role({:is_applicant => true})
       person.save!

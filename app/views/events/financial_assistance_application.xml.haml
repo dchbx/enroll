@@ -1,0 +1,38 @@
+!!! XML
+%financial_assistance_application{ :xmlns => "http://openhbx.org/api/terms/1.0"}
+  %id
+    %id= financial_assistance_application.hbx_id
+  - unless financial_assistance_application.external_id.blank?
+    %haven_app_id= financial_assistance_application.external_id
+  - unless financial_assistance_application.integrated_case_id.blank?
+    %e_case_id= financial_assistance_application.integrated_case_id
+  %applicant_type= "urn:openhbx:terms:v1:financial_assistance_application_applicant##{financial_assistance_application.applicant_kind.gsub(" ","_").gsub("/","_")}"
+  %request_type= "urn:openhbx:terms:v1:financial_assistance_application_request##{financial_assistance_application.request_kind}"
+  %motivation_type= "urn:openhbx:terms:v1:financial_assistance_application_motivation##{financial_assistance_application.motivation_kind}"
+  %status= "urn:openhbx:terms:v1:financial_assistance_application_status##{financial_assistance_application.aasm_state}"
+  %submitted_at= financial_assistance_application.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')
+  %effective_date= financial_assistance_application.effective_date.strftime('%Y-%m-%dT%H:%M:%S')
+  %assistance_year= financial_assistance_application.assistance_year
+  %is_renewal_authorized= financial_assistance_application.is_renewal_authorized
+  - unless financial_assistance_application.renewal_base_year.blank?
+    %renewal_base_year= financial_assistance_application.renewal_base_year
+  - unless financial_assistance_application.years_to_renew.blank?
+    %years_to_renew= financial_assistance_application.years_to_renew
+  %us_state= financial_assistance_application.us_state.upcase
+  = render :partial => "events/financial_assistance/benchmark_plan", :locals=> {:financial_assistance_application => financial_assistance_application}
+  %has_accepted_medicaid_terms= financial_assistance_application.medicaid_terms
+  %has_accepted_medicaid_insurance_collection_terms= financial_assistance_application.medicaid_insurance_collection_terms
+  - unless financial_assistance_application.attestation_terms.nil?
+    %has_accepted_attestation_terms= financial_assistance_application.attestation_terms
+  %has_accepted_submission_terms= financial_assistance_application.submission_terms
+  %has_accepted_parent_living_out_of_home_terms= financial_assistance_application.parent_living_out_of_home_terms
+  %has_accepted_report_change_terms= financial_assistance_application.report_change_terms
+  - unless financial_assistance_application.request_full_determination.nil?
+    %request_full_determination= financial_assistance_application.request_full_determination
+  %assistance_tax_households
+    = render :partial => "events/financial_assistance/assistance_tax_household", :collection => financial_assistance_application.tax_households, as: :assistance_tax_household, :locals=> {:financial_assistance_application => financial_assistance_application}
+
+
+
+
+

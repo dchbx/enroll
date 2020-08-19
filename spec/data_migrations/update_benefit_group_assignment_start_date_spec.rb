@@ -30,7 +30,6 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
       allow(census_employee).to receive(:benefit_group_assignments).and_return benefit_group_assignments
       allow(benefit_group_assignment).to receive(:benefit_group).and_return(benefit_group)
       allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group).and_return(benefit_group)
-
     end
 
 

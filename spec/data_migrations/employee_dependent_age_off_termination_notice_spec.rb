@@ -27,8 +27,8 @@ describe EmployeeDependentAgeOffTerminationNotice, dbclean: :after_each do
                   family = FactoryGirl.build(:family, :with_primary_family_member, person: person)
                   FactoryGirl.create(:family_member, family: family, person: person2)
                   FactoryGirl.create(:family_member, family: family, person: person3)
-                  person.person_relationships.create(relative_id: person2.id, kind: "child")
-                  person.person_relationships.create(relative_id: person3.id, kind: "child")
+                  person.person_relationships.create(predecessor_id: person.id, successor_id: person2.id, family_id: family.id, relative_id: person2.id, kind: "child")
+                  person.person_relationships.create(predecessor_id: person.id, successor_id: person3.id, family_id: family.id, relative_id: person3.id, kind: "child")
                   person.save!
                   family.save!
                   family

@@ -220,8 +220,7 @@ padding: 2.5%;
   position: relative;
   display: block;
   text-align: right;
-  width: 65%;
-  float: right;
+  width: 100%;
 }
 
 .wizard.vertical > .actions

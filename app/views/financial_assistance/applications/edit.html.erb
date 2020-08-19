@@ -1,0 +1,30 @@
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+  <div class='col-md-9'>
+    <% content_for :primary_member_fa do %>
+      <div class="row row-form-wrapper no-buffer faa-row">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+          <%= render "financial_assistance_row", applicant: @application.primary_applicant %>
+        </div>
+      </div>
+    <% end %>
+
+    <% @application.active_applicants.each do |applicant| %>
+      <% content_for "person_#{applicant.person.id}" do %>
+        <div class="row row-form-wrapper no-buffer">
+          <%= render "financial_assistance_row", applicant: applicant %>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%= render partial: 'insured/family_members/family_members' %>
+  </div>
+
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: @application.ready_for_attestation? ? other_questions_financial_assistance_application_applicant_path(@application, @application.active_applicants.last) : application_checklist_financial_assistance_applications_path,
+      next_url: @application.active_applicants.count > 1 ? insured_family_relationships_path(@person.consumer_role.id) : find_next_application_path(@application),
+      disabled: @application.incomplete_applicants? ? true : false
+    } %>
+  </div>
+</div>
+

@@ -36,8 +36,14 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     let(:child)  { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 7.years, ssn: '555532230') }
     let(:child1) { FactoryGirl.create(:person, dob: TimeKeeper.date_of_record - 2.years, ssn: '555532229') }
 
-    let!(:person) { FactoryGirl.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on, person_relationships: family_relationships) }
-    let!(:family) { FactoryGirl.create(:family, :with_family_members, person: person, people: family_members) }
+    let!(:person) { FactoryGirl.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on) }
+    let!(:family) { 
+      family = FactoryGirl.build(:family, :with_family_members, person: person, people: family_members)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child.id, kind: "parent", family_id: family.id)
+      person.save
+      family
+    }
 
     let!(:hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: benefit_group.id, benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, effective_on: benefit_group.start_on, household: family.active_household, active_year: benefit_group.start_on.year)}
     let!(:renewing_hbx_enrollment) { FactoryGirl.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year)}
@@ -96,10 +102,10 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     end
 
     context "and child dropped from employee's enrollment" do
-      let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, spouse, child] }
 
       before do
+        family.save
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 
@@ -138,10 +144,10 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     end
 
     context "and spouse added to employee's enrollment" do
-      let(:family_relationships) { [PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, child] }
 
       before do
+        family.save
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 
@@ -183,10 +189,10 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
 
     context "and child dropped and new child added to employee's enrollment" do
-      let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, spouse, child] }
 
       before do
+        family.save
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end
 

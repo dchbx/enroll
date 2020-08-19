@@ -46,6 +46,10 @@ set :assets_roles, [:web, :app]
 
 namespace :assets do
   desc "Kill all the assets"
+  # before :refresh do
+  #   execute :rake, "assets:clobber"
+  # end
+
   task :refresh do
     on roles(:web) do
 #      execute "rm -rf #{shared_path}/public/assets/*"

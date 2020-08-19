@@ -16,7 +16,7 @@ module PortalHeaderHelper
       else
         link_to "#{image_tag 'icons/icon-individual.png'} &nbsp; I'm an #{controller == 'employer_profiles' ? 'Employer' : 'Employee'}".html_safe, family_account_path, class: "portal"
       end
-    elsif controller_path.include?("insured") && current_user.try(:has_consumer_role?)
+    elsif ((controller_path.include?("insured") || controller_path.include?("financial_assistance")) && current_user.try(:has_consumer_role?))
       if current_user.identity_verified_date.present?
         link_to "#{image_tag 'icons/icon-family.png'} &nbsp; Individual and Family".html_safe, main_app.family_account_path, class: "portal"
       else

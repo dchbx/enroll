@@ -1,0 +1,15 @@
+<div id="faa_flow_info">
+  <div class="coverage-table">
+    <div class="initial-info notification-error-wrapper">
+      <div class="row no-buffer">
+        <div class="col-md-8">
+          <strong>You have added/removed/edited a family member on your profile. <br>Please update your financial
+            assistances application.</strong>
+        </div>
+        <% if @family.application_in_progress.present? %>
+            <%= link_to 'Continue', edit_financial_assistance_application_path(@family.application_in_progress.id), class: 'btn btn-default', id: 'faa_continue_button' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

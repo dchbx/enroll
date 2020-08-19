@@ -3,7 +3,7 @@ require Rails.root.join('lib', 'tasks', 'hbx_import', 'plan_cross_walk_list_pars
 namespace :xml do
   desc "Import plan crosswalk"
   task :plan_cross_walk, [:files] => :environment do |task, args|
-    files = args[:files] || Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk/2019", "**", "*.xml"))
+    files = args[:files] || Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", Settings.aca.state_abbreviation.downcase, "cross_walk", "**", "*.xml"))
     files.each do |file_path|
       @file_path = file_path
       @current_year = file_path.split("/")[-2].to_i # Retrieve the year of the master xml file you are uploading

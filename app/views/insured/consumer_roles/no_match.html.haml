@@ -3,14 +3,17 @@
 .container
   #new_person_wrapper
     .row
+      .col-lg-2.col-md-2.col-sm-2.col-xs-12
+        = render  partial: 'shared/left_nav.html.erb'
       = form_for @person, { :as => :person, :url => match_insured_consumer_role_index_path, :method => :post } do |f|
-        .col-lg-7.col-md-7.col-sm-8.col-xs-12
+        .col-lg-10.col-md-10.col-sm-10.col-xs-12.row
+          .col-lg-9.col-md-9.col-sm-9.col-xs-12
           %h3
             = l10n("personal_information")
-          = render 'insured/consumer_roles/remote_search_form', f: f
-          #person_search_results
-            = render 'no_match'
-          %br
+            = render 'insured/consumer_roles/remote_search_form', f: f
+            #person_search_results
+              = render 'no_match'
+            %br
 
-        .col-lg-3.col-md-3.col-sm-3.col-xs-12.col-md-offset-2.col-sm-offset-1.right-section
+        .col-lg-3.col-md-3.col-sm-3.col-xs-12
           = render  partial: 'shared/individual_progress', locals: {step: '1', search_page: true}

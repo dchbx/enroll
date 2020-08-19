@@ -4,21 +4,29 @@
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-4 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("first_name").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.first_name %></span>
+          <label class="static_label label-floatlabel">NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.full_name %></span>
         </div>
       </div>
-      <div class="col-md-4 col-sm-4 no-pd">
+      <div class="col-md-2 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("middle_name").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.middle_name %></span>
+          <label class="static_label label-floatlabel">AGE</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.person.age_on(Date.today) %></span>
         </div>
       </div>
 
-      <div class="col-md-4 col-sm-4 no-pd">
+      <div class="col-md-3 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("last_name").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.last_name %></span>
+          <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
+          
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel"> <%= dependent.relationship.try(:humanize) %> </span>
           <div class="text-right">
             <%=
               link_to edit_insured_family_member_path(dependent), remote: true, class: 'close close-2' do
@@ -29,101 +37,7 @@
         </div>
       </div>
     </div>
-
-    <div class="row row-form-wrapper no-buffer">
-      <div class="col-md-3 col-sm-3 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("date_of_birth").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.dob %></span>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-3 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("social_security").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= "#{dependent.ssn.try(:[], 0..2)}-#{dependent.ssn.try(:[], 3..4)}-#{dependent.ssn.try(:[], 5..9)}" %></span>
-        </div>
-      </div>
-
-      <div class="col-md-3 col-sm-3 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.relationship.try(:humanize) %></span>
-        </div>
-      </div>
-      <div class="col-md-3 col-sm-3 no-pd">
-        <div class="form-group form-group-lg">
-          <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
-        </div>
-      </div>
-    </div>
-
-    <% addresses = get_address_from_dependent(dependent) %>
-    <% addresses.each do |address| %>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-2 col-sm-2 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("kind").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.kind.capitalize %></span>
-          </div>
-        </div>
-        <div class="col-md-5 col-sm-5 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("address_1").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_1 %></span>
-          </div>
-        </div>
-        <div class="col-md-5 col-sm-5 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("address_2").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.address_2 %></span>
-          </div>
-        </div>
-      </div>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-4 col-sm-4 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("city").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.city %></span>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-4 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("state").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.state %></span>
-          </div>
-        </div>
-        <div class="col-md-4 col-sm-4 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("zip").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= address.zip %></span>
-          </div>
-        </div>
-      </div>
-    <% end %>
-    <% if (@prev_url_include_intractive_identity || @prev_url_include_consumer_role_id) && !@employee_role %>
-      <div class="row row-form-wrapper no-buffer">
-        <div class="col-md-6 col-sm-6 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("race_or_ethnicity").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= parse_ethnicity(dependent.try(:ethnicity)) %></span>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-3 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("language").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.language_code.try(:humanize) %></span>
-          </div>
-        </div>
-        <div class="col-md-3 col-sm-3 no-pd">
-          <div class="form-group form-group-lg">
-            <label class="static_label label-floatlabel"><%= l10n("is_incarcerated").to_s.upcase %></label>
-            <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.is_incarcerated == true ? l10n("yes") : l10n("no") %></span>
-          </div>
-        </div>
-      </div>
-    <% end %>
+    <%= yield "person_#{dependent.person.id}" %>
 
     <div class="clearfix"></div>
   </div>

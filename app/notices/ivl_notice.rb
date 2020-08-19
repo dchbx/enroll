@@ -121,7 +121,7 @@ class IvlNotice < Notice
   def attach_non_discrimination
     join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_non_discrimination.pdf')]
   end
-
+  
   def join_pdfs_with_path(pdfs, path = nil)
     pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
     pdf << CombinePDF.load(pdfs[1])

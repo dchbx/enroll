@@ -1,0 +1,15 @@
+<% content_for :navigation do %>
+<%= render 'navigation' %>
+<% end %>
+
+<div class="my-account-page">
+  <h1>Manage Family</h1>
+</div>
+  <div class="content-bottom">
+    <%= render "profile_submenu", :active_subtab => "family-matrix-tab" %>
+    <div id="profile-content">
+<div id="family-matrix">
+<%= render partial: '/insured/family_relationships/form', locals: {form_remote: true, all_relationships: @all_relationships, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds, family: @family, redirect_url: ''}%>
+</div>
+</div>
+</div>

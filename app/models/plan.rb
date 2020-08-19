@@ -494,14 +494,53 @@ class Plan
       REFERENCE_PLAN_METAL_LEVELS.map{|k| [k.humanize, k]}
     end
 
-    def individual_plans(coverage_kind:, active_year:, tax_household:, hbx_enrollment:)
+    def individual_plans(coverage_kind:, active_year:, tax_households:, hbx_enrollment:)
+      family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) if hbx_enrollment.present?
       case coverage_kind
       when 'dental'
         Plan.individual_dental_by_active_year(active_year).with_premium_tables
       when 'health'
-        shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
-        csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
-        csr_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind rescue nil
+        csr_kinds = []
+        csr_kind = nil
+
+        if tax_households.present?
+          if tax_households.first.family.application_in_progress.present?
+            csr_kinds << "csr_100"
+          else
+            if family_member_ids.present?
+              app_ids = tax_households.map(&:application_id)
+              if !app_ids.include?(nil)
+                tax_households.each do |tax_household|
+                  tax_household.active_applicants.where(:family_member_id.in => family_member_ids).each do |applicant|
+                    if applicant.non_ia_eligible?
+                      csr_kinds << "csr_100"
+                    else
+                      csr_kinds << tax_household.current_csr_eligibility_kind
+                    end
+                  end
+                end
+              else
+                tax_households.each do |tax_household|
+                  tax_household.tax_household_members.where(:applicant_id.in => family_member_ids).each do |tax_household_member|
+                    if tax_household_member.non_ia_eligible?
+                      csr_kinds << "csr_100"
+                    else
+                      csr_kinds << tax_household.current_csr_eligibility_kind
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+
+        #Selects the right csr_kind from the array of csr_kinds.
+        csr_kind = "csr_0" if csr_kinds.include? "csr_0"
+        csr_kind = "csr_73" if csr_kinds.include? "csr_73"
+        csr_kind = "csr_87" if csr_kinds.include? "csr_87"
+        csr_kind = "csr_94" if csr_kinds.include? "csr_94"
+        csr_kind = "csr_100" if csr_kinds.include? "csr_100"
+
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

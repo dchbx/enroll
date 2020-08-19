@@ -9,6 +9,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
+  before_filter :load_support_texts, only: [:personal, :manage_family]
 
   def home
     authorize @family, :show?
@@ -49,6 +50,21 @@ class Insured::FamiliesController < FamiliesController
     # @employee_role = @person.employee_roles.first
     @tab = params['tab']
 
+
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def family_relationships_matrix
+    set_bookmark_url
+    @family_members = @family.active_family_members
+    @people = @family.family_members.where(is_active: true).map(&:person)
+    @matrix = @family.build_relationship_matrix
+    @missing_relationships = @family.find_missing_relationships(@matrix)
+    @relationship_kinds = PersonRelationship::Relationships_UI
+    @all_relationships = @family.find_all_relationships(@matrix)
+    @tab = params['tab']
 
     respond_to do |format|
       format.html
@@ -104,14 +120,16 @@ class Insured::FamiliesController < FamiliesController
 
   def personal
     @tab = params['tab']
-
     @family_members = @family.active_family_members
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role) if @person.is_consumer_role_active?
     @person.consumer_role.build_nested_models_for_person if @person.is_consumer_role_active?
     @person.resident_role.build_nested_models_for_person if @person.is_resident_role_active?
     @resident = @person.is_resident_role_active?
-    respond_to do |format|
-      format.html
+    if @tab.present?
+      respond_to do |format|
+        format.html
+        format.js
+      end
     end
   end
 
@@ -305,6 +323,10 @@ class Insured::FamiliesController < FamiliesController
   def updateable?
     authorize Family, :updateable?
   end
+  
+  def load_support_texts
+    @support_texts = YAML.load_file("app/views/shared/support_text_household.yml")
+  end
 
   def check_employee_role
     employee_role_id = (params[:employee_id].present? && params[:employee_id].include?('employee_role')) ? params[:employee_id].gsub("employee_role_", "") : nil
@@ -372,7 +394,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.is_consumer_role_active?
-      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path

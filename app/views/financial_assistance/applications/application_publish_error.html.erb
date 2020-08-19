@@ -1,0 +1,19 @@
+<div class="col-md-7">
+  <div class="">
+    <p class="alert alert-error hide"></p>
+    <h1 class="darkblue">Error Submitting Application</h1>
+    <h4 class="darkblue">[Additional Text Here]</h4>
+  </div>
+</div>
+<!--- <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+  <%find_sep_url = find_sep_insured_families_path(consumer_role_id: @person.consumer_role.try(:id))%>
+  <%= render  partial: 'shared/individual_progress', locals: {step: '3', url: find_sep_url} %>
+</div> -->
+
+<div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+  <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+    previous_url: financial_assistance_applications_path,
+    next_url: find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+  } %>
+</div>
+<%= render partial: 'insured/plan_shoppings/help_with_plan'  %>

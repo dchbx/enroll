@@ -1,18 +1,21 @@
-require 'autoinc'
+# A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
+# when determining eligibility for Insurance Assistance and Medicaid
 
 class TaxHousehold
+  require 'autoinc'
+
   include Mongoid::Document
-  include SetCurrentUser
   include Mongoid::Timestamps
+  include Mongoid::Autoinc
   include HasFamilyMembers
   include Acapi::Notifiers
-  include Mongoid::Autoinc
+  include SetCurrentUser
 
-  # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
-  # when determining eligibility for Insurance Assistance and Medicaid
+  before_create :set_effective_starting_on
 
   embedded_in :household
 
+  field :application_id, type: BSON::ObjectId
   field :hbx_assigned_id, type: Integer
   increments :hbx_assigned_id, seed: 9999
 
@@ -28,11 +31,12 @@ class TaxHousehold
 
   embeds_many :eligibility_determinations
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
-  scope :active_tax_household, ->{ where(effective_ending_on: nil) }
+  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
+  scope :active_tax_household, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
 
   def latest_eligibility_determination
-    eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+    preferred_eligibility_determination
+    # eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
   end
 
   def group_by_year
@@ -40,7 +44,8 @@ class TaxHousehold
   end
 
   def current_csr_eligibility_kind
-    latest_eligibility_determination.csr_eligibility_kind
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_eligibility_kind : "csr_100"
+    # eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
   end
 
   def valid_csr_kind(hbx_enrollment)
@@ -51,22 +56,20 @@ class TaxHousehold
   end
 
   def current_csr_percent
-    latest_eligibility_determination.csr_percent
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.csr_percent : 0
   end
 
   def current_max_aptc
-    eligibility_determination = latest_eligibility_determination
-    #TODO need business rule to decide how to get the max aptc
-    #during open enrollment and determined_at
-    if eligibility_determination.present? #and eligibility_determination.determined_on.year == TimeKeeper.date_of_record.year
-      eligibility_determination.max_aptc
-    else
-      0
-    end
+    preferred_eligibility_determination.present? ? preferred_eligibility_determination.max_aptc : 0
   end
 
   def aptc_members
-    tax_household_members.find_all(&:is_ia_eligible?)
+    #Review split brain
+    if application_id.present?
+      active_applicants.find_all(&:is_ia_eligible?)
+    else
+      tax_household_members.find_all(&:is_ia_eligible?)
+    end
   end
 
   def aptc_ratio_by_member
@@ -83,24 +86,20 @@ class TaxHousehold
     #slcsp = current_benefit_coverage_period.second_lowest_cost_silver_plan
     benefit_coverage_period = @benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(effective_starting_on)}
     slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
-
     # Look up premiums for each aptc_member
     benchmark_member_cost_hash = {}
     aptc_members.each do |member|
       #TODO use which date to calculate premiums by slcp
       premium = slcsp.premium_for(effective_starting_on, member.age_on_effective_date)
-      benchmark_member_cost_hash[member.applicant_id.to_s] = premium
+      benchmark_member_cost_hash[member.family_member.id.to_s] = premium
     end
-
     # Sum premium total for aptc_members
     sum_premium_total = benchmark_member_cost_hash.values.sum.to_f
-
     # Compute the ratio
     ratio_hash = {}
     benchmark_member_cost_hash.each do |member_id, cost|
       ratio_hash[member_id] = cost/sum_premium_total
     end
-
     ratio_hash
   rescue => e
     log(e.message, {:severity => 'critical'})
@@ -237,23 +236,44 @@ class TaxHousehold
     household.family
   end
 
-  #usage: filtering through group_by criteria
-  def group_by_year
-    effective_starting_on.year
-  end
-
-  def is_eligibility_determined?
-    if self.elegibility_determinizations.size > 0
-      true
-    else
-      false
-    end
-  end
-
   #primary applicant is the tax household member who is the subscriber
   def primary_applicant
-    tax_household_members.detect do |tax_household_member|
-      tax_household_member.is_subscriber == true
+    application_id.present? ? application.applicants.detect{ |applicant| applicant.family_member.is_primary_applicant?} : tax_household_members.detect { |tax_household_member| tax_household_member.is_subscriber }
+  end
+
+  def active_applicants
+    return nil unless applicants
+    applicants.where(tax_household_id: self.id)
+  end
+
+  def application
+    FinancialAssistance::Application.find(application_id)
+  end
+
+  def applicants
+    return nil unless application
+    application.applicants.where(tax_household_id: self.id) if application.applicants.present?
+  end
+
+  def any_applicant_ia_eligible?
+    return nil unless active_applicants.present?
+    active_applicants.map(&:is_ia_eligible).include?(true)
+  end
+
+  def preferred_eligibility_determination
+    return nil unless eligibility_determinations.present?
+    if application_id.present?
+      admin_ed = eligibility_determinations.where(source: "Admin").first
+      curam_ed = eligibility_determinations.where(source: "Curam").first
+      return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
+      return curam_ed if curam_ed.present?
+      return eligibility_determinations.max_by(&:determined_at)
+    else
+      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
     end
+  end
+
+  def set_effective_starting_on
+    write_attributes(effective_starting_on: TimeKeeper.date_of_record) if effective_starting_on.blank?
   end
 end

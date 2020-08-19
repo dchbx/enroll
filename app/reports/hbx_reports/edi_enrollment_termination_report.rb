@@ -62,7 +62,7 @@ class TerminatedHbxEnrollments < MongoidMigrationTask
                       enrollment.aasm_state,
                       enrollment.effective_on,
                       enrollment.terminated_on,
-                      primary_person.find_relationship_with(person),
+                      primary_person.find_relationship_with(person, family.id),
                       transition_date(enrollment)
                   ]
                 end

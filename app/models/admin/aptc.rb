@@ -34,8 +34,8 @@ class Admin::Aptc < ApplicationController
 
     def build_household_members(year, family, max_aptc=nil)
       individuals_covered_array = Array.new
-      max_aptc = max_aptc.present? ? max_aptc.to_f : (family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f rescue 0)
-      ratio_by_member = family.active_household.latest_active_tax_household_with_year(year).try(:aptc_ratio_by_member)
+      max_aptc = max_aptc.present? ? max_aptc.to_f : (family.active_household.latest_active_tax_households_with_year(year).first.latest_eligibility_determination.max_aptc.to_f rescue 0)
+      ratio_by_member = family.active_household.latest_active_tax_households_with_year(year).first.try(:aptc_ratio_by_member)
       family.family_members.each_with_index do |one_member, index|
         individuals_covered_array << {one_member.person.id.to_s => [ratio_by_member[one_member.id.to_s] * max_aptc, max_aptc]}  rescue nil # Individuals and their assigned APTC Ratio
       end
@@ -106,10 +106,10 @@ class Admin::Aptc < ApplicationController
     def build_aptc_applied_per_member_values_for_enrollment(family, current_hbx, aptc_applied_vals, applied_aptc_array=nil)
       aptc_applied_per_member = Hash.new
       percent_sum = 0.0
-      aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+      aptc_ratio_by_member = family.active_household.latest_active_tax_households.first.aptc_ratio_by_member
 
       current_hbx.hbx_enrollment_members.each do |member|
-        percent_sum += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0
+        percent_sum += family.active_household.latest_active_tax_households.first.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0
       end
 
       current_hbx.hbx_enrollment_members.each do |hem|
@@ -123,7 +123,7 @@ class Admin::Aptc < ApplicationController
 
     def build_max_aptc_values(year, family, max_aptc=nil, hbxs=nil)
       max_aptc_hash = Hash.new
-      #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #eligibility_determinations = family.active_household.latest_active_tax_households.first.eligibility_determinations
       eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
@@ -164,7 +164,7 @@ class Admin::Aptc < ApplicationController
 
     def build_csr_percentage_values(year, family, csr_percentage=nil)
       csr_percentage_hash = Hash.new
-      #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #eligibility_determinations = family.active_household.latest_active_tax_households.first.eligibility_determinations
       eligibility_determinations = family.active_household.eligibility_determinations_for_year(year)
       eligibility_determinations.sort! {|a, b| a.determined_at <=> b.determined_at}
       #ed = family.active_household.latest_tax_household_with_year(year).latest_eligibility_determination
@@ -211,14 +211,14 @@ class Admin::Aptc < ApplicationController
 
     def calculate_slcsp_value(year, family, member_ids=nil)
       benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      #eligibility_determinations = family.active_household.latest_active_tax_household.eligibility_determinations
+      #eligibility_determinations = family.active_household.latest_active_tax_households.first.eligibility_determinations
       #date = Date.new(year, 1, 1)
       benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}
       slcsp = benefit_coverage_period.second_lowest_cost_silver_plan
       if member_ids.present?
-        aptc_members = family.active_household.latest_active_tax_household.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
+        aptc_members = family.active_household.latest_active_tax_households.first.tax_household_members.select {|m| member_ids.include?(m.person.id.to_s) }
       else
-        aptc_members = family.active_household.latest_active_tax_household.aptc_members
+        aptc_members = family.active_household.latest_active_tax_households.first.aptc_members
       end
       cost = aptc_members.map do |member|
         slcsp.premium_for(TimeKeeper.datetime_of_record, member.age_on_effective_date)
@@ -230,7 +230,7 @@ class Admin::Aptc < ApplicationController
     def build_eligible_members(family, member_ids=nil)
       return member_ids if member_ids.present?
       eligible_members = Array.new
-      tax_household_members = family.active_household.latest_active_tax_household_with_year(TimeKeeper.date_of_record.year).try(:tax_household_members)
+      tax_household_members = family.active_household.latest_active_tax_households_with_year(TimeKeeper.date_of_record.year).first.try(:tax_household_members)
       return [] if tax_household_members.nil?
       tax_household_members.each do |member|
         if member.is_ia_eligible
@@ -269,20 +269,20 @@ class Admin::Aptc < ApplicationController
     # Redetermine Eligibility on Max APTC / CSR Update.
     def redetermine_eligibility_with_updated_values(family, params, hbxs, year)
       eligibility_redetermination_result = false
-      latest_eligibility_determination = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination
+      latest_eligibility_determination = family.active_household.latest_active_tax_households_with_year(year).first.latest_eligibility_determination
       max_aptc = latest_eligibility_determination.max_aptc
       csr_percent_as_integer = latest_eligibility_determination.csr_percent_as_integer
       csr_percentage_param = params[:csr_percentage] == "limited" ? -1 : params[:csr_percentage].to_i # storing "limited" CSR as -1
 
       if !(params[:max_aptc].to_f == max_aptc && csr_percentage_param == csr_percent_as_integer) # If any changes made to MAX APTC or CSR
-        effective_starting_on = family.active_household.latest_active_tax_household_with_year(year).effective_starting_on
+        effective_starting_on = family.active_household.latest_active_tax_households_with_year(year).first.effective_starting_on
         if effective_starting_on > TimeKeeper.date_of_record
           eligibility_date = effective_starting_on
         else
           eligibility_date = hbxs.present? ? find_enrollment_effective_on_date(TimeKeeper.datetime_of_record) : TimeKeeper.datetime_of_record # Follow 15th of month rule if active enrollment.
         end
         # If max_aptc / csr percent is updated, create a new eligibility_determination with a new "determined_at" timestamp and the corresponsing csr/aptc update.
-        tax_household = family.active_household.latest_active_tax_household_with_year(year)
+        tax_household = family.active_household.latest_active_tax_households_with_year(year).first
         tax_household.eligibility_determinations.build({"determined_at"                 => eligibility_date,
                                                         "determined_on"                 => eligibility_date,
                                                         "csr_eligibility_kind"          => latest_eligibility_determination.csr_eligibility_kind,
@@ -304,7 +304,7 @@ class Admin::Aptc < ApplicationController
       enrollment_update_result = false
       # For every HbxEnrollment, if Applied APTC was updated, clone a new enrtollment with the new Applied APTC and make the current one inactive.
       #family = Family.find(params[:person][:family_id])
-      max_aptc = family.active_household.latest_active_tax_household_with_year(year).latest_eligibility_determination.max_aptc.to_f
+      max_aptc = family.active_household.latest_active_tax_households_with_year(year).first.latest_eligibility_determination.max_aptc.to_f
       active_aptc_hbxs = family.active_household.hbx_enrollments_with_aptc_by_year(params[:year].to_i)
 
       params.each do |key, aptc_value|
@@ -318,7 +318,7 @@ class Admin::Aptc < ApplicationController
             percent_sum_for_all_enrolles = 0.0
             enrollment_update_result = true
             original_hbx = HbxEnrollment.find(hbx_id)
-            aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+            aptc_ratio_by_member = family.active_household.latest_active_tax_households.first.aptc_ratio_by_member
 
             # Duplicate Enrollment
             duplicate_hbx = original_hbx.dup
@@ -344,7 +344,7 @@ class Admin::Aptc < ApplicationController
 
             # This (and the division using percent_sum_for_all_enrolles in the next block) is needed to get the right ratio for members to use in an enrollment. (ratio of the applied_aptc for an enrollment)
             duplicate_hbx.hbx_enrollment_members.each do |member|
-              percent_sum_for_all_enrolles += family.active_household.latest_active_tax_household.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0
+              percent_sum_for_all_enrolles += family.active_household.latest_active_tax_households.first.aptc_ratio_by_member[member.applicant_id.to_s] || 0.0
             end
 
             # Update the correct breakdown of Applied APTC on the individual level.
@@ -431,7 +431,7 @@ class Admin::Aptc < ApplicationController
       max_aptc_for_enrollment = 0
       hbx = HbxEnrollment.find(hbx_id)
       hbx_enrollment_members = hbx.hbx_enrollment_members
-      aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
+      aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_households.first.aptc_ratio_by_member
       hbx_enrollment_members.each do |hem|
         max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
       end

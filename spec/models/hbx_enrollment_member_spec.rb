@@ -29,7 +29,6 @@ describe HbxEnrollmentMember, dbclean: :after_all do
         expect(enrollment_member.primary_relationship).to eq enrollment_member.family_member.primary_relationship
       end
     end
-
     context "validate hbx_enrollment_member" do
       let!(:subscriber) {enrollment.hbx_enrollment_members.first}
       let!(:enrollment_members) {enrollment.hbx_enrollment_members}
@@ -97,9 +96,9 @@ describe HbxEnrollmentMember, dbclean: :after_all do
       expect(subject.person).to eq person
     end
 
-    it "delegates #ivl_coverage_selected to the family member" do
-      expect(family_member).to receive(:ivl_coverage_selected)
-      subject.ivl_coverage_selected
+    it "delegates #trigger_hub_call to the family member" do
+      expect(family_member).to receive(:trigger_hub_call)
+      subject.trigger_hub_call
     end
   end
 end

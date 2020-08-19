@@ -181,7 +181,7 @@ describe Subscribers::FamilyApplicationCompleted do
       let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
 
       let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-      let(:tax_household_db) { family_db.active_household.latest_active_tax_household }
+      let(:tax_household_db) { family_db.active_household.latest_active_tax_households.first }
       let(:person_db) { family_db.primary_applicant.person }
       let(:consumer_role_db) { person_db.consumer_role }
 
@@ -218,7 +218,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
         it "updates the tax household with aptc from the payload on the primary persons family" do
           expect(tax_household_db).to be_truthy
-          expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+          expect(person.primary_family.active_household.latest_active_tax_households).to eq([tax_household_db])
           expect(tax_household_db.primary_applicant.family_member.person).to eq person
           expect(tax_household_db.allocated_aptc).to eq 0
           expect(tax_household_db.is_eligibility_determined).to be_truthy
@@ -291,7 +291,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "updates the tax household with aptc from the payload on the primary persons family" do
         expect(tax_household_db).to be_truthy
-        expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+        expect(person.primary_family.active_household.latest_active_tax_households).to eq([tax_household_db])
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
@@ -362,7 +362,7 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "updates the tax household with aptc from the payload on the primary persons family" do
         expect(tax_household_db).to be_truthy
-        expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
+        expect(person.primary_family.active_household.latest_active_tax_households).to eq([tax_household_db])
         expect(tax_household_db.primary_applicant.family_member.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
@@ -402,7 +402,7 @@ describe Subscribers::FamilyApplicationCompleted do
       end
 
       it "should have a new tax household with the same aptc data" do
-        updated_tax_household = tax_household_db.household.latest_active_tax_household
+        updated_tax_household = tax_household_db.household.latest_active_tax_households.first
         expect(updated_tax_household).to be_truthy
         expect(updated_tax_household.primary_applicant.family_member.person).to eq person
         expect(updated_tax_household.allocated_aptc).to eq 0
@@ -469,8 +469,8 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "updates the tax household with aptc from the payload on the primary persons family" do
         expect(tax_household_db).to be_truthy
-        expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household
-        expect(tax_household_db.primary_applicant.family_member.person).to eq person
+        expect(person.primary_family.active_household.latest_active_tax_households).to eq([tax_household_db])
+        expect(tax_household_db.tax_household_members.detect{ |t| t.is_primary_applicant? }.person).to eq person
         expect(tax_household_db.allocated_aptc).to eq 0
         expect(tax_household_db.is_eligibility_determined).to be_truthy
         expect(tax_household_db.current_max_aptc).to eq max_aptc
@@ -478,7 +478,8 @@ describe Subscribers::FamilyApplicationCompleted do
 
       it "has 4 tax household members with primary person as primary tax household member" do
         expect(tax_household_db.tax_household_members.length).to eq 4
-        expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?)).to eq [true,false,false,false]
+        expect(tax_household_db.tax_household_members.map(&:is_primary_applicant?).uniq).to include(true)
+        expect(tax_household_db.tax_household_members.detect{ |t| t.is_primary_applicant? }.person).to eq(person)
         expect(tax_household_db.tax_household_members.select{|thm| thm.is_primary_applicant?}.first.family_member).to eq person.primary_family.primary_family_member
       end
 

@@ -62,7 +62,7 @@ describe Insured::InteractiveIdentityVerificationsController do
   describe "POST #create" do
     let(:mock_person_user) { instance_double("User") }
     let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
-    let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user) }
+    let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, id: "test") }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
     let(:mock_response_description_text) { double }
@@ -160,7 +160,7 @@ describe Insured::InteractiveIdentityVerificationsController do
   describe "POST #update" do
     let(:mock_person_user) { instance_double("User") }
     let(:mock_consumer_role) { instance_double("ConsumerRole", id: "test") }
-    let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user) }
+    let(:mock_person) { double(:consumer_role => mock_consumer_role, :user => mock_person_user, id: "test") }
     let(:mock_user) { double(:person => mock_person) }
     let(:mock_service) { instance_double("::IdentityVerification::InteractiveVerificationService") }
     let(:mock_response_description_text) { double }

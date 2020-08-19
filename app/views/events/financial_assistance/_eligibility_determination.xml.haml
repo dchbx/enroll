@@ -1,0 +1,26 @@
+%eligibility_determination
+  %id
+    %id= eligibility_determination.e_pdc_id
+  %eligibility_determination_applicants
+    = render :partial => "events/financial_assistance/eligibility_determination_applicant", :collection => eligibility_determination.family_members, as: :eligibility_determination_applicant
+  / we currently do not have total_incomes_by_year implemented in the model as a field or a method. If we want it later it will need to be implemented.
+  %total_incomes_by_year
+    = render :partial => "events/financial_assistance/total_income_by_year", :collection => 
+  - if eligibility_determination.aasm_state
+    %household_state= "urn:openhbx:terms:v1:household_state##{eligibility_determination.aasm_state}"
+  %maximum_aptc= '%.2f' % (eligibility_determination.max_aptc.round(2))
+  %csr_percent= eligibility_determination.csr_percent_as_integer
+  - if eligibility_determination.benchmark_plan_id
+    %benchmark_plan_id
+      %id= eligibility_determination.benchmark_plan.hios_id
+  - if (1..15).include?(eligibility_determination.determined_at.day)
+    %effective_on= (eligibility_determination.determined_at.end_of_month)+1.day
+  - elsif (16..30).include?(eligibility_determination.determined_at.day)
+    %effective_on= (eligibility_determination.determined_at.end_of_month)+1.day+1.month
+  %determination_date= simple_date_for(eligibility_determination.determined_at)
+  - if eligibility_determination.created_at
+    %created_at= eligibility_determination.created_at.strftime('%Y-%m-%dT%H:%M:%S')
+  - if eligibility_determination.updated_at
+    %modified_at= eligibility_determination.updated_at.strftime('%Y-%m-%dT%H:%M:%S')
+  - if eligibility_determination.version
+    %version= eligibility_determination.version

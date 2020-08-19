@@ -4,28 +4,10 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse)  { 
-      p = FactoryGirl.create(:person)
-      p.person_relationships.build(relative: person, kind: "spouse")
-      p.save; p
-    }
-
-    let!(:child1)  { 
-      p = FactoryGirl.create(:person)
-      p.person_relationships.build(relative: person, kind: "child")
-      p.save; p
-    }
-
-    let!(:child2)  { 
-      p = FactoryGirl.create(:person)
-      p.person_relationships.build(relative: person, kind: "child")
-      p.save; p
-    }
-
-    let!(:person) do
-      p = FactoryGirl.build(:person)
-      p.save; p
-    end
+    let(:spouse) { FactoryGirl.create(:person)}
+    let(:child1) { FactoryGirl.create(:person)}
+    let(:person) { FactoryGirl.create(:person)}
+    let(:child2) { FactoryGirl.create(:person)}
 
     context "Family already exists" do
 
@@ -35,6 +17,9 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
         family.family_members.build(is_primary_applicant: false, person: spouse)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.save(:validate => false)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
         family
       }
 
@@ -43,6 +28,8 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
           hbx_assigned_id: '24112',
           e_case_id: "6754632"
           })
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
         family.family_members.build(is_primary_applicant: true, person: person)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.family_members.build(is_primary_applicant: false, person: child2)
@@ -57,10 +44,13 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
       end
 
       def build_person_relationships
-        person.person_relationships.build(relative: spouse, kind: "spouse")
-        person.person_relationships.build(relative: child1, kind: "child")
-        person.person_relationships.build(relative: child2, kind: "child")
+        person.person_relationships.build(successor_id: spouse.id, predecessor_id: person.id, kind: "spouse", family_id: source_family.id)
+        person.person_relationships.build(successor_id: child1.id, predecessor_id: person.id, kind: "parent", family_id: source_family.id)
+        person.person_relationships.build(successor_id: child2.id, predecessor_id: person.id, kind: "parent", family_id: source_family.id)
         person.save!
+        spouse.person_relationships.create(successor_id: person.id, predecessor_id: spouse.id, kind: "spouse", family_id: source_family.id)
+        child1.person_relationships.create(successor_id: person.id, predecessor_id: child1.id, kind: "child", family_id: source_family.id)
+        child2.person_relationships.create(successor_id: person.id, predecessor_id: child2.id, kind: "child", family_id: source_family.id)
       end
 
       def change_relationship

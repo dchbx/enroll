@@ -1,6 +1,6 @@
 module Parsers::Xml::Cv::Importers
   module Base
-    def get_person_object_by(person, person_demographics, person_relationships)
+    def get_person_object_by(person, person_demographics, person_relationships, family_id)
       hbx_id = person.id.strip.split('#').last rescue ''
       gender = person_demographics.sex.match(/gender#(.*)/)[1] rescue ''
 
@@ -22,8 +22,10 @@ module Parsers::Xml::Cv::Importers
       person_relationships.each do |relationship|
         relation = relationship.relationship_uri.strip.split("#").last rescue ''
         person_object.person_relationships.build({
-          relative_id: relationship.object_individual, #use subject_individual or object_individual
-          kind: relation,
+          successor_id: relationship.object_individual, #use subject_individual or object_individual
+          predecessor_id: person_object.id,
+          family_id: family_id,
+          kind: PersonRelationship::InverseMap[relation]
         })
       end
       person.addresses.each do |address|

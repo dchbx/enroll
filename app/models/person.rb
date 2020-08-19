@@ -26,7 +26,8 @@ class Person
                         :race,
                         :tribal_id,
                         :no_dc_address,
-                        :no_dc_address_reason,
+                        :is_homeless,
+                        :is_temporarily_out_of_state,
                         :is_active,
                         :no_ssn],
                 :modifier_field => :modifier,
@@ -77,7 +78,8 @@ class Person
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
-  field :no_dc_address_reason, type: String, default: ""
+  field :is_homeless, type: Boolean, default: false
+  field :is_temporarily_out_of_state, type: Boolean, default: false
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String
@@ -206,7 +208,9 @@ class Person
   index({"hbx_staff_role.is_active" => 1})
 
   # PersonRelationship child model indexes
-  index({"person_relationship.relative_id" =>  1})
+  # index({"person_relationship.relative_id" =>  1}) #old_code
+  index({"person_relationship.predecessor_id" =>  1})
+  index({"person_relationship.successor_id" =>  1})
 
   index({"hbx_employer_staff_role._id" => 1})
 
@@ -279,7 +283,7 @@ class Person
   end
 
   delegate :citizen_status, :citizen_status=, :to => :consumer_role, :allow_nil => true
-  delegate :ivl_coverage_selected, :to => :consumer_role, :allow_nil => true
+  delegate :trigger_hub_call, :to => :consumer_role, :allow_nil => true
   delegate :all_types_verified?, :to => :consumer_role
 
   def notify_created
@@ -439,6 +443,14 @@ class Person
     is_active
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   def deactivate_types(types)
     types.each do |type|
       verification_type_by_name(type).update_attributes(:inactive => true) unless verification_type_by_name(type).inactive
@@ -466,37 +478,69 @@ class Person
     ridp_verification_types
   end
 
-  def relatives
-    person_relationships.reject do |p_rel|
-      p_rel.relative_id.to_s == self.id.to_s
-    end.map(&:relative)
+  def all_verification_types(family_id)
+    family = Family.where(id: family_id).first
+    if family.present? && family.has_financial_assistance_verification? && has_faa_application?(family)
+      verifications = verification_types + ["Income", "MEC"]
+    else
+      verifications = verification_types
+    end
+
+    return verifications
   end
 
-  def find_relationship_with(other_person)
+  def has_faa_application?(family)
+    member = family.family_members.where(person_id: id).first
+    family.latest_applicable_submitted_application.applicants.where(family_member_id: member.id).first.present?
+  end
+
+  def relatives(family_id)
+    person_relationships.where(family_id: family_id).map(&:relative)
+    # person_relationships.reject do |p_rel|
+    #   p_rel.relative_id.to_s == self.id.to_s
+    # end.map(&:relative)
+  end
+
+  def find_relationship_with(other_person, family_id)
     if self.id == other_person.id
       "self"
     else
-      person_relationship_for(other_person).try(:kind)
+      person_relationship_for(other_person, family_id).try(:kind)
     end
   end
 
-  def person_relationship_for(other_person)
-    person_relationships.detect do |person_relationship|
-      person_relationship.relative_id == other_person.id
-    end
+  def person_relationship_for(other_person, family_id)
+    person_relationships.where(successor_id: other_person.id, predecessor_id: self.id, family_id: family_id).first
+    # person_relationships.detect do |person_relationship|
+    #   person_relationship.relative_id == other_person.id
+    # end
   end
 
-  def ensure_relationship_with(person, relationship)
+  def ensure_relationship_with(person, relationship, family_id)
     return if person.blank?
-    existing_relationship = self.person_relationships.detect do |rel|
-      rel.relative_id.to_s == person.id.to_s
-    end
-    if existing_relationship
-      existing_relationship.update_attributes(:kind => relationship)
+    # existing_relationship = self.person_relationships.detect do |rel|
+    #   rel.relative_id.to_s == person.id.to_s
+    # end
+    direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: person.id).first
+    inverse_relationship = person.person_relationships.where(family_id: family_id, predecessor_id: person.id, successor_id: self.id).first
+    if direct_relationship.present? && inverse_relationship.present?
+      direct_relationship.update_attributes(:kind => PersonRelationship::InverseMap[relationship])
+      inverse_relationship.update_attributes(:kind => relationship)
+      # existing_relationship.update_attributes(:kind => relationship)
     else
       self.person_relationships << PersonRelationship.new({
+        :kind => PersonRelationship::InverseMap[relationship],
+        # :relative_id => person.id,
+        :successor_id => person.id,
+        :predecessor_id => self.id,
+        :family_id => family_id
+      })
+      person.person_relationships << PersonRelationship.new({
         :kind => relationship,
-        :relative_id => person.id
+        # :relative_id => person.id,
+        :successor_id => self.id,
+        :predecessor_id => person.id,
+        :family_id => family_id
       })
     end
   end
@@ -627,12 +671,12 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    no_dc_address and  (is_homeless? || is_temporarily_out_of_state?)
   end
 
   def is_dc_resident?
-    return false if no_dc_address == true && no_dc_address_reason.blank?
-    return true if no_dc_address == true && no_dc_address_reason.present?
+    return false if no_dc_address == true && (is_homeless? && is_temporarily_out_of_state?)
+    return true if no_dc_address == true && (is_homeless? || is_temporarily_out_of_state?)
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == 'DC'}
@@ -1046,6 +1090,50 @@ class Person
     if user && session_var == 'paper'
       user.ridp_by_paper_application
     end
+  end
+
+  # Related to Relationship Matrix
+  def add_relationship(successor, relationship_kind, family_id, destroy_relation=false)
+    if same_successor_exists?(successor, family_id)
+      direct_relationship = person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first # Direct Relationship
+
+      # Destroying the relationships associated to the Person other than the new updated relationship.
+      if direct_relationship != nil && destroy_relation
+        other_relations = person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).map(&:successor_id)
+        person_relationships.where(family_id: family_id, predecessor_id: self.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+
+        other_relations.each do |otr|
+          otr_relation = Person.find(otr).person_relationships.where(family_id: family_id, predecessor_id: otr, successor_id: self.id).first
+          otr_relation.destroy unless otr_relation.blank?
+        end
+      end
+
+      direct_relationship.update(kind: relationship_kind)
+    else
+      if self.id != successor.id
+        person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+      end
+    end
+  end
+
+  def build_relationship(successor, relationship_kind, family_id)
+    person_relationships.build(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+  end
+
+  def remove_relationship(family_id)
+    successor_ids = person_relationships.where(family_id: family_id, predecessor_id: self.id).collect(&:successor_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id).each(&:destroy)
+    successor_ids.each do |s|
+      Person.find(s).person_relationships.where(family_id: family_id, successor_id: self.id).each(&:destroy)
+    end
+  end
+
+  def same_successor_exists?(successor, family_id)
+    person_relationships.where(family_id: family_id, predecessor_id: self.id, successor_id: successor.id).first.present?
+  end
+
+  def format_citizen
+    ::ConsumerRole::CITIZEN_KINDS[citizen_status.to_sym]
   end
 
   private

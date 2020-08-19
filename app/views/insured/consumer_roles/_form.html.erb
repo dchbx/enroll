@@ -1,56 +1,61 @@
 <div class="container">
   <div id="new_person_wrapper">
     <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render :partial => 'shared/left_nav.html.erb' %>
+      </div>
       <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
       <div class="col-lg-7 col-md-7 col-sm-8 col-xs-12 bottom-pd">
         <% if current_user.has_hbx_staff_role? %>
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-4 col-md-4 form-group form-group-lg no-pd top-buffer" >
-            <div class="row_align_application_type">
-              <span> <b> Application Type :</b></span>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-4 col-md-4 form-group form-group-lg no-pd top-buffer" >
+              <div class="row_align_application_type">
+                <span> <b> Application Type :</b></span>
+              </div>
+            </div>
+            <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 form-group form-group-lg no-pd">
+              <%= f.fields_for :family do |f| %>
+                <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
+                  <%= f.select(:application_type, options_for_select(["Curam"], selected: "Curam"), required: true, id:'application_type_id' ) %>
+                <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
+                  <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+                <% else %>
+                  <%= f.select(:application_type, options_for_select(["Phone", "Paper"] ), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
+                <% end %>
+              <% end %>
             </div>
           </div>
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 form-group form-group-lg no-pd">
-            <%= f.fields_for :family do |f| %>
-              <% if @person.primary_family.e_case_id.present? && !(@person.primary_family.e_case_id.include? "curam_landing") %>
-                <%= f.select(:application_type, options_for_select(["Curam"], selected: "Curam"), required: true, id:'application_type_id' ) %>
-              <% elsif pundit_allow(ConsumerRole, :can_view_application_types?) %>
-                  <%= f.select(:application_type, options_for_select(["Phone", "In Person", "Paper", "Curam", "Mobile"]), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
-              <% else %>
-                <%= f.select(:application_type, options_for_select(["Phone", "Paper"] ), {include_blank: "choose #{'*'}"}, required: true, id:'application_type_id' ) %>
-              <% end %>
+        <% end %>
+      </div>
+      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+        <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+          <h2 class="darkblue">Personal Information</h2>
+          <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
+          <p class='memo'>* = required field</p>
+          <%= render "shared/error_messages", object: f.object %>
+          <%= render 'shared/person/consumer_information', f: f %>
+          <br>
+          <div id="consumer_fields_sets">
+            <%= render 'shared/consumer_fields', f: f %>
+            <br>
+          </div>
+          <%= render 'shared/consumer_home_address_fields', f: f %><br>
+          <%= render 'shared/phone_fields', f: f %><br>
+          <div id="email_info" class="row row-form-wrapper no-buffer">
+            <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+              <%= render 'shared/email_fields', f: email %>
             <% end %>
           </div>
+          <br>
+          <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %>
         </div>
-        <% end %>
-        <h1 class="darkblue">Personal Information</h1>
-        <p>Please answer the following questions, provide your address, telephone number and email address. When you're finished, select CONTINUE.</p>
-        <p class='memo'>* = required field</p>
-        <%= render "shared/error_messages", object: f.object %>
-        <%= render 'shared/person/consumer_information', f: f %>
-        <br>
-        <div id="consumer_fields_sets">
-        <%= render 'shared/consumer_fields', f: f %>
-        <br>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
+          <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
+          <%= render partial: 'shared/help_me_sign_up' %>
         </div>
-        <%= render 'shared/consumer_home_address_fields', f: f %><br>
-        <%= render 'shared/phone_fields', f: f %><br>
-
-        <div id="email_info" class="row row-form-wrapper no-buffer">
-          <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-            <%= render 'shared/email_fields', f: email %>
-          <% end %>
-        </div>
-        <br>
-        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %>
-      </div>
-
-
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-2 col-sm-offset-1 right-section">
-        <%= render  partial: 'shared/individual_progress', locals: {step: '1'} %>
-        <%= render partial: 'shared/help_me_sign_up' %>
       </div>
     </div>
   </div>
-  <%= render partial: 'insured/plan_shoppings/help_with_plan'  %>
+  <%= render partial: 'insured/plan_shoppings/help_with_plan' %>
 </div>

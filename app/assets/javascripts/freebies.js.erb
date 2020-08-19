@@ -65,7 +65,7 @@ var Freebies = ( function( window, undefined ) {
 
 	function selectric() {
 		if (!disableSelectric) {
-			$("select[multiple!='multiple']").not('[name*="dataTable_length"]').selectric();
+			$("select[multiple!='multiple']:visible").not('[name*="dataTable_length"]').selectric();
 		}
 	}
 

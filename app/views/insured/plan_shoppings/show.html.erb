@@ -111,7 +111,7 @@ $(document).ready(function() {
   <% end %>
 
   $.ajax({
-    url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present? %>",
+    url: "<%= plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, family_member_ids: @family_member_ids) if @hbx_enrollment.present? %>",
     type: "GET"
   });
 });

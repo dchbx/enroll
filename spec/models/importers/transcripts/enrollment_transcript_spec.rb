@@ -7,15 +7,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     let!(:spouse)  { FactoryGirl.create(:person)}
     let!(:child1)  { FactoryGirl.create(:person)}
     let!(:child2)  { FactoryGirl.create(:person)}
-
-    let!(:person) do
-      p = FactoryGirl.build(:person)
-      p.person_relationships.build(relative: spouse, kind: "spouse")
-      p.person_relationships.build(relative: child1, kind: "child")
-      p.person_relationships.build(relative: child2, kind: "child")
-      p.save
-      p
-    end
+    let!(:person)  { FactoryGirl.create(:person)}
 
     let(:source_effective_on) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
     let(:other_effective_on) { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
@@ -29,6 +21,7 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
         })
 
       primary = family.family_members.build(is_primary_applicant: true, person: person)
+      family.save
       family
     }
 
@@ -48,14 +41,27 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       enrollment
     }
 
-    let!(:source_family) { 
-      family = Family.create({ hbx_assigned_id: '25112', e_case_id: "6754632" })
+    let!(:source_family) {
+
+
+      family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
       family.family_members.build(is_primary_applicant: true, person: person)
       family.family_members.build(is_primary_applicant: false, person: spouse)
       family.family_members.build(is_primary_applicant: false, person: child1)
       family.family_members.build(is_primary_applicant: false, person: child2)
-      family.save
-      family
+
+      person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      spouse.person_relationships.create(predecessor_id: spouse.id , successor_id: person.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child1.id, kind: "parent", family_id: family.id)
+      child1.person_relationships.create(predecessor_id: child1.id , successor_id: person.id, kind: "child", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id , successor_id: child2.id, kind: "parent", family_id: family.id)
+      child2.person_relationships.create(predecessor_id: child2.id , successor_id: person.id, kind: "child", family_id: family.id)
+
+      person.save!
+      child1.save!
+      child2.save!
+      family.save!
+      family.reload
     }
 
     let(:primary) { source_family.primary_applicant }

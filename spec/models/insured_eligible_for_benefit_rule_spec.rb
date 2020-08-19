@@ -138,8 +138,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
   context "is_cost_sharing_satisfied?" do
     include_context "BradyBunchAfterAll"
+
     let(:consumer_role) { ConsumerRole.new}
     let(:tax_household) { double("TaxHousehold", current_csr_eligibility_kind: nil)}
+
     before :all do
       create_tax_household_for_mikes_family
       @consumer_role = mike.consumer_role
@@ -150,7 +152,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     let(:benefit_package_with_current_date_start_on) { FactoryGirl.build(:benefit_package) }
 
     it "should return true when csr_kind is blank" do
-      allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return tax_household
+      allow(consumer_role).to receive(:latest_active_tax_households_with_year).and_return [tax_household]
       rule = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
@@ -162,12 +164,14 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
     end
 
     it "should return true when cost_sharing is equal to csr_kind" do
+      mike.primary_family.households.first.tax_households.first.effective_ending_on = TimeKeeper.date_of_record
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_87'
       rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family)
       expect(rule.is_cost_sharing_satisfied?).to eq true
     end
 
     it "should return false when cost_sharing is not equal to csr_kind" do
+      mike.primary_family.households.first.tax_households.first.effective_ending_on = TimeKeeper.date_of_record
       benefit_package.benefit_eligibility_element_group.cost_sharing = 'csr_100'
       rule = InsuredEligibleForBenefitRule.new(@consumer_role, benefit_package, family: mike.primary_family)
       expect(rule.is_cost_sharing_satisfied?).to eq false

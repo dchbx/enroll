@@ -1,0 +1,25 @@
+%eligibility_determination_applicant
+  %individual
+  - person = eligibility_determination_applicant.person
+  = render :partial => "events/individuals/individual", :object => person
+  %is_primary_applicant= eligibility_determination_applicant.family_member.is_primary_applicant
+  %is_consent_applicant= eligibility_determination_applicant.family_member.is_consent_applicant
+  %is_coverage_applicant= eligibility_determination_applicant.family_member.is_coverage_applicant
+  %is_without_assistance= eligibility_determination_applicant.is_without_assistance
+  - if eligibility_determination_applicant.is_ia_eligible
+    %is_insurance_assistance_eligible= eligibility_determination_applicant.is_ia_eligible?
+  - if eligibility_determination_applicant.is_medicaid_chip_eligible
+    %is_medicaid_chip_eligible= eligibility_determination_applicant.is_medicaid_chip_eligible?
+  - if eligibility_determination_applicant.is_non_magi_medicaid_eligible
+    %is_non_magi_medicaid_eligible= eligibility_determination_applicant.is_non_magi_medicaid_eligible
+  - if eligibility_determination_applicant.is_totally_ineligible
+    %is_totally_ineligible= eligibility_determination_applicant.is_totally_ineligible
+  - unless eligibility_determination_applicant.person.is_disabled.blank? && eligibility_determination_applicant.person.is_tobacco_user.blank?
+      %person_health
+        - unless eligibility_determination_applicant.person.is_tobacco_user.blank?
+          %is_tobacco_user= eligibility_determination_applicant.person.is_tobacco_user
+        - unless eligibility_determination_applicant.person.is_disabled.blank?
+          %is_disabled= eligibility_determination_applicant.person.is_disabled
+  / we currently do not have the below data. implmenetation will follow at a later date. We will need to fully implement at a later date if still desired. 
+  %total_incomes_by_year
+    = render :partial => "events/financial_assistance/total_income_by_year", :collection => 

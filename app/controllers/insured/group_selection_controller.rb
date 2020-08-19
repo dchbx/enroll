@@ -85,17 +85,20 @@ class Insured::GroupSelectionController < ApplicationController
       hbx_enrollment.kind = @market_kind
     end
 
+    # Set effective_on if this is a case of QLE with date options available.
+    hbx_enrollment.effective_on = Date.strptime(params[:effective_on_option_selected], '%m/%d/%Y') if params[:effective_on_option_selected].present?
+
     if hbx_enrollment.save
       hbx_enrollment.inactive_related_hbxs # FIXME: bad name, but might go away
       if keep_existing_plan
         hbx_enrollment.update_coverage_kind_by_plan
         redirect_to purchase_insured_families_path(change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, hbx_enrollment_id: hbx_enrollment.id)
       elsif @change_plan.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, family_member_ids: params[:family_member_ids], change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       else
         # FIXME: models should update relationships, not the controller
         hbx_enrollment.benefit_group_assignment.update(hbx_enrollment_id: hbx_enrollment.id) if hbx_enrollment.benefit_group_assignment.present?
-        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
+        redirect_to insured_plan_shopping_path(:id => hbx_enrollment.id, family_member_ids: params[:family_member_ids], market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)
       end
     else
       raise "You must select the primary applicant to enroll in the healthcare plan"

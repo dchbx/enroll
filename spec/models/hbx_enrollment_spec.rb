@@ -492,6 +492,7 @@ describe HbxEnrollment, dbclean: :after_all do
       }
       let(:hbx_enrollment_members) { enrollment.hbx_enrollment_members}
       let(:active_year) {TimeKeeper.date_of_record.year}
+      let(:thhs) {family.households.first.tax_households}
 
       before :each do
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
@@ -501,7 +502,7 @@ describe HbxEnrollment, dbclean: :after_all do
 
       it "should return plans with csr kind when individual market is selected" do
         decorated_plans = enrollment.decorated_elected_plans('health', enrollment.kind)
-        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', tax_household, enrollment.kind))
+        expect(decorated_plans). to eq (benefit_coverage_period.elected_plans_by_enrollment_members(hbx_enrollment_members, 'health', thhs, enrollment.kind))
       end
     end
 
@@ -535,6 +536,7 @@ describe HbxEnrollment, dbclean: :after_all do
       let(:consumer_role) { FactoryGirl.create(:consumer_role) }
       let(:person) { household.family.primary_applicant.person}
       let(:family) { household.family }
+      let(:application) { double(family: family)}
       let(:enrollment) {
         enrollment = household.new_hbx_enrollment_from(
           consumer_role: consumer_role,
@@ -563,6 +565,8 @@ describe HbxEnrollment, dbclean: :after_all do
           allow(household).to receive(:family).and_return family
           allow(family).to receive(:is_under_special_enrollment_period?).and_return false
           allow(family).to receive(:is_under_ivl_open_enrollment?).and_return true
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           allow(enrollment).to receive(:enrollment_kind).and_return "open_enrollment"
         end
 
@@ -601,6 +605,8 @@ describe HbxEnrollment, dbclean: :after_all do
         end
 
         it "should return decoratored plans when not in the open enrollment" do
+          allow(family).to receive(:active_approved_application).and_return application
+          allow(application).to receive(:latest_active_tax_households_with_year).and_return []
           enrollment.update_attributes(effective_on: sep.effective_on - 1.month)
           allow(renewal_bcp).to receive(:open_enrollment_contains?).and_return false
           allow(benefit_sponsorship).to receive(:benefit_coverage_period_by_effective_date).with(enrollment.effective_on).and_return(bcp)
@@ -918,7 +924,7 @@ describe HbxProfile, "class methods", type: :model do
        TimeKeeper.set_date_of_record_unprotected!(Date.today) if TimeKeeper.date_of_record.month == 1 || TimeKeeper.date_of_record.month == 12
     end
 
-    it "should cancel hbx enrollemnt plan1 from carrier1 when choosing plan2 from carrier2" do
+    it "should cancel hbx enrollment plan1 from carrier1 when choosing plan2 from carrier2" do
       hbx_enrollment1.effective_on = date + 1.day
       hbx_enrollment2.effective_on = date
       # This gets processed on 31st Dec
@@ -932,7 +938,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
-    it "should not cancel hbx enrollemnt of previous plan year enrollment" do
+    it "should not cancel hbx enrollment of previous plan year enrollment" do
       hbx_enrollment1.effective_on = date + 1.year
       hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
@@ -940,7 +946,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment2.coverage_selected?).to be_truthy
     end
 
-    it "should terminate hbx enrollemnt plan1 from carrier1 when choosing hbx enrollemnt plan2 from carrier2" do
+    it "should terminate hbx enrollment plan1 from carrier1 when choosing hbx enrollment plan2 from carrier2" do
       hbx_enrollment1.effective_on = date - 1.day
       hbx_enrollment2.effective_on = date
       hbx_enrollment2.select_coverage!
@@ -950,7 +956,7 @@ describe HbxProfile, "class methods", type: :model do
       expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
     end
 
-    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollemnt plan2" do
+    it "should terminate hbx enrollment plan1 from carrier1 in enrolled contingent state when choosing hbx enrollment plan2" do
       person1.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
       hbx_enrollment3.effective_on = date
       hbx_enrollment2.effective_on = date + 1.day
@@ -973,7 +979,7 @@ describe HbxProfile, "class methods", type: :model do
 
   end
 
-  describe "when maket type is individual" do
+  describe "when market type is individual" do
     let(:person) { FactoryGirl.create(:person, :with_active_consumer_role,  :with_consumer_role)}
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member, person: person) }
     let(:coverage_household) { family.households.first.coverage_households.first }
@@ -1004,9 +1010,9 @@ describe HbxProfile, "class methods", type: :model do
       enrollment.update_attributes!(plan_id: plan.id)
     end
 
-    context "ivl consumer role with unverified state purchased a plan" do
+    context "ivl consumer role with pending state purchased a plan" do
       it "should return enrollment status as unverified" do
-        person.consumer_role.update_attribute("aasm_state","unverified")
+        person.consumer_role.trigger_hub_call
         enrollment.select_coverage!
         enrollment.reload
         expect(person.consumer_role.aasm_state).to eq "ssa_pending"
@@ -1028,6 +1034,7 @@ describe HbxProfile, "class methods", type: :model do
 
     context "ivl user in verification outstanding state." do
       it "should return enrollment status as coverage_selected and set is_any_enrollment_member_outstanding to true " do
+        person.consumer_role.trigger_hub_call
         enrollment.select_coverage!
         person.consumer_role.ssn_invalid!(verification_attr)
         enrollment.reload
@@ -3147,8 +3154,22 @@ describe HbxEnrollment, dbclean: :after_all do
       expect(ivl_enrollment.is_ivl_actively_outstanding?).to be_falsey
     end
   end
+end
 
-  context "for set_is_any_enrollment_member_outstanding" do
+describe "set_is_any_enrollment_member_outstanding" do
+
+  context "family has no FAA application" do
+
+    let!(:ivl_person)             { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role) }
+    let!(:ivl_family)             { FactoryGirl.create(:family, :with_primary_family_member, person: ivl_person) }
+    let(:ivl_enrollment) do
+      FactoryGirl.build(:hbx_enrollment, household: ivl_family.active_household, kind: "individual", aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record)
+    end
+
+    let!(:ivl_enrollment_member) do
+      FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true, applicant_id: ivl_family.primary_applicant.id, hbx_enrollment: ivl_enrollment, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record)
+    end
+
 
     it "should return true for is_any_enrollment_member_outstanding" do
       ivl_person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
@@ -3159,6 +3180,47 @@ describe HbxEnrollment, dbclean: :after_all do
     it "should return false for is_any_enrollment_member_outstanding" do
       ivl_enrollment.save!
       expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
+    end
+  end
+
+  context 'family has FAA application' do
+    include_examples 'draft application with 2 applicants'
+
+    let!(:ivl_enrollment_member) do
+      FactoryGirl.create(:hbx_enrollment_member, is_subscriber: true, applicant_id: family.primary_applicant.id, hbx_enrollment: ivl_enrollment, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record)
+    end
+
+    let(:ivl_enrollment) do
+      FactoryGirl.build(:hbx_enrollment, household: family.active_household, kind: "individual", aasm_state: "coverage_selected", effective_on: TimeKeeper.date_of_record)
+    end
+
+    before do
+      allow_any_instance_of(FinancialAssistance::Application).to receive(:is_application_valid?).and_return(true)
+      application.submit!
+    end
+
+    it 'should return true for is_any_enrollment_member_outstanding' do
+      first_applicant.update_attributes!(aasm_state: 'verification_outstanding')
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
+    end
+
+    it 'should return false for is_any_enrollment_member_outstanding' do
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_falsey
+    end
+
+    it 'should return true if consumer is outstanding but not applicant' do
+      primary_person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
+    end
+
+    it 'should return true if both consumer role and applicant of a person is outstanding' do
+      primary_person.consumer_role.update_attributes!(aasm_state: 'verification_outstanding')
+      first_applicant.update_attributes!(aasm_state: 'verification_outstanding')
+      ivl_enrollment.save!
+      expect(ivl_enrollment.is_any_enrollment_member_outstanding).to be_truthy
     end
   end
 end

@@ -174,7 +174,7 @@ class QhpBuilder
     if plan.present?
       @qhp.plan = plan
     else
-      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Market: #{plan.market}, Coverage kind: #{plan.coverage_kind}, Plan Name: #{@qhp.plan_marketing_name}"
+      puts "\rPlan Not Saved! Year: #{@qhp.active_year} :: Hios: #{@qhp.standard_component_id}, Market: #{@qhp.market_coverage}, Coverage kind: #{parse_coverage_kind}, Plan Name: #{@qhp.plan_marketing_name}"
       @qhp.plan = nil
     end
   end
@@ -208,7 +208,7 @@ class QhpBuilder
             ehb: @qhp.ehb_percent_premium,
             # carrier_profile_id: "53e67210eb899a460300000d",
             carrier_profile_id: get_carrier_id(@carrier_name),
-            coverage_kind: @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental",
+            coverage_kind: parse_coverage_kind,
             dental_level: @dental_metal_level
             )
           if new_plan.valid?
@@ -217,6 +217,10 @@ class QhpBuilder
         end
       end
     end
+  end
+
+  def parse_coverage_kind
+    @qhp.dental_plan_only_ind.downcase == "no" ? "health" : "dental"
   end
 
   def parse_metal_level

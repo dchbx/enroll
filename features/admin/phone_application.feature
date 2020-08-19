@@ -24,7 +24,7 @@ Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Iden
     And Admin clicks CONTINUE button
     Then the Admin will be navigated to the DOCUMENT UPLOAD page
     When the Admin clicks CONTINUE without uploading and verifying an application
-    Then the Admin can navigate to the next page and finish the application
+    Then the user will navigate to the Help Paying for Coverage page
 
   Scenario: Hbx Admin clicks continue after uploading and verifying an application
     Given the Admin should navigate to the Experian Auth and Consent Page
@@ -32,7 +32,7 @@ Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Iden
     And Admin clicks CONTINUE button
     Then the Admin will be navigated to the DOCUMENT UPLOAD page
     When the Admin clicks CONTINUE after uploading and verifying an application
-    Then the Admin can navigate to the next page and finish the application
+    Then the user will navigate to the Help Paying for Coverage page
 
   Scenario: Hbx Admin clicks continue after uploading and verifying an application
     Given the Admin should navigate to the Experian Auth and Consent Page
@@ -40,5 +40,5 @@ Feature: Hbx Admin as Phone Application for ivl- User Disagrees to Experian Iden
     And Admin clicks CONTINUE button
     Then the Admin will be navigated to the DOCUMENT UPLOAD page
     When the Admin clicks CONTINUE after uploading and verifying an Identity
-    Then the Admin can navigate to the next page and finish the application
+    Then the user will navigate to the Help Paying for Coverage page
     

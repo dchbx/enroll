@@ -51,7 +51,8 @@ namespace :reports do
   end
 
   def get_aptc_and_csr_by_person_and_year(person: nil, year: 2016)
-    tax_household = person.primary_family.latest_household.latest_active_tax_household_with_year(year)
+    active_tax_households = person.primary_family.latest_household.latest_active_tax_households_with_year(year)
+    tax_household = active_tax_households.first if active_tax_households.present?
     eligibility_determination = tax_household.latest_eligibility_determination
     [eligibility_determination.max_aptc, eligibility_determination.csr_percent_as_integer]
   rescue => e

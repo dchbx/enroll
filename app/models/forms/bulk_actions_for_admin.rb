@@ -76,7 +76,7 @@ module Forms
             # creation of roles for a person
             @family = Family.find(params[:family])
             person.consumer_role.move_to_expired if person.consumer_role.present? && person.active_individual_market_role == "resident"
-            build_consumer_role(person, @family) if person.active_individual_market_role == "consumer" && !person.consumer_role.present?
+            build_consumer(person, @family) if person.active_individual_market_role == "consumer" && !person.consumer_role.present?
             build_resident_role(person, @family) if person.active_individual_market_role == "resident" && !person.resident_role.present?
 
             # creation of SEP?

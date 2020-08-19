@@ -52,11 +52,7 @@ module Subscribers
       family.save!
       #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       family.e_case_id = verified_family.integrated_case_id
-      begin
-        active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
-      rescue
-        throw(:processing_issue, "Failure to update tax household")
-      end
+
       update_vlp_for_consumer_role(primary_person.consumer_role, verified_primary_family_member)
       begin
         new_dependents.each do |p|
@@ -66,22 +62,23 @@ module Subscribers
             new_family_member.save!
             active_household.add_household_coverage_member(new_family_member)
           end
-          if active_verified_tax_households.present?
-            active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
-            if active_verified_tax_household.present?
-              new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
-            end
-          end
-        end
-        if active_household.latest_active_tax_household.present?
-          unless active_household.latest_active_tax_household.eligibility_determinations.present?
-            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-          end
         end
       rescue
-        log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
+        log("ERROR: Unable to create family member from xml: #{xml}", {:severity => "error"})
       end
+
+      begin
+        active_household.build_or_update_tax_households_and_eligibility_determinations(verified_family, primary_person, active_verified_household, new_dependents)
+      rescue
+        throw(:processing_issue, "Failure to update tax household")
+      end
+
+      if active_household.latest_active_tax_households.present?
+        active_household.latest_active_tax_households.each do |thh|
+          log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"}) unless thh.eligibility_determinations.present?
+        end
+      end
+
       family.active_household.coverage_households.each{|ch| ch.coverage_household_members.each{|chm| chm.save! }}
       family.save!
     end
@@ -128,7 +125,6 @@ module Subscribers
             pr.object_individual_id == verified_family_member.id &&
               pr.subject_individual_id == verified_primary_family_member.id
           end.first.relationship_uri.split('#').last
-
           relationship = PersonRelationship::InverseMap[relationship]
 
           if existing_person.present?

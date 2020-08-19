@@ -282,7 +282,8 @@ module Transcripts
     #    "name_pfx"=>nil,
     #    "name_sfx"=>nil,
     #    "no_dc_address"=>false,
-    #    "no_dc_address_reason"=>"",
+    #    "is_homeless"=>"",
+    #    "is_temporarily_out_of_state"=>"",
     #    "no_ssn"=>nil,
     #    "phones"=>
     #     [{"_id"=>BSON::ObjectId('57faba61fb9cdd52da000001'),
@@ -358,7 +359,8 @@ module Transcripts
     #    "name_pfx"=>nil,
     #    "name_sfx"=>nil,
     #    "no_dc_address"=>false,
-    #    "no_dc_address_reason"=>"",
+    #    "is_homeless"=>"",
+    #    "is_temporarily_out_of_state"=>"",
     #    "no_ssn"=>nil,
     #    "phones"=>
     #     [{"_id"=>BSON::ObjectId('57faba67fb9cdd52da00000a'),

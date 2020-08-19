@@ -32,5 +32,4 @@ module TimeHelper
       min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
     end
   end
-
 end

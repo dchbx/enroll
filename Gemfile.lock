@@ -60,6 +60,12 @@ PATH
       wkhtmltopdf-binary-edge (~> 0.12.3.0)
 
 PATH
+  remote: components
+  specs:
+    ui_helpers (0.0.1)
+      rails (~> 4.2.3)
+
+PATH
   remote: components/sponsored_benefits
   specs:
     sponsored_benefits (0.0.1)
@@ -770,6 +776,7 @@ DEPENDENCIES
   therubyracer
   turbolinks (= 2.5.3)
   uglifier (>= 1.3.0)
+  ui_helpers!
   unicorn (~> 4.8.3)
   virtus
   warden
@@ -781,4 +788,4 @@ DEPENDENCIES
   yard-mongoid (~> 0.1.0)
 
 BUNDLED WITH
-   1.17.1
+   1.17.2

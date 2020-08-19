@@ -83,13 +83,13 @@
         </div>
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
-          <% if @tax_household.present? && params[:market_kind]=='individual'%>
-            <% eligibility_kind = @tax_household.valid_csr_kind(@hbx_enrollment) %>
-            <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
+        <% application = @person.primary_family.active_approved_application %>
+          <% if application.present? && application.tax_households.present? && params[:market_kind]=='individual' %>
+            <% if (EligibilityDetermination::CSR_KINDS.include? @eligibility_kind) && @eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
               <%= link_to "Select Plan", "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
               <%= link_to("Select Plan", "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
-              <% else %>
+            <% else %>
               <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
             <% end %>
           <% else %>

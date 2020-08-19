@@ -16,6 +16,8 @@ Feature: Update DOB and SSN
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual again clicks on add member button #TODO re-write this step

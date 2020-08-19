@@ -154,6 +154,17 @@ require File.join(File.dirname(__FILE__),'seedfiles', 'employers_seed')
 require File.join(File.dirname(__FILE__),'seedfiles', 'employees_seed')
 puts "::: complete :::"
 
+fixtures_pattern = File.join(Rails.root, "db", "fixtures_dump", "application_*.yaml")
+fixtures_dump = Dir.glob(fixtures_pattern)
+
+if fixtures_dump.present?
+  puts "*"*80
+  puts "Loading faa families and applications"
+  system "bundle exec rake seed:faa_core_families"
+  system "bundle exec rake fixture_dump:load_applications"
+  puts "::: complete :::"
+end
+
 puts "*"*80
 puts "Loading benefit packages."
 require File.join(File.dirname(__FILE__),'seedfiles', 'benefit_packages_ivl_2015_seed')

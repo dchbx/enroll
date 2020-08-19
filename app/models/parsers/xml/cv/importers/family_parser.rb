@@ -68,7 +68,7 @@ module Parsers::Xml::Cv::Importers
       person_demographics = fm.person_demographics
       person_relationships = fm.person_relationships
 
-      get_person_object_by(person, person_demographics, person_relationships)
+      get_person_object_by(person, person_demographics, person_relationships, @id)
     end
 
     def get_coverage_households_by_household_xml(household)
@@ -109,7 +109,12 @@ module Parsers::Xml::Cv::Importers
       primary_applicant_person = family_member_objects.detect{|f| f.is_primary_applicant}.person rescue nil
       return if primary_applicant_person.blank?
 
-      primary_applicant_person.person_relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
+      temp_relation = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
+
+      temp_relation.each do |relation|
+        primary_applicant_person.ensure_relationship_with(relation.person, relation.kind, family.id)
+        relation.destroy
+      end
     end
   end
 end

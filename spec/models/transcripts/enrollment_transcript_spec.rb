@@ -7,15 +7,7 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
     let!(:spouse)  { FactoryGirl.create(:person)}
     let!(:child1)  { FactoryGirl.create(:person)}
     let!(:child2)  { FactoryGirl.create(:person)}
-
-    let!(:person) do
-      p = FactoryGirl.build(:person)
-      p.person_relationships.build(relative: spouse, kind: "spouse")
-      p.person_relationships.build(relative: child1, kind: "child")
-      p.person_relationships.build(relative: child2, kind: "child")
-      p.save
-      p
-    end
+    let!(:person)  { FactoryGirl.create(:person)}
 
     context "Family already exists" do
 
@@ -50,19 +42,24 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
       let(:source_enrollment_hbx_id2) { '1000002' }
 
       let(:source_family) { 
-         family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
-         primary = family.family_members.build(is_primary_applicant: true, person: person)
-         dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
+        family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
+        person.person_relationships.update_all(family_id: family.id)
+        primary = family.family_members.build(is_primary_applicant: true, person: person)
+        dependent = family.family_members.build(is_primary_applicant: false, person: spouse)
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
-         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-         enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
-         enrollment.save!
+        person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child1.id, kind: "child", family_id: family.id)
+        person.person_relationships.create(predecessor_id: person.id, successor_id: child2.id, kind: "child", family_id: family.id)
 
-         enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
-         enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
-         family.save
-         family
+        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id1, kind: 'individual',plan: source_plan, effective_on: (source_effective_on + 2.months), aasm_state: 'coverage_selected' })
+        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
+        enrollment.hbx_enrollment_members.build({applicant_id: dependent.id, is_subscriber: false, coverage_start_on: source_effective_on, eligibility_date: source_effective_on })
+        enrollment.save!
+
+        enrollment = family.active_household.hbx_enrollments.build({ hbx_id: source_enrollment_hbx_id2, kind: 'individual',plan: source_plan, effective_on: (source_effective_on), aasm_state: 'coverage_selected'})
+        enrollment.hbx_enrollment_members.build({applicant_id: primary.id, is_subscriber: true, coverage_start_on: (source_effective_on + 1.month), eligibility_date: (source_effective_on + 1.month) })
+        family.save
+        family
        }
 
       context "and enrollment member missing & plan hios is different" do
@@ -73,7 +70,6 @@ RSpec.describe Transcripts::EnrollmentTranscript, type: :model, dbclean: :after_
           factory = Transcripts::EnrollmentTranscript.new
           factory.find_or_build(other_enrollment)
           transcript = factory.transcript
-
           expect(transcript[:compare]['hbx_enrollment_members']['add']).to be_present
           expect(transcript[:compare]['hbx_enrollment_members']['add']['hbx_id']['hbx_id']).to eq dependent2.hbx_id
           expect(transcript[:compare]['hbx_enrollment_members']['remove']).to be_present

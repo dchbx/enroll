@@ -4,9 +4,10 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
 
   def new_member
     random_value = rand(999_999_999)
+    random_array = ["self","unrelated","grandparent","guardian","child"]
     instance_double(
       "HbxEnrollmentMember",
-      primary_relationship: "self:#{random_value}",
+      primary_relationship: random_array.sample,
       person: new_person(random_value)
     )
   end
@@ -79,7 +80,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
   it "should match the enrollment memebers" do
     enrollment.hbx_enrollment_members.each do |enr_member|
       expect(rendered).to match(/#{enr_member.person.full_name}/m)
-      expect(rendered).to match(/#{enr_member.primary_relationship}/m)
+      expect(rendered).to match(/#{PersonRelationship::InverseMap[enr_member.primary_relationship]}/m)
       expect(rendered).to match(/#{dob_in_words(enr_member.person.age_on(Time.now.utc.to_date),enr_member.person.dob)}/m)
       expect(rendered).to match(/#{@plan.premium_for(enr_member)}/m)
       expect(rendered).to match(/#{@plan.employer_contribution_for(enr_member)}/m)

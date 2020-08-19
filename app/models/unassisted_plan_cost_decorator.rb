@@ -1,13 +1,13 @@
 class UnassistedPlanCostDecorator < SimpleDelegator
   attr_reader :hbx_enrollment
   attr_reader :elected_aptc
-  attr_reader :tax_household
+  attr_reader :tax_households
 
-  def initialize(plan, hbx_enrollment, elected_aptc=0, tax_household=nil)
+  def initialize(plan, hbx_enrollment, elected_aptc=0, tax_households=nil)
     super(plan)
     @hbx_enrollment = hbx_enrollment
     @elected_aptc = elected_aptc.to_f
-    @tax_household = tax_household
+    @tax_households = tax_households
   end
 
   def members
@@ -48,6 +48,16 @@ class UnassistedPlanCostDecorator < SimpleDelegator
   end
 
   def aptc_amount(member)
+    return 0.00 if @tax_households.blank?
+
+    if !@tax_households.map(&:application_id).include?(nil)
+      @tax_household = @tax_households.select{|thh|  thh if thh.applicants.map(&:family_member_id).include?(member.applicant_id)}.first
+    else
+      @tax_household = @tax_households.select{|thh|  thh if thh.tax_household_members.map(&:applicant_id).include?(member.applicant_id)}.first
+    end
+
+    return (0.00) if @tax_household.blank?
+
     if @tax_household.present? && @tax_household.is_member_aptc_eligible?(member.family_member)
       unchecked_eligible_fms = @tax_household.find_aptc_family_members(members.map(&:family_member))
       aptc_ratio = ((member.family_member.aptc_benchmark_amount)/@tax_household.total_benchmark_amount(unchecked_eligible_fms))

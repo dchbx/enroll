@@ -1,6 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Insured::FamilyMembersController do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:user) { instance_double("User", :primary_family => test_family, :person => person) }
   let(:qle) { FactoryGirl.create(:qualifying_life_event_kind) }
   let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
@@ -14,6 +18,7 @@ RSpec.describe Insured::FamilyMembersController do
   before do
     employer_profile.plan_years << published_plan_year
     employer_profile.save
+    allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
   end
 
 
@@ -22,6 +27,11 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
@@ -38,7 +48,7 @@ RSpec.describe Insured::FamilyMembersController do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -46,6 +56,11 @@ RSpec.describe Insured::FamilyMembersController do
       before(:each) do
         allow(person).to receive(:broker_role).and_return(nil)
         allow(user).to receive(:person).and_return(person)
+        allow(@controller).to receive(:set_family)
+        @controller.instance_variable_set(:@person, person)
+        @controller.instance_variable_set(:@family, test_family)
+        allow(test_family).to receive(:build_relationship_matrix).and_return([])
+        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -62,7 +77,7 @@ RSpec.describe Insured::FamilyMembersController do
       end
 
       it "assigns the family" do
-        expect(assigns(:family)).to eq nil #wat?
+        expect(assigns(:family)).to eq test_family
       end
     end
 
@@ -129,10 +144,15 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "GET show" do
     let(:dependent) { double("Dependent") }
-    let(:family_member) {double("FamilyMember", id: double("id"))}
+    let(:app) { double("App") }
+    let(:family_member) {double("FamilyMember", id: double("id"), family: double("Family", application_in_progress: double("App")))}
 
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(dependent).to receive(:family_member).and_return(family_member)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       sign_in(user)
       get :show, :id => family_member.id
     end
@@ -165,10 +185,11 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "POST create" do
     let(:address) { double }
-    let(:dependent) { double(addresses: [address], family_member: true, same_with_primary: true) }
+    let(:family_member) { double("FamilyMember")}
+    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: true) }
     let(:dependent_properties) { { :family_id => "saldjfalkdjf"} }
     let(:save_result) { false }
-    # let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
+    let(:test_family) { FactoryGirl.build(:family, :with_primary_family_member) }
 
     before :each do
       sign_in(user)
@@ -176,7 +197,12 @@ RSpec.describe Insured::FamilyMembersController do
       allow(dependent).to receive(:save).and_return(save_result)
       allow(dependent).to receive(:address=)
       allow(dependent).to receive(:family_id).and_return(dependent_properties)
+      allow(dependent).to receive(:family).and_return(test_family)
+      allow(dependent).to receive(:copy_finanacial_assistances_application)
+      allow(test_family).to receive(:build_relationship_matrix).and_return([])
+      allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
+      allow(family_member).to receive_message_chain(:family, :application_in_progress).and_return nil
       post :create, :dependent => dependent_properties
     end
 
@@ -243,13 +269,118 @@ RSpec.describe Insured::FamilyMembersController do
     end
   end
 
+  describe "For member addition/deletion (post create or delete destroy)" do
+
+    let!(:family) {FactoryGirl.create(:family, :with_primary_family_member)}
+    let!(:application) {FactoryGirl.create(:application, family: family)}
+    let!(:household) {family.households.first}
+    let!(:tax_household) {FactoryGirl.create(:tax_household, household: household, effective_ending_on: nil)}
+    let!(:family_member) {family.primary_applicant}
+    let!(:applicant) {FactoryGirl.create(:applicant, tax_household_id: tax_household.id, application: application, family_member_id: family_member.id)}
+    let(:params) {{
+        "consumer_role_id"=>"",
+        "employee_role_id"=>"",
+        "dependent"=>
+            {"first_name"=>"mem",
+             "middle_name"=>"",
+             "last_name"=>"one",
+             "is_applying_coverage"=>"true",
+             "dob"=>"1990-06-01",
+             "ssn"=>"213-21-3312",
+             "no_ssn"=>"0",
+             "gender"=>"female",
+             "relationship"=>"domestic_partner",
+             "us_citizen"=>"true",
+             "naturalized_citizen"=>"false",
+             "indian_tribe_member"=>"false",
+             "tribal_id"=>"",
+             "is_incarcerated"=>"false",
+             "ethnicity"=>["", "", "", "", "", "", ""],
+             "is_consumer_role"=>"true",
+             "same_with_primary"=>"true",
+             "addresses"=>
+                 {"0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
+                  "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}},
+             "is_homeless"=>"0",
+             "is_temporarily_out_of_state"=>"0",
+             "family_id"=> family.id},
+        "jq_datepicker_ignore_dependent"=>{"dob"=>"06/01/1990"},
+        "immigration_doc_type"=>"",
+        "naturalization_doc_type"=>"",
+        "form_for_consumer_role"=>"false",
+        "button"=>"",
+        "controller"=>"insured/family_members"}}
+
+    before :each do
+      sign_in(user)
+      allow(STDOUT).to receive(:puts)
+    end
+
+    context "for member addition" do
+      it "should copy application if previous application is not in draft state" do
+        expect(family.applications.count).to eq 1
+        post :create, params
+        expect(family.applications.count).to eq 2
+      end
+
+      it "should not copy application if previous application is in draft state" do
+        family.applications.first.update_attributes(aasm_state: "draft")
+        expect(family.applications.count).to eq 1
+        post :create, params
+        expect(family.applications.count).to eq 1
+      end
+
+      it "should not copy application if there are no applications" do
+        family.applications.first.destroy!
+        family.reload
+        expect(family.applications.count).to eq 0
+        post :create, params
+        expect(family.applications.count).to eq 0
+      end
+    end
+
+    context "for member deletion" do
+      let!(:person2) { FactoryGirl.create(:person) }
+      let!(:family_member2){FactoryGirl.create(:family_member, family: family,is_primary_applicant: false, is_active: true, person: person2)}
+
+
+      it "should copy application if previous application is not in draft state" do
+        expect(family.applications.count).to eq 1
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 2
+      end
+
+      it "should not copy application if previous application is in draft state" do
+        family.applications.first.update_attributes(aasm_state: "draft")
+        expect(family.applications.count).to eq 1
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 1
+      end
+
+      it "should not copy application if there are no applications" do
+        family.applications.first.destroy!
+        family.reload
+        expect(family.applications.count).to eq 0
+        delete :destroy, :id => family.family_members[1].id
+        expect(family.applications.count).to eq 0
+      end
+    end
+  end
+
+
   describe "DELETE destroy" do
-    let(:dependent) { double }
-    let(:dependent_id) { "234dlfjadsklfj" }
+    let!(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+    let!(:family_member) { test_family.primary_applicant }
+    let!(:application) { FactoryGirl.create(:application, aasm_state: "draft", family: test_family) }
+    let!(:applicant) { FactoryGirl.create(:applicant, family_member_id: family_member.id, application: application)}
+    let!(:dependent) { double }
+    let!(:dependent_id) { "234dlfjadsklfj" }
 
     before :each do
       sign_in(user)
       allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
+      allow(dependent).to receive(:family_member).and_return(family_member)
+      allow(dependent).to receive(:copy_finanacial_assistances_application)
     end
 
     it "should destroy the dependent" do
@@ -287,8 +418,7 @@ RSpec.describe Insured::FamilyMembersController do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:family_member) { double }
-    let(:dependent) { double(addresses: [address], family_member: family_member, same_with_primary: 'true') }
+    let(:dependent) { double(addresses: [address], family_member: double("FamilyMember", family: double("Family", application_in_progress: double("App"))), same_with_primary: 'true') }
     let(:dependent_id) { "234dlfjadsklfj" }
     let(:dependent_properties) { { "first_name" => "lkjdfkajdf" } }
     let(:update_result) { false }
@@ -319,7 +449,14 @@ RSpec.describe Insured::FamilyMembersController do
     end
 
     describe "with a valid dependent" do
+      let(:test_family) { FactoryGirl.create(:family, :with_primary_family_member) }
+      let(:family_member) {  test_family.primary_applicant }
       let(:update_result) { true }
+
+      before :each do
+        allow(dependent).to receive(:family_member).and_return(family_member)
+      end
+
       it "should render the show template" do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
         put :update, :id => dependent_id, :dependent => dependent_properties

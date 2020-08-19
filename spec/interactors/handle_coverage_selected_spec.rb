@@ -19,8 +19,8 @@ describe HandleCoverageSelected do
     let(:enrollment_members) { [enrollment_member_1, enrollment_member_2] }
 
     before(:each) do
-      allow(enrollment_member_1).to receive(:ivl_coverage_selected)
-      allow(enrollment_member_2).to receive(:ivl_coverage_selected)
+      allow(enrollment_member_1).to receive(:trigger_hub_call)
+      allow(enrollment_member_2).to receive(:trigger_hub_call)
       allow(Time).to receive(:now).and_return(the_update_time)
       allow(hbx_enrollment).to receive(:update_attributes!).with({:published_to_bus_at => the_update_time})
     end
@@ -30,12 +30,12 @@ describe HandleCoverageSelected do
     end
 
     it "notifies of coverage selection for enrollment member 1" do
-      expect(enrollment_member_1).to receive(:ivl_coverage_selected).with(no_args)
+      expect(enrollment_member_1).to receive(:trigger_hub_call).with(no_args)
       HandleCoverageSelected.call(context)
     end
 
     it "notifies of coverage selection for enrollment member 2" do
-      expect(enrollment_member_2).to receive(:ivl_coverage_selected).with(no_args)
+      expect(enrollment_member_2).to receive(:trigger_hub_call).with(no_args)
       HandleCoverageSelected.call(context)
     end
 
@@ -66,12 +66,12 @@ describe HandleCoverageSelected do
       end
 
       it "does not notify of ivl coverage selection for enrollment member 1" do
-        expect(enrollment_member_1).not_to receive(:ivl_coverage_selected).with(no_args)
+        expect(enrollment_member_1).not_to receive(:trigger_hub_call).with(no_args)
         HandleCoverageSelected.call(context)
       end
 
       it "does not notify of ivl coverage selection for enrollment member 1" do
-        expect(enrollment_member_1).not_to receive(:ivl_coverage_selected).with(no_args)
+        expect(enrollment_member_1).not_to receive(:trigger_hub_call).with(no_args)
         HandleCoverageSelected.call(context)
       end
 
@@ -99,12 +99,12 @@ describe HandleCoverageSelected do
       end
 
       it "does not notify of ivl coverage selection for enrollment member 1" do
-        expect(enrollment_member_1).not_to receive(:ivl_coverage_selected)
+        expect(enrollment_member_1).not_to receive(:trigger_hub_call)
         HandleCoverageSelected.call(context)
       end
 
       it "does not notify of ivl coverage selection for enrollment member 1" do
-        expect(enrollment_member_2).not_to receive(:ivl_coverage_selected)
+        expect(enrollment_member_2).not_to receive(:trigger_hub_call)
         HandleCoverageSelected.call(context)
       end
 

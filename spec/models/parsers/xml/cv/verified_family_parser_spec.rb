@@ -8,8 +8,6 @@ describe Parsers::Xml::Cv::VerifiedFamilyParser do
 
     it 'should return the elements as a hash' do
       subject.parse(xml)
-      # puts subject.to_hash
-      # TODO expect min valid elements for valid XSD
       expect(subject.to_hash).to include(:integrated_case_id, :family_members, :primary_family_member_id, :households, :submitted_at, :is_active, :created_at)
     end
   end

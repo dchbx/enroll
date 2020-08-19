@@ -228,7 +228,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
     let(:family) { FactoryGirl.create(:family, :with_primary_family_member)}
 
     it "should build consumer role for a person" do
-      helper.build_consumer_role(person,family)
+      helper.build_consumer(person,family)
       expect(person.consumer_role.present?). to eq true
     end
   end

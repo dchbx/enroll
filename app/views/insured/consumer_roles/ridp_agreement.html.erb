@@ -1,49 +1,53 @@
 <% content_for :horizontal_status do %>
-<%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if show_component(request.path) %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
 
 <div class="container <%=pundit_class Family, :updateable?%>">
-  <div class="row">
-    <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12">
-      <h1 class="darkblue">Authorization and Consent</h1>
-      <p><b> Read the authorization and consent statement. You must select "I Agree" to complete your application online. When you're finished, select CONTINUE. </b></p>
-      <div class="row row-form-wrapper no-buffer" >
-        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-          <div class="col-lg-12" style="margin-top: 10px">
-            <p>For your security, we need to verify your identity before you can proceed. If you agree, you are providing consent to Experian to access your personal information to conduct identity verification on behalf of the Centers for Medicare and Medicaid Services (CMS) - part of the U.S. Department of Health and Human Services (HHS). Below are a few items to keep in mind.</p>
-            <ul >
-              <li>
-                Make sure that you entered your legal name, current home address, primary phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, a third party identity verification provider.
-              </li>
-              <li>
-                To verify your identity, Experian uses information from your consumer credit report profile. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, are never shared with third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.
-              </li>
-              <li>
-                You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you based on data in their files.
-              </li>
-            </ul>
-            <p>
-              <br/>
-              Please select one of the following options to continue:
-            </p>
-          </div>
+  <div class="col-lg-2 col-md-2 col-sm-2">
+    <%= render :partial => 'shared/left_nav.html.erb' %>
+  </div>
+  <div class="col-lg-7 col-md-7 col-sm-7">
+    <div class="panel">
+      <div class="panel-body">
+        <h2 class="darkblue">Authorization and Consent</h2>
+        <p> Read the authorization and consent statement. You must select "I Agree" to complete your application online. When you're finished, select CONTINUE.</p>
+        <p>For your security, we need to verify your identity before you can proceed. If you agree, you are providing consent to Experian to access your personal information to conduct identity verification on behalf of the Centers for Medicare and Medicaid Services (CMS) - part of the U.S. Department of Health and Human Services (HHS). Below are a few items to keep in mind.</p>
+        <ul >
+          <li>
+            Make sure that you entered your legal name, current home address, primary phone number, date of birth and email address correctly. We will only collect personal information to verify your identity with Experian, a third party identity verification provider.
+          </li>
+          <br>
+          <li>
+            To verify your identity, Experian uses information from your consumer credit report profile. As a result, you may see an entry called a “soft inquiry” on your Experian consumer report. Soft inquiries are only visible to you, are never shared with third parties, and do not affect your credit score. The soft inquiry will be titled “CMS Proofing Services” and will be removed from your Experian consumer report after 25 months.
+          </li>
+          <br>
+          <li>
+            You may need to have access to your personal and consumer report information, as the Experian application will pose questions to you based on data in their files.
+          </li>
+        </ul>
+        <p>
+          <br/>
+          Please select one of the following options to continue:
+        </p>
+        <div class="disagree_placeholder_text" style="display: none">
+          <%= "Please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number} for more information" %>
         </div>
       </div>
-      <div class="disagree_placeholder_text" style="display: none">
-        <%= "Please contact #{Settings.contact_center.name}: #{Settings.contact_center.phone_number} for more information" %>
-      </div>
       <div class="row row-form-wrapper no-buffer" style="border-top: solid 1px #b7b7b7;">
-        <div class="col-lg-12 radio skinned-form-controls skinned-form-controls-mac">
+        <div class="col-lg-2 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "agree", true, class: "required floatlabel"  %>
           <label for="agreement_agree"><span style="white-space: nowrap;">I agree</span></label>
         </div>
       </div>
       <div class="row row-form-wrapper no-buffer">
-        <div class="col-lg-12 radio skinned-form-controls skinned-form-controls-mac">
+        <div class="col-lg-10 radio skinned-form-controls skinned-form-controls-mac">
           <%= radio_button_tag :agreement, "disagree", false, class: "required floatlabel"  %>
           <label for="agreement_disagree"><span style="white-space: nowrap;">I disagree</span></label>
         </div>
       </div>
+      <br />
       <div class="row row-form-wrapper no-buffer hide">
         <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 edit pd aut_cons_text">
           <p>
@@ -55,8 +59,8 @@
         </div>
       </div>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 right-section">
-      <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
-    </div>
+  </div>
+  <div class="col-lg-3 col-md-3 col-sm-3">
+    <%= render  partial: 'shared/individual_progress', locals: {step: '2', ridp: true} %>
   </div>
 </div>

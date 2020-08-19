@@ -3,24 +3,24 @@ When(/^the user navigates to the DOCUMENTS tab$/) do
   visit verification_insured_families_path
 end
 
-Then(/^a button will be visible to the user labeled MEDICAID & TAX CREDITS$/) do
-  expect(page).to have_content('Medicaid & Tax Credits')
+Then(/^a button will be visible to the user labeled GO TO MEDICAID$/) do
+  expect(page).to have_content('Go To Medicaid')
 end
 
-When(/^MEDICAID & TAX CREDITS button is visible to the user$/) do
-  find_link('Medicaid & Tax Credits').visible?
+When(/^GO TO MEDICAID button is visible to the user$/) do
+  find_link('Go to Medicaid').visible?
 end
 
-Then(/^there will be text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional documents')
+Then(/^there will be text to the left of the GO TO MEDICAID button$/) do
+  expect(page).to have_content('If you qualify for Medicaid, view your Medicaid documents.')
 end
 
-Then(/^there will be messages text to the left of the MEDICAID & TAX CREDITS button$/) do
-  expect(page).to have_content('If you applied for Medicaid and tax credit savings, view additional messages')
+Then(/^there will be messages text to the left of the GO TO MEDICAID button$/) do
+  expect(page).to have_content('If you qualify for Medicaid, view your Medicaid messages.')
 end
 
-When(/^the user clicks on the MEDICAID & TAX CREDITS button$/) do
-  switch_to_window { find('.btn', text: 'Medicaid & Tax Credits').click }
+When(/^the user clicks on the GO TO MEDICAID button$/) do
+  switch_to_window { find('.btn', text: 'Go To Medicaid').click }
 end
 
 Then(/^EA sets a flag in IAM to direct the consumer to the curam\/ drupal login$/) do

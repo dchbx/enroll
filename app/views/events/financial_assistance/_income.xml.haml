@@ -1,0 +1,27 @@
+%income 
+  %income_id= income.id
+  - if income.title.present?
+    %title= income.title
+  %income_type= "urn:openhbx:terms:v1:financial_assistance_income##{income.income_type}"
+  - unless income.has_property_usage_rights.nil?
+    %has_property_usage_rights= income.has_property_usage_rights
+  - if income.wage_type.present?
+    %wage_type= "urn:openhbx:terms:v1:financial_assistance_income_wage_type##{income.wage_type}"
+  - if income.hours_per_week.present? && income.hours_per_week > 0
+    %hours_per_week= income.hours_per_week
+  %amount= '%.2f' % (income.amount.to_f.round(2))
+  %frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{income.frequency_kind}"
+  %start_on= simple_date_for(income.start_on)
+  - unless income.end_on.blank?
+    %end_on= simple_date_for(income.end_on)
+  - unless income.employer_name.blank?
+    %employer_name= income.employer_name
+  - unless income.employer_id.blank?
+    %employer_id= income.employer_id
+  - if income.employer_address.present?
+    = render :partial => "events/addresses/employer_address", :object => income.employer_address, as: :address
+  - if income.employer_phone.present?
+    = render :partial => "events/phones/employer_phone", :object => income.employer_phone, as: :phone
+  - unless income.is_projected.nil?
+    %is_projected= income.is_projected
+  %submitted_at= income.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')

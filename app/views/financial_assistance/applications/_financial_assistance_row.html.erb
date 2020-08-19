@@ -1,0 +1,17 @@
+<div class="col-md-4 col-sm-10 no-pd form-group-lg app-status white-background" id = "applicant_<%= applicant.id %>">
+  <%= render '/financial_assistance/shared/info_needed', applicant: applicant%>
+</div>
+
+<div class="col-md-8 col-sm-2 form-group-lg white-background right">
+ <% if applicant.workflow.present? %>
+		<%= link_to go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default" do %>
+			<i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
+			EDIT INCOME & COVERAGE INFO
+		<% end %>
+	<% else %>
+		<%= link_to go_to_step_financial_assistance_application_applicant_path(applicant.application, applicant, 1), class: "btn btn-default add" do %>
+			<i class="fa fa-file-text-o fa-lg" aria-hidden="true"></i>
+			ADD INCOME & COVERAGE INFO
+		<% end %>
+	<% end %>
+</div>

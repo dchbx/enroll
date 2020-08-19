@@ -43,6 +43,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
         expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
@@ -69,6 +70,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
     describe "no unverified enrollments" do
       before :each do
         allow(view).to receive(:enrollment_group_unverified?).and_return false
+        allow(view).to receive(:verification_needed?).and_return false
         render partial: "insured/families/navigation.html.erb"
       end
 
@@ -76,6 +78,45 @@ RSpec.describe "insured/families/_navigation.html.erb" do
         expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
         expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
         expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
+        expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
+      end
+
+      it "should display the info under my account in the side bar" do
+        expect(rendered).to have_selector('h4', 'My Account')
+        expect(rendered).to have_selector('span', "#{person.first_name} #{person.last_name}")
+        expect(rendered).to have_selector('span', "Your household of #{family_members.count}")
+      end
+
+      it "should display the list of active household" do
+        family_members.each do |family_member|
+          expect(rendered).to match(/#{family_member.first_name} #{family_member.last_name}/)
+        end
+      end
+
+      it "should have a link to manage family button" do
+        expect(rendered).to have_selector('a[href="/insured/families/manage_family?tab=family"]', text: 'Manage Family')
+      end
+
+      it "doesn't show action needed label" do
+        expect(rendered).to_not match(/Action Needed/)
+      end
+    end
+
+    describe "with uploaded documents" do
+      before :each do
+        allow(view).to receive(:enrollment_group_unverified?).and_return true
+        allow(view).to receive(:verification_needed?).and_return true
+        allow(view).to receive(:documents_uploaded).and_return true
+        allow(view).to receive(:enrollment_group_unverified?).and_return false
+        render partial: "insured/families/navigation.html.erb"
+      end
+
+      it "should match the side bar tabs info on family home page" do
+        expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
+        expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
+        expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+        expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
         expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
       end
 
@@ -111,6 +152,7 @@ RSpec.describe "insured/families/_navigation.html.erb" do
       expect(rendered).to have_selector('a[href="/families/home?tab=home"]', text: "My #{Settings.site.short_name}")
       expect(rendered).to have_selector('a[href="/insured/families/brokers?tab=broker"]', text: 'My Broker')
       expect(rendered).to have_selector('a[href="/insured/families/verification?tab=verification"]', text: 'Documents')
+      expect(rendered).to have_selector('a[href="/financial_assistance/applications"]', text: 'Cost Savings')
       expect(rendered).to have_selector('a[href="/insured/families/inbox?tab=messages"]', text: 'Messages')
     end
 

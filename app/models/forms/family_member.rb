@@ -5,7 +5,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
+    attr_accessor :addresses, :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -32,14 +32,14 @@ module Forms
 
     attr_reader :dob
 
-    HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }
+    HUMANIZED_ATTRIBUTES = {relationship: "Select Relationship Type "}
 
     def self.human_attribute_name(attr, options={})
       HUMANIZED_ATTRIBUTES[attr.to_sym] || super
     end
 
     def consumer_fields_validation
-      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true")#only check this for consumer flow.
+      if (@is_consumer_role.to_s == "true" && is_applying_coverage.to_s == "true") #only check this for consumer flow.
         if @us_citizen.nil?
           self.errors.add(:base, "Citizenship status is required")
         elsif @us_citizen == false && @eligible_immigration_status.nil?
@@ -106,6 +106,7 @@ module Forms
       assign_person_address(person)
       family.save_relevant_coverage_households
       family.save!
+      family.build_relationship_matrix
       self.id = family_member.id
       true
     end
@@ -119,7 +120,7 @@ module Forms
     def assign_person_address(person)
       if same_with_primary == 'true'
         primary_person = family.primary_family_member.person
-        person.update(no_dc_address: primary_person.no_dc_address, no_dc_address_reason: primary_person.no_dc_address_reason)
+        person.update(no_dc_address: primary_person.no_dc_address, is_homeless: primary_person.is_homeless?, is_temporarily_out_of_state: primary_person.is_temporarily_out_of_state?)
         address = primary_person.home_address
         if address.present?
           person.home_address.try(:destroy)
@@ -181,7 +182,8 @@ module Forms
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
         :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :is_homeless => is_homeless,
+        :is_temporarily_out_of_state => is_temporarily_out_of_state
       }
     end
 
@@ -231,7 +233,8 @@ module Forms
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary.to_s,
         :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
-        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
+        :is_homeless => has_same_address_with_primary ? false : found_family_member.try(:person).try(:is_homeless),
+        :is_temporarily_out_of_state => has_same_address_with_primary ? false : found_family_member.try(:person).try(:is_temporarily_out_of_state),
         :addresses => [home_address, mailing_address]
       })
     end
@@ -242,7 +245,8 @@ module Forms
 
       compare_keys = ["address_1", "address_2", "city", "state", "zip"]
       current.no_dc_address == primary.no_dc_address &&
-        current.no_dc_address_reason == primary.no_dc_address_reason &&
+        current.is_homeless? == primary.is_homeless? && 
+        current.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
         current.home_address.attributes.select{|k,v| compare_keys.include? k} == primary.home_address.attributes.select{|k,v| compare_keys.include? k}
     rescue
       false
@@ -285,7 +289,10 @@ module Forms
         family_member.family.build_resident_role(family_member)
       end
       assign_person_address(family_member.person)
-      family_member.update_relationship(relationship)
+      #family_member.update_relationship(relationship) #old_code
+      family_member.person.add_relationship(family.primary_applicant.person, relationship, family_id, true)
+      family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
+      family.build_relationship_matrix
       family_member.save!
       true
     end
@@ -295,11 +302,31 @@ module Forms
       return if family.blank? || family.family_members.blank?
 
       relationships = Hash.new
-      family.active_family_members.each{|fm| relationships[fm._id.to_s]=fm.relationship}
+      family.active_family_members.each {|fm| relationships[fm._id.to_s]=fm.relationship}
       relationships[self.id.to_s] = self.relationship
-      if relationships.values.count{|rs| rs=='spouse' || rs=='life_partner'} > 1
+      if relationships.values.count {|rs| rs=='spouse' || rs=='life_partner'} > 1
         self.errors.add(:base, "can not have multiple spouse or life partner")
       end
+    end
+
+    def copy_finanacial_assistances_application
+      service = application_service.new(family)
+      service.process_application unless service.code == :no_app
+    end
+
+    def age_on(date)
+      age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
+    end
+
+    private
+
+    def application_service
+      FinancialAssistance::Services::ApplicationService
     end
   end
 end

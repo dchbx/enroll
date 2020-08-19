@@ -229,7 +229,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
   end
 
-  context "PUT update" do
+  context "PUT update", dbclean: :after_each do
     let(:person_params){{"family"=>{"application_type"=>"Phone"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.create(:person, :with_family) }
 
@@ -243,26 +243,27 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     end
 
     it "should update existing person" do
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
     end
 
-    it "should redirect to family members path when current user is admin & doing new paper app" do
+    it "should redirect to help paying for coverage path when current user is admin & doing new paper app" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return true
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      expect(response).to redirect_to help_paying_coverage_financial_assistance_applications_path
     end
 
     it "should not update the person" do
       allow(controller).to receive(:update_vlp_documents).and_return(false)
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'unverified'
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -271,6 +272,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(controller).to receive(:update_vlp_documents).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'unverified'
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
@@ -278,6 +280,7 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
     it "should raise error" do
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:success)
+      expect(consumer_role.aasm_state).to eq 'unverified'
       expect(response).to render_template(:edit)
       expect(person.errors.full_messages).to include "Document type cannot be blank"
     end
@@ -287,12 +290,13 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       allow(consumer_role).to receive(:update_by_person).and_return(false)
       expect(controller).to receive(:bubble_address_errors_by_person)
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'unverified'
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:edit)
     end
   end
 
-  context "PUT update as HBX Admin" do
+  context "PUT update as HBX Admin", dbclean: :after_each do
     let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryGirl.create(:person, :with_family, :with_hbx_staff_role) }
 
@@ -305,49 +309,49 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
       sign_in user
     end
 
-    it "should redirect to family members path when current user has application type as Curam" do
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
+    it "should redirect to help paying for coverage path  when current user has application type as Curam" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      expect(response).to redirect_to help_paying_coverage_financial_assistance_applications_path
     end
 
-    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Curam' do
+    it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Curam' do
       person_params["family"]["application_type"] = "Curam"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      expect(response).to redirect_to help_paying_coverage_financial_assistance_applications_path
     end
 
-    it "should redirect to family members path when current user has application type as Mobile" do
+    it "should redirect to help paying for coverage page when current user has application type as Mobile" do
       person_params["family"]["application_type"] = "Mobile"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
+      expect(response).to redirect_to help_paying_coverage_financial_assistance_applications_path
     end
 
-    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Mobile' do
+    it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Mobile' do
       person_params["family"]["application_type"] = "Mobile"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
       put :update, person: person_params, id: "test"
+      expect(consumer_role.aasm_state).to eq 'ssa_pending'
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_update_reason). to eq 'Verified from Mobile'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      expect(response).to redirect_to help_paying_coverage_financial_assistance_applications_path
     end
   end
 
@@ -547,6 +551,5 @@ RSpec.describe Insured::ConsumerRolesController, :type => :controller do
         expect(response).to redirect_to(edit_insured_consumer_role_path(user.person.consumer_role.id))
       end
     end
-
   end
 end

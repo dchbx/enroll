@@ -1,0 +1,32 @@
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Age</th>
+      <th>Needs Coverage?</th>
+      <th>Verified?</th>
+      <th>Status?</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <%members.each do |member|%>
+      <tr>
+        <td><%=member.person.full_name%></td>
+        <td><%=member.person.age_on(TimeKeeper.date_of_record)%></td>
+        <td>Yes</td>
+        <td>No</td>
+        <td>
+          <%if @application.active_applicants.find_by(family_member_id: member.id).applicant_validation_complete?%>
+          <span class="glyphicon glyphicon-ok complete-icon"></span>&nbsp;<span class="complete-icon">Complete</span>
+          <%else%>
+          <span class="glyphicon glyphicon-refresh in-progress-icon"></span>&nbsp;<span class ="in-progress-icon">In Progress</span>
+          <%end%>
+        </td>
+        <td>
+          <%= link_to "Add Info", go_to_step_financial_assistance_application_applicant_path(@application, @application.active_applicants.find_by(family_member_id: member.id), 1), class: "btn btn-info"  %>
+        </td>
+      </tr>
+    <%end%>
+  </tbody>
+</table>

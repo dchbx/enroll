@@ -63,11 +63,17 @@ module BradyBunch
     let(:brady_children) {brady_sons + brady_daughters}
     let(:bradys) {[mike, carol, greg, marcia, peter, jan, bobby, cindy]}
     let!(:mikes_family) do
-      mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
-      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
+      mike.person_relationships.build(predecessor_id: mike.id, :successor_id => carol.id, :kind => "spouse", family_id: family.id)
+      carol.person_relationships.build(successor_id: mike.id, :predecessor_id => carol.id, :kind => "spouse", family_id: family.id)
       brady_children.each do |child|
-        mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        mike.person_relationships.build(predecessor_id: mike.id, :successor_id => child.id, :kind => "parent", family_id: family.id)
+        child.person_relationships.build(successor_id: mike.id, :predecessor_id => child.id, :kind => "child", family_id: family.id)
       end
+      # mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
+      # mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
+      # brady_children.each do |child|
+      #   mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+      # end
       mike.save
 
       family = FactoryGirl.build(:family)
@@ -79,11 +85,17 @@ module BradyBunch
       family
     end
     let!(:carols_family) do
-      carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
-      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
+      mike.person_relationships.build(predecessor_id: mike.id, :successor_id => carol.id, :kind => "spouse", family_id: family.id)
+      carol.person_relationships.build(successor_id: mike.id, :predecessor_id => carol.id, :kind => "spouse", family_id: family.id)
       brady_children.each do |child|
-        carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+        carol.person_relationships.build(predecessor_id: carol.id, :successor_id => child.id, :kind => "parent", family_id: family.id)
+        child.person_relationships.build(successor_id: carol.id, :predecessor_id => child.id, :kind => "child", family_id: family.id)
       end
+      # carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
+      # carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
+      # brady_children.each do |child|
+      #   carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
+      # end
       carol.save
 
       family = FactoryGirl.build(:family)

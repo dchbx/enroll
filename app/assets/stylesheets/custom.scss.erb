@@ -13,7 +13,7 @@ body {
     padding-bottom: 70px;
 }
 
-h1, h2, h3, h4, h5, h6 {font-weight: 300; line-height: 1.6em;}
+h1, h2, h3, h4, h5, h6 {font-weight: 500; line-height: 1.6em;}
 #new_person_wrapper p, .group-selection p {
   font-weight: 300;
 }
@@ -3810,6 +3810,7 @@ ul.list-right-section li a img {
 }
 .row-form-wrapper .radio {margin: 6px 0;}
 .row-form-wrapper input[type="radio"] {display: none;}
+.row-form-wrapper.radio-align input[type="radio"] {display: inline;}
 .row-form-wrapper input[type="radio"] + label span {
     background: rgba(0, 0, 0, 0) url("<%= asset_path('icons/check_radio_sheet.png') %>") no-repeat scroll left top;
     cursor: pointer;
@@ -4875,6 +4876,86 @@ input:required:valid {
   margin-bottom: 10px;
 }
 
+.small-right-margin {
+    margin-right: 10px !important;
+}
+
+.small-left-margin {
+    margin-left: 10px !important;
+}
+
+.small-margin-top {
+    margin-top:20px !important;
+}
+
+.very-small-margin-top {
+    margin-top: 10px !important;
+}
+
+.faded {
+  font-weight: 600;
+  opacity: 0.4
+}
+
+.activer {
+  background: #007BC4;
+  color: white;
+  font-weight: 600;
+}
+.activer > a {
+  background: #007BC4;
+  font-weight: 600;
+}
+
+.white-background {
+  background: white;
+}
+
+.padding-vertical {
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 1px solid black;
+}
+.back_to-household-btn {
+  float: right;  
+}
+.not-sure-margin{
+  margin-top: 14px;
+  margin-left: -15px;
+}
+
+.no-padding {
+  padding: 0px;
+}
+.ln-ht46{
+  line-height: 46px;
+}
+.family-row-height{
+  min-height: 53px;
+}
+.mt-label{
+  margin-top: -19px;
+}
+.ml-label{
+  margin-left: -4px;
+}
+.position-full-name{
+  top:2px;
+  position:relative;
+  margin-left: -4px;
+}
+.static-font {
+  font-size: 12px;
+  color: #444;
+}
+.mt18 {
+  margin-top: 18px;
+}
+.position-left{
+  float:left;
+  margin-right: 10px;
+}
+
 .row_align_application_type{
   color: rgb(131, 135, 128);
   margin-left: 15px;
@@ -4884,4 +4965,14 @@ input:required:valid {
   .selectric-wrapper {
     left: 30%;
   }
+}
+
+.border-bottom {
+  border-bottom: 1px solid #ddd;
+}
+
+.border-sides {
+  border: 1px solid #ddd;
+  border-top: none;
+  border-bottom: none;
 }
