@@ -4,23 +4,23 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse)  {
+    let!(:spouse) do
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "spouse")
       p.save; p
-    }
+    end
 
-    let!(:child1)  {
+    let!(:child1) do
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "child")
       p.save; p
-    }
+    end
 
-    let!(:child2)  {
+    let!(:child2) do
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "child")
       p.save; p
-    }
+    end
 
     let!(:person) do
       p = FactoryBot.build(:person)
@@ -29,16 +29,16 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
     context "Family already exists" do
 
-      let!(:source_family) {
+      let!(:source_family) do
         family = Family.new({ hbx_assigned_id: '25112', e_case_id: "6754632" })
         family.family_members.build(is_primary_applicant: true, person: person)
         family.family_members.build(is_primary_applicant: false, person: spouse)
         family.family_members.build(is_primary_applicant: false, person: child1)
         family.save(:validate => false)
         family
-      }
+      end
 
-      let(:other_family) {
+      let(:other_family) do
         family = Family.new({
           hbx_assigned_id: '24112',
           e_case_id: "6754632"
@@ -48,7 +48,7 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
         family.family_members.build(is_primary_applicant: false, person: child2)
         family.irs_groups.build(hbx_assigned_id: '651297232112', effective_starting_on: Date.new(2016,1,1), effective_ending_on: Date.new(2016,12,31), is_active: true)
         family
-      }
+      end
 
       def build_transcript
        factory = Transcripts::FamilyTranscript.new
