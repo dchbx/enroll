@@ -39,28 +39,25 @@
               <strong><%= hbx_enrollment.effective_on %></strong>
             </div>
             <% if hbx_enrollment.is_shop? %>
-              <label><%= l10n("termination_date") %>: </label>
-              <% if @family.latest_shop_sep_termination_kinds.present? %>
-                <br>
-                <div class="col-lg-4">
-                  <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on'} %>
-                </div>
-              <% else %>
-                <div>
+              <div>
+                <% if @family.latest_shop_sep_termination_kinds.present? %>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <label><%= l10n("termination_date") %>: </label>
+                    </div>
+                    <div class="col-md-6 termination_date no-pd-left">
+                      <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: 'terminated_on', name: 'terminated_on'} %>
+                    </div>
+                  </div>
+                <% else %>
+                  <label><%= l10n("termination_date") %>: </label>
                   <strong><%= @family.terminate_date_for_shop_by_enrollment(hbx_enrollment) %></strong>
-                </div>
-              <% end %>
+                <% end %>
+              </div>
             <% end %>
           </div>
-          <div class="col-xs-4">
-            <div class="family-plan-selection">
-              <div class="status">
-
-              </div>
-             </div>
-          </div>
         </div>
-
+        <br>
         <div class="row">
           <div class="col-xs-4 fa-icon-link">
             <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: plan } %>
