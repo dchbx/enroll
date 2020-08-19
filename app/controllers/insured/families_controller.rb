@@ -329,7 +329,7 @@ class Insured::FamiliesController < FamiliesController
     return term_date unless terminate_date.present?
 
     begin
-      Date.strptime(:terminate_date, "%m/%d/%Y")
+      Date.strptime(terminate_date, "%m/%d/%Y")
     rescue StandardError
       term_date
     end
