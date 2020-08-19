@@ -13,8 +13,8 @@ RSpec.describe PaymentTransactionsController, :type => :controller do
 
   context 'GET generate saml response' do
     before(:each) do
-      primary_person.person_relationships.first.update_attributes!(predecessor_id: primary_person.id, successor_id: child1.id, family_id: family.id )
-      primary_person.person_relationships.last.update_attributes!(predecessor_id: primary_person.id, successor_id: child2.id, family_id: family.id )
+      primary_person.person_relationships.first.update_attributes!(predecessor_id: primary_person.id, successor_id: child1.id, family_id: family.id)
+      primary_person.person_relationships.last.update_attributes!(predecessor_id: primary_person.id, successor_id: child2.id, family_id: family.id)
       sign_in user
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
       allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
