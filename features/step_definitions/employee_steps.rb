@@ -94,7 +94,15 @@ And(/employee (.*) with a dependent has (.*) relationship with age (.*) than 26/
 end
 
 Given(/^Covid QLE present with top ordinal position$/) do
-  FactoryBot.create(:qualifying_life_event_kind, title: 'Covid-19', reason: 'covid-19', market_kind: "shop", post_event_sep_in_days: 30,  effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"], termination_on_kinds: ["end_of_event_month", "date_before_event"], ordinal_position: 5, qle_event_date_kind: :submitted_at)
+  FactoryBot.create(:qualifying_life_event_kind,
+                    title: 'Covid-19',
+                    reason: 'covid-19',
+                    market_kind: "shop",
+                    post_event_sep_in_days: 30,
+                    effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
+                    termination_on_kinds: ["end_of_event_month", "date_before_event"],
+                    ordinal_position: 5,
+                    qle_event_date_kind: :submitted_at)
 end
 
 Then(/^\w+ should see the "(.*?)" at the (.*) of the (.*?) qle list$/) do |qle_event, position, _market_kind|
