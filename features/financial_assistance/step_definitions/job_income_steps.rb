@@ -86,7 +86,6 @@ Given(/^the user has entered at least one job income information$/) do
   page.all(".interaction-choice-control-income-employer-address-state").last.click
   page.all(".interaction-choice-control-income-employer-address-state-5").last.click
   fill_in 'income[employer_address][zip]', with: "22046"
-  binding.pry
   find('.interaction-click-control-save').click
 end
 
