@@ -809,15 +809,11 @@ Given("Employee creates account and on home page") do
   step "employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal"
 end
 
-When(/^.+ clicks on (.*) button$/) do |button|
-  if button == 'Shop For Plans'
-    sfp = page.all('div').detect { |div| div.text == 'Shop For Plans'}
-    sfp.click
-    find('.interaction-click-control-shop-now').click
-    find(".interaction-click-control-continue").click
-  else
-    step "Patrick Doe clicked on make changes button"
-  end
+When("Patrick Doe clicked on Shop For Plans button") do
+  sfp = page.all('div').detect { |div| div.text == 'Shop For Plans'}
+  sfp.click
+  find('.interaction-click-control-shop-now').click
+  find(".interaction-click-control-continue").click
 end
 
 Then(/^.+ should see Termination on kinds dropdown$/) do

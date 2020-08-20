@@ -26,7 +26,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     Then Employee should see coverage summary page with "first_of_this_month" as coverage effective date
     Then Employee should see receipt page with "first_of_this_month" as coverage effective date
     Then Patrick Doe should see "my account" page with enrollment
-    When Patrick Doe clicks on <shopping_button> button
+    When Patrick Doe clicked on <shopping_button> button
     Then Patrick Doe should see page with SelectPlanToTerminate button
     When Patrick Doe clicks SelectPlanToTerminate button
     Then Patrick Doe should see Termination on kinds dropdown
