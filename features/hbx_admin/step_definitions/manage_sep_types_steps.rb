@@ -688,7 +688,6 @@ Then(/^\w+ should (.*) input field to enter the Sep Type date$/) do |action|
   end
 end
 
-
 And(/^\w+ fill in QLE date (.*) the range eligiblity date period$/) do |date|
   if date == 'outside'
     fill_in "qle_date", with: (TimeKeeper.date_of_record - 3.months).strftime('%m/%d/%Y').to_s
@@ -703,7 +702,6 @@ And(/^\w+ should see QLE date filled and clicks continue$/) do
     find('.interaction-click-control-continue').click
   end
 end
-
 
 Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
   if action == 'see'
@@ -809,4 +807,16 @@ Given("Employee creates account and on home page") do
   step "employee Patrick Doe has past hired on date"
   step "Employee has not signed up as an HBX user"
   step "employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal"
+end
+
+When(/^.+ clicks on Shop For Plans button$/) do
+  sfp = page.all('div').detect { |div| div.text == 'Shop For Plans'}
+  sfp.click
+  find('.interaction-click-control-shop-now').click
+end
+
+And(/^.+ selects Termination on kinds date on the dropdown$/) do
+  sleep 2
+  find("span", :text => "Choose").click
+  find("li", :text => TimeKeeper.date_of_record.end_of_month.to_s).click
 end
