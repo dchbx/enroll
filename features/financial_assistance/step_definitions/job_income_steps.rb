@@ -40,18 +40,20 @@ end
 And(/^the user fills out the required employer information$/) do
   fill_in 'income[employer_name]', with: "Sample Employer"
   fill_in 'income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-income-frequency-kind")[1].trigger('click')
-  find_all('.interaction-choice-control-income-frequency-kind-7')[1].trigger('click')
+  page.all(".interaction-choice-control-income-frequency-kind")[1].click
+  sleep 1
+  page.all('.interaction-choice-control-income-frequency-kind-7').last.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
+  sleep 1
+  page.all('.fa-darkblue').last.click
   fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
   fill_in 'income[employer_address][address_1]', with: "12 main st"
   fill_in 'income[employer_address][address_2]', with: "beside starbucks"
   fill_in 'income[employer_address][city]', with: "washington"
 
-  find_all(".interaction-choice-control-income-employer-address-state")[2].trigger('click')
-  find_all(".interaction-choice-control-income-employer-address-state-5")[1].trigger('click')
+  page.all(".interaction-choice-control-income-employer-address-state").last.click
+  page.all(".interaction-choice-control-income-employer-address-state-5").last.click
   fill_in 'income[employer_address][zip]', with: "22046"
 end
 
@@ -70,19 +72,21 @@ Given(/^the user has entered at least one job income information$/) do
   sleep 1
   fill_in 'income[employer_name]', with: "Sample Employer1"
   fill_in 'income[amount]', with: '33.3'
-  find_all(".interaction-choice-control-income-frequency-kind")[1].trigger('click')
-  find_all('.interaction-choice-control-income-frequency-kind-7')[1].trigger('click')
+  page.all(".interaction-choice-control-income-frequency-kind")[1].click
+  page.all('.interaction-choice-control-income-frequency-kind-7').last.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
+  sleep 1
+  page.all('.fa-darkblue').last.click
   fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
   fill_in 'income[employer_address][address_1]', with: "12 main st"
   fill_in 'income[employer_address][address_2]', with: "beside starbucks1"
   fill_in 'income[employer_address][city]', with: "washington"
 
-  find_all(".interaction-choice-control-income-employer-address-state")[2].trigger('click')
-  find_all(".interaction-choice-control-income-employer-address-state-5")[1].trigger('click')
+  page.all(".interaction-choice-control-income-employer-address-state").last.click
+  page.all(".interaction-choice-control-income-employer-address-state-5").last.click
   fill_in 'income[employer_address][zip]', with: "22046"
+  binding.pry
   find('.interaction-click-control-save').click
 end
 
@@ -109,7 +113,7 @@ And(/^the user fills out the required self employment information$/) do
   find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div/div[3]/div/ul/li[3]").click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
+  page.find('.fa-darkblue').click
 end
 
 Given(/^the user has entered at least one self employment information$/) do
@@ -120,7 +124,7 @@ Given(/^the user has entered at least one self employment information$/) do
   find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div/div[3]/div/ul/li[3]").click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
+  page.find('.fa-darkblue').click
   find('.interaction-click-control-save').click
 end
 
