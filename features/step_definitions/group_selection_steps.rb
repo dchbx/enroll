@@ -317,7 +317,7 @@ Then(/(.*) should see the dental enrollment with make changes button/) do |role|
   expect(page).to have_link "Make Changes"
 end
 
-When(/(.*) clicked on make changes button/) do |role|
+When(/(.*) clicked on make changes button/) do |_role|
   click_link('Make Changes',  wait: 10)
 end
 

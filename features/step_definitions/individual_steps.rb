@@ -338,10 +338,6 @@ And(/I click on back to my account button$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
-And(/consumer clicked on continue for plan shopping/) do
-  find(".interaction-click-control-continue").click
-end
-
 Then(/I should land on home page$/) do
   sleep 1
   expect(page).to have_content "My #{Settings.site.short_name}"
