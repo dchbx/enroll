@@ -126,6 +126,8 @@ class EmployeeRole
   end
 
   def qle_benefit_package
+    return unless person.primary_family.current_sep
+
     sep_effective_on                 = person.primary_family.current_sep.effective_on
     employee_earliest_eligible_date  = census_employee.earliest_eligible_date
     possible_effective_date          = [sep_effective_on, employee_earliest_eligible_date].compact.max
