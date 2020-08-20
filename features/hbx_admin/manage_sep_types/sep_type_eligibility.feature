@@ -24,7 +24,7 @@ Feature: Qualifying life of event kind based on eligibity dates
 
   Scenario: Admin logged to qualify consumer for special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
-    And Admin logs out
+    And Hbx Admin logs out
     Given Individual creates account and on home page
     And I click on log out link
     And Hbx Admin logs on to the Hbx Portal
@@ -81,7 +81,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     And Admin clicks name of a shop family person on the family datatable
     Then I should land on home page
     And I should see listed shop market SEP Types
-    And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
+    And I should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     When I click on the "Entered into a legal domestic partnership" Sep Type
     And I should see input field to enter the Sep Type date
     And I fill in QLE date within the range eligiblity date period
@@ -94,3 +94,34 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Admin should not see sucess confirmation text
     And Admin logs out
 
+  Scenario: Admin logged to qualify employee for special enrollment period based on extended eligibity dates
+    Given Hbx Admin Creates a new Shop market SEP Type
+    When Admin navigates to SEP Types List page
+    When Admin clicks shop filter on SEP Types datatable
+    And Admin clicks on Draft filter of shop market filter
+    Then Admin should see newly created SEP Type title on Datatable
+    When Admin clicks on newly created SEP Type
+    Then Admin should navigate to update SEP Type page
+    When Admin extends the eligibility start date of a SEP Type
+    And Admin clicks on Publish button
+    Then Admin should see Successfully publish message
+    Given Employee creates account and on home page
+    And Employee logs out
+    And Hbx Admin logs on to the Hbx Portal
+    When Admin clicks Families tab
+    Then the Admin is navigated to the Families screen
+    And Admin clicks name of a shop family person on the family datatable
+    Then I should land on home page
+    And I should see listed shop market SEP Types
+    And I should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
+    When I click on the "Entered into a legal domestic partnership" Sep Type
+    And I should see input field to enter the Sep Type date
+    And I fill in QLE date within the range eligiblity date period
+    And I should see QLE date filled and clicks continue
+    Then I should see sucess confirmation text
+    And I click on continue button on select effective date
+    When I click on continue button on household info form
+    Then the primary person checkbox should be in unchecked status
+    When I clicks Shop for new plan button
+    Then I should see a failure message for plan shopping
+    And Admin logs out

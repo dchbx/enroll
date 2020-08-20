@@ -406,6 +406,10 @@ When("Admin fills eligibility start and end dates") do
   fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
+When("Admin extends the eligibility start date of a SEP Type") do
+  fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.prev_year.prev_year.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+end
+
 And("Admin clicks on Create Draft button") do
   page.find_button('Create Draft').click
 end
@@ -711,7 +715,7 @@ Then(/^\w+ should (.*) sucess confirmation text$/) do |action|
   end
 end
 
-Given("Hbx Admin Creates and Publish Individual market SEP Type") do
+Given("Hbx Admin Creates a new Individual market SEP Type") do
   step "Qualifying life events of all markets are present"
   step "the Admin will see the Manage SEP Types under admin dropdown"
   step "Admin can click Manage SEP Types link"
@@ -732,6 +736,10 @@ Given("Hbx Admin Creates and Publish Individual market SEP Type") do
   step "Admin fills eligibility start and end dates"
   step "Admin clicks on Create Draft button"
   step "Admin should see SEP Type Created Successfully message"
+end
+
+Given("Hbx Admin Creates and Publish Individual market SEP Type") do
+  step "Hbx Admin Creates a new Individual market SEP Type"
   step "Admin navigates to SEP Types List page"
   step "Admin clicks individual filter on SEP Types datatable"
   step "Admin clicks on Draft filter of individual market filter"
@@ -767,7 +775,7 @@ Given("Individual creates account and on home page") do
   step "I should land on home page"
 end
 
-Given("Hbx Admin Creates and Publish Shop market SEP Type") do
+Given("Hbx Admin Creates a new Shop market SEP Type") do
   step "Qualifying life events of all markets are present"
   step "the Admin will see the Manage SEP Types under admin dropdown"
   step "Admin can click Manage SEP Types link"
@@ -788,6 +796,10 @@ Given("Hbx Admin Creates and Publish Shop market SEP Type") do
   step "Admin fills eligibility start and end dates"
   step "Admin clicks on Create Draft button"
   step "Admin should see SEP Type Created Successfully message"
+end
+
+Given("Hbx Admin Creates and Publish Shop market SEP Type") do
+  step "Hbx Admin Creates a new Shop market SEP Type"
   step "Admin navigates to SEP Types List page"
   step "Admin clicks shop filter on SEP Types datatable"
   step "Admin clicks on Draft filter of shop market filter"
@@ -823,4 +835,8 @@ end
 
 And(/^.+ selects Termination on kinds date on the dropdown$/) do
   find("li", :text => TimeKeeper.date_of_record.end_of_month.to_s).click
+end
+
+And("I should see a failure message for plan shopping") do
+  expect(page).to have_content("You must select at least one Eligible applicant to enroll in the healthcare plan")
 end
