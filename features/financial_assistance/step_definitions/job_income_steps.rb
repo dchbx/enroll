@@ -40,21 +40,24 @@ end
 And(/^the user fills out the required employer information$/) do
   fill_in 'income[employer_name]', with: "Sample Employer"
   fill_in 'income[amount]', with: '23.3'
+  # Choosing income frequency
+  # Clicks "Choose"
+  page.all('.interaction-choice-control-income-frequency-kind').first.click
+  # Choose Bi-Weekly
+  page.all('.interaction-choice-control-income-frequency-kind-1').first.click
+  # Clicks "Choose"
   page.all(".interaction-choice-control-income-frequency-kind")[1].click
-  sleep 1
-  page.all('.interaction-choice-control-income-frequency-kind-7').last.click
+  # Selects state of "DC"
+  page.all('.interaction-choice-control-income-frequency-kind-9').last.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
-  sleep 1
   page.all('.fa-darkblue').last.click
   fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
   fill_in 'income[employer_address][address_1]', with: "12 main st"
   fill_in 'income[employer_address][address_2]', with: "beside starbucks"
   fill_in 'income[employer_address][city]', with: "washington"
-
-  page.all(".interaction-choice-control-income-employer-address-state").last.click
-  page.all(".interaction-choice-control-income-employer-address-state-5").last.click
   fill_in 'income[employer_address][zip]', with: "22046"
+  sleep 1
 end
 
 And(/^the user saves the employer information$/) do
@@ -72,8 +75,15 @@ Given(/^the user has entered at least one job income information$/) do
   sleep 1
   fill_in 'income[employer_name]', with: "Sample Employer1"
   fill_in 'income[amount]', with: '33.3'
+  # Choosing income frequency
+  # Clicks "Choose"
+  page.all('.interaction-choice-control-income-frequency-kind').first.click
+  # Choose Bi-Weekly
+  page.all('.interaction-choice-control-income-frequency-kind-1').first.click
+  # Clicks "Choose"
   page.all(".interaction-choice-control-income-frequency-kind")[1].click
-  page.all('.interaction-choice-control-income-frequency-kind-7').last.click
+  # Selects state of "DC"
+  page.all('.interaction-choice-control-income-frequency-kind-9').last.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
   sleep 1
@@ -82,9 +92,6 @@ Given(/^the user has entered at least one job income information$/) do
   fill_in 'income[employer_address][address_1]', with: "12 main st"
   fill_in 'income[employer_address][address_2]', with: "beside starbucks1"
   fill_in 'income[employer_address][city]', with: "washington"
-
-  page.all(".interaction-choice-control-income-employer-address-state").last.click
-  page.all(".interaction-choice-control-income-employer-address-state-5").last.click
   fill_in 'income[employer_address][zip]', with: "22046"
   find('.interaction-click-control-save').click
 end
