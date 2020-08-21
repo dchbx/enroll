@@ -152,9 +152,15 @@ FactoryBot.define do
     end
   end
 
+  # trait :with_nuclear_family do
+  #   after :create do |user|
+  #     FactoryBot.create :person, :with_nuclear_family, :user => user
+  #   end
+  # end
+
   trait :with_nuclear_family do
     after :create do |user|
-      FactoryBot.create :person, :with_nuclear_family, :user => user
+      FactoryBot.build :person, :with_nuclear_family, :user => user
     end
   end
 

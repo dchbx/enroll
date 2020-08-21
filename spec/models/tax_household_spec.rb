@@ -239,8 +239,7 @@ RSpec.describe TaxHousehold, type: :model do
   context "current_csr_eligibility_kind" do
     let(:eligibility_determination) {EligibilityDetermination.new(csr_eligibility_kind: 'csr_87', determined_at: TimeKeeper.date_of_record)}
     let(:tax_household) {TaxHousehold.new}
-
-    it "should equal to the csr_eligibility_kind of preferred_eligibility_determination" do
+    it "should equal to the csr_eligibility_kind of preferred eligibility determination" do
       tax_household.eligibility_determinations = [eligibility_determination]
       expect(tax_household.current_csr_eligibility_kind).to eq eligibility_determination.csr_eligibility_kind
     end

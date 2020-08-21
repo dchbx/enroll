@@ -13,6 +13,10 @@ module FinancialAssistance
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
         application.populate_applicants_for(consumer.primary_family)
       end
+      @application.active_applicants.each do |applicant|
+        applicant.update_attributes(is_claimed_as_tax_dependent: false)
+      end
+      @application
     end
 
     def user_sign_up
@@ -27,6 +31,14 @@ module FinancialAssistance
     def create_plan
       hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
+    end
+
+    def assign_benchmark_plan_id(application)
+      hbx_profile = HbxProfile.all.first
+      product = BenefitMarkets::Products::Product.all.first
+      coverage_period = hbx_profile.benefit_sponsorship.current_benefit_coverage_period
+      coverage_period.update_attributes!(slcsp_id: product.id, slcsp: product.id)
+      application.update_attributes!(benchmark_plan_id: coverage_period.slcsp)
     end
 
     def create_dummy_eligibility(application)

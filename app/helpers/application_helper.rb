@@ -843,7 +843,7 @@ module ApplicationHelper
   end
 
   def external_application_configured?(application_name)
-    external_app = ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    external_app = ::ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
     return false unless external_app
     return false unless external_app.is_authorized_for?(current_user)
     !external_app.url.blank?
