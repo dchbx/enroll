@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "slim",                      "~> 3.0"
   spec.add_dependency 'symmetric-encryption',      '~> 3.9.1'
   spec.add_dependency 'pundit',                    '~> 2.0'
+  spec.add_dependency 'font-awesome-rails',        '~> 4.7'
 
   spec.add_development_dependency 'capybara',                  '~> 3.12'
   spec.add_development_dependency 'database_cleaner'

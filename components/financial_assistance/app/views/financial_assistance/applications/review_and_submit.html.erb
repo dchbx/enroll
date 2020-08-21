@@ -43,8 +43,8 @@
                       <td>
                         <%= start_to_end_dates(embedded_document) %>
                         <span class= "ml10">
-                          <%= link_to income_and_deductions_edit(@application, applicant, embedded_document) do %>
-                            <i class="fa fa-pencil fa-lg"></i>
+                          <%= link_to income_and_deductions_edit(@application, applicant, embedded_document), id: 'edit-income-and-deductions-pencil' do %>
+                            <i class="fa fa-pencil-alt fa-lg"></i>
                           <% end %>
                         </span>
                       </td>
@@ -73,7 +73,7 @@
                 <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %>
               </div>
               <div class="col-md-1">
-                <!-- <a><span class="fa fa-pencil fa-lg" aria-hidden="true"></span></a> -->
+                <!-- <a><span class="fa fa-pencil-alt fa-lg" aria-hidden="true"></span></a> -->
               </div>
             </div>
 
@@ -107,8 +107,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11 form-heading"> TAX INFO</div>
                   <div class="col-md-1">
-                    <%= link_to go_to_step_application_applicant_path(@application, applicant, 1) do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                    <%= link_to go_to_step_application_applicant_path(@application, applicant, 1), id: 'edit-tax-info-pencil' do %>
+                      <i class="fa fa-pencil-alt fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
@@ -144,8 +144,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                    <%= link_to application_applicant_incomes_path(@application, applicant), id: 'edit-income-pencil' do %>
+                      <i class="fa fa-pencil-alt fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
@@ -216,8 +216,8 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
-                      <i class="fa fa-pencil fa-lg"></i>
+                    <%= link_to application_applicant_deductions_path(@application, applicant), id: 'edit-income-adjustments-pencil' do %>
+                      <i class="fa fa-pencil-alt fa-lg"></i>
                     <% end %>
                   </div>
                 </div>
@@ -232,8 +232,8 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">HEALTH COVERAGE</div>
                 <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
-                    <i class="fa fa-pencil fa-lg"></i>
+                  <%= link_to application_applicant_benefits_path(@application, applicant), id: 'edit-health-coverage-pencil' do %>
+                    <i class="fa fa-pencil-alt fa-lg"></i>
                   <% end %>
                 </div>
               </div>
@@ -263,8 +263,8 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">OTHER QUESTIONS</div>
               <div class="col-md-1">
-                <%= link_to other_questions_application_applicant_path(@application, applicant) do %>
-                  <i class="fa fa-pencil fa-lg"></i>
+                <%= link_to other_questions_application_applicant_path(@application, applicant), id: 'edit-other-questions-pencil' do %>
+                  <i class="fa fa-pencil-alt fa-lg"></i>
                 <% end %>
               </div>
             </div>
@@ -411,8 +411,8 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">FAMILY RELATIONSHIPS</div>
               <div class="col-md-1">
-                <%= link_to insured_family_relationships_path do %>
-                  <i class="fa fa-pencil fa-lg"></i>
+                <%= link_to insured_family_relationships_path, id: 'edit-family-relationships-pencil' do %>
+                  <i class="fa fa-pencil-alt fa-lg"></i>
                 <% end %>
               </div>
             </div>

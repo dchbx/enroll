@@ -144,7 +144,7 @@ module FinancialAssistance
       @application = @person.primary_family.application_in_progress
       @applicants = @application.active_applicants if @application.present?
       if @application.blank?
-        redirect_to financial_assistance_applications_path
+        redirect_to applications_path
       else
         render layout: 'financial_assistance'
       end
