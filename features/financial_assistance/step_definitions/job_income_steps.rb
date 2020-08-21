@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the user answers no to having an income from an employer$/) do
   choose('has_job_income_false')
   sleep 1
@@ -65,9 +67,9 @@ And(/^the user saves the employer information$/) do
 end
 
 Then(/^the employer information should be saved on the page$/) do
- expect(page).to have_content("Sample Employer")
- expect(page).to have_content("23.3")
- expect(page).to have_content("beside starbucks")
+  expect(page).to have_content("Sample Employer")
+  expect(page).to have_content("23.3")
+  expect(page).to have_content("beside starbucks")
 end
 
 Given(/^the user has entered at least one job income information$/) do
@@ -97,7 +99,7 @@ Given(/^the user has entered at least one job income information$/) do
 end
 
 When(/^the Add Another Job Income link appears$/) do
- find('.interaction-click-control-add-another-job-income').visible?
+  find('.interaction-click-control-add-another-job-income').visible?
 end
 
 When(/^the user adds another income$/) do
