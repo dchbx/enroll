@@ -1455,7 +1455,7 @@ class HbxEnrollment
       end
 
       if !employee_role.is_under_open_enrollment?
-        raise "You may not enroll until you're eligible under an enrollment period."
+        raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
       end
 
       employee_role.employer_profile.show_plan_year.start_on
@@ -1536,7 +1536,7 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll until you're eligible under an enrollment period"
+          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
         end
       when resident_role.present?
         enrollment.kind = "coverall"
@@ -1551,7 +1551,7 @@ class HbxEnrollment
           enrollment.effective_on = benefit_sponsorship.current_benefit_period.earliest_effective_date
           enrollment.enrollment_kind = "open_enrollment"
         else
-          raise "You may not enroll until you're eligible under an enrollment period"
+          raise "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period."
         end
       else
         raise "either employee_role or consumer_role is required" unless resident_role.present?
