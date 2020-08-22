@@ -2,9 +2,6 @@
   <%= form_for @qle, url: exchanges_manage_sep_type_path(@qle._id), method: :patch do |f| %>
     <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;" data-controller="sep-types">
       <meta data-target='sep-types.metadata'
-        data-ivl-kinds="<%= @qle.ivl_effective_kinds%>"
-        data-shop-kinds="<%= @qle.shop_effective_kinds%>"
-        data-fehb-kinds="<%= @qle.fehb_effective_kinds%>"
         data-qle-reason="<%= @qle.reason%>"
         data-termination-kinds="<%= @qle.termination_on_kinds%>"
         data-effective-kinds="<%= @qle.effective_on_kinds%>"
@@ -41,25 +38,27 @@
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
         <div class="row justify-content-start">
-          <div class="col-6" id= "market_kind" data-action='change->sep-types#marketChange'>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+          <div class="col-6">
+            <div id= "market_kind" data-action='change->sep-types#marketChange'>
+              <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+            </div>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
           </div>
-
           <div class="col-6">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
           </div>
 
           <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_start_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
           </div>
           <div class="col-6" id="effective_on_kinds">
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
           </div>
           <div class="col-6">
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
-            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
             <%= build_option_field(EnrollRegistry[:sep_types].setting(:date_options_available),f) %>
           </div>
