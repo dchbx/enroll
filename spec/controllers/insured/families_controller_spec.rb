@@ -659,7 +659,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "renders the 'check_qle_date' template" do
-   get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+      get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
       expect(response).to have_http_status(:success)
     end
 
@@ -699,7 +699,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "future_qualified_date return true/false when qle market kind is shop" do
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-     get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
+        get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
         expect(response).to have_http_status(:success)
         expect(assigns(:future_qualified_date)).to eq(false)
       end
@@ -737,7 +737,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-       get :check_qle_date,params: {date_val: date, format: :js}
+          get :check_qle_date,params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
@@ -745,9 +745,93 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 40.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, format: :js}
+          get :check_qle_date, params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
+        end
+      end
+
+      context "QLEK based on event date", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        it "should return event date" do
+          date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+          qle.update_attributes(qle_event_date_kind: :qle_on)
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qle_date)).to eq Date.strptime(date, "%m/%d/%Y")
+        end
+      end
+
+      context "QLEK based on reporting date", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        it "should return reporting date" do
+          date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+          qle.update_attributes(qle_event_date_kind: :submitted_at)
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qle_date)).to eq TimeKeeper.date_of_record
+        end
+      end
+
+      context "QLEK with eligibity start & end dates", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        context "Event date cover eligibity dates" do
+
+          it "should return true" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.end_of_month)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq true
+          end
+        end
+
+        context "Event date outside eligibity dates" do
+
+          it "should return false" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq false
+          end
+        end
+
+        context "Reporting date cover eligibity dates" do
+
+          it "should return true" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :submitted_at, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.end_of_month)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq true
+          end
+        end
+
+        context "Reporting date outside eligibity dates" do
+
+          it "should return false" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :submitted_at, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record - 1.day)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq false
+          end
         end
       end
 
@@ -760,21 +844,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return true" do
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
 
         it "should return false" do
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
 
         it "should return false and also notify sep request denied" do
           date = TimeKeeper.date_of_record.prev_month.strftime("%m/%d/%Y")
-       get :check_qle_date, params: {qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js}
+          get :check_qle_date, params: {qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js}
           expect(assigns(:qualified_date)).to eq false
 
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -794,7 +878,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
           allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return(true)
           allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:effective_on_options)).to eq effective_on_options
         end
@@ -829,7 +913,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "displays the upload_notice_form view" do
-   get :upload_notice_form
+      get :upload_notice_form
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:upload_notice_form)
     end
