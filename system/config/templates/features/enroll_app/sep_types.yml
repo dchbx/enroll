@@ -103,7 +103,15 @@ registry:
             item: <%= ENV['effective_on_kinds'] %>
             meta:
               label: Effective On
-              enum: [{date_of_event: Date of Event}, {first_of_month: First of Month}, {first_of_this_month: First of This Month}, {first_of_next_month: First of Next Month}, {fixed_first_of_next_month: Fixed First of Next Month}, {exact_date: Exact Date}]
+              enum: [{date_of_event: Date of Event},
+              {first_of_this_month: First of Event Month},
+              {fixed_first_of_next_month: First of Month after Event},
+              {first_of_next_month: Event First of Next Month},
+              {first_of_month_plan_selection: First of the Month following Plan Selection},
+              {first_of_month: 15th of Month Plan Shopping},
+              {first_of_reporting_month: First of Reporting Month},
+              {fixed_first_of_next_month_reporting: First of Month after Reporting},
+              {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
               description: Select Coverage Effective Type
@@ -164,6 +172,16 @@ registry:
               content_type: :text_field
               default: ''
               description: Enter Event Label
+              is_required: true
+              is_visible: true
+          - key: :qle_event_date_kind
+            item: <%= ENV['qle_event_date_kind'] %>
+            meta:
+              label: SEP Eligibility Kind
+              content_type: :radio_select
+              enum: [ {qle_on: 'Event Date' }, { submitted_at: 'Reported Date'} ]
+              default: :qle_on
+              description: Select Date Kind
               is_required: true
               is_visible: true
       - key: :expire_sep_type
