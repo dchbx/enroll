@@ -830,4 +830,56 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       expect(sep10.fetch_termiation_date('exact_date')).to eq(sep10.qle_on)
     end
   end
+
+  context 'set_date_period' do
+
+    let(:qle_on) { TimeKeeper.date_of_record - 2.days}
+
+    context 'QLEK with coverage_start_on & coverage_end_on dates' do
+      let!(:qle) { create(:qualifying_life_event_kind, pre_event_sep_in_days: 0, post_event_sep_in_days: 30, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record.end_of_month) }
+      let!(:sep) do
+        subject.qualifying_life_event_kind = qle
+        subject
+      end
+
+      it 'should return sep range' do
+        sep_dates = sep.send(:set_date_period)
+        expect(sep_dates).to eq TimeKeeper.date_of_record..TimeKeeper.date_of_record + qle.post_event_sep_in_days.days
+      end
+
+      it 'should set start on based qle submitted' do
+        sep.send(:set_date_period)
+        expect(sep.start_on).to eq sep.submitted_at.to_date
+      end
+
+      it 'should set end on based qle submitted' do
+        sep.send(:set_date_period)
+        expect(sep.end_on).to eq sep.submitted_at.to_date + qle.post_event_sep_in_days.days
+      end
+    end
+
+    context 'QLEK without coverage_start_on & coverage_end_on dates' do
+      let!(:qle) { create(:qualifying_life_event_kind, pre_event_sep_in_days: 0, post_event_sep_in_days: 30) }
+      let!(:sep) do
+        subject.qualifying_life_event_kind = qle
+        subject.qle_on = qle_on
+        subject
+      end
+
+      it 'should return sep range' do
+        sep_dates = sep.send(:set_date_period)
+        expect(sep_dates).to eq qle_on..qle_on + qle.post_event_sep_in_days.days
+      end
+
+      it 'should set start on based qle_on' do
+        sep.send(:set_date_period)
+        expect(sep.start_on).to eq qle_on
+      end
+
+      it 'should set end on based qle_on' do
+        sep.send(:set_date_period)
+        expect(sep.end_on).to eq qle_on + qle.post_event_sep_in_days.days
+      end
+    end
+  end
 end
