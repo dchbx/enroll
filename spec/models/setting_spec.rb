@@ -7,7 +7,7 @@ describe Setting do
     end
 
     it "should get default value from setting_record" do
-      expect(Setting.individual_market_monthly_enrollment_due_on).to eq 19
+      expect(Setting.individual_market_monthly_enrollment_due_on).to eq 15
     end
   end
 end
