@@ -143,8 +143,7 @@ module Insured::FamiliesHelper
   end
 
   def find_effective_on(qle, qle_date, kind)
-    return unless @family
-    special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: kind)
+    special_enrollment_period = SpecialEnrollmentPeriod.new(effective_on_kind: kind)
     special_enrollment_period.qualifying_life_event_kind = qle
     special_enrollment_period.qle_on = qle_date
     special_enrollment_period.effective_on
