@@ -62,11 +62,11 @@ Then("Admin navigates to SEP Type List page") do
 end
 
 def sep_type_start_on
-  TimeKeeper.date_of_record.prev_month.at_beginning_of_month
+  TimeKeeper.date_of_record
 end
 
 def sep_type_end_on
-  TimeKeeper.date_of_record.next_year.prev_month.end_of_month
+  TimeKeeper.date_of_record.next_year
 end
 
 def ivl_qualifying_life_events
@@ -387,17 +387,17 @@ end
 
 When(/Admin selects (.*) visibility radio button for (.*) market$/) do |user, _market_kind|
   if user == 'Customer & Admin'
-    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[1]/div/div/input').click
+    find("[name='forms_qualifying_life_event_kind_form[is_visible]'][value='true']").click
   else
-    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[2]/div[2]/div/div/input').click
+    find("[name='forms_qualifying_life_event_kind_form[is_visible]'][value='false']").click
   end
 end
 
 When(/Admin selects (.*) self attestation radio button for (.*) market$/) do |user, _market_kind|
   if user == 'Self Service'
-    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[3]/div[1]/div/div/input').click
+    find("[name='forms_qualifying_life_event_kind_form[is_self_attested]'][value='true']").click
   else
-    find(:xpath, '//*[@id="new_forms_qualifying_life_event_kind_form"]/div/div[2]/div[5]/div[5]/div[3]/div[2]/div/div/input').click
+    find("[name='forms_qualifying_life_event_kind_form[is_self_attested]'][value='false']").click
   end
 end
 
