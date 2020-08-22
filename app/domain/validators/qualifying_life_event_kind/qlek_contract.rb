@@ -37,7 +37,7 @@ module Validators
         end
       end
 
-      rule(:start_on) do  # TODO : cukes
+      rule(:start_on) do
         if values[:start_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.start_date_valid")) if values[:start_on].is_a?(Date) && values[:start_on] < TimeKeeper.date_of_record
         end
@@ -77,7 +77,7 @@ module Validators
         key.failure(l10n("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
       end
 
-      rule(:coverage_start_on) do # TODO : cukes
+      rule(:coverage_start_on) do
         if values[:coverage_start_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_start_on].is_a?(Date)
         end
@@ -87,7 +87,7 @@ module Validators
         end
       end
 
-      rule(:coverage_end_on) do # TODO : cukes
+      rule(:coverage_end_on) do
         if values[:coverage_end_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_end_on].is_a?(Date)
         end

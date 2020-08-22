@@ -50,7 +50,7 @@ Feature: Admin has ability to create a new SEP Type
     And Admin <action> select termination on kinds for <market_kind> SEP Type
     And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
     And Admin clicks on Create Draft button
-    Then Admin should see failure reason while creating a new SEP Type
+    Then Admin should see failure for end date
     And Hbx Admin logs out
 
   Examples:
@@ -88,3 +88,70 @@ Feature: Admin has ability to create a new SEP Type
       | fehb        |  selected       |
       | shop        |  not selected   |
       | fehb        |  not selected   |
+
+  Scenario: Admin should see failure when creating SEP type with past start date
+    Given Admin can navigate to the Manage SEP Types screen
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with past start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects individual market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin clicks on Create Draft button
+    Then Admin should see failure for start date
+    And Hbx Admin logs out
+
+  Scenario: Admin should see failure when creating SEP type with invalid eligibity date
+    Given Admin can navigate to the Manage SEP Types screen
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects individual market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin fills invalid eligibility start and end dates
+    And Admin clicks on Create Draft button
+    Then Admin should see failure for invalid eligibility date
+    And Hbx Admin logs out
+
+  Scenario: Admin should see failure when creating SEP type withonly eligibility start date
+    Given Admin can navigate to the Manage SEP Types screen
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects individual market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin fills eligibility start date
+    And Admin clicks on Create Draft button
+    Then Admin should see failure for eligibility end date
+    And Hbx Admin logs out
+
+  Scenario: Admin should see failure when creating SEP type withonly eligibility end date
+    Given Admin can navigate to the Manage SEP Types screen
+    When Admin clicks on the Create SEP Type button
+    Then Admin navigates to Create SEP Type page
+    When Admin fills Create SEP Type form with start and end dates
+    And Admin fills Create SEP Type form with Title
+    And Admin fills Create SEP Type form with Event label
+    And Admin fills Create SEP Type form with Tool Tip
+    And Admin selects individual market radio button
+    And Admin fills Create SEP Type form with Reason
+    And Admin selects effective on kinds for Create SEP Type
+    And Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates
+    And Admin fills eligibility end date
+    And Admin clicks on Create Draft button
+    Then Admin should see failure for eligibility start date
+    And Hbx Admin logs out

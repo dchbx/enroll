@@ -79,6 +79,7 @@ def shop_qualifying_life_events
   FactoryBot.create(:qualifying_life_event_kind,
                     title: 'Covid-19',
                     reason: 'covid-19',
+                    qle_event_date_kind: :submitted_at,
                     market_kind: "shop",
                     event_kind_label: "event kind label",
                     post_event_sep_in_days: 1,
@@ -260,6 +261,9 @@ When(/Admin fills Create SEP Type form with(?: (.*))? start and end dates$/) do 
   if date == 'future'
     fill_in "Start Date", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
+  elsif date == 'past'
+    fill_in "Start Date", with: (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
+    fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
   else
     fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
@@ -401,8 +405,21 @@ When(/Admin selects (.*) self attestation radio button for (.*) market$/) do |us
   end
 end
 
-When("Admin fills eligibility start and end dates") do
+When(/Admin fills(?: (.*))? eligibility start and end dates$/) do |type|
+  if type == 'invalid'
+    fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.next_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+    fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.strftime('%m/%d/%Y').to_s
+  else
+    fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+    fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
+  end
+end
+
+When("Admin fills eligibility start date") do
   fill_in "Eligibility Start Date", with: TimeKeeper.date_of_record.prev_month.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+end
+
+When("Admin fills eligibility end date") do
   fill_in "Eligibility End Date", with: TimeKeeper.date_of_record.next_year.prev_month.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
@@ -552,9 +569,26 @@ When(/Admin should see effective on kinds disabled for (.*)$/) do |market_kind|
   end
 end
 
-Then("Admin should see failure reason while creating a new SEP Type") do
+Then("Admin should see failure for end date") do
   expect(page).to have_content('End on must be after start on date')
 end
+
+Then("Admin should see failure for start date") do
+  expect(page).to have_content('Start on must be current or future date')
+end
+
+Then("Admin should see failure for invalid eligibility date") do
+  expect(page).to have_content('Eligibility End Date must be after Eligibility Start Date')
+end
+
+Then("Admin should see failure for eligibility start date") do
+  expect(page).to have_content('Eligibility Start Date must be filled')
+end
+
+Then("Admin should see failure for eligibility end date") do
+  expect(page).to have_content('Eligibility End Date must be filled')
+end
+
 
 Then("Admin should see failure title while publishing a new SEP Type") do
   expect(page).to have_content('Active SEP type exists with same title')
