@@ -12,7 +12,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
     after :all do
       DatabaseCleaner.clean
-      invoke_dry_types_script
     end
 
     let!(:person) do
@@ -47,17 +46,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
       end
 
-      it 'should load ivl_effective_kinds on to the form object' do
-        expect(assigns(:qle).ivl_effective_kinds).to eq(["date_of_event", "exact_date", "first_of_month", "first_of_next_month", "fixed_first_of_next_month"])
-      end
-
-      it 'should load shop_effective_kinds on to the form object' do
-        expect(assigns(:qle).shop_effective_kinds).to eq(["date_of_event", "first_of_next_month", "first_of_this_month", "fixed_first_of_next_month"])
-      end
-
-      it 'should load fehb_effective_kinds on to the form object' do
-        expect(assigns(:qle).fehb_effective_kinds).to eq(["date_of_event", "first_of_next_month", "first_of_this_month", "fixed_first_of_next_month"])
-      end
 
       context 'updateable?' do
         before do
@@ -94,6 +82,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       coverage_end_on: '2020-07-31',
                                                       event_kind_label: 'event kind label',
                                                       is_visible: true,
+                                                      qle_event_date_kind: :qle_on,
                                                       date_options_available: true }}
 
       end
@@ -199,18 +188,6 @@ if EnrollRegistry.feature_enabled?(:sep_types)
         expect(assigns(:qle)).to be_a(Forms::QualifyingLifeEventKindForm)
       end
 
-      it 'should load ivl_effective_kinds on to the form object' do
-        expect(assigns(:qle).ivl_effective_kinds).to eq(QualifyingLifeEventKind::IVL_EFFECTIVE_ON_KINDS)
-      end
-
-      it 'should load shop_effective_kinds on to the form object' do
-        expect(assigns(:qle).shop_effective_kinds).to eq(QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS)
-      end
-
-      it 'should load fehb_effective_kinds on to the form object' do
-        expect(assigns(:qle).fehb_effective_kinds).to eq(QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS)
-      end
-
       it 'should load qlek id data on to the form object' do
         expect(assigns(:qle)._id.to_s).to eq(q1.id.to_s)
       end
@@ -262,6 +239,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       coverage_start_on: '2020-07-01',
                                                       coverage_end_on: '2020-07-31',
                                                       event_kind_label: 'event kind label',
+                                                      qle_event_date_kind: :qle_on,
                                                       is_visible: true,
                                                       date_options_available: true }}
       end
@@ -325,6 +303,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                         coverage_start_on: '2020-07-01',
                                                         coverage_end_on: '2020-07-31',
                                                         event_kind_label: 'event kind label',
+                                                        qle_event_date_kind: :qle_on,
                                                         is_visible: true,
                                                         publish: "Publish",
                                                         date_options_available: true }}
@@ -646,12 +625,5 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       end
     end
 
-    def invoke_dry_types_script
-      consts = ['IndividualEffectiveOnKinds',
-                'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
-      types_module_constants = Types.constants(false)
-      consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}
-      load File.join(Rails.root, 'app/domain/types.rb')
-    end
   end
 end

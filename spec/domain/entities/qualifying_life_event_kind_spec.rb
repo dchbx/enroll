@@ -23,6 +23,7 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
         coverage_start_on: TimeKeeper.date_of_record,
         coverage_end_on: (TimeKeeper.date_of_record + 25.days),
         event_kind_label: 'event kind label',
+        qle_event_date_kind: 'qle_on',
         is_visible: true,
         termination_on_kinds: [],
         date_options_available: true }

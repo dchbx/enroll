@@ -11,37 +11,27 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, is_active: true) }
 
     before :each do
-      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_new
     end
 
     it 'should initialize QualifyingLifeEventKindForm object' do
       expect(@qlek_form).to be_a(Forms::QualifyingLifeEventKindForm)
     end
-
-    it 'should set some effective kinds for ivl' do
-      expect(@qlek_form.ivl_effective_kinds).to eq(QualifyingLifeEventKind::IVL_EFFECTIVE_ON_KINDS)
-    end
-
-    it 'should set some effective kinds for shop' do
-      expect(@qlek_form.shop_effective_kinds).to eq(QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS)
-    end
-
-    it 'should set some effective kinds for fehb' do
-      expect(@qlek_form.fehb_effective_kinds).to eq(QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS)
-    end
   end
 
   context 'for for_edit' do
-    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, is_active: true) }
+    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, reason: "test_reason", is_active: true) }
 
     before :each do
-      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_edit({:id => qlek.id.to_s})
     end
 
     it 'should set title value on to the QualifyingLifeEventKindForm title' do
       expect(@qlek_form.title).to eq(qlek.title)
+    end
+
+    it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
+      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
     end
 
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
@@ -58,16 +48,19 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
   end
 
   context 'for for_update' do
-    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, is_active: true) }
-    let(:update_params){ qlek.attributes.merge({:_id => qlek.id.to_s, :market_kind => 'individual'}) }
+    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, reason: "test_reason", is_active: true) }
+    let(:update_params){ qlek.attributes.transform_keys(&:to_sym).merge({:_id => qlek.id.to_s, :market_kind => 'individual'}) }
 
     before :each do
-      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_update(update_params)
     end
 
     it 'should set title value on to the QualifyingLifeEventKindForm title' do
       expect(@qlek_form.title).to eq(qlek.title)
+    end
+
+    it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
+      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
     end
 
     it 'should set id value on to the QualifyingLifeEventKindForm id' do
@@ -85,15 +78,18 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
   end
 
   context 'for for_clone' do
-    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, is_active: true) }
+    let!(:qlek) { FactoryBot.create(:qualifying_life_event_kind, reason: "test_reason", is_active: true) }
 
     before :each do
-      invoke_dry_types_script
       @qlek_form = Forms::QualifyingLifeEventKindForm.for_clone({:id => qlek.id.to_s})
     end
 
     it 'should set title value on to the QualifyingLifeEventKindForm title' do
       expect(@qlek_form.title).to eq(qlek.title)
+    end
+
+    it 'should set reason & humanize on to the QualifyingLifeEventKindForm' do
+      expect(@qlek_form.reason).to eq(qlek.reason.humanize)
     end
 
     it 'should not set ID on to the QualifyingLifeEventKindForm' do
@@ -149,11 +145,4 @@ RSpec.describe Forms::QualifyingLifeEventKindForm, type: :model, dbclean: :after
     end
   end
 
-  def invoke_dry_types_script
-    consts = ['IndividualEffectiveOnKinds',
-              'ShopEffectiveOnKinds', 'FehbEffectiveOnKinds']
-    types_module_constants = Types.constants(false)
-    consts.each {|const| Types.send(:remove_const, const.to_sym) if types_module_constants.include?(const.to_sym)}
-    load File.join(Rails.root, 'app/domain/types.rb')
-  end
 end

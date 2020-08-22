@@ -13,8 +13,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   end
 
   let(:contract_params) do
-    { :start_on => "#{TimeKeeper.date_of_record.year}-07-09",
-      :end_on => "#{TimeKeeper.date_of_record.year}-07-29",
+    { :start_on => TimeKeeper.date_of_record,
+      :end_on => TimeKeeper.date_of_record.next_month,
       :title => 'Married',
       :tool_tip => 'test tool tip',
       :pre_event_sep_in_days => '4',
@@ -28,6 +28,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       coverage_end_on: (TimeKeeper.date_of_record + 25.days),
       event_kind_label: 'event kind label',
       is_visible: true,
+      qle_event_date_kind: 'qle_on',
       termination_on_kinds: ['date_of_event'],
       date_options_available: true }
   end
@@ -81,7 +82,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
     context 'for coverage_start_on being optional' do
       before do
-        contract_params.merge!({coverage_start_on: nil})
+        contract_params.merge!({coverage_start_on: nil, coverage_end_on: nil})
         @result = subject.call(contract_params)
       end
 
@@ -96,7 +97,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
     context 'for coverage_end_on being optional' do
       before do
-        contract_params.merge!({coverage_end_on: nil})
+        contract_params.merge!({coverage_start_on: nil, coverage_end_on: nil})
         @result = subject.call(contract_params)
       end
 
@@ -141,6 +142,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   end
 
   context 'failure case' do
+
     context 'start on date is in the past' do
       before  do
         contract_params.merge!({start_on: TimeKeeper.date_of_record - 1.day})
@@ -162,7 +164,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
     context 'end on date is less than start on date' do
       before  do
-        contract_params.merge!({start_on: "#{TimeKeeper.date_of_record.year}-08-29", publish: 'Publish'})
+        contract_params.merge!({end_on: TimeKeeper.date_of_record - 1.year, publish: 'Publish'})
         @result = subject.call(contract_params)
       end
 
@@ -181,7 +183,7 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
 
     context 'one of the effective_on_kinds is not valid for given market kind' do
       before  do
-        contract_params.merge!({effective_on_kinds: ['first_of_this_month'], publish: 'Publish'})
+        contract_params.merge!({effective_on_kinds: [], publish: 'Publish'})
         @result = subject.call(contract_params)
       end
 
@@ -193,8 +195,8 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
         expect(@result.errors.empty?).to be_falsy
       end
 
-      it 'should return error message as start date is after end date' do
-        expect(@result.errors.messages.first.text).to eq('One of the selected values is invalid')
+      it 'should return error must be selected' do
+        expect(@result.errors.messages.first.text).to eq('Must be selected')
       end
     end
 

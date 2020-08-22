@@ -29,6 +29,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
           'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label': 'event kind label',
+          qle_event_date_kind: 'qle_on',
           'is_visible': true,
           'date_options_available': true }
 
@@ -95,6 +96,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
               'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
               'event_kind_label': 'event kind label',
               'is_visible': true,
+              qle_event_date_kind: 'qle_on',
               'id': q2.id.to_s,
               'publish': 'Publish',
               'date_options_available': true }
@@ -136,6 +138,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           coverage_end_on: "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           event_kind_label: 'event kind label',
           is_visible: true,
+          qle_event_date_kind: 'qle_on',
           date_options_available: true }
       end
 
@@ -182,6 +185,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
+          qle_event_date_kind: 'qle_on',
           'date_options_available' => true }
       end
 
@@ -221,6 +225,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
+          qle_event_date_kind: 'qle_on',
           'date_options_available' => true }
       end
 
