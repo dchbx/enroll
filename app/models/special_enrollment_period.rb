@@ -254,21 +254,28 @@ private
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
-    when "date_of_event"
-      qle_on
-    when "exact_date"
-      qle_on
-    when "first_of_month"
-      first_of_month_effective_date
-    when "first_of_this_month"
-      first_of_this_month_effective_date
-    when "first_of_next_month"
-      first_of_next_month_effective_date
-    when "fixed_first_of_next_month"
-      fixed_first_of_next_month_effective_date
-    end
+                        when "date_of_event"
+                          qle_on
+                        when "exact_date"
+                          qle_on
+                        when "first_of_month"
+                          first_of_month_effective_date
+                        when "first_of_this_month"
+                          first_of_this_month_effective_date
+                        when "first_of_next_month"
+                          first_of_next_month_effective_date
+                        when "fixed_first_of_next_month"
+                          fixed_first_of_next_month_effective_date
+                        when "first_of_month_plan_selection"
+                          first_of_month_plan_selection_effective_date
+                        when "first_of_reporting_month"
+                          first_of_reporting_month_effective_date
+                        when "fixed_first_of_next_month_reporting"
+                          fixed_first_of_next_month_reporting_effective_date
+                        end
   end
 
+  # follows 15th of month rule
   def first_of_month_effective_date
     if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
@@ -326,6 +333,21 @@ private
     end
   end
 
+  def first_of_month_plan_selection_effective_date
+    if qle_on < TimeKeeper.date_of_record
+      TimeKeeper.date_of_record.next_month.beginning_of_month
+    else
+      @earliest_effective_date.end_of_month + 1.day
+    end
+  end
+
+  def first_of_reporting_month_effective_date
+    submitted_at.to_date.beginning_of_month
+  end
+
+  def fixed_first_of_next_month_reporting_effective_date
+    submitted_at.to_date.end_of_month + 1.day
+  end
 
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
   ## HBX_Admin override
