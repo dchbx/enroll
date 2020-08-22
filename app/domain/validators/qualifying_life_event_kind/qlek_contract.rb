@@ -36,6 +36,12 @@ module Validators
         end
       end
 
+      rule(:start_on) do  # TODO : cukes
+        if values[:start_on].present?
+          key.failure(l10n("validators.qualifying_life_event_kind.start_date_valid")) if values[:start_on].is_a?(Date) && values[:start_on] < TimeKeeper.date_of_record
+        end
+      end
+
       rule(:end_on, :start_on) do
         if values[:end_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:end_on].is_a?(Date)
