@@ -20,9 +20,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
   end
 
   context "when Had a baby" do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     before :each do
-      assign(:family, family)
       assign :qle_date, TimeKeeper.date_of_record
       allow(qlk).to receive(:reason).and_return("birth")
       allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event', 'fixed_first_of_next_month'])

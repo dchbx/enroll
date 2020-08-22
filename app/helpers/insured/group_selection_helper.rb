@@ -110,8 +110,6 @@ module Insured
 
     def selected_enrollment(family, employee_role, coverage_kind)
       employer_profile = employee_role.employer_profile
-      return unless family.current_sep
-
       benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, family.current_sep.effective_on)} || employer_profile.published_benefit_application
       enrollments = family.active_household.hbx_enrollments
       if benefit_application.present? && benefit_application.is_renewing?
