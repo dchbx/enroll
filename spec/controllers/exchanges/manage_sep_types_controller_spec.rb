@@ -68,8 +68,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
     context 'for create' do
       let(:post_params) do
-        { :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
-                                                      end_on: '2020-07-31',
+        { :forms_qualifying_life_event_kind_form => { start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                      end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                       title: 'test title',
                                                       tool_tip: 'jhsdjhs',
                                                       pre_event_sep_in_days: '10',
@@ -78,8 +78,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       post_event_sep_in_days: '88',
                                                       market_kind: 'individual',
                                                       effective_on_kinds: ['date_of_event'],
-                                                      coverage_start_on: '2020-07-01',
-                                                      coverage_end_on: '2020-07-31',
+                                                      coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                      coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                       event_kind_label: 'event kind label',
                                                       is_visible: true,
                                                       qle_event_date_kind: :qle_on,
@@ -130,7 +130,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'failure case' do
         before :each do
-          post_params[:forms_qualifying_life_event_kind_form].merge!({end_on: '2019-07-01'})
+          post_params[:forms_qualifying_life_event_kind_form].merge!({end_on: TimeKeeper.date_of_record.last_month.strftime("%Y-%m-%d")})
           sign_in(current_user)
           post :create, params: post_params
         end
@@ -226,8 +226,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
     context 'for update', :dbclean => :after_each do
       let(:post_params) do
         { id: q1.id.to_s,
-          :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
-                                                      end_on: '2020-07-31',
+          :forms_qualifying_life_event_kind_form => { start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                      end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                       title: 'test_title',
                                                       tool_tip: 'test_tooltip',
                                                       pre_event_sep_in_days: '10',
@@ -236,8 +236,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       post_event_sep_in_days: '88',
                                                       market_kind: 'individual',
                                                       effective_on_kinds: ['date_of_event'],
-                                                      coverage_start_on: '2020-07-01',
-                                                      coverage_end_on: '2020-07-31',
+                                                      coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                      coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                       event_kind_label: 'event kind label',
                                                       qle_event_date_kind: :qle_on,
                                                       is_visible: true,
@@ -269,7 +269,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
 
       context 'failure case' do
         before :each do
-          post_params[:forms_qualifying_life_event_kind_form].merge!({end_on: '2019-07-01'})
+          post_params[:forms_qualifying_life_event_kind_form].merge!({end_on: TimeKeeper.date_of_record.last_month.strftime("%Y-%m-%d")})
           sign_in(current_user)
           post :update, params: post_params
         end
@@ -290,8 +290,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       context "publish", :dbclean => :after_each do
         let(:post_params) do
           { id: q1.id.to_s,
-            :forms_qualifying_life_event_kind_form => { start_on: '2020-07-01',
-                                                        end_on: '2020-07-31',
+            :forms_qualifying_life_event_kind_form => { start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                        end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                         title: 'title_new',
                                                         tool_tip: 'tooltip_new',
                                                         pre_event_sep_in_days: '10',
@@ -300,8 +300,8 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                         post_event_sep_in_days: '88',
                                                         market_kind: 'individual',
                                                         effective_on_kinds: ['date_of_event'],
-                                                        coverage_start_on: '2020-07-01',
-                                                        coverage_end_on: '2020-07-31',
+                                                        coverage_start_on: TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
+                                                        coverage_end_on: TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
                                                         event_kind_label: 'event kind label',
                                                         qle_event_date_kind: :qle_on,
                                                         is_visible: true,
