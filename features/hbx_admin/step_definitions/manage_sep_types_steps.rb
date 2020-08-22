@@ -578,7 +578,7 @@ Then("Admin should navigate to update SEP Type page") do
 end
 
 When("Admin changes start and end dates of draft SEP Type") do
-  fill_in "Start Date", with: TimeKeeper.date_of_record.at_beginning_of_month.strftime('%m/%d/%Y').to_s
+  fill_in "Start Date", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: TimeKeeper.date_of_record.next_year.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
