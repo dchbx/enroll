@@ -25,6 +25,7 @@ module Validators
         optional(:termination_on_kinds).maybe(:array)
         required(:date_options_available).filled(:bool)
         optional(:publish).maybe(:string)
+        required(:qle_event_date_kind).maybe(:string)
 
         before(:value_coercer) do |result|
           result_hash = result.to_h
@@ -70,18 +71,6 @@ module Validators
 
       rule(:effective_on_kinds) do
         key.failure(l10n("validators.qualifying_life_event_kind.effective_on_kinds")) if values[:effective_on_kinds].blank?
-        effective_on_kinds_by_market = case values[:market_kind]
-                                       when 'shop'
-                                         ::QualifyingLifeEventKind::SHOP_EFFECTIVE_ON_KINDS
-                                       when 'individual'
-                                         ::QualifyingLifeEventKind::IVL_EFFECTIVE_ON_KINDS
-                                       when 'fehb'
-                                         ::QualifyingLifeEventKind::FEHB_EFFECTIVE_ON_KINDS
-                                       end
-
-        if values[:effective_on_kinds].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.effective_on_kinds_valid")) if value.any? {|each_kind| !effective_on_kinds_by_market.include?(each_kind)}
-        end
       end
 
       rule(:ordinal_position) do

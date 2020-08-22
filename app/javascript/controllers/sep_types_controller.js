@@ -6,9 +6,6 @@ export default class extends Controller {
 
   initialize() {
     this.metadata = {
-      ivl_kinds:    JSON.parse(this.metadataTarget.dataset.ivlKinds),
-      shop_kinds:   JSON.parse(this.metadataTarget.dataset.shopKinds),
-      fehb_kinds:   JSON.parse(this.metadataTarget.dataset.fehbKinds),
       reason:       this.metadataTarget.dataset.qleReason,
       market:       this.metadataTarget.dataset.qleMarket,
       draft:       this.metadataTarget.dataset.qleDraft
@@ -16,45 +13,6 @@ export default class extends Controller {
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
     this.disableOrEnable(market)
   }
-
-  initializeEffectiveKinds(market){
-    var ivl_kinds = this.metadata.ivl_kinds
-    var shop_kinds = this.metadata.shop_kinds
-    var fehb_kinds = this.metadata.fehb_kinds
-    var effective_on_kinds= document.getElementById('effective_on_kinds').querySelectorAll('input[type=checkbox]')
-    for (var effective_on_kind of effective_on_kinds){
-      effective_on_kind.disabled = false
-      effective_on_kind.checked = false
-      effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = false
-    }
-    if (market.value == "individual"){
-      for (var effective_on_kind of effective_on_kinds){
-        if ((ivl_kinds.includes(effective_on_kind.value)) == false){
-          effective_on_kind.disabled = true
-          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
-        }
-      }
-    }
-    else if (market.value == "shop"){
-      for (var effective_on_kind of effective_on_kinds){
-        if ((shop_kinds.includes(effective_on_kind.value)) == false){
-          effective_on_kind.disabled = true
-          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
-        }
-      }
-    }
-    else if (market.value == "fehb"){
-      for (var effective_on_kind of effective_on_kinds){
-        if ((fehb_kinds.includes(effective_on_kind.value)) == false){
-          effective_on_kind.disabled = true
-          effective_on_kind.parentElement.parentElement.parentElement.querySelectorAll('input[type=text]')[0].disabled = true
-        }
-      }
-    }
-    if (this.metadataTarget.dataset.terminationKinds != undefined) {
-      this.checkSelectedEffectiveKinds()
-    }
-  };
 
   disableTerminationkinds(market){
     var termination_on_kinds= document.getElementById('termination_on_kinds').querySelectorAll('input[type=checkbox]')
@@ -85,7 +43,9 @@ export default class extends Controller {
 
   marketChange(event) {
     var market = document.getElementById('market_kind').querySelectorAll('input[type=radio]:checked')[0]
-    this.initializeEffectiveKinds(market);
+    if (this.metadataTarget.dataset.terminationKinds != undefined) {
+      this.checkSelectedEffectiveKinds()
+    }
     this.disableTerminationkinds(market);
   }
 
@@ -137,7 +97,9 @@ export default class extends Controller {
       for (var i = 0; i < checkbox.length; i++) {
         checkbox[i].disabled = false;
       }
-      this.initializeEffectiveKinds(market)
+      if (this.metadataTarget.dataset.terminationKinds != undefined) {
+        this.checkSelectedEffectiveKinds()
+      }
       this.disableTerminationkinds(market)
     }
   }

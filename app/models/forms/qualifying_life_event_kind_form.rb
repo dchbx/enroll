@@ -24,14 +24,12 @@ module Forms
     attribute :coverage_start_on, Types::Date
     attribute :coverage_end_on, Types::Date
     attribute :event_kind_label, Types::String
+    attribute :qle_event_date_kind, Types::String
     attribute :is_visible, Types::Bool
     attribute :termination_on_kinds, Types::Array.of(Types::String)
     attribute :date_options_available, Types::Bool
     attribute :reason, Types::String
     attribute :draft, Types::Bool
-    attribute :ivl_effective_kinds, Types::Array.of(Types::String)
-    attribute :shop_effective_kinds, Types::Array.of(Types::String)
-    attribute :fehb_effective_kinds, Types::Array.of(Types::String)
 
     def self.for_new(params = {})
       if params.blank?
@@ -40,7 +38,7 @@ module Forms
         schema.each {|item| params[item.name] = nil unless params.key?(item.name)}
       end
 
-      new(params.merge(fetch_additional_params))
+      new params
     end
 
     def self.for_edit(params)
@@ -60,19 +58,14 @@ module Forms
     end
 
     class << self
-      def fetch_additional_params
-        { ivl_effective_kinds: ::Types::IndividualEffectiveOnKinds.values,
-          shop_effective_kinds: ::Types::ShopEffectiveOnKinds.values,
-          fehb_effective_kinds: ::Types::FehbEffectiveOnKinds.values }
-      end
-
       def fetch_qlek_data(id, update_params = nil)
         qle = ::QualifyingLifeEventKind.find(id)
         params = if update_params.present?
-                   update_params.merge(fetch_additional_params)
+                   update_params
                  else
-                   qle.attributes.merge(fetch_additional_params)
+                   qle.attributes
                  end
+        params[:reason] = params[:reason].humanize if params[:reason]
         params.merge!({draft: qle.draft?})
       end
 

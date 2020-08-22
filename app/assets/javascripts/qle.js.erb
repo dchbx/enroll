@@ -112,7 +112,7 @@ $(function () {
       $('#qle-date-chose').addClass('hidden');
       $('#qle-details .error-info').removeClass('hidden');
     } else {
-      if ($(this).data('qle-event-date-kind') == 'submitted_at') {
+      if ($(this).data('qle-event-date-kind') == 'submitted_at' && $(this).data('title') == 'COVID-19') {
          $('#qle_date').val($(this).data('current-date'));
          $('#qle_date').attr('placeholder',$(this).data('current-date'));
          $('#qle_date').attr('readonly',true);

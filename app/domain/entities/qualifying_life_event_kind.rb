@@ -21,5 +21,6 @@ module Entities
     attribute :is_visible, Types::Bool
     attribute :termination_on_kinds, Types::Array.of(Types::String).optional
     attribute :date_options_available, Types::Bool
+    attribute :qle_event_date_kind, Types::String
   end
 end
