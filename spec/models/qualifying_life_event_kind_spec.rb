@@ -509,6 +509,7 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
 
   context "advance_day" do
     let!(:past_expire_peding_qlek) { create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record.yesterday, is_active: true, aasm_state: :expire_pending)}
+    let!(:past_active_qlek) { create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record.yesterday, is_active: true, aasm_state: :active)}
     let!(:cur_expire_peding_qlek) { create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_month, end_on: TimeKeeper.date_of_record, is_active: true, aasm_state: :expire_pending)}
 
     before do
@@ -517,10 +518,15 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
 
     it "should expire eligble qleks" do
       past_expire_peding_qlek.reload
+      past_active_qlek.reload
       expect(past_expire_peding_qlek.aasm_state).to eq :expired
+      expect(past_active_qlek.aasm_state).to eq :expired
 
       expect(past_expire_peding_qlek.workflow_state_transitions.first.from_state).to eq "expire_pending"
       expect(past_expire_peding_qlek.workflow_state_transitions.first.to_state).to eq "expired"
+
+      expect(past_active_qlek.workflow_state_transitions.first.from_state).to eq "active"
+      expect(past_active_qlek.workflow_state_transitions.first.to_state).to eq "expired"
     end
 
     it "should not update not eligble qleks" do
