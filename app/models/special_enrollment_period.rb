@@ -235,9 +235,15 @@ private
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
+  #TODO : cukes
   def set_date_period
-    self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
-    self.end_on   = qle_on + @qualifying_life_event_kind.post_event_sep_in_days.days
+    if @qualifying_life_event_kind.coverage_start_on.present? && @qualifying_life_event_kind.coverage_end_on.present?
+      self.start_on = submitted_at.to_date - @qualifying_life_event_kind.pre_event_sep_in_days.days
+      self.end_on   = submitted_at.to_date + @qualifying_life_event_kind.post_event_sep_in_days.days
+    else
+      self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
+      self.end_on   = qle_on + @qualifying_life_event_kind.post_event_sep_in_days.days
+    end
 
     # Use end_on date as boundary guard for lapsed SEPs
     @reference_date = [submitted_at.to_date, end_on].min
