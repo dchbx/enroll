@@ -1,6 +1,7 @@
 Feature: Insured Plan Shopping on Individual Assisted market
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
+    When the FAA feature configuration is enabled
     When Individual visits the Insured portal during open enrollment
     Then Aptc user create consumer role account
     Then Aptc user goes to register as individual

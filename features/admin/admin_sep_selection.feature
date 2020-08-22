@@ -2,6 +2,7 @@ Feature: Update DOB and SSN
 
   Scenario: Admin purchases the an insured user through sep
     Given Individual has not signed up as an HBX user
+    When the FAA feature configuration is enabled
     When Individual visits the Insured portal during open enrollment
     Then Individual creates HBX account
     Then I should see a successful sign up message

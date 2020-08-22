@@ -2,6 +2,7 @@ Feature: plan shopping with mixed household determination
 
   Background: Consumer work flow while plan shopping for mixed household determinations
     Given Individual has not signed up as an HBX user
+    When the FAA feature configuration is enabled
     When Individual visits the Insured portal during open enrollment
     Then Individual creates a new HBX account
     Then I should see a successful sign up message
