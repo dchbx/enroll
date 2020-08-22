@@ -263,7 +263,7 @@ class QualifyingLifeEventKind
   class << self
 
     def advance_day(new_date)
-      QualifyingLifeEventKind.where(:end_on.lt => new_date, aasm_state: :expire_pending).each do |qle|
+      QualifyingLifeEventKind.where(:end_on.lt => new_date, :aasm_state.in => [:active, :expire_pending]).each do |qle|
         qle.advance_date! if qle.may_advance_date?
       end
     end
