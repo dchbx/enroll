@@ -138,19 +138,23 @@ class Insured::FamiliesController < FamiliesController
 
   def check_qle_date
     today = TimeKeeper.date_of_record
-    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = today - 30.days
     end_date = today + 30.days
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @qle_date = @qle.qle_event_date_kind == :qle_on ? Date.strptime(params[:date_val], "%m/%d/%Y") : today
       start_date = today - @qle.post_event_sep_in_days.try(:days)
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
       @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
-
+    @qle_date ||= if @qle
+                    @qle.qle_event_date_kind == :qle_on ? Date.strptime(params[:date_val], "%m/%d/%Y") : today
+                  else
+                    Date.strptime(params[:date_val], "%m/%d/%Y")
+                  end
     @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
                         (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
                       else
@@ -170,10 +174,12 @@ class Insured::FamiliesController < FamiliesController
       reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
       employee_role = @person.active_employee_roles.first
       if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial',
+                                qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: Date.strptime(params[:date_val], "%m/%d/%Y").strftime("%m/%d/%Y"))
       elsif Settings.site.key == :dc
         event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
+        trigger_notice_observer(employee_role, benefit_application, event_name,
+                                qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: Date.strptime(params[:date_val], "%m/%d/%Y").strftime("%m/%d/%Y"))
       end
     end
   end
