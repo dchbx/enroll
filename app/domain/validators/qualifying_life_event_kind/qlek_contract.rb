@@ -88,15 +88,27 @@ module Validators
         key.failure(l10n("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
       end
 
-      rule(:coverage_start_on) do
+      rule(:coverage_start_on) do # TODO : cukes
         if values[:coverage_start_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_start_on].is_a?(Date)
         end
+
+        if values[:coverage_start_on].blank? && values[:coverage_end_on].present?
+          key.failure(l10n("validators.qualifying_life_event_kind.coverage_start_on")) if values[:coverage_end_on].is_a?(Date)
+        end
       end
 
-      rule(:coverage_end_on) do
+      rule(:coverage_end_on) do # TODO : cukes
         if values[:coverage_end_on].present?
           key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_end_on].is_a?(Date)
+        end
+
+        if values[:coverage_start_on].present? && values[:coverage_end_on].blank?
+          key.failure(l10n("validators.qualifying_life_event_kind.coverage_end_on")) if values[:coverage_start_on].is_a?(Date)
+        end
+
+        if values[:coverage_start_on].present? && values[:coverage_end_on].present? && values[:coverage_start_on].is_a?(Date) && values[:coverage_end_on].is_a?(Date)
+          key.failure(l10n("validators.qualifying_life_event_kind.coverage_end_on_valid")) if values[:coverage_end_on] <= values[:coverage_start_on]
         end
       end
 
