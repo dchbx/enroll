@@ -85,7 +85,6 @@ def shop_qualifying_life_events
                     post_event_sep_in_days: 1,
                     effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
                     ordinal_position: 1,
-                    qle_event_date_kind: :submitted_at,
                     start_on: sep_type_start_on,
                     end_on: sep_type_end_on)
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
