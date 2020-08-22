@@ -1,7 +1,8 @@
 Feature: This is the final review page before submiting an application
 
   Background: Submit Your Application page
-    Given the user is on FAA Household Info: Family Members page
+    Given the FAA feature configuration is enabled
+    And the user is on FAA Household Info: Family Members page
     And all applicants are in Info Completed state with all types of income
     And the user clicks CONTINUE
     Then the user is on the Review Your Application page

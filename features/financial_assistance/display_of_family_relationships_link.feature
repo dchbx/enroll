@@ -2,6 +2,7 @@ Feature: Conditional Display of Family Relationships link in the left nav of the
 
   Background: Household Info page
     Given a consumer exists
+    And the FAA feature configuration is enabled
     And is logged in
     And a benchmark plan exists
     And the user will navigate to the FAA Household Info page
