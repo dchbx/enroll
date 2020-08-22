@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    before do
+    before :all do
       DatabaseCleaner.clean
     end
 
