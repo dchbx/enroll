@@ -2,6 +2,7 @@ Feature: Consumer verification process
 
   Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
+    Given the FAA feature configuration is enabled
     * Individual visits the Insured portal during open enrollment
     * Individual creates HBX account
     * I should see a successful sign up message

@@ -3,6 +3,7 @@ Feature: Review your application page functionality
   Background: Review your application page
     Given a consumer exists
     And is logged in
+    And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     And all applicants are in Info Completed state with all types of income
     And the user clicks CONTINUE

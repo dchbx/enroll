@@ -1,5 +1,8 @@
 Feature: A dedicated page that visit the eligibility determination page
 
+  Background: Submit Your Application page
+    Given the FAA feature configuration is enabled
+    
 	Scenario: View Elibility link will be disabled in draft state
 		Given that a user with a family has a Financial Assistance application in the "draft" state
 		And the user navigates to the "Help Paying For Coverage" portal

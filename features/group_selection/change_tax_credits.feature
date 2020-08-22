@@ -2,6 +2,7 @@ Feature: Change Tax Credit button
 
 Background:
   Given a consumer exists
+  Given the FAA feature configuration is enabled
   And the consumer is logged in
   And consumer has a dependent in child relationship with age greater than 26
   And consumer has a dependent in spouse relationship with age greater than 26

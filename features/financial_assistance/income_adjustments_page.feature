@@ -4,6 +4,7 @@ Feature: Start a new Financial Assistance Application and fills out Income Adjus
     Given a consumer, with a family, exists
     And is logged in
     And a benchmark plan exists
+    And the FAA feature configuration is enabled
     When the user will navigate to the FAA Household Info page
     And they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page

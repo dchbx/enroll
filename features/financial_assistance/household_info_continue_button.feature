@@ -1,6 +1,7 @@
 Feature: A dedicated page that gives the user access to household member creation/edit as well as Financial application forms for each household member.
 
   Background: Household Info page
+    Given the FAA feature configuration is enabled
     Given a plan year, with premium tables, exists
     Given that the user is on FAA Household Info: Family Members page
 

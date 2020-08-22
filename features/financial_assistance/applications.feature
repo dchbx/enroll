@@ -1,6 +1,7 @@
 Feature: Start a new Financial Assistance Application
   Background:
     Given a consumer, with a family, exists
+    And the FAA feature configuration is enabled
     And is logged in
     And a benchmark plan exists
 

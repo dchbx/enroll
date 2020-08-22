@@ -1,6 +1,7 @@
 Feature: CSR finishes shopping for Individual
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
+      When the FAA feature configuration is enabled
       When a CSR exists
       When Individual visits the Insured portal outside of open enrollment
       Then Individual creates a new HBX account
