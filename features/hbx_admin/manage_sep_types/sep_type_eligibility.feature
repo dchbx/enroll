@@ -94,6 +94,8 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Admin should not see sucess confirmation text
     And Admin logs out
 
+ # TODO: Refactor
+  @wip
   Scenario: Admin logged to qualify employee for special enrollment period based on extended eligibity dates
     Given Hbx Admin Creates a new Shop market SEP Type
     When Admin navigates to SEP Types List page
