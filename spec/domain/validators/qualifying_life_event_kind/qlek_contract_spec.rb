@@ -141,6 +141,25 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
   end
 
   context 'failure case' do
+    context 'start on date is in the past' do
+      before  do
+        contract_params.merge!({start_on: TimeKeeper.date_of_record - 1.day})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should have any errors' do
+        expect(@result.errors.empty?).to be_falsy
+      end
+
+      it 'should return error message as start date' do
+        expect(@result.errors.messages.first.text).to eq('Start on must be current or future date')
+      end
+    end
+
     context 'end on date is less than start on date' do
       before  do
         contract_params.merge!({start_on: "#{TimeKeeper.date_of_record.year}-08-29", publish: 'Publish'})
