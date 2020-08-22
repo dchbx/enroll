@@ -235,6 +235,93 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
       end
     end
 
+    context 'invalid coverage_start_on value' do
+      before do
+        contract_params.merge!({coverage_start_on: 'test'})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should return error message as end_on is not a date' do
+        expect(@result.errors.messages.first.text).to eq('must be a date')
+      end
+    end
+
+    context 'invalid coverage_end_on value' do
+      before do
+        contract_params.merge!({coverage_end_on: 'test'})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should return error message as end_on is not a date' do
+        expect(@result.errors.messages.first.text).to eq('must be a date')
+      end
+    end
+
+    context 'coverage_start_on present' do
+      before  do
+        contract_params.merge!({coverage_start_on: TimeKeeper.date_of_record + 1.day, coverage_end_on: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should have any errors' do
+        expect(@result.errors.empty?).to be_falsy
+      end
+
+      it 'should return error message as start date' do
+        expect(@result.errors.messages.first.text).to eq('Eligibility End Date must be filled')
+      end
+    end
+
+    context 'coverage_end_on present' do
+      before  do
+        contract_params.merge!({coverage_end_on: TimeKeeper.date_of_record + 1.day, coverage_start_on: nil})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should have any errors' do
+        expect(@result.errors.empty?).to be_falsy
+      end
+
+      it 'should return error message as start date' do
+        expect(@result.errors.messages.first.text).to eq('Eligibility Start Date must be filled')
+      end
+    end
+
+    context 'coverage_end_on less than coverage_start_on date ' do
+      before  do
+        contract_params.merge!({coverage_start_on: TimeKeeper.date_of_record.next_month, coverage_end_on: TimeKeeper.date_of_record})
+        @result = subject.call(contract_params)
+      end
+
+      it 'should return failure' do
+        expect(@result.failure?).to be_truthy
+      end
+
+      it 'should have any errors' do
+        expect(@result.errors.empty?).to be_falsy
+      end
+
+      it 'should return error message as start date' do
+        expect(@result.errors.messages.first.text).to eq('Eligibility End Date must be after Eligibility Start Date')
+      end
+    end
+
     #TODO: uncomment spec when code uncommented here
     # app/domain/validators/qualifying_life_event_kind/qlek_contract.rb:98
     # context 'for termination_on_kinds being empty for shop market' do
