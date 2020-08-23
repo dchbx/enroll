@@ -19,6 +19,7 @@
         <h3 class="heading-text">
           <%= l10n("exchange.manage_sep_types.create_sep_type")%>
         </h3>
+        <p style="margin-left: 847px;margin-top: -30px;">* indicates a required field</p>
       </div>
       <div class="col-12" style="line-height: 0.8; margin-top: 20px;" >
         <div class="row justify-content-start">
@@ -30,8 +31,8 @@
           </div>
         </div>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <div class="row justify-content-start">
           <div class="col-6">
             <div id= "market_kind" data-action='change->sep-types#marketChange'>

@@ -19,7 +19,7 @@ registry:
           - key: :start_on
             item: <%= ENV['start_on'] %>
             meta:
-              label: Start Date
+              label: Start Date *
               content_type: :date
               default: ''
               description: Enter Start Date
@@ -37,45 +37,45 @@ registry:
           - key: :title
             item: <%= ENV['title'] %>
             meta:
-              label: Title
+              label: SEP Name *
               content_type: :text_field
               default: ''
-              description: Enter Title
+              description: Enter SEP Name
               is_required: true
               is_visible: true
           - key: :tool_tip
             item: <%= ENV['tool_tip'] %>
             meta:
-              label: Tool Tip
+              label: SEP Name Tool Tip
               content_type: :text_field
               default: ''
-              description: Enter Toot Tip
+              description: Enter SEP Name Tool Tip
               is_required: false
               is_visible: true
           - key: :pre_event_sep_in_days
             item: <%= ENV['pre_event_sep_in_days'] %>
             meta:
-              label: Pre Event SEP( In Days )
+              label: Days Eligible Before Event Date *
               content_type: :number
               default: ''
-              description: Enter Sep Start(In Days)
+              description: Enter Days Eligible Before Event Date
               is_required: true
               is_visible: true
           - key: :post_event_sep_in_days
             item: <%= ENV['post_event_sep_in_days'] %>
             meta:
-              label: Post Event SEP( In Days )
+              label: Days Eligible After Event Date *
               content_type: :number
               default: ''
-              description: Enter Sep End( In Days )
+              description: Enter Days Eligible After Event Date
               is_required: true
               is_visible: true
           - key: :market_kind
             item: <%= ENV[':market_kind'] %>
             meta:
-              label: Market
+              label: Market *
               content_type: :radio_select
-              enum: [{individual: "Individual"}, {shop: "Shop"}, {fehb: "Congress"}]
+              enum: [{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}]
               default: :individual
               description: Select Market Kind
               is_required: true
@@ -83,26 +83,26 @@ registry:
           - key: :is_self_attested
             item: <%= ENV['is_self_attested'] %>
             meta:
-              label: Self Attestation
+              label: Self Attestation *
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Self-Service' }, { 'false': 'Admin Only'} ]
-              description: 'Select Self Attestation Type'
+              description: Select Self Attestation Type
               is_required: true
               is_visible: true
           - key: :reason
             item: <%= ENV['reason'] %>
             meta:
-              label: Reason
+              label: EDI Reason Code *
               content_type: :text_field
               default: ''
-              description: Enter Reason
+              description: Enter EDI Reason Code
               is_required: true
               is_visible: true
           - key: :effective_on_kinds
             item: <%= ENV['effective_on_kinds'] %>
             meta:
-              label: Effective On
+              label: Effective Date Rules *
               enum: [{date_of_event: Date of Event},
               {first_of_this_month: First of Event Month},
               {fixed_first_of_next_month: First of Month after Event},
@@ -114,7 +114,7 @@ registry:
               {exact_date: Exact Date}]
               content_type: :checkbox_select
               default: ''
-              description: Select Coverage Effective Type
+              description: Select Effective Date Rules
               is_required: false
               is_visible: true
           - key: :termination_on_kinds
@@ -148,40 +148,40 @@ registry:
           - key: :is_visible
             item: <%= ENV['is_visible'] %>
             meta:
-              label: Visibility
+              label: Visibility *
               content_type: :radio_select
               default: true
               enum: [ {'true': 'Customer & Admin' }, { 'false': 'Admin Only'} ]
-              description: 'Select Visibility'
+              description: Select Visibility
               is_required: true
               is_visible: true
           - key: :date_options_available
             item: <%= ENV['date_options_available'] %>
             meta:
-              label: Date Options Available
+              label: Date Options Available *
               content_type: :radio_select
-              default: true
+              default: false
               enum: [ {'true': 'True' }, { 'false': 'False'} ]
-              description: 'Select Date Options Availabilty'
+              description: Select Date Options Availabilty
               is_required: true
               is_visible: true
           - key: :event_kind_label
             item: <%= ENV['event_kind_label'] %>
             meta:
-              label: Event Label
+              label: Event Date Label *
               content_type: :text_field
               default: ''
-              description: Enter Event Label
+              description: Enter Event Date Label
               is_required: true
               is_visible: true
           - key: :qle_event_date_kind
             item: <%= ENV['qle_event_date_kind'] %>
             meta:
-              label: SEP Eligibility Kind
+              label: SEP Eligibility Kind *
               content_type: :radio_select
               enum: [ {qle_on: 'Event Date' }, { submitted_at: 'Reported Date'} ]
               default: :qle_on
-              description: Select Date Kind
+              description: Select Eligibility Kind
               is_required: true
               is_visible: true
       - key: :expire_sep_type

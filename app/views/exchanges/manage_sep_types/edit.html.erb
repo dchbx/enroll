@@ -35,8 +35,8 @@
           </div>
         </div>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
-        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
         <div class="row justify-content-start">
           <div class="col-6">
             <div id= "market_kind" data-action='change->sep-types#marketChange'>

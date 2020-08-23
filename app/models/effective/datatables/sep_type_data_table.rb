@@ -6,7 +6,7 @@ module Effective
       include Config::AcaModelConcern
       datatable do
         table_column :title, :label => l10n("datatables.sep_type_data_table.title"), :proc => proc { |row| link_to(row.title, edit_exchanges_manage_sep_type_path(row.id), data: {turbolinks: false})}, :filter => false, :sortable => true
-        table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row| row.market_kind}, :filter => false, :sortable => false
+        table_column :Market, :label => l10n("datatables.sep_type_data_table.market"), :proc => proc { |row|  market_kind(row)}, :filter => false, :sortable => false
         table_column :start_date, :label => l10n("datatables.sep_type_data_table.start_date"), :proc => proc { |row| row.start_on }, :filter => false, :sortable => false
         table_column :state, :label => l10n("datatables.sep_type_data_table.state"), :proc => proc { |row| row.aasm_state}, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => proc { |row|
@@ -30,6 +30,14 @@ module Effective
 
       def global_search?
         true
+      end
+
+      def market_kind(qle)
+        if qle.shop?
+          "SHOP"
+        else
+          qle.fehb? ? "Congress" : qle.market_kind.capitalize
+        end
       end
 
       def can_expire_sep_type?(qle, allow)

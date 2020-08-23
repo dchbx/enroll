@@ -72,7 +72,7 @@
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'users-orphans', link_path: main_app.users_orphans_path, display_name: 'Orphan Accounts', active_tab: 'users-orphans', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
               - if EnrollRegistry.feature_enabled?(:sep_types)
                 li
-                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-sep-types', link_path: main_app.sep_types_dt_exchanges_manage_sep_types_path, data: { turbolinks: false }, display_name: l10n("exchange.manage_sep_types.manage_sep_types"), active_tab: "manage-sep-types", remote: false, pundit_object: QualifyingLifeEventKind, pundit_method: :can_manage_qles?}
+                  = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-sep-types', link_path: main_app.sep_types_dt_exchanges_manage_sep_types_path, data: { turbolinks: false }, display_name: l10n("exchange.manage_sep_types.manage_seps"), active_tab: "manage-sep-types", remote: false, pundit_object: QualifyingLifeEventKind, pundit_method: :can_manage_qles?}
           li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
             = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
               | Inbox
