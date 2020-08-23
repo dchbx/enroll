@@ -47,7 +47,7 @@ Then(/^I can see the error message (.*?)$/) do |message|
 end
 
 And 'I select a effective date from list' do
-  select 'Date of event', from: 'effective_on_kind'
+  find("[name='effective_on_kind'] option[value='date_of_event']").select_option
 end
 
 And(/user should see your information page$/) do
