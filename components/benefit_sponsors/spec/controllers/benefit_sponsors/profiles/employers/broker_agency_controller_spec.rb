@@ -3,6 +3,10 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe Profiles::Employers::BrokerAgencyController, type: :controller, dbclean: :after_each do
 
+    before do
+      DatabaseCleaner.clean
+    end
+
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
     let!(:rating_area)   { FactoryBot.create :benefit_markets_locations_rating_area }
