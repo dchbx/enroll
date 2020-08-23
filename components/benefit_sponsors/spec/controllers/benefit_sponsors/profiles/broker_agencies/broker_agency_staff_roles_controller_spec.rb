@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    before :all do
+    before  do
       DatabaseCleaner.clean
     end
 
@@ -246,7 +246,7 @@ module BenefitSponsors
       end
     end
 
-    describe "GET search_broker_agency" do
+    describe "GET search_broker_agency", dbclean: :after_each  do
 
       before do
         broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
@@ -255,7 +255,7 @@ module BenefitSponsors
         get :search_broker_agency, params: params, format: :js, xhr: true
       end
 
-      context "return result if broker agency is present" do
+      context "return result if broker agency is present", dbclean: :after_each  do
 
         let!(:params) do
           {
@@ -277,7 +277,7 @@ module BenefitSponsors
         end
       end
 
-      context "should not return result" do
+      context "should not return result", dbclean: :after_each  do
 
         let!(:params) do
           {
