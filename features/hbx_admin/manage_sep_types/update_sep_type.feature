@@ -4,11 +4,11 @@ Feature: Admin has ability to update a Draft SEP Type
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the Admin will see the Manage SEP Types under admin dropdown
-    And Admin can click Manage SEP Types link
+    And the Admin will see the Manage SEPs under admin dropdown
+    And Admin can click Manage SEPs link
 
   Scenario Outline: Admin will create a new <market_kind> SEP type and updates it
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -41,7 +41,7 @@ Feature: Admin has ability to update a Draft SEP Type
     | fehb        |  can   |
 
   Scenario Outline: Admin will see a failure reason while updating <market_kind> SEP type
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page

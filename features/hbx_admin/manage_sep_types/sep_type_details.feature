@@ -4,11 +4,11 @@ Feature: When Admin visits SEP Details page
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the Admin will see the Manage SEP Types under admin dropdown
-    And Admin can click Manage SEP Types link
+    And the Admin will see the Manage SEPs under admin dropdown
+    And Admin can click Manage SEPs link
 
   Scenario Outline: Admin should see disabled form
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And Admin clicks <market_kind> filter on SEP Types datatable
     And Admin clicks on Active filter of <market_kind> market filter
     Then Admin clicks on Active SEP Type title for <market_kind> on Datatable

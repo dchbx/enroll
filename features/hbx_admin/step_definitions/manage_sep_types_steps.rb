@@ -17,24 +17,24 @@ Given(/^that a user with a HBX staff role with (.*) subrole exists$/) do |subrol
   FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
-And(/the Admin will (.*) the Manage SEP Types under admin dropdown$/) do |action|
+And(/the Admin will (.*) the Manage SEPs under admin dropdown$/) do |action|
   find('.dropdown-toggle', :text => "Admin").click
   if action == 'see'
-    find_link('Manage SEP Types').visible? == true
+    find_link('Manage SEPs').visible? == true
   else
-    page.has_css?('Manage SEP Types') == false
+    page.has_css?('Manage SEPs') == false
   end
 end
 
-Given(/^Admin (.*) click Manage SEP Types link$/) do |action|
+Given(/^Admin (.*) click Manage SEPs link$/) do |action|
   if action == 'can'
-    page.find('.interaction-click-control-manage-sep-types').click
+    page.find('.interaction-click-control-manage-seps').click
   else
-    page.has_css?('Manage SEP Types') == false
+    page.has_css?('Manage SEPs') == false
   end
 end
 
-Then(/^Admin (.*) navigate to the Manage SEP Types screen$/) do |action|
+Then(/^Admin (.*) navigate to the Manage SEPs screen$/) do |action|
   if action == 'can'
     expect(page).to have_xpath('//*[@id="Tab:all"]', text: 'All')
     expect(page).to have_xpath('//*[@id="Tab:ivl_qles"]', text: 'Individual')
@@ -48,9 +48,9 @@ Then(/^Admin (.*) navigate to the Manage SEP Types screen$/) do |action|
   end
 end
 
-Then("Admin should see sorting SEP Types button and create SEP Type button") do
-  expect(page).to have_content('Sorting SEP Types')
-  step "Admin navigates to Create SEP Type page"
+Then("Admin should see Sort SEPs button and Create SEP button") do
+  expect(page).to have_content('Sort SEPs')
+  step "Admin navigates to Create SEP page"
 end
 
 When("Admin clicks on List SEP Types link") do
@@ -58,7 +58,7 @@ When("Admin clicks on List SEP Types link") do
 end
 
 Then("Admin navigates to SEP Type List page") do
-  step "Admin can navigate to the Manage SEP Types screen"
+  step "Admin can navigate to the Manage SEPs screen"
 end
 
 def sep_type_start_on
@@ -71,7 +71,8 @@ end
 
 def ivl_qualifying_life_events
   {:effective_on_event_date => 1, :effective_on_first_of_month => 2}.map do |event_trait, ordinal_position|
-    FactoryBot.create(:qualifying_life_event_kind, event_trait, event_kind_label: "event kind label", market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, event_kind_label: "event kind label",
+                                                                market_kind: "individual", post_event_sep_in_days: 90, ordinal_position: ordinal_position, start_on: TimeKeeper.date_of_record.last_month, end_on: sep_type_end_on)
   end
 end
 
@@ -85,14 +86,14 @@ def shop_qualifying_life_events
                     post_event_sep_in_days: 1,
                     effective_on_kinds: ["first_of_this_month", "fixed_first_of_next_month"],
                     ordinal_position: 1,
-                    start_on: sep_type_start_on,
+                    start_on: TimeKeeper.date_of_record.last_month,
                     end_on: sep_type_end_on)
-  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", ordinal_position: 2, start_on: sep_type_start_on, end_on: sep_type_end_on)
+  FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", ordinal_position: 2, start_on: TimeKeeper.date_of_record.last_month, end_on: sep_type_end_on)
 end
 
 def fehb_qualifying_life_events
   {:effective_on_fixed_first_of_next_month => 1, :adoption => 2}.map do |event_trait, ordinal_position|
-    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", ordinal_position: ordinal_position, start_on: sep_type_start_on, end_on: sep_type_end_on)
+    FactoryBot.create(:qualifying_life_event_kind, event_trait, market_kind: "fehb", ordinal_position: ordinal_position, start_on: TimeKeeper.date_of_record.last_month, end_on: sep_type_end_on)
   end
 end
 
@@ -102,8 +103,8 @@ And(/^Qualifying life events of all markets are present$/) do
   fehb_qualifying_life_events
 end
 
-When("Admin clicks on the Sorting SEP Types button") do
-  page.find('.interaction-click-control-sorting-sep-types').click
+When("Admin clicks on the Sort SEPs button") do
+  page.find('.interaction-click-control-sort-seps').click
 end
 
 Then("Admin should see three tabs Individual, Shop and Congress markets") do
@@ -248,23 +249,27 @@ Given(/(.*) Qualifying life events of (.*) market is present$/) do |state, marke
 end
 
 When("Admin clicks on the Create SEP Type button") do
-  page.find('.interaction-click-control-create-sep-types').click
+  page.find('.interaction-click-control-create-sep').click
 end
 
 Then("Admin navigates to Create SEP Type page") do
   expect(page).to have_content('Create SEP Type')
 end
 
+Then("Admin navigates to Create SEP page") do
+  expect(page).to have_content('Create SEP')
+end
+
 When(/Admin fills Create SEP Type form with(?: (.*))? start and end dates$/) do |date|
   sleep 1
   if date == 'future'
-    fill_in "Start Date", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
+    fill_in "Start Date *", with: (sep_type_start_on + 2.months).strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
   elsif date == 'past'
-    fill_in "Start Date", with: (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
+    fill_in "Start Date *", with: (sep_type_start_on - 2.months).strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: (sep_type_end_on + 2.months).strftime('%m/%d/%Y').to_s
   else
-    fill_in "Start Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
+    fill_in "Start Date *", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
     fill_in "End Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
   end
 end
@@ -314,20 +319,20 @@ When(/Admin should see effective on kinds checked based on (.*)$/) do |market_ki
 end
 
 When("Admin fills Create SEP Type form with start on date greater than end on date") do
-  fill_in "Start Date", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
+  fill_in "Start Date *", with: sep_type_end_on.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: sep_type_start_on.strftime('%m/%d/%Y').to_s
 end
 
 And("Admin fills Create SEP Type form with Title") do
-  fill_in "Title", with: "Entered into a legal domestic partnership"
+  fill_in "SEP Name *", with: "Entered into a legal domestic partnership"
 end
 
 And("Admin fills Create SEP Type form with Event label") do
-  fill_in "Event Label", with: "Date of domestic partnership"
+  fill_in "Event Date Label *", with: "Date of domestic partnership"
 end
 
 And("Admin fills Create SEP Type form with Tool Tip") do
-  fill_in "Tool Tip", with: "Enroll or add a family member due to a new domestic partnership"
+  fill_in "SEP Name Tool Tip", with: "Enroll or add a family member due to a new domestic partnership"
 end
 
 And(/Admin selects (.*) market radio button$/) do |market_kind|
@@ -342,28 +347,28 @@ And(/Admin selects (.*) market radio button$/) do |market_kind|
 end
 
 And("Admin fills Create SEP Type form with Reason") do
-  fill_in "Reason", with: "domestic partnership"
+  fill_in "EDI Reason Code *", with: "domestic partnership"
 end
 
 And(/Admin fills active reason for (.*) SEP type form$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
-    fill_in "Reason", with: "birth'"
+    fill_in "EDI Reason Code *", with: "birth'"
   elsif market_kind == 'shop'
-    fill_in "Reason", with: "marriage'"
+    fill_in "EDI Reason Code *", with: "marriage'"
   else
-    fill_in "Reason", with: "adoption'"
+    fill_in "EDI Reason Code *", with: "adoption'"
   end
 end
 
 And(/Admin fills active title for (.*) SEP type form$/) do |market_kind|
   sleep(2)
   if market_kind == 'individual'
-    fill_in "Title", with: "Had a baby"
+    fill_in "SEP Name *", with: "Had a baby"
   elsif market_kind == 'shop'
-    fill_in "Title", with: "Married"
+    fill_in "SEP Name *", with: "Married"
   else
-    fill_in "Title", with: "Adopted a child"
+    fill_in "SEP Name *", with: "Adopted a child"
   end
 end
 
@@ -384,8 +389,8 @@ And(/Admin (.*) termination on kinds for (.*) market$/) do |action, _market_kind
 end
 
 And("Admin fills Create SEP Type form with Pre Event SEP and Post Event SEP dates") do
-  fill_in "Pre Event SEP( In Days )", with: "0"
-  fill_in "Post Event SEP( In Days )", with: "30"
+  fill_in "Days Eligible Before Event Date *", with: "0"
+  fill_in "Days Eligible After Event Date *", with: "30"
 end
 
 When(/Admin selects (.*) visibility radio button for (.*) market$/) do |user, _market_kind|
@@ -435,7 +440,7 @@ Then("Admin should see SEP Type Created Successfully message") do
 end
 
 When("Admin navigates to SEP Types List page") do
-  step "Admin should see sorting SEP Types button and create SEP Type button"
+  step "Admin should see Sort SEPs button and Create SEP button"
 end
 
 When(/Admin clicks (.*) filter on SEP Types datatable$/) do |market_kind|
@@ -611,7 +616,7 @@ Then("Admin should navigate to update SEP Type page") do
 end
 
 When("Admin changes start and end dates of draft SEP Type") do
-  fill_in "Start Date", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
+  fill_in "Start Date *", with: TimeKeeper.date_of_record.next_month.strftime('%m/%d/%Y').to_s
   fill_in "End Date", with: TimeKeeper.date_of_record.next_year.end_of_month.strftime('%m/%d/%Y').to_s
 end
 
@@ -750,9 +755,9 @@ end
 
 Given("Hbx Admin Creates a new Individual market SEP Type") do
   step "Qualifying life events of all markets are present"
-  step "the Admin will see the Manage SEP Types under admin dropdown"
-  step "Admin can click Manage SEP Types link"
-  step "Admin can navigate to the Manage SEP Types screen"
+  step "the Admin will see the Manage SEPs under admin dropdown"
+  step "Admin can click Manage SEPs link"
+  step "Admin can navigate to the Manage SEPs screen"
   step "expired Qualifying life events of individual market is present"
   step "Admin clicks on the Create SEP Type button"
   step "Admin navigates to Create SEP Type page"
@@ -810,9 +815,9 @@ end
 
 Given("Hbx Admin Creates a new Shop market SEP Type") do
   step "Qualifying life events of all markets are present"
-  step "the Admin will see the Manage SEP Types under admin dropdown"
-  step "Admin can click Manage SEP Types link"
-  step "Admin can navigate to the Manage SEP Types screen"
+  step "the Admin will see the Manage SEPs under admin dropdown"
+  step "Admin can click Manage SEPs link"
+  step "Admin can navigate to the Manage SEPs screen"
   step "expired Qualifying life events of shop market is present"
   step "Admin clicks on the Create SEP Type button"
   step "Admin navigates to Create SEP Type page"

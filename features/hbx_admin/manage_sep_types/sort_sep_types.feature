@@ -1,4 +1,4 @@
-Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save their positions in DB
+Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their positions in DB
     User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
     User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
 
@@ -7,12 +7,12 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the Admin will see the Manage SEP Types under admin dropdown
-    And Admin can click Manage SEP Types link
+    And the Admin will see the Manage SEPs under admin dropdown
+    And Admin can click Manage SEPs link
 
   Scenario: Admin has ability to sort the SEP Types and saves the positions to the database
-    Given Admin can navigate to the Manage SEP Types screen
-    When Admin clicks on the Sorting SEP Types button
+    Given Admin can navigate to the Manage SEPs screen
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on individual tab
     Then Admin should see listed individual market SEP Types with ascending positions
@@ -34,8 +34,8 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And Hbx Admin logs out
 
   Scenario: Admin will sort Individual market SEP Types and it will reflect the same order on the individual insured home page qle carousel
-    Given Admin can navigate to the Manage SEP Types screen
-    When Admin clicks on the Sorting SEP Types button
+    Given Admin can navigate to the Manage SEPs screen
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on individual tab
     Then Admin should see listed individual market SEP Types with ascending positions
@@ -67,10 +67,10 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And I click on log out link
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
-    And the Admin will see the Manage SEP Types under admin dropdown
-    When Admin can click Manage SEP Types link
-    Given Admin can navigate to the Manage SEP Types screen
-    When Admin clicks on the Sorting SEP Types button
+    And the Admin will see the Manage SEPs under admin dropdown
+    When Admin can click Manage SEPs link
+    Given Admin can navigate to the Manage SEPs screen
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on individual tab
     Then Admin should see listed individual market SEP Types with ascending positions
@@ -86,7 +86,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Individual logs out
 
   Scenario: Admin will create a new Individual market SEP type with future date and try to sort the Sep Type
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -109,7 +109,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Admin should navigate to update SEP Type page
     When Admin clicks on Publish button
     Then Admin should see Successfully publish message
-    When Admin clicks on the Sorting SEP Types button
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on individual tab
     And Admin should see listed individual market SEP Types
@@ -117,8 +117,8 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And Hbx Admin logs out
 
   Scenario: Admin will sort Shop market SEP Types and it will reflect the same order on the employee home page qle carousel
-    Given Admin can navigate to the Manage SEP Types screen
-    When Admin clicks on the Sorting SEP Types button
+    Given Admin can navigate to the Manage SEPs screen
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on shop tab
     Then Admin should see listed Active shop market SEP Types on datatable
@@ -135,10 +135,10 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Employee logs out
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
-    And the Admin will see the Manage SEP Types under admin dropdown
-    When Admin can click Manage SEP Types link
-    Given Admin can navigate to the Manage SEP Types screen
-    When Admin clicks on the Sorting SEP Types button
+    And the Admin will see the Manage SEPs under admin dropdown
+    When Admin can click Manage SEPs link
+    Given Admin can navigate to the Manage SEPs screen
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     Then Admin should see listed individual market SEP Types with ascending positions
     When Admin sorts Individual SEP Types by drag and drop
@@ -156,7 +156,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Employee logs out
 
   Scenario: Admin will create a new Shop market SEP type with future date and try to sort the Sep Type
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of shop market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -179,7 +179,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Admin should navigate to update SEP Type page
     When Admin clicks on Publish button
     Then Admin should see Successfully publish message
-    When Admin clicks on the Sorting SEP Types button
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on shop tab
     And Admin should see listed shop market SEP Types
@@ -187,7 +187,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     And Hbx Admin logs out
 
   Scenario Outline: Admin will create a new <market_kind> SEP type and publish it
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -210,7 +210,7 @@ Feature: Admin has ability to sort SEP Types on Sorting SEP Types Page and save 
     Then Admin should navigate to update SEP Type page
     When Admin clicks on Publish button
     Then Admin should see Successfully publish message
-    When Admin clicks on the Sorting SEP Types button
+    When Admin clicks on the Sort SEPs button
     Then Admin should see three tabs Individual, Shop and Congress markets
     When Admin clicks on <market_kind> tab
     Then Admin should see listed <market_kind> market SEP Types

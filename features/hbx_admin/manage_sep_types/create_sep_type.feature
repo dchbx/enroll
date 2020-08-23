@@ -4,11 +4,11 @@ Feature: Admin has ability to create a new SEP Type
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
     And Qualifying life events of all markets are present
-    And the Admin will see the Manage SEP Types under admin dropdown
-    And Admin can click Manage SEP Types link
+    And the Admin will see the Manage SEPs under admin dropdown
+    And Admin can click Manage SEPs link
 
   Scenario Outline: Admin will create a new <market_kind> SEP type
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -36,7 +36,7 @@ Feature: Admin has ability to create a new SEP Type
     | fehb        |  can   |
 
   Scenario Outline: Failure scenario to create <market_kind> market SEP type
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -61,7 +61,7 @@ Feature: Admin has ability to create a new SEP Type
 
 
   Scenario Outline: Admin will create a new <market_kind> SEP type with/without selecting termination on kinds
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of <market_kind> market is present
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
@@ -90,7 +90,7 @@ Feature: Admin has ability to create a new SEP Type
       | fehb        |  not selected   |
 
   Scenario: Admin should see failure when creating SEP type with past start date
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
     When Admin fills Create SEP Type form with past start and end dates
@@ -106,7 +106,7 @@ Feature: Admin has ability to create a new SEP Type
     And Hbx Admin logs out
 
   Scenario: Admin should see failure when creating SEP type with invalid eligibity date
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
     When Admin fills Create SEP Type form with start and end dates
@@ -123,7 +123,7 @@ Feature: Admin has ability to create a new SEP Type
     And Hbx Admin logs out
 
   Scenario: Admin should see failure when creating SEP type withonly eligibility start date
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
     When Admin fills Create SEP Type form with start and end dates
@@ -140,7 +140,7 @@ Feature: Admin has ability to create a new SEP Type
     And Hbx Admin logs out
 
   Scenario: Admin should see failure when creating SEP type withonly eligibility end date
-    Given Admin can navigate to the Manage SEP Types screen
+    Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
     Then Admin navigates to Create SEP Type page
     When Admin fills Create SEP Type form with start and end dates
