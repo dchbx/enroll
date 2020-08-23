@@ -586,13 +586,11 @@ class Person
     if inverse_relationship.present?
       inverse_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
-      person.person_relationships.build({
-        :kind => relationship,
-        :successor_id => self.id,
-        :relative_id => person.id,
-        :predecessor_id => person.id,
-        :family_id => family_id
-      })
+      person.person_relationships.build({:kind => relationship,
+                                         :successor_id => self.id,
+                                         :relative_id => person.id,
+                                         :predecessor_id => person.id,
+                                         :family_id => family_id})
     end
   end
 
@@ -1372,4 +1370,3 @@ class Person
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end
-

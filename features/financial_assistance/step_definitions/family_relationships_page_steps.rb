@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Given(/^the user is logged in$/) do
   login_as user :with_consumer_role
 end
@@ -65,12 +67,12 @@ Then(/^the relationship is saved$/) do
 end
 
 Given(/^all the relationships have been entered$/) do
-  find_all(:css, ".missing_relation").each {|relation|
+  find_all(:css, ".missing_relation").each do |relation|
     relation.find(:xpath, 'div/div[2]/div[2]/div[2]/div/div[3]/div/ul/li[7]', :visible => false).trigger('click')
-  }
-  find_all(:css, ".selectric .label").each{ |selector|
+  end
+  find_all(:css, ".selectric .label").each do |selector|
     expect(selector.text).to eq("parent")
-  }
+  end
   expect(page).to have_no_css('.missing_relation')
 end
 

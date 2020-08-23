@@ -20,7 +20,12 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
-        relation = relationship.relationship_uri.strip.split("#").last rescue ''
+        relation = ''
+        begin
+          relation = relationship.relationship_uri.strip.split("#").last
+        rescue StandardError
+          relation = ''
+        end
 
         next if relationship.subject_individual == relationship.object_individual
         person_object.person_relationships.build(
@@ -44,14 +49,19 @@ module Parsers::Xml::Cv::Importers
 
     def build_addresses(person, person_object)
       person.addresses.each do |address|
-        kind = address.type.match(/address_type#(.*)/)[1] rescue 'home'
+        kind = 'home'
+        begin
+          kind = address.type.match(/address_type#(.*)/)[1]
+        rescue StandardError
+          kind = 'home'
+        end
         person_object.addresses.build({
           address_1: address.address_line_1,
           address_2: address.address_line_2,
           city: address.location_city_name,
           state: address.location_state_code,
           zip: address.postal_code,
-          kind: kind,
+          kind: kind
         })
       end
     end
@@ -74,10 +84,8 @@ module Parsers::Xml::Cv::Importers
         email_type = email.type
         email_type_for_enroll = email_type.blank? ? nil : email_type.strip.split("#").last
         if ["home", "work"].include?(email_type_for_enroll)
-          person_object.emails.build({
-            :kind => email_type_for_enroll,
-            :address => email.email_address
-          })
+          person_object.emails.build({:kind => email_type_for_enroll,
+                                      :address => email.email_address})
         end
       end
     end
