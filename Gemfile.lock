@@ -114,7 +114,9 @@ PATH
     financial_assistance (0.1.0)
       aasm (~> 4.8)
       config (~> 2.0)
-      money-rails (~> 1.13)
+      devise (~> 4.5)
+      haml-rails
+      money-rails (~> 1.13.3)
       mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)

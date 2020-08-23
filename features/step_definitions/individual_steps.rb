@@ -365,8 +365,9 @@ And(/^.+ click on sign in existing account$/) do
 end
 
 And(/I signed in$/) do
+  sleep 1
   find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
-  sleep 5
+  sleep 3
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
   find('.sign-in-btn').click

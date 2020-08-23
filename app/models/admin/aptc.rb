@@ -339,7 +339,7 @@ class Admin::Aptc < ApplicationController
           if actual_aptc_value != updated_aptc_value # TODO: check if the effective_on doesnt go to next year?????
             percent_sum_for_all_enrolles = 0.0
             enrollment_update_result = true
-            aptc_ratio_by_member = family.active_household.latest_active_tax_household.aptc_ratio_by_member
+            aptc_ratio_by_member = family.active_household.latest_active_tax_households.first.aptc_ratio_by_member
 
             # Duplicate Enrollment
             duplicate_hbx = original_hbx.dup

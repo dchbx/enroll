@@ -23,6 +23,7 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
     family.relate_new_member(person2, 'child')
     family.relate_new_member(person3, 'child')
     family.save
+    person.save
     family
   end
 
@@ -54,11 +55,12 @@ describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around
   end
 
   context 'recurring:dependent_age_off_termination_notification_manual' do
-    
+
     it "should trigger dependent age off notice for next month" do
       person2.update_attributes(dob: TimeKeeper.date_of_record.next_month - 26.years)
       person3.update_attributes(dob: TimeKeeper.date_of_record.next_month - 25.years)
       allow(TimeKeeper).to receive(:date_of_record).and_return TimeKeeper.date_of_record.next_month.beginning_of_month
+
       expect_any_instance_of(BenefitSponsors::Observers::NoticeObserver).to receive(:deliver)
       person.employee_roles.first.update_attributes(census_employee_id: census_employee.id)
       Rake::Task["recurring:dependent_age_off_termination_notification_manual"].reenable

@@ -69,6 +69,7 @@ And(/^an uploaded identity verification in REVIEW status is present$/) do
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
+  scroll_to find('#upload_identity')
   find('#upload_identity').click
   find('#select_upload_identity').click
   within '#select_upload_identity' do

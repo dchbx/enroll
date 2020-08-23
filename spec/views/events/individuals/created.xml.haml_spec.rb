@@ -12,11 +12,11 @@ RSpec.describe "events/individuals/created.haml.erb", dbclean: :after_each do
         download_vocabularies
       end
 
-      let(:individual) { FactoryBot.create(:person)}
-      let(:family) { FactoryBotspec/models/forms/family_member_spec.rb.create(family, :with_primary_family_member, person: person)}
+      let(:individual) { FactoryBot.create(:person) }
+      let(:family) { FactoryBot.create(family, :with_primary_family_member, person: person) }
 
       before :each do
-        render :template => "events/individuals/created", :locals => { :individual => individual}
+        render :template => "events/individuals/created", :locals => {:individual => individual}
       end
 
       it "should be schema valid" do

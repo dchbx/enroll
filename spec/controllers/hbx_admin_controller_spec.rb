@@ -40,6 +40,7 @@ RSpec.describe HbxAdminController, :type => :controller do
       person_with_fam_hbx_enrollment.coverage_kind = 'health'
       person_with_fam_hbx_enrollment.save!
       tax_household.effective_starting_on = Date.new(valid_date.year, 10, valid_date.day)
+      tax_household.is_eligibility_determined = true
       tax_household.save!
       eligibility_determination.max_aptc = 100
       eligibility_determination.csr_percent_as_integer = 50

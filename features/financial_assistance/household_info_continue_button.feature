@@ -23,10 +23,10 @@ Feature: A dedicated page that gives the user access to household member creatio
     When all applicants are in Info Completed state
     Then the CONTINUE button will be ENABLED
   
-  # TODO: This will be moved over by pod handling family relationships
-  # Scenario: CONTINUE button navigation
-    # And at least one other household members exist
-    # When all applicants are in Info Completed state
-    # And user clicks CONTINUE
+  Scenario: CONTINUE button navigation
+    And the primary member exists
+    And at least one other household members exist
+    When all applicants are in Info Completed state
+    And user clicks CONTINUE
+    # TODO: This family relationships stuff not moved in yet
     # Then the user will navigate to Family Relationships page
-

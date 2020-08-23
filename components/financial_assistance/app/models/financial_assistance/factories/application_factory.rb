@@ -81,7 +81,7 @@ module FinancialAssistance
 
       #match number of  active family members with active applicants
       # should only sync draft application
-      def sync_family_members_with_applicants
+      def sync_family_members_with_applicants # rubocop:todo Metrics/CyclomaticComplexity
         return unless application.is_draft?
         active_member_ids = family.active_family_members.map(&:id)
         applicants.each do |app|

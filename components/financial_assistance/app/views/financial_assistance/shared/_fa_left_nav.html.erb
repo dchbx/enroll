@@ -1,8 +1,8 @@
 <nav class=" smartscroll-nav" id="mainnav" style="margin-left: 0px !important;">
   <ul class="nav nav-stacked" id="left-navigation">
-    <% if defined?(@applicant) %>
+    <% if @applicant.present? %>
       <li class="activer list-box step-tabs no-hover global-nav">
-        <a href="<%= financial_assistance.edit_application_path(@application) %>">
+        <a href="<%= financial_assistance.edit_application_applicant_path(id: @application.id) %>">
           <i class="fa fa-arrow-circle-left white-font hh-previous-icon" aria-hidden="true"></i>
           My Household</a>
       </li>
@@ -99,7 +99,7 @@
 
       <li class="list-box step-tabs <%= li_nav_classes_for(:household_info) %> global-nav indent-w no-hover">
         <% if @application.present? && @application.is_draft?  %>
-          <a href="<%= financial_assistance.edit_application_path(@application) %>">Household Info</a>
+          <a href="<%= financial_assistance.edit_application_path(id: @application.id) %>">Household Info</a>
         <% else %>
           <a href="javascript:void(0);" class="cna">Household Info</a>
         <% end %>
@@ -112,10 +112,11 @@
           </li>
         <% end %>
       <% else %>
-        <% if @application && @application.active_applicants.count > 1 && @applicant.application.is_draft?%>
-          <%# TODO: The familiy relationships files need to be moved over %>
+        <% if @application && @application.family.family_members.count > 1 && @application.is_draft? %>
+          <%# TODO: The family relationships files need to be moved over %>
           <li class='list-box step-tabs <%= li_nav_classes_for(:relationships) %> indent-w no-hover-disable global-nav'>
-            <%= link_to 'Family Relationships', insured_family_relationships_path%>
+            Family Relationships
+            <%#= link_to 'Family Relationships', insured_family_relationships_path%>
           </li>
         <% end %>
       <% end %>

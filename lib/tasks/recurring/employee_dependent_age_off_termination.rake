@@ -41,7 +41,7 @@ namespace :recurring do
           covered_members += enrollment.hbx_enrollment_members.map(&:family_member).map(&:person)
         end.uniq
         covered_members_ids = covered_members.flat_map(&:_id)
-        relations = person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "child")}
+        relations = person.person_relationships.select{ |rel| (covered_members_ids.include? rel.relative_id) && (rel.kind == "parent")}
         if relations.present?
           aged_off_dependents = relations.select{|dep| (new_date.month == (dep.relative.dob.month)) && (dep.relative.age_on(new_date.end_of_month) >= 26)}.flat_map(&:relative)
           next if aged_off_dependents.empty?

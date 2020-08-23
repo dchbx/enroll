@@ -27,7 +27,7 @@ module FinancialAssistance
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
 
-    FAA_SCHEMA_FILE_PATH     = File.join(Rails.root, 'lib', 'schemas', 'financial_assistance.xsd')
+    FAA_SCHEMA_FILE_PATH     = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance.xsd')
 
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
@@ -87,7 +87,6 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     embeds_many :applicants, inverse_of: :application
-
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
@@ -467,7 +466,7 @@ module FinancialAssistance
 
     def incomplete_applicants?
       active_applicants.each do |applicant|
-        return true if applicant.applicant_validation_complete? == false
+        return true unless applicant.applicant_validation_complete?
       end
       false
     end
@@ -691,7 +690,7 @@ module FinancialAssistance
       delete_verification_documents
     end
 
-    def create_tax_households
+    def create_tax_households # rubocop:todo Metrics/CyclomaticComplexity
       ## Remove  when copy method is fixed to exclude copying Tax Household
       active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
 
@@ -732,7 +731,7 @@ module FinancialAssistance
     def create_verification_documents
       active_applicants.each do |applicant|
         %w[Income MEC].each do |type|
-          applicant.verification_types << VerificationType.new(type_name: type, validation_status: 'pending')
+          applicant.verification_types << ::VerificationType.new(type_name: type, validation_status: 'pending')
           applicant.move_to_pending!
         end
       end

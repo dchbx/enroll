@@ -7,7 +7,6 @@ describe "insured/family_relationships/index.html.erb" do
   let(:user) { FactoryBot.create(:user, person: person) }
   let(:family) { Family.new }
   let(:test_family){FactoryBot.create(:family, :with_primary)}
-  let(:family_member2) {FactoryBot.create()}
 
   before :each do
     sign_in user

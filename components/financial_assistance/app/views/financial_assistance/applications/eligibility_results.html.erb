@@ -107,15 +107,15 @@
           <p class="mt-10">If you do not agree with this determination, you have the right to appeal. <a href="">Find out more about the appeal process</a> or <a href="">get assistance</a> by contacting us directly.</p>
           <p class="mb-0">Your application reference number is <b><%= @application.hbx_id %></b>.</p>
           <br />
-          <div><%= link_to "View my Applications", financial_assistance_applications_path, class: "btn btn-small btn-primary" %></div>
+          <div><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
         </div>
       </div>
     </div>
 
     <div class='col-md-2'>
       <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-          previous_url: financial_assistance_applications_path,
-          next_url: find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+          previous_url: applications_path,
+          next_url: main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
         } %>
     </div>
   </div>

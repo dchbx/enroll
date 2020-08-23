@@ -8,7 +8,7 @@ describe PersonRelationship, dbclean: :after_each do
 
   let(:kind) {"spouse"}
   let(:person) {FactoryBot.create(:person, gender: "male", dob: "10/10/1974", ssn: "123456789" )}
-  let(:person_2) {FactoryBot.create(:person, gender: "male", dob: "10/10/1975", ssn: "123456780" )}
+  let(:person_2) {FactoryBot.create(:person, gender: "male", dob: "10/10/1975", ssn: "123456780")}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:family_member1) { FactoryBot.create(:family_member, person: person, family: family, is_primary_applicant: true) }
   let(:family_member2) { FactoryBot.create(:family_member, person: person_2, family: family) }

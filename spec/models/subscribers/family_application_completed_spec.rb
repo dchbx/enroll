@@ -97,9 +97,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           end
 
           let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
-          let(:family) { 
-            consumer_role.person.primary_family
-          }
+          let(:family) { consumer_role.person.primary_family }
 
           before do
             family.update_attributes!(e_case_id: "curam_landing_for#{consumer_role.person.id}")

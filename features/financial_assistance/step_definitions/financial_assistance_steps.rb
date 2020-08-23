@@ -26,7 +26,7 @@ end
 
 Then(/^they should see each of their dependents listed$/) do
   consumer.person.primary_family.family_members.each do |family_member|
-    expect(page).to have_content(family_member.full_name)
+    expect(page).to have_content(family_member.first_name)
   end
 end
 
@@ -39,7 +39,7 @@ When(/^they view the financial assistance application$/) do
 end
 
 When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
-  click_link 'ADD INCOME & COVERAGE INFO', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
+  click_link 'ADD INCOME & COVERAGE INFO', href: financial_assistance.go_to_step_application_applicant_path(application_id: consumer.primary_family.application_in_progress.id, id: consumer.primary_family.application_in_progress.primary_applicant.id, step: 1)
 end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
@@ -53,34 +53,35 @@ end
 And(/^they answer job income question and complete the form for the Job income$/) do
   choose('has_job_income_true')
   sleep 1
-  fill_in 'financial_assistance_income[employer_name]', with: "Sample Employer"
-  fill_in 'financial_assistance_income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-financial-assistance-income-frequency-kind")[1].trigger('click')
-  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-7')[1].trigger('click')
-  fill_in 'financial_assistance_income[start_on]', with: "11/11/2016"
-  fill_in 'financial_assistance_income[end_on]', with: "11/11/2017"
-  page.find('.darkblue').click
-  fill_in 'financial_assistance_income[employer_phone][full_phone_number]', with: "2036548484"
-  fill_in 'financial_assistance_income[employer_address][address_1]', with: "12 main st"
-  fill_in 'financial_assistance_income[employer_address][address_2]', with: "beside starbucks"
-  fill_in 'financial_assistance_income[employer_address][city]', with: "washington"
-
-  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state")[2].trigger('click')
-  find_all(".interaction-choice-control-financial-assistance-income-employer-address-state-5")[1].trigger('click')
-  fill_in 'financial_assistance_income[employer_address][zip]', with: "22046"
-
+  fill_in 'income[employer_name]', with: "Sample Employer"
+  fill_in 'income[amount]', with: '23.3'
+  find_all(".interaction-choice-control-income-frequency-kind")[1].click
+  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
+  fill_in 'income[start_on]', with: "11/11/2016"
+  fill_in 'income[end_on]', with: "11/11/2017"
+  # TODO: This isn't showing up
+  # page.find('.darkblue').click
+  fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
+  fill_in 'income[employer_address][address_1]', with: "12 main st"
+  fill_in 'income[employer_address][address_2]', with: "beside starbucks"
+  fill_in 'income[employer_address][city]', with: "washington"
+  find_all(".interaction-choice-control-income-employer-address-state")[0].click
+  find_all(".interaction-choice-control-income-employer-address-state-5")[0].click
+  fill_in 'income[employer_address][zip]', with: "22046"
   click_button 'Save'
 end
 
 Given(/^they answer job income question and complete the form with incorrect data format$/) do
   choose('has_job_income_true')
   sleep 1
-  fill_in 'financial_assistance_income[employer_name]', with: "Sample Employer"
-  fill_in 'financial_assistance_income[amount]', with: '23.3'
-  find_all(".interaction-choice-control-financial-assistance-income-frequency-kind")[1].trigger('click')
-  find_all('.interaction-choice-control-financial-assistance-income-frequency-kind-7')[1].trigger('click')
-  fill_in 'financial_assistance_income[start_on]', with: "11/11/16"
-  page.find('.darkblue').click
+  fill_in 'income[employer_name]', with: "Sample Employer"
+  fill_in 'income[amount]', with: '23.3'
+  find_all(".interaction-choice-control-income-frequency-kind")[1].click
+  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
+  fill_in 'income[start_on]', with: "11/11/16"
+  find_all(".interaction-choice-control-income-employer-address-state")[0].click
+  # TODO: This isn't showing up
+  # page.find('.darkblue').click
 end
 
 Then(/^I should see a JS alert$/) do

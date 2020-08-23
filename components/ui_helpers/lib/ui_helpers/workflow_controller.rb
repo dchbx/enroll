@@ -31,7 +31,8 @@ module UIHelpers
     end
 
     def load_steps
-      @steps = Workflow::Steps.new YAML.load_file(Rails.root + "components/financial_assistance/app/views/#{controller_path}/steps.yml")
+      filename = lookup_context.find_template("#{controller_path}/steps.yml").identifier
+      @steps = Workflow::Steps.new YAML.load_file(filename)
     end
 
     def load_support_texts

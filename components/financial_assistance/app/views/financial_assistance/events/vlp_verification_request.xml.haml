@@ -1,0 +1,58 @@
+!!! XML
+%lawful_presence_request{ :xmlns => "http://openhbx.org/api/terms/1.0" }
+  %individual
+    %id
+      %id= individual.id
+    = render :partial => "financial_assistance/events/person", :object => individual
+    = render :partial => "financial_assistance/events/person_demographics", :object => individual
+  - consumer = individual.consumer_role
+  %immigration_information
+    %also_known_as=individual.full_name
+    - if consumer.alien_number.present?
+      %alien_number=consumer.alien_number
+    - if consumer.i94_number.present?
+      %i94_number=consumer.i94_number
+    - if consumer.citizenship_number.present?
+      %citizenship_number=consumer.citizenship_number
+    - if consumer.visa_number.present?
+      %visa_number=consumer.visa_number
+    - if consumer.sevis_id.present?
+      %sevis_id=consumer.sevis_id
+    - if consumer.naturalization_number.present?
+      %naturalization_number=consumer.naturalization_number
+    %documents
+      %has_document_I327=consumer.has_i327?
+      %has_document_I571=consumer.has_i571?
+      %has_document_cert_of_citizenship=consumer.has_cert_of_citizenship?
+      %has_document_cert_of_naturalization=consumer.has_cert_of_naturalization?
+      %has_document_temp_I551=consumer.has_temp_i551?
+      %has_document_I94=consumer.has_i94?
+      %has_document_I20=consumer.has_i20?
+      %has_document_DS2019=consumer.has_ds2019?
+      - if consumer.i551.present?
+        %document_I551_receipt_number= consumer.i551.receipt_number
+      - if consumer.i766.present?
+        %document_I766
+          %receipt_number=consumer.i766.receipt_number
+          %expiration_date=simple_date_for(consumer.i766.expiration_date)
+      - if consumer.mac_read_i551.present?
+        %document_mac_read_I551
+          %issuing_country=consumer.mac_read_i551.issuing_country
+          %passport_number=consumer.mac_read_i551.passport_number
+          %expiration_date=simple_date_for(consumer.mac_read_i551.expiration_date)
+      - if consumer.foreign_passport_i94.present?
+        %document_foreign_passport_I94
+          %issuing_country=consumer.foreign_passport_i94.issuing_country
+          %passport_number=consumer.foreign_passport_i94.passport_number
+          %expiration_date=simple_date_for(consumer.foreign_passport_i94.expiration_date)
+      - if consumer.foreign_passport.present?
+        %document_foreign_passport
+          %issuing_country=consumer.foreign_passport.issuing_country
+          %passport_number=consumer.foreign_passport.passport_number
+          %expiration_date=simple_date_for(consumer.foreign_passport.expiration_date)
+      - if consumer.case1.present?
+        %other_case_1_document_description=consumer.case1.description
+      - if consumer.case2.present?
+        %other_case_2_document_description=consumer.case2.description
+  %check_five_year_bar=consumer.five_year_bar
+  %requested_coverage_start_date=simple_date_for(coverage_start_date)

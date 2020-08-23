@@ -38,8 +38,8 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     let!(:person) { FactoryBot.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on) }
     let!(:family) do
       family = FactoryBot.build(:family, :with_family_members, person: person, people: family_members)
-      person.person_relationships.create(predecessor_id: person.id , successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.create(predecessor_id: person.id , successor_id: child.id, kind: "parent", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
+      person.person_relationships.create(predecessor_id: person.id, successor_id: child.id, kind: "parent", family_id: family.id)
       person.save
       family
     end

@@ -4,31 +4,30 @@ module FinancialAssistance
   class IncomesController < ::ApplicationController
 
     before_action :set_current_person
+    before_action :find_application_and_applicant
+    before_action :load_support_texts, only: [:index, :other]
 
     include ::UIHelpers::WorkflowController
     include NavigationHelper
     include ApplicationHelper
 
-    before_action :find_application_and_applicant
-    before_action :load_support_texts, only: [:index, :other]
+    layout "financial_assistance_nav", only: [:index, :other, :new, :step]
 
     def index
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
     end
 
     def other
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
     end
 
     def new
       @model = @applicant.incomes.build
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance'
+      render 'workflow/step'
     end
 
     def edit
@@ -48,7 +47,6 @@ module FinancialAssistance
 
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
       update_employer_contact(@model, params) if @model.income_type == job_income_type
-
       if params.key?(model_name)
         if @model.save(context: "step_#{@current_step.to_i}".to_sym)
           @current_step = @current_step.next_step if @current_step.next_step.present?
@@ -58,21 +56,21 @@ module FinancialAssistance
             redirect_to application_applicant_incomes_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step'
           end
         else
           @model.workflow = { current_step: @current_step.to_i }
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step'
       end
     end
 
     def create
       format_date(params)
-      @income = @applicant.incomes.build permit_params(params[:financial_assistance_income])
+      @income = @applicant.incomes.build params.permit![:income]
       if @income.save
         render :create
       else
@@ -83,7 +81,7 @@ module FinancialAssistance
     def update
       format_date(params)
       @income = @applicant.incomes.find params[:id]
-      if @income.update_attributes permit_params(params[:financial_assistance_income])
+      if @income.update_attributes permit_params(params[:income])
         render :update
       else
         render head: 'ok'
@@ -100,9 +98,9 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      return if params[:financial_assistance_income].blank?
-      params[:financial_assistance_income][:start_on] = Date.strptime(params[:financial_assistance_income][:start_on].to_s, "%m/%d/%Y")
-      params[:financial_assistance_income][:end_on] = Date.strptime(params[:financial_assistance_income][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_income][:end_on].present?
+      return if params[:income].blank?
+      params[:income][:start_on] = Date.strptime(params[:income][:start_on].to_s, "%m/%d/%Y")
+      params[:income][:end_on] = Date.strptime(params[:income][:end_on].to_s, "%m/%d/%Y") if params[:income][:end_on].present?
     end
 
     def job_income_type
@@ -142,14 +140,14 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end
 
     def find
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).incomes.find(params[:id])
-    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO: Remove this
+    rescue StandardError
       ''
     end
   end

@@ -488,14 +488,17 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   end
 
   describe "when updated" do
+    let(:attrs) { {:citizen_status => nil,:no_ssn => nil,:no_dc_address => nil,:is_homeless => nil,:is_temporarily_out_of_state => nil} }
     it "should update the person properties of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => nil, :no_dc_address => nil, :no_dc_address_reason => nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge(attrs)).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
+      allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
 
     it "should update the person attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => nil, :no_dc_address => nil, :no_dc_address_reason => nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge(attrs))
+      allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
   end

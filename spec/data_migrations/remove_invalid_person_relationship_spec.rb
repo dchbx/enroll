@@ -15,12 +15,14 @@ describe RemoveIncorrectPersonRelationship, dbclean: :after_each do
   describe "destroying person relationships" do
 
     let(:person) { FactoryBot.create(:person)}
+    let(:dep_person) { FactoryBot.create(:person, first_name: 'mem1', last_name: 'one') }
 
-    before(:each) do
-      person.person_relationships << PersonRelationship.new(kind: "child", relative_id: person.id)
-      person.save!
-      # allow(ENV).to receive(:[]).with("hbx_id").and_return(person.hbx_id)
-      # allow(ENV).to receive(:[]).with("_id").and_return(person.person_relationships.first.id)
+    let!(:family) do
+      family = FactoryBot.build(:family, :with_primary_family_member, person: person)
+      family.relate_new_member(dep_person, 'child')
+      family.save
+      person.save
+      family
     end
 
     it "should destroy the person relationship" do

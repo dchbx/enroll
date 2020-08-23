@@ -170,7 +170,7 @@ class PeopleController < ApplicationController
     @dependent = @family.family_members.where(_id: params[:id]).first
     if !@dependent.nil?
       @family_member_id = @dependent._id
-      if !@dependent.is_primary_applicant  
+      if !@dependent.is_primary_applicant
         @dependent.remove_relationship if @dependent.destroy
         # @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
         @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all

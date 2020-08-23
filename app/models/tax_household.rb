@@ -32,7 +32,7 @@ class TaxHousehold
 
   before_create :set_effective_starting_on
 
-  scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
+  scope :tax_household_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
 
 
@@ -71,9 +71,9 @@ class TaxHousehold
     # tax_household_members.find_all(&:is_ia_eligible?)
     #Review split brain
     if application_id.present?
-     active_applicants.find_all(&:is_ia_eligible?)
+      active_applicants.find_all(&:is_ia_eligible?)
     else
-     tax_household_members.find_all(&:is_ia_eligible?)
+      tax_household_members.find_all(&:is_ia_eligible?)
     end
   end
 
@@ -301,10 +301,9 @@ class TaxHousehold
       curam_ed = eligibility_determinations.where(source: "Curam").first
       return admin_ed if admin_ed.present? #TODO: Pick the last admin, because you may have multiple.
       return curam_ed if curam_ed.present?
-      return eligibility_determinations.max_by(&:determined_at)
+      eligibility_determinations.max_by(&:determined_at)
     else
-      false
-      eligibility_determinations.sort {|a, b| a.determined_on <=> b.determined_on}.last
+      eligibility_determinations.max {|a, b| a.determined_on <=> b.determined_on}
     end
   end
 

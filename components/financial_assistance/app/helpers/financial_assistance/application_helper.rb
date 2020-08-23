@@ -64,7 +64,7 @@ module FinancialAssistance
       elsif model_name == "application"
         review_and_submit_application_path(@application)
       else
-        send("financial_assistance_application_applicant_#{model_name.pluralize}_path", @application, @applicant)
+        send("application_applicant_#{model_name.pluralize}_path", @application, @applicant)
       end
     end
 
@@ -77,7 +77,7 @@ module FinancialAssistance
         # and instead we'll short circuit by checking that -1 is less then i, which always would be true
         ((document_flow.index(options[:current]) || -1) < document_flow.index(embeded_document)) && applicant.send(embeded_document).present?
       end
-      next_path ? send("financial_assistance_application_applicant_#{next_path}_path", application, applicant) : other_questions_application_applicant_path(application, applicant)
+      next_path ? send("application_applicant_#{next_path}_path", application, applicant) : other_questions_application_applicant_path(application, applicant)
     end
 
     def find_previous_applicant_path(application, applicant, options = {})
@@ -89,7 +89,7 @@ module FinancialAssistance
         # and instead we'll short circuit by checking that -1 is less then i, which always would be true
         ((reverse_document_flow.index(options[:current]) || -1) < reverse_document_flow.index(embeded_document)) && applicant.send(embeded_document).present?
       end
-      previous_path ? send("financial_assistance_application_applicant_#{previous_path}_path", application, applicant) : go_to_step_application_applicant_path(application, applicant, 2)
+      previous_path ? send("application_applicant_#{previous_path}_path", application, applicant) : go_to_step_application_applicant_path(application, applicant, 2)
     end
 
     def left_nav_css(conditional)
@@ -178,9 +178,10 @@ module FinancialAssistance
       end
     end
 
-    def support_text_placeholders(raw_support_text) # rubocop:disable Naming/AccessorMethodName
-      # set <application-applicable-year> placeholders
-      assistance_year = @application.family.application_applicable_year.to_s
+    def support_text_placeholders(raw_support_text)
+      # set <application-applicable-year> placeholdersr
+      return [] if @application.nil?
+      assistance_year = @application&.family&.application_applicable_year&.to_s
       raw_support_text.update(raw_support_text).each do |_key, value|
         value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
       end

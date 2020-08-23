@@ -123,23 +123,46 @@ RSpec.describe TaxHousehold, type: :model do
   end
 =end
 
-  context "aptc_ratio_by_member" do
-    let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    #let(:current_hbx) {double(benefit_sponsorship: double(current_benefit_period: double(second_lowest_cost_silver_plan: plan)))}
-    let(:current_hbx) {double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period]))}
-    let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
-    let(:tax_household_member1) {double(is_ia_eligible?: true, age_on_effective_date: 28, applicant_id: 'tax_member1')}
-    let(:tax_household_member2) {double(is_ia_eligible?: true, age_on_effective_date: 26, applicant_id: 'tax_member2')}
+  context 'aptc_ratio_by_member' do
+    let(:dependent_1) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 25.years) }
+    let(:person) { FactoryBot.create(:person,dob: TimeKeeper.date_of_record - 30.years) }
 
-    it "can return ratio hash" do
+    let(:family) do
+      family = FactoryBot.build(:family, :with_primary_family_member, person: person)
+      family.relate_new_member(dependent_1, 'spouse')
+      family.save
+      family
+    end
+    let(:household) { family.active_household }
+    let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let(:current_hbx) { double(benefit_sponsorship: double(benefit_coverage_periods: [benefit_coverage_period])) }
+    let(:benefit_coverage_period) { double(contains?: true, second_lowest_cost_silver_plan: plan) }
+    let(:tax_household) do
+      tax_household = FactoryBot.create(:tax_household, effective_starting_on: TimeKeeper.date_of_record.beginning_of_year, household: household)
+      tax_household.tax_household_members.create(applicant_id: family.family_members[0].id, is_ia_eligible: true)
+      tax_household.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
+      tax_household
+    end
+
+    before :each do
       allow(HbxProfile).to receive(:current_hbx).and_return(current_hbx)
-      tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
-      allow(tax_household).to receive(:aptc_members).and_return([tax_household_member1, tax_household_member2])
+      allow(current_hbx).to receive(:under_open_enrollment?).and_return(false)
+    end
+
+    it 'can return ratio hash' do
       expect(tax_household.aptc_ratio_by_member.class).to eq Hash
-      result = {"tax_member1" => 0.5, "tax_member2" => 0.5}
+      result = {family.family_members[0].id.to_s => 0.5, family.family_members[1].id.to_s => 0.5}
+      expect(tax_household.aptc_ratio_by_member).to eq result
+    end
+    it 'should return 1.0 ratio for first family member as second family member is eligible for medicaid' do
+      tax_household.tax_household_members[1].update_attributes(is_ia_eligible: false)
+      allow(tax_household).to receive(:aptc_members).and_return([tax_household.tax_household_members[0]])
+      expect(tax_household.aptc_ratio_by_member.class).to eq Hash
+      result = {family.family_members[0].id.to_s => 1.0}
       expect(tax_household.aptc_ratio_by_member).to eq result
     end
   end
+
 
   context "aptc_available_amount_by_member" do
     let!(:family) {create(:family, :with_primary_family_member_and_dependent)}

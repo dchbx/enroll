@@ -41,7 +41,7 @@ class GroupSelectionEligibilityChecker
   end
 
   def map_family_member_data(family_member)
-    rel = family_member.is_primary_applicant? ? "self" : family_member.relationship
+    rel = family_member.is_primary_applicant? ? "self" : PersonRelationship::InverseMap[family_member.relationship]
     disability = family_member.person.is_disabled
     dob = family_member.person.dob
     [rel, disability, dob]

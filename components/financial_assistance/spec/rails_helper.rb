@@ -16,10 +16,10 @@ require 'capybara/rspec'
 require 'factory_bot_rails'
 require 'test_prof'
 require 'test_prof/recipes/rspec/factory_default'
-require 'climate_control'
 
 FactoryBot.definition_file_paths = [
-  File.expand_path(File.join(File.dirname(__FILE__),'dummy/spec/factories'))
+  "spec/dummy/spec/factories"
+  #File.expand_path(File.join(File.dirname(__FILE__),'spec/dummy/spec/factories'))
 ]
 FactoryBot.find_definitions
 
@@ -92,4 +92,8 @@ RSpec.configure do |config|
     example.run
     DatabaseCleaner.clean
   end
+end
+
+def main_app
+  Rails.application.class.routes.url_helpers
 end

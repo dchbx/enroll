@@ -1382,7 +1382,8 @@ class Family
     self.errors.add(:family_members, "may not have more than one primary family member") if list.size > 1
   end
 
-  def all_family_member_relations_defined #new_code Checks only in context of primary person.
+  #new_code Checks only in context of primary person.
+  def all_family_member_relations_defined
     return unless primary_family_member.present? && primary_family_member.person.present?
 
     primary_member = primary_family_member

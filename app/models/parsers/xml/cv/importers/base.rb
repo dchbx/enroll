@@ -21,12 +21,18 @@ module Parsers::Xml::Cv::Importers
       )
       person_relationships.each do |relationship|
         relation = relationship.relationship_uri.strip.split("#").last rescue ''
-        person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
-                                                  predecessor_id: person_object.id,
-                                                  family_id: family_id,
-                                                  kind: PersonRelationship::InverseMap[relation]}) if relationship.subject_individual != relationship.object_individual
-                                                  # relative_id: relationship.object_individual, #use subject_individual or object_individual
-                                                  # kind: relation
+
+        next if relationship.subject_individual == relationship.object_individual
+        person_object.person_relationships.build(
+          {
+            successor_id: relationship.object_individual, #use subject_individual or object_individual
+            predecessor_id: person_object.id,
+            family_id: family_id,
+            kind: PersonRelationship::InverseMap[relation]
+          }
+        )
+        # relative_id: relationship.object_individual, #use subject_individual or object_individual
+        # kind: relation
       end
 
       build_addresses(person, person_object)
@@ -75,6 +81,5 @@ module Parsers::Xml::Cv::Importers
         end
       end
     end
-
   end
 end
