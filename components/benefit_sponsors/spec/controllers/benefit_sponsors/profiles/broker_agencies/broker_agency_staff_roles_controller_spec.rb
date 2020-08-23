@@ -5,7 +5,7 @@ module BenefitSponsors
 
     routes { BenefitSponsors::Engine.routes }
 
-    before  do
+    before do
       DatabaseCleaner.clean
     end
 
@@ -246,7 +246,7 @@ module BenefitSponsors
       end
     end
 
-    describe "GET search_broker_agency", dbclean: :after_each  do
+    xdescribe "GET search_broker_agency", dbclean: :after_each  do
 
       before do
         broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
