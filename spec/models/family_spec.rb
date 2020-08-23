@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -532,7 +532,7 @@ describe Family, dbclean: :around_each do
     end
   end
 
-  context 'for options_for_termination_dates' do
+  context 'for options_for_termination_dates', dbclean: :after_each do
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
     let!(:sep10) do
       sep = FactoryBot.create(:special_enrollment_period, family: family10)

@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Insured::FamiliesHelper, :type => :helper do
+RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  do
 
-  describe "#plan_shopping_dependent_text" do
+  describe "#plan_shopping_dependent_text", dbclean: :after_each  do
     let(:person) { FactoryBot.build_stubbed(:person)}
     let(:family) { FactoryBot.build_stubbed(:family, :with_primary_family_member, person: person) }
     let(:household) { FactoryBot.build_stubbed(:household, family: family) }
@@ -25,7 +25,7 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
-  describe "#generate_options_for_effective_on_kinds" do
+  describe "#generate_options_for_effective_on_kinds", dbclean: :after_each  do
     let(:qle) {FactoryBot.create(:qualifying_life_event_kind, effective_on_kinds: ['date_of_event', 'fixed_first_of_next_month'])}
     let(:person) {FactoryBot.create(:person, :with_family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }

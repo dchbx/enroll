@@ -603,7 +603,7 @@ if EnrollRegistry.feature_enabled?(:sep_types)
       end
 
       it 'should update the position' do
-        expect(response.body).to match(/Sorting Sep Types/i)
+        expect(response.body).to match(/Sort SEPs/i)
       end
 
       context 'updateable?' do
