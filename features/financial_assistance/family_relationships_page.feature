@@ -30,12 +30,6 @@ Feature: Functionality for the Family Relationships page
     And all the relationships have been entered
     Then the CONTINUE button will be ENABLED
 
-  Scenario: Correct left nav elements
-    Given that the user is on the FAA Family Relationships page
-    Then View My Applications left section WILL display
-    Then Family Relationships WILL display in the left nav
-    And Review & Submit left section WILL display
-
   Scenario:  Missing value is highlighted
     Given that the user is on the FAA Family Relationships page
     And there is a nil value for at least one relationship
