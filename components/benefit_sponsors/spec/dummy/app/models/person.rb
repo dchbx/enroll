@@ -276,16 +276,22 @@ class Person
       additional_exprs
     end
 
-    def search_first_name_last_name_npn(s_str, query=self)
+    def search_first_name_last_name_npn(s_str, query = self)
       clean_str = s_str.strip
-      s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
-      query.where({
-        "$or" => ([
-          {"first_name" => s_rex},
-          {"last_name" => s_rex},
-          {"broker_role.npn" => s_rex}
-          ] + additional_exprs(clean_str))
-        })
+      if clean_str =~ /[a-z]/i
+        people_user_ids = query.collection.aggregate([{"$match" => {
+                                                             "$text" => {"$search" => clean_str}
+                                                         }.merge(Person.broker_ga_search_hash(clean_str))},
+                                                         {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
+                                                         {"$sort" => {"last_name" => 1, "first_name" => 1}},
+                                                         {"$project" => {"_id" => 1}}
+                                                     ], {allowDiskUse: true}).map do |rec|
+          rec["_id"]
+        end
+        query.where(:id => {"$in" => people_user_ids})
+      else
+        query.where(broker_ga_search_hash(s_str))
+      end
     end
 
     def brokers_matching_search_criteria(search_str)
