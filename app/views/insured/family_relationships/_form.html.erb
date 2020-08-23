@@ -15,7 +15,7 @@
         <th> Relationship to </th>
         <th> Member B </th>
       </tr>
-      <tr>
+      <tr class='missing_relation'>
         <td><%= member_name_by_id(missing_relationships.first.flatten.first) %></td>
         <td><%= select_tag "kind", options_for_select(relationship_kinds), include_blank: true%></td>
         <td><%= member_name_by_id(missing_relationships.first.flatten.second) %></td>

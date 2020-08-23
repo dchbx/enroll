@@ -58,6 +58,9 @@
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
   - else next_link.present?
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
+- elsif step == 7
+  - matrix = @person.primary_family.build_relationship_matrix
+  = link_to 'Continue', financial_assistance.review_and_submit_application_path(@person.primary_family.application_in_progress.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', :disabled => @person.primary_family.find_missing_relationships(matrix).any?
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4

@@ -411,7 +411,7 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">FAMILY RELATIONSHIPS</div>
               <div class="col-md-1">
-                <%= link_to insured_family_relationships_path, id: 'edit-family-relationships-pencil' do %>
+                <%= link_to main_app.insured_family_relationships_path, id: 'edit-family-relationships-pencil' do %>
                   <i class="fa fa-pencil-alt fa-lg"></i>
                 <% end %>
               </div>
@@ -428,6 +428,7 @@
                   <div class="col-lg-3"><%= member_name_by_id(er[:predecessor]) %></div>
                   <div class="col-lg-5">
                     <div class="select-relation rs_selection">
+                      <% relation = er[:relation] || 'none' %>
                       <%= "is " + er[:relation] %>
                     </div>
                     <div style="float:left; margin-right: 10px;"> of</div>
