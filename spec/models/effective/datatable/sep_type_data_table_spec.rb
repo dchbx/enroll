@@ -55,5 +55,32 @@ describe Effective::Datatables::SepTypeDataTable, dbclean: :after_each do
       end
     end
   end
+
+  context "market_kind", dbclean: :after_each do
+
+    context " shop qle", dbclean: :after_each do
+      let!(:qlek){FactoryBot.create(:qualifying_life_event_kind, market_kind: "shop", aasm_state: :active, is_active: true)}
+
+      it "should return SHOP" do
+        expect(subject.market_kind(qlek)).to eq 'SHOP'
+      end
+    end
+
+    context "individual qle", dbclean: :after_each do
+      let!(:qlek){FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual", aasm_state: :active, is_active: true)}
+
+      it "should return Individual" do
+        expect(subject.market_kind(qlek)).to eq 'Individual'
+      end
+    end
+
+    context "fehb qle", dbclean: :after_each do
+      let!(:qlek){FactoryBot.create(:qualifying_life_event_kind, market_kind: "fehb", aasm_state: :active, is_active: true)}
+
+      it "should return Congress" do
+        expect(subject.market_kind(qlek)).to eq 'Congress'
+      end
+    end
+  end
 end
 
