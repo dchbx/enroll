@@ -310,7 +310,7 @@ module BenefitSponsors
 
     describe ".general_agency_search!", dbclean: :after_each do
 
-      before do
+      before :each do
         Person.create_indexes
       end
 
