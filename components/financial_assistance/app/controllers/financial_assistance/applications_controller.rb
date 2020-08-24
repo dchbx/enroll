@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class ApplicationsController < ::FinancialAssistance::ApplicationController
+  class ApplicationsController < ApplicationController
 
     before_action :set_current_person
     before_action :set_primary_family
@@ -11,13 +11,8 @@ module FinancialAssistance
     before_action :family_relationships, only: :review_and_submit
 
     include ::UIHelpers::WorkflowController
-    include NavigationHelper
     include Acapi::Notifiers
-    include L10nHelper
-    include ApplicationHelper
     require 'securerandom'
-
-    before_action :load_support_texts, only: [:edit, :help_paying_coverage]
 
     def index
       @family = @person.primary_family
@@ -42,13 +37,14 @@ module FinancialAssistance
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find params[:id]
+      @application = @person.primary_family.applications.find(params[:id])
+      load_support_texts
       matrix = @family.build_relationship_matrix
       @missing_relationships = @family.find_missing_relationships(matrix)
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
-    def step # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
+    def step # rubocop:disable Metrics/CyclomaticComplexity
       save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
@@ -75,22 +71,26 @@ module FinancialAssistance
             end
 
           else
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
           @model.assign_attributes(workflow: { current_step: @current_step.to_i })
           @model.save!(validate: false)
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step', layout: 'financial_assistance_nav'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step', layout: 'financial_assistance_nav'
       end
       # rubocop:enable Metrics/BlockNesting
     end
 
-    def generate_payload(application)
-      render_to_string "events/financial_assistance_application", :formats => ["xml"], :locals => { :financial_assistance_application => application }
+    def generate_payload(_application)
+      ::FinancialAssistance::ApplicationController.new.render_to_string(
+        "financial_assistance/events/financial_assistance_application",
+        :formats => ["xml"],
+        :locals => { :financial_assistance_application => @application }
+      )
     end
 
     def copy
@@ -100,6 +100,8 @@ module FinancialAssistance
     end
 
     def help_paying_coverage
+      @application = @person.primary_family.applications.find(params[:id]) if params[:id]
+      load_support_texts
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
@@ -110,7 +112,7 @@ module FinancialAssistance
     end
 
     def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
-      if params["is_applying_for_assistance"].nil?
+      if params["is_applying_for_assistance"].blank?
         flash[:error] = "Please choose an option before you proceed."
         redirect_to help_paying_coverage_applications_path
       elsif params["is_applying_for_assistance"] == "true"
@@ -144,9 +146,9 @@ module FinancialAssistance
       @application = @person.primary_family.application_in_progress
       @applicants = @application.active_applicants if @application.present?
       if @application.blank?
-        redirect_to financial_assistance_applications_path
+        redirect_to applications_path
       else
-        render layout: 'financial_assistance'
+        render layout: 'financial_assistance_nav'
       end
     end
 
@@ -154,11 +156,11 @@ module FinancialAssistance
       save_faa_bookmark(@person, request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       @applicants = @application.active_applicants if @application.present?
-      redirect_to financial_assistance_applications_path if @application.blank?
+      redirect_to applications_path if @application.blank?
     end
 
     def wait_for_eligibility_response
-      save_faa_bookmark(@person, financial_assistance_applications_path)
+      save_faa_bookmark(@person, applications_path)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
@@ -170,7 +172,7 @@ module FinancialAssistance
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
 
-      render layout: 'financial_assistance' if params.keys.include? "cur"
+      render layout: 'financial_assistance_nav' if params.keys.include? "cur"
     end
 
     def application_publish_error
@@ -179,7 +181,7 @@ module FinancialAssistance
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
 
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def eligibility_response_error
@@ -190,7 +192,7 @@ module FinancialAssistance
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
 
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
     end
 
     def check_eligibility_results_received
@@ -216,7 +218,7 @@ module FinancialAssistance
     def check_eligibility
       call_service
       return if params['action'] == "get_help_paying_coverage_response"
-      [(flash[:error] = l10n(decode_msg(@message))), (redirect_to financial_assistance_applications_path)] unless @assistance_status
+      [(flash[:error] = helpers.l10n(helpers.decode_msg(@message))), (redirect_to applications_path)] unless @assistance_status
     end
 
     def call_service
@@ -244,6 +246,7 @@ module FinancialAssistance
       redirect_to application_checklist_applications_path
     end
 
+    # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
       coverage_year = @person.primary_family.application_applicable_year
@@ -271,6 +274,7 @@ module FinancialAssistance
       end
     end
 
+    # TODO: Remove dummy stuff before prod
     def dummy_data_5_year_bar(application)
       return unless application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
       application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
@@ -285,7 +289,9 @@ module FinancialAssistance
     end
 
     def load_support_texts
-      @support_texts = YAML.load_file("components/financial_assistance/app/views/financial_assistance/shared/support_text.yml")
+      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+      @support_texts = helpers.support_text_placeholders raw_support_text
     end
 
     def permit_params(attributes)

@@ -1,0 +1,13 @@
+%office_location
+  %id
+    %id= office_location.id
+  %primary= office_location.is_primary?
+  - if office_location.address.present?
+    %address
+      %type= "urn:openhbx:terms:v1:address_type#" + office_location_address_kind(office_location.address.kind)
+      = render :partial => "financial_assistance/events/address_fields", :object => office_location.address
+  - if office_location.phone.present?
+    %phone
+      %type= "urn:openhbx:terms:v1:phone_type#work"
+      %full_phone_number= office_location.phone.to_s.gsub(/\D/, "")
+      %is_preferred= (office_location.phone.primary.blank? ? false : office_location.phone.primary)

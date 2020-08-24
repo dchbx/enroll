@@ -53,6 +53,18 @@ class ConsumerRole
       indian_tribe_member
   )
 
+  CITIZEN_KINDS = {
+    us_citizen: "US citizen",
+    naturalized_citizen: "Naturalized citizen",
+    alien_lawfully_present: "Alien lawfully present",
+    lawful_permanent_resident: "Lawful permanent resident",
+    undocumented_immigrant: "Undocumented immigrant",
+    not_lawfully_present_in_us: "Not lawfully present in US",
+    non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
+    ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
+    non_native_citizen: "Non-native citizen"
+  }.freeze
+
   # FiveYearBarApplicabilityIndicator ??
   field :five_year_bar, type: Boolean, default: false
   field :requested_coverage_start_date, type: Date, default: TimeKeeper.date_of_record

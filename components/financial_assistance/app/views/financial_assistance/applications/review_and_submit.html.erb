@@ -144,7 +144,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_incomes_path(@application, applicant) do %>
+                    <%= link_to application_applicant_incomes_path(@application, applicant) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -216,7 +216,7 @@
                 <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                   <div class="col-md-11">INCOME ADJUSTMENTS</div>
                   <div class="col-md-1">
-                    <%= link_to financial_assistance_application_applicant_deductions_path(@application, applicant) do %>
+                    <%= link_to application_applicant_deductions_path(@application, applicant) do %>
                       <i class="fa fa-pencil fa-lg"></i>
                     <% end %>
                   </div>
@@ -232,7 +232,7 @@
               <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
                 <div class="col-md-11">HEALTH COVERAGE</div>
                 <div class="col-md-1">
-                  <%= link_to financial_assistance_application_applicant_benefits_path(@application, applicant) do %>
+                  <%= link_to application_applicant_benefits_path(@application, applicant) do %>
                     <i class="fa fa-pencil fa-lg"></i>
                   <% end %>
                 </div>
@@ -411,9 +411,10 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">FAMILY RELATIONSHIPS</div>
               <div class="col-md-1">
-                <%= link_to insured_family_relationships_path do %>
+                <%# TODO: This will be moved in soon %>
+                <%# = link_to insured_family_relationships_path do %>
                   <i class="fa fa-pencil fa-lg"></i>
-                <% end %>
+                <%# end %>
               </div>
             </div>
 
@@ -425,10 +426,12 @@
                   <div class="col-lg-4">HOUSEHOLD MEMBER</div>
                 </div>
                 <div class="row">
-                  <div class="col-lg-3"><%= member_name_by_id(er[:predecessor]) %></div>
+                  <%#= TODO: Find member_by_id method and move it in %>
+                  <div class="col-lg-3"><%#=  member_name_by_id(er[:predecessor]) %></div>
                   <div class="col-lg-5">
                     <div class="select-relation rs_selection">
-                      <%= "is " + er[:relation] %>
+                      <%# TODO: FIX THIS %>
+                      <%#= "is " + er[:relation] %>
                     </div>
                     <div style="float:left; margin-right: 10px;"> of</div>
                     <div class="icon-rel">
@@ -438,7 +441,7 @@
                     </div>
                   </div>
                   <div class="col-lg-4">
-                    <%= member_name_by_id(er[:successor]) %>
+                    <%# = member_name_by_id(er[:successor]) %>
                   </div>
                 </div>
               </div>

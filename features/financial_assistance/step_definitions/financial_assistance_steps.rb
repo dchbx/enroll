@@ -39,7 +39,7 @@ When(/^they view the financial assistance application$/) do
 end
 
 When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
-  click_link 'ADD INCOME & COVERAGE INFO', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
+  click_link 'ADD INCOME & COVERAGE INFO', href: financial_assistance.go_to_step_application_applicant_path(application_id: consumer.primary_family.application_in_progress.id, id: consumer.primary_family.application_in_progress.primary_applicant.id, step: 1)
 end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do

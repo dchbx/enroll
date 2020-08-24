@@ -24,17 +24,20 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
   spec.add_dependency "aasm",                      "~> 4.8"
   spec.add_dependency 'config',                    '~> 2.0'
-  spec.add_dependency 'money-rails',               '~> 1.13'
+  spec.add_dependency 'devise',                    '~> 4.5'
+  spec.add_dependency 'money-rails',               '~> 1.13.3'
   spec.add_dependency "slim",                      "~> 3.0"
   spec.add_dependency 'symmetric-encryption',      '~> 3.9.1'
   spec.add_dependency 'pundit',                    '~> 2.0'
+  spec.add_dependency "haml-rails"
+
 
   spec.add_development_dependency 'capybara',                  '~> 3.12'
   spec.add_development_dependency 'database_cleaner'
   spec.add_development_dependency 'factory_bot_rails',         '~> 4'
   spec.add_development_dependency 'forgery',                   '~> 0.7.0'
   spec.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
-  spec.add_development_dependency "mongoid-rspec",             '~> 4'
+  spec.add_development_dependency "mongoid-rspec",             '~> 4.0.1'
   spec.add_development_dependency 'rails-perftest',            '~> 0.0.7'
   spec.add_development_dependency "rspec-rails",               '~> 3.8'
   spec.add_development_dependency 'rubocop-rspec',             '~> 1.31'

@@ -18,6 +18,7 @@ AllCops:
     - "./components/benefit_markets/db/seedfiles/**/*"
     - "./components/benefit_sponsors/spec/dummy/**/*"
     - "./components/benefit_sponsors/db/seedfiles/**/*"
+    - "./components/financial_assistance/spec/dummy/**/*"
     - "./components/notifier/spec/dummy/**/*"
     - "./components/old_sponsored_benefits/**/*"
     - "./components/sponsored_benefits/spec/dummy/**/*"

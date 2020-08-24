@@ -5,35 +5,39 @@ module FinancialAssistance
     include Mongoid::Document
     include Mongoid::Timestamps
 
-    embedded_in :applicant, class_name: "::FinancialAssistance::Applicant"
+    before_create :set_submission_timestamp
+
+    embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+    embeds_one :employer_address, class_name: 'FinancialAssistance::Locations::Address', cascade_callbacks: true
+    embeds_one :employer_phone, class_name: 'FinancialAssistance::Locations::Phone', cascade_callbacks: true
 
     TITLE_SIZE_RANGE = (3..30).freeze
     STATE_HEALTH_BENEFITS = %w[medicaid].freeze
 
     INSURANCE_KINDS = %w[
-        acf_refugee_medical_assistance
-        americorps_health_benefits
-        child_health_insurance_plan
-        medicaid
-        medicare
-        medicare_advantage
-        medicare_part_b
-        private_individual_and_family_coverage
-        state_supplementary_payment
-        tricare
-        veterans_benefits
-        naf_health_benefit_program
-        health_care_for_peace_corp_volunteers
-        department_of_defense_non_appropriated_health_benefits
-        cobra
-        employer_sponsored_insurance
-        self_funded_student_health_coverage
-        foreign_government_health_coverage
-        private_health_insurance_plan
-        coverage_obtained_through_another_exchange
-        coverage_under_the_state_health_benefits_risk_pool
-        veterans_administration_health_benefits
-        peace_corps_health_benefits
+      acf_refugee_medical_assistance
+      americorps_health_benefits
+      child_health_insurance_plan
+      medicaid
+      medicare
+      medicare_advantage
+      medicare_part_b
+      private_individual_and_family_coverage
+      state_supplementary_payment
+      tricare
+      veterans_benefits
+      naf_health_benefit_program
+      health_care_for_peace_corp_volunteers
+      department_of_defense_non_appropriated_health_benefits
+      cobra
+      employer_sponsored_insurance
+      self_funded_student_health_coverage
+      foreign_government_health_coverage
+      private_health_insurance_plan
+      coverage_obtained_through_another_exchange
+      coverage_under_the_state_health_benefits_risk_pool
+      veterans_administration_health_benefits
+      peace_corps_health_benefits
       ].freeze
 
     KINDS = %w[
@@ -42,29 +46,29 @@ module FinancialAssistance
     ].freeze
 
     INSURANCE_TYPE = {
-      acf_refugee_medical_assistance: "ACF Refugee Medical Assistance",
-      americorps_health_benefits: "AmeriCorps health benefits",
+      acf_refugee_medical_assistance: 'ACF Refugee Medical Assistance',
+      americorps_health_benefits: 'AmeriCorps health benefits',
       child_health_insurance_plan: "Children's Health Insurance Program",
-      medicaid: "Medicaid",
-      medicare: "Medicare",
-      medicare_advantage: "Medicare Advantage",
-      medicare_part_b: "Medicare Part B",
-      private_individual_and_family_coverage: "Private individual and family coverage",
-      state_supplementary_payment: "State Supplementary Payment",
-      tricare: "TRICARE",
-      veterans_benefits: "Veterans benefits",
-      naf_health_benefit_program: "NAF Health Benefits Program",
-      health_care_for_peace_corp_volunteers: "Health care for Peace Corps volunteers",
-      department_of_defense_non_appropriated_health_benefits: "Department of Defense Nonappropriated Fund health benefits",
-      cobra: "COBRA",
-      employer_sponsored_insurance: "Employer-sponsored insurance",
-      self_funded_student_health_coverage: "Self-funded student health coverage",
-      foreign_government_health_coverage: "Foreign government health coverage",
-      private_health_insurance_plan: "Private health insurance plan",
-      coverage_obtained_through_another_exchange: "Coverage obtained through another exchange",
-      coverage_under_the_state_health_benefits_risk_pool: "Coverage under the state health benefits risk pool",
-      veterans_administration_health_benefits: "Veterans Administration health benefits",
-      peace_corps_health_benefits: "Peace Corps health benefits"
+      medicaid: 'Medicaid',
+      medicare: 'Medicare',
+      medicare_advantage: 'Medicare Advantage',
+      medicare_part_b: 'Medicare Part B',
+      private_individual_and_family_coverage: 'Private individual and family coverage',
+      state_supplementary_payment: 'State Supplementary Payment',
+      tricare: 'TRICARE',
+      veterans_benefits: 'Veterans benefits',
+      naf_health_benefit_program: 'NAF Health Benefits Program',
+      health_care_for_peace_corp_volunteers: 'Health care for Peace Corps volunteers',
+      department_of_defense_non_appropriated_health_benefits: 'Department of Defense Nonappropriated Fund health benefits',
+      cobra: 'COBRA',
+      employer_sponsored_insurance: 'Employer-sponsored insurance',
+      self_funded_student_health_coverage: 'Self-funded student health coverage',
+      foreign_government_health_coverage: 'Foreign government health coverage',
+      private_health_insurance_plan: 'Private health insurance plan',
+      coverage_obtained_through_another_exchange: 'Coverage obtained through another exchange',
+      coverage_under_the_state_health_benefits_risk_pool: 'Coverage under the state health benefits risk pool',
+      veterans_administration_health_benefits: 'Veterans Administration health benefits',
+      peace_corps_health_benefits: 'Peace Corps health benefits'
     }.freeze
 
     ESI_COVERED_KINDS = %w[self self_and_spouse family].freeze
@@ -87,13 +91,10 @@ module FinancialAssistance
     field :workflow, type: Hash, default: { }
 
     field :employer_name, type: String
-    field :employer_id, type: String, default: ""
+    field :employer_id, type: String, default: ''
 
-    embeds_one :employer_address, class_name: "::Address"
-    embeds_one :employer_phone, class_name: "::Phone"
-
-    scope :eligible, -> { where(kind: "is_eligible")}
-    scope :enrolled, -> { where(kind: "is_enrolled")}
+    scope :eligible, -> { where(kind: 'is_eligible')}
+    scope :enrolled, -> { where(kind: 'is_enrolled')}
 
     scope :of_insurance_kind, ->(insurance_kind) { where(insurance_kind: insurance_kind) }
 
@@ -106,14 +107,14 @@ module FinancialAssistance
     validates :kind, presence: true,
                      inclusion: {
                        in: KINDS,
-                       message: "%<value> is not a valid benefit kind type"
+                       message: '%{value} is not a valid benefit kind type'
                      },
                      on: [:step_1, :submission]
 
     validates :insurance_kind, presence: true,
                                inclusion: {
                                  in: INSURANCE_KINDS,
-                                 message: "%<value> is not a valid benefit insurance kind type"
+                                 message: '%{value} is not a valid benefit insurance kind type'
                                },
                                on: [:step_1, :submission]
 
@@ -122,16 +123,14 @@ module FinancialAssistance
              :presence_of_dates_if_enrolled,
              on: [:step_1, :submission]
 
-    before_create :set_submission_timestamp
-
     alias is_employer_sponsored? is_employer_sponsored
 
     def is_eligible?
-      kind == "is_eligible"
+      kind == 'is_eligible'
     end
 
     def is_enrolled?
-      kind == "is_enrolled"
+      kind == 'is_enrolled'
     end
 
     # Eligibility through public employee
@@ -144,9 +143,9 @@ module FinancialAssistance
     class << self
       def find(id)
         bson_id = BSON::ObjectId.from_string(id.to_s)
-        applications = ::FinancialAssistance::Application.where("applicants.benefits._id" => bson_id)
+        applications = ::FinancialAssistance::Application.where('applicants.benefits._id' => bson_id)
         return unless applications.size == 1
-        applicants = applications.first.applicants.where("benefits._id" => bson_id)
+        applicants = applications.first.applicants.where('benefits._id' => bson_id)
         applicants.size == 1 ? applicants.first.benefits.find(bson_id) : nil
       end
     end
@@ -156,7 +155,7 @@ module FinancialAssistance
     def clean_params(params)
       model_params = params[:benefit]
 
-      return unless model_params.present? && model_params[:insurance_kind] != "employer_sponsored_insurance"
+      return unless model_params.present? && model_params[:insurance_kind] != 'employer_sponsored_insurance'
       clean_benefit_params_when_not_esi(model_params)
       clean_employer_params_when_not_esi(params)
     end
@@ -191,12 +190,12 @@ module FinancialAssistance
 
     def presence_of_dates_if_enrolled
       return unless is_enrolled?
-      errors.add(:start_on, " Start On Date must be present") if start_on.blank?
+      errors.add(:start_on, 'Start On Date must be present') if start_on.blank?
       start_on_must_precede_end_on(start_on, end_on)
     end
 
     def presence_of_esi_details_if_esi
-      return unless insurance_kind == "employer_sponsored_insurance"
+      return unless insurance_kind == 'employer_sponsored_insurance'
       errors.add(:employer_name, " ' EMPLOYER NAME' can't be blank ") if employer_name.blank?
       errors.add(:esi_covered, "' Who can be covered?' can't be blank ") if esi_covered.blank?
       errors.add(:start_on, "' Start On' Date can't be blank ") if start_on.blank?

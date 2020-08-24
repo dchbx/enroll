@@ -1,17 +1,5 @@
 <% content_for :head do %>
-  <%= javascript_include_tag "financial_assistance/application", media: 'all' %>
+    <%= javascript_include_tag 'financial_assistance/application', media: 'all' %>
 <% end %>
 
-<% content_for :content do %>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-2">
-        <%= render '/financial_assistance/shared/fa_left_nav'%>
-      </div>
-
-      <%= yield %>
-    </div>
-  </div>
-<% end %>
-
-<%= render template: "layouts/application" %>
+<%= render template: 'layouts/application' %>

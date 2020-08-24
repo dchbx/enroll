@@ -1,0 +1,73 @@
+%has_fixed_address= applicant.has_fixed_address
+- unless applicant.is_living_in_state.nil?
+  %is_living_in_state= applicant.is_living_in_state
+- unless applicant.is_temp_out_of_state.nil?
+  %is_temp_out_of_state= applicant.is_temp_out_of_state
+- unless applicant.is_required_to_file_taxes.nil?
+  %is_required_to_file_taxes= applicant.is_required_to_file_taxes
+%tax_filer_type= "urn:openhbx:terms:v1:tax_filer##{applicant.tax_filer_kind}"
+- unless applicant.is_joint_tax_filing.nil?
+  %is_joint_tax_filing= applicant.is_joint_tax_filing
+%is_claimed_as_tax_dependent= applicant.is_claimed_as_tax_dependent
+%has_insurance= applicant.is_enrolled_in_insurance?
+- if (applicant.had_prior_insurance?).present?
+  %had_prior_insurance= applicant.had_prior_insurance?
+%has_state_health_benefit= applicant.has_state_health_benefit?
+%is_medicare_eligible= applicant.is_medicare_eligible
+- unless applicant.is_physically_disabled.nil?
+  %is_physically_disabled= applicant.is_physically_disabled
+- unless applicant.is_student.nil?
+  %is_student= applicant.is_student
+- unless applicant.student_kind.blank?
+  %student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind.downcase.gsub(" ","_")}"
+- unless applicant.student_school_kind.blank?
+  %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind.downcase.gsub(" ","_")}"
+- if applicant.student_status_end_on.present?
+  %student_status_end_on= simple_date_for(Time.strptime(applicant.student_status_end_on,'%m/%d/%Y'))
+- unless applicant.is_ia_eligible.nil?
+  %is_ia_eligible= applicant.is_ia_eligible
+- unless applicant.is_medicaid_chip_eligible.nil?
+  %is_medicaid_chip_eligible= applicant.is_medicaid_chip_eligible
+- unless applicant.is_magi_medicaid.nil?
+  %is_magi_medicaid= applicant.is_magi_medicaid
+%is_self_attested_blind= applicant.is_self_attested_blind
+%is_self_attested_disabled= applicant.is_self_attested_disabled
+%is_self_attested_long_term_care= applicant.is_self_attested_long_term_care
+%is_veteran= applicant.is_veteran
+%is_refugee= applicant.is_refugee
+%is_trafficking_victim= applicant.is_trafficking_victim
+- unless applicant.is_former_foster_care.nil?
+  %is_former_foster_care= applicant.is_former_foster_care
+- unless applicant.age_left_foster_care.blank?
+  %age_left_foster_care= applicant.age_left_foster_care
+- unless applicant.foster_care_us_state.blank?
+  %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==applicant.foster_care_us_state.upcase end.first.downcase.gsub(' ','_')}"
+- unless applicant.had_medicaid_during_foster_care.blank?
+  %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
+- unless applicant.is_pregnant.nil?
+  %is_pregnant= applicant.is_pregnant
+- unless applicant.is_enrolled_on_medicaid.blank?
+  %is_enrolled_on_medicaid= applicant.is_enrolled_on_medicaid
+- unless applicant.is_post_partum_period.blank?
+  %is_post_partum_period= applicant.is_post_partum_period
+- unless applicant.children_expected_count.blank?
+  %children_expected_count= applicant.children_expected_count
+- unless applicant.pregnancy_due_on.blank?
+  %pregnancy_due_on= simple_date_for(applicant.pregnancy_due_on)
+- unless applicant.pregnancy_end_on.blank?
+  %pregnancy_end_on= simple_date_for(applicant.pregnancy_end_on)
+%is_subject_to_five_year_bar= applicant.is_subject_to_five_year_bar
+- if !applicant.is_five_year_bar_met.nil?
+  %is_five_year_bar_met= applicant.is_five_year_bar_met
+- unless applicant.is_forty_quarters.nil?
+  %is_forty_quarters= applicant.is_forty_quarters
+- unless applicant.is_ssn_applied.nil?
+  %is_ssn_applied= applicant.is_ssn_applied
+- if applicant.non_ssn_apply_reason.present?
+  %non_ssn_apply_reason= applicant.non_ssn_apply_reason
+%has_daily_living_help= applicant.has_daily_living_help
+%has_bill_pay_3_month_help= applicant.need_help_paying_bills
+- unless applicant.is_resident_post_092296.nil?
+  %is_resident_post_092296= applicant.is_resident_post_092296
+- unless applicant.is_vets_spouse_or_child.nil?
+  %is_vets_spouse_or_child= applicant.is_vets_spouse_or_child

@@ -154,9 +154,9 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
+    embeds_many :incomes,     class_name: "FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
 
@@ -410,7 +410,11 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
-      valid?(:submission) &&
+      # TODO: Reevaluate the valid?(:submission)
+      # Possible that some of the validations expected there conflict with when we
+      # expect the "Continue" button to be available, which is dependent on these
+      # validations passing
+      valid? &&
         incomes.all? { |income| income.valid? :submission } &&
         benefits.all? { |benefit| benefit.valid? :submission } &&
         deductions.all? { |deduction| deduction.valid? :submission } &&
@@ -430,6 +434,8 @@ module FinancialAssistance
     end
 
     def foster_age_satisfied?
+      # TODO: Look into this. Seems like this is only relevant if pregnant?
+      return true if is_pregnant == true
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
@@ -703,6 +709,10 @@ module FinancialAssistance
       end
 
       errors.add(:is_student, "' Is this person a student?' should be answered") if age_of_applicant.between?(18,19) && is_student.nil?
+      # TODO: Decide if these validations should be ended?
+      # errors.add(:claimed_as_tax_dependent_by, "' This person will be claimed as a dependent by' can't be blank") if is_claimed_as_tax_dependent && claimed_as_tax_dependent_by.nil?
+
+      # errors.add(:is_required_to_file_taxes, "' is_required_to_file_taxes can't be blank") if is_required_to_file_taxes.nil?
     end
 
     def age_of_applicant

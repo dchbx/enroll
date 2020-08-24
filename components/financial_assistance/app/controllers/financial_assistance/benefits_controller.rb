@@ -15,7 +15,7 @@ module FinancialAssistance
     def index
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
-      render layout: 'financial_assistance'
+      render layout: 'financial_assistance_nav'
       # @insurance_kinds = FinancialAssistance::Benefit::INSURANCE_TYPE
     end
 
@@ -23,7 +23,7 @@ module FinancialAssistance
       @model = @applicant.benefits.build
       load_steps
       current_step
-      render 'workflow/step', layout: 'financial_assistance'
+      render 'workflow/step', layout: 'financial_assistance_nav'
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
@@ -43,28 +43,28 @@ module FinancialAssistance
           if params.key? :last_step
             @model.update_attributes!(workflow: { current_step: 1 })
             flash[:notice] = 'Benefit Info Added.'
-            redirect_to financial_assistance_application_applicant_benefits_path(@application, @applicant)
+            redirect_to application_applicant_benefits_path(@application, @applicant)
           else
             @model.update_attributes!(workflow: { current_step: @current_step.to_i })
-            render 'workflow/step', layout: 'financial_assistance'
+            render 'workflow/step', layout: 'financial_assistance_nav'
           end
         else
           flash[:error] = build_error_messages(@model)
-          render 'workflow/step', layout: 'financial_assistance'
+          render 'workflow/step', layout: 'financial_assistance_nav'
         end
       else
-        render 'workflow/step', layout: 'financial_assistance'
+        render 'workflow/step', layout: 'financial_assistance_nav'
       end
     end
 
     def create
       format_date(params)
-      @benefit = @applicant.benefits.build permit_params(params[:financial_assistance_benefit])
+      @benefit = @applicant.benefits.build permit_params(params[:benefit])
       @benefit_kind = @benefit.kind
       @benefit_insurance_kind = @benefit.insurance_kind
 
       if @benefit.save
-        render :create, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+        render :create, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
         render head: 'ok'
       end
@@ -73,8 +73,8 @@ module FinancialAssistance
     def update
       format_date(params)
       @benefit = @applicant.benefits.find params[:id]
-      if @benefit.update_attributes permit_params(params[:financial_assistance_benefit])
-        render :update, :locals => { kind: params[:financial_assistance_benefit][:kind], insurance_kind: params[:financial_assistance_benefit][:insurance_kind] }
+      if @benefit.update_attributes permit_params(params[:benefit])
+        render :update, :locals => { kind: params[:benefit][:kind], insurance_kind: params[:benefit][:insurance_kind] }
       else
         render head: 'ok'
       end
@@ -92,8 +92,8 @@ module FinancialAssistance
     private
 
     def format_date(params)
-      params[:financial_assistance_benefit][:start_on] = Date.strptime(params[:financial_assistance_benefit][:start_on].to_s, "%m/%d/%Y")
-      params[:financial_assistance_benefit][:end_on] = Date.strptime(params[:financial_assistance_benefit][:end_on].to_s, "%m/%d/%Y") if params[:financial_assistance_benefit][:end_on].present?
+      params[:benefit][:start_on] = Date.strptime(params[:benefit][:start_on].to_s, "%m/%d/%Y")
+      params[:benefit][:end_on] = Date.strptime(params[:benefit][:end_on].to_s, "%m/%d/%Y") if params[:benefit][:end_on].present?
     end
 
     def update_employer_contact(_model, params)
@@ -123,13 +123,12 @@ module FinancialAssistance
     end
 
     def find
-      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.find(params[:id])
-    rescue StandardError # rubocop:disable Lint/EmptyRescueClause TODO Remove this
-      ''
+      FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.where(id: params[:id]).last || nil
     end
 
     def load_support_texts
-      file_path = Rails.root.to_s + "/components/financial_assistance/app/views/financial_assistance/shared/support_text.yml"
+      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+
       raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
       @support_texts = support_text_placeholders raw_support_text
     end

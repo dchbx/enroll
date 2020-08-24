@@ -340,6 +340,10 @@ class Person
     role_data(broker_agency_staff_roles, :benefit_sponsors_broker_agency_profile_id) + role_data(general_agency_staff_roles, :benefit_sponsors_general_agency_profile_id)
   end
 
+  def format_citizen
+    ::ConsumerRole::CITIZEN_KINDS[citizen_status.to_sym]
+  end
+
   def role_data(data, agency)
     data.collect do |role|
       {
@@ -1228,7 +1232,7 @@ class Person
 
       direct_relationship.update(kind: relationship_kind)
     elsif self.id != successor.id
-      person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind) # Direct Relationship
+      person_relationships.create(family_id: family_id, predecessor_id: self.id, successor_id: successor.id, kind: relationship_kind, relative_id: self.id) # Direct Relationship
     end
   end
 
@@ -1279,11 +1283,15 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    if broker_role || broker_agency_staff_roles.present?
-      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
-    else
-      welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
-    end
+    welcome_body = if broker_role || broker_agency_staff_roles.present?
+                     "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and" \
+                     " select health insurance that meets your health needs and budgets."
+                   else
+                     "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your" \
+                     " needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features." \
+                     " Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have" \
+                     " any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
+                   end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: site_short_name.to_s)
   end
@@ -1351,3 +1359,4 @@ class Person
     self.errors.add(:base, "Incarceration status is required.") if is_incarcerated.to_s.blank?
   end
 end
+
