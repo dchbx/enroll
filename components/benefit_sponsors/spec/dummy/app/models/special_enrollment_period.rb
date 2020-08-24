@@ -221,7 +221,7 @@ private
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on
+    if @reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else

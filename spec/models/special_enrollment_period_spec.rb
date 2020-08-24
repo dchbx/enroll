@@ -280,7 +280,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     context "and QLE is reported before end of SEP" do
       let(:today)                           { TimeKeeper.date_of_record }
-      let(:monthly_enrollment_deadline)     { today.beginning_of_month + Setting.individual_market_monthly_enrollment_due_on.days - 1.day }
+      let(:monthly_enrollment_deadline)     { today.beginning_of_month + EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item.days - 1.day }
 
       let(:qle_on_date)                     { today.beginning_of_month }
 

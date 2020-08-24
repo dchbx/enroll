@@ -9,7 +9,7 @@ class Setting
 
   def self.get_individual_market_monthly_enrollment_due_on
     setting_record = Setting.where(name: "individual_market_monthly_enrollment_due_on").last
-    setting_record = Setting.create(name: "individual_market_monthly_enrollment_due_on", value: '15') if setting_record.blank?
+    setting_record = Setting.create(name: "individual_market_monthly_enrollment_due_on", value: '19') if setting_record.blank?
 
     setting_record
   end
