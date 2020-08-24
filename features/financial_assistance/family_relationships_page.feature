@@ -1,11 +1,7 @@
 Feature: Functionality for the Family Relationships page
 
   Background: Family Relationships page
-    # Given a consumer exists
     Given the user is logged in
-    # And is logged in
-    # And the consumer is logged in
-    # And a benchmark plan exists
     And family has two other household members
     When all applicants are in Info Completed state with all types of income
     And the user will navigate to the FAA Household Info page

@@ -8,6 +8,7 @@
 - identity_verified = (defined? identity_verified) ? identity_verified : false
 - application_verified = (defined? application_verified) ? application_verified : false
 - search_page = (defined? search_page ) ? search_page : false
+- application_in_progress = @person&.primary_family&.application_in_progress
 
 - percent_complete = 0
 - percent_complete = step == 1 ? 15 : (step == 2) ? 35 : ((step == 3) ? 50 : ((step == 4) ? 75 : ((step == 5) ? 90 : (step == 6 ? 100 : 0))))
@@ -58,15 +59,10 @@
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
   - else next_link.present?
     = link_to "Continue", next_link, :method => :get, class: 'button btn btn-lg btn-primary  btn-block interaction-click-control-continue', id: 'btn-continue', :disabled => !identity_verified
-- elsif step == 7
-  - missing_relationships = []
-  - if @person.primary_family
-    - matrix = @person.primary_family.build_relationship_matrix
-    - missing_relationships = @person.primary_family.find_missing_relationships(matrix)
-    = link_to 'Continue', financial_assistance.review_and_submit_application_path(@person.primary_family.application_in_progress.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', :disabled => missing_relationships.any?
-  - else
-    %button.btn.btn-lg.btn-primary.btn-block#btn-continue{disabled: true}
-      CONTINUE
+- elsif application_in_progress && step == 7
+  - matrix = @person.primary_family.build_relationship_matrix
+  - missing_relationships = @person.primary_family.find_missing_relationships(matrix)
+  = link_to 'Continue', financial_assistance.review_and_submit_application_path(application_in_progress.id), class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', :disabled => missing_relationships.any?
 - elsif defined? url
   = link_to 'Continue', url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue'
 - elsif step == 4
