@@ -4,7 +4,7 @@ module ScheduledEventService
   included do
     # has_many employers
     def self.individual_market_monthly_enrollment_due_on
-        @individual_market_monthly_enrollment_due_on ||= ScheduledEvent.day_of_month_for("ivl_monthly_enrollment_due_on") || EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
+      @individual_market_monthly_enrollment_due_on ||= ScheduledEvent.day_of_month_for("ivl_monthly_enrollment_due_on") || EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
     end
 
     def self.shop_market_binder_payment_due_on
