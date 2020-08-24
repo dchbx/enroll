@@ -794,7 +794,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
           it "should return true" do
             date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
-            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.end_of_month)
+            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month)
             get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
             expect(response).to have_http_status(:success)
             expect(assigns(:qualified_date)).to eq true
