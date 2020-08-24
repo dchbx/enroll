@@ -700,6 +700,17 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[addresses][0][zip]', with: '01001'
 end
 
+Then("Employee should see the relationship selection") do
+  expect(page).to have_content("Household Relationships")
+end
+
+When(/^Employee selects relationship and clicks Add Relationship$/) do
+  find('.button').click
+  @relationship = find(".selectric-items").find(:xpath, 'div/ul/li[5]').click
+  expect(find(".selectric-wrapper").find(:xpath, 'div[2]/span').text).to eq("parent")
+  click_button("Add Relationship")
+end
+
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
   expect(page).to have_link('Add New Person')

@@ -13,9 +13,6 @@ module FinancialAssistance
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
         application.populate_applicants_for(consumer.primary_family)
       end
-      @application.active_applicants.each do |applicant|
-        applicant.update_attributes(is_claimed_as_tax_dependent: false)
-      end
       @application
     end
 

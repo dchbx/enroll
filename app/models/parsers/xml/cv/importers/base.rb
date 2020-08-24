@@ -20,24 +20,14 @@ module Parsers::Xml::Cv::Importers
         race: person_demographics.race,
       )
       person_relationships.each do |relationship|
-        relation = ''
-        begin
-          relation = relationship.relationship_uri.strip.split("#").last
-        rescue StandardError
-          relation = ''
-        end
-
         next if relationship.subject_individual == relationship.object_individual
-        person_object.person_relationships.build(
-          {
-            successor_id: relationship.object_individual, #use subject_individual or object_individual
-            predecessor_id: person_object.id,
-            family_id: family_id,
-            kind: PersonRelationship::InverseMap[relation]
-          }
-        )
-        # relative_id: relationship.object_individual, #use subject_individual or object_individual
-        # kind: relation
+        relation = relationship&.relationship_uri&.strip&.split("#")&.last
+        person_object.person_relationships.build({successor_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  predecessor_id: person_object.id,
+                                                  family_id: family_id,
+                                                  kind: PersonRelationship::InverseMap[relation]})
+                                                  # relative_id: relationship.object_individual, #use subject_individual or object_individual
+                                                  # kind: relation
       end
 
       build_addresses(person, person_object)
@@ -55,14 +45,12 @@ module Parsers::Xml::Cv::Importers
         rescue StandardError
           kind = 'home'
         end
-        person_object.addresses.build({
-          address_1: address.address_line_1,
-          address_2: address.address_line_2,
-          city: address.location_city_name,
-          state: address.location_state_code,
-          zip: address.postal_code,
-          kind: kind
-        })
+        person_object.addresses.build({address_1: address.address_line_1,
+                                       address_2: address.address_line_2,
+                                       city: address.location_city_name,
+                                       state: address.location_state_code,
+                                       zip: address.postal_code,
+                                       kind: kind})
       end
     end
 
@@ -70,12 +58,9 @@ module Parsers::Xml::Cv::Importers
       person.phones.each do |phone|
         phone_type = phone.type
         phone_type_for_enroll = phone_type.blank? ? nil : phone_type.strip.split("#").last
-        if Phone::KINDS.include?(phone_type_for_enroll)
-          person_object.phones.build({
-            kind: phone_type_for_enroll,
-            full_phone_number: phone.full_phone_number
-          })
-        end
+        next if Phone::KINDS.include?(phone_type_for_enroll)
+        person_object.phones.build({kind: phone_type_for_enroll,
+                                    full_phone_number: phone.full_phone_number})
       end
     end
 

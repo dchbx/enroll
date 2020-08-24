@@ -28,10 +28,13 @@ Feature: Employee goes through plan shopping with dependents when employer offer
     When Employee clicks confirm member
     Then Employee should see 1 dependents
     When Employee clicks continue on the dependents page
+    Then Employee should see the relationship selection
+    When Employee selects relationship and clicks Add Relationship
+    And Employee clicks continue
     Then Employee should see the group selection page
     When Employee clicks continue button on group selection page for dependents
     Then Employee should see the list of plans
-    And I should not see any plan which premium is 0
+    # And I should not see any plan which premium is 0 TODO Figure out why we can't have 0
     When Employee selects a plan on the plan shopping page
     When Employee clicks on Confirm button on the coverage summary page
     Then Employee should see the receipt page

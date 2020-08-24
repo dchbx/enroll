@@ -2,7 +2,7 @@ require 'rails_helper'
 Rake.application.rake_require "tasks/nfp"
 Rake::Task.define_task(:environment)
 
-RSpec.describe 'upload the invoice to s3', :type => :task, dbclean: :after_each do
+RSpec.describe 'upload the invoice to s3', :type => :task, dbclean: :around_each do
 
   let!(:benefit_markets_location_rating_area) { FactoryBot.create_default(:benefit_markets_locations_rating_area) }
   let!(:benefit_markets_location_service_area) { FactoryBot.create_default(:benefit_markets_locations_service_area) }
