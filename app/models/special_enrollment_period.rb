@@ -235,15 +235,10 @@ private
     self.submitted_at ||= TimeKeeper.datetime_of_record
   end
 
-  #TODO : cukes
   def set_date_period
-    if @qualifying_life_event_kind.coverage_start_on.present? && @qualifying_life_event_kind.coverage_end_on.present?
-      self.start_on = submitted_at.to_date - @qualifying_life_event_kind.pre_event_sep_in_days.days
-      self.end_on   = submitted_at.to_date + @qualifying_life_event_kind.post_event_sep_in_days.days
-    else
-      self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
-      self.end_on   = qle_on + @qualifying_life_event_kind.post_event_sep_in_days.days
-    end
+    targeted_date = @qualifying_life_event_kind.coverage_start_on.present? && @qualifying_life_event_kind.coverage_end_on.present? ? submitted_at.to_date : qle_on
+    self.start_on = targeted_date - @qualifying_life_event_kind.pre_event_sep_in_days.days
+    self.end_on   = targeted_date + @qualifying_life_event_kind.post_event_sep_in_days.days
 
     # Use end_on date as boundary guard for lapsed SEPs
     @reference_date = [submitted_at.to_date, end_on].min
@@ -277,7 +272,7 @@ private
 
   # follows 15th of month rule
   def first_of_month_effective_date
-    if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on
+    if @reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
       @earliest_effective_date.end_of_month + 1.day
     else
