@@ -8,7 +8,11 @@
 - identity_verified = (defined? identity_verified) ? identity_verified : false
 - application_verified = (defined? application_verified) ? application_verified : false
 - search_page = (defined? search_page ) ? search_page : false
-- application_in_progress = @person&.primary_family&.application_in_progress
+- if @person.class.name == "Person"
+  - application_in_progress = @person&.primary_family&.application_in_progress
+- else
+  - application_in_progress = nil
+
 
 - percent_complete = 0
 - percent_complete = step == 1 ? 15 : (step == 2) ? 35 : ((step == 3) ? 50 : ((step == 4) ? 75 : ((step == 5) ? 90 : (step == 6 ? 100 : 0))))
