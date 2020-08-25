@@ -13,8 +13,8 @@ module ConsumerRolesHelper
 
   def latino_collection
     [
-      ["Mexican", "Mexican American"],
-      ["Chicano/a", "Puerto Rican"],
+      ["Mexican, Mexican American, Chicano/a"],
+      ["Puerto Rican"],
       ["Cuban", "Other"]
     ].inject([]){ |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
