@@ -7,4 +7,4 @@ registry:
         is_enabled: true
         settings:
           - key: :operation
-            item: "::Operations::ProductSelectionEffects::DefaultProductSelectionEffects"
+            item: "::Operations::ProductSelectionEffects::DchbxProductSelectionEffects"
