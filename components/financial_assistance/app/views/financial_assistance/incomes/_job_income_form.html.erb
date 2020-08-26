@@ -65,7 +65,7 @@
     <div class="row">
       <div class="col-md-3 pull-right cancel-save-mt">
         <a class="btn btn-default income-cancel">Cancel</a>
-        <%= f.submit 'Save', class: 'btn btn-danger' %>
+        <%= f.submit 'Save', class: 'btn btn-danger', onclick: "checkDate('#{income.id}')" %>
       </div>
     </div>
 <% end %>
