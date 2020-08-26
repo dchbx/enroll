@@ -14,7 +14,6 @@ RSpec.shared_context 'family with one member and one enrollment', :shared_contex
                                      open_enrollment_end_on: Date.new(next_year_date.year, 1, 31))
     bcp
   end
-  let!(:benefit_package) { current_bcp.benefit_packages.first }
   let!(:person) do
     FactoryBot.create(:person,
                       :with_consumer_role,
@@ -45,7 +44,6 @@ RSpec.shared_context 'family with one member and one enrollment', :shared_contex
                       kind: 'individual',
                       family: family,
                       consumer_role_id: family.primary_person.consumer_role.id,
-                      benefit_package_id: benefit_package.id,
                       effective_on: start_of_year)
   end
 
@@ -73,7 +71,6 @@ RSpec.shared_context 'family with one member and one enrollment and one renewal 
                       kind: 'individual',
                       family: family,
                       consumer_role_id: family.primary_person.consumer_role.id,
-                      benefit_package_id: benefit_package.id,
                       effective_on: current_bcp.successor.start_on)
   end
 
@@ -111,7 +108,6 @@ RSpec.shared_context 'family with one member and one enrollment and one predeces
                       kind: 'individual',
                       family: family,
                       consumer_role_id: family.primary_person.consumer_role.id,
-                      benefit_package_id: predecessor_bcp.benefit_packages.first.id,
                       effective_on: predecessor_bcp.start_on)
   end
 
