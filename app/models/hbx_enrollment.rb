@@ -925,6 +925,8 @@ class HbxEnrollment
   end
 
   def propagate_selection
+    return unless [:coverage_selected, :renewing_coverage_selected].include?(aasm.to_state)
+
     Operations::ExecuteProductSelectionEffects.call(
       Entities::ProductSelection.new(
         {
@@ -1712,11 +1714,11 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => :record_transition do
+    event :select_coverage, :after => [:record_transition, :propagate_selection] do
       transitions from: :shopping,
-                  to: :coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
+                  to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
-                  to: :renewing_coverage_selected, after: [:propagate_selection], :guard => :can_select_coverage?
+                  to: :renewing_coverage_selected, :guard => :can_select_coverage?
       transitions from: :auto_renewing_contingent,
                   to: :renewing_contingent_selected, :guard => :can_select_coverage?
     end
