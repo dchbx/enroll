@@ -37,7 +37,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
       :individual_unassisted,
       household: family.active_household,
       effective_on: Date.new(coverage_year, 11, 1),
-      family: family,
+      family: family
     )
   end
 
