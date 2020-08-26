@@ -17,6 +17,18 @@ function startEditingIncome(income_kind) {
   $('.interaction-click-control-save').addClass('disabled');
 };
 
+function checkDate(income_id) {
+
+  var startDate = $("#start_on_"+income_id).datepicker('getDate');
+  var endDate = $("#end_on_"+income_id).datepicker('getDate');
+
+  if ((endDate != "" && endDate != null) && (endDate < startDate)) {
+    alert('The end date must be after the start date.')
+    $("#end_on_"+income_id)[0].value = ""
+    $('.interaction-click-control-save').addClass('disabled')
+  }
+}
+
 function currentlyEditing() {
   return $('.interaction-click-control-continue').hasClass('disabled');
 };
@@ -354,10 +366,11 @@ $(document).on('turbolinks:load', function () {
 
   function validateForm(form) {
     var isValid = true;
-    // form.find('#financial_assistance_income_start_on, input[name*=financial_assistance_income[start_on]], input[name*=financial_assistance_income[end_on]]').each(function() {
-    //   if ( $(this).val() == '' ||  $(this).val()=='0')
-    //     isValid = false;
-    // });
+    debugger
+    form.find('#financial_assistance_income_start_on, input[name*=financial_assistance_income[start_on]], input[name*=financial_assistance_income[end_on]]').each(function() {
+      if ( $(this).val() == '' ||  $(this).val()=='0')
+        isValid = false;
+    });
     return isValid;
   }
 
@@ -369,7 +382,7 @@ $(document).on('turbolinks:load', function () {
   //   return 'You have an unsaved income, are you sure you want to proceed?';
   // });
 
-  $('input[type="checkbox"]').click(function(e){
+  $('input[name="financial_assistance_income[start_on]"]').click(function(e){
     var value = e.target.checked;
     self = this;
     if (value) {
