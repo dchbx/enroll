@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "rails_helper"
+require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "when:
 - there is no current coverage
@@ -26,13 +27,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
         bcp.start_on > bcp.open_enrollment_start_on
     end
   end
-  let(:family) do
-    FactoryBot.create(
-      :family,
-      :with_primary_family_member,
-      person: consumer_role.person
-    )
-  end
+  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: consumer_role.person)}
   let(:product) do
     BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first)
   end
@@ -48,13 +43,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
 
   let(:product_selection) do
-    Entities::ProductSelection.new(
-      {
-        :enrollment => ivl_enrollment,
-        :product => product,
-        :family => family
-      }
-    )
+    Entities::ProductSelection.new({:enrollment => ivl_enrollment, :product => product, :family => family})
   end
 
   subject do
@@ -105,12 +94,8 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   let(:product) do
     BenefitMarkets::Products::Product.find(benefit_package.benefit_ids.first)
   end
-  let(:renewal_benefit_coverage_period) do
-    benefit_coverage_period.successor
-  end
-  let(:renewal_benefit_package) do
-    renewal_benefit_coverage_period.benefit_packages.first
-  end
+  let(:renewal_benefit_coverage_period) {benefit_coverage_period.successor}
+  let(:renewal_benefit_package) {renewal_benefit_coverage_period.benefit_packages.first}
 
   let(:renewal_product) do
     r_product = BenefitMarkets::Products::Product.find(renewal_benefit_package.benefit_ids.first)
@@ -134,13 +119,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
   end
 
   let(:product_selection) do
-    Entities::ProductSelection.new(
-      {
-        :enrollment => ivl_enrollment,
-        :product => product,
-        :family => family
-      }
-    )
+    Entities::ProductSelection.new({:enrollment => ivl_enrollment, :product => product, :family => family})
   end
 
   subject do
@@ -160,5 +139,103 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
     renewal_start_date = renewal_enrollment.effective_on
     expect(renewal_benefit_coverage_period.start_on).to eq renewal_start_date
     expect(renewal_enrollment.product_id).to eq renewal_product.id
+  end
+end
+
+RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, type: :model do
+  before { DatabaseCleaner.clean }
+
+  context 'Prospective' do
+    let(:current_year) { TimeKeeper.date_of_record.year }
+
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+    end
+
+    include_context 'family with one member and one enrollment and one renewal enrollment'
+
+    context 'new enrollment in existing plan year' do
+
+      before do
+        product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment' do
+        expect(family.hbx_enrollments.count).to eq(3)
+      end
+
+      it 'should renew enrollment with start_on of successor bcp' do
+        expect(@result.success.effective_on).to eq(current_bcp.successor.start_on)
+      end
+
+      it 'should cancel existing renewel enrollment' do
+        successor_enrollment.reload
+        expect(successor_enrollment.aasm_state).to eq('coverage_canceled')
+      end
+    end
+
+    context 'new enrollment in renewal plan year' do
+      before do
+        enrollment.update_attributes!(effective_on: enrollment.effective_on + 1.year)
+        product_selection = Entities::ProductSelection.new({:enrollment => enrollment, :product => enrollment.product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should not create renewal enrollment' do
+        expect(family.hbx_enrollments.count).to eq(2)
+      end
+
+      it 'should return ok as success' do
+        expect(@result.success).to eq(:ok)
+      end
+    end
+  end
+
+  context 'Retrospective' do
+    let(:current_year) { TimeKeeper.date_of_record.year + 1 }
+
+    before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 1, 1))
+    end
+
+    include_context 'family with one member and one enrollment and one predecessor enrollment'
+
+    context 'new enrollment in prior plan year' do
+
+      before do
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment' do
+        expect(family.hbx_enrollments.count).to eq(3)
+      end
+
+      it 'should renew enrollment with start_on of successor bcp' do
+        expect(@result.success.effective_on).to eq(predecessor_bcp.successor.start_on)
+      end
+
+      it 'should cancel existing renewel enrollment' do
+        enrollment.reload
+        expect(enrollment.aasm_state).to eq('coverage_canceled')
+      end
+    end
+
+    context 'new enrollment in current plan year' do
+      before do
+        predecessor_enrollment.update_attributes!(effective_on: predecessor_enrollment.effective_on + 1.year)
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should not create renewal enrollment' do
+        expect(family.hbx_enrollments.count).to eq(2)
+      end
+
+      it 'should return ok as success' do
+        expect(@result.success).to eq(:ok)
+      end
+    end
   end
 end

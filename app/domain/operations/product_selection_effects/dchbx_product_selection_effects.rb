@@ -36,25 +36,35 @@ module Operations
         Success(:ok)
       end
 
+      private
+
       def renew_ivl_if_is_open_enrollment(enrollment)
-        return nil if enrollment.is_shop?
-        bp = BenefitPackage.find(enrollment.benefit_package_id)
-        bcp = bp.benefit_coverage_period
-        return nil unless in_open_enrollment_before_plan_year_start?(bcp)
-        sbcp = bcp.successor
+        return nil if enrollment.is_shop? || !HbxProfile.current_hbx.under_open_enrollment?
+        sbcp = BenefitPackage.find(enrollment.benefit_package_id).benefit_coverage_period.successor
+        return nil if sbcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment)
+        cancel_or_term_renewal_enrollments(enrollment)
         Operations::Individual::RenewEnrollment.new.call(
           hbx_enrollment: enrollment,
           effective_on: sbcp.start_on
         )
       end
 
-      def in_open_enrollment_before_plan_year_start?(benefit_coverage_period)
-        current_date = TimeKeeper.date_of_record
-        next_coverage_period = benefit_coverage_period.successor
-        return false unless next_coverage_period
-        return false if current_date.year >= next_coverage_period.start_on.year
-        (current_date >= next_coverage_period.open_enrollment_start_on) &&
-          (current_date <= next_coverage_period.open_enrollment_end_on)
+      def current_enrollment_is_in_renewal_plan_year?(enrollment)
+        bs = HbxProfile.current_hbx.benefit_sponsorship
+        current_bcp = bs.benefit_coverage_periods.detect{|bcp| bcp.open_enrollment_contains?(TimeKeeper.date_of_record)}
+        enrollment.effective_on.year == current_bcp.start_on.year
+      end
+
+      def fetch_renewal_enrollment_year(enrollment)
+        current_year = TimeKeeper.date_of_record.year
+        current_year == enrollment.effective_on.year ? (current_year + 1) : current_year
+      end
+
+      def cancel_or_term_renewal_enrollments(enrollment)
+        year = fetch_renewal_enrollment_year(enrollment)
+        renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
+        # TODO: Cancel or Terminate renewal enrollments
+        renewal_enrollments.each(&:cancel_ivl_enrollment)
       end
     end
   end

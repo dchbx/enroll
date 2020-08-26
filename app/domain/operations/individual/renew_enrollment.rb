@@ -3,7 +3,7 @@
 module Operations
   module Individual
     # This class is invoked when we want to generate a passive renewal for an active enrollment.
-    # It will validate the incoming enrollment if it can be renewed and call a different class
+    # It will validate the incoming enrollment if it can be renewed and calls a different class
     # to generate the renewal enrollment.
     # It will renew an HbxEnrollment that is in active state by aasm state.
     # It will renew an HbxEnrollment with a retroactive effective date.

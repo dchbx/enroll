@@ -2114,6 +2114,15 @@ class HbxEnrollment
     )
   end
 
+  def cancel_ivl_enrollment
+    return if is_shop?
+
+    previous_state = self.aasm_state
+    self.update_attributes(aasm_state: 'coverage_canceled')
+    workflow_state_transitions << WorkflowStateTransition.new(from_state: previous_state,
+                                                              to_state: 'coverage_canceled')
+  end
+
   def cancel_terminated_enrollment(termination_date, edi_required)
     if effective_on == termination_date
       prevs_state = self.aasm_state
