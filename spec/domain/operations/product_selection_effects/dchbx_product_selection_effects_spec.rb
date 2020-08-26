@@ -167,6 +167,10 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
         expect(@result.success.effective_on).to eq(current_bcp.successor.start_on)
       end
 
+      it 'should generate renewal in auto_renewing state' do
+        expect(@result.success.aasm_state).to eq('auto_renewing')
+      end
+
       it 'should cancel existing renewel enrollment' do
         successor_enrollment.reload
         expect(successor_enrollment.aasm_state).to eq('coverage_canceled')
@@ -212,6 +216,10 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
 
       it 'should renew enrollment with start_on of successor bcp' do
         expect(@result.success.effective_on).to eq(predecessor_bcp.successor.start_on)
+      end
+
+      it 'should generate renewal in coverage_selected state' do
+        expect(@result.success.aasm_state).to eq('coverage_selected')
       end
 
       it 'should cancel existing renewel enrollment' do

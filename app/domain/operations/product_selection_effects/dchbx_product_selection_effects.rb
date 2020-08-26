@@ -39,14 +39,15 @@ module Operations
       private
 
       def renew_ivl_if_is_open_enrollment(enrollment)
-        return nil if enrollment.is_shop? || !HbxProfile.current_hbx.under_open_enrollment?
+        return nil if enrollment.is_shop? || !HbxProfile.current_hbx&.under_open_enrollment?
         current_bcp = fetch_current_bcp_by_oe_period
         return nil if current_bcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment, current_bcp)
         cancel_or_term_renewal_enrollments(enrollment)
-        Operations::Individual::RenewEnrollment.new.call(
-          hbx_enrollment: enrollment,
-          effective_on: current_bcp.start_on
-        )
+        renewal_enrollment = Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
+                                                                              effective_on: current_bcp.start_on)
+        return renewal_enrollment if renewal_enrollment.success.nil?
+
+        transition_enrollment(renewal_enrollment.success, current_bcp)
       end
 
       def current_enrollment_is_in_renewal_plan_year?(enrollment, current_bcp)
@@ -69,6 +70,11 @@ module Operations
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
           bcp.open_enrollment_contains?(TimeKeeper.date_of_record)
         end
+      end
+
+      def transition_enrollment(enrollment, current_bcp)
+        enrollment.begin_coverage! if TimeKeeper.date_of_record >= current_bcp.start_on && enrollment.may_begin_coverage?
+        Success(enrollment)
       end
     end
   end
