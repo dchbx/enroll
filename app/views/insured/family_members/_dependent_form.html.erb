@@ -227,7 +227,7 @@
         $("#address_info .address_required").removeAttr('required');
       };
       $("#dependent_first_name").change(function() {
-        var text = $("#dependent_first_name").val() == '' ? "this person" : $("#dependent_first_name").val()
+        var text = $("#dependent_first_name").val() == '' ? "This person" : $("#dependent_first_name").val()
         $("#is_applying_coverage_value_dep").text("Does "+ text +" need coverage? *");
         $("#is_applying_coverage_value_dep_1").text(text);
       });
