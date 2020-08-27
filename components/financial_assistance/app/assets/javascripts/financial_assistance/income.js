@@ -365,7 +365,6 @@ $(document).on('turbolinks:load', function () {
 
   function validateForm(form) {
     var isValid = true;
-    debugger
     form.find('#financial_assistance_income_start_on, input[name*=financial_assistance_income[start_on]], input[name*=financial_assistance_income[end_on]]').each(function() {
       if ( $(this).val() == '' ||  $(this).val()=='0')
         isValid = false;
