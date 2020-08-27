@@ -54,6 +54,22 @@ And(/^the user fills out the required employer information$/) do
   fill_in 'income[employer_address][zip]', with: "22046"
 end
 
+And(/^the user fills out the required employer information with incorrect dates$/) do
+  fill_in 'income[employer_name]', with: "Sample Employer"
+  fill_in 'income[amount]', with: '23.3'
+  find_all(".interaction-choice-control-income-frequency-kind")[1].click
+  find_all('.interaction-choice-control-income-frequency-kind-7')[0].click
+  fill_in 'income[start_on]', with: "11/11/2017"
+  fill_in 'income[end_on]', with: "11/11/2016"
+  fill_in 'income[employer_phone][full_phone_number]', with: "2036548484"
+  fill_in 'income[employer_address][address_1]', with: "12 main st"
+  fill_in 'income[employer_address][address_2]', with: "beside starbucks"
+  fill_in 'income[employer_address][city]', with: "washington"
+  find_all(".interaction-choice-control-income-employer-address-state")[0].click
+  find_all(".interaction-choice-control-income-employer-address-state-5")[0].click
+  fill_in 'income[employer_address][zip]', with: "22046"
+end
+
 And(/^the user saves the employer information$/) do
   find('.interaction-click-control-save').click
 end
@@ -106,6 +122,14 @@ And(/^the user fills out the required self employment information$/) do
   find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
+end
+
+And(/^the user fills out the required self employment information with incorrect dates$/) do
+  fill_in 'income[amount]', with: '23.3'
+  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div").click
+  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div/div[3]/div/ul/li[3]").click
+  fill_in 'income[start_on]', with: "11/11/2017"
+  fill_in 'income[end_on]', with: "11/11/2016"
 end
 
 Given(/^the user has entered at least one self employment information$/) do
