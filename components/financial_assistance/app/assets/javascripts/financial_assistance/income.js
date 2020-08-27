@@ -18,14 +18,13 @@ function startEditingIncome(income_kind) {
 };
 
 function checkDate(income_id) {
-
   var startDate = $("#start_on_"+income_id).datepicker('getDate');
   var endDate = $("#end_on_"+income_id).datepicker('getDate');
 
   if ((endDate != "" && endDate != null) && (endDate < startDate)) {
     alert('The end date must be after the start date.')
     $("#end_on_"+income_id)[0].value = ""
-    $('.interaction-click-control-save').addClass('disabled')
+    window.event.preventDefault()
   }
 }
 
