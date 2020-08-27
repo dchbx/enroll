@@ -159,3 +159,23 @@ Feature: Insured Plan Shopping on Individual market
     Then should find I-551 doc type
     And should find alien number
     Then Individual logs out
+
+  Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
+    Given Individual resumes enrollment
+    And Individual click on sign in existing account
+    And I signed in
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping
+    Then Individual should see a form to enter personal information
+    When Individual click continue button
+    And Individual agrees to the privacy agreeement
+    Then Individual should see identity verification page and clicks on submit
+    And Individual should see the dependents form
+    When I click on continue button on household info form
+    And I click on continue button on group selection page
+    And I select a plan on plan shopping page
+    And I checks the Insured portal open enrollment dates
+    And I click on purchase button on confirmation page
+    And I click on continue button to go to the individual home page
+    Then I should see a new renewing enrollment title on home page
+    And I logs out

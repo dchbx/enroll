@@ -6,6 +6,8 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   screenshot("individual_start")
+  r_id = BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[1].id.to_s
+  BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
@@ -743,4 +745,23 @@ end
 
 When("consumer visits home page") do
   visit "/families/home"
+end
+
+When(/^\w+ checks? the Insured portal open enrollment dates$/) do
+  current_day = TimeKeeper.date_of_record
+  if (Date.new(current_day.year - 1, 11, 1)..Date.new(current_day.year, 1, 31)).include?(current_day)
+    expect(page).to have_content "Confirm Your Plan Selection"
+  else
+    next_year_date = current_day.next_year
+    bcp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.first
+    bcp.update_attributes!(open_enrollment_start_on: Date.new(current_day.year - 1, 11, 1),
+                           open_enrollment_end_on: Date.new(current_day.year, 1, 31))
+    successor_bcp = bcp.successor
+    successor_bcp.update_attributes!(open_enrollment_start_on: (current_day - 10.days),
+                                     open_enrollment_end_on: Date.new(next_year_date.year, 1, 31))
+  end
+end
+
+Then("I should see a new renewing enrollment title on home page") do
+  expect(page).to have_content "Auto Renewing"
 end
