@@ -129,6 +129,7 @@ module BenefitSponsors
     describe "GET search_general_agency" do
 
       before do
+        Person.create_indexes
         general_agency_staff_role.update_attributes!(is_primary: true)
         general_agency_profile1.approve!
         organization.reload

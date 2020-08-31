@@ -249,6 +249,7 @@ module BenefitSponsors
     describe "GET search_broker_agency" do
 
       before do
+        Person.create_indexes
         broker_agency_profile1.update_attributes!(primary_broker_role_id: broker_role1.id)
         broker_agency_profile1.approve!
         organization.reload
