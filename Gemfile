@@ -152,6 +152,10 @@ group :development, :test do
   gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry'
+  gem 'pry-rails'
+  gem 'pry-remote'
+  gem 'pry-stack_explorer'
 end
 
 group :test do

@@ -9,7 +9,7 @@ class BrokerAgencyStaffRegistration
     find(:xpath, '(//input[@id="inputFirstname"])[2]')
   end
 
-  def seelf.last_name
+  def self.last_name
     find(:xpath, '(//input[@id="inputLastname"])[2]')
   end
 

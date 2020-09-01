@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class BrokerRegistration
+
+  def self.broker_registration_form
+    binding.pry
+    find(:xpath, '//form[@id="broker_registration_form"]')
+  end  
+
   def self.broker_tab
     find(:xpath, '//a[@id="ui-id-1"]')
   end
@@ -23,6 +29,10 @@ class BrokerRegistration
 
   def self.npn
     find(:xpath, '//input[@id="inputNPN"]')
+  end
+
+  def self.broker_agency_inf_text
+    find(:xpath, '//h4[@class="mb-2"]/preceding-sibling::legend')
   end
 
   def self.legal_name
@@ -88,4 +98,5 @@ class BrokerRegistration
   def self.create_broker_agency_btn
     find(:xpath, '//input[@id="broker-btn"]')
   end
+  
 end
