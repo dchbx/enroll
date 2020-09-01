@@ -1,95 +1,99 @@
 # frozen_string_literal: true
 
 class GeneralAgencyRegistration
-  def self.general_agency_tab
+
+  include RSpec::Matchers
+  include Capybara::DSL
+
+  def general_agency_tab
     find(:xpath, '//a[@id="ui-id-1"]')
   end
 
-  def self.first_name
+  def first_name
     find(:xpath, '//input[@id="inputFirstname"]')
   end
 
-  def self.last_name
+  def last_name
     find(:xpath, '//input[@id="inputLastname"]')
   end
 
-  def self.ga_dob
+  def ga_dob
     find(:xpath, '//input[@id="inputDOB"]')
   end
 
-  def self.email
+  def email
     find(:xpath, '//input[@id="inputEmail"]')
   end
 
-  def self.npn
+  def npn
     find(:xpath, '//input[@id="inputNPN"]')
   end
 
-  def self.legal_name
+  def legal_name
     find(:xpath, '//input[@id="validationCustomLegalName"]')
   end
 
-  def self.dba
+  def dba
     find(:xpath, '//input[@id="validationCustomdba"]')
   end
 
-  def self.fein
+  def fein
     find(:xpath, '//input[@id="inputFein"]')
   end
 
-  def self.practice_area_dropdown
+  def practice_area_dropdown
     find(:xpath, '//select[@id="agency_organization_profile_attributes_market_kind"]')
   end
 
-  def self.select_languages
+  def select_languages
     find(:xpath, '//select[@id="broker_agency_language_select"]')
   end
 
-  def self.evening_hours_checkbox
+  def evening_hours_checkbox
     find(:xpath, '//input[@id="agency_organization_profile_attributes_working_hours"]')
   end
 
-  def self.accept_new_client_checkbox
+  def accept_new_client_checkbox
     find(:xpath, '//input[@id="agency_organization_profile_attributes_accept_new_clients"]')
   end
 
-  def self.address
+  def address
     find(:xpath, '//input[@id="inputAddress1"]')
   end
 
-  def self.kind_dropdown
+  def kind_dropdown
     find(:xpath, '//select[@id="kindSelect"]')
   end
 
-  def self.address2
+  def address2
     find(:xpath, '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_address_2"]')
   end
 
-  def self.city
+  def city
     find(:xpath, '//input[@id="agency_organization_profile_attributes_office_locations_attributes_0_address_attributes_city"]')
   end
 
-  def self.state_dropdown
+  def state_dropdown
     find(:xpath, '//select[@id="inputState"]')
   end
 
-  def self.zip
+  def zip
     find(:xpath, '//input[@id="inputZip"]')
   end
 
-  def self.area_code
+  def area_code
     find(:xpath, '//input[@id="inputAreacode"]')
   end
 
-  def self.number
+  def number
     find(:xpath, '//input[@id="inputNumber"]')
   end
 
-  def self.add_office_location_btn
+  def add_office_location_btn
     find(:xpath, '//a[@id="addOfficeLocation"]')
   end
 
-  def self.create_general_agency_btn
+  def create_general_agency_btn
     find(:xpath, '//input[@id="general-btn"]')
   end
 end
