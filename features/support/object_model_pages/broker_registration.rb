@@ -2,8 +2,10 @@
 
 class BrokerRegistration
 
-  def self.broker_registration_form
-    binding.pry
+  include RSpec::Matchers
+  include Capybara::DSL
+
+  def broker_registration_form
     find(:xpath, '//form[@id="broker_registration_form"]')
   end  
 
@@ -31,7 +33,7 @@ class BrokerRegistration
     find(:xpath, '//input[@id="inputNPN"]')
   end
 
-  def self.broker_agency_inf_text
+  def broker_agency_inf_text
     find(:xpath, '//h4[@class="mb-2"]/preceding-sibling::legend')
   end
 
