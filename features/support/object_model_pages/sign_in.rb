@@ -4,7 +4,7 @@ class SignIn
 
   include RSpec::Matchers
   include Capybara::DSL
-  
+
   def sign_in_text
     '//h1[text()="Sign In"]'
   end

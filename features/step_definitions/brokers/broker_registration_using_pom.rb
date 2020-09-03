@@ -13,9 +13,9 @@ end
 When("Primary Broker enters personal information POM") do
   broker_registration_pom = BrokerRegistration.new
   visit "/broker_registration"
-  fill_in broker_registration_pom.first_name, with: 'This Is' 
-  fill_in broker_registration_pom.last_name,	with: 'a POM example'
+  fill_in broker_registration_pom.first_name, with: 'This Is'
+  fill_in broker_registration_pom.last_name, with: 'a POM example'
   fill_in broker_registration_pom.broker_dob, with: "12/12/1992"
-  fill_in broker_registration_pom.email, with: 'POMexample@gmail.com' 
-  fill_in broker_registration_pom.npn, with: '837364667' 
+  fill_in broker_registration_pom.email, with: 'POMexample@gmail.com'
+  fill_in broker_registration_pom.npn, with: '837364667'
 end

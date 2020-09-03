@@ -7,7 +7,7 @@ class BrokerRegistration
 
   def broker_registration_form
     '//form[@id="broker_registration_form"]'
-  end  
+  end
 
   def broker_tab
     '//a[@id="ui-id-1"]'
