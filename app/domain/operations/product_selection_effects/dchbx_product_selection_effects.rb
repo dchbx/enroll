@@ -62,7 +62,6 @@ module Operations
       def cancel_or_term_renewal_enrollments(enrollment)
         year = fetch_renewal_enrollment_year(enrollment)
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
-        # TODO: Cancel or Terminate renewal enrollments
         renewal_enrollments.each(&:cancel_ivl_enrollment)
       end
 
