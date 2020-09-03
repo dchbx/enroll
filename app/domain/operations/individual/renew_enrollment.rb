@@ -5,7 +5,7 @@ module Operations
     # This class is invoked when we want to generate a passive renewal for an active enrollment.
     # It will validate the incoming enrollment if it can be renewed and calls a different class
     # to generate the renewal enrollment.
-    # It will renew an HbxEnrollment that is in active state by aasm state.
+    # It will renew HbxEnrollments that are effectuated(by aasm state).
     # It will renew an HbxEnrollment with a retroactive effective date.
     # It will renew an HbxEnrollment for an effective date that's not first day of month.
     # It will renew both health and dental enrollments.
@@ -40,7 +40,7 @@ module Operations
       def validate(enrollment, effective_on)
         return Failure('Given object is not a valid enrollment object') unless enrollment.is_a?(HbxEnrollment)
         return Failure('Given enrollment is not IVL by kind') unless enrollment.is_ivl_by_kind?
-        return Failure('Given enrollment is not an active enrollment by aasm_state') unless HbxEnrollment::ENROLLED_STATUSES.include?(enrollment.aasm_state)
+        return Failure('Given enrollment is a shopping enrollment by aasm_state') if enrollment.shopping?
         return Failure('There exists active enrollments for the subscriber in the year with given effective_on') unless enrollment.can_renew_coverage?(effective_on)
 
         Success(enrollment)

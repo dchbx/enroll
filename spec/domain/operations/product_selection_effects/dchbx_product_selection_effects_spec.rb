@@ -206,6 +206,7 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     context 'new enrollment in prior plan year' do
 
       before do
+        predecessor_enrollment.expire_coverage!
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
         @result = subject.call(product_selection)
       end

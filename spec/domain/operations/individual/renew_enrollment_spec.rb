@@ -202,6 +202,21 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         expect(@result.success.product_id).to eq(renewal_product.id)
       end
     end
+
+    context 'with an expired enrollment by aasm state' do
+      before :each do
+        enrollment.expire_coverage!
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should renew the given enrollment' do
+        expect(@result.success).to be_a(HbxEnrollment)
+      end
+    end
   end
 
   context 'for renewal failure' do
@@ -275,7 +290,7 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
       end
 
       it 'should return failure with message' do
-        expect(@result.failure).to eq('Given enrollment is not an active enrollment by aasm_state')
+        expect(@result.failure).to eq('Given enrollment is a shopping enrollment by aasm_state')
       end
     end
   end
