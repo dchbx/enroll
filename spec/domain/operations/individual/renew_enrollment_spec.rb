@@ -217,6 +217,42 @@ RSpec.describe Operations::Individual::RenewEnrollment, type: :model, dbclean: :
         expect(@result.success).to be_a(HbxEnrollment)
       end
     end
+
+    context 'dental enrollment with bad aptc values for renewal' do
+      let!(:renewal_product) do
+        FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+                          :ivl_product,
+                          application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
+      end
+
+      let!(:product) do
+        FactoryBot.create(:benefit_markets_products_dental_products_dental_product,
+                          :ivl_product,
+                          renewal_product_id: renewal_product.id)
+      end
+
+      before :each do
+        enrollment.expire_coverage!
+        enrollment.update_attributes!(coverage_kind: 'dental',
+                                      elected_aptc_pct: 0.7,
+                                      applied_aptc_amount: 100.00,
+                                      product_id: product.id)
+        @result = subject.call(hbx_enrollment: enrollment, effective_on: effective_on)
+      end
+
+      it 'should return success' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should renew the given enrollment' do
+        expect(@result.success).to be_a(HbxEnrollment)
+      end
+
+      it 'should not apply any aptc values for dental enrollment' do
+        expect(@result.success.elected_aptc_pct).to be_zero
+        expect(@result.success.applied_aptc_amount).to be_zero
+      end
+    end
   end
 
   context 'for renewal failure' do

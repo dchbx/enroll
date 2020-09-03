@@ -47,6 +47,8 @@ module Operations
       end
 
       def fetch_eligibility_values(enrollment, effective_on)
+        return Success({}) unless enrollment.is_health_enrollment?
+
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
