@@ -42,7 +42,7 @@ module Operations
         return nil if enrollment.is_shop? || !HbxProfile.current_hbx&.under_open_enrollment?
         current_bcp = fetch_current_bcp_by_oe_period
         return nil if current_bcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment, current_bcp)
-        cancel_or_term_renewal_enrollments(enrollment)
+        cancel_renewal_enrollments(enrollment)
         renewal_enrollment = Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
                                                                               effective_on: current_bcp.start_on)
         return renewal_enrollment if renewal_enrollment.success.nil?
@@ -59,7 +59,7 @@ module Operations
         current_year == enrollment.effective_on.year ? (current_year + 1) : current_year
       end
 
-      def cancel_or_term_renewal_enrollments(enrollment)
+      def cancel_renewal_enrollments(enrollment)
         year = fetch_renewal_enrollment_year(enrollment)
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
         renewal_enrollments.each(&:cancel_ivl_enrollment)
