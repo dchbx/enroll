@@ -22,6 +22,8 @@ module Notifier
       attribute :expected_income_for_coverage_year, Float
       attribute :previous_coverage_year, Integer
       attribute :aptc, String
+      attribute :tax_households, Array[MergeDataModels::TaxHousehold]
+      attribute :enrollments, Array[MergeDataModels::Enrollment]
       attribute :dependents, Array[MergeDataModels::Dependent]
       attribute :magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
@@ -75,15 +77,14 @@ module Notifier
             totally_ineligible: 'No',
             csr: true,
             csr_percent: 73,
-            ivl_oe_start_date: Date.parse('November 01, 2019')
-                                   .strftime('%B %d, %Y'),
-            ivl_oe_end_date: Date.parse('January 31, 2020')
-                                 .strftime('%B %d, %Y')
+            ivl_oe_start_date: Date.parse('November 01, 2020').strftime('%B %d, %Y'),
+            ivl_oe_end_date: Date.parse('January 31, 2021').strftime('%B %d, %Y')
           }
         )
 
         notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
         notice.addresses = [notice.mailing_address]
+        notice.tax_households = [Notifier::MergeDataModels::TaxHousehold.stubbed_object]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
@@ -91,7 +92,7 @@ module Notifier
       end
 
       def collections
-        %w[addresses dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members]
+        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members]
       end
 
       def conditions

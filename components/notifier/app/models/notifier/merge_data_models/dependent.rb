@@ -11,7 +11,7 @@ module Notifier
     attribute :incarcerated, String
     attribute :federal_tax_filing_status, String
     attribute :tax_household_size, Integer
-    attribute :expected_income_for_coverage_year, String
+    attribute :expected_income_for_coverage_year, String #actual_income
     attribute :aptc, String
     attribute :other_coverage, String
     attribute :aqhp_eligible, Boolean
@@ -22,6 +22,23 @@ module Notifier
     attribute :aqhp_or_non_magi_medicaid_members_present, Boolean
     attribute :totally_ineligible_members_present, Boolean
     attribute :magi_medicaid_members_present, Boolean
+    attribute :mec, Boolean
+    attribute :indian_conflict, Boolean
+    attribute :is_medicaid_chip_eligible, Boolean
+    attribute :is_non_magi_medicaid_eligible, Boolean
+    attribute :magi_medicaid_monthly_income_limit, Integer
+    attribute :magi_as_percentage_of_fpl, Integer
+    attribute :has_access_to_affordable_coverage, Boolean
+    attribute :no_medicaid_because_of_income, Boolean
+    attribute :no_medicaid_because_of_immigration, Boolean
+    attribute :no_medicaid_because_of_age, Boolean
+    attribute :no_aptc_because_of_income, Boolean
+    attribute :no_aptc_because_of_tax, Boolean
+    attribute :no_aptc_because_of_mec, Boolean
+    attribute :no_csr_because_of_income, Boolean
+    attribute :no_csr_because_of_tax, Boolean
+    attribute :no_csr_because_of_mec, Boolean
+    attribute :non_applicant, Boolean
 
     def self.stubbed_object
       Notifier::MergeDataModels::Dependent.new(
@@ -48,7 +65,25 @@ module Notifier
           uqhp_event: false,
           aqhp_or_non_magi_medicaid_members_present: false,
           totally_ineligible_members_present: false,
-          magi_medicaid_members_present: true
+          magi_medicaid_members_present: true,
+          actual_income: '12345.00',
+          mec: 'mec',
+          indian_conflict: true,
+          is_medicaid_chip_eligible: true,
+          is_non_magi_medicaid_eligible: true,
+          magi_medicaid_monthly_income_limit: 234,
+          magi_as_percentage_of_fpl: 45,
+          has_access_to_affordable_coverage: true,
+          no_medicaid_because_of_income: true,
+          no_medicaid_because_of_immigration: true,
+          no_medicaid_because_of_age: true,
+          no_aptc_because_of_income: true,
+          no_aptc_because_of_tax: true,
+          no_aptc_because_of_mec: true,
+          no_csr_because_of_income: true,
+          no_csr_because_of_tax: true,
+          no_csr_because_of_mec: true,
+          non_applicant: true
         }
       )
     end

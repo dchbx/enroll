@@ -3,20 +3,41 @@
 module Notifier
   module ConsumerRoleHelper
     def dependent_hash(dependent, member)
-      MergeDataModels::Dependent.new({first_name: dependent.first_name,
-                                      last_name: dependent.last_name,
-                                      age: dependent.age,
-                                      federal_tax_filing_status: filer_type(member['filer_type']),
-                                      expected_income_for_coverage_year: member['actual_income'].present? ? ActionController::Base.helpers.number_to_currency(member['actual_income'], :precision => 0) : "",
-                                      citizenship: citizen_status(member["citizen_status"]),
-                                      dc_resident: member['resident'].capitalize,
-                                      tax_household_size: member['tax_hh_count'],
-                                      incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
-                                      other_coverage: member["mec"].presence || 'No',
-                                      aptc: member['aptc'],
-                                      aqhp_eligible: dependent.is_aqhp_eligible,
-                                      uqhp_eligible: dependent.is_uqhp_eligible,
-                                      totally_ineligible: dependent.is_totally_ineligible})
+      MergeDataModels::Dependent.new(
+        {
+          first_name: dependent.first_name,
+          last_name: dependent.last_name,
+          age: dependent.age,
+          federal_tax_filing_status: filer_type(member['filer_type']),
+          expected_income_for_coverage_year: format_currency(member['actual_income']),
+          citizenship: citizen_status(member["citizen_status"]),
+          dc_resident: member['resident'].capitalize,
+          tax_household_size: member['tax_hh_count'],
+          incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
+          other_coverage: member["mec"].presence || 'No',
+          mec: check_format(member['mec']),
+          aptc: member['aptc'],
+          indian_conflict: check_format(member['indian']),
+          is_medicaid_chip_eligible: check_format(member['magi_medicaid']),
+          is_non_magi_medicaid_eligible: check_format(member['non_magi_medicaid']),
+          magi_medicaid_monthly_income_limit: format_currency(member['medicaid_monthly_income_limit']),
+          magi_as_percentage_of_fpl: member['magi_as_fpl'],
+          has_access_to_affordable_coverage: check_format(member['mec']),
+          no_medicaid_because_of_income: member["nonmedi_reason"].present? && member["nonmedi_reason"].downcase == "over income" ? true : false,
+          no_medicaid_because_of_immigration: member["nonmedi_reason"].present? && member["nonmedi_reason"].downcase == "immigration" ? true : false,
+          no_medicaid_because_of_age: member["nonmedi_reason"].present? && member["nonmedi_reason"].downcase == "age" ? true : false,
+          no_aptc_because_of_income: member["nonaptc_reason"].present? && member["nonaptc_reason"].downcase == "over income" ? true : false,
+          no_aptc_because_of_tax: member["nonaptc_reason"].present? && member["nonaptc_reason"].downcase == "tax" ? true : false,
+          no_aptc_because_of_mec: member["nonaptc_reason"].present? && member["nonaptc_reason"].downcase == "medicare eligible" ? true : false,
+          no_csr_because_of_income: member["noncsr_reason"].present? && member["noncsr_reason"].downcase == "over income" ? true : false,
+          no_csr_because_of_tax: member["noncsr_reason"].present? && member["noncsr_reason"].downcase == "tax" ? true : false,
+          no_csr_because_of_mec: member["noncsr_reason"].present? && member["noncsr_reason"].downcase == "medicare eligible" ? true : false,
+          non_applicant: member["nonaptc_reason"].present? && member["nonaptc_reason"].downcase == "non-applicant" ? true : false,
+          aqhp_eligible: dependent.is_aqhp_eligible,
+          uqhp_eligible: dependent.is_uqhp_eligible,
+          totally_ineligible: dependent.is_totally_ineligible
+        }
+      )
     end
 
     def member_hash(fam_member)
@@ -79,10 +100,20 @@ module Notifier
       end
     end
 
+    def format_currency(value)
+      return '' if value.blank?
+
+      ActionController::Base.helpers.number_to_currency(value, :precision => 0)
+    end
+
     def format_date(date)
       return '' if date.blank?
 
       date.strftime('%B %d, %Y')
+    end
+
+    def check_format(value)
+      value.try(:upcase) == "YES"
     end
   end
 end
