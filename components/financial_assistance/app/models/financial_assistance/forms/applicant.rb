@@ -12,6 +12,8 @@ module FinancialAssistance
       attr_accessor :gender, :relationship
       attr_accessor :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
       attr_accessor :addresses, :phones, :emails
+      attr_accessor :addresses_attributes, :phones_attributes, :emails_attributes
+
       attr_writer :family
       include ::Forms::PeopleNames
       include ::Forms::ConsumerFields
@@ -20,15 +22,6 @@ module FinancialAssistance
       #include ::Forms::DateOfBirthField
       #include Validations::USDate.on(:date_of_birth)
       # accepts_nested_attributes_for :addresses
-
-      def initialize(*attributes)
-        @addresses = [FinancialAssistance::Locations::Address.new(kind: 'home'), FinancialAssistance::Locations::Address.new(kind: 'mailing')]
-        @phones    = FinancialAssistance::Locations::Phone::KINDS.collect{|kind| FinancialAssistance::Locations::Phone.new(kind: kind) }
-        @emails    = FinancialAssistance::Locations::Email::KINDS.collect{|kind| FinancialAssistance::Locations::Email.new(kind: kind) }
-        @same_with_primary = "true"
-        @is_applying_coverage = true
-        super
-      end
 
       validates_presence_of :first_name, :allow_blank => nil
       validates_presence_of :last_name, :allow_blank => nil
@@ -41,11 +34,32 @@ module FinancialAssistance
 
       attr_reader :dob
 
-      HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }.freeze
+      # HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }.freeze
 
-      def self.human_attribute_name(attr, options = {})
-        HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+      def initialize(*attributes)
+        initialize_attributes
+        super
       end
+
+      def dob=(val)
+        @dob = begin
+          Date.strptime(val, "%Y-%m-%d")
+        rescue StandardError # rubocop:disable Lint/EmptyRescueClause
+          nil
+        end
+      end
+
+      def initialize_attributes
+        @addresses = %w[home mailing].collect{|kind| FinancialAssistance::Locations::Address.new(kind: kind) }
+        @phones    = FinancialAssistance::Locations::Phone::KINDS.collect{|kind| FinancialAssistance::Locations::Phone.new(kind: kind) }
+        @emails    = FinancialAssistance::Locations::Email::KINDS.collect{|kind| FinancialAssistance::Locations::Email.new(kind: kind) }
+        @same_with_primary = "true"
+        @is_applying_coverage = true
+      end
+
+      # def self.human_attribute_name(attr, options = {})
+      #   HUMANIZED_ATTRIBUTES[attr.to_sym] || super
+      # end
 
       def consumer_fields_validation
         return true unless individual_market_is_enabled?
@@ -59,94 +73,48 @@ module FinancialAssistance
 
       def validate_citizen_status
         error_message = if @us_citizen.nil?
-                          "Citizenship status is required"
-                        elsif @us_citizen == false && @eligible_immigration_status.nil?
-                          "Eligible immigration status is required"
-                        elsif @us_citizen == true && @naturalized_citizen.nil?
-                          "Naturalized citizen is required"
-                        end
+          "Citizenship status is required"
+        elsif @us_citizen == false && @eligible_immigration_status.nil?
+          "Eligible immigration status is required"
+        elsif @us_citizen == true && @naturalized_citizen.nil?
+          "Naturalized citizen is required"
+        end
         self.errors.add(:base, error_message)
-      end
-
-      def dob=(val)
-        @dob = begin
-                 Date.strptime(val, "%Y-%m-%d")
-               rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-                 nil
-               end
-      end
-
-      def consumer_role=(_val)
-        true
-      end
-
-      # def addresses_attributes
-      #   # @addresses.map do |address|
-      #   #   address.attributes
-      #   # end
-      #   @addresses_attributes
-      # end
-
-      def addresses_attributes=(attrs)
-        # @addresses = []
-        # attrs.each_pair do |k, att_set|
-        #   @addresses << FinancialAssistance::Locations::Address.new(att_set.except(:_destroy))
-        # end
-        # @addresses
-
-        @addresses_attributes = attrs.to_h
-      end
-
-      # def phones_attributes
-      #   # @phones.map do |address|
-      #   #   address.attributes
-      #   # end
-      #   @phones_attributes
-      # end
-
-      def phones_attributes=(attrs)
-        # @phones = []
-        # attrs.each_pair do |k, att_set|
-        #   @phones << FinancialAssistance::Locations::Phone.new(att_set.except(:_destroy))
-        # end
-        # @phones
-        @phones_attributes = attrs.to_h
-      end
-
-      # def emails_attributes
-      #   # @emails.map do |address|
-      #   #   address.attributes
-      #   # end
-      #   @emails_attributes
-      # end
-
-      def emails_attributes=(attrs)
-        # @emails = []
-        # attrs.each_pair do |k, att_set|
-        #   @emails << FinancialAssistance::Locations::Email.new(att_set.except(:_destroy))
-        # end
-        @emails_attributes = attrs.to_h
       end
 
       def application
         return @application if defined? @application
-        @application = FinancialAssistance::Application.find(application_id)
+        @application = FinancialAssistance::Application.find(application_id) if application_id.present?
+      end
+
+      def applicant
+        return @applicant if defined? @applicant
+        @applicant = @application.applicants.find(applicant_id) if applicant_id.present?
       end
 
       def save
-        applicant = application.applicants.find(applicant_id) if applicant_id.present?
-        applicant ||= application.applicants.build(extract_applicant_params)
+        applicant_entity = FinancialAssistance::Operations::Applicant::Create.new.call(params: extract_applicant_params)
 
-        if applicant.persisted?
-          applicant.update(extract_applicant_params)
+        binding.pry
+        if applicant_entity.success?
+          values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
+
+          applicant = application.applicants.find(applicant_id) if applicant_id.present?
+
+          if applicant.present? && applicant.persisted?
+            applicant.update(values)
+          else
+            applicant = application.applicants.build(values)
+            applicant.save
+          end
+
+          application.ensure_relationship_with_primary(applicant, relationship)
+          [true, applicant]
         else
-          applicant.save
+          [false, applicant_entity.failure.errors.to_h]
         end
-
-        application.ensure_relationship_with_primary(applicant, relationship)
       end
 
-      # @relationship="spouse"
       def extract_applicant_params
         assign_citizen_status
 
@@ -167,273 +135,17 @@ module FinancialAssistance
           indian_tribe_member: indian_tribe_member,
           tribal_id: tribal_id,
           citizen_status: citizen_status,
-          is_temporarily_out_of_state: is_temporarily_out_of_state,
-          addresses_attributes: @addresses_attributes,
-          phones_attributes: @phones_attributes,
-          emails_attributes: @emails_attributes
-        }.reject{|_k, v| v.blank?}
+          is_temporarily_out_of_state: is_temporarily_out_of_state
+        }.reject{|k, val| val.nil?}.merge(nested_parameters)
       end
 
-      # def save
-      #   assign_citizen_status
-      #   return false unless valid?
-      #   existing_inactive_family_member = family.find_matching_inactive_member(self)
-      #   if existing_inactive_family_member
-      #     self.id = existing_inactive_family_member.id
-      #     existing_inactive_family_member.reactivate!(self.relationship)
-      #     existing_inactive_family_member.save!
-      #     family.save!
-      #     return true
-      #   end
-      #   existing_person = Person.match_existing_person(self)
-      #   if existing_person
-      #     family_member = family.relate_new_member(existing_person, self.relationship)
-      #     if self.is_consumer_role == "true"
-      #       family_member.family.build_consumer_role(family_member)
-      #     elsif self.is_resident_role == "true"
-      #       family_member.build_resident_role(family_member)
-      #     end
-      #     assign_person_address(existing_person)
-      #     family_member.save!
-      #     family.save!
-      #     self.id = family_member.id
-      #     return true
-      #   end
-      #   person = Person.new(extract_person_params)
-      #   return false unless try_create_person(person)
-      #   family_member = family.relate_new_member(person, self.relationship)
-      #   if self.is_consumer_role == "true"
-      #     family_member.family.build_consumer_role(family_member, extract_consumer_role_params)
-      #   elsif self.is_resident_role == "true"
-      #     family_member.family.build_resident_role(family_member)
-      #   end
-      #   assign_person_address(person)
-      #   family.save_relevant_coverage_households
-      #   family.save!
-      #   family.primary_person.save
-      #   family.build_relationship_matrix
-      #   self.id = family_member.id
-      #   true
-      # end
-
-      # def try_create_person(person)
-      #   person.save.tap do
-      #     bubble_person_errors(person)
-      #   end
-      # end
-
-      # def assign_person_address(person)
-      #   if same_with_primary == 'true'
-      #     primary_person = family.primary_family_member.person
-      #     person.update(no_dc_address: primary_person.no_dc_address, is_homeless: primary_person.is_homeless?, is_temporarily_out_of_state: primary_person.is_temporarily_out_of_state?)
-      #     address = primary_person.home_address
-      #     if address.present?
-      #       person.home_address.try(:destroy)
-      #       attrs = address.attributes.slice('address_1', 'address_2', 'address_3', 'county', 'country_name', 'kind', 'city', 'state', 'zip')
-      #       person.addresses << ::Address.new(attrs)
-      #       person.save
-      #     end
-      #   else
-      #     home_address = begin
-      #                      person.home_address
-      #                    rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-      #                      nil
-      #                    end
-      #     mailing_address = person.has_mailing_address? ? person.mailing_address : nil
-
-      #     addresses.each do |_key, one_address|
-      #       current_address = case one_address["kind"]
-      #                         when "home"
-      #                           home_address
-      #                         when "mailing"
-      #                           mailing_address
-      #                         else
-      #                           next
-      #                         end
-      #       if one_address["address_1"].blank? && one_address["city"].blank?
-      #         current_address.destroy if current_address.present?
-      #         next
-      #       end
-      #       if current_address.present?
-      #         current_address.update(one_address.permit!)
-      #       else
-      #         person.addresses.create(one_address.permit!)
-      #       end
-      #     end
-      #   end
-      #   true
-      # rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-      #   false
-      # end
-
-      # def extract_consumer_role_params
-      #   {
-      #     :citizen_status => @citizen_status,
-      #     :vlp_document_id => vlp_document_id,
-      #     :is_applying_coverage => is_applying_coverage
-      #   }
-      # end
-
-      # def extract_person_params
-      #   {
-      #     :first_name => first_name,
-      #     :last_name => last_name,
-      #     :middle_name => middle_name,
-      #     :name_pfx => name_pfx,
-      #     :name_sfx => name_sfx,
-      #     :gender => gender,
-      #     :dob => dob,
-      #     :ssn => ssn,
-      #     :no_ssn => no_ssn,
-      #     :race => race,
-      #     :ethnicity => ethnicity,
-      #     :language_code => language_code,
-      #     :is_incarcerated => is_incarcerated,
-      #     :citizen_status => @citizen_status,
-      #     :tribal_id => tribal_id,
-      #     :no_dc_address => no_dc_address,
-      #     :is_homeless => is_homeless,
-      #     :is_temporarily_out_of_state => is_temporarily_out_of_state
-      #   }
-      # end
-
-      # def persisted?
-      #   !id.blank?
-      # end
-
-      # def destroy!
-      #   status, messages = family.remove_family_member(family_member.person)
-      #   if status
-      #     family.save
-      #   else
-      #     self.errors.add(:base, messages)
-      #   end
-      # end
-
-      # def family
-      #   @family ||= Family.find(family_id)
-      # end
-
-      # def self.find(family_member_id)
-      #   found_family_member = ::FamilyMember.find(family_member_id)
-      #   has_same_address_with_primary = compare_address_with_primary(found_family_member)
-      #   home_address = if has_same_address_with_primary
-      #                    Address.new(kind: 'home')
-      #                  else
-      #                    found_family_member.try(:person).try(:home_address) || Address.new(kind: 'home')
-      #             end
-      #   mailing_address = found_family_member.person.has_mailing_address? ? found_family_member.person.mailing_address : Address.new(kind: 'mailing')
-      #   record = self.new({
-      #                       :relationship => found_family_member.primary_relationship,
-      #                       :id => family_member_id,
-      #                       :family => found_family_member.family,
-      #                       :family_id => found_family_member.family_id,
-      #                       :first_name => found_family_member.first_name,
-      #                       :last_name => found_family_member.last_name,
-      #                       :middle_name => found_family_member.middle_name,
-      #                       :name_pfx => found_family_member.name_pfx,
-      #                       :name_sfx => found_family_member.name_sfx,
-      #                       :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
-      #                       :gender => found_family_member.gender,
-      #                       :ssn => found_family_member.ssn,
-      #                       :race => found_family_member.race,
-      #                       :ethnicity => found_family_member.ethnicity,
-      #                       :language_code => found_family_member.language_code,
-      #                       :is_incarcerated => found_family_member.is_incarcerated,
-      #                       :citizen_status => found_family_member.citizen_status,
-      #                       :naturalized_citizen => found_family_member.naturalized_citizen,
-      #                       :eligible_immigration_status => found_family_member.eligible_immigration_status,
-      #                       :indian_tribe_member => found_family_member.indian_tribe_member,
-      #                       :tribal_id => found_family_member.tribal_id,
-      #                       :same_with_primary => has_same_address_with_primary.to_s,
-      #                       :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
-      #                       :is_homeless => has_same_address_with_primary ? false : found_family_member.try(:person).try(:is_homeless),
-      #                       :is_temporarily_out_of_state => has_same_address_with_primary ? false : found_family_member.try(:person).try(:is_temporarily_out_of_state),
-      #                       :addresses => [home_address, mailing_address]
-      #                     })
-      # end
-
-      # def self.compare_address_with_primary(family_member)
-      #   current = family_member.person
-      #   primary = family_member.family.primary_family_member.person
-
-      #   compare_keys = ["address_1", "address_2", "city", "state", "zip"]
-      #   current.no_dc_address == primary.no_dc_address &&
-      #     current.is_homeless? == primary.is_homeless? &&
-      #     current.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
-      #     current.home_address.attributes.select{|k,_v| compare_keys.include? k} == primary.home_address.attributes.select{|k,_v| compare_keys.include? k}
-      # rescue StandardError
-      #   false
-      # end
-
-      # def family_member
-      #   @family_member = ::FamilyMember.find(id)
-      # end
-
-      # def assign_attributes(atts)
-      #   atts.each_pair do |k, v|
-      #     self.send("#{k}=".to_sym, v)
-      #   end
-      # end
-
-      # def bubble_person_errors(person)
-      #   self.errors.add(:ssn, person.errors[:ssn]) if person.errors.key?(:ssn)
-      # end
-
-      # def try_update_person(person)
-      #   person.consumer_role&.update_attributes(:is_applying_coverage => is_applying_coverage)
-      #   person.update_attributes(extract_person_params).tap do
-      #     bubble_person_errors(person)
-      #   end
-      # end
-
-      # def update_attributes(attr)
-      #   assign_attributes(attr)
-      #   assign_citizen_status
-      #   return false unless valid?
-      #   return false unless try_update_person(family_member.person)
-      #   if attr["is_consumer_role"] == "true"
-      #     family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
-      #     return false unless assign_person_address(family_member.person)
-      #   elsif attr["is_resident_role"] == "true"
-      #     family_member.family.build_resident_role(family_member)
-      #   end
-      #   assign_person_address(family_member.person)
-      #   family_member.person.add_relationship(family.primary_applicant.person, relationship, family_id, true)
-      #   family.primary_applicant.person.add_relationship(family_member.person, PersonRelationship::InverseMap[relationship], family_id)
-      #   family.build_relationship_matrix
-      #   family_member.save!
-      #   true
-      # end
-
-      # def relationship_validation
-      #   return if family.blank? || family.family_members.blank?
-
-      #   relationships = {}
-      #   family.active_family_members.each{|fm| relationships[fm._id.to_s] = fm.relationship}
-      #   relationships[self.id.to_s] = self.relationship
-      #   self.errors.add(:base, "can not have multiple spouse or life partner") if relationships.values.count{|rs| ['spouse', 'life_partner'].include?(rs)} > 1
-      # end
-
-      # def copy_finanacial_assistances_application
-      #   service = application_service.new(family)
-      #   service.process_application unless service.code == :no_app
-      # end
-
-      # def age_on(date)
-      #   age = date.year - dob.year
-      #   if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
-      #     age - 1
-      #   else
-      #     age
-      #   end
-      # end
-
-      # private
-
-      # def application_service
-      #   FinancialAssistance::Services::ApplicationService
-      # end
+      def nested_parameters
+        {
+          addresses_attributes: addresses_attributes.reject{|key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?},
+          phones_attributes: phones_attributes.reject{|key, value| value[:full_phone_number].blank?},
+          emails_attributes: emails_attributes.reject{|key, value| value[:address].blank?}
+        }
+      end
     end
   end
 end

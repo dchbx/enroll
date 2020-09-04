@@ -40,6 +40,19 @@ module FinancialAssistance
       "stepson_or_stepdaughter"
     ].freeze
 
+    RELATIONSHIPS_UI = [
+      "spouse",
+      "domestic_partner",
+      "child",
+      "parent",
+      "sibling",
+      "unrelated",
+      "aunt_or_uncle",
+      "nephew_or_niece",
+      "grandchild",
+      "grandparent"
+    ]
+
     INVERSE_MAP = {
       "child" => "parent",
       "parent" => "child",

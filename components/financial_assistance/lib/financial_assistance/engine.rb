@@ -9,6 +9,8 @@ module FinancialAssistance
   class Engine < ::Rails::Engine
     isolate_namespace FinancialAssistance
 
+    config.autoload_paths += Dir[root.join("app/domain/**")]
+
     initializer "financial_assistance.factories", :after => "Factory_bot.set_factory_paths" do
       FactoryBot.definition_file_paths << File.expand_path('../../../spec/factories', __FILE__) if defined?(FactoryBot)
     end

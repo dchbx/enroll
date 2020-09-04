@@ -1,5 +1,6 @@
 function applyFaaListenersFor(target) {
   // target is person or dependent
+
   $("input[name='" + target + "[us_citizen]']").change(function() {
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html("");

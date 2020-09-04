@@ -1,8 +1,8 @@
 %has_fixed_address= applicant.has_fixed_address
 - unless applicant.is_living_in_state.nil?
   %is_living_in_state= applicant.is_living_in_state
-- unless applicant.is_temp_out_of_state.nil?
-  %is_temp_out_of_state= applicant.is_temp_out_of_state
+- unless applicant.is_temporarily_out_of_state.nil?
+  %is_temp_out_of_state= applicant.is_temporarily_out_of_state
 - unless applicant.is_required_to_file_taxes.nil?
   %is_required_to_file_taxes= applicant.is_required_to_file_taxes
 %tax_filer_type= "urn:openhbx:terms:v1:tax_filer##{applicant.tax_filer_kind}"

@@ -59,6 +59,10 @@ module Forms
                               ::ConsumerRole::NOT_LAWFULLY_PRESENT_STATUS
                             end
         end
+
+        def consumer_role=(_val)
+          true
+        end
       end
     end
   end
