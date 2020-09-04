@@ -25,6 +25,10 @@ module Notifier
     attribute :coverage_end_on_minus_60_days, String
     attribute :coverage_end_on_plus_60_days, String
 
+    attribute :is_receiving_assistance, Boolean, :default => false
+    attribute :aptc_amount, String
+    attribute :responsible_amount, String
+
     def self.stubbed_object
       end_on = TimeKeeper.date_of_record.end_of_month
       enrollment = Notifier::MergeDataModels::Enrollment.new({
@@ -44,8 +48,10 @@ module Notifier
         waiver_effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month.strftime('%m/%d/%Y'),
         waiver_plan_name: 'Aetna GOLD',
         waiver_enrolled_count: '2',
-        waiver_coverage_end_on: end_on
-
+        waiver_coverage_end_on: end_on,
+        is_receiving_assistance: false,
+        aptc_amount: '',
+        responsible_amount: ''
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
