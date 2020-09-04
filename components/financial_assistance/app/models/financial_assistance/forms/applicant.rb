@@ -95,10 +95,8 @@ module FinancialAssistance
       def save
         applicant_entity = FinancialAssistance::Operations::Applicant::Create.new.call(params: extract_applicant_params)
 
-        binding.pry
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
-
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
 
           if applicant.present? && applicant.persisted?

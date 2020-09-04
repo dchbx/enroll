@@ -9,7 +9,7 @@
         <% if dependent.errors.any? %>
             <div class="alert alert-error">
               <h4>
-                <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
+                <%= "#{pluralize(@applicant.errors.size, "error")} prohibited this family member from being saved:" %>
               </h4>
               <ul>
                 <% dependent.errors.full_messages.each do |msg| %>
@@ -20,29 +20,29 @@
         <% end %>
 
         <%if
-          @dependent.first_name &&
-              @dependent.last_name &&
-              @dependent.dob &&
-              @dependent.gender &&
-              @dependent.relationship
+          @applicant.first_name &&
+              @applicant.last_name &&
+              @applicant.dob &&
+              @applicant.gender &&
+              @applicant.relationship
         %>
             <div class="row row-form-wrapper no-buffer">
               <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
                 <div class="col-md-4 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
                   <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
-                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.first_name} #{@dependent.middle_name} #{@dependent.last_name}" %></span>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@applicant.first_name} #{@applicant.middle_name} #{@applicant.last_name}" %></span>
                 </div>
                 <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
                   <label class="static_label label-floatlabel" for="name">AGE</label>
-                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(Date.today)}" %></span>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@applicant.age_on(Date.today)}" %></span>
                 </div>
                 <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
                   <label class="static_label label-floatlabel" for="name">GENDER</label>
-                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.gender.humanize}" %></span>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@applicant.gender.humanize}" %></span>
                 </div>
                 <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
                   <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
-                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.relationship.capitalize}" %></span>
+                  <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@applicant.relationship.capitalize}" %></span>
                 </div>
               </div>
             </div>
@@ -85,9 +85,9 @@
           <div class="row row-form-wrapper no-buffer">
             <% if @person.has_active_consumer_role? %>
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
-                  <label id="is_applying_coverage_value_dep">Does <%= @dependent.first_name.present? ? @dependent.first_name : "this person" %> need coverage?</label>
+                  <label id="is_applying_coverage_value_dep">Does <%= @applicant.first_name.present? ? @applicant.first_name : "this person" %> need coverage?</label>
                 </div>
-                <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @dependent.is_applying_coverage, second_checked: !@dependent.is_applying_coverage %>
+                <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
             <% end %>
           </div>
 
@@ -140,11 +140,11 @@
           </div>
 
           <div class="row row-form-wrapper no-buffer">
-            <% if has_active_consumer_dependent?(@person,@dependent) %>
+            <% if has_active_consumer_dependent?(@person,@applicant) %>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
                   <label class="static_label label-floatlabel mt-label">NAME</label>
                   <label id="is_applying_coverage_value_dep_1" class= "ml-label">
-                    <%= @dependent.first_name.present? ? @dependent.first_name : 'this person' %>
+                    <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
                   </label>
                 </div>
             <% end %>
@@ -167,11 +167,11 @@
             </div>
           </div>
 
-          <%# if has_active_consumer_dependent?(@person,@dependent) %>
+          <%# if has_active_consumer_dependent?(@person,@applicant) %>
               <%#= render 'shared/ssn_coverage_msg' %>
           <%# end %>
 
-          <%# if has_active_consumer_dependent?(@person,@dependent) %>
+          <%# if has_active_consumer_dependent?(@person,@applicant) %>
               <br>
               <div id="consumer_fields_sets">
                 <%= render 'shared/consumer_fields', f: f %>

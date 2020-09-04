@@ -207,7 +207,31 @@ module FinancialAssistance
 
     def faa_relationship_options(dependent, referer)
       relationships = FinancialAssistance::Relationship::RELATIONSHIPS_UI
-      options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: FinancialAssistance::Relationship::INVERSE_MAP[dependent.applicant.try(:relationship)])
+      options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: FinancialAssistance::Relationship::INVERSE_MAP[dependent.applicant&.relationship])
+    end
+
+    def show_naturalized_citizen_container(applicant)
+      applicant&.us_citizen
+    end
+
+    def show_immigration_status_container(applicant)
+      applicant&.us_citizen == false
+    end
+
+    def show_tribal_container(applicant)
+      applicant&.indian_tribe_member
+    end
+
+    def show_naturalization_doc_type(applicant)
+      show_naturalized_citizen_container(applicant) && applicant&.naturalized_citizen
+    end
+
+    def show_immigration_doc_type(applicant)
+      show_immigration_status_container(applicant) && applicant&.eligible_immigration_status
+    end
+
+    def show_vlp_documents_container(applicant)
+      show_naturalization_doc_type(applicant) || show_immigration_doc_type(applicant)
     end
   end
 end

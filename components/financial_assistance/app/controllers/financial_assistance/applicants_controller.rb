@@ -9,7 +9,7 @@ module FinancialAssistance
     before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
 
     def new
-      @dependent = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
+      @applicant = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
 
       respond_to do |format|
         format.html
@@ -18,9 +18,9 @@ module FinancialAssistance
     end
 
     def create
-      @dependent = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit!)
-      @dependent.application_id = params[:application_id]
-      @dependent.save
+      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit!)
+      @applicant.application_id = params[:application_id]
+      @applicant.save
 
       respond_to do |format|
         format.js { render js: "window.location = '#{edit_application_path(@application)}'"}
@@ -37,10 +37,10 @@ module FinancialAssistance
     end
 
     def update
-      @dependent = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
-      @dependent.application_id = params[:application_id]
-      @dependent.applicant_id = params[:id]
-      @dependent.save
+      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+      @applicant.application_id = params[:application_id]
+      @applicant.applicant_id = params[:id]
+      @applicant.save
 
       redirect_to edit_application_path(@application)
     end

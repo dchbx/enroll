@@ -43,7 +43,7 @@
     </div>
     <div class="col-md-2 not-sure-margin left-seprator">
       <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not Sure?</a>
-      <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
     </div>
   </div>
 
@@ -69,12 +69,11 @@
     </div>
     <div class="col-md-2 not-sure-margin left-seprator" >
       <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not Sure?</a>
-      <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
     </div>
   </div>
-  <%#= f.fields_for find_consumer_role_for_fields(f.object) do |c| %>
-    <%#= render :partial => "insured/consumer_roles/immigration_document_fields", locals: {c: c, f: f} %>
-  <%# end %>
+
+  <%= render :partial => "financial_assistance/shared/immigration_document_fields", locals: {f: f} %>
 
   <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
     <div class="row no-buffer">
