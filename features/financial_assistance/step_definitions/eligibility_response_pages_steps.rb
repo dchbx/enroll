@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 Given(/^the application is correct$/) do
   FinancialAssistance::Application.any_instance.should_receive(:publish).and_return(true)
-  FinancialAssistance::Application.all.where(:'id'.in => [@application.id]).first.delete
+  FinancialAssistance::Application.all.where(:id.in => [@application.id]).first.delete
   application = FinancialAssistance::Application.all[0]
   application.family.active_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: TimeKeeper.date_of_record, is_eligibility_determined: false, application_id: @application.id)
   application.active_applicants.first.tax_household = application.family.active_household.tax_households.first
@@ -10,16 +12,15 @@ Given(/^the user qualifies for "([^"]*)"$/) do |type|
   application = FinancialAssistance::Application.all[0]
   application.update_attributes!(aasm_state: 'determined', assistance_year: 2018, determination_http_status_code: 200)
   application.tax_households.each do |txh|
-    txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(2018, 01, 01))
+    txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(2018, 0o1, 0o1))
 
-    new_eligible = EligibilityDetermination.new( max_aptc: 200.00, csr_percent_as_integer: 73,
-                                                 csr_eligibility_kind: 'csr_73',
-                                                 determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                                 determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                                 premium_credit_strategy_kind: 'allocated_lump_sum_credit',
-                                                 e_pdc_id: '3110344',
-                                                 source: 'Haven'
-    )
+    new_eligible = EligibilityDetermination.new(max_aptc: 200.00, csr_percent_as_integer: 73,
+                                                csr_eligibility_kind: 'csr_73',
+                                                determined_on: TimeKeeper.datetime_of_record - 30.days,
+                                                determined_at: TimeKeeper.datetime_of_record - 30.days,
+                                                premium_credit_strategy_kind: 'allocated_lump_sum_credit',
+                                                e_pdc_id: '3110344',
+                                                source: 'Haven')
     txh.eligibility_determinations << new_eligible
 
     case type
