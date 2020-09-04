@@ -23,6 +23,7 @@ module Operations
     # If the current enrollment is assisted(has applied aptc), then the same percentage of aptc will be applied to the renewing enrollment.
     class RenewEnrollment
       include Dry::Monads[:result, :do]
+      include FloatHelper
 
       # @param [ HbxEnrollment ] hbx_enrollment Enrollment that needs to be renewed.
       # @param [ Date ] effective_on Effective Date of the renewal enrollment.
@@ -55,7 +56,7 @@ module Operations
           max_aptc = tax_household.current_max_aptc.to_f
           default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
           applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
-          applied_aptc = max_aptc * applied_percentage
+          applied_aptc = float_fix(max_aptc * applied_percentage)
           data = { applied_percentage: applied_percentage,
                    applied_aptc: applied_aptc,
                    max_aptc: max_aptc,

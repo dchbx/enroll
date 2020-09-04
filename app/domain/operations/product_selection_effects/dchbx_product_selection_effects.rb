@@ -40,18 +40,18 @@ module Operations
 
       def renew_ivl_if_is_open_enrollment(enrollment)
         return nil if enrollment.is_shop? || !HbxProfile.current_hbx&.under_open_enrollment?
-        current_bcp = fetch_current_bcp_by_oe_period
-        return nil if current_bcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment, current_bcp)
+        bcp = fetch_bcp_by_oe_period
+        return nil if bcp.nil? || current_enrollment_is_in_renewal_plan_year?(enrollment, bcp)
         cancel_renewal_enrollments(enrollment)
         renewal_enrollment = Operations::Individual::RenewEnrollment.new.call(hbx_enrollment: enrollment,
-                                                                              effective_on: current_bcp.start_on)
+                                                                              effective_on: bcp.start_on)
         return renewal_enrollment if renewal_enrollment.success.nil?
 
-        transition_enrollment(renewal_enrollment.success, current_bcp)
+        transition_enrollment(renewal_enrollment.success, bcp)
       end
 
-      def current_enrollment_is_in_renewal_plan_year?(enrollment, current_bcp)
-        enrollment.effective_on.year == current_bcp.start_on.year
+      def current_enrollment_is_in_renewal_plan_year?(enrollment, bcp)
+        enrollment.effective_on.year == bcp.start_on.year
       end
 
       def fetch_renewal_enrollment_year(enrollment)
@@ -65,14 +65,14 @@ module Operations
         renewal_enrollments.each(&:cancel_ivl_enrollment)
       end
 
-      def fetch_current_bcp_by_oe_period
+      def fetch_bcp_by_oe_period
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
           bcp.open_enrollment_contains?(TimeKeeper.date_of_record)
         end
       end
 
-      def transition_enrollment(enrollment, current_bcp)
-        enrollment.begin_coverage! if TimeKeeper.date_of_record >= current_bcp.start_on && enrollment.may_begin_coverage?
+      def transition_enrollment(enrollment, bcp)
+        enrollment.begin_coverage! if TimeKeeper.date_of_record >= bcp.start_on && enrollment.may_begin_coverage?
         Success(enrollment)
       end
     end
