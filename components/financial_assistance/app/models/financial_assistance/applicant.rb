@@ -5,6 +5,7 @@ module FinancialAssistance
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
+    include ::Ssn
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -52,6 +53,35 @@ module FinancialAssistance
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
 
+    field :name_pfx, type: String
+    field :first_name, type: String
+    field :middle_name, type: String
+    field :last_name, type: String
+    field :name_sfx, type: String
+    field :encrypted_ssn, type: String
+    field :gender, type: String
+    field :dob, type: Date
+
+    field :is_incarcerated, type: Boolean
+    field :is_disabled, type: Boolean
+    field :ethnicity, type: Array
+    field :race, type: String
+    field :indian_tribe_member, type: Boolean
+    field :tribal_id, type: String
+
+    field :language_code, type: String
+    field :no_dc_address, type: Boolean, default: false
+    field :is_homeless, type: Boolean, default: false
+    field :is_temporarily_out_of_state, type: Boolean, default: false
+
+    field :no_ssn, type: String
+    field :citizen_status, type: String
+    field :is_consumer_role, type: Boolean
+    field :is_resident_role, type: Boolean
+    field :vlp_document_id, type: String
+    field :same_with_primary, type: Boolean
+    field :is_applying_coverage, type: Boolean
+
     field :assisted_income_validation, type: String, default: "pending"
     validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
     field :assisted_mec_validation, type: String, default: "pending"
@@ -68,7 +98,7 @@ module FinancialAssistance
 
     field :has_fixed_address, type: Boolean, default: true
     field :is_living_in_state, type: Boolean, default: false
-    field :is_temp_out_of_state, type: Boolean, default: false
+    field :is_temporarily_out_of_state, type: Boolean, default: false
 
     field :is_required_to_file_taxes, type: Boolean
     field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
@@ -154,16 +184,21 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+
     embeds_many :incomes,     class_name: "FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
-    embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
-
+    embeds_many :addresses, cascade_callbacks: true, validate: true, class_name: "::FinancialAssistance::Locations::Address"
+    embeds_many :phones, class_name: "FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
+    embeds_many :emails, class_name: "FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
 
     accepts_nested_attributes_for :incomes, :deductions, :benefits
+    accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
+    accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true
+    accepts_nested_attributes_for :emails, :reject_if => proc { |addy| addy[:address].blank? }, allow_destroy: true
 
     validate :presence_of_attr_step_1, on: [:step_1, :submission]
 
@@ -179,6 +214,74 @@ module FinancialAssistance
 
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
+
+    # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+
+    def us_citizen=(val)
+      @us_citizen = (val.to_s == "true")
+      @naturalized_citizen = false if val.to_s == "false"
+    end
+
+    def naturalized_citizen=(val)
+      @naturalized_citizen = (val.to_s == "true")
+    end
+
+    def indian_tribe_member=(val)
+      self.tribal_id = nil if val.to_s == false
+      @indian_tribe_member = (val.to_s == "true")
+    end
+
+    def eligible_immigration_status=(val)
+      @eligible_immigration_status = (val.to_s == "true")
+    end
+
+    def us_citizen
+      return @us_citizen unless @us_citizen.nil?
+      return nil if citizen_status.blank?
+      @us_citizen ||= ::ConsumerRole::US_CITIZEN_STATUS_KINDS.include?(citizen_status)
+    end
+
+    def naturalized_citizen
+      return @naturalized_citizen unless @naturalized_citizen.nil?
+      return nil if citizen_status.blank?
+      @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
+    end
+
+    def indian_tribe_member
+      return @indian_tribe_member unless @indian_tribe_member.nil?
+      return nil if citizen_status.blank?
+      @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
+    end
+
+    def eligible_immigration_status
+      return @eligible_immigration_status unless @eligible_immigration_status.nil?
+      return nil if us_citizen.nil?
+      return nil if @us_citizen
+      return nil if citizen_status.blank?
+      @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
+    end
+
+    def relationships
+      application.relationships.in(applicant_id: id)
+    end
+
+    def relatives
+      relationships.map(&:relative)
+    end
+
+    def relation_with_primary
+      primary_relationship = relationships.in(relative_id: application.primary_applicant.id).first
+      primary_relationship&.kind
+    end
+
+    def age_on(date)
+      age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
+    end
 
     def is_ia_eligible?
       is_ia_eligible && !is_medicaid_chip_eligible && !is_without_assistance && !is_totally_ineligible
@@ -362,6 +465,18 @@ module FinancialAssistance
 
     def person
       @person ||= family_member.person
+    end
+
+    def first_name
+      if family_member.present?
+        person.first_name
+      else
+        read_attribute(:first_name)
+      end
+    end
+
+    def full_name
+      @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
     end
 
     # Use income entries to determine hours worked
@@ -635,7 +750,13 @@ module FinancialAssistance
 
     def other_questions_answers
       [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-        array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && consumer_role.no_ssn == '1')
+        no_ssn_flag = if family_member.present?
+                        consumer_role.no_ssn
+                      else
+                        no_ssn
+                      end
+
+        array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
         array
       end
     end
@@ -715,7 +836,11 @@ module FinancialAssistance
     end
 
     def age_of_applicant
-      person.age_on(TimeKeeper.date_of_record)
+      if family_member.present?
+        family_member.person.age_on(TimeKeeper.date_of_record)
+      else
+        age_on(TimeKeeper.date_of_record)
+      end
     end
 
     def clean_params(model_params) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this

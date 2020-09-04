@@ -37,6 +37,10 @@ class User
     :id
   end
 
+  def financial_assistance_identifier
+    person.id
+  end
+
   def switch_to_idp!
     # new_password = self.class.generate_valid_password
     # self.password = new_password

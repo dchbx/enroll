@@ -14,7 +14,7 @@ module FinancialAssistance
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
     validates :application_submission_validity, presence: true, on: :submission
     validates :before_attestation_validity, presence: true, on: :before_attestation
-    validate :attestation_terms_on_parent_living_out_of_home
+    validate  :attestation_terms_on_parent_living_out_of_home
 
     YEARS_TO_RENEW_RANGE = (0..5).freeze
     RENEWAL_BASE_YEAR_RANGE = (2013..TimeKeeper.date_of_record.year + 1).freeze
@@ -38,6 +38,7 @@ module FinancialAssistance
     field :external_id, type: String
     field :integrated_case_id, type: String
     ##
+    field :applied_person_id, type: BSON::ObjectId
 
     field :haven_app_id, type: String
     field :haven_ic_id, type: String
@@ -86,6 +87,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
+    embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
@@ -122,6 +124,27 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 
+    def ensure_relationship_with_primary(applicant, relation_kind)
+      update_or_build_relationship(applicant, primary_applicant, relation_kind)
+      update_or_build_relationship(primary_applicant, applicant, FinancialAssistance::Relationship::INVERSE_MAP[relation_kind])
+    end
+
+    def update_or_build_relationship(applicant, relative, relation_kind)
+      relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
+
+      if relationship.present?
+        relationship.update(kind: relation_kind)
+        return relationship
+      end
+
+      self.relationships << FinancialAssistance::Relationship.new(
+        {
+          kind: relation_kind,
+          applicant_id: applicant.id,
+          relative_id: relative.id
+        }
+      )
+    end
 
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
@@ -129,6 +152,14 @@ module FinancialAssistance
     #   raise ArgumentError.new("expected Product") unless new_benchmark_product.is_a?(BenefitMarkets::Products::Product)
     #   write_attribute(:benchmark_plan_id, new_benchmark_product._id)
     #   @benchmark_product = new_benchmark_product
+    # end
+
+    # Set the benchmark plan for this financial assistance application.
+    # @param benchmark_plan_id [ {Plan} ] The benchmark plan for this application.
+    # def benchmark_plan=(new_benchmark_plan)
+    #   raise ArgumentError.new("expected Plan") unless new_benchmark_plan.is_a?(Plan)
+    #   write_attribute(:benchmark_plan_id, new_benchmark_plan._id)
+    #   @benchmark_plan = new_benchmark_plan
     # end
 
     # Get the benchmark product for this application.
@@ -176,6 +207,10 @@ module FinancialAssistance
     def primary_applicant
       return @primary_applicant if defined?(@primary_applicant)
       @primary_applicant = active_applicants.detect(&:is_primary_applicant?)
+    end
+
+    def find_applicant(id)
+      applicants.find(id)
     end
 
 
@@ -481,6 +516,10 @@ module FinancialAssistance
       applicants.where(:is_active => true)
     end
 
+    def non_primary_applicants
+      active_applicants.reject{|applicant| applicant == primary_applicant}
+    end
+
     def clean_conditional_params(model_params)
       clean_params(model_params)
     end
@@ -589,12 +628,11 @@ module FinancialAssistance
     end
 
     def set_assistance_year
-      assistance_year = self.family.application_applicable_year
-      update_attribute(:assistance_year, assistance_year)
+      update_attribute(:assistance_year, application_applicable_year)
     end
 
     def set_effective_date
-      effective_date = HbxProfile.try(:current_hbx).try(:benefit_sponsorship).try(:earliest_effective_date)
+      effective_date = HbxProfile.current_hbx&.benefit_sponsorship&.earliest_effective_date
       update_attribute(:effective_date, effective_date)
     end
 
@@ -621,6 +659,17 @@ module FinancialAssistance
 
     def unset_effective_date
       update_attribute(:effective_date, nil)
+    end
+
+    def application_applicable_year
+      current_year = TimeKeeper.date_of_record.year
+      enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
+      current_hbx = HbxProfile.current_hbx
+      if current_hbx&.under_open_enrollment? && current_year == enrollment_start_on_year.year
+        current_year + 1
+      else
+        current_year
+      end
     end
 
     def application_submission_validity

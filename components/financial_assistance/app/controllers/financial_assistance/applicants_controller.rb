@@ -6,11 +6,43 @@ module FinancialAssistance
 
     before_action :set_current_person
     before_action :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
-    before_action :load_support_texts, only: [:other_questions, :step]
+    before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
+
+    def new
+      @dependent = FinancialAssistance::Forms::Applicant.new(:application_id => params.require(:application_id))
+
+      respond_to do |format|
+        format.html
+        format.js
+      end
+    end
+
+    def create
+      @dependent = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit!)
+      @dependent.application_id = params[:application_id]
+      @dependent.save
+
+      respond_to do |format|
+        format.js { render js: "window.location = '#{edit_application_path(@application)}'"}
+      end
+    end
 
     def edit
-      @applicant = find
-      render html: '', layout: 'financial_assistance_nav'
+      @applicant.addresses.build(kind: 'home') unless @applicant.addresses.present?
+
+      respond_to do |format|
+        format.html
+        format.js
+      end
+    end
+
+    def update
+      @dependent = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+      @dependent.application_id = params[:application_id]
+      @dependent.applicant_id = params[:id]
+      @dependent.save
+
+      redirect_to edit_application_path(@application)
     end
 
     def other_questions
@@ -42,6 +74,7 @@ module FinancialAssistance
       model_params = params[model_name]
       @model.clean_conditional_params(model_params) if model_params.present?
       @model.assign_attributes(permit_params(model_params)) if model_params.present?
+
       if params.key?(model_name)
         if @model.save(context: "step_#{@current_step.to_i}".to_sym)
           @applicant.reload
@@ -74,11 +107,6 @@ module FinancialAssistance
     def primary_applicant_has_spouse
       has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
       render :plain => has_spouse.to_s
-    end
-
-    def update
-      @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
-      head :ok, content_type: "text/html"
     end
 
     private
@@ -116,5 +144,30 @@ module FinancialAssistance
     def permit_params(attributes)
       attributes.permit!
     end
+
+    def applicant_parameters
+      [
+        :first_name,
+        :last_name,
+        :middle_name,
+        :name_pfx,
+        :name_sfx,
+        :dob,
+        :ssn,
+        :gender,
+        :is_applying_coverage,
+        :us_citizen,
+        :naturalized_citizen,
+        :indian_tribe_member,
+        :tribal_id,
+        :is_incarcerated,
+        :ethnicity,
+        :is_consumer_role,
+        { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
+        { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
+        { :emails_attributes => [:kind, :address, :id, :_destroy] }
+      ]
+    end
+
   end
 end

@@ -6,10 +6,12 @@ module FinancialAssistance
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+
       after_save :save_phone_components
       before_save :set_full_phone_number
 
-      KINDS = %w[home work mobile main fax].freeze
+      KINDS = %w[home work mobile fax].freeze
 
       field :kind, type: String, default: ''
       field :country_code, type: String, default: ''

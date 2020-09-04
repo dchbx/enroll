@@ -62,7 +62,16 @@ module UIHelpers
     # Personalize heading_text from steps.yml
     def personalize_heading_text(heading_text)
       if heading_text.include? '<family-member-name-placeholder>'
-        heading_text.sub! '<family-member-name-placeholder>', (@model.class.to_s == "FinancialAssistance::Applicant" ? @model.family_member.person.first_name : (@model.class.to_s == "FinancialAssistance::Application" ? @model.primary_applicant.family_member.person.first_name : @applicant.family_member.person.first_name)) # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
+
+        first_name = if @model.is_a?(FinancialAssistance::Applicant)
+                       @model.first_name
+                     elsif @model.is_a?(FinancialAssistance::Application)
+                       @model.primary_applicant.first_name
+                     else
+                       @applicant.family_member.person.first_name
+                     end
+
+        heading_text.sub! '<family-member-name-placeholder>', first_name.titleize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this
       else
         heading_text
       end

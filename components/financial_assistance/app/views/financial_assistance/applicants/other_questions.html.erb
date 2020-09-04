@@ -10,14 +10,14 @@
               <i class="fa fa-question fa-stack-2x "></i>
           </span>
         </div>
-        <h2 class="fa-darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %></h2>
+        <h2 class="fa-darkblue">Other Questions for <%= @applicant.first_name.titleize %></h2>
       </div>
     </div>
-      <!-- <h2 class="darkblue">Other Questions for <%= @applicant.family_member.person.first_name.titleize %> </h2> -->
+      <!-- <h2 class="darkblue">Other Questions for <%= @applicant.first_name.titleize %> </h2> -->
       <p>Answer these questions for this person. When you're finished, select CONTINUE.</p>
       <p class="memo">* = required field</p>
 
-        <% if @applicant.present? && @applicant.person.no_ssn == "1" %>
+        <% if @applicant.present? && @applicant.no_ssn == "1" %>
           <div class="row row-form-wrapper no-buffer row-height">
             <div class='col-md-6'>
               <span class="fa-text-color">Has this person applied for an SSN *</span>
@@ -279,7 +279,7 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_physically_disabled"} %>
           </div>
         </div>
-        <% if @applicant.person.eligible_immigration_status.present? %>
+        <% if @applicant.eligible_immigration_status.present? %>
         <div class="row row-form-wrapper no-buffer row-height">
           <div class='col-md-6'>
             <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>

@@ -26,7 +26,6 @@ module UIHelpers
     end
 
     def step
-      puts 'test'
       render 'step'
     end
 

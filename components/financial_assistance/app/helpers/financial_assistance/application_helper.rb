@@ -15,11 +15,6 @@ module FinancialAssistance
       sum
     end
 
-    def applicant_name(applicant_id)
-      applicant = FinancialAssistance::Applicant.find applicant_id
-      applicant&.person&.full_name
-    end
-
     def total_aptc_across_tax_households(application_id)
       application = FinancialAssistance::Application.find(application_id)
       total_aptc = 0.0
@@ -45,7 +40,7 @@ module FinancialAssistance
 
     def applicant_age(applicant)
       now = Time.now.utc.to_date
-      dob = applicant.family_member.person.dob
+      dob = applicant.dob
       now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
     end
 
@@ -105,7 +100,7 @@ module FinancialAssistance
     def claim_eligible_tax_dependents
       return if @application.blank? || @applicant.blank?
       eligible_applicants = @application.active_applicants.map! do |applicant|
-        [applicant.person.full_name, applicant.id.to_s] if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
+        [applicant.full_name, applicant.id.to_s] if applicant != @applicant && applicant.is_required_to_file_taxes? && applicant.claimed_as_tax_dependent_by != @applicant.id
       end
       eligible_applicants
     end

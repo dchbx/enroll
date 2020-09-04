@@ -38,6 +38,7 @@ module FinancialAssistance
     def edit
       save_faa_bookmark(@person, request.original_url)
       set_admin_bookmark_url
+
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
       load_support_texts
@@ -229,13 +230,15 @@ module FinancialAssistance
     end
 
     def aqhp_flow
-      if @family.applications.where(aasm_state: "draft").blank?
-        application = @family.applications.build(aasm_state: "draft")
+      if FinancialAssistance::Application.where(applied_person_id: current_user.financial_assistance_identifier, aasm_state: "draft").blank?
+        application = FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
+        application.family = @family
         @family.active_family_members.each do |family_member|
           application.applicants.build(family_member_id: family_member.id)
         end
         application.save!
       end
+
       redirect_to application_checklist_applications_path
     end
 

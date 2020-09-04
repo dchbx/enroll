@@ -135,7 +135,7 @@
                 <% if @cfl_service.displayable_field?('applicant', applicant.id, :claimed_as_tax_dependent_by) %>
                   <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                     <div class="col-md-6">This person will be claimed as a dependent by</div>
-                    <div class="col-md-6"><%= applicant_name(applicant.claimed_as_tax_dependent_by.to_s) %></div>
+                    <div class="col-md-6"><%= @application.find_applicant(applicant.claimed_as_tax_dependent_by.to_s) %></div>
                   </div>
                 <% end %>
               </div>

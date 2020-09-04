@@ -6,6 +6,8 @@ module FinancialAssistance
       include Mongoid::Document
       include Mongoid::Timestamps
 
+      embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
+
       KINDS = %w[home work mailing].freeze
 
       # The type of address

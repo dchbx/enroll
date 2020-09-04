@@ -8,15 +8,15 @@
       </div>
     <% end %>
 
-    <% @application.active_applicants.each do |applicant| %>
-      <% content_for "person_#{applicant.person.id}" do %>
+    <% @application.non_primary_applicants.each do |applicant| %>
+      <% content_for "person_#{applicant.id}" do %>
         <div class="row row-form-wrapper no-buffer">
           <%= render "financial_assistance_row", applicant: applicant %>
         </div>
       <% end %>
     <% end %>
 
-    <%= render partial: 'insured/family_members/family_members' %>
+    <%= render partial: 'financial_assistance/applicants/applicants' %>
   </div>
 
   <div class='col-md-3'>
