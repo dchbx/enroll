@@ -34,8 +34,6 @@ module FinancialAssistance
 
       attr_reader :dob
 
-      # HUMANIZED_ATTRIBUTES = { relationship: "Select Relationship Type " }.freeze
-
       def initialize(*attributes)
         initialize_attributes
         super
@@ -56,10 +54,6 @@ module FinancialAssistance
         @same_with_primary = "true"
         @is_applying_coverage = true
       end
-
-      # def self.human_attribute_name(attr, options = {})
-      #   HUMANIZED_ATTRIBUTES[attr.to_sym] || super
-      # end
 
       def consumer_fields_validation
         return true unless individual_market_is_enabled?
@@ -116,7 +110,7 @@ module FinancialAssistance
       def extract_applicant_params
         assign_citizen_status
 
-        {
+        attrs = {
           first_name: first_name,
           last_name: last_name,
           middle_name: middle_name,
@@ -134,7 +128,13 @@ module FinancialAssistance
           tribal_id: tribal_id,
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state
-        }.reject{|k, val| val.nil?}.merge(nested_parameters)
+        }.reject{|k, val| val.nil?}
+
+        attrs.merge({
+          adddresses: nested_parameters[:addresses_attributes],
+          phones: nested_parameters[:phones_attributes],
+          emails: nested_parameters[:emails_attributes]
+        })
       end
 
       def nested_parameters
