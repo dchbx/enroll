@@ -603,7 +603,7 @@ module BenefitSponsors
       state :suspended                        # Premium payment is 61-90 days past due and Sponsor's benefit coverage has lapsed
       state :terminated                       # Sponsor's ability to offer benefits under this BenefitSponsorship is permanently terminated
       state :ineligible                       # Sponsor is permanently banned from sponsoring benefits due to regulation or policy
-      
+
       # event :approve_initial_application do
       #   transitions from: [:applicant, :initial_application_under_review], to: :initial_application_approved
       # end

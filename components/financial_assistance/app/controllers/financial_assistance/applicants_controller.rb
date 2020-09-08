@@ -170,8 +170,7 @@ module FinancialAssistance
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
-          :ethnicity => []
-          }
+          :ethnicity => [] }
       ]
     end
 

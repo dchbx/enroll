@@ -3,7 +3,7 @@
 module FinancialAssistance
   module Forms
     module ConsumerFields
-      def self.included(base)
+      def self.included(base) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength, Metrics/PerceivedComplexity
         base.class_eval do
           attr_accessor :race, :ethnicity, :language_code, :citizen_status, :tribal_id
           attr_accessor :is_incarcerated, :is_disabled, :citizen_status

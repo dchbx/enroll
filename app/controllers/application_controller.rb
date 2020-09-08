@@ -277,7 +277,7 @@ class ApplicationController < ActionController::Base # rubocop:disable Metrics/C
     redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
   end
 
-  def get_current_person
+  def get_current_person # rubocop:disable Naming/AccessorMethodName
     if current_user.try(:person).try(:agent?) && session[:person_id].present?
       Person.find(session[:person_id])
     else
