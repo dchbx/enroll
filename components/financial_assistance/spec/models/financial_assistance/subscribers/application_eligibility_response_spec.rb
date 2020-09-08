@@ -36,7 +36,7 @@ RSpec.describe ::FinancialAssistance::Subscribers::ApplicationEligibilityRespons
   end
 
   describe 'given a valid payload with a medicad member and get status 203' do
-    let(:xml) { File.read(Rails.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_medicaid_member_1_thh_203_status.xml')) }
+    let(:xml) { File.read(FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_medicaid_member_1_thh_203_status.xml')) }
 
     context 'update application as determined with status code' do
       let(:message) { { 'body' => xml } }
@@ -205,7 +205,7 @@ RSpec.describe ::FinancialAssistance::Subscribers::ApplicationEligibilityRespons
   end
 
   describe 'given a valid payload with a medicad member and get status 200' do
-    let(:xml) { File.read(Rails.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_3_aptc_members_1_thh_200_status.xml')) }
+    let(:xml) { File.read(FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_3_aptc_members_1_thh_200_status.xml')) }
 
     context 'update application as determined with status code' do
       let(:message) { { 'body' => xml } }
