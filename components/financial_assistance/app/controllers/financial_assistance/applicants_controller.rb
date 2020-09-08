@@ -36,12 +36,17 @@ module FinancialAssistance
     end
 
     def update
-      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
-      @applicant.application_id = params[:application_id]
-      @applicant.applicant_id = params[:id]
-      @applicant.save
+      if params[:financial_assistance_applicant].present?
+        @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
+        head :ok, content_type: "text/html"
+      else
+        @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+        @applicant.application_id = params[:application_id]
+        @applicant.applicant_id = params[:id]
+        @applicant.save
 
-      redirect_to edit_application_path(@application)
+        redirect_to edit_application_path(@application)
+      end
     end
 
     def other_questions
@@ -104,7 +109,7 @@ module FinancialAssistance
     end
 
     def primary_applicant_has_spouse
-      has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
+      has_spouse =  @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
       render :plain => has_spouse.to_s
     end
 
@@ -166,7 +171,7 @@ module FinancialAssistance
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
           :ethnicity => []
-        }
+          }
       ]
     end
 
