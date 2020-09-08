@@ -51,7 +51,7 @@ module FinancialAssistance
       "nephew_or_niece",
       "grandchild",
       "grandparent"
-    ]
+    ].freeze
 
     INVERSE_MAP = {
       "child" => "parent",

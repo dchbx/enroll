@@ -8,14 +8,16 @@ module FinancialAssistance
           attr_accessor :dob
 
           def dob
-            Date.strptime(dob, "%Y-%m-%d") rescue nil
+            Date.strptime(dob, "%Y-%m-%d")
+          rescue StandardError # rubocop:disable Lint/EmptyRescueClause
+            nil
           end
 
           def dob=(val)
             @dob = begin
               Date.strptime(val, "%Y-%m-%d")
-            rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-              nil
+                   rescue StandardError # rubocop:disable Lint/EmptyRescueClause
+                     nil
             end
           end
         end

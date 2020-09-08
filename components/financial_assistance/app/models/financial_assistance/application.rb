@@ -150,14 +150,14 @@ module FinancialAssistance
       person = family_member.person
       # :naturalized_citizen,
       attrs = person.attributes.slice(:first_name,:last_name,:middle_name,:name_pfx,:name_sfx,:dob,:ssn,:gender, :ethnicity, :tribal_id, :no_ssn)
-      attrs.merge!({
+      attrs.merge!(
         family_member_id: family_member.id,
         is_applying_coverage: person.consumer_role.is_applying_coverage,
         us_citizen: person.consumer_role.us_citizen,
         is_consumer_role: true,
         indian_tribe_member: person.consumer_role.is_tribe_member?,
-        is_incarcerated: person.is_incarcerated,
-      })
+        is_incarcerated: person.is_incarcerated
+      )
 
       applicant = FinancialAssistance::Applicant.new(attrs)
       applicant.addresses = person.addresses.collect{|address| FinancialAssistance::Locations::Address.new(address.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }

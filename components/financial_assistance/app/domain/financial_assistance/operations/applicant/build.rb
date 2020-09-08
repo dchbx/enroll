@@ -14,15 +14,15 @@ module FinancialAssistance
         def call(params:)
           values   = yield validate(params)
           product  = yield build(values)
-          
+
           Success(product)
         end
 
         private
-  
+
         def validate(params)
           result = FinancialAssistance::Validators::ApplicantContract.new.call(params)
-        
+
           if result.success?
             Success(result.to_h)
           else

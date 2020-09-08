@@ -70,9 +70,9 @@ module FinancialAssistance
         "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)",
         "Other (With Alien Number)",
         "Other (With I-94 Number)"
-      ]
+    ].freeze
 
-    NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"]
+    NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
 
     field :name_pfx, type: String
     field :first_name, type: String

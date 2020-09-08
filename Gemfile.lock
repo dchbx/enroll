@@ -115,7 +115,7 @@ PATH
       aasm (~> 4.8)
       config (~> 2.0)
       devise (~> 4.5)
-      font-awesome-rails (~> 4.6)
+      font-awesome-rails (~> 4.7)
       haml-rails
       money-rails (~> 1.13.3)
       mongoid (~> 7.0.2)

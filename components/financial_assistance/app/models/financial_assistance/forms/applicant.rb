@@ -58,12 +58,12 @@ module FinancialAssistance
 
       def validate_citizen_status
         error_message = if @us_citizen.nil?
-          "Citizenship status is required"
-        elsif @us_citizen == false && @eligible_immigration_status.nil?
-          "Eligible immigration status is required"
-        elsif @us_citizen == true && @naturalized_citizen.nil?
-          "Naturalized citizen is required"
-        end
+                          "Citizenship status is required"
+                        elsif @us_citizen == false && @eligible_immigration_status.nil?
+                          "Eligible immigration status is required"
+                        elsif @us_citizen == true && @naturalized_citizen.nil?
+                          "Naturalized citizen is required"
+                        end
         self.errors.add(:base, error_message)
       end
 
@@ -119,20 +119,20 @@ module FinancialAssistance
           tribal_id: tribal_id,
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state
-        }.reject{|k, val| val.nil?}
+        }.reject{|_k, val| val.nil?}
 
         attrs.merge({
-          addresses: nested_parameters[:addresses_attributes].values,
-          phones: nested_parameters[:phones_attributes].values,
-          emails: nested_parameters[:emails_attributes].values
-        })
+                      addresses: nested_parameters[:addresses_attributes].values,
+                      phones: nested_parameters[:phones_attributes].values,
+                      emails: nested_parameters[:emails_attributes].values
+                    })
       end
 
       def nested_parameters
         {
-          addresses_attributes: addresses_attributes.reject{|key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?},
-          phones_attributes: phones_attributes.reject{|key, value| value[:full_phone_number].blank?},
-          emails_attributes: emails_attributes.reject{|key, value| value[:address].blank?}
+          addresses_attributes: addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?},
+          phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?},
+          emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}
         }
       end
     end

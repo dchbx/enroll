@@ -205,7 +205,7 @@ module FinancialAssistance
       "$" + cost.to_s + " " + frequency.to_s.capitalize
     end
 
-    def faa_relationship_options(dependent, referer)
+    def faa_relationship_options(dependent, _referer)
       relationships = FinancialAssistance::Relationship::RELATIONSHIPS_UI
       options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: FinancialAssistance::Relationship::INVERSE_MAP[dependent.applicant&.relationship])
     end
