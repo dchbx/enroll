@@ -17,11 +17,7 @@ module FinancialAssistance
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
     def index
-      # @family = @person.primary_family
-      # @family_members = @person.primary_family.active_family_members
-      # @applications = @family.applications
-      @applications = ::FinancialAssistance::Application.where(applied_person_id: current_user.financial_assistance_identifier)
-      # @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
+      @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
     end
 
     def new
@@ -29,9 +25,9 @@ module FinancialAssistance
     end
 
     def create
-      # @application = @family.applications.new
-      @application = ::FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
-      @application.populate_applicants_for(@family)
+      primary_family_id
+      @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+      @application.import_applicants
       @application.save!
 
       redirect_to edit_application_path(@application)
@@ -98,7 +94,7 @@ module FinancialAssistance
     end
 
     def copy
-      service = application_service.new(@family, {application_id: params[:id]})
+      service = FinancialAssistance::Services::ApplicationService.new(@family, {application_id: params[:id]})
       @application = service.copy!
       redirect_to edit_application_path(@application)
     end
@@ -232,13 +228,11 @@ module FinancialAssistance
     end
 
     def aqhp_flow
-      if FinancialAssistance::Application.where(applied_person_id: current_user.financial_assistance_identifier, aasm_state: "draft").blank?
-        application = FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
-        application.family = @family
-        @family.active_family_members.each do |family_member|
-          application.build_applicant_from_family_member(family_member)
-        end
-        application.save!
+      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
+      if @application.blank?
+        @application = FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+        @application.import_applicants
+        @application.save!
       end
 
       redirect_to application_checklist_applications_path
@@ -298,10 +292,6 @@ module FinancialAssistance
 
     def find
       @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
-    end
-
-    def application_service
-      FinancialAssistance::Services::ApplicationService
     end
   end
 end

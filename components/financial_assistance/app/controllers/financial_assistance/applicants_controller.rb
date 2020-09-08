@@ -136,7 +136,7 @@ module FinancialAssistance
     end
 
     def find_application
-      @application = FinancialAssistance::Application.find_by(id: params[:application_id], applied_person_id: current_user.financial_assistance_identifier)
+      @application = FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
     end
 
     def find

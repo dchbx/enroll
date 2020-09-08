@@ -38,7 +38,7 @@ module FinancialAssistance
     field :external_id, type: String
     field :integrated_case_id, type: String
     ##
-    field :applied_person_id, type: BSON::ObjectId
+    field :family_id, type: BSON::ObjectId
 
     field :haven_app_id, type: String
     field :haven_ic_id, type: String
@@ -145,28 +145,6 @@ module FinancialAssistance
         }
       )
     end
-
-    def build_applicant_from_family_member(family_member)
-      person = family_member.person
-      # :naturalized_citizen,
-      attrs = person.attributes.slice(:first_name,:last_name,:middle_name,:name_pfx,:name_sfx,:dob,:ssn,:gender, :ethnicity, :tribal_id, :no_ssn)
-      attrs.merge!({
-        family_member_id: family_member.id,
-        is_applying_coverage: person.consumer_role.is_applying_coverage,
-        us_citizen: person.consumer_role.us_citizen,
-        is_consumer_role: true,
-        indian_tribe_member: person.consumer_role.is_tribe_member?,
-        is_incarcerated: person.is_incarcerated,
-      })
-
-      applicant = FinancialAssistance::Applicant.new(attrs)
-      applicant.addresses = person.addresses.collect{|address| FinancialAssistance::Locations::Address.new(address.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
-      applicant.phones = person.phones.collect{|phone| FinancialAssistance::Locations::Phone.new(phone.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
-      applicant.emails = person.emails.collect{|email| FinancialAssistance::Locations::Email.new(email.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
-
-      applicants << applicant
-    end
-
 
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
@@ -413,12 +391,14 @@ module FinancialAssistance
       end
     end
 
-    def populate_applicants_for(family)
-      self.applicants = family.active_family_members.map do |family_member|
-        applicant = FinancialAssistance::Applicant.new family_member_id: family_member.id, application: self
-        applicant.save
-        applicant
-      end
+    def family
+      return @family if defined? @family
+      @family = Family.find(family_id) unless family_id.blank?
+    end
+
+    def import_applicants
+      family_payload = Services::FamilyService.call(family)
+      family_payload.each {|member_attributes| applicants.build(member_attributes) }
     end
 
     def current_csr_eligibility_kind(tax_household_id)

@@ -83,12 +83,10 @@
           </div>
 
           <div class="row row-form-wrapper no-buffer">
-            <% if @person.has_active_consumer_role? %>
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
                   <label id="is_applying_coverage_value_dep">Does <%= @applicant.first_name.present? ? @applicant.first_name : "this person" %> need coverage?</label>
                 </div>
                 <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
-            <% end %>
           </div>
 
           <div class="row row-form-wrapper no-buffer">
@@ -140,14 +138,12 @@
           </div>
 
           <div class="row row-form-wrapper no-buffer">
-            <% if has_active_consumer_dependent?(@person,@applicant) %>
                 <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
                   <label class="static_label label-floatlabel mt-label">NAME</label>
                   <label id="is_applying_coverage_value_dep_1" class= "ml-label">
                     <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
                   </label>
                 </div>
-            <% end %>
             <div class="col-md-5 mt18">
               <div class="select-positioning ml-label"> <label>is</label> </div>
               <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
@@ -163,7 +159,7 @@
             </div>
             <div class="col-lg-4 mt18 static-font">
               <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
-              <span class="position-full-name"> <%= @person.full_name %> </span>
+              <span class="position-full-name"> <%= @application.primary_applicant.full_name %> </span>
             </div>
           </div>
 

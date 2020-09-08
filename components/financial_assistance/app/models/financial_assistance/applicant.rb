@@ -472,6 +472,7 @@ module FinancialAssistance
     end
 
     def is_primary_applicant?
+      return false if family_member.blank?
       family_member.is_primary_applicant?
     end
 

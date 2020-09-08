@@ -498,6 +498,10 @@ class Person
     @primary_family ||= Family.find_primary_applicant_by_person(self).first
   end
 
+  def financial_assistance_identifier
+    primary_family&.id
+  end
+
   def families
     Family.find_all_by_person(self)
   end
