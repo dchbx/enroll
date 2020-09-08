@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module FinancialAssistance
   module Subscribers
     class ApplicationEligibilityResponse < ::Acapi::Subscription
@@ -9,7 +11,7 @@ module FinancialAssistance
         ['acapi.info.events.assistance_application.application_processed']
       end
 
-      def call(event_name, e_start, e_end, msg_id, payload)
+      def call(_event_name, _e_start, _e_end, _msg_id, payload)
         stringed_key_payload = payload.stringify_keys
         xml = stringed_key_payload['body']
         application = FinancialAssistance::Application.where(:hbx_id => stringed_key_payload['assistance_application_id']).first if stringed_key_payload['assistance_application_id'].present?
@@ -21,7 +23,7 @@ module FinancialAssistance
               sc = ShortCircuit.on(:processing_issue) do |err|
                 log(xml, {:severity => 'critical', :error_message => err})
               end
-              sc.and_then do |payload|
+              sc.and_then do |payload| # rubocop:todo Lint/ShadowingOuterLocalVariable
                 haven_import_from_xml(payload)
               end
               sc.call(xml)
@@ -67,11 +69,10 @@ module FinancialAssistance
         active_verified_household = verified_family.households.max_by(&:start_date)
 
         verified_dependents.each do |verified_family_member|
-          if search_person(verified_family_member).blank?
-            application_in_context.set_determination_response_error!
-            application_in_context.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find dependent from xml')
-            throw(:processing_issue, 'ERROR: Failed to find dependent from xml')
-          end
+          next unless search_person(verified_family_member).blank?
+          application_in_context.set_determination_response_error!
+          application_in_context.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find dependent from xml')
+          throw(:processing_issue, 'ERROR: Failed to find dependent from xml')
         end
 
         primary_person = search_person(verified_primary_family_member) #such mongoid
@@ -80,7 +81,7 @@ module FinancialAssistance
 
         begin
           active_household.build_or_update_tax_households_and_applicants_and_eligibility_determinations(verified_family, primary_person, active_verified_household, application_in_context)
-        rescue
+        rescue StandardError
           application_in_context.set_determination_response_error!
           application_in_context.update_attributes(determination_http_status_code: 422, determination_error_message: 'Failure to update tax household')
           throw(:processing_issue, 'ERROR: Failure to update tax household')
@@ -89,7 +90,7 @@ module FinancialAssistance
         begin
           family.save!
           application_in_context.determine!
-        rescue
+        rescue StandardError
           throw(:processing_issue, 'ERROR: Failure to save family or to transition application to determined state')
         end
       end
@@ -103,14 +104,14 @@ module FinancialAssistance
 
         if !ssn.blank?
           Person.where({
-                           :encrypted_ssn => Person.encrypt_ssn(ssn),
-                           :dob => dob
+                         :encrypted_ssn => Person.encrypt_ssn(ssn),
+                         :dob => dob
                        }).first
         else
           Person.where({
-                           :dob => dob,
-                           :last_name => last_name_regex,
-                           :first_name => first_name_regex
+                         :dob => dob,
+                         :last_name => last_name_regex,
+                         :first_name => first_name_regex
                        }).first
         end
       end
@@ -118,7 +119,7 @@ module FinancialAssistance
       def eligibility_payload_schema_valid?(xml)
         return false if xml.blank?
         xml = Nokogiri::XML.parse(xml)
-        xsd = Nokogiri::XML::Schema(File.open ELIGIBILITY_SCHEMA_FILE_PATH)
+        xsd = Nokogiri::XML::Schema(File.open(ELIGIBILITY_SCHEMA_FILE_PATH))
         xsd.valid?(xml)
       end
     end

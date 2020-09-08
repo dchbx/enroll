@@ -1,19 +1,25 @@
-module Parsers::Xml::Cv
-  class FamilyBrokerAccountsParser
-    include HappyMapper
+# frozen_string_literal: true
 
-    tag 'broker_account'
+module Parsers
+  module Xml
+    module Cv
+      class FamilyBrokerAccountsParser
+        include HappyMapper
 
-    element :broker_npn, String
-    element :start_on, Date
-    element :end_on, Date
+        tag 'broker_account'
 
-    def to_hash
-      {
-        broker_npn: broker_npn,
-        start_on: start_on,
-        end_on: end_on
-      }
+        element :broker_npn, String
+        element :start_on, Date
+        element :end_on, Date
+
+        def to_hash
+          {
+            broker_npn: broker_npn,
+            start_on: start_on,
+            end_on: end_on
+          }
+        end
+      end
     end
   end
 end
