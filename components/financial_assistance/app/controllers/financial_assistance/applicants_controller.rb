@@ -161,11 +161,13 @@ module FinancialAssistance
         :indian_tribe_member,
         :tribal_id,
         :is_incarcerated,
-        :ethnicity,
+        :relationship,
         :is_consumer_role,
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
-        { :emails_attributes => [:kind, :address, :id, :_destroy] }
+        { :emails_attributes => [:kind, :address, :id, :_destroy],
+          :ethnicity => []
+        }
       ]
     end
 

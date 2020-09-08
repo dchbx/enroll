@@ -13,15 +13,14 @@ module FinancialAssistance
       attr_accessor :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
       attr_accessor :addresses, :phones, :emails
       attr_accessor :addresses_attributes, :phones_attributes, :emails_attributes
-
       attr_writer :family
-      include ::Forms::PeopleNames
-      include ::Forms::ConsumerFields
-      include ::Forms::SsnField
-      RELATIONSHIPS = ::PersonRelationship::Relationships + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
-      #include ::Forms::DateOfBirthField
-      #include Validations::USDate.on(:date_of_birth)
-      # accepts_nested_attributes_for :addresses
+
+      include FinancialAssistance::Forms::PeopleNames
+      include FinancialAssistance::Forms::ConsumerFields
+      include FinancialAssistance::Forms::SsnField
+      include FinancialAssistance::Forms::DateOfBirthField
+
+      RELATIONSHIPS = FinancialAssistance::Relationship::RELATIONSHIPS + ::BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS
 
       validates_presence_of :first_name, :allow_blank => nil
       validates_presence_of :last_name, :allow_blank => nil
@@ -37,14 +36,6 @@ module FinancialAssistance
       def initialize(*attributes)
         initialize_attributes
         super
-      end
-
-      def dob=(val)
-        @dob = begin
-          Date.strptime(val, "%Y-%m-%d")
-        rescue StandardError # rubocop:disable Lint/EmptyRescueClause
-          nil
-        end
       end
 
       def initialize_attributes
