@@ -273,12 +273,16 @@ class ApplicationController < ActionController::Base # rubocop:disable Metrics/C
   append_after_action :clear_current_user
 
   def set_current_person(required: true) # rubocop:disable Naming/AccessorMethodName
-    @person = if current_user.try(:person).try(:agent?) && session[:person_id].present?
-                Person.find(session[:person_id])
-              else
-                current_user.person
-              end
+    @person = get_current_person
     redirect_to logout_saml_index_path if required && !set_current_person_succeeded?
+  end
+
+  def get_current_person
+    if current_user.try(:person).try(:agent?) && session[:person_id].present?
+      Person.find(session[:person_id])
+    else
+      current_user.person
+    end
   end
 
   def set_current_person_succeeded?
@@ -429,8 +433,9 @@ class ApplicationController < ActionController::Base # rubocop:disable Metrics/C
     browser.ie? && !support_for_ie_browser?
   end
 
-  def save_faa_bookmark(person, url)
-    return if person.consumer_role.blank?
-    person.consumer_role.update_attribute(:bookmark_url, url) if person.consumer_role.identity_verified?
+  def save_faa_bookmark(url)
+    current_person = get_current_person
+    return if current_person.consumer_role.blank?
+    current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
   end
 end
