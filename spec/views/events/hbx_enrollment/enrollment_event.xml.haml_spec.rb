@@ -129,7 +129,7 @@ RSpec.describe "app/views/events/enrollment_event.xml.haml" do
       let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
       let(:hbx_enrollment_member2) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
       let!(:hbx_enrollment_member3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
-      let(:member_enrollment2) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member2.id,product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
+      let(:member_enrollment2) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member2.id,product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
       let(:member_enrollment3) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member3.id, product_price: BigDecimal(100), sponsor_contribution: BigDecimal(100))}
 
       before do
