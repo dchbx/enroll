@@ -87,7 +87,7 @@ module FinancialAssistance
       end
 
       def save
-        applicant_entity = FinancialAssistance::Operations::Applicant::Create.new.call(params: extract_applicant_params)
+        applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
 
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
@@ -131,9 +131,9 @@ module FinancialAssistance
         }.reject{|k, val| val.nil?}
 
         attrs.merge({
-          adddresses: nested_parameters[:addresses_attributes],
-          phones: nested_parameters[:phones_attributes],
-          emails: nested_parameters[:emails_attributes]
+          addresses: nested_parameters[:addresses_attributes].values,
+          phones: nested_parameters[:phones_attributes].values,
+          emails: nested_parameters[:emails_attributes].values
         })
       end
 

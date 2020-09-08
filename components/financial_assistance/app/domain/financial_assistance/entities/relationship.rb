@@ -2,7 +2,7 @@
 
 module FinancialAssistance
   module Entities
-    class Phone < Dry::Struct
+    class Relationship < Dry::Struct
       transform_keys(&:to_sym)
 
       attribute :kind, Types::String.optional

@@ -18,7 +18,7 @@ module FinancialAssistance
     end
 
     def create
-      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit!)
+      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
       @applicant.application_id = params[:application_id]
       @applicant.save
 
