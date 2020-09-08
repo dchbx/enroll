@@ -17,10 +17,11 @@ module FinancialAssistance
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
     def index
-      @family = @person.primary_family
-      @family_members = @person.primary_family.active_family_members
-      @applications = @family.applications
-      @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
+      # @family = @person.primary_family
+      # @family_members = @person.primary_family.active_family_members
+      # @applications = @family.applications
+      @applications = ::FinancialAssistance::Application.where(applied_person_id: current_user.financial_assistance_identifier)
+      # @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
     end
 
     def new
@@ -28,7 +29,8 @@ module FinancialAssistance
     end
 
     def create
-      @application = @family.applications.new
+      # @application = @family.applications.new
+      @application = ::FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
       @application.populate_applicants_for(@family)
       @application.save!
 
@@ -97,7 +99,7 @@ module FinancialAssistance
 
     def copy
       service = application_service.new(@family, {application_id: params[:id]})
-      @application = service.process_application if service.code == :copy!
+      @application = service.copy!
       redirect_to edit_application_path(@application)
     end
 

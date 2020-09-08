@@ -1,8 +1,8 @@
 <div aria-labelledby="aria-labelledby"class="tab-pane fade in active" id="home">
-  <div class="container">
+  <div class="container" style="margin-top: 20px;">
     <div class="row">
     <div class="col-md-2">
-      <%= render 'navigation' %>
+      <%= render 'ui-components/v1/navs/families_navigation' %>
     </div>
     <div class="col-md-10">
       <h1 class="darkblue no-buffer">Cost Savings Applications</h1>
@@ -44,7 +44,7 @@
             <%
             dropdown = [
             ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
-            ['Copy to new application', copy_application_path(application), application.is_draft? || @family.application_in_progress.present? ? 'disabled' : 'static'],
+            ['Copy to new application', copy_application_path(application), application.is_draft? ? 'disabled' : 'static'],
             ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
             ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
             ]
