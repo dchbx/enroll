@@ -6,12 +6,11 @@ module FinancialAssistance
     include NavigationHelper
     include ApplicationHelper
 
-    before_action :set_current_person
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index]
 
     def index
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       render layout: 'financial_assistance_nav'
     end
@@ -24,7 +23,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       model_name = @model.class.to_s.split('::').last.downcase
       model_params = params[model_name]

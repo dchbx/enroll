@@ -38,7 +38,7 @@ module FinancialAssistance
     end
 
     def edit
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
       @family = @person.primary_family
@@ -49,7 +49,7 @@ module FinancialAssistance
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity
-      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -106,7 +106,7 @@ module FinancialAssistance
     def help_paying_coverage
       @application = @person.primary_family.applications.find(params[:id]) if params[:id]
       load_support_texts
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]
     end
@@ -138,13 +138,13 @@ module FinancialAssistance
     end
 
     def application_checklist
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @application = @person.primary_family.application_in_progress
     end
 
     def review_and_submit
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @consumer_role = @person.consumer_role
       @application = @person.primary_family.application_in_progress
@@ -153,21 +153,21 @@ module FinancialAssistance
     end
 
     def review
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       @application = FinancialAssistance::Application.where(id: params["id"]).first
       @applicants = @application.active_applicants if @application.present?
       redirect_to applications_path if @application.blank?
     end
 
     def wait_for_eligibility_response
-      save_faa_bookmark(@person, applications_path)
+      save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
     end
 
     def eligibility_results
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
@@ -176,14 +176,14 @@ module FinancialAssistance
     end
 
     def application_publish_error
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
     end
 
     def eligibility_response_error
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
       @application = @person.primary_family.applications.find(params[:id])
@@ -236,7 +236,7 @@ module FinancialAssistance
         application = FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
         application.family = @family
         @family.active_family_members.each do |family_member|
-          application.applicants.build(family_member_id: family_member.id)
+          application.build_applicant_from_family_member(family_member)
         end
         application.save!
       end

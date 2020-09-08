@@ -4,7 +4,6 @@ module FinancialAssistance
   class ApplicantsController < ::ApplicationController
     include ::UIHelpers::WorkflowController
 
-    before_action :set_current_person
     before_action :find, :find_application, :except => [:age_of_applicant, :primary_applicant_has_spouse] #except the ajax requests
     before_action :load_support_texts, only: [:other_questions, :step, :new, :edit]
 
@@ -37,16 +36,21 @@ module FinancialAssistance
     end
 
     def update
-      @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
-      @applicant.application_id = params[:application_id]
-      @applicant.applicant_id = params[:id]
-      @applicant.save
+      if params[:financial_assistance_applicant].present?
+        @applicant.update_attributes!(permit_params(params[:financial_assistance_applicant]))
+        head :ok, content_type: "text/html"
+      else
+        @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
+        @applicant.application_id = params[:application_id]
+        @applicant.applicant_id = params[:id]
+        @applicant.save
 
-      redirect_to edit_application_path(@application)
+        redirect_to edit_application_path(@application)
+      end
     end
 
     def other_questions
-      save_faa_bookmark(@person, request.original_url)
+      save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @applicant = @application.active_applicants.find(params[:id])
       render layout: 'financial_assistance_nav'
@@ -67,7 +71,7 @@ module FinancialAssistance
     end
 
     def step
-      save_faa_bookmark(@person, request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
+      save_faa_bookmark(request.original_url.gsub(%r{/step.*}, "/step/#{@current_step.to_i}"))
       set_admin_bookmark_url
       flash[:error] = nil
       model_name = @model.class.to_s.split('::').last.downcase
@@ -105,7 +109,7 @@ module FinancialAssistance
     end
 
     def primary_applicant_has_spouse
-      has_spouse =  @person.person_relationships.where(kind: 'spouse').first.present? ? 'true' : 'false'
+      has_spouse =  @application.primary_applicant.relationships.where(kind: 'spouse').present? ? 'true' : 'false'
       render :plain => has_spouse.to_s
     end
 
@@ -132,7 +136,7 @@ module FinancialAssistance
     end
 
     def find_application
-      @application = FinancialAssistance::Application.find(params[:application_id])
+      @application = FinancialAssistance::Application.find_by(id: params[:application_id], applied_person_id: current_user.financial_assistance_identifier)
     end
 
     def find
@@ -167,7 +171,7 @@ module FinancialAssistance
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
           :ethnicity => []
-        }
+          }
       ]
     end
 
