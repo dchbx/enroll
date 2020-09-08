@@ -146,6 +146,28 @@ module FinancialAssistance
       )
     end
 
+    def build_applicant_from_family_member(family_member)
+      person = family_member.person
+      # :naturalized_citizen,
+      attrs = person.attributes.slice(:first_name,:last_name,:middle_name,:name_pfx,:name_sfx,:dob,:ssn,:gender, :ethnicity, :tribal_id, :no_ssn)
+      attrs.merge!({
+        family_member_id: family_member.id,
+        is_applying_coverage: person.consumer_role.is_applying_coverage,
+        us_citizen: person.consumer_role.us_citizen,
+        is_consumer_role: true,
+        indian_tribe_member: person.consumer_role.is_tribe_member?,
+        is_incarcerated: person.is_incarcerated,
+      })
+
+      applicant = FinancialAssistance::Applicant.new(attrs)
+      applicant.addresses = person.addresses.collect{|address| FinancialAssistance::Locations::Address.new(address.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
+      applicant.phones = person.phones.collect{|phone| FinancialAssistance::Locations::Phone.new(phone.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
+      applicant.emails = person.emails.collect{|email| FinancialAssistance::Locations::Email.new(email.attributes.except(:_id, :created_at, :updated_at, :tracking_version)) }
+
+      applicants << applicant
+    end
+
+
     # Set the benchmark product for this financial assistance application.
     # @param benchmark_product_id [ {Plan} ] The benchmark product for this application.
     # def benchmark_product=(new_benchmark_product)

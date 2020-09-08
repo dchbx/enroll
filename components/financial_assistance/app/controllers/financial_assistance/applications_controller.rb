@@ -234,7 +234,7 @@ module FinancialAssistance
         application = FinancialAssistance::Application.new(applied_person_id: current_user.financial_assistance_identifier)
         application.family = @family
         @family.active_family_members.each do |family_member|
-          application.applicants.build(family_member_id: family_member.id)
+          application.build_applicant_from_family_member(family_member)
         end
         application.save!
       end
