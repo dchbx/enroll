@@ -1,18 +1,18 @@
-<li id="<%= employee_dependent_form_id(dependent) %>" class="dependent_list">
-  <div id="add_info_<%= dependent.id %>" class="<%= pundit_class Family, :updateable?%>">
+<li id="<%= employee_dependent_form_id(@applicant) %>" class="dependent_list">
+  <div id="add_info_<%= @applicant.id %>" class="<%= pundit_class Family, :updateable?%>">
 
-    <%= form_for dependent, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
+    <%= form_for @applicant, {url: application_applicants_path(@application), as: :applicant, remote: true} do |f| %>
 
         <%= hidden_field_tag :consumer_role_id, params[:consumer_role_id] %>
         <%= hidden_field_tag :employee_role_id, params[:employee_role_id] %>
 
-        <% if dependent.errors.any? %>
+        <% if @applicant.errors.any? %>
             <div class="alert alert-error">
               <h4>
                 <%= "#{pluralize(@applicant.errors.size, "error")} prohibited this family member from being saved:" %>
               </h4>
               <ul>
-                <% dependent.errors.full_messages.each do |msg| %>
+                <% @applicant.errors.full_messages.each do |msg| %>
                     <li> <%= msg %> </li>
                 <% end %>
               </ul>
@@ -51,29 +51,29 @@
         <%= token_tag form_authenticity_token %>
 
         <div class="house col-md-12 col-sm-12 col-xs-12 no-pd">
-          <div class="dependent_notice_div_<%= dependent.id%>"></div>
+          <div class="dependent_notice_div_<%= @applicant.id%>"></div>
           <div class="row row-form-wrapper no-buffer">
 
             <div class="col-md-4 col-sm-4 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :first_name, value: dependent.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
+                <%= f.text_field :first_name, value: @applicant.first_name,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("first_name").to_s.upcase} *" %>
               </div>
             </div>
 
             <div class="col-md-4 col-sm-4 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :middle_name, value: dependent.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
+                <%= f.text_field :middle_name, value: @applicant.middle_name, class: "home floatlabel form-control", placeholder: l10n("middle_name").to_s.upcase%>
               </div>
             </div>
 
             <div class="col-md-4 col-sm-4 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :last_name, value: dependent.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
+                <%= f.text_field :last_name, value: @applicant.last_name ,class: "home required floatlabel form-control", required: true, placeholder: "#{l10n("last_name").to_s.upcase} *" %>
                 <div class="text-right">
-                  <% if !dependent.persisted? %>
+                  <% if !@applicant.persisted? %>
                       <a href="#" class="close close-1 remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \'Add Member\'. When you\'re finished, select CONTINUE.')" data-target="#new_employee_dependent_form"><%= image_tag "member-close.png" %></a>
                   <% else %>
-                      <%= link_to insured_family_member_path(dependent), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
+                      <%= link_to insured_family_member_path(@applicant), class: 'close close-2', :method => :delete, :remote => true, data: {confirm: l10n("confirm_remove_dependent"), ok: l10n("yes"), cancel: l10n("no")} do
                         '<i class="fa fa-times"></i>'.html_safe
                       end %>
                   <% end %>
@@ -93,14 +93,14 @@
             <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
                 <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
-                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{dependent.id}"}, dependent.dob %>
+                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
               </div>
             </div>
 
 
             <div class="col-md-3 col-sm-3 no-pd">
               <div class="form-group form-group-lg">
-                <%= f.text_field :ssn, value: dependent.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
+                <%= f.text_field :ssn, value: @applicant.ssn,class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
               </div>
             </div>
 
@@ -215,14 +215,14 @@
         </div>
 
         <div class="clearfix"></div>
-        <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
+        <div id="add_info_buttons_<%= @applicant.id %>" style="padding-top: 20px;">
 
-          <% if !dependent.persisted? %>
+          <% if !@applicant.persisted? %>
               <a href="#" class="btn btn-default remove-new-employee-dependent" onclick="$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\'. When you’re finished, select CONTINUE.')" data-target="#new_employee_dependent_form">
                 <%= l10n("cancel") %>
               </a>
           <% else %>
-              <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(dependent), :remote => true %>
+              <%= link_to "<span class='glyphicon glyphicon-remove-circle' aria-hidden='true'></span> #{l10n("cancel")}".html_safe, insured_family_member_path(@applicant), :remote => true %>
           <% end %>
 
           <%= f.button(id: 'confirm-member', class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');$('#dependents_info_wrapper h4:first').text('If you need to get insurance coverage for other members of your household, select \‘Add Member\’. When you’re finished, select CONTINUE.');") do %>

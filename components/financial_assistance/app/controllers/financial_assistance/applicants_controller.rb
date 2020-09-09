@@ -19,10 +19,15 @@ module FinancialAssistance
     def create
       @applicant = FinancialAssistance::Forms::Applicant.new(params.require(:applicant).permit(*applicant_parameters))
       @applicant.application_id = params[:application_id]
-      @applicant.save
+      success, _result = @applicant.save
 
       respond_to do |format|
-        format.js { render js: "window.location = '#{edit_application_path(@application)}'"}
+        if success
+          format.js { render js: "window.location = '#{edit_application_path(@application)}'"}
+        else
+          load_support_texts
+          format.js { render 'new' }
+        end
       end
     end
 

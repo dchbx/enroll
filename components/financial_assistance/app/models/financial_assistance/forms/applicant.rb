@@ -94,7 +94,10 @@ module FinancialAssistance
           application.ensure_relationship_with_primary(applicant, relationship)
           [true, applicant]
         else
-          [false, applicant_entity.failure.errors.to_h]
+          applicant_entity.failure.errors.to_h.collect{|key, msg| "#{key} #{msg[0]}"}.each do |error_msg|
+            errors.add(:base, error_msg)
+          end
+          [false, applicant_entity.failure]
         end
       end
 
@@ -134,6 +137,15 @@ module FinancialAssistance
           phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?},
           emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}
         }
+      end
+
+      def age_on(date)
+        age = date.year - dob.year
+        if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+          age - 1
+        else
+          age
+        end
       end
     end
   end

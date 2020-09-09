@@ -2,17 +2,18 @@ $('#dependents_info_wrapper h4:first').text("Please enter the information reques
 $('#btn-continue').addClass('disabled');
 
 <% if @applicant.errors.present?  %>
-  var dependent_response = $("<%= escape_javascript(render 'dependent_form', dependent: @applicant, person: @person) %>");
-  if($("#dependent_ul").find("form#new_dependent .alert-error").length){
-      $("#dependent_ul").find("form#new_dependent .alert-error").replaceWith($(dependent_response).find(".alert-error"));
+  var dependent_response = $("<%= escape_javascript(render 'dependent_form') %>");
+
+  if($("#dependent_ul").find("form#new_applicant .alert-error").length){
+      $("#dependent_ul").find("form#new_applicant .alert-error").replaceWith($(dependent_response).find(".alert-error"));
   }else {
-      $("#dependent_ul").find("form#new_dependent").prepend($(dependent_response).find(".alert-error"));
+      $("#dependent_ul").find("form#new_applicant").prepend($(dependent_response).find(".alert-error"));
   }
 <% else %>
   $("#new_employee_dependent_form").each(function(idx, ele) {
       $(ele).remove();
   });
-  $("#dependent_ul").append("<%= escape_javascript(render 'dependent_form', dependent: @applicant, person: @person) %>");
+  $("#dependent_ul").append("<%= escape_javascript(render 'dependent_form') %>");
 <% end %>
 
 $("#add_member_list_<%= @applicant.id %>").attr('data-confirm', '');
