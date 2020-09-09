@@ -90,7 +90,7 @@ module FinancialAssistance
             applicant = application.applicants.build(values)
             applicant.save
           end
-          application.ensure_relationship_with_primary(applicant, relationship)
+          application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
           [true, applicant]
         else
           applicant_entity.failure.errors.to_h.collect{|key, msg| "#{key} #{msg[0]}"}.each do |error_msg|
