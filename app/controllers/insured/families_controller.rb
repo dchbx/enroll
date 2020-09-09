@@ -69,19 +69,6 @@ class Insured::FamiliesController < FamiliesController
     @employee_role = @person.active_employee_roles.first if @person.active_employee_roles.present?
   end
 
-  def family_relationships_matrix
-    set_bookmark_url
-    @family_members = @family.active_family_members
-    @matrix = @family.build_relationship_matrix
-    @missing_relationships = @family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships
-    @tab = params['tab']
-
-    respond_to do |format|
-      format.html
-    end
-  end
-
   def find_sep
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @change_plan = params[:change_plan]

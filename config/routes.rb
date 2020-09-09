@@ -250,7 +250,6 @@ Rails.application.routes.draw do
       collection do
         get 'home'
         get 'manage_family'
-        get 'family_relationships_matrix'
         get 'personal'
         get 'inbox'
         get 'brokers'
@@ -311,8 +310,6 @@ Rails.application.routes.draw do
       get :show_resident_dependent, on: :member
     end
 
-    resources :family_relationships
-
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
         post :cancel
@@ -324,8 +321,6 @@ Rails.application.routes.draw do
         get :terminate_confirm
       end
     end
-
-    resources :family_relationships
   end
 
   namespace :employers do

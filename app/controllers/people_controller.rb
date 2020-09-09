@@ -140,10 +140,7 @@ class PeopleController < ApplicationController
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
         if member.save && @dependent.save
-          # @person.ensure_relationship_with(member, params[:family_member][:primary_relationship], family.id)
-          @dependent.person.add_relationship(@family.primary_applicant.person, params[:family_member][:primary_relationship], family.id, true)
-          @family.primary_applicant.person.add_relationship(@dependent.person, PersonRelationship::InverseMap[params[:family_member][:primary_relationship]], family.id)
-
+          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
@@ -171,8 +168,8 @@ class PeopleController < ApplicationController
     if !@dependent.nil?
       @family_member_id = @dependent._id
       if !@dependent.is_primary_applicant
-        @dependent.remove_relationship if @dependent.destroy
-        # @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
+        @dependent.destroy
+        @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
         @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
         @flash = "Family Member Removed"
       else

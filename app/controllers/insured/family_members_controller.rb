@@ -57,8 +57,6 @@ class Insured::FamilyMembersController < ApplicationController
       @prev_url_include_consumer_role_id = false
     end
     @source = session[:source_fa] = params[:source]
-    @matrix = @family.build_relationship_matrix
-    @missing_relationships = @family.find_missing_relationships(@matrix)
   end
 
   def new
@@ -74,10 +72,6 @@ class Insured::FamilyMembersController < ApplicationController
     if Family.find(@dependent.family_id).primary_applicant.person.resident_role?
       if @dependent.save
         @created = true
-        @matrix = @dependent.family.build_relationship_matrix
-        @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
-        @relationship_kinds = PersonRelationship::Relationships_UI
-        @missing_relation_url = insured_family_relationships_path(resident_role_id: @dependent.family_member.person.resident_role.id)
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
@@ -88,10 +82,6 @@ class Insured::FamilyMembersController < ApplicationController
 
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
-      @missing_relation_url = insured_family_relationships_path(consumer_role_id: params[:consumer_role_id], employee_role_id: params[:employee_role_id])
-      @matrix = @dependent.family.build_relationship_matrix
-      @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
-      @relationship_kinds = PersonRelationship::Relationships_UI
       @dependent.copy_finanacial_assistances_application
       financial_application = @dependent.family_member.family.application_in_progress
       @application = financial_application if financial_application.present?
@@ -128,9 +118,6 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def show
-    @matrix = @dependent.family.build_relationship_matrix
-    @missing_relationships = @dependent.family.find_missing_relationships(@matrix)
-    @relationship_kinds = PersonRelationship::Relationships
     respond_to do |format|
       format.html
       format.js
