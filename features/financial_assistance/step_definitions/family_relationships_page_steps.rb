@@ -3,12 +3,12 @@
 Given(/^at least two other household members exist$/) do
   click_link "Add New Person"
 
-  fill_in 'dependent[first_name]', :with => 'johnson'
-  fill_in 'dependent[last_name]', :with => 'smith'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', :with => '10/10/1984'
+  fill_in 'applicant[first_name]', :with => 'johnson'
+  fill_in 'applicant[last_name]', :with => 'smith'
+  fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/1984'
   #click_link(10)
   click_outside_datepicker('Household Info: Family Members')
-  fill_in 'dependent[ssn]', :with => '123456543'
+  fill_in 'applicant[ssn]', :with => '123456543'
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, '//label[@for="radio_male"]').click
@@ -16,12 +16,12 @@ Given(/^at least two other household members exist$/) do
   find(".btn", text: "CONFIRM MEMBER").click
 
   click_link "Add New Person"
-  fill_in 'dependent[first_name]', :with => 'smity'
-  fill_in 'dependent[last_name]', :with => 'johnson'
-  fill_in 'jq_datepicker_ignore_dependent[dob]', :with => '10/10/2010'
+  fill_in 'applicant[first_name]', :with => 'smity'
+  fill_in 'applicant[last_name]', :with => 'johnson'
+  fill_in 'jq_datepicker_ignore_applicant[dob]', :with => '10/10/2010'
   #click_link(10)
   click_outside_datepicker('Household Info: Family Members')
-  fill_in 'dependent[ssn]', :with => '123456549'
+  fill_in 'applicant[ssn]', :with => '123456549'
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
   find(:xpath, '//label[@for="radio_male"]').click

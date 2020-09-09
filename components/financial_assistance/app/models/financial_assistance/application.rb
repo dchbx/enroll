@@ -130,6 +130,8 @@ module FinancialAssistance
     end
 
     def update_or_build_relationship(applicant, relative, relation_kind)
+      puts "applicant.id #{applicant.id.inspect}"
+      puts "relative.id #{relative.id.inspect}"
       relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
 
       if relationship.present?

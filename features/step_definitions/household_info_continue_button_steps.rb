@@ -41,14 +41,14 @@ end
 
 Given(/^at least one other household members exist$/) do
   click_link "Add New Person"
-  fill_in "dependent_first_name", with: 'johnson'
-  fill_in "dependent_last_name", with: 'smith'
+  fill_in "applicant_first_name", with: 'johnson'
+  fill_in "applicant_last_name", with: 'smith'
   fill_in "family_member_dob_", with: '10/10/1984'
-  fill_in "dependent_ssn", with: '123456543'
+  fill_in "applicant_ssn", with: '123456543'
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/label[1]').click
   # Click label
-  find('#new_dependent > div.house.col-md-12.col-sm-12.col-xs-12.no-pd > div:nth-child(5) > div.col-md-5.mt18 > label.static_label.label-floatlabel.mt-label').click
+  find('#new_applicant > div.house.col-md-12.col-sm-12.col-xs-12.no-pd > div:nth-child(5) > div.col-md-5.mt18 > label.static_label.label-floatlabel.mt-label').click
   # Click Dropdown Label
   find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/span', visible: false).click
   # Click option
@@ -56,6 +56,11 @@ Given(/^at least one other household members exist$/) do
   #find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul').click
   #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/p').click
   #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[7]').click
+  choose('applicant_us_citizen_true', allow_label_click: true)
+  choose('applicant_naturalized_citizen_false', allow_label_click: true)
+  choose('indian_tribe_member_no', allow_label_click: true)
+  choose('radio_incarcerated_no', allow_label_click: true)
+
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   find(".btn", text: "CONFIRM MEMBER").click
 
