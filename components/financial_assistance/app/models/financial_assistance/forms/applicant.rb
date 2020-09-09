@@ -137,8 +137,11 @@ module FinancialAssistance
       end
 
       def nested_parameters
-        address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        address_params = primary_applicant_address_attributes if address_params.empty? && same_with_primary == 'true'
+        address_params = if same_with_primary == 'true'
+          primary_applicant_address_attributes
+        else
+          addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
+        end
 
         {
           addresses_attributes: address_params,
