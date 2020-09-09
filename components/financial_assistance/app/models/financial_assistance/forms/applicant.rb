@@ -124,6 +124,11 @@ module FinancialAssistance
           is_temporarily_out_of_state: is_temporarily_out_of_state
         }.reject{|_k, val| val.nil?}
 
+        if same_with_primary == 'true'
+          primary =  application.primary_applicant
+          attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
+        end
+
         attrs.merge({
                       addresses: nested_parameters[:addresses_attributes].values,
                       phones: nested_parameters[:phones_attributes].values,
@@ -132,11 +137,25 @@ module FinancialAssistance
       end
 
       def nested_parameters
+        address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
+        address_params = primary_applicant_address_attributes if address_params.empty? && same_with_primary == 'true'
+
         {
-          addresses_attributes: addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?},
+          addresses_attributes: address_params,
           phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?},
           emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}
         }
+      end
+
+      def primary_applicant_address_attributes
+        primary = application.primary_applicant
+        if home_address = primary.addresses.in(kind: 'home').first
+          address_params = {
+            0 => home_address.attributes.slice('address_1', 'address_2', 'address_3', 'county', 'country_name', 'kind', 'city', 'state', 'zip')
+          }
+        end
+
+        address_params || {}
       end
 
       def age_on(date)

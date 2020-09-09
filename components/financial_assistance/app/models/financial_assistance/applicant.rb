@@ -100,7 +100,7 @@ module FinancialAssistance
     field :is_consumer_role, type: Boolean
     field :is_resident_role, type: Boolean
     field :vlp_document_id, type: String
-    field :same_with_primary, type: Boolean
+    field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
 
     field :assisted_income_validation, type: String, default: "pending"
@@ -751,6 +751,36 @@ module FinancialAssistance
 
     def eligible_health_coverage_exists?
       benefits.eligible.present?
+    end
+
+    def attributes_for_export
+      attributes.slice(*[
+        :_id,
+        :family_member_id,
+        :name_pfx,
+        :first_name,
+        :middle_name,
+        :last_name,
+        :name_sfx,
+        :gender,
+        :dob,
+        :is_incarcerated,
+        :is_disabled,
+        :ethnicity,
+        :race,
+        :indian_tribe_member,
+        :tribal_id,
+        :language_code,
+        :no_dc_address,
+        :is_homeless,
+        :is_temporarily_out_of_state,
+        :no_ssn,
+        :citizen_status,
+        :is_consumer_role,
+        :vlp_document_id,
+        :same_with_primary,
+        :is_applying_coverage
+      ]).merge(ssn: ssn)
     end
 
     class << self

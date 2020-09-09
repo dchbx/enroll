@@ -20,9 +20,9 @@ module Services
                     is_consumer_role: true,
                     indian_tribe_member: person.consumer_role.is_tribe_member?,
                     is_incarcerated: person.is_incarcerated,
-                    addresses: construct_association_fields(person.addresses),
-                    phones: construct_association_fields(person.phones),
-                    emails: construct_association_fields(person.emails)
+                    addresses_attributes: construct_association_fields(person.addresses),
+                    phones_attributes: construct_association_fields(person.phones),
+                    emails_attributes: construct_association_fields(person.emails)
                   })
     end
 
