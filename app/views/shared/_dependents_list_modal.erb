@@ -30,9 +30,9 @@
                   </td>
                   <td>
                     <% if subscriber.blank? %>
-                      <%= @hbx_enrollment.consumer_role.person.find_relationship_with(d.person, d.family.id) %>
+                      <%= @hbx_enrollment.consumer_role.person.find_relationship_with(d.person) %>
                     <% else %>
-                      <%= subscriber.first.person.find_relationship_with(d.person, d.family.id) %>
+                      <%= subscriber.first.person.find_relationship_with(d.person) %>
                     <% end %>
                   </td>
                 </tr>

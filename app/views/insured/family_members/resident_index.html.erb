@@ -73,7 +73,7 @@
         <% else %>
           <%= render  partial: 'shared/resident_progress', locals: {
             step: '3',
-            url: @missing_relationships.present? ? insured_family_relationships_path(:resident_role_id => @person.resident_role.id) : (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+            url: (@resident_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
           } %>
         <% end %>
       </div>

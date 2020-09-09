@@ -22,13 +22,12 @@
         <% elsif @type == "employee" %>
           <%= render  partial: 'shared/signup_progress', locals: {
               step: '4',
-              # url: @missing_relationships.present? ? insured_family_relationships_path(:employee_role_id => @employee_role.id) : group_selection_url
               url: group_selection_url
           } %>
         <% else %>
           <%= render  partial: 'shared/individual_progress', locals: {
               step: '3',
-              url: @missing_relationships.present? ? insured_family_relationships_path(:consumer_role_id => @consumer_role.id) : (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
+              url: (@consumer_role.present? && !is_under_open_enrollment? ? find_sep_url : group_selection_url)
           } %>
         <% end %>
       </div>
