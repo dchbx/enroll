@@ -577,8 +577,8 @@ class Person
       existing_relationship.update_attributes(:kind => relationship)
     elsif id != person.id
       self.person_relationships << PersonRelationship.new({
-                                                              :kind => relationship,
-                                                              :relative_id => person.id
+                                                            :kind => relationship,
+                                                            :relative_id => person.id
                                                           })
     end
   end

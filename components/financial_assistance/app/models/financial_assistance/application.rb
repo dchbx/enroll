@@ -397,7 +397,7 @@ module FinancialAssistance
     end
 
     def import_applicants
-      # TODO Remove this dependency
+      # TODO: Remove this dependency
       family_payload = ::Services::FamilyService.call(family)
       family_payload.each {|member_attributes| applicants.build(member_attributes) }
     end

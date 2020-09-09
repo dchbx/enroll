@@ -558,16 +558,12 @@ describe Family, ".find_or_build_from_employee_role:", type: :model, dbclean: :a
   let(:child)         { FactoryBot.create(:person, last_name: "sheen", first_name: "sam") }
   let(:grandpa)       { FactoryBot.create(:person, last_name: "sheen", first_name: "martin") }
 
-  let(:married_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"),
-                                 PersonRelationship.new(relative: child, kind: "child")] }
-  let(:family_relationships)  {  married_relationships <<
-      PersonRelationship.new(relative: grandpa, kind: "grandparent") }
+  let(:married_relationships) {[PersonRelationship.new(relative: spouse, kind: 'spouse'), PersonRelationship.new(relative: child, kind: 'child')]}
+  let(:family_relationships) {married_relationships << PersonRelationship.new(relative: grandpa, kind: 'grandparent')}
 
-  let(:single_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "tigerblood") }
-  let(:married_dude)  { FactoryBot.create(:person, last_name: "sheen", first_name: "chuck",
-                                          person_relationships: married_relationships ) }
-  let(:family_dude)   { FactoryBot.create(:person, last_name: "sheen", first_name: "charles",
-                                          person_relationships: family_relationships ) }
+  let(:single_dude) {FactoryBot.create(:person, last_name: 'sheen', first_name: 'tigerblood')}
+  let(:married_dude) {FactoryBot.create(:person, last_name: 'sheen', first_name: 'chuck', person_relationships: married_relationships)}
+  let(:family_dude) {FactoryBot.create(:person, last_name: 'sheen', first_name: 'charles', person_relationships: family_relationships)}
 
   let(:single_employee_role)    { FactoryBot.create(:employee_role, person: single_dude) }
   let(:married_employee_role)   { FactoryBot.create(:employee_role, person: married_dude) }
