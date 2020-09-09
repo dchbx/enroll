@@ -58,7 +58,7 @@ module FinancialAssistance
     field :timeout_response_last_submitted_at, type: DateTime
 
     # The `assistance_year` of an application gets set during the submission of an application.
-    # Use `application_applicable_year` method in the Family model incase you need `assistance_year`
+    # Use `HbxProfile.faa_application_applicable_year` method in the Family model incase you need `assistance_year`
     # when aplication is in a `draft state`.
     field :assistance_year, type: Integer
 
@@ -633,7 +633,7 @@ module FinancialAssistance
     end
 
     def set_assistance_year
-      update_attribute(:assistance_year, application_applicable_year)
+      update_attribute(:assistance_year, HbxProfile.faa_application_applicable_year)
     end
 
     def set_effective_date
@@ -664,17 +664,6 @@ module FinancialAssistance
 
     def unset_effective_date
       update_attribute(:effective_date, nil)
-    end
-
-    def application_applicable_year
-      current_year = TimeKeeper.date_of_record.year
-      enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
-      current_hbx = HbxProfile.current_hbx
-      if current_hbx&.under_open_enrollment? && current_year == enrollment_start_on_year.year
-        current_year + 1
-      else
-        current_year
-      end
     end
 
     def application_submission_validity

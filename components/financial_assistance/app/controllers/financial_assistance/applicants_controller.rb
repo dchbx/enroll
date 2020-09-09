@@ -174,12 +174,13 @@ module FinancialAssistance
         :is_consumer_role,
         :same_with_primary,
         :no_dc_address,
+        :is_temporarily_out_of_state,
+        :is_homeless,
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],
           :ethnicity => [] }
       ]
     end
-
   end
 end

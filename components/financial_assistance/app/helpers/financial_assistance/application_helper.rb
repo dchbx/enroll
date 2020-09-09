@@ -177,22 +177,10 @@ module FinancialAssistance
     def support_text_placeholders(raw_support_text)
       # set <application-applicable-year> placeholdersr
       return [] if @application.nil?
-      assistance_year = application_applicable_year.to_s
+      assistance_year = HbxProfile.faa_application_applicable_year.to_s
 
       raw_support_text.update(raw_support_text).each do |_key, value|
         value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
-      end
-    end
-
-    def application_applicable_year
-      current_year = TimeKeeper.date_of_record.year
-      enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
-      current_hbx = HbxProfile.current_hbx
-
-      if current_hbx&.under_open_enrollment? && current_year == enrollment_start_on_year.year
-        current_year + 1
-      else
-        current_year
       end
     end
 

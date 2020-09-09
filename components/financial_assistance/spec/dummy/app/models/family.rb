@@ -780,20 +780,9 @@ class Family
     enrollments.verification_needed.any?
   end
 
-  def application_applicable_year
-    current_year = TimeKeeper.date_of_record.year
-    enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
-    current_hbx = HbxProfile.current_hbx
-    if current_hbx&.under_open_enrollment? && current_year == enrollment_start_on_year.year
-      current_year + 1
-    else
-      current_year
-    end
-  end
-
   def latest_applicable_submitted_application
     return nil unless applications.present?
-    applications.where(:assistance_year => application_applicable_year, :aasm_state.in => ["submitted", "determined"]).order_by(:submitted_at => 'desc').first
+    applications.where(:assistance_year => HbxProfile.application_applicable_year, :aasm_state.in => ["submitted", "determined"]).order_by(:submitted_at => 'desc').first
   end
 
   def has_financial_assistance_verification?
@@ -810,7 +799,7 @@ class Family
 
   def active_approved_application
     # Returns the most recent application that is approved (has eligibility determination) for the current year.
-    applications.where(aasm_state: "determined", assistance_year: application_applicable_year).order_by(:submitted_at => 'desc').first
+    applications.where(aasm_state: "determined", assistance_year: HbxProfile.application_applicable_year).order_by(:submitted_at => 'desc').first
   end
 
   def approved_applications_for_year(year)

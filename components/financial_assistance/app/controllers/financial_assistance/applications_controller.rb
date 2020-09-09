@@ -238,7 +238,7 @@ module FinancialAssistance
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
-      coverage_year = helpers.application_applicable_year
+      coverage_year = HbxProfile.faa_application_applicable_year
       @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
       @model.tax_households.each do |txh|
