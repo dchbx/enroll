@@ -4,27 +4,31 @@ RSpec.describe Importers::Transcripts::FamilyTranscript, type: :model do
 
   describe "find_or_build_family" do
 
-    let!(:spouse)  do
+    let!(:spouse) do
       p = FactoryBot.create(:person)
       p.person_relationships.build(relative: person, kind: "spouse")
-      p.save; p
+      p.save
+      p
     end
 
-    let!(:child1)  do
-      p = FactoryBot.create(:person) 
-      p.person_relationships.build(relative: person, kind: "child") 
-      p.save; p 
+    let!(:child1) do
+      p = FactoryBot.create(:person)
+      p.person_relationships.build(relative: person, kind: "child")
+      p.save
+      p
     end
 
-    let!(:child2)  do
-      p = FactoryBot.create(:person) 
-      p.person_relationships.build(relative: person, kind: "child") 
-      p.save; p 
+    let!(:child2) do
+      p = FactoryBot.create(:person)
+      p.person_relationships.build(relative: person, kind: "child")
+      p.save
+      p
     end
 
-    let!(:person) do  
-      p = FactoryBot.build(:person)  
-      p.save; p 
+    let!(:person) do
+      p = FactoryBot.build(:person)
+      p.save
+      p
     end
 
     context "Family already exists" do
