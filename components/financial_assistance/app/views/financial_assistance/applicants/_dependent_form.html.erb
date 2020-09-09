@@ -9,7 +9,7 @@
         <% if @applicant.errors.any? %>
             <div class="alert alert-error">
               <h4>
-                <%= "#{pluralize(@applicant.errors.size, "error")} prohibited this family member from being saved:" %>
+                <%= "#{pluralize(@applicant.errors.size, "error")} prohibited this applicant from being saved:" %>
               </h4>
               <ul>
                 <% @applicant.errors.full_messages.each do |msg| %>

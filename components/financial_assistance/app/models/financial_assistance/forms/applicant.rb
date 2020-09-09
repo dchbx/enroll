@@ -25,7 +25,6 @@ module FinancialAssistance
       validates_presence_of :first_name, :allow_blank => nil
       validates_presence_of :last_name, :allow_blank => nil
       validates_presence_of :gender, :allow_blank => nil
-      validates_presence_of :family_id, :allow_blank => nil
       validates_presence_of :dob
       validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
       validate :relationship_validation
@@ -42,6 +41,7 @@ module FinancialAssistance
         @addresses = %w[home mailing].collect{|kind| FinancialAssistance::Locations::Address.new(kind: kind) }
         @phones    = FinancialAssistance::Locations::Phone::KINDS.collect{|kind| FinancialAssistance::Locations::Phone.new(kind: kind) }
         @emails    = FinancialAssistance::Locations::Email::KINDS.collect{|kind| FinancialAssistance::Locations::Email.new(kind: kind) }
+
         @same_with_primary = "true"
         @is_applying_coverage = true
       end
@@ -64,7 +64,7 @@ module FinancialAssistance
                         elsif @us_citizen == true && @naturalized_citizen.nil?
                           "Naturalized citizen is required"
                         end
-        self.errors.add(:base, error_message)
+        self.errors.add(:base, error_message) if error_message.present?
       end
 
       def application
@@ -78,6 +78,7 @@ module FinancialAssistance
       end
 
       def save
+        return false unless valid?
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
 
         if applicant_entity.success?
@@ -166,6 +167,15 @@ module FinancialAssistance
           age - 1
         else
           age
+        end
+      end
+
+      def relationship_validation
+        return if relationship.blank?
+        primary_relations = application.primary_applicant.relationships.pluck(:kind)
+
+        if ['spouse', 'life_partner'].include?(relationship) && primary_relations.any?{|relation| ['spouse', 'life_partner'].include?(relation)}
+          self.errors.add(:base, "can not have multiple spouse or life partner")
         end
       end
     end

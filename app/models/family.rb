@@ -860,6 +860,14 @@ class Family
     enrollments.verification_needed.any?
   end
 
+  def application_in_progress
+    # Do we disable creating new Applications if there is one already in “draft”?
+    # Also implement the logic to populate assistance_year (current_year or next_year based on application done before/after OE)
+    #applications.where(aasm_state: "draft", assistance_year: TimeKeeper.date_of_record.year).last
+    applications.where(aasm_state: "draft").last
+  end
+
+
   class << self
 
     # Set the sort order to return families by primary applicant last_name, first_name
