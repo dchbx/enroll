@@ -32,9 +32,9 @@ module FinancialAssistance
         required(:same_with_primary).filled(:bool)
         required(:is_applying_coverage).filled(:bool)
 
-        optional(:addresses).filled(:array)
-        optional(:phones).filled(:array)
-        optional(:emails).filled(:array)
+        optional(:addresses).maybe(:array)
+        optional(:phones).maybe(:array)
+        optional(:emails).maybe(:array)
       end
 
       rule(:addresses).each do
