@@ -16,35 +16,35 @@ class PersonRelationship
                               guardian court\ appointed\ guardian collateral\ dependent life\ partner)
 
   Relationships = [
-    "spouse",
-    "life_partner",
-    "child",
-    "adopted_child",
-    "annuitant", # no inverse
-    "aunt_or_uncle",
-    "brother_or_sister_in_law",
-    "collateral_dependent",
-    "court_appointed_guardian",
-    "daughter_or_son_in_law",
-    "dependent_of_a_minor_dependent",
-    "father_or_mother_in_law",
-    "foster_child",
-    "grandchild",
-    "grandparent",
-    "great_grandchild",
-    "great_grandparent",
-    "guardian",
-    "nephew_or_niece",
-    "other_relationship",
-    "parent",
-    "sibling",
-    "sponsored_dependent",
-    "stepchild",
-    "stepparent",
-    "trustee", # no inverse
-    "unrelated",
-    "ward",
-    "stepson_or_stepdaughter"
+      "spouse",
+      "life_partner",
+      "child",
+      "adopted_child",
+      "annuitant", # no inverse
+      "aunt_or_uncle",
+      "brother_or_sister_in_law",
+      "collateral_dependent",
+      "court_appointed_guardian",
+      "daughter_or_son_in_law",
+      "dependent_of_a_minor_dependent",
+      "father_or_mother_in_law",
+      "foster_child",
+      "grandchild",
+      "grandparent",
+      "great_grandchild",
+      "great_grandparent",
+      "guardian",
+      "nephew_or_niece",
+      "other_relationship",
+      "parent",
+      "sibling",
+      "sponsored_dependent",
+      "stepchild",
+      "stepparent",
+      "trustee", # no inverse
+      "unrelated",
+      "ward",
+      "stepson_or_stepdaughter"
   ]
 
   Relationships_UI = [
@@ -85,7 +85,6 @@ class PersonRelationship
     "other_relationship" => "other_relationship",
     "cousin" => "cousin",
     "unrelated" => "unrelated",
-    "domestic_partner" => "domestic_partner",
 
     #one directional
     "foster_child" => "guardian",
@@ -100,11 +99,6 @@ class PersonRelationship
 
   field :relative_id, type: BSON::ObjectId # Deprecated
   field :kind, type: String
-  field :predecessor_id, type: BSON::ObjectId
-  field :successor_id, type: BSON::ObjectId
-  field :family_id, type: BSON::ObjectId
-
-  validates_presence_of :predecessor_id, :successor_id, :family_id
 
   track_history :on => [:fields],
                 :scope => :person,
@@ -115,30 +109,17 @@ class PersonRelationship
                 :track_update  => true,    # track document updates, default is true
                 :track_destroy => true
 
-  # validates_presence_of :relative_id, message: "Choose a relative"
+  validates_presence_of :relative_id, message: "Choose a relative"
   validates :kind,
             presence: true,
             allow_blank: false,
             allow_nil:   false,
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
-  validate :check_predecessor_and_successor
 
   after_save :notify_updated
 
   def notify_updated
     person.notify_updated
-  end
-
-  def check_predecessor_and_successor
-    errors.add(:successor, "can't be the same as predecessor") if successor_id == predecessor_id
-  end
-
-  def predecessor
-    family.family_member.find(predecessor_id)
-  end
-
-  def successor
-    family.family_member.find(successor_id)
   end
 
   def parent
@@ -154,8 +135,7 @@ class PersonRelationship
 
   def relative
     return @relative if defined? @relative
-    @relative = Person.find(self.successor_id) unless self.successor_id.blank?
-    # @relative = Person.find(self.relative_id) unless self.relative_id.blank?
+    @relative = Person.find(self.relative_id) unless self.relative_id.blank?
   end
 
   def invert_relationship

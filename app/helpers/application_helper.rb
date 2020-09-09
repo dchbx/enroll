@@ -492,8 +492,7 @@ module ApplicationHelper
     relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
       BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
       PersonRelationship::Relationships_UI
-    # options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
-    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: PersonRelationship::InverseMap[dependent.family_member.try(:relationship)])
+    options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
   end
 
   def enrollment_progress_bar(plan_year, p_min, options = {:minimum => true})

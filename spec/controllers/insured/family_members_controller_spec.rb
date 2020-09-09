@@ -32,8 +32,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(@controller).to receive(:set_family)
         @controller.instance_variable_set(:@person, person)
         @controller.instance_variable_set(:@family, test_family)
-        allow(test_family).to receive(:build_relationship_matrix).and_return([])
-        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return('http://dchealthlink.com/insured/interactive_identity_verifications')
@@ -61,8 +59,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
         allow(@controller).to receive(:set_family)
         @controller.instance_variable_set(:@person, person)
         @controller.instance_variable_set(:@family, test_family)
-        allow(test_family).to receive(:build_relationship_matrix).and_return([])
-        allow(test_family).to receive(:find_missing_relationships).and_return([])
         allow(user).to receive(:has_hbx_staff_role?).and_return(false)
         sign_in(user)
         allow(controller.request).to receive(:referer).and_return(nil)
@@ -153,8 +149,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     before(:each) do
       allow(Forms::FamilyMember).to receive(:find).and_return(dependent)
       allow(dependent).to receive(:family).and_return(test_family)
-      allow(test_family).to receive(:build_relationship_matrix).and_return([])
-      allow(test_family).to receive(:find_missing_relationships).and_return([])
       sign_in(user)
       get :show, params: {id: family_member.id}
     end
@@ -201,8 +195,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       allow(dependent).to receive(:family_id).and_return(dependent_properties)
       allow(dependent).to receive(:family).and_return(test_family)
       allow(dependent).to receive(:copy_finanacial_assistances_application)
-      allow(test_family).to receive(:build_relationship_matrix).and_return([])
-      allow(test_family).to receive(:find_missing_relationships).and_return([])
       allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
       allow(family_member).to receive_message_chain(:family, :application_in_progress).and_return nil
       post :create, params: {dependent: dependent_properties}
