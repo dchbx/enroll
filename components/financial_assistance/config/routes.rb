@@ -21,6 +21,8 @@ FinancialAssistance::Engine.routes.draw do
     get :eligibility_response_error, on: :member
     get 'checklist_pdf', on: :collection, action: 'checklist_pdf', as: 'checklist_pdf'
 
+    resources :relationships
+
     resources :applicants do
       put :step, on: :member
       put ':step/:step', on: :member, action: 'step'
