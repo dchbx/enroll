@@ -36,11 +36,9 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
 
-      @family = @person.primary_family
-      @application = @person.primary_family.applications.find(params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+
       load_support_texts
-      matrix = @family.build_relationship_matrix
-      @missing_relationships = @family.find_missing_relationships(matrix)
     end
 
     def step # rubocop:disable Metrics/CyclomaticComplexity
