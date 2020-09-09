@@ -1036,25 +1036,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
     end
   end
-
-  describe "GET family_member_matrix" do
-
-    before :each do
-      allow(family).to receive(:active_family_members).and_return(family_members)
-      allow(family).to receive(:build_relationship_matrix).and_return([])
-      allow(family).to receive(:find_missing_relationships).and_return([])
-      get :family_relationships_matrix
-    end
-
-    it "should be a success" do
-      expect(response).to have_http_status(:success)
-    end
-
-    it "should render my account page" do
-      expect(response).to render_template("family_relationships_matrix")
-    end
-  end
-
 end
 
 RSpec.describe Insured::FamiliesController, dbclean: :after_each do

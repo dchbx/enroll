@@ -35,14 +35,13 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
     let(:spouse) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 30.years, ssn: '555532232') }
     let(:child)  { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 7.years, ssn: '555532230') }
     let(:child1) { FactoryBot.create(:person, dob: TimeKeeper.date_of_record - 2.years, ssn: '555532229') }
-    let!(:person) { FactoryBot.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on) }
-    let!(:family) do
-      family = FactoryBot.build(:family, :with_family_members, person: person, people: family_members)
-      person.person_relationships.create(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.create(predecessor_id: person.id, successor_id: child.id, kind: "parent", family_id: family.id)
-      person.save
-      family
+    let!(:person) do
+      per = FactoryBot.create(:person_with_employee_role, first_name: census_employee.first_name, last_name: census_employee.last_name, ssn: census_employee.ssn, dob: census_employee.dob, census_employee_id: census_employee.id, employer_profile_id: employer_profile.id, hired_on: census_employee.hired_on)
+      per.person_relationships = [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")]
+      per.save!
+      per
     end
+    let(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: family_members) }
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,:with_enrollment_members,  family: family, enrollment_members: family.family_members, benefit_group_id: benefit_group.id, benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id, effective_on: benefit_group.start_on, household: family.active_household, active_year: benefit_group.start_on.year)}
     let(:renewing_hbx_enrollment) { FactoryBot.create(:hbx_enrollment, :with_enrollment_members, enrollment_members: family.family_members, benefit_group_id: renewal_benefit_group.id, benefit_group_assignment_id: census_employee.benefit_group_assignments[1].id, family: family, effective_on: renewal_benefit_group.start_on, household: family.active_household, active_year: renewal_benefit_group.start_on.year)}
 
@@ -187,9 +186,12 @@ describe Importers::ConversionEmployeePolicyUpdate, dbclean: :after_each do
 
 
     context "and child dropped and new child added to employee's enrollment" do
+      let(:family_relationships) { [PersonRelationship.new(relative: spouse, kind: "spouse"), PersonRelationship.new(relative: child, kind: "child")] }
       let(:family_members) { [person, spouse, child] }
 
       before do
+        person.person_relationships = family_relationships
+        person.save!
         family.save
         census_employee.update_attributes(employee_role_id: person.employee_roles.first.id)
       end

@@ -9,7 +9,14 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
     let!(:spouse) { FactoryBot.create(:person) }
     let!(:child1) { FactoryBot.create(:person) }
     let!(:child2) { FactoryBot.create(:person) }
-    let!(:person)  { FactoryBot.create(:person)}
+    let!(:person) do
+      p = FactoryBot.build(:person)
+      p.person_relationships.build(relative: spouse, kind: "spouse")
+      p.person_relationships.build(relative: child1, kind: "child")
+      p.person_relationships.build(relative: child2, kind: "child")
+      p.save
+      p
+    end
 
     let(:source_effective_on) { Date.new(TimeKeeper.date_of_record.year, 1, 1) }
     let(:other_effective_on) { Date.new(TimeKeeper.date_of_record.year, 3, 1) }
@@ -51,12 +58,11 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
       family.family_members.build(is_primary_applicant: false, person: child1)
       family.family_members.build(is_primary_applicant: false, person: child2)
 
-      person.person_relationships.build(predecessor_id: person.id, successor_id: spouse.id, kind: "spouse", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id, successor_id: child1.id, kind: "parent", family_id: family.id)
-      person.person_relationships.build(predecessor_id: person.id, successor_id: child2.id, kind: "parent", family_id: family.id)
+      person.person_relationships.build(relative: spouse, kind: 'spouse')
+      person.person_relationships.build(relative: child1, kind: 'child')
+      person.person_relationships.build(relative: child2, kind: 'child')
 
       person.save
-      # person.person_relationships.update_all(family_id: family.id)
       family.save
       family.reload
     end
