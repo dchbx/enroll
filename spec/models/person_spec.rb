@@ -764,19 +764,18 @@ describe Person, :dbclean => :after_each do
 
   describe 'ensure_relationship_with' do
     let(:person10) { FactoryBot.create(:person) }
-    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person10)}
 
     describe 'with no relationship to a dependent' do
       context 'after ensure_relationship_with' do
-        let(:person11) do
-          human = FactoryBot.create(:person)
-          human.ensure_relationship_with(person10, 'child', family.id)
-          human
-        end
+        let(:person11) { FactoryBot.create(:person) }
 
         before do
-          person10.ensure_relationship_with(person11, 'child', family.id)
+          person10.ensure_relationship_with(person11, 'child')
           person10.save!
+        end
+
+        it 'should have the new relationship' do
+          expect(person10.person_relationships.first.relative_id).to eq(person11.id)
         end
 
         it 'should have fixed number of relationships' do
@@ -789,12 +788,13 @@ describe Person, :dbclean => :after_each do
       context 'after ensure_relationship_with a different type of relationship' do
         let(:person11) do
           human = FactoryBot.create(:person)
-          human.ensure_relationship_with(person10, 'child', family.id)
+          person10.person_relationships << PersonRelationship.new(relative_id: human.id, kind: 'child')
+          person10.save!
           human
         end
 
         before do
-          person10.ensure_relationship_with(person11, 'spouse', family.id)
+          person10.ensure_relationship_with(person11, 'spouse')
           person10.save!
         end
 
@@ -810,7 +810,7 @@ describe Person, :dbclean => :after_each do
 
     context 'should not create a relationship from self to self' do
       before do
-        person10.ensure_relationship_with(person10, 'unrelated', family.id)
+        person10.ensure_relationship_with(person10, 'unrelated')
         person10.save!
       end
 
@@ -1602,73 +1602,6 @@ describe Person, :dbclean => :after_each do
         end
       end
 
-    end
-  end
-
-  describe Person, "given a relationship to update", dbclean: :after_each do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let(:primary_person) {family.primary_applicant.person}
-    let(:relationship) { "spouse" }
-    let(:person) { FactoryBot.build(:person) }
-    subject { FactoryBot.build(:family_member, person: person, family: family).person }
-    let(:family_member2) {FactoryBot.create(:family_member, :family => family).person}
-    let(:family_member3) {FactoryBot.create(:family_member, :family => family).person}
-
-    it "should update the direct relationship from the context of both persons" do
-      subject.save
-      subject.add_relationship(primary_person, relationship, family.id)
-      primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
-      rel = subject.person_relationships.where(successor_id: primary_person.id, predecessor_id: subject.id).first.kind
-      expect(rel).to eq relationship
-      expect(subject.person_relationships.size).to eq 1
-    end
-
-    it "should create the relationships" do
-      subject.save
-      subject.add_relationship(primary_person, relationship, family.id)
-      primary_person.add_relationship(subject, PersonRelationship::InverseMap[relationship], family.id)
-
-      family_member2.add_relationship(primary_person, "parent", family.id)
-      primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
-
-      family_member3.add_relationship(primary_person, "child", family.id)
-      primary_person.add_relationship(family_member3, PersonRelationship::InverseMap["child"], family.id)
-
-      family.build_relationship_matrix
-      expect(primary_person.person_relationships.size).to eq 3
-      family_member2.add_relationship(primary_person, "unrelated", family.id) #Test for updating the exisiting relationship
-      primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["unrelated"], family.id)
-
-      expect(primary_person.person_relationships.size).to eq 3
-      expect(family_member2.person_relationships.size).to eq 1
-      unr_relationship = family_member2.person_relationships.where(successor_id: primary_person.id, predecessor_id: family_member2.id).first.kind
-      expect(unr_relationship).to eq "unrelated"
-    end
-
-    it "should build relationship" do
-      family_member2.build_relationship(primary_person, "spouse", family.id)
-      primary_person.build_relationship(family_member2, PersonRelationship::InverseMap["spouse"], family.id)
-      expect(primary_person.person_relationships.size).to eq 1
-    end
-
-    it "should destroy relationships associated to removed family member" do
-      family_member2.add_relationship(primary_person, "parent", family.id)
-      primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
-      expect(family_member2.person_relationships.size).to eq 1
-      family_member2.remove_relationship(family.id)
-      expect(family_member2.person_relationships.size).to eq 0
-    end
-
-    it "should return true if same successor exists" do
-      family_member2.add_relationship(primary_person, "parent", family.id)
-      primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
-      expect(family_member2.same_successor_exists?(primary_person, family.id)).to eq true
-    end
-
-    it "should not return true if same successor does not exists" do
-      family_member2.add_relationship(primary_person, "parent", family.id)
-      primary_person.add_relationship(family_member2, PersonRelationship::InverseMap["parent"], family.id)
-      expect(family_member2.same_successor_exists?(primary_person, family.id)).not_to eq false
     end
   end
 end
