@@ -270,6 +270,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
@@ -329,6 +330,15 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
     end
 
+    it "should redirect to family members page when current user is admin & doing new paper app and faa is disabled" do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return true
+      put :update, params: {person: person_params, id: 'test'}
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+    end
+
     it "should not update the person" do
       allow(controller).to receive(:update_vlp_documents).and_return(false)
       allow(consumer_role).to receive(:update_by_person).and_return(true)
@@ -370,6 +380,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
@@ -396,6 +407,19 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to have_http_status(:redirect)
       routes { FinancialAssistance::Engine.routes }
       expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+    end
+
+    it "should update consumer identity and application fields to valid and redirect to family members page when current user has application type as Curam and faa is disabled" do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      person_params["family"]["application_type"] = "Curam"
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, params: {person: person_params, id: "test"}
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
     it "should redirect to help paying for coverage page when current user has application type as Mobile" do
