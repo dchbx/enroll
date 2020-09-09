@@ -68,7 +68,7 @@ module Parsers::Xml::Cv::Importers
       person_demographics = fm.person_demographics
       person_relationships = fm.person_relationships
 
-      get_person_object_by(person, person_demographics, person_relationships, @id)
+      get_person_object_by(person, person_demographics, person_relationships)
     end
 
     def get_coverage_households_by_household_xml(household)
@@ -105,18 +105,13 @@ module Parsers::Xml::Cv::Importers
       tax_households
     end
 
+    # rubocop:disable Style/RescueModifier, Lint/EmptyRescueClause
     def generate_person_relationships_for_primary_applicant(family_member_objects)
       primary_applicant_person = family_member_objects.detect{|f| f.is_primary_applicant}.person rescue nil
       return if primary_applicant_person.blank?
 
-      # relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
-      # primary_applicant_person.person_relationships = relationships.reject{ |relation| relation.relative_id == primary_applicant_person.id }
-      temp_relation = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact
-
-      temp_relation.each do |relation|
-        primary_applicant_person.ensure_relationship_with(relation.person, relation.kind, family.id)
-        relation.destroy
-      end
+      primary_applicant_person.person_relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
     end
+    # rubocop:enable Style/RescueModifier, Lint/EmptyRescueClause
   end
 end

@@ -65,13 +65,14 @@ module BradysAfterAll
     end
 
     def create_mikes_family
-      family = FactoryBot.build(:family)
-
-      mike.ensure_relationship_with(carol, 'spouse', family.id)
+      mike.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "self")
+      mike.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "spouse")
       brady_children.each do |child|
-        mike.ensure_relationship_with(child, 'child', family.id)
+        mike.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
       end
+      mike.save
 
+      family = FactoryBot.build(:family)
       family.add_family_member(mike, is_primary_applicant: true)
       (bradys - [mike]).each do |brady|
         family.add_family_member(brady)
@@ -81,13 +82,14 @@ module BradysAfterAll
     end
 
     def create_carols_family
-      family = FactoryBot.build(:family)
-
-      carol.ensure_relationship_with(mike, 'spouse', family.id)
+      carol.person_relationships << PersonRelationship.new(relative_id: carol.id, kind: "self")
+      carol.person_relationships << PersonRelationship.new(relative_id: mike.id, kind: "spouse")
       brady_children.each do |child|
-        carol.ensure_relationship_with(child, 'child', family.id)
+        carol.person_relationships << PersonRelationship.new(relative_id: child.id, kind: "child")
       end
+      carol.save
 
+      family = FactoryBot.build(:family)
       family.add_family_member(carol, is_primary_applicant: true)
       (bradys - [carol]).each do |brady|
         family.add_family_member(brady)
@@ -103,11 +105,11 @@ module BradysAfterAll
       end
 
       last_year = TimeKeeper.date_of_record - 1.years
-      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: last_year, is_eligibility_determined: true)
+      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: last_year)
       mikes_family.latest_household.tax_households.first.eligibility_determinations << EligibilityDetermination.new(max_aptc: 200, csr_eligibility_kind: 'csr_100', csr_percent_as_integer: 100, determined_at: last_year, determined_on: last_year, source: 'Admin')
 
       current_date = TimeKeeper.date_of_record
-      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: current_date, is_eligibility_determined: true)
+      mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: current_date)
       mikes_family.latest_household.tax_households.last.eligibility_determinations << EligibilityDetermination.new(max_aptc: 100, csr_eligibility_kind: 'csr_87', csr_percent_as_integer: 87, determined_at: current_date, determined_on: current_date, source: 'Admin')
     end
 

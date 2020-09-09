@@ -33,7 +33,7 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
 
       it "should get relationship by person" do
         person = subject.get_family_object.family_members.last.person
-        expect(person.person_relationships.first.kind).to eq 'parent'
+        expect(person.person_relationships.first.kind).to eq 'child'
       end
 
       it "should get person info by family_members" do

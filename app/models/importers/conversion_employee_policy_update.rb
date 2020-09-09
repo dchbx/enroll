@@ -204,7 +204,7 @@ module Importers
 
           if person.blank?
             relationship = person_relationship_for(dependent.employee_relationship)
-            primary.ensure_relationship_with(matched[0], relationship, family.id)
+            primary.ensure_relationship_with(matched[0], relationship)
             family.add_family_member(matched[0])
           end
 

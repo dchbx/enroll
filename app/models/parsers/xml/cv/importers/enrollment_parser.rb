@@ -140,7 +140,7 @@ module Parsers::Xml::Cv::Importers
       person_demographics = member.person_demographics
       person_relationships = member.person_relationships
 
-      get_person_object_by(person, person_demographics, person_relationships, member.primary_family_id)
+      get_person_object_by(person, person_demographics, person_relationships)
     end
   end
 end

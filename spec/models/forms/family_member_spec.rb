@@ -322,7 +322,6 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
       expect(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil})).and_return(new_person)
-      expect(family).to receive(:build_relationship_matrix).and_return(true)
       subject.save
     end
 
@@ -464,7 +463,6 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     allow(Family).to receive(:find).and_return family
     allow(family).to receive(:primary_applicant).and_return family_member
     allow(person).to receive(:add_relationship).and_return nil
-    allow(family).to receive(:build_relationship_matrix).and_return true
   end
 
   it "should be considered persisted" do
@@ -492,6 +490,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     it "should update the person properties of the dependent" do
       allow(person).to receive(:update_attributes).with(person_properties.merge(attrs)).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
+      allow(family_member).to receive(:update_relationship).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)
     end
@@ -509,9 +508,9 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     let(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     it "should the old relationship from spouse to child" do
-      primary_person.person_relationships.create(predecessor_id: primary_person.id, :successor_id => dependent_person.id, :kind => "spouse", family_id: test_family.id)
+      primary_person.person_relationships.create(:relative_id => dependent_person.id, :kind => "spouse")
       expect(primary_person.person_relationships.first.kind).to eq "spouse"
-      primary_person.add_relationship(dependent_person, "child", test_family.id)
+      primary_person.ensure_relationship_with(dependent_person, "child")
       expect(primary_person.person_relationships.first.kind).to eq "child"
     end
   end
