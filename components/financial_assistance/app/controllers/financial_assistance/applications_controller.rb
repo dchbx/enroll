@@ -25,7 +25,6 @@ module FinancialAssistance
     end
 
     def create
-      primary_family_id
       @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
       @application.import_applicants
       @application.save!
