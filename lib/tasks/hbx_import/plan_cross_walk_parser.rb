@@ -10,6 +10,7 @@ module Parser
     element :plan_id_2018_hios, String, tag: "plan_id_2018_hios"
     element :plan_id_2019_hios, String, tag: "plan_id_2019_hios"
     element :plan_id_2020_hios, String, tag: "plan_id_2020_hios"
+    element :plan_id_2021_hios, String, tag: "plan_id_2021_hios"
     element :is_this_plan_catastrophic_or_child_only_plan, String, tag: "is_this_plan_catastrophic_or_child_only_plan"
     element :plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan"
     element :plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan"
@@ -25,6 +26,7 @@ module Parser
         plan_id_2018_hios: plan_id_2018_hios.present? ? plan_id_2018_hios.gsub(/\n/,'').strip : "",
         plan_id_2020_hios: plan_id_2020_hios.present? ? plan_id_2020_hios.gsub(/\n/,'').strip : "",
         plan_id_2019_hios: plan_id_2019_hios.present? ? plan_id_2019_hios.gsub(/\n/,'').strip : "",
+        plan_id_2021_hios: plan_id_2021_hios.present? ? plan_id_2021_hios.gsub(/\n/,'').strip : "",
         is_this_plan_catastrophic_or_child_only_plan: is_this_plan_catastrophic_or_child_only_plan.gsub(/\n/,'').strip,
         plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
         plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
