@@ -60,7 +60,7 @@ Given(/^the user will navigate to the FAA Household Info page$/) do
 end
 
 Given(/^the user SSN is nil$/) do
-  consumer.person.update_attributes(no_ssn: "1")
+  application.applicants.first.update_attributes(no_ssn: "1")
 end
 
 Given(/^the user has an eligible immigration status$/) do
@@ -68,7 +68,7 @@ Given(/^the user has an eligible immigration status$/) do
 end
 
 Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
-  consumer.person.update_attributes(dob: TimeKeeper.date_of_record - 19.years)
+  application.applicants.first.update_attributes(dob: TimeKeeper.date_of_record - 19.years)
 end
 
 Then(/^the have you applied for an SSN question should display$/) do
@@ -127,7 +127,7 @@ And(/^the user fills out the rest of form with medicaid during pregnancy as yes 
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
   choose('is_former_foster_care_no')
-  choose('is_student_no')
+  choose('is_student_no') if page.has_css?("#is_student_no", wait: 1)
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
   choose('is_resident_post_092296_no') if page.has_css?('#is_resident_post_092296_no', wait: 1)
@@ -171,7 +171,7 @@ Then(/^the is this person a student question should display$/) do
 end
 
 Given(/^the user answers yes to being a student$/) do
-  choose('is_student_yes')
+  choose('is_student_yes', allow_label_click: true)
 end
 
 And(/^the type of student question should display$/) do
