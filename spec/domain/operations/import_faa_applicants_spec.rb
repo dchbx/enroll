@@ -11,7 +11,7 @@ RSpec.describe Operations::ImportFaaApplicants, type: :model, dbclean: :after_ea
 
   context 'invalid application id passed' do
     let(:second_application) { FactoryBot.build(:financial_assistance_application, family: family) }
-    
+
     it 'should return a failure' do
       result = subject.call(application_id: second_application.id, family_id: family.id)
 
@@ -35,10 +35,10 @@ RSpec.describe Operations::ImportFaaApplicants, type: :model, dbclean: :after_ea
   context 'FAA application and family ids mismatching' do
     let(:second_person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:second_family) { FactoryBot.create(:family, :with_primary_family_member, person: second_person)}
-    
+
     it 'should return a failure' do
       result = subject.call(application_id: application.id, family_id: second_family.id)
-      
+
       expect(result.failure?).to be_truthy
       expect(result.failure).to eq(['Application family not matching the family ID passed'])
     end
@@ -46,7 +46,7 @@ RSpec.describe Operations::ImportFaaApplicants, type: :model, dbclean: :after_ea
 
   context 'FAA application and family passed' do
     subject { Operations::ImportFaaApplicants.new.call(application_id: application.id, family_id: family.id) }
-    
+
     it 'should return success' do
       expect(subject.success?).to be_truthy
       expect(subject.success.persisted?).to be_truthy
@@ -65,7 +65,7 @@ RSpec.describe Operations::ImportFaaApplicants, type: :model, dbclean: :after_ea
 
       expect(spouse_person.ssn).to eq spouse.ssn
       expect(spouse_person.dob).to eq spouse.dob
-      expect(spouse_person.consumer_role).to be_present    
+      expect(spouse_person.consumer_role).to be_present
 
       expect(spouse_person.addresses.count).to eq spouse.addresses.count
       expect(spouse_person.emails.count).to eq spouse.emails.count

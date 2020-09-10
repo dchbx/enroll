@@ -12,7 +12,7 @@ module FinancialAssistance
         # @param [ FinancialAssistance::Application ] application Applicant Attributes
         # @return [ Hash ] payload Application Payload
         def call(application:)
-          payload  = yield export(application)
+          payload = yield export(application)
 
           Success(payload)
         end
@@ -23,7 +23,7 @@ module FinancialAssistance
           payload = application.attributes.slice(:family_id, :effective_date)
           payload[:applicants] = application.applicants.collect {|applicant| applicant.attributes_for_export }
           payload[:relationships] = application.relationships.collect {|relationship| relationship.attributes.except(:_id, :created_at, :updated_at) }
-          
+
           Success(payload)
         end
       end

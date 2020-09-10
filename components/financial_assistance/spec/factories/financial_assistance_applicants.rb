@@ -19,15 +19,15 @@ FactoryBot.define do
     is_consumer_role true
 
     trait :with_ssn do
-      sequence(:ssn) { |n| 222222220 + n }
+      sequence(:ssn) { |n| 222_222_220 + n }
     end
 
     trait :with_work_email do
-      emails { [FactoryBot.build(:email, kind: "work") ] }
+      emails { [FactoryBot.build(:email, kind: "work")] }
     end
 
     trait :with_work_phone do
-      phones { [FactoryBot.build(:phone, kind: "work") ] }
+      phones { [FactoryBot.build(:phone, kind: "work")] }
     end
 
     trait :male do
@@ -39,14 +39,14 @@ FactoryBot.define do
     end
 
     trait :child do
-    	relationship { 'child' }
+      relationship { 'child' }
     end
 
     trait :spouse do
       relationship { 'spouse' }
     end
 
-	  trait :with_home_address do
+    trait :with_home_address do
       addresses { [FactoryBot.build(:financial_assistance_address)]}
     end
   end
