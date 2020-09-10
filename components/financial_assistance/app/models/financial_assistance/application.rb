@@ -149,14 +149,14 @@ module FinancialAssistance
 
     #TODO: start of work progress
     # Related to Relationship Matrix
-    def add_relationship(predecessor, successor, relationship_kind, destroy_relation=false)
+    def add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
       if same_relative_exists?(predecessor, successor)
         direct_relationship = relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first # Direct Relationship
 
         # Destroying the relationships associated to the Person other than the new updated relationship.
-        if direct_relationship != nil && destroy_relation
-          other_relations = relationships.where( applicant_id: predecessor.id, :id.nin =>[direct_relationship.id]).map(&:relative_id)
-          relationships.where(applicant_id: predecessor.id, :id.nin =>[direct_relationship.id]).each(&:destroy)
+        if !direct_relationship.nil? && destroy_relation
+          other_relations = relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).map(&:relative_id)
+          relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).each(&:destroy)
 
           other_relations.each do |otr|
             otr_relation = relationships.where(applicant_id: otr, relative_id: predecessor.id).first
@@ -165,10 +165,8 @@ module FinancialAssistance
         end
 
         direct_relationship.update(kind: relationship_kind)
-      else
-        if predecessor.id != successor.id
-          relationships.create(applicant_id: predecessor.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
-        end
+      elsif predecessor.id != successor.id
+        relationships.create(applicant_id: predecessor.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
       end
     end
 
@@ -197,7 +195,7 @@ module FinancialAssistance
       return 'self' if member_a_id == member_b_id
 
       rel = relationships.where(applicant_id: member_a_id, relative_id: member_b_id).first
-      return rel&.kind
+      rel&.kind
     end
 
     def find_all_relationships(matrix)
@@ -242,12 +240,11 @@ module FinancialAssistance
         relation = relation1 + relation2
         s_ids = relation.collect(&:relative_id)
 
-        if s_ids.count > s_ids.uniq.count
-          members = applicants.where(:id.in => rel.to_a.flatten)
-          members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: 'sibling')
-          members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: 'sibling')
-          missing_relationship = missing_relationship - [rel] #Remove Updated Relation from list of missing relationships
-        end
+        next unless s_ids.count > s_ids.uniq.count
+        members = applicants.where(:id.in => rel.to_a.flatten)
+        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: 'sibling')
+        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: 'sibling')
+        missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
       #GrandParent/GrandChild
