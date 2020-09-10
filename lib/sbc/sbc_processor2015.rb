@@ -48,20 +48,18 @@ class SbcProcessor2015
         product.sbc_document = Document.new({title: file_name, subject: "SBC", format: 'application/pdf', identifier: uri})
         product.sbc_document.save!
         product.save!
+        # end of new model
+
+        # old model
+        plan = Plan.where(active_year: product.active_year, hios_id: product.hios_id).first
+        plan.update_attributes(sbc_document: product.sbc_document) if plan.present?
+        # end old model
+
         counter += 1
         puts "Product #{product.title} #{product.hios_id}updated, SBC #{file_name}, Document uri #{product.sbc_document.identifier}" unless Rails.env.test?
-        # end of new model
       end
     end
 
-    # old model
-    Plan.where(active_year: 2020).each do |plan|
-      product = ::BenefitMarkets::Products::Product.where(hios_id: plan.hios_id).select{|a| a.active_year.to_i  == plan.active_year.to_i}.first
-
-      plan.sbc_document = product.sbc_document
-      plan.save
-    end
-    # end  old model
     puts "Total #{counter} plans/products updated." unless Rails.env.test?
 
   end
