@@ -130,10 +130,9 @@ module FinancialAssistance
     end
 
     def update_or_build_relationship(applicant, relative, relation_kind)
-      puts "applicant.id #{applicant.id.inspect}"
-      puts "relative.id #{relative.id.inspect}"
-      relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
+      return if applicant.blank? || relative.blank? || relation_kind.blank?
 
+      relationship = relationships.where(applicant_id: applicant.id, relative_id: relative.id).first
       if relationship.present?
         relationship.update(kind: relation_kind)
         return relationship
@@ -646,8 +645,12 @@ module FinancialAssistance
     #   write_attribute(:benchmark_product_id, benchmark_product_id)
     # end
 
+    def active_approved_application
+      family.applications.where(aasm_state: "determined", assistance_year: HbxProfile.faa_application_applicable_year).order_by(:submitted_at => 'desc').first if family.present?
+    end
+
     def set_external_identifiers
-      app = family.active_approved_application
+      app = active_approved_application
       return unless app.present?
       write_attribute(:haven_app_id, app.haven_app_id)
       write_attribute(:haven_ic_id, app.haven_ic_id)
