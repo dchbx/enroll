@@ -362,8 +362,7 @@ module FinancialAssistance
     # Get the {FamilyMember} who is primary for this application.
     # @return [ {FamilyMember} ] primary {FamilyMember}
     def primary_applicant
-      return @primary_applicant if defined?(@primary_applicant)
-      @primary_applicant = active_applicants.detect(&:is_primary_applicant?)
+      @primary_applicant ||= applicants.detect(&:is_primary_applicant?)
     end
 
     def find_applicant(id)
