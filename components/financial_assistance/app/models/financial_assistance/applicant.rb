@@ -83,6 +83,8 @@ module FinancialAssistance
     field :gender, type: String
     field :dob, type: Date
 
+    field :is_primary_applicant, type: Boolean, default: false
+
     field :is_incarcerated, type: Boolean
     field :is_disabled, type: Boolean
     field :ethnicity, type: Array
@@ -471,32 +473,6 @@ module FinancialAssistance
       is_without_assistance
     end
 
-    def is_primary_applicant?
-      return false if family_member.blank?
-      family_member.is_primary_applicant?
-    end
-
-    def family_member
-      @family_member ||= FamilyMember.find(family_member_id)
-    end
-
-    def consumer_role
-      return @consumer_role if defined?(@consumer_role)
-      @consumer_role = person.consumer_role
-    end
-
-    def person
-      @person ||= family_member.person
-    end
-
-    def first_name
-      if family_member.present?
-        person.first_name
-      else
-        read_attribute(:first_name)
-      end
-    end
-
     def full_name
       @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
     end
@@ -521,7 +497,6 @@ module FinancialAssistance
 
     def age_on_effective_date
       return @age_on_effective_date unless @age_on_effective_date.blank?
-      dob = family_member.person.dob
       coverage_start_on = ::Forms::TimeKeeper.new.date_of_record
       return unless coverage_start_on.present?
       age = coverage_start_on.year - dob.year
@@ -800,11 +775,7 @@ module FinancialAssistance
 
     def other_questions_answers
       [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-        no_ssn_flag = if family_member.present?
-                        consumer_role.no_ssn
-                      else
-                        no_ssn
-                      end
+        no_ssn_flag = no_ssn
 
         array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
         array
@@ -812,7 +783,7 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :family_member_id, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
     end
 
     def driver_question_responses
@@ -886,11 +857,7 @@ module FinancialAssistance
     end
 
     def age_of_applicant
-      if family_member.present?
-        family_member.person.age_on(TimeKeeper.date_of_record)
-      else
-        age_on(TimeKeeper.date_of_record)
-      end
+      age_on(TimeKeeper.date_of_record)
     end
 
     def clean_params(model_params) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this

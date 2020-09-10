@@ -564,7 +564,7 @@ module FinancialAssistance
     def import_applicants
       # TODO: Remove this dependency
       family_payload = ::Services::FamilyService.call(family)
-      family_payload.each {|member_attributes| applicants.build(member_attributes) }
+      family_payload.each { |member_attributes| applicants.build(member_attributes) }
     end
 
     def current_csr_eligibility_kind(tax_household_id)
@@ -652,7 +652,11 @@ module FinancialAssistance
       self.active_applicants.each do |applicant|
         return false unless applicant.applicant_validation_complete?
       end
-      application_valid && family.relationships_complete?
+      application_valid && relationships_complete?
+    end
+
+    def relationships_complete?
+      true
     end
 
     def is_draft?
