@@ -236,6 +236,8 @@ module FinancialAssistance
     alias is_medicare_eligible? is_medicare_eligible
     alias is_joint_tax_filing? is_joint_tax_filing
 
+    attr_accessor :relationship
+
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
 
     def us_citizen=(val)
@@ -291,6 +293,8 @@ module FinancialAssistance
     end
 
     def relation_with_primary
+      return 'self' if is_primary_applicant?
+
       primary_relationship = relationships.in(relative_id: application.primary_applicant.id).first
       primary_relationship&.kind
     end
@@ -754,7 +758,7 @@ module FinancialAssistance
     end
 
     def attributes_for_export
-      attributes.slice(*[
+      applicant_params = attributes.slice(*[
         :_id,
         :family_member_id,
         :name_pfx,
@@ -780,7 +784,17 @@ module FinancialAssistance
         :vlp_document_id,
         :same_with_primary,
         :is_applying_coverage
-      ]).merge(ssn: ssn)
+      ]).symbolize_keys
+
+      applicant_params.merge!(ssn: ssn, relationship: relation_with_primary)
+      applicant_params[:addresses] = construct_association_fields(addresses)
+      applicant_params[:emails] = construct_association_fields(emails)
+      applicant_params[:phones] = construct_association_fields(phones)
+      applicant_params
+    end
+
+    def construct_association_fields(records)
+      records.collect{|record| record.attributes.except(:_id, :created_at, :updated_at) }
     end
 
     class << self

@@ -9,13 +9,6 @@ module FinancialAssistance
       def initialize(family, opts = {})
         @family = family
         @application_id = opts[:application_id]
-        @code = generate_code
-      end
-
-      def generate_code
-        return :no_app unless family.applications.present?
-        return :sync! if drafted_app.present?
-        return :copy! if submitted_app.present?
       end
 
       def drafted_app
@@ -25,10 +18,6 @@ module FinancialAssistance
       def submitted_app
         return family.latest_submitted_application if application_id.blank?
         family.applications.find application_id
-      end
-
-      def process_application
-        send(code)
       end
 
       def sync!
