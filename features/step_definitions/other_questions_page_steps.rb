@@ -113,10 +113,10 @@ And(/^the user fills out the rest of the other questions form and submits it$/) 
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
   choose('is_former_foster_care_no')
-  choose('is_student_no')
+  choose('is_student_no') if page.has_css?('#is_student_no')
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
-  choose('is_resident_post_092296_no') if page.has_css?('is_resident_post_092296_no', wait: 1)
+  choose('is_resident_post_092296_no') if page.has_css?('#is_resident_post_092296_no', wait: 1)
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
 end
@@ -130,7 +130,7 @@ And(/^the user fills out the rest of form with medicaid during pregnancy as yes 
   choose('is_student_no')
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
-  choose('is_resident_post_092296_no') if page.has_css?('is_resident_post_092296_no', wait: 1)
+  choose('is_resident_post_092296_no') if page.has_css?('#is_resident_post_092296_no', wait: 1)
   choose("medicaid_pregnancy_yes") if page.all("#medicaid_pregnancy_yes").present?
   find('[name=commit]').click
 end

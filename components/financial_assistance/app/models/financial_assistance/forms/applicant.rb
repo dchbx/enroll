@@ -89,7 +89,7 @@ module FinancialAssistance
             applicant.update(values)
           else
             applicant = application.applicants.build(values)
-            applicant.save
+            applicant.save!
           end
           application.ensure_relationship_with_primary(applicant, relationship) if relationship.present?
           [true, applicant]
