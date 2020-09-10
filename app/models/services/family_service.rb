@@ -16,7 +16,7 @@ module Services
 
       attrs.merge({
                     is_applying_coverage: person.consumer_role.is_applying_coverage,
-                    us_citizen: person.consumer_role.us_citizen,
+                    citizen_status: person.citizen_status,
                     is_consumer_role: true,
                     indian_tribe_member: person.consumer_role.is_tribe_member?,
                     is_incarcerated: person.is_incarcerated,
