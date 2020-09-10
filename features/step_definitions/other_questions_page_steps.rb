@@ -64,7 +64,7 @@ Given(/^the user SSN is nil$/) do
 end
 
 Given(/^the user has an eligible immigration status$/) do
-  consumer.person.consumer_role.update_attributes(citizen_status: "alien_lawfully_present")
+  application.applicants.first.update_attributes(citizen_status: "alien_lawfully_present")
 end
 
 Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
@@ -116,7 +116,7 @@ And(/^the user fills out the rest of the other questions form and submits it$/) 
   choose('is_student_no')
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
-  choose("is_resident_post_092296_no")
+  choose('is_resident_post_092296_no') if page.has_css?('is_resident_post_092296_no', wait: 1)
   choose("medicaid_pregnancy_no") if page.all("#medicaid_pregnancy_no").present?
   find('[name=commit]').click
 end
@@ -130,7 +130,7 @@ And(/^the user fills out the rest of form with medicaid during pregnancy as yes 
   choose('is_student_no')
   choose('is_self_attested_blind_no')
   choose('is_veteran_or_active_military_no')
-  choose("is_resident_post_092296_no")
+  choose('is_resident_post_092296_no') if page.has_css?('is_resident_post_092296_no', wait: 1)
   choose("medicaid_pregnancy_yes") if page.all("#medicaid_pregnancy_yes").present?
   find('[name=commit]').click
 end
@@ -217,7 +217,7 @@ And(/^the user answers yes to having an eligible immigration status$/) do
   applicant_id = page.current_path[/#{str1_markerstring}(.*?)#{str2_markerstring}/m, 1]
   application = FinancialAssistance::Application.where(id: application_id).first
   current_applicant = application.applicants.find(applicant_id)
-  expect(current_applicant.person.eligible_immigration_status).to eq(true)
+  expect(current_applicant.eligible_immigration_status).to eq(true)
 end
 
 Then(/^the did you move to the US question should display$/) do

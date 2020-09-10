@@ -280,19 +280,20 @@
           </div>
         </div>
         <% if @applicant.eligible_immigration_status.present? %>
-        <div class="row row-form-wrapper no-buffer row-height">
-          <div class='col-md-6'>
-            <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>
+          <div class="row row-form-wrapper no-buffer row-height">
+            <div class='col-md-6'>
+              <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes", required: true) %>
+              <label class="radio-yml" for="is_resident_post_092296_yes">Yes</label>
+            </div>
+            <div class='col-md-2'>
+              <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no", required: true) %>
+              <label class="radio-yml" for="is_resident_post_092296_no">No</label>
+            </div>
           </div>
-          <div class='col-md-2'>
-            <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes", required: true) %>
-            <label class="radio-yml" for="is_resident_post_092296_yes">Yes</label>
-          </div>
-          <div class='col-md-2'>
-            <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no", required: true) %>
-            <label class="radio-yml" for="is_resident_post_092296_no">No</label>
-          </div>
-        </div>
+        <% end %>
 
         <div class="row row-form-wrapper no-buffer row-height">
           <div class='col-md-6'>
@@ -307,7 +308,6 @@
             <label class="radio-yml" for="is_veteran_or_active_military_no">No</label>
           </div>
         </div>
-        <% end %>
 
         <div class="row row-form-wrapper no-buffer row-height">
           <div class='col-md-6'>
