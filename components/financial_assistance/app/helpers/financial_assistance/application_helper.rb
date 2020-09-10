@@ -234,5 +234,9 @@ module FinancialAssistance
     def show_vlp_documents_container(applicant)
       show_naturalization_doc_type(applicant) || show_immigration_doc_type(applicant)
     end
+
+    def member_name_by_id(id)
+      ::FinancialAssistance::Applicant.find(id).full_name
+    end
   end
 end

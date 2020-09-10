@@ -90,8 +90,8 @@ module FinancialAssistance
     Kinds = RELATIONSHIPS
 
     field :kind, type: String
-    field :applicant_id, type: BSON::ObjectId
-    field :relative_id, type: BSON::ObjectId
+    field :applicant_id, type: BSON::ObjectId # predecessor or from
+    field :relative_id, type: BSON::ObjectId # successor or to
 
     def applicant
       return @applicant if defined? @applicant

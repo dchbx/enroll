@@ -149,65 +149,65 @@ module FinancialAssistance
 
     #TODO: start of work progress
     # Related to Relationship Matrix
-    def add_relationship(successor, relationship_kind, destroy_relation = false)
-      if same_relative_exists?(successor)
-        direct_relationship = relationships.where(applicant_id: primary_applicant.id, relative_id: successor.id).first # Direct Relationship
+    def add_relationship(predecessor, successor, relationship_kind, destroy_relation = false)
+      if same_relative_exists?(predecessor, successor)
+        direct_relationship = relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first # Direct Relationship
 
         # Destroying the relationships associated to the Person other than the new updated relationship.
         if !direct_relationship.nil? && destroy_relation
-          other_relations = relationships.where(applicant_id: primary_applicant.id, :id.nin => [direct_relationship.id]).map(&:relative_id)
-          relationships.where(applicant_id: primary_applicant.id, :id.nin => [direct_relationship.id]).each(&:destroy)
+          other_relations = relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).map(&:relative_id)
+          relationships.where(applicant_id: predecessor.id, :id.nin => [direct_relationship.id]).each(&:destroy)
 
           other_relations.each do |otr|
-            otr_relation = Person.find(otr).relationships.where(applicant_id: otr, relative_id: primary_applicant.id).first
+            otr_relation = relationships.where(applicant_id: otr, relative_id: predecessor.id).first
             otr_relation.destroy unless otr_relation.blank?
           end
         end
 
         direct_relationship.update(kind: relationship_kind)
-      elsif primary_applicant.id != successor.id
-        relationships.create(applicant_id: primary_applicant.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
+      elsif predecessor.id != successor.id
+        relationships.create(applicant_id: predecessor.id, relative_id: successor.id, kind: relationship_kind) # Direct Relationship
       end
     end
 
-    def same_relative_exists?(successor)
-      relationships.where(applicant_id: primary_applicant.id, relative_id: successor.id).first.present?
+    def same_relative_exists?(predecessor, successor)
+      relationships.where(applicant_id: predecessor.id, relative_id: successor.id).first.present?
     end
 
     #Used for RelationshipMatrix
     def build_relationship_matrix
-      family_id = self.id
-      applicants_id = applicants.where(is_active: true).map(&:id)
-      matrix_size = applicants.where(is_active: true).count
+      applicant_ids = active_applicants.map(&:id)
+      matrix_size = applicant_ids.count
       matrix = Array.new(matrix_size){Array.new(matrix_size)}
       id_map = {}
-      applicants_id.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
+      applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
       matrix.each_with_index do |x, xi|
         x.each_with_index do |_y, yi|
-          matrix[xi][yi] = find_existing_relationship(id_map[xi], id_map[yi], family_id)
-          matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi], family_id)
+          matrix[xi][yi] = find_existing_relationship(id_map[xi], id_map[yi])
+          matrix[yi][xi] = find_existing_relationship(id_map[yi], id_map[xi])
         end
       end
       matrix = apply_rules_and_update_relationships(matrix)
       matrix
     end
 
-    def find_existing_relationship(member_a_id, member_b_id, _family_id)
-      return "self" if member_a_id == member_b_id
+    def find_existing_relationship(member_a_id, member_b_id)
+      return 'self' if member_a_id == member_b_id
+
       rel = relationships.where(applicant_id: member_a_id, relative_id: member_b_id).first
-      return rel.kind if rel.present?
+      rel&.kind
     end
 
     def find_all_relationships(matrix)
       id_map = {}
-      applicants_id = applicants.where(is_active: true).map(&:id)
-      applicants_id.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
+      applicant_ids = active_applicants.map(&:id)
+      applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
       all_relationships = []
       matrix.each_with_index do |x, xi|
         x.each_with_index do |_y, yi|
           next unless xi < yi
           relation = relationships.where(applicant_id: id_map[xi], relative_id: id_map[yi]).first
-          relation_kind = relation.present? ? relation.kind : nil
+          relation_kind = relation&.kind
           all_relationships << {:applicant => id_map[xi], :relation => relation_kind,  :relative => id_map[yi]}
         end
       end
@@ -216,8 +216,8 @@ module FinancialAssistance
 
     def find_missing_relationships(matrix)
       id_map = {}
-      applicants_id = applicants.where(is_active: true).map(&:id)
-      applicants_id.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
+      applicant_ids = active_applicants.map(&:id)
+      applicant_ids.each_with_index { |hmid, index| id_map.merge!(index => hmid) }
       missing_relationships = []
       matrix.each_with_index do |x, xi|
         x.each_with_index do |_y, yi|
@@ -234,16 +234,16 @@ module FinancialAssistance
       missing_relationship.each do |rel|
         first_rel = rel.to_a.flatten.first
         second_rel = rel.to_a.flatten.second
-        relation1 = relationships.where(applicant_id: first_rel, kind: "child").to_a
-        relation2 = relationships.where(applicant_id: second_rel, kind: "child").to_a
+        relation1 = relationships.where(applicant_id: first_rel, kind: 'child').to_a
+        relation2 = relationships.where(applicant_id: second_rel, kind: 'child').to_a
 
         relation = relation1 + relation2
         s_ids = relation.collect(&:relative_id)
 
         next unless s_ids.count > s_ids.uniq.count
         members = applicants.where(:id.in => rel.to_a.flatten)
-        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: "sibling")
-        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: "sibling")
+        members.second.relationships.create(applicant_id: members.second.id, relative_id: members.first.id, kind: 'sibling')
+        members.first.relationships.create(applicant_id: members.first.id, relative_id: members.second.id, kind: 'sibling')
         missing_relationship -= [rel] #Remove Updated Relation from list of missing relationships
       end
 
