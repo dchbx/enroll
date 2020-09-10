@@ -8,7 +8,7 @@ module Services
     end
 
     def execute(family:)
-      family.family_members.collect {|family_member| person_attributes(family_member.person).merge(family_member_id: family_member.id) }
+      family.family_members.collect {|family_member| person_attributes(family_member.person).merge(family_member_id: family_member.id, is_primary_applicant: family_member.is_primary_applicant) }
     end
 
     def person_attributes(person)

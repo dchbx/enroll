@@ -33,8 +33,7 @@ FactoryBot.define do
 
         { 'Kelly' => 'spouse', 'Danny' => 'child' }.each do |first_name, relationship|
           person = FactoryBot.create(:person, :with_consumer_role, first_name: first_name, last_name: family.person.last_name)
-          family.person.person_relationships.push PersonRelationship.new(relative_id: person.id, kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id)
-          person.person_relationships = [PersonRelationship.new(kind: relationship, family_id: family.id, successor_id: person.id, predecessor_id: family.person.id)]
+          family.person.person_relationships.push PersonRelationship.new(relative_id: person.id, kind: relationship)
           person.save
           FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, person: person, family: family)
         end

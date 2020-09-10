@@ -29,7 +29,7 @@
                 <% @applicants.each do |applicant| %>
                   <% income_and_deductions_for(applicant).each do |embedded_document| %>
                     <tr>
-                      <td> <%= applicant.person.full_name %> </td>
+                      <td> <%= applicant.full_name %> </td>
                       <td> <%= embedded_document.kind.humanize %> </td>
                       <td> <%= embedded_document.frequency_kind.humanize %> </td>
                       <td>
@@ -70,7 +70,7 @@
           <div class="col-md-12 pz">
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
               <div class="col-md-11"><span></span>
-                <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %>
+                <i class="fa fa-user blue-icon"></i> <%= applicant.full_name %>
               </div>
               <div class="col-md-1">
                 <!-- <a><span class="fa fa-pencil fa-lg" aria-hidden="true"></span></a> -->
@@ -83,7 +83,9 @@
                   <tr class="form-heading">
                     <th class="form-heading">AGE</th>
                     <th class="form-heading">GENDER</th>
-                    <th class="form-heading">RELATIONSHIP</th>
+                    <% unless @all_relationships.empty? %>
+                      <th class="form-heading">RELATIONSHIP</th>
+                    <% end %>
                     <th class="form-heading">STATUS</th>
                     <th class="form-heading">INCARCERATED</th>
                     <th class="form-heading">NEEDS COVERAGE?</th>
@@ -92,11 +94,13 @@
                 <tbody>
                   <tr class="noBorder">
                     <td><%= applicant.age_of_the_applicant %></td>
-                    <td><%= applicant.person.gender.humanize %></td>
-                    <td><%= applicant.family_member.relationship.humanize %></td>
-                    <td><%= applicant.person.format_citizen if applicant.person.citizen_status.present? %></td>
-                    <td><%= human_boolean applicant.person.is_incarcerated %></td>
-                    <td><%= human_boolean applicant.person.is_applying_coverage %></td>
+                    <td><%= applicant.gender.humanize %></td>
+                    <% unless @all_relationships.empty? %>
+                      <td><%= applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %></td>
+                    <% end %>
+                    <td><%= applicant.format_citizen if applicant.citizen_status.present? %></td>
+                    <td><%= human_boolean applicant.is_incarcerated %></td>
+                    <td><%= human_boolean applicant.is_applying_coverage %></td>
                   </tr>
                 </tbody>
               </table>
@@ -411,7 +415,7 @@
             <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
               <div class="col-md-11">FAMILY RELATIONSHIPS</div>
               <div class="col-md-1">
-                <%= link_to main_app.insured_family_relationships_path, id: 'edit-family-relationships-pencil' do %>
+                <%= link_to financial_assistance.application_relationships_path(@application), id: 'edit-family-relationships-pencil' do %>
                   <i class="fa fa-pencil fa-lg"></i>
                 <% end %>
               </div>
@@ -485,6 +489,6 @@
   </div>
 
   <div class='col-md-3'>
-    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? main_app.insured_family_relationships_path(@person.consumer_role.id) : edit_application_path(@application), next_url: go_to_step_application_path(@application, 1)} %>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {previous_url: @application.active_applicants.count > 1 ? financial_assistance.application_relationships_path(@application) : edit_application_path(@application), next_url: go_to_step_application_path(@application, 1)} %>
   </div>
 </div>

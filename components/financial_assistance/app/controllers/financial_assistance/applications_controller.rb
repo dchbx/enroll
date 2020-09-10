@@ -12,7 +12,6 @@ module FinancialAssistance
 
     before_action :check_eligibility, only: [:create, :get_help_paying_coverage_response, :copy]
     before_action :init_cfl_service, only: :review_and_submit
-    before_action :family_relationships, only: :review_and_submit
 
     layout "financial_assistance_nav", only: %i[edit step review_and_submit eligibility_response_error application_publish_error]
 
@@ -139,8 +138,8 @@ module FinancialAssistance
     def review_and_submit
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @consumer_role = @person.consumer_role
-      @application = @person.primary_family.application_in_progress
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+      @all_relationships = @application.relationships
       @applicants = @application.active_applicants if @application.present?
       redirect_to applications_path if @application.blank?
     end
@@ -156,14 +155,14 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find(params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
     end
 
     def eligibility_results
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find(params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
 
       render layout: 'financial_assistance_nav' if params.keys.include? "cur"
     end
@@ -172,20 +171,20 @@ module FinancialAssistance
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find(params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
     end
 
     def eligibility_response_error
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @family = @person.primary_family
-      @application = @person.primary_family.applications.find(params[:id])
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       @application.update_attributes(determination_http_status_code: 999) if @application.determination_http_status_code.nil?
       @application.send_failed_response
     end
 
     def check_eligibility_results_received
-      application = @person.primary_family.applications.find(params[:id])
+      application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
       render :plain => application.success_status_codes?(application.determination_http_status_code).to_s
     end
 
@@ -197,11 +196,6 @@ module FinancialAssistance
 
     def init_cfl_service
       @cfl_service = ::FinancialAssistance::Services::ConditionalFieldsLookupService.new
-    end
-
-    def family_relationships
-      matrix = @family.build_relationship_matrix
-      @all_relationships = @family.find_all_relationships(matrix)
     end
 
     def check_eligibility
@@ -288,7 +282,7 @@ module FinancialAssistance
     end
 
     def find
-      @application = @person.primary_family.applications.find(params[:id]) if params.key?(:id)
+      @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier) if params.key?(:id)
     end
   end
 end
