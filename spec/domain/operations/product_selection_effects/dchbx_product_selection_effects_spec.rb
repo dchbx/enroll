@@ -204,7 +204,6 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
     include_context 'family with one member and one enrollment and one predecessor enrollment'
 
     context 'new enrollment in prior plan year' do
-
       before do
         predecessor_enrollment.expire_coverage!
         product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
@@ -226,6 +225,22 @@ RSpec.describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects
       it 'should cancel existing renewel enrollment' do
         enrollment.reload
         expect(enrollment.aasm_state).to eq('coverage_canceled')
+      end
+    end
+
+    context 'new enrollment in prior plan year for dependent add' do
+      include_context 'family with two members and one enrollment and one predecessor enrollment'
+
+      before do
+        predecessor_enrollment.expire_coverage!
+        product_selection = Entities::ProductSelection.new({:enrollment => predecessor_enrollment, :product => predecessor_product, :family => family})
+        @result = subject.call(product_selection)
+      end
+
+      it 'should create a renewal enrollment with all the eligible enrollment members' do
+        expect(predecessor_enrollment.hbx_enrollment_members.size).to eq 2
+        expect(family.hbx_enrollments.count).to eq(3)
+        expect(family.hbx_enrollments.last.hbx_enrollment_members.size).to eq 2
       end
     end
 
