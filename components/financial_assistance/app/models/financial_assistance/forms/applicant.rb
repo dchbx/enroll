@@ -125,7 +125,7 @@ module FinancialAssistance
         }.reject{|_k, val| val.nil?}
 
         if same_with_primary == 'true'
-          primary =  application.primary_applicant
+          primary = application.primary_applicant
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
         end
 
@@ -138,10 +138,10 @@ module FinancialAssistance
 
       def nested_parameters
         address_params = if same_with_primary == 'true'
-          primary_applicant_address_attributes
-        else
-          addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
-        end
+                           primary_applicant_address_attributes
+                         else
+                           addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
+                         end
 
         {
           addresses_attributes: address_params,
@@ -152,7 +152,7 @@ module FinancialAssistance
 
       def primary_applicant_address_attributes
         primary = application.primary_applicant
-        if home_address = primary.addresses.in(kind: 'home').first
+        if (home_address = primary.addresses.in(kind: 'home').first)
           address_params = {
             0 => home_address.attributes.slice('address_1', 'address_2', 'address_3', 'county', 'country_name', 'kind', 'city', 'state', 'zip')
           }
@@ -174,9 +174,7 @@ module FinancialAssistance
         return if relationship.blank?
         primary_relations = application.primary_applicant.relationships.pluck(:kind)
 
-        if ['spouse', 'life_partner'].include?(relationship) && primary_relations.any?{|relation| ['spouse', 'life_partner'].include?(relation)}
-          self.errors.add(:base, "can not have multiple spouse or life partner")
-        end
+        self.errors.add(:base, "can not have multiple spouse or life partner") if ['spouse', 'life_partner'].include?(relationship) && primary_relations.any?{|relation| ['spouse', 'life_partner'].include?(relation)}
       end
     end
   end

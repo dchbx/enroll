@@ -754,33 +754,31 @@ module FinancialAssistance
     end
 
     def attributes_for_export
-      attributes.slice(*[
-        :_id,
-        :family_member_id,
-        :name_pfx,
-        :first_name,
-        :middle_name,
-        :last_name,
-        :name_sfx,
-        :gender,
-        :dob,
-        :is_incarcerated,
-        :is_disabled,
-        :ethnicity,
-        :race,
-        :indian_tribe_member,
-        :tribal_id,
-        :language_code,
-        :no_dc_address,
-        :is_homeless,
-        :is_temporarily_out_of_state,
-        :no_ssn,
-        :citizen_status,
-        :is_consumer_role,
-        :vlp_document_id,
-        :same_with_primary,
-        :is_applying_coverage
-      ]).merge(ssn: ssn)
+      attributes.slice(:_id,
+                       :family_member_id,
+                       :name_pfx,
+                       :first_name,
+                       :middle_name,
+                       :last_name,
+                       :name_sfx,
+                       :gender,
+                       :dob,
+                       :is_incarcerated,
+                       :is_disabled,
+                       :ethnicity,
+                       :race,
+                       :indian_tribe_member,
+                       :tribal_id,
+                       :language_code,
+                       :no_dc_address,
+                       :is_homeless,
+                       :is_temporarily_out_of_state,
+                       :no_ssn,
+                       :citizen_status,
+                       :is_consumer_role,
+                       :vlp_document_id,
+                       :same_with_primary,
+                       :is_applying_coverage).merge(ssn: ssn)
     end
 
     class << self
