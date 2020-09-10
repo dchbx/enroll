@@ -96,9 +96,7 @@ while offset <= enrollment_count
 
       person = policy.subscriber.person
 
-      value = person.primary_family ? 'No' : 'Yes'
-
-      add_to_csv(csv, policy, person, value, check_for_outstanding_verification_types(person), document_due_date(policy.family))
+      add_to_csv(csv, policy, person, "No", check_for_outstanding_verification_types(person), document_due_date(policy.family))
 
       policy.hbx_enrollment_members.each do |hbx_enrollment_member|
         add_to_csv(csv, policy, hbx_enrollment_member.person, "Yes", check_for_outstanding_verification_types(hbx_enrollment_member.person), document_due_date(policy.family)) if hbx_enrollment_member.person != person
