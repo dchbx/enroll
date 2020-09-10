@@ -1,4 +1,4 @@
-$(document).ready(function () {
+$(document).on('turbolinks:load', function () {
   $("#family-matrix").on("change", ".selected_relationship", function () {
 
     $.ajax({
