@@ -59,7 +59,7 @@ module FinancialAssistance
       end
 
       def has_no_ssn?
-        @instance.person.no_ssn == '1'
+        @instance.no_ssn == '1'
       end
 
       def is_ssn_applied
