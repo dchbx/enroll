@@ -16,7 +16,7 @@
               <div class="col-lg-5">
                 <div class="select-positioning"> is</div>
                 <div class="select-relation rs_selection">
-                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-predecessor": er[:predecessor], "data-successor": er[:successor] %>
+                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant_id], "data-relative": er[:relative_id]%>
                 </div>
                 <div style="float:left; margin-right: 10px;"> of</div>
                 <div class="icon-rel">
