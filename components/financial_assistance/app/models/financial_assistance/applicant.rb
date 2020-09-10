@@ -72,6 +72,18 @@ module FinancialAssistance
         "Other (With I-94 Number)"
     ].freeze
 
+    CITIZEN_KINDS = {
+      us_citizen: "US citizen",
+      naturalized_citizen: "Naturalized citizen",
+      alien_lawfully_present: "Alien lawfully present",
+      lawful_permanent_resident: "Lawful permanent resident",
+      undocumented_immigrant: "Undocumented immigrant",
+      not_lawfully_present_in_us: "Not lawfully present in US",
+      non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
+      ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
+      non_native_citizen: "Non-native citizen"
+    }.freeze
+
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
 
     CITIZEN_KINDS = {
@@ -555,6 +567,10 @@ module FinancialAssistance
 
     def age_of_the_applicant
       age_of_applicant
+    end
+
+    def format_citizen
+      CITIZEN_KINDS[citizen_status.to_sym]
     end
 
     def student_age_satisfied?
