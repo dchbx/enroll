@@ -100,7 +100,7 @@ module FinancialAssistance
 
     def relative
       return @relative if defined? @relative
-      @relative = FinancialAssistance::Applicant.find(applicant_id)
+      @relative = FinancialAssistance::Applicant.find(relative_id)
     end
   end
 end
