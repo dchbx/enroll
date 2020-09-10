@@ -415,7 +415,7 @@ module FinancialAssistance
     end
 
     def spouse_relationship
-      person.person_relationships.where(family_id: family.id, kind: 'spouse').first
+      application.relationships.where(applicant_id: id, kind: 'spouse').first
     end
 
     def has_spouse
