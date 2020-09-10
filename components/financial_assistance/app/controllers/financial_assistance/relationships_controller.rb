@@ -8,6 +8,9 @@ module FinancialAssistance
       @relationships = @application.relationships
     end
 
+    def create
+    end
+
     private
     def find_application
       @application = FinancialAssistance::Application.find_by(id: params[:application_id], family_id: get_current_person.financial_assistance_identifier)
