@@ -12,7 +12,6 @@ module FinancialAssistance
 
     #TODO: work in progress
     def create
-      @application
       applicant_id = params[:applicant_id]
       relative_id = params[:relative_id]
       predecessor = FinancialAssistance::Applicant.find(applicant_id)
@@ -29,9 +28,9 @@ module FinancialAssistance
       @relationships = @application.find_all_relationships(@matrix)
 
       respond_to do |format|
-        format.html {
-          redirect_to application_relationships_path , notice: 'Relationship was successfully updated.'
-        }
+        format.html do
+          redirect_to application_relationships_path, notice: 'Relationship was successfully updated.'
+        end
         format.js
       end
     end
