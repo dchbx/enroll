@@ -1,0 +1,12 @@
+<div id="immigration_temporary_i_20_stamp_fields_container">
+  <% document = c.object.find_document("I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+  <% end %>
+</div>

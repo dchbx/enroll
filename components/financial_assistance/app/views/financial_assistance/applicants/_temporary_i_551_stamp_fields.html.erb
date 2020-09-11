@@ -1,0 +1,11 @@
+<div id="immigration_temporary_i_551_stamp_fields_container">
+  <% document = c.object.find_document("Temporary I-551 Stamp (on passport or I-94)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Temporary I-551 Stamp"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+  <% end %>
+</div>

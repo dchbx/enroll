@@ -1,0 +1,9 @@
+<div id="immigration_citizenship_cert_container">
+  <% document = c.object.find_document("Certificate of Citizenship") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/citizenship_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+  <% end %>
+</div>

@@ -32,6 +32,7 @@ FinancialAssistance::Engine.routes.draw do
       get :primary_applicant_has_spouse
       get 'other_questions', on: :member, action: 'other_questions', as: 'other_questions'
       get 'save_questions', on: :member, action: 'save_questions', as: 'save_questions'
+      get :immigration_document_options, on: :collection
       post :update, on: :member
 
       resources :incomes do

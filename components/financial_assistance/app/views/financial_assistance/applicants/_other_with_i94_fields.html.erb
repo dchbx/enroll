@@ -1,0 +1,13 @@
+<div id="immigration_other_with_i94_fields_container">
+  <% document = c.object.find_document("Other (With I-94 Number)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/document_description", locals: {v: v} %>
+  <% end %>
+</div>

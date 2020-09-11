@@ -1,0 +1,12 @@
+<div id="immigration_DS_2019_fields_container">
+  <% document = c.object.find_document("DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/servis_id", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/i_94_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Passport"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+  <% end %>
+</div>

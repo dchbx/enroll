@@ -1,0 +1,9 @@
+<div id="immigration_i_571_fields_container">
+  <% document = c.object.find_document("I-571 (Refugee Travel Document)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "I-571"} %>
+  <% end %>
+</div>

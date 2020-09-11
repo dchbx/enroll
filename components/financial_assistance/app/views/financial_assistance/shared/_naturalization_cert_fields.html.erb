@@ -1,0 +1,9 @@
+<div id="immigration_naturalization_cert_container">
+  <% document = c.object.find_document("Naturalization Certificate") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/naturalization_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+  <% end %>
+</div>

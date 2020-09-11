@@ -118,6 +118,21 @@ module FinancialAssistance
       render :plain => has_spouse.to_s
     end
 
+    def immigration_document_options
+      if params[:target_type] == "FinancialAssistance::Forms::Applicant"
+        if params[:target_id].present?
+          @target = FinancialAssistance::Forms::Applicant.find(params[:target_id])
+          vlp_docs = @target.applicant.vlp_documents
+        else
+          @target = FinancialAssistance::Forms::Applicant.new
+        end
+      end
+
+      @vlp_doc_target = params[:vlp_doc_target]
+      vlp_doc_subject = params[:vlp_doc_subject]
+      @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+    end
+
     private
 
     def load_support_texts

@@ -1,0 +1,12 @@
+<div id="machine_readable_immigrant_visa_fields_container">
+  <% document = c.object.find_document("Machine Readable Immigrant Visa (with Temporary I-551 Language)") %>
+  <%= c.fields_for 'vlp_documents', document do |v| %>
+    <%= v.hidden_field :subject %>
+    <%= v.hidden_field :id %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/passport_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/visa_number", locals: {v: v } %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "Temporary I-551"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/country_of_citizenship", locals: {v: v} %>
+  <% end %>
+</div>
