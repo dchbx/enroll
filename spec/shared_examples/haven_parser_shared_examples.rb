@@ -2,7 +2,7 @@
 
 RSpec.shared_examples :haven_parser_examples do |class_name|
   let!(:xml) {File.read(Rails.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_3_aptc_members_1_thh_200_status.xml'))}
-  let!(:subject) {"Parsers::Xml::Cv::#{class_name}".constantize.parse(xml)}
+  let!(:subject) {"Parsers::Xml::Cv::Haven::#{class_name}".constantize.parse(xml)}
   let(:family_members)  {Nokogiri::XML(xml).css('n1|family_members')}
   let(:family_member_id)  {Nokogiri::XML(xml).xpath('//n1:family_members/n1:family_member/n1:id/n1:id')}
   let(:household_id)  {Nokogiri::XML(xml).xpath('//n1:households/n1:household/n1:id/n1:id')}
