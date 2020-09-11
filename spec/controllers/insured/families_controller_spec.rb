@@ -757,7 +757,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     describe "with valid params" do
       it "returns qualified_date as true" do
-     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
@@ -766,12 +766,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     describe "with invalid params" do
 
       it "returns qualified_date as false for invalid future date" do
-     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
 
       it "returns qualified_date as false for invalid past date" do
-     get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
     end
