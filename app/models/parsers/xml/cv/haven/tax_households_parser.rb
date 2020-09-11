@@ -11,8 +11,8 @@ module Parsers
 
           element :hbx_assigned_id, String, tag: 'id/n1:id'
           element :primary_applicant_id, String, tag: 'primary_applicant_id/n1:id'
-          has_many :tax_household_members, Parsers::Xml::Cv::HavenTaxHouseholdMembersParser, tag: 'tax_household_member', namespace: 'n1'
-          has_many :eligibility_determinations, Parsers::Xml::Cv::HavenEligibilityDeterminationsParser, tag: 'eligibility_determination', namespace: 'n1'
+          has_many :tax_household_members, Parsers::Xml::Cv::Haven::TaxHouseholdMembersParser, tag: 'tax_household_member', namespace: 'n1'
+          has_many :eligibility_determinations, Parsers::Xml::Cv::Haven::EligibilityDeterminationsParser, tag: 'eligibility_determination', namespace: 'n1'
           element :start_date, Date
         end
       end

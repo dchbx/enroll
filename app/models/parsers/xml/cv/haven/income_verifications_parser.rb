@@ -12,7 +12,7 @@ module Parsers
           tag 'income_verification_result'
 
           element :income_verification_result_id, String, tag: 'id/n1:id'
-          has_one :individual, Parsers::Xml::Cv::HavenIndividualParser, tag: 'individual'
+          has_one :individual, Parsers::Xml::Cv::Haven::IndividualParser, tag: 'individual'
           element :response_code, String, tag: 'response_code'
           element :income_verification_failed, Boolean, tag: 'income_verification_failed'
         end
