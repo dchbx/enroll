@@ -6,7 +6,7 @@ class QualifyingLifeEventKind
   ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative]
   MarketKinds = %w[shop]
 
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+  EFFECTIVEONKINDS = %w[date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",

@@ -161,7 +161,6 @@ class Insured::FamiliesController < FamiliesController
                       else
                         (start_date..end_date).cover?(@qle_date)
                       end
-
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > today) ? true : false
     end

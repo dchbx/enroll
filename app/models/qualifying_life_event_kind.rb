@@ -6,7 +6,7 @@ class QualifyingLifeEventKind
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
-  ### added enumerations to EffectiveOnKinds with following definitions:
+  ### added enumerations to EFFECTIVEONKINDS with following definitions:
   ###   exact_date: specific date provided
   ###   date_of_event: specific date upon which the QLE occurred
   ###   first_of_month: first of month following the 15th of month rule
@@ -120,7 +120,7 @@ class QualifyingLifeEventKind
   #           presence: true,
   #           allow_blank: false,
   #           allow_nil:   false,
-  #           inclusion: {in: EffectiveOnKinds}
+  #           inclusion: {in: EFFECTIVEONKINDS}
 
   validates :market_kind,
             presence: true,
