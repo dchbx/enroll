@@ -95,7 +95,7 @@ div.disabled {
     height: 20px;
     .label
     {
-      height: 14px;
+      height: 16px;
       line-height: 14px;
     }
 
@@ -112,6 +112,10 @@ div.disabled {
 }
 .amount {
   padding-left: 10px;
+}
+
+.address-right-padding {
+  padding-right: 0px !important;
 }
 .ph-width{
   width: 100%;
