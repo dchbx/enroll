@@ -15,9 +15,9 @@ module Parsers
 
           def to_hash
             {
-                broker_npn: broker_npn,
-                start_on: start_on,
-                end_on: end_on
+              broker_npn: broker_npn,
+              start_on: start_on,
+              end_on: end_on
             }
           end
         end

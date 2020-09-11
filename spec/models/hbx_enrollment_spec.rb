@@ -1277,9 +1277,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       before :each do
         allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
-          :qle_on => qle_on
-          ))
+                                                                           :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"),
+                                                                           :qle_on => qle_on
+                                                                         ))
       end
 
       it "should have the eligibility event date of the qle_on" do
@@ -1296,9 +1296,9 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
       before :each do
         allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(
-          :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"),
-          :qle_on => qle_on
-          ))
+                                                                           :qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"),
+                                                                           :qle_on => qle_on
+                                                                         ))
       end
 
       it "should have the eligibility event date of the qle_on" do

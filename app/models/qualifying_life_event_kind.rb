@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -17,11 +19,13 @@ class QualifyingLifeEventKind
   ## added event_kind_label -- use to populate label for collecting event_on date
   ## renamed property: kind to action_kind (also renamed associated constant)
 
-  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
+  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member].freeze
   MARKET_KINDS = %w[shop individual fehb].freeze
 
+  # rubocop:disable Naming/ConstantName
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
+  EffectiveOnKinds = %w[date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date].freeze
+  # rubocop:enable Naming/ConstantName
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -59,9 +63,9 @@ class QualifyingLifeEventKind
     "exceptional_circumstances",
     "eligibility_failed_or_documents_not_received_by_due_date",
     "eligibility_documents_provided"
-  ]
+  ].freeze
 
-  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on].freeze
 
   field :event_kind_label, type: String
   field :action_kind, type: String
@@ -99,7 +103,7 @@ class QualifyingLifeEventKind
   validates :market_kind,
             presence: true,
             allow_blank: false,
-            allow_nil:   false,
+            allow_nil: false,
             inclusion: {in: MARKET_KINDS}
 
   # before_create :activate_household_sep
@@ -263,7 +267,7 @@ class QualifyingLifeEventKind
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
-  
+
   private
 
   def qle_date_guards
