@@ -120,6 +120,9 @@ def invoke_script(with_params = true)
   if with_params
     ARGV[0] = input_file
     ARGV[1] = 'final_eligibility_notice_aqhp'
+  else
+    ARGV[0] = nil
+    ARGV[1] = nil
   end
   final_eligibility_notice = File.join(Rails.root, "script/final_eligibility_notice_script.rb")
   load final_eligibility_notice
