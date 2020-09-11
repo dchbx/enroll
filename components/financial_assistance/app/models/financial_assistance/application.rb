@@ -647,7 +647,7 @@ module FinancialAssistance
     end
 
     def relationships_complete?
-      true
+      find_missing_relationships(build_relationship_matrix).present? ? false : true
     end
 
     def is_draft?

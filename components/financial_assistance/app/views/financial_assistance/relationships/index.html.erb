@@ -1,8 +1,5 @@
 <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
   <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
-    <% #group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
-    <% #find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, resident_role_id: @resident_role.try(:id)) %>
-    <% #redirect_url = build_button(@person.consumer_role, @family, find_sep_url, @all_relationships).first %>
     <div id="family-matrix">
       <%= render partial: 'form', locals: {form_remote: false, all_relationships: @all_relationships, missing_relationships: @missing_relationships, relationship_kinds: @relationship_kinds } %>
     </div>
@@ -10,8 +7,8 @@
 
   <div class='col-md-3'>
     <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-        previous_url: 'google.com', #@family.application_in_progress.present? ? financial_assistance.edit_application_path(@family.application_in_progress) : insured_family_members_path(consumer_role_id: @consumer_role&.id, employee_role_id: @employee_role&.id),
-        next_url: 'google.com' #@family.application_in_progress.present? ? financial_assistance.review_and_submit_application_path(@family.application_in_progress) : find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)
+        previous_url: financial_assistance.edit_application_path(@application.id),
+        next_url: financial_assistance.review_and_submit_application_path(@application.id)
     } %>
   </div>
 </div>
