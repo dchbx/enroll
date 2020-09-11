@@ -3,21 +3,23 @@
 module Parsers
   module Xml
     module Cv
-      class FamilyBrokerAccountsParser
-        include HappyMapper
+      module Haven
+        class FamilyBrokerAccountsParser
+          include HappyMapper
 
-        tag 'broker_account'
+          tag 'broker_account'
 
-        element :broker_npn, String
-        element :start_on, Date
-        element :end_on, Date
+          element :broker_npn, String
+          element :start_on, Date
+          element :end_on, Date
 
-        def to_hash
-          {
-            broker_npn: broker_npn,
-            start_on: start_on,
-            end_on: end_on
-          }
+          def to_hash
+            {
+                broker_npn: broker_npn,
+                start_on: start_on,
+                end_on: end_on
+            }
+          end
         end
       end
     end

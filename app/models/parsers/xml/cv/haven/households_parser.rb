@@ -14,7 +14,7 @@ module Parsers
           element :irs_group_id, String
           element :start_date, Date
           # has_many :coverage_households, Parsers::Xml::Cv::CoverageHouseholdsParser, tag: 'coverage_household', namespace: 'n1'
-          has_many :tax_households, Parsers::Xml::Cv::HavenTaxHouseholdsParser, tag: 'tax_household', namespace: 'n1'
+          has_many :tax_households, Parsers::Xml::Cv::Haven::TaxHouseholdsParser, tag: 'tax_household', namespace: 'n1'
           # element :submitted_at, DateTime
           # element :is_active, Boolean
           # element :created_at, DateTime
