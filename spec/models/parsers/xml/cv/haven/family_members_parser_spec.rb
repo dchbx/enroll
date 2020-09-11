@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/shared_examples/haven_parser_shared_examples.rb"
+require "#{Rails.root}/spec/shared_examples/haven_parser_shared_examples.rb"
 
-RSpec.describe 'FamilyMembersParser' do
+describe 'FamilyMembersParser' do
   class_name = self.name.demodulize
   include_examples :haven_parser_examples, class_name
 
@@ -20,13 +20,13 @@ RSpec.describe 'FamilyMembersParser' do
 
     it 'should get person' do
       subject.each_with_index do |sub, _index|
-        expect(sub.person).to be_instance_of(Parsers::Xml::Cv::HavenPersonParser)
+        expect(sub.person).to be_instance_of(Parsers::Xml::Cv::Haven::PersonParser)
       end
     end
 
     it 'should get person_demographics' do
       subject.each_with_index do |sub, _index|
-        expect(sub.person_demographics).to be_instance_of(Parsers::Xml::Cv::HavenPersonDemographicsParser)
+        expect(sub.person_demographics).to be_instance_of(Parsers::Xml::Cv::Haven::PersonDemographicsParser)
       end
     end
 
