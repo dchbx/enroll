@@ -129,6 +129,7 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_daily_living_no").click
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
+  choose('is_veteran_or_active_military_no')
   find('[name=commit]').click
 end
 

@@ -13,6 +13,10 @@ Given(/^at least two other household members exist$/) do
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  choose('radio_incarcerated_no', allow_label_click: true)
+  choose('indian_tribe_member_no', allow_label_click: true)
+  choose('applicant_us_citizen_true', allow_label_click: true)
+  choose('applicant_naturalized_citizen_false', allow_label_click: true)
   find(".btn", text: "CONFIRM MEMBER").click
 
   click_link "Add New Person"
@@ -26,6 +30,10 @@ Given(/^at least two other household members exist$/) do
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  choose('radio_incarcerated_no', allow_label_click: true)
+  choose('indian_tribe_member_no', allow_label_click: true)
+  choose('applicant_us_citizen_true', allow_label_click: true)
+  choose('applicant_naturalized_citizen_false', allow_label_click: true)
   find(".btn", text: "CONFIRM MEMBER").click
 
   sleep 1

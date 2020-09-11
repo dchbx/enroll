@@ -311,7 +311,7 @@ module Forms
 
     def copy_finanacial_assistances_application
       service = application_service.new(family)
-      service.process_application unless service.code == :no_app
+      service.copy!
     end
 
     def age_on(date)
