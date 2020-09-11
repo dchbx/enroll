@@ -81,13 +81,6 @@ class Insured::FamilyMembersController < ApplicationController
     end
 
     if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
-      @created = true
-      @dependent.copy_finanacial_assistances_application
-      financial_application = @dependent.family_member.family.application_in_progress
-      @application = financial_application if financial_application.present?
-      # consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-      # consumer_role.trigger_hub_call if consumer_role
-
       respond_to do |format|
         if session[:source_fa].present?
           session[:source_fa] = nil

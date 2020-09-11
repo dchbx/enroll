@@ -46,16 +46,11 @@ Given(/^at least one other household members exist$/) do
   fill_in "family_member_dob_", with: '10/10/1984'
   fill_in "applicant_ssn", with: '123456543'
   find(:xpath, '//label[@for="radio_female"]').click
-  find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/label[1]').click
+  #find(:xpath, '//form/div[1]/div[5]/div[2]/label[1]').click
   # Click label
   find('#new_applicant > div.house.col-md-12.col-sm-12.col-xs-12.no-pd > div:nth-child(5) > div.col-md-5.mt18 > label.static_label.label-floatlabel.mt-label').click
-  # Click Dropdown Label
-  find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/span', visible: false).click
-  # Click option
-  find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[2]', visible: false).click
-  #find(:xpath, '/html/body/div[3]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul').click
-  #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[2]/p').click
-  #find(:xpath, '/html/body/div[2]/div[2]/div/div[2]/div[1]/div[5]/ul/li/div/form/div[1]/div[5]/div[2]/div[2]/div/div[3]/div/ul/li[7]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   choose('applicant_us_citizen_true', allow_label_click: true)
   choose('applicant_naturalized_citizen_false', allow_label_click: true)
   choose('indian_tribe_member_no', allow_label_click: true)
@@ -103,6 +98,7 @@ When(/^all applicants are in Info Completed state$/) do
     find("#has_daily_living_no").click
     find("#need_help_paying_bills_no").click
     find("#radio_physically_disabled_no").click
+    choose('is_veteran_or_active_military_no')
     find('[name=commit]').click
   end
 end
@@ -133,6 +129,7 @@ And(/^primary applicant completes application and marks they are required to fil
   find("#has_daily_living_no").click
   find("#need_help_paying_bills_no").click
   find("#radio_physically_disabled_no").click
+  choose('is_veteran_or_active_military_no')
   find('[name=commit]').click
 end
 

@@ -4,7 +4,7 @@ Given(/^that a user with a family has a Financial Assistance application in the 
   login_as consumer, scope: :user
   visit financial_assistance.applications_path
   create_plan
-  application
+  application aasm_state: 'draft'
 end
 
 Given(/^the user navigates to the "Help Paying For Coverage" portal$/) do

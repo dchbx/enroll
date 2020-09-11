@@ -11,6 +11,7 @@ RSpec.describe "insured/families/personal.html.erb" do
     assign(:person, person)
     sign_in(current_user)
     allow(person).to receive_message_chain("primary_family.current_broker_agency.present?").and_return(false)
+    allow(person).to receive(:primary_family).and_return(person.families.first)
     allow(view).to receive(:enrollment_group_unverified?).and_return true
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
   end
@@ -65,7 +66,7 @@ RSpec.describe "insured/families/personal.html.erb" do
         render file: 'insured/families/personal.html.erb'
       end
 
-      let(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
+      let(:person) {FactoryBot.create(:person, :with_family, :with_consumer_role, :with_active_consumer_role)}
       let(:current_user) { FactoryBot.create(:user, person: person) }
 
       it "should renders home address fields and consumer fields" do

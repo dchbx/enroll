@@ -40,7 +40,6 @@ module FinancialAssistance
 
     def create_dummy_ineligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
-      application.submit!
       application.tax_households.each do |txh|
         txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
         txh.eligibility_determinations.create!(max_aptc: 0.00,
@@ -59,7 +58,6 @@ module FinancialAssistance
 
     def create_dummy_eligibility(application)
       coverage_year = TimeKeeper.date_of_record.year
-      application.submit!
       application.tax_households.each do |txh|
         txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
         txh.eligibility_determinations.create!(max_aptc: 200.00,

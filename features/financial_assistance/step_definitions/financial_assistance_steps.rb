@@ -39,7 +39,7 @@ When(/^they view the financial assistance application$/) do
 end
 
 When(/^they click ADD INCOME & COVERAGE INFO for an applicant$/) do
-  click_link 'ADD INCOME & COVERAGE INFO', href: financial_assistance.go_to_step_application_applicant_path(application_id: consumer.primary_family.application_in_progress.id, id: consumer.primary_family.application_in_progress.primary_applicant.id, step: 1)
+  click_link 'ADD INCOME & COVERAGE INFO', href: financial_assistance.go_to_step_application_applicant_path(application_id: application.id, id: application.primary_applicant.id, step: 1)
 end
 
 Then(/^they should be taken to the applicant's Tax Info page$/) do
@@ -102,7 +102,7 @@ Then(/^they should be taken back to the application's details page for applicant
 end
 
 When(/^they click edit for an applicant$/) do
-  click_link 'Add Info', href: "/financial_assistance/applications/#{consumer.primary_family.application_in_progress.id}/applicants/#{consumer.primary_family.application_in_progress.primary_applicant.id}/step/1"
+  click_link 'Add Info', href: "/financial_assistance/applications/#{application.id}/applicants/#{application.primary_applicant.id}/step/1"
 end
 
 When(/^they complete and submit the Income and Coverage information$/) do
@@ -165,7 +165,7 @@ end
 
 
 Then(/^they should be taken back to the application's details page for income$/) do
-  page.should have_content("Income for #{consumer.person.first_name}")
+  page.should have_content("Income for #{application.primary_applicant.first_name}")
 end
 
 Then(/^the income should be no longer be shown$/) do
@@ -317,7 +317,7 @@ And(/^they complete the form for the deduction/) do
 end
 
 Given(/^the consumer has an income$/) do
-  consumer.primary_family.application_in_progress.active_applicants.first.incomes.create(
+  application.active_applicants.first.incomes.create(
     {
       :amount => '5000',
       :frequency_kind => 'monthly',
@@ -331,11 +331,11 @@ Given(/^the consumer has an income$/) do
 end
 
 Given(/^the consumer has a benefit$/) do
-  consumer.primary_family.application_in_progress.active_applicants.first.update_attributes has_enrolled_health_coverage: true
+  application.active_applicants.first.update_attributes has_enrolled_health_coverage: true
 end
 
 Given(/^the consumer has a deduction$/) do
-  consumer.primary_family.application_in_progress.active_applicants.first.deductions.create! kind: 'alimony_paid'
+  application.active_applicants.first.deductions.create! kind: 'alimony_paid'
 end
 
 And(/^they should see the newly added deduction$/) do
@@ -348,7 +348,7 @@ Then(/^they click on 'Remove deduction' button/) do
 end
 
 And(/^they should be taken back to the application's details page for deduction$/) do
-  page.should have_content("Income Adjustments for #{consumer.person.first_name}")
+  page.should have_content("Income Adjustments for #{application.applicant.first.first_name}")
 end
 
 Given(/^the FAA feature configuration is disabled$/) do

@@ -388,7 +388,10 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
        }
       let(:person) { FactoryBot.create(:person)}
       before :each do
-        person.ensure_relationship_with(family.family_members.where(is_primary_applicant: false).first.person, 'child', family.id)
+        person.person_relationships << PersonRelationship.new({
+                                                                :kind => 'child',
+                                                                :relative_id => family.family_members.where(is_primary_applicant: false).first.person.id
+                                                              })
       end
 
       context "if relationship is child" do

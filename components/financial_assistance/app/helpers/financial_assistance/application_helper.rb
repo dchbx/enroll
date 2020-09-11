@@ -26,7 +26,7 @@ module FinancialAssistance
 
     def eligible_applicants(application_id, eligibility_flag)
       application = FinancialAssistance::Application.find(application_id)
-      application.active_applicants.where(eligibility_flag => true).map(&:person).map(&:full_name).map(&:titleize)
+      application.active_applicants.where(eligibility_flag => true).map(&:full_name).map(&:titleize)
     end
 
     def any_csr_ineligible_applicants?(application_id)

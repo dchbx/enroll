@@ -68,6 +68,7 @@ Given(/^all applicants are in Info Completed state with all types of income$/) d
     find('#has_daily_living_no').click
     find('#need_help_paying_bills_no').click
     find('#radio_physically_disabled_no').click
+    choose('is_veteran_or_active_military_no')
     find('[name=commit]').click
   end
 end
@@ -96,8 +97,8 @@ Given(/^all required questions are answered$/) do
 end
 
 Given(/^the user has signed their name$/) do
-  fill_in 'first_name_thank_you', with: application.primary_applicant.person.first_name
-  fill_in 'last_name_thank_you', with: application.primary_applicant.person.last_name
+  fill_in 'first_name_thank_you', with: application.primary_applicant.first_name
+  fill_in 'last_name_thank_you', with: application.primary_applicant.last_name
 end
 
 Then(/^the submit button will be enabled$/) do
