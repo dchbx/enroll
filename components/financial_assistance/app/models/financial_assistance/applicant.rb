@@ -310,10 +310,6 @@ module FinancialAssistance
       @eligible_immigration_status ||= (::ConsumerRole::ALIEN_LAWFULLY_PRESENT_STATUS == citizen_status)
     end
 
-    def format_citizen
-      CITIZEN_KINDS[citizen_status.to_sym]
-    end
-
     def relationships
       application.relationships.in(applicant_id: id)
     end
