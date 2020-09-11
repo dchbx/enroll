@@ -27,7 +27,7 @@ module FinancialAssistance
       validates_presence_of :last_name, :allow_blank => nil
       validates_presence_of :gender, :allow_blank => nil
       validates_presence_of :dob
-      validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
+      # validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
       validate :relationship_validation
       validate :consumer_fields_validation
 

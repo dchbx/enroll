@@ -1,0 +1,11 @@
+<div class="col-md-4 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+  <%= v.text_field :expiration_date, {id: "doc_date_field", class: "date-field doc_fields", placeholder: l10n("insured.consumer_roles.docs_shared.expiration_date", name: name)} %><br>
+</div>
+
+<script>
+  $(function() {
+    $( "#doc_date_field" ).datepicker({
+      dateFormat: 'mm/dd/yy'
+   });
+  });
+</script>
