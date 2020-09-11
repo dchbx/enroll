@@ -842,7 +842,7 @@ module FinancialAssistance
     def is_application_valid?
       application_attributes_validity = self.valid?(:submission) ? true : false
 
-      if family.relationships_complete?
+      if relationships_complete?
         relationships_validity = true
       else
         self.errors[:base] << "You must have a complete set of relationships defined among every member."
