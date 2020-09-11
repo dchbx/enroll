@@ -631,7 +631,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let!(:person2) do
       member = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: (TimeKeeper.date_of_record - 40.years))
-      person.ensure_relationship_with(member, 'spouse', family.id)
+      person.ensure_relationship_with(member, 'spouse')
       member.save!
       member
     end
