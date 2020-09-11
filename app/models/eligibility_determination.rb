@@ -33,6 +33,11 @@ class EligibilityDetermination
   field :max_aptc, type: Money, default: 0.00
   field :premium_credit_strategy_kind, type: String
 
+
+  field :aptc_csr_annual_household_income, type: Money, default: 0.00
+  field :aptc_annual_income_limit, type: Money, default: 0.00
+  field :csr_annual_income_limit, type: Money, default: 0.00
+
   # Cost-sharing reduction assistance subsidies reduce out-of-pocket expenses by raising
   #   the plan actuarial value (the average out-of-pocket costs an insurer pays on a plan)
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.

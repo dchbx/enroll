@@ -163,7 +163,7 @@ class Household
         tax_household.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
         #Applicant/TaxHouseholdMember block start
         applicants_persons_hbx_ids = []
-        application_in_context.applicants.each { |appl| applicants_persons_hbx_ids << appl.person.hbx_id.to_s}
+        application_in_context.applicants.each { |appl| applicants_persons_hbx_ids << appl.person_hbx_id.to_s}
         vthh.tax_household_members.each do |thhm|
           #If applicant exisits in our db.
           next unless applicants_persons_hbx_ids.include?(thhm.person_id)
@@ -182,7 +182,7 @@ class Household
   end
 
   def update_verified_applicants(application_in_context, verified_family, thhm)
-    applicant = application_in_context.applicants.select { |app| app.person.hbx_id == thhm.person_id }.first
+    applicant = application_in_context.applicants.select { |app| app.person_hbx_id == thhm.person_id }.first
     verified_family.family_members.each do |verified_family_member|
       next unless verified_family_member.person.hbx_id == thhm.person_id
       applicant.update_attributes({medicaid_household_size: verified_family_member.medicaid_household_size,

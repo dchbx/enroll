@@ -265,6 +265,16 @@ module FinancialAssistance
 
     attr_accessor :relationship
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+    #
+    #
+
+    def self.encrypt_ssn(val)
+      if val.blank?
+        return nil
+      end
+      ssn_val = val.to_s.gsub(/\D/, '')
+      SymmetricEncryption.encrypt(ssn_val)
+    end
 
     before_save :generate_hbx_id
 

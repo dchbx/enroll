@@ -132,7 +132,7 @@ module FinancialAssistance
     def application_checklist
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = @person.primary_family.application_in_progress
+      @application = ::FinancialAssistance::Application.find_by(family_id: get_current_person.financial_assistance_identifier)
     end
 
     def review_and_submit

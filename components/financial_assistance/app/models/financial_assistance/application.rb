@@ -3,13 +3,15 @@
 module FinancialAssistance
   class Application # rubocop:disable Metrics/ClassLength TODO: Remove this
 
+    require 'pry'
+
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
 
-    belongs_to :family, class_name: "Family"
+    # belongs_to :family, class_name: "Family"
 
     before_create :set_hbx_id, :set_applicant_kind, :set_request_kind, :set_motivation_kind, :set_us_state, :set_is_ridp_verified, :set_external_identifiers
     validates :application_submission_validity, presence: true, on: :submission
@@ -42,6 +44,8 @@ module FinancialAssistance
 
     field :haven_app_id, type: String
     field :haven_ic_id, type: String
+    field :eligibility_response_payload, type: String
+    field :eligibility_status_code, type: Integer
     field :e_case_id, type: String
 
     field :applicant_kind, type: String
@@ -227,6 +231,55 @@ module FinancialAssistance
       missing_relationships
     end
 
+    def set_attributes(attrs)
+      update_attributes(attrs)
+    end
+
+    def add_response(attrs)
+      set_attributes(attrs)
+      if success_status_codes?(eligibility_status_code)
+        if eligibility_payload_schema_valid?(eligibility_response_payload)
+          result = ::Operations::HavenImport.new.call(eligibility_response_payload: eligibility_response_payload, application_id: id)
+          result.failure? ? update_application(result) : determine!
+        else
+          set_determination_response_error!
+          set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to validate Eligibility Determination response XML')
+          log(eligibility_response_payload, {:severity => 'critical', :error_message => 'ERROR: Failed to validate Eligibility Determination response XML'})
+        end
+      else
+        application.set_determination_response_error!
+        set_attributes(determination_http_status_code: eligibility_status_code, has_eligibility_response: true, determination_error_message: eligibility_response_payload)
+      end
+      #step 2
+        # create instance of faa eligi determination(send ea the payload and create eligi deter ins in ea)
+        # state around eli determinations to determine active/inactive
+      # step 3 - notify ea that there is new determination
+    end
+
+    def update_application(result)
+      set_determination_response_error!
+      error_message_code = result.failure[0]
+      error_message = result.failure[1]
+      case error_message_code
+      when :person_not_found
+        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find primary person in xml')
+      when :family_not_found
+        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find primary family for users person in xml')
+      when :dependent_not_found
+        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find dependent from xml')
+      else
+      end
+      log(eligibility_response_payload, {:severity => 'critical', :error_message => error_message})
+    end
+
+    def eligibility_payload_schema_valid?(xml)
+      schema_file_path = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance.xsd')
+      return false if xml.blank?
+      xml = Nokogiri::XML.parse(xml)
+      xsd = Nokogiri::XML::Schema(File.open(schema_file_path))
+      xsd.valid?(xml)
+    end
+
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       missing_relationship = find_missing_relationships(matrix)
 
@@ -352,8 +405,8 @@ module FinancialAssistance
     # @return [ true, false ] true if RIDP verification is complete, false if not
     def is_ridp_verified?
       return @is_ridp_verified if defined?(@is_ridp_verified)
-      @is_ridp_verified = if primary_applicant.person.user.present?
-                            primary_applicant.person.user.identity_verified?
+      @is_ridp_verified = if primary_applicant.user.present?
+                            primary_applicant.user.identity_verified?
                           else
                             false
                           end
@@ -485,7 +538,7 @@ module FinancialAssistance
       end
     end
 
-    # Compute the actual days a person worked during one year
+    # Compute the actual days a applicant worked during one year
     def compute_actual_days_worked(year, start_date, end_date)
       working_days_in_year = Float(52 * 5)
 
@@ -634,7 +687,7 @@ module FinancialAssistance
               :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
               :haven_application_id => haven_app_id,
               :haven_ic_id => haven_ic_id,
-              :primary_applicant_id => family.primary_applicant.person.hbx_id.to_s })
+              :primary_applicant_id => primary_applicant.hbx_id.to_s })
     end
 
     def ready_for_attestation?
@@ -707,9 +760,9 @@ module FinancialAssistance
                { :correlation_id => SecureRandom.uuid.gsub("-",""),
                  :body => JSON.dump({
                                       error: "Timed-out waiting for verification response",
-                                      applicant_first_name: applicant.person.first_name,
-                                      applicant_last_name: applicant.person.last_name,
-                                      applicant_id: applicant.person.hbx_id,
+                                      applicant_first_name: applicant.first_name,
+                                      applicant_last_name: applicant.last_name,
+                                      applicant_id: applicant.hbx_id,
                                       rejected_verification_types: type
                                     }),
                  :assistance_application_id => self._id.to_s,
@@ -751,9 +804,9 @@ module FinancialAssistance
 
     def trigger_eligibilility_notice
       if is_family_totally_ineligibile
-        IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "ineligibility_notice")
+        IvlNoticesNotifierJob.perform_later(primary_applicant.id.to_s, "ineligibility_notice")
       else
-        IvlNoticesNotifierJob.perform_later(self.primary_applicant.person.id.to_s, "eligibility_notice")
+        IvlNoticesNotifierJob.perform_later(primary_applicant.id.to_s, "eligibility_notice")
       end
     end
 
@@ -916,7 +969,7 @@ module FinancialAssistance
       end
 
       tax_dependents.each do |applicant|
-        # Assign applicant to the same THH that the person claiming this dependent belongs to.
+        # Assign applicant to the same THH that the applicant claiming this dependent belongs to.
         thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).tax_household
         applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
         applicant.update_attributes!(tax_filer_kind: 'dependent')

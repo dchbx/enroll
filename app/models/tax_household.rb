@@ -29,6 +29,7 @@ class TaxHousehold
   accepts_nested_attributes_for :tax_household_members
 
   embeds_many :eligibility_determinations, cascade_callbacks: true
+  #embeds_many :faa_eligibility_determinations, cascade_callbacks: true
 
   before_create :set_effective_starting_on
 
