@@ -123,7 +123,7 @@ module Operations
       attributes = [
         :first_name,:last_name,:middle_name,:name_pfx,:name_sfx,:gender,:dob,
         :ssn,:no_ssn,:race,:ethnicity,:language_code,:is_incarcerated,:citizen_status,
-        :tribal_id,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,
+        :tribal_id,:no_dc_address,:is_homeless,:is_temporarily_out_of_state
       ]
 
       applicant.slice(*attributes)

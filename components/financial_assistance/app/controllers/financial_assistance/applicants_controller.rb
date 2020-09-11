@@ -128,7 +128,7 @@ module FinancialAssistance
       end
 
       @vlp_doc_target = params[:vlp_doc_target]
-      vlp_doc_subject = params[:vlp_doc_subject]
+      # vlp_doc_subject = params[:vlp_doc_subject]
       # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
     end
 
