@@ -125,9 +125,30 @@ module FinancialAssistance
     field :citizen_status, type: String
     field :is_consumer_role, type: Boolean
     field :is_resident_role, type: Boolean
-    field :vlp_document_id, type: String
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
+    field :vlp_document_id, type: String
+
+    field :vlp_subject, type: String
+    field :alien_number, type: String
+    field :i94_number, type: String
+    field :visa_number, type: String
+    field :passport_number, type: String
+    field :sevis_id, type: String
+    field :naturalization_number, type: String
+    field :receipt_number, type: String
+    field :citizenship_number, type: String
+    field :card_number, type: String
+    field :country_of_citizenship, type: String
+
+    # date of expiration of the document. e.g. passport / documentexpiration date
+    field :expiration_date, type: DateTime
+    # country which issued the document. e.g. passport issuing country
+    field :issuing_country, type: String
+    # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
+    field :status, type: String, default: "not submitted"
+    # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
+    # field :verification_type
 
     field :assisted_income_validation, type: String, default: "pending"
     validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
@@ -242,7 +263,7 @@ module FinancialAssistance
     embeds_many :emails, class_name: "FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
-
+    
     accepts_nested_attributes_for :incomes, :deductions, :benefits
     accepts_nested_attributes_for :phones, :reject_if => proc { |addy| addy[:full_phone_number].blank? }, allow_destroy: true
     accepts_nested_attributes_for :addresses, :reject_if => proc { |addy| addy[:address_1].blank? && addy[:city].blank? && addy[:state].blank? && addy[:zip].blank? }, allow_destroy: true

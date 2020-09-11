@@ -50,9 +50,8 @@ function addEventOnSsn(target){
   });
 }
 
-function applyListenersFor(target) {
-  debugger
-  // target is person or dependent
+function applyFaaListenersFor(target) {
+  // target is applicant or dependent
   $("input[name='" + target + "[us_citizen]']").change(function() {
     $('#vlp_documents_container').hide();
     $('#vlp_documents_container .vlp_doc_area').html("");
@@ -72,7 +71,6 @@ function applyListenersFor(target) {
   });
 
   $("input[name='" + target + "[naturalized_citizen]']").change(function() {
-    debugger
     var selected_doc_type = $('#naturalization_doc_type').val();
     if ($(this).val() == 'true') {
       $('#vlp_documents_container').show();
@@ -155,13 +153,9 @@ function showOnly(selected) {
   });
 }
 
-function applyListeners() {
-  if ($("form.edit_person").length > 0) {
-    applyListenersFor("person");
-  } else if ($("form.new_dependent, form.edit_dependent").length > 0) {
-    applyListenersFor("dependent");
-  } else if ($("form.new_applicant, form.edit_applicant").length > 0) {
-    applyListenersFor("applicant");
+function applyFaaListeners() {
+  if ($("form.new_applicant, form.edit_applicant").length > 0) {
+    applyFaaListenersFor("applicant");
   }
 
   $("#naturalization_doc_type").change(function() {
@@ -180,8 +174,8 @@ function validationForIndianTribeMember() {
   $('.close').click(function() {
     $('#tribal_id_alert').hide()
   });
-  $('form.edit_person, form.new_dependent, form.new_applicant, form.edit_dependent').submit(function(e) {
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+  $('form.new_applicant, form.edit_applicant').submit(function(e) {
+    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
@@ -200,7 +194,7 @@ function validationForIndianTribeMember() {
   });
 }
 
-var PersonValidations = (function(window, undefined) {
+var ApplicantValidations = (function(window, undefined) {
 
   function manageRequiredValidations(this_obj) {
     hidden_requireds = $('[required]').not(":visible");
@@ -216,39 +210,39 @@ var PersonValidations = (function(window, undefined) {
   }
 
   function validationForUsCitizenOrUsNational(e) {
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
-    if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
+    if ($('input[name="applicant[us_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a US Citizen or US National?');
-      PersonValidations.restoreRequiredAttributes(e);
+      ApplicantValidations.restoreRequiredAttributes(e);
     }
   }
 
   function validationForIncarcerated(e) {
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
-    if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
+    if ($('input[name="applicant[is_incarcerated]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you currently incarcerated?');
-      PersonValidations.restoreRequiredAttributes(e);
+      ApplicantValidations.restoreRequiredAttributes(e);
     }
   }
 
   function validationForNaturalizedCitizen(e) {
-    if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
+    if ($('input[name="applicant[is_applying_coverage]"]').length > 0 && $('input[name="applicant[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
-    if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
+    if ($('#naturalized_citizen_container').is(':visible') && $('input[name="applicant[naturalized_citizen]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Are you a naturalized citizen?');
-      PersonValidations.restoreRequiredAttributes(e);
+      ApplicantValidations.restoreRequiredAttributes(e);
     }
   }
 
   function validationForEligibleImmigrationStatuses(e) {
-    if ($('#immigration_status_container').is(':visible') && $('input[name="person[eligible_immigration_status]"]').not(":checked").length == 2) {
+    if ($('#immigration_status_container').is(':visible') && $('input[name="applicant[eligible_immigration_status]"]').not(":checked").length == 2) {
       alert('Please provide an answer for question: Do you have eligible immigration status?');
-      PersonValidations.restoreRequiredAttributes(e);
+      ApplicantValidations.restoreRequiredAttributes(e);
     }
   }
 
@@ -258,7 +252,7 @@ var PersonValidations = (function(window, undefined) {
         if ($(this).attr('placeholder') == 'Certificate Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-            PersonValidations.restoreRequiredAttributes(e);
+            ApplicantValidations.restoreRequiredAttributes(e);
           } else {
 
           }
@@ -269,26 +263,26 @@ var PersonValidations = (function(window, undefined) {
           if ($(this).attr('placeholder') == 'Alien Number') {
             if ($(this).val().length < 1) {
               alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
+              ApplicantValidations.restoreRequiredAttributes(e);
             } else {}
           }
         }
         if ($(this).attr('placeholder') == 'Document Description') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-            PersonValidations.restoreRequiredAttributes(e);
+            ApplicantValidations.restoreRequiredAttributes(e);
           } else {}
         }
         if ($(this).attr('placeholder') == 'Card Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-            PersonValidations.restoreRequiredAttributes(e);
+            ApplicantValidations.restoreRequiredAttributes(e);
           } else {}
         }
         if ($(this).attr('placeholder') == 'Naturalization Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-            PersonValidations.restoreRequiredAttributes(e);
+            ApplicantValidations.restoreRequiredAttributes(e);
           } else {}
         }
         if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)' || $('#immigration_doc_type').val() == 'Other (With Alien Number)' || $('#immigration_doc_type').val() == 'Other (With I-94 Number)') {
@@ -297,7 +291,7 @@ var PersonValidations = (function(window, undefined) {
           if ($(this).attr('placeholder') == 'Passport Number') {
             if ($(this).val().length < 1) {
               alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
+              ApplicantValidations.restoreRequiredAttributes(e);
 
             } else {}
           }
@@ -305,14 +299,14 @@ var PersonValidations = (function(window, undefined) {
         if ($(this).attr('placeholder') == 'I-766 Expiration Date') {
           if ($(this).val().length != 10) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-            PersonValidations.restoreRequiredAttributes(e);
+            ApplicantValidations.restoreRequiredAttributes(e);
 
           } else {}
         }
 //        if ($(this).attr('placeholder') == 'I-94 Expiration Date') {
 //          if ($(this).val().length != 10) {
 //            alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-//            PersonValidations.restoreRequiredAttributes(e);
+//            ApplicantValidations.restoreRequiredAttributes(e);
 //
 //          } else {}
 //        }
@@ -320,7 +314,7 @@ var PersonValidations = (function(window, undefined) {
           if ($(this).attr('placeholder') == 'Passport Expiration Date') {
             if ($(this).val().length != 10) {
              alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
-             PersonValidations.restoreRequiredAttributes(e);
+             ApplicantValidations.restoreRequiredAttributes(e);
 
             } else {}
           }
@@ -331,7 +325,7 @@ var PersonValidations = (function(window, undefined) {
           if ($(this).attr('placeholder') == 'I 94 Number') {
             if ($(this).val().length < 1) {
               alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
+              ApplicantValidations.restoreRequiredAttributes(e);
 
             } else {}
           }
@@ -341,7 +335,7 @@ var PersonValidations = (function(window, undefined) {
           if ($(this).attr('placeholder') == 'SEVIS ID') {
             if ($(this).val().length < 1) {
               alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
-              PersonValidations.restoreRequiredAttributes(e);
+              ApplicantValidations.restoreRequiredAttributes(e);
 
             } else {}
           }
@@ -369,15 +363,15 @@ var PersonValidations = (function(window, undefined) {
 })(window);
 
 $(document).on('turbolinks:load', function () {
-  applyListeners();
+  applyFaaListeners();
   validationForIndianTribeMember();
 
-  $('form.edit_person, form.new_dependent, form.new_applicant, form.edit_dependent, form.edit_applicant').submit(function(e) {
-    PersonValidations.validationForUsCitizenOrUsNational(e);
-    PersonValidations.validationForNaturalizedCitizen(e);
-    PersonValidations.validationForEligibleImmigrationStatuses(e);
-    PersonValidations.validationForIncarcerated(e);
-    PersonValidations.validationForVlpDocuments(e);
+  $('form.new_applicant, form.edit_applicant').submit(function(e) {
+    ApplicantValidations.validationForUsCitizenOrUsNational(e);
+    ApplicantValidations.validationForNaturalizedCitizen(e);
+    ApplicantValidations.validationForEligibleImmigrationStatuses(e);
+    ApplicantValidations.validationForIncarcerated(e);
+    ApplicantValidations.validationForVlpDocuments(e);
   });
   
   isApplyingCoverage("applicant");

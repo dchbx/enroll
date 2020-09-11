@@ -33,6 +33,7 @@ module FinancialAssistance
 
     def edit
       @applicant.addresses.build(kind: 'home') unless @applicant.addresses.present?
+      @vlp_doc_subject = @applicant.vlp_subject
 
       respond_to do |format|
         format.html
@@ -119,18 +120,16 @@ module FinancialAssistance
     end
 
     def immigration_document_options
-      if params[:target_type] == "FinancialAssistance::Forms::Applicant"
-        if params[:target_id].present?
-          @target = FinancialAssistance::Forms::Applicant.find(params[:target_id])
-          vlp_docs = @target.applicant.vlp_documents
-        else
-          @target = FinancialAssistance::Forms::Applicant.new
-        end
+      if params[:target_type] == "FinancialAssistance::Applicant" && params[:target_id].present?
+        @target = FinancialAssistance::Applicant.find(params[:target_id])
+        # vlp_docs = @target.applicant.vlp_documents
+      else
+        @target = FinancialAssistance::Forms::Applicant.new
       end
 
       @vlp_doc_target = params[:vlp_doc_target]
       vlp_doc_subject = params[:vlp_doc_subject]
-      @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
+      # @country = vlp_docs.detect{|doc| doc.subject == vlp_doc_subject }.try(:country_of_citizenship) if vlp_docs
     end
 
     private
@@ -183,6 +182,7 @@ module FinancialAssistance
         :us_citizen,
         :naturalized_citizen,
         :indian_tribe_member,
+        :eligible_immigration_status,
         :tribal_id,
         :is_incarcerated,
         :relationship,
@@ -191,6 +191,10 @@ module FinancialAssistance
         :no_dc_address,
         :is_temporarily_out_of_state,
         :is_homeless,
+        :vlp_subject, :citizenship_number, :naturalization_number,
+        :alien_number, :passport_number, :sevis_id, :visa_number,
+        :receipt_number, :expiration_date, :card_number, :description,
+        :i94_number, :country_of_citizenship,
         { :addresses_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :id, :_destroy] },
         { :phones_attributes => [:kind, :full_phone_number, :id, :_destroy] },
         { :emails_attributes => [:kind, :address, :id, :_destroy],

@@ -34,6 +34,21 @@ module FinancialAssistance
       attribute :same_with_primary, Types::Strict::Bool
       attribute :is_applying_coverage, Types::Strict::Bool
 
+      attribute :vlp_subject, Types::String.optional.meta(omittable: true)
+      attribute :alien_number, Types::String.optional.meta(omittable: true)
+      attribute :i94_number, Types::String.optional.meta(omittable: true)
+      attribute :visa_number, Types::String.optional.meta(omittable: true)
+      attribute :passport_number, Types::String.optional.meta(omittable: true)
+      attribute :sevis_id, Types::String.optional.meta(omittable: true)
+      attribute :naturalization_number, Types::String.optional.meta(omittable: true)
+      attribute :receipt_number, Types::String.optional.meta(omittable: true)
+      attribute :citizenship_number, Types::String.optional.meta(omittable: true)
+      attribute :card_number, Types::String.optional.meta(omittable: true)
+      attribute :country_of_citizenship, Types::String.optional.meta(omittable: true)
+      attribute :expiration_date, Types::Date.optional.meta(omittable: true)
+      attribute :issuing_country, Types::String.optional.meta(omittable: true)
+      attribute :status, Types::String.optional.meta(omittable: true)
+
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)
       attribute :phones, Types::Array.of(FinancialAssistance::Entities::Phone)

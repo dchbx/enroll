@@ -7,6 +7,7 @@ module FinancialAssistance
         base.class_eval do
           attr_accessor :race, :ethnicity, :language_code, :citizen_status, :tribal_id
           attr_accessor :is_incarcerated, :is_disabled, :citizen_status
+          attr_accessor :vlp_subject, :alien_number, :i94_number, :visa_number, :passport_number, :sevis_id, :naturalization_number, :receipt_number, :citizenship_number, :card_number, :country_of_citizenship, :issuing_country, :status
 
           def us_citizen=(val)
             @us_citizen = (val.to_s == "true")
@@ -23,6 +24,14 @@ module FinancialAssistance
 
           def eligible_immigration_status=(val)
             @eligible_immigration_status = (val.to_s == "true")
+          end
+
+          def expiration_date
+            @expiration_date
+          end
+
+          def expiration_date=(val)
+            @expiration_date = Date.strptime(val, '%m/%d/%Y') if val.to_s.present?
           end
 
           def us_citizen

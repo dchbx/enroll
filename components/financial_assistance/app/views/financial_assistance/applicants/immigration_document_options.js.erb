@@ -34,11 +34,7 @@
 <% end %>
 
 <% if @target.present? %>
-  <% url = {} #@target.is_a?(FinancialAssistance::Applicant) ? {} : main_app.employee_dependent_submission_options_for(@target) %>
-
-  '<%= form_for @target, url do |f| %>'
-    '<%= f.fields_for find_consumer_role_for_fields(f.object) do |c| %>'
-      $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: c}) %>")
-    '<% end %>'
+  '<%= form_for @target, immigration_document_options_submission_url(@application, @target) do |f| %>'
+    $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: f}) %>")
   '<% end %>'
 <% end %>

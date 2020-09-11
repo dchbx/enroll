@@ -13,6 +13,7 @@ module FinancialAssistance
       attr_accessor :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
       attr_accessor :addresses, :phones, :emails
       attr_accessor :addresses_attributes, :phones_attributes, :emails_attributes
+
       attr_writer :family
 
       include FinancialAssistance::Forms::PeopleNames
@@ -67,6 +68,11 @@ module FinancialAssistance
         self.errors.add(:base, error_message) if error_message.present?
       end
 
+      def persisted?
+        return false unless applicant
+        applicant.persisted?
+      end
+
       def application
         return @application if defined? @application
         @application = FinancialAssistance::Application.find(application_id) if application_id.present?
@@ -80,7 +86,6 @@ module FinancialAssistance
       def save
         return false unless valid?
         applicant_entity = FinancialAssistance::Operations::Applicant::Build.new.call(params: extract_applicant_params)
-
         if applicant_entity.success?
           values = applicant_entity.success.to_h.except(:addresses, :emails, :phones).merge(nested_parameters)
           applicant = application.applicants.find(applicant_id) if applicant_id.present?
@@ -129,11 +134,23 @@ module FinancialAssistance
           attrs.merge!(no_dc_address: primary.no_dc_address, is_homeless: primary.is_homeless?, is_temporarily_out_of_state: primary.is_temporarily_out_of_state?)
         end
 
+        attrs.merge!(vlp_parameters)
         attrs.merge({
                       addresses: nested_parameters[:addresses_attributes].values,
                       phones: nested_parameters[:phones_attributes].values,
                       emails: nested_parameters[:emails_attributes].values
                     })
+      end
+
+
+      def vlp_parameters
+        [:vlp_subject, :alien_number, :i94_number, :visa_number,
+        :passport_number, :sevis_id, :naturalization_number, :receipt_number,
+        :citizenship_number, :card_number, :country_of_citizenship, :expiration_date,
+        :issuing_country, :status].inject({}) do |attrs, attribute|
+          attrs[attribute] = self.send(attribute) if self.send(attribute).present?
+          attrs
+        end
       end
 
       def nested_parameters
