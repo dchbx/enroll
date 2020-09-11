@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{FinancialAssistance::Engine.root}/spec/shared_examples/haven_parser_shared_examples.rb"
+require "#{Rails.root}/spec/shared_examples/haven_parser_shared_examples.rb"
 
-RSpec.describe :EligibilityDeterminationsParser do
+describe :EligibilityDeterminationsParser do
   class_name = self.name.demodulize
   include_examples :haven_parser_examples, class_name
 
