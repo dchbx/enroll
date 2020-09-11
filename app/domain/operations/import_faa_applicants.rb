@@ -56,19 +56,23 @@ module Operations
     end
 
     def create_family_members(payload, family)
-      family_member_applicant_mapping = {}
+      applicant_id_mappings = {}
 
       payload[:applicants].each do |applicant|
         candidate = PersonCandidate.new(applicant[:ssn], applicant[:dob])
 
         if applicant[:family_member_id].present?
-          family_member_applicant_mapping[applicant[:_id]] = applicant[:family_member_id]
+          applicant_id_mappings[applicant[:_id]] = {
+            family_member_id: applicant[:family_member_id],
+            person_hbx_id: applicant[:person_hbx_id]
+          }
           # update
         else
           person = Person.match_existing_person(candidate)
 
           if person.blank?
-            person = Person.new(extract_person_params(applicant))
+            new_person_params = extract_person_params(applicant).merge(hbx_id: applicant[:person_hbx_id])
+            person = Person.new(new_person_params)
             return false unless try_create_person(person)
           end
 
@@ -81,11 +85,14 @@ module Operations
 
           family.save!
           family.primary_person.save!
-          family_member_applicant_mapping[applicant[:_id]] = family_member.id
+          applicant_id_mappings[applicant[:_id]] = {
+            family_member_id: family_member.id,
+            person_hbx_id: person.hbx_id
+          }
         end
       end
 
-      Success([family, family_member_applicant_mapping])
+      Success([family, applicant_id_mappings])
     end
 
     def create_or_update_associations(person, applicant, assoc)
@@ -105,7 +112,8 @@ module Operations
     def update_applicants(application, family_member_mapping)
       application.applicants.each do |applicant|
         next if applicant.family_member_id.present?
-        applicant.family_member_id = family_member_mapping[applicant.id]
+        applicant.family_member_id = family_member_mapping[applicant.id][:family_member_id]
+        applicant.person_hbx_id = family_member_mapping[applicant.id][:person_hbx_id]
       end
       application.save!
       Success(application)
@@ -115,7 +123,7 @@ module Operations
       attributes = [
         :first_name,:last_name,:middle_name,:name_pfx,:name_sfx,:gender,:dob,
         :ssn,:no_ssn,:race,:ethnicity,:language_code,:is_incarcerated,:citizen_status,
-        :tribal_id,:no_dc_address,:is_homeless,:is_temporarily_out_of_state
+        :tribal_id,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,
       ]
 
       applicant.slice(*attributes)

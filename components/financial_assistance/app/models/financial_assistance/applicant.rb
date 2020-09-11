@@ -138,6 +138,7 @@ module FinancialAssistance
 
     field :aasm_state, type: String, default: :unverified
 
+    field :person_hbx_id, type: String
     field :family_member_id, type: BSON::ObjectId
     field :tax_household_id, type: BSON::ObjectId
 
@@ -263,8 +264,13 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
 
     attr_accessor :relationship
-
     # attr_writer :us_citizen, :naturalized_citizen, :indian_tribe_member, :eligible_immigration_status
+
+    before_save :generate_hbx_id
+
+    def generate_hbx_id
+      write_attribute(:person_hbx_id, HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+    end
 
     def us_citizen=(val)
       @us_citizen = (val.to_s == "true")
@@ -763,6 +769,7 @@ module FinancialAssistance
     def attributes_for_export
       applicant_params = attributes.slice(:_id,
                                           :family_member_id,
+                                          :person_hbx_id,
                                           :name_pfx,
                                           :first_name,
                                           :middle_name,
