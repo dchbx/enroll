@@ -160,7 +160,7 @@ module FinancialAssistance
     end
 
     def checklist_pdf
-      send_file(Rails.root.join("public", "ivl_checklist.pdf").to_s, :disposition => "inline", :type => "application/pdf")
+      send_file(FinancialAssistance::Engine.root.join('db','documents', 'ivl_checklist.pdf').to_s, :disposition => "inline", :type => "application/pdf")
     end
 
     private
