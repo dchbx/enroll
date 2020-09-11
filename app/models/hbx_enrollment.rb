@@ -2068,7 +2068,7 @@ class HbxEnrollment
       roster_member = EnrollmentMemberAdapter.new(
         hem.id,
         person.dob,
-        hem.fetch_relationship_kind,
+        hem.primary_relationship,
         hem.is_subscriber?,
         person.is_disabled
       )
