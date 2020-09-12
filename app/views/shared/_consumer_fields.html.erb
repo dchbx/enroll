@@ -28,7 +28,7 @@
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
         <label>Are you a naturalized citizen? *</label>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => true do %>
@@ -36,7 +36,7 @@
           <% end %>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => false do %>
@@ -44,13 +44,17 @@
           <% end %>
         </div>
       </div>
+      <div class="col-md-2 not-sure-margin left-seprator">
+        <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not Sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
+      </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
       <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
         <label>Do you have eligible immigration status? *</label>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => true do %>
@@ -58,13 +62,17 @@
           <% end %>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-2 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => false do %>
             <span>No</span>
           <% end %>
         </div>
+      </div>
+      <div class="col-md-2 not-sure-margin left-seprator" >
+        <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not Sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
       </div>
     </div>
     <%= f.fields_for find_consumer_role_for_fields(f.object) do |c| %>

@@ -16,6 +16,7 @@
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= stylesheet_link_tag "application", :media => "all" %>
     <%= stylesheet_link_tag "sponsored_benefits/application", :media => "all" %>
+    <%= javascript_include_tag "glossary" %>
     <%= javascript_include_tag "application" %>
     <%= javascript_include_tag "sponsored_benefits/application" %>
     <%= javascript_pack_tag 'ui_components', 'data-turbolinks-track': 'reload' %>
@@ -34,7 +35,7 @@
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
       <![endif]-->
 
-
+    <%= yield :head %>
         <script>
                 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -63,7 +64,11 @@
         <%= yield :horizontal_status %>
 
       </div>
+      <% if content_for? :content %>
+        <%= yield :content %>
+      <% else %>
         <%= yield %>
+      <% end %>
 
     </div>
 
