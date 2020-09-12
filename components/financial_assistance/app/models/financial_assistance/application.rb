@@ -3,8 +3,6 @@
 module FinancialAssistance
   class Application # rubocop:disable Metrics/ClassLength TODO: Remove this
 
-    require 'pry'
-
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
@@ -45,7 +43,6 @@ module FinancialAssistance
     field :haven_app_id, type: String
     field :haven_ic_id, type: String
     field :eligibility_response_payload, type: String
-    field :eligibility_status_code, type: Integer
     field :e_case_id, type: String
 
     field :applicant_kind, type: String
@@ -231,45 +228,31 @@ module FinancialAssistance
       missing_relationships
     end
 
-    def set_attributes(attrs)
+    def update_response_attributes(attrs)
       update_attributes(attrs)
     end
 
     def add_response(attrs)
-      set_attributes(attrs)
-      if success_status_codes?(eligibility_status_code)
-        if eligibility_payload_schema_valid?(eligibility_response_payload)
-          result = ::Operations::HavenImport.new.call(eligibility_response_payload: eligibility_response_payload, application_id: id)
-          result.failure? ? update_application(result) : determine!
-        else
-          set_determination_response_error!
-          set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to validate Eligibility Determination response XML')
-          log(eligibility_response_payload, {:severity => 'critical', :error_message => 'ERROR: Failed to validate Eligibility Determination response XML'})
-        end
-      else
-        application.set_determination_response_error!
-        set_attributes(determination_http_status_code: eligibility_status_code, has_eligibility_response: true, determination_error_message: eligibility_response_payload)
+      update_response_attributes(attrs)
+
+      unless success_status_codes?(determination_http_status_code)
+        update_application(eligibility_response_payload, determination_http_status_code)
+        return
       end
-      #step 2
-        # create instance of faa eligi determination(send ea the payload and create eligi deter ins in ea)
-        # state around eli determinations to determine active/inactive
-      # step 3 - notify ea that there is new determination
+
+      unless eligibility_payload_schema_valid?(eligibility_response_payload)
+        update_application('Failed to validate Eligibility Determination response XML', 422)
+        return
+      end
+
+      result = ::Operations::HavenImport.new.call(eligibility_response_payload: eligibility_response_payload, application_id: id)
+      result.failure? ? update_application(result.failure, 422) : determine!
     end
 
-    def update_application(result)
+    def update_application(error_message, status_code)
       set_determination_response_error!
-      error_message_code = result.failure[0]
-      error_message = result.failure[1]
-      case error_message_code
-      when :person_not_found
-        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find primary person in xml')
-      when :family_not_found
-        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find primary family for users person in xml')
-      when :dependent_not_found
-        set_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to find dependent from xml')
-      else
-      end
-      log(eligibility_response_payload, {:severity => 'critical', :error_message => error_message})
+      update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
+      log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
     end
 
     def eligibility_payload_schema_valid?(xml)

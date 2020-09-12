@@ -17,8 +17,8 @@ module Operations
       family = yield fetch_family(primary_person)
       active_household = yield fetch_active_household(family)
       household_from_payload = yield fetch_household_from_parsed_object(parsed_object)
-      dependents_check = yield check_if_dependents_exist_in_ea(dependents)
-      set_ecase_id = yield set_integrated_case_id(family, parsed_object)
+      yield check_if_dependents_exist_in_ea(dependents)
+      yield set_integrated_case_id(family, parsed_object)
 
       result = yield build_or_update_tax_households(active_household, parsed_object, primary_person, household_from_payload, application)
 
@@ -58,24 +58,24 @@ module Operations
       dob = verified_family_member.person_demographics.birth_date
       last_name_regex = /^#{verified_family_member.person.name_last}$/i
       first_name_regex = /^#{verified_family_member.person.name_first}$/i
-     person =  if !ssn.blank?
+      person = if !ssn.blank?
                  Person.where({
-                       :encrypted_ssn => Person.encrypt_ssn(ssn),
-                       :dob => dob
-                     }).first
+                                :encrypted_ssn => Person.encrypt_ssn(ssn),
+                                :dob => dob
+                              }).first
                else
                  Person.where({
-                       :dob => dob,
-                       :last_name => last_name_regex,
-                       :first_name => first_name_regex
-                     }).last
+                                :dob => dob,
+                                :last_name => last_name_regex,
+                                :first_name => first_name_regex
+                              }).last
                end
-      person ?  Success(person) : Failure([:person_not_found, 'ERROR: Failed to find primary person in xml'])
+      person.present? ? Success(person) : Failure('Failed to find primary person in xml')
     end
 
     def fetch_family(person)
       family = person.primary_family
-      family ?  Success(family) : Failure([:family_not_found, 'ERROR: Failed to find primary family for users person in xml'])
+      family ? Success(family) : Failure('Failed to find primary family for users person in xml')
     end
 
     def fetch_active_household(family)
@@ -88,8 +88,10 @@ module Operations
 
     def check_if_dependents_exist_in_ea(dependents)
       dependents.each do |verified_family_member|
-        next unless fetch_person(verified_family_member).blank?
-          Failure([:dependent_not_found, 'ERROR: Failed to find dependent from xml'])
+        result = fetch_person(verified_family_member)
+        return Failure('Failed to find dependent from xml') if result.failure?
+
+        next
       end
       Success(true)
     end
@@ -101,10 +103,10 @@ module Operations
 
     def build_or_update_tax_households(active_household, parsed_object, primary_person, household_from_payload, application)
       result = active_household.build_or_update_tax_households_and_applicants_and_eligibility_determinations(parsed_object, primary_person, household_from_payload,
-                                                                                                    application)
+                                                                                                             application)
       Success(result)
     rescue StandardError
-      Failure([:update_failed, 'ERROR: Failure to update tax household'])
+      Failure('Failure to update tax household')
     end
 
   end

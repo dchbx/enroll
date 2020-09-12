@@ -129,8 +129,8 @@ RSpec.describe ::FinancialAssistance::Subscribers::ApplicationEligibilityRespons
         end
 
         it 'logs failed to find application for person in xml error' do
-          allow(FinancialAssistance::Application).to receive(:where).and_return(double(first: application))
-          expect(application).to receive(:log) do |arg1, arg2|
+          allow(FinancialAssistance::Application).to receive(:where).and_return(double(first: nil))
+          expect(subject).to receive(:log) do |arg1, arg2|
             expect(arg1).to eq message['body']
             expect(arg2[:error_message]).to match(/ERROR: Failed to find the Application in XML/)
             expect(arg2[:severity]).to eq('critical')
@@ -302,8 +302,8 @@ RSpec.describe ::FinancialAssistance::Subscribers::ApplicationEligibilityRespons
         end
 
         it 'logs failed to find application for person in xml error' do
-          allow(FinancialAssistance::Application).to receive(:where).and_return(double(first: application))
-          expect(application).to receive(:log) do |arg1, arg2|
+          allow(FinancialAssistance::Application).to receive(:where).and_return(double(first: nil))
+          expect(subject).to receive(:log) do |arg1, arg2|
             expect(arg1).to eq message['body']
             expect(arg2[:error_message]).to match(/ERROR: Failed to find the Application in XML/)
             expect(arg2[:severity]).to eq('critical')

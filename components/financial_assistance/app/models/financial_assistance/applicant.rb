@@ -269,9 +269,7 @@ module FinancialAssistance
     #
 
     def self.encrypt_ssn(val)
-      if val.blank?
-        return nil
-      end
+      return nil if val.blank?
       ssn_val = val.to_s.gsub(/\D/, '')
       SymmetricEncryption.encrypt(ssn_val)
     end

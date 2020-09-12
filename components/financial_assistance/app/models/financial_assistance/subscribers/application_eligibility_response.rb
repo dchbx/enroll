@@ -19,7 +19,7 @@ module FinancialAssistance
         if application.present?
           payload_http_status_code = stringed_key_payload['return_status']
 
-         application.add_response(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, haven_app_id: stringed_key_payload['haven_application_id'], haven_ic_id: stringed_key_payload['haven_ic_id'], eligibility_response_payload: xml, eligibility_status_code: payload_http_status_code)
+          application.add_response(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, haven_app_id: stringed_key_payload['haven_application_id'], haven_ic_id: stringed_key_payload['haven_ic_id'], eligibility_response_payload: xml)
 
 
           # if application.success_status_codes?(payload_http_status_code.to_i)
@@ -27,7 +27,6 @@ module FinancialAssistance
           #     sc = ShortCircuit.on(:processing_issue) do |err|
           #       log(xml, {:severity => 'critical', :error_message => err})
           #     end
-          #     sc.and_then do |payload| # rubocop:todo Lint/ShadowingOuterLocalVariable
           #       haven_import_from_xml(payload)
           #     end
           #     sc.call(xml)

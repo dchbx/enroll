@@ -14,7 +14,8 @@ module Services
     def family_member_attributes(family_member)
       person_attributes(family_member.person).merge(
         family_member_id: family_member.id,
-        is_primary_applicant: family_member.is_primary_applicant)
+        is_primary_applicant: family_member.is_primary_applicant
+      )
     end
 
     def person_attributes(person)
