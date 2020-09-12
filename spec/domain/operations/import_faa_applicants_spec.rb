@@ -78,6 +78,40 @@ RSpec.describe Operations::ImportFaaApplicants, type: :model, dbclean: :after_ea
     end
   end
 
+  context 'When Immigration status provided' do
+
+    context 'When Permanent Resident Card selected' do
+
+      let(:immigration_params) do
+        {
+          vlp_subject: 'I-551 (Permanent Resident Card)',
+          alien_number: "974312399",
+          card_number: "7478823423442",
+          expiration_date: Date.new(2020,10,31)
+        }
+      end
+
+      let(:spouse) { application.applicants.detect{|applicant| applicant.relation_with_primary == 'spouse' } }
+
+      before do
+        spouse.update_attributes(immigration_params)
+      end
+
+      subject { Operations::ImportFaaApplicants.new.call(application_id: application.id, family_id: family.id) }
+
+      it 'should create vlp document with subject' do
+        updated_family = subject.success
+        spouse_person = updated_family.family_members.detect{|fm| fm.primary_relationship == 'spouse'}.person
+        consumer_role = spouse_person.consumer_role
+        expect(consumer_role).to be_present
+        expect(consumer_role.vlp_documents.count).to eq 1
+        vlp_document = consumer_role.vlp_documents.first
+        immigration_params.each_pair {|attr, value| expect(vlp_document.send(attr)).to eq value }
+        expect(consumer_role.active_vlp_document_id).to eq vlp_document.id
+      end
+    end
+  end
+
   # context 'FAA applicant present on the family and information updated' do
 
   #   it 'should update the matching family member' do

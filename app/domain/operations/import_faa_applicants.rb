@@ -79,9 +79,10 @@ module Operations
           family_member = family.relate_new_member(person, applicant[:relationship])
           family_member.family.build_consumer_role(family_member, extract_consumer_role_params(applicant)) if applicant[:is_consumer_role]
 
-          %w[addresses emails phones].each do |assoc|
-            create_or_update_associations(person, applicant, assoc)
-          end
+          raise 'Consumer Role missing!!' unless person.consumer_role
+
+          create_vlp_document(person, applicant[:vlp_subject], extract_vlp_params(applicant)) if applicant[:vlp_subject].present?
+          %w[addresses emails phones].each {|assoc| create_or_update_associations(person, applicant, assoc) }
 
           family.save!
           family.primary_person.save!
@@ -93,6 +94,14 @@ module Operations
       end
 
       Success([family, applicant_id_mappings])
+    end
+
+    def create_vlp_document(person, subject, vlp_attrs)
+      vlp_document = person.consumer_role.find_document(subject)
+      vlp_document.assign_attributes(vlp_attrs)
+      vlp_document.save!
+      person.consumer_role.active_vlp_document_id = vlp_document.id
+      person.save!
     end
 
     def create_or_update_associations(person, applicant, assoc)
@@ -132,6 +141,16 @@ module Operations
     def extract_consumer_role_params(applicant)
       attributes = [:citizen_status, :vlp_document_id, :is_applying_coverage]
       applicant.slice(*attributes)
+    end
+
+    def extract_vlp_params(applicant)
+      attributes = [
+        :vlp_subject,:alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,
+        :naturalization_number,:receipt_number,:citizenship_number,:card_number,
+        :country_of_citizenship,:expiration_date,:issuing_country,:status
+      ]
+
+      applicant.slice(*attributes).reject{|_name, value| value.blank?}
     end
 
     def try_create_person(person)
