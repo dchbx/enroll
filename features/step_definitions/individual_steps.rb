@@ -474,7 +474,7 @@ end
 
 Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
-  find('.container .row div div.btn', text: 'Help').click
+  find('.container div.btn', text: 'Help').click
   wait_for_ajax
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
