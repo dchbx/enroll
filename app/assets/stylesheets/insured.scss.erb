@@ -525,3 +525,48 @@
   word-break: break-word; // IE & Edge compatibility
   overflow-wrap: break-word;
 }
+
+.run-glossary .popover {
+  background-color: #003260;
+  color: white;
+  max-width: 350px;
+  .arrow { display: none; }
+  .popover-title {
+    background-color: #003260;
+    border-bottom: none;
+    color: white;
+    font-weight: bold;
+    padding-bottom: 0;
+    button.close {
+      background-repeat: no-repeat;
+      background-size: 16px;
+      height: 16px;
+      width: 16px;
+      margin-top: 3px;
+      opacity: 1;
+      &:hover {
+        opacity: .5;
+      }
+    }
+  }
+  .popover-content {
+    padding: 8px 14px 15px 14px;
+    text-align: left;
+  }
+
+  a {
+    color: white;
+    text-decoration: underline;
+    &:hover {
+      color: white;
+    }
+  }
+}
+
+span.glossary {
+  border-bottom: 1px dashed #007bc4;
+}
+span.glossary:hover {
+  cursor: pointer;
+  color: #007bc4;
+}
