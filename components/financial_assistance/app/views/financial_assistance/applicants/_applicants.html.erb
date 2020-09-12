@@ -1,0 +1,79 @@
+<% if @change_plan.present? && @sep.blank?%>
+    <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
+<% end %>
+
+<% if @sep.present? %>
+  <h3 class="blue-text"><%= @sep.title %> on: <%= @sep.qle_on %></h3>
+<% end %>
+
+<h2 class="darkblue">Household Info: Family Members</h2>
+<p class="subtext">If you need to get insurance coverage for other members of your household, select 'Add New Person'. When you’re finished, select CONTINUE.</p>
+<p class='memo'>* = required field</p>
+<div class="row row-form-wrapper no-buffer">
+  <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
+    <div class="col-md-4 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+      <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
+      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
+    </div>
+    <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+      <label class="static_label label-floatlabel" for="name">AGE</label>
+      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(Date.today)}" %></span>
+    </div>
+    <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+      <label class="static_label label-floatlabel" for="name">GENDER</label>
+      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.gender.humanize}" %></span>
+    </div>
+    <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
+      <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
+       <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= l10n(".self").to_s.upcase %></span>
+      <%#= link_to main_app.personal_insured_families_path, remote: true, class: 'close close-2' do %>
+
+            <%=
+              link_to edit_application_applicant_path(@application, @application.primary_applicant), remote: true, class: 'close close-2' do
+                '<i class="fas fa-pencil-alt"></i>'.html_safe
+              end
+            %>
+<!--         <i class="fas fa-pencil-alt"></i>
+ -->      <%# end %>
+    </div>
+  </div>
+</div>
+<div class="append_consumer_info">
+</div>
+
+<%= yield :primary_member_fa %>
+
+<br>
+<div class="row no-buffer">
+  <ul class="" id="dependent_ul">
+    <% @application.non_primary_applicants.each do |dependent| %>
+      <%= render "financial_assistance/applicants/dependent_applicant", dependent: dependent, person: @person %>
+    <% end %>
+  </ul>
+</div>
+
+<div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12 icon-mtb <%= pundit_class Family, :updateable?%>">
+    <%= hidden_field_tag 'origin_source', @source %>
+    <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add New Person</b>" .html_safe, new_application_applicant_path(@application), :remote => true, :id => "household_info_add_member" %>
+    <%#= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add New Person</b>" .html_safe, main_app.new_insured_family_member_path(:family_id => @family.id, consumer_role_id: @consumer_role.try(:id)), :remote => true, :id => "household_info_add_member" %>
+
+
+
+    <div class="help-to-decide">
+      <% if @application.present? %>
+        <a href="help_me_decide" data-toggle="modal" data-target="#help_me_decide" id="help_me_decide_not_sure" class="interaction-click-control-not-sure?"> Help me decide who to include in my household </a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "help_me_decide"} %>
+      <% end %>
+    </div>
+    <% group_selection_url = main_app.new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option]) %>
+    <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
+
+    <% if @change_plan.present? %>
+      <%=
+        link_to '<i class="fa fa-user-plus"></i> Continue'.html_safe, group_selection_url,
+          class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
+      %>
+    <% end %>
+  </div>
+</div>

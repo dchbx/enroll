@@ -1,0 +1,11 @@
+%deduction
+  %deduction_id= deduction.id
+  - if deduction.title.present?
+    %title= deduction.title
+  %deduction_type= "urn:openhbx:terms:v1:financial_assistance_deduction##{deduction.kind}"
+  %amount= '%.2f' % (deduction.amount.to_f.round(2))
+  %frequency= "urn:openhbx:terms:v1:financial_assistance_income_frequency##{deduction.frequency_kind}"
+  %start_on= simple_date_for(deduction.start_on)
+  - unless deduction.end_on.blank?
+    %end_on= simple_date_for(deduction.end_on)
+  %submitted_at= deduction.submitted_at.strftime('%Y-%m-%dT%H:%M:%S')

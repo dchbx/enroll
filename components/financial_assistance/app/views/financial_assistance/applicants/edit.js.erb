@@ -1,0 +1,14 @@
+<% if @applicant.is_primary_applicant? %>
+$(".append_consumer_info").html("<%= escape_javascript(render partial: "edit")%>")
+<% else %>
+$("#edit_applicant_<%= @applicant.id %>").html("<%= escape_javascript(render partial: "edit")%>")
+<% end %>
+$("#jq_datepicker_ignore_person_dob").closest(".floatlabel-wrapper").hide();
+$(".close_member_form").removeClass('hide');
+$(".save_member").addClass('pull-right');
+$(".faa-row").addClass('hide');
+// Had to extensively call this function because this is being called only on Document load.
+// FAA specific case For Primary Demographic fields conditional edit.
+// demographicValidations();
+isApplyingCoverage("applicant");
+applyFaaListeners();

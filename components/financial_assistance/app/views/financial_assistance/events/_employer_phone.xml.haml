@@ -1,0 +1,4 @@
+%employer_phone
+  %type= "urn:openhbx:terms:v1:phone_type##{phone.kind}"
+  %full_phone_number= phone.full_phone_number
+  %is_preferred= (phone.primary.blank? ? false : phone.primary)

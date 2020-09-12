@@ -1,0 +1,34 @@
+%id
+  %id= individual.hbx_id
+= render :partial => "events/individuals/person", :object => individual
+- if individual.person_relationships.any?
+  %person_relationships
+    - individual.person_relationships.each do |rel|
+      %person_relationship
+        %subject_individual
+          %id= rel.relative.hbx_id
+        %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{vocab_relationship_map(rel.kind)}"
+        %object_individual
+          %id= individual.hbx_id
+= render :partial => "events/individuals/person_demographics", :object => individual
+- if individual.broker_role.present?
+  - broker_role = individual.broker_role
+  - if broker_role.benefit_sponsors_broker_agency_profile_id.present? && broker_role.broker_agency_profile.present?
+    - broker_agency_profile = broker_role.broker_agency_profile
+    %broker_roles
+      %broker_role
+        %id
+          %id= broker_role.npn
+        %npn= broker_role.npn
+        %broker_agency
+          %id
+            %id= broker_agency_profile.id
+          %name= broker_agency_profile.legal_name
+          - if !broker_agency_profile.corporate_npn.blank?
+            %npn= broker_agency_profile.corporate_npn
+          - if broker_agency_profile.primary_office_location.present?
+            - office_location = broker_agency_profile.primary_office_location
+            %office_locations
+              = render :partial => "events/organizations/office_location", :object => office_location
+        = render :partial => "events/shared/versioned_resource", :object => broker_role
+  

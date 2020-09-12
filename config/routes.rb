@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
+  mount FinancialAssistance::Engine,  at: '/financial_assistance'
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 

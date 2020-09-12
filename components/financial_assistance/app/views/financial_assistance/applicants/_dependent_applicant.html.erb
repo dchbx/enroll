@@ -1,0 +1,50 @@
+<li id="add_member_list_<%= dependent.id %>" class="dependent_list">
+  <div id="add_info_<%= dependent.id %>">
+    <div class="dependent_notice_div_<%= dependent.id%>"></div>
+    <div class="row row-form-wrapper no-buffer">
+      <div class="col-md-4 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">NAME</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.full_name %></span>
+        </div>
+      </div>
+      <div class="col-md-2 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel">AGE</label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.age_on(Date.today) %></span>
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.gender.try(:humanize) %></span>
+          
+        </div>
+      </div>
+
+      <div class="col-md-3 col-sm-4 no-pd">
+        <div class="form-group form-group-lg">
+          <label class="static_label label-floatlabel"><%= l10n("relationship").to_s.upcase %></label>
+          <span class="field_value floatlabel form-control active-floatlabel"> <%= dependent.relation_with_primary.try(:humanize) %> </span>
+          <div class="text-right">
+            <%=
+              link_to edit_application_applicant_path(@application, dependent), remote: true, class: 'close close-2' do
+                '<i class="fas fa-pencil-alt"></i>'.html_safe
+              end
+            %>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="edit_applicant_<%= dependent.id %>">
+    <%= yield "person_#{dependent.id}" %>
+    </div>
+
+    <div class="clearfix"></div>
+  </div>
+  <script>
+    Freebies.floatlabels();
+  </script>
+</li>

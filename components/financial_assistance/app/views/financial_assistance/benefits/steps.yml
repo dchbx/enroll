@@ -1,0 +1,310 @@
+- step:
+    heading: Health Coverage for <family-member-name-placeholder>
+    heading_text: Tell us about other health coverage options for this person. When you're finished select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 4
+                  type: text
+                  text: Are you adding a health coverage that you are enrolled in or eligible for? *
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: label_radio
+                  name: person_enrolled
+                  value: is_eligible
+                  required: true
+                  id: 'is_eligible'
+                  model: benefit
+                  attribute: kind
+                  label: 'Eligible'
+                  classNames: 'span-text'
+                - gutter: 3
+                  type: label_radio
+                  name: person_enrolled
+                  value: is_enrolled
+                  required: true
+                  id: 'is_enrolled'
+                  model: benefit
+                  attribute: kind
+                  label: 'Enrolled'
+                  classNames: 'span-text'
+                - gutter: 3
+                  type: raw_html
+                  text: '| &nbsp <a> Not Sure? </a>'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_enrolled
+            - cells:
+                - gutter: 6
+                  type: input_date
+                  placeholder: Start On *
+                  id: 'start_on'
+                  model: benefit
+                  attribute: start_on
+                - gutter: 6
+                  type: input_date
+                  placeholder: End On
+                  id: 'end_on'
+                  model: benefit
+                  attribute: end_on
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  Where can this person access coverage ?*
+                - gutter: 6
+                  type: 'dropdown'
+                  name: ''
+                  values:
+                    - acf_refugee_medical_assistance
+                    - americorps_health_benefits
+                    - child_health_insurance_plan
+                    - medicaid
+                    - medicare
+                    - medicare_advantage
+                    - medicare_part_b
+                    - private_individual_and_family_coverage
+                    - state_supplementary_payment
+                    - tricare
+                    - veterans_benefits
+                    - naf_health_benefit_program
+                    - health_care_for_peace_corp_volunteers
+                    - state_supplementary_payment
+                    - department_of_defense_non_appropriated_health_benefits
+                    - cobra
+                    - employer_sponsored_insurance
+                    - self_funded_student_health_coverage
+                    - foreign_government_health_coverage
+                    - private_health_insurance_plan
+                    - coverage_obtained_through_another_exchange
+                    - coverage_under_the_state_health_benefits_risk_pool
+                    - veterans_administration_health_benefits
+                    - peace_corps_health_benefits
+                  id: 'insurance_kind'
+                  model: benefit
+                  attribute: insurance_kind
+            - cells:
+                - gutter: 6
+                  type: 'dropdown'
+                  name: who_can_be_covered?
+                  id: 'esi_covered'
+                  values:
+                    - self
+                    - self_and_spouse
+                    - family
+                  model: benefit
+                  attribute: esi_covered
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: '<strong> Please Note: </strong> Have this employers Human Resource Department fill out the Employer Coverage Tool to answer the questions in this section.'
+                  classNames: 'span-text'
+            - cells:  
+                - gutter: 12
+                  type: input
+                  name: employer_name
+                  placeholder: EMPLOYER NAME *
+                  id: 'employer_name'
+                  model: benefit
+                  attribute: employer_name
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_1
+                  placeholder: EMPLOYER ADDRESS  Line 1 *
+                  id: 'add1'
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_1
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_2
+                  placeholder: EMPLOYER ADDRESS Line 2(APT, UNIT, ETC)
+                  id: 'add2'
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_2
+            - cells:
+                - gutter: 4
+                  type: input
+                  name: city
+                  placeholder: CITY*
+                  id: 'city'
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: city
+                - gutter: 4
+                  type: 'dropdown'
+                  name: 'STATE *'
+                  id: 'state'
+                  prompt: Choose State
+                  values:
+                    - AL
+                    - AK
+                    - AZ
+                    - AR
+                    - CA
+                    - CO
+                    - CT
+                    - DE
+                    - DC
+                    - FL
+                    - GA
+                    - HI
+                    - ID
+                    - IL
+                    - IN
+                    - IA
+                    - KS
+                    - KY
+                    - LA
+                    - ME
+                    - MD
+                    - MA
+                    - MI
+                    - MN
+                    - MS
+                    - MO
+                    - MT
+                    - NE
+                    - NV
+                    - NH
+                    - NJ
+                    - NY
+                    - NC
+                    - ND
+                    - OH
+                    - OK
+                    - OR
+                    - PA
+                    - PR
+                    - RI
+                    - SC
+                    - SD
+                    - TN
+                    - TX
+                    - UT
+                    - VT
+                    - WA
+                    - WV
+                    - WI
+                    - WY
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: state
+                - gutter: 4
+                  type: input
+                  name: zip
+                  placeholder: ZIP *
+                  id: 'zip'
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: zip
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_phone
+                  placeholder: EMPLOYER PHONE
+                  model: employer_phone
+                  id: 'phone'
+                  accessor:
+                    - employer_phone
+                  attribute: full_phone_number
+                - gutter: 6
+                  type: input
+                  name: employer_indentification_no.
+                  placeholder: EMPLOYER IDENTIFICATION NO.(EIN)
+                  id: 'fein'
+                  model: benefit
+                  attribute: employer_id
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: label_radio
+                  name: is_eligible
+                  id: 'is_eligible_yes'
+                  value: true
+                  label: 'Yes'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_esi_waiting_period
+                - gutter: 2
+                  type: label_radio
+                  name: is_eligible
+                  value: false
+                  id: 'is_eligible_no'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_esi_waiting_period
+                - gutter: 2
+                  type: raw_html
+                  text: '| &nbsp <a> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: text
+                  text:  Does this employer offer a health plan that meets the minimum value standard ? *
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: label_radio
+                  name: employer_sponsored
+                  value: true
+                  id: 'health_plan_yes'
+                  model: benefit
+                  attribute: is_esi_mec_met
+                  label: 'Yes'
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: label_radio
+                  name: employer_sponsored
+                  value: false
+                  id: 'no2'
+                  label: 'No'
+                  classNames: 'span-text'
+                  model: benefit
+                  attribute: is_esi_mec_met
+                - gutter: 2
+                  type: raw_html
+                  text: '| &nbsp <a> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 8
+                  type: text
+                  text: How much would the employee only pay for the lowest cost minimum value standard plan ? *
+                  classNames: 'span-text'
+                - gutter: 2
+                  type: raw_html
+                  text: '| &nbsp <a> Not Sure? </a>'
+                  classNames: 'span-text'
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: amount
+                  placeholder: AMOUNT*
+                  id: 'amount'
+                  model: benefit
+                  attribute: employee_cost
+                - gutter: 6
+                  type: 'dropdown'
+                  name: 'How Often'
+                  prompt: Choose One
+                  id: 'frequency'
+                  values:
+                    - biweekly 
+                    - daily 
+                    - half_yearly 
+                    - monthly 
+                    - quarterly 
+                    - weekly 
+                    - yearly
+                  model: benefit
+                  attribute: employee_cost_frequency

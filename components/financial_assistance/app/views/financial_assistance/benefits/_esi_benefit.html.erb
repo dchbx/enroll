@@ -1,0 +1,128 @@
+<div id="<%= dom_id benefit %>" class="benefit">
+  <div class="focus_effect_module benefit-show">
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-10 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">EMPLOYER NAME</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_name %></span>
+      </div>
+       <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
+        <a class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
+        <a class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 1</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_1) %></span>
+      </div>
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">EMPLOYER ADDRESSS LINE 2</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:address_2) %></span>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">CITY</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:city) %></span>
+      </div>
+      <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">STATE</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:state) %></span>
+      </div>
+      <div class="col-md-4 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">ZIP</label>
+        <span class="field_value zip floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_address.try(:zip) %></span>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">EMPLOYER PHONE</label>
+        <span class="field_value phone_number floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_phone.try(:full_phone_number) %></span>
+      </div>
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">EMPLOYER IDENTIFICATION NUMBER</label>
+        <span class="field_value fien_field floatlabel form-control active-floatlabel" id="name"><%= benefit.employer_id %></span>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-6 labelforcoverage'>
+        <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
+      </div>
+      <div class='col-md-6' style="line-height: 30px;">
+        <div class='col-md-4'>
+          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
+          <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
+        </div>
+        <div class='col-md-4'>
+          <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", false, !benefit.is_esi_waiting_period ,class: "radio-yml" )%>
+          <label class="radio-yml" for="is_esi_waiting_period_no">No</label>
+        </div>
+        <div class='col-md-4'>
+          <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-6 labelforcoverage'>
+        <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
+      </div>
+      <div class='col-md-6' style="line-height: 30px;">
+        <div class='col-md-4'>
+          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
+          <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
+        </div>
+        <div class='col-md-4'>
+          <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", false, !benefit.is_esi_mec_met, class: "radio-yml" )%>
+          <label class="radio-yml" for="is_esi_mec_met_no">No</label>
+        </div>
+        <div class='col-md-4'>
+          <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-6 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">Who Can be Covered? *</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.esi_covered.titleize %></span>
+      </div>
+      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">FROM</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+      </div>
+      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">TO</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-9 labelforcoverage'>
+        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan ? *</span>
+      </div>
+      <div class='col-md-3 not-sure-margin'>
+        <a href="#" data-toggle="modal" data-target="#">Not Sure?</a>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">AMOUNT *</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost %></span>
+      </div>
+      <div class="col-md-3 no-pd form-group-lg no-pd class-fa-household">
+        <label class="static_label label-floatlabel">How Often *</label>
+        <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.employee_cost_frequency %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="edit-benefit-form hidden">
+    <%= render partial: 'financial_assistance/benefits/esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+  </div>
+</div>

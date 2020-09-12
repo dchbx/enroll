@@ -1,0 +1,16 @@
+<%= text_field_tag cell.name_attribute, nil, placeholder: cell.placeholder, required: cell.required, class: "floatlabel put-class-name-here", value: input_text_value(@model, cell) %>
+
+<!--TODO : move this to assets-->
+  <script>
+  $( function() {
+
+    $( "#income_start_on" ).datepicker();
+    $( "#income_end_on" ).datepicker();
+
+    $( "#benefit_start_on" ).datepicker();
+    $( "#benefit_end_on" ).datepicker();
+
+    $( "#deduction_start_on" ).datepicker();
+    $( "#deduction_end_on" ).datepicker();
+  } );
+  </script>

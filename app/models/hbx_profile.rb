@@ -73,7 +73,6 @@ class HbxProfile
     BrokerRole.inactive
   end
 
-
   class << self
     def find(id)
       org = Organization.where("hbx_profile._id" => BSON::ObjectId.from_string(id)).first
@@ -97,6 +96,17 @@ class HbxProfile
     def current_hbx
       Caches::CurrentHbx.fetch do
         find_by_state_abbreviation(aca_state_abbreviation)
+      end
+    end
+
+    def faa_application_applicable_year
+      calender_year = TimeKeeper.date_of_record.year
+      enrollment_start_on_year = Settings.aca.individual_market.open_enrollment.start_on.to_date
+
+      if current_hbx&.under_open_enrollment? && calender_year == enrollment_start_on_year.year
+        calender_year + 1
+      else
+        calender_year
       end
     end
 

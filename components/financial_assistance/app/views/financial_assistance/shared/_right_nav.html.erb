@@ -1,0 +1,36 @@
+<% if show_faa_status %>
+    <div class = "faa-status">
+      <%= render partial: 'financial_assistance/shared/status', locals: { application: @application || @family.application_in_progress } %>
+    </div>
+<% end %>
+<% if content_for? :submit_button %>
+  <%= yield :submit_button %>
+<% else %>
+    <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled) unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+<% end %>
+
+<ul class='list-unstyled list-right-section'>
+  <li>
+    <%= link_to previous_url do %>
+      <%= image_tag 'icons/list.png' %>
+      PREVIOUS
+    <% end %>
+  </li>
+  <li>
+    <a href="#">
+      <%= image_tag 'icons/list.png' %>
+      SAVE &amp; EXIT
+    </a>
+    <br>
+    <br>
+  </li>
+  <li>
+    <p class="aside-text">
+      If you select Save &amp; Exit, you can save your work and continue where you left off the next time you login.
+    </p>
+  </li>
+  <br class="clear">
+</ul>
+
+<%= render partial: 'shared/help_me_sign_up' %>
+<%= render partial: 'ui-components/v1/modals/help_with_plan' %>

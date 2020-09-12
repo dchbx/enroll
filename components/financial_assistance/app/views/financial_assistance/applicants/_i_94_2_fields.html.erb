@@ -1,0 +1,9 @@
+<div id="immigration_i_94_2_fields_container">
+  <%= c.hidden_field :vlp_subject, value: "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/i_94_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/passport_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/visa_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/servis_id", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "Passport"} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/country_of_citizenship", locals: {v: c} %>
+</div>
