@@ -28,8 +28,9 @@ jobs:
           bundle install --jobs 4 --retry 3
       - name: Run rubocop
         run: |
-          git fetch --no-tags origin
-          bundle exec rubocop-git origin/master
+          git config diff.renameLimit 800
+          git fetch --no-tags --depth=1 origin master
+          bundle exec rubocop-git origin/master | grep "no offenses detected"
   testing_matrix:
     name: ${{matrix.command_configs.name}}
     needs: [rubocop]
