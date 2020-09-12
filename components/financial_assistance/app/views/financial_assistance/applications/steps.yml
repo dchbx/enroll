@@ -1,0 +1,280 @@
+- step:
+    heading: Your Preferences
+    heading_text: "Tell us your preferences. When you're finished, select CONTINUE."
+    sections:
+      - section:
+          lines:
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "To make it easier to determine my eligibility for help paying for coverage in future years, I agree to allow DC Health Link to use my income data, including information from tax returns, for the next five years. DC Health Link will send me a notice, let me make any changes, and I can opt out at any time. *<br>"
+            - cells:
+                  - gutter: 3
+                    type: label_radio
+                    label: I agree
+                    id: 'agree'
+                    value: true
+                    classNames: 'span-text'
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                    id: 'eligibility_easier_yes'
+                  - gutter: 3
+                    type: label_radio
+                    id: 'disagree'
+                    classNames: 'span-text'
+                    label: I disagree
+                    value: false
+                    model: application
+                    name: is_renewal_authorized
+                    attribute: is_renewal_authorized
+                    id: 'eligibility_easier_no'
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "When it’s time to renew or change coverage, I authorize DC Health Link to automatically check my federal income tax returns for the sole purpose of redetermining my eligibility."
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "How long would you like your eligibility for help paying for coverage to be renewed? *"
+                  - gutter: 12
+                    type: label_radio
+                    label: 5 years
+                    value: 5
+                    classNames: 'span-text'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+                  - gutter: 12
+                    type: label_radio
+                    label: 4 years
+                    value: 4
+                    classNames: 'span-text'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+                  - gutter: 12
+                    type: label_radio
+                    label: 3 years
+                    value: 3
+                    classNames: 'span-text'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+                  - gutter: 12
+                    type: label_radio
+                    label: 2 years
+                    value: 2
+                    classNames: 'span-text'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+                  - gutter: 12
+                    type: label_radio
+                    label: 1 year
+                    value: 1
+                    classNames: 'span-text'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+                  - gutter: 12
+                    type: label_radio
+                    label: "None. I understand that this means I won't get cost savings in future years unless I change my mind and tell DC Health Link"
+                    value: 0
+                    classNames: 'span-text radio-inline-override'
+                    model: application
+                    name: years_to_renew
+                    attribute: years_to_renew
+      - section:
+          heading: Voter Registration
+          heading_text: "Tell us your preferences. When you're finished, select CONTINUE."
+          lines:
+            - cells:
+                  - gutter: 8
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "Would you like to register to vote in DC or update your current registration? * (A form will be mailed to you)"
+                  - gutter: 2
+                    type: label_radio
+                    id: 'mailed_yes'
+                    label: "Yes"
+                    value: true
+                    classNames: 'span-text'
+                    model: application
+                    name: is_requesting_voter_registration_application_in_mail
+                    attribute: is_requesting_voter_registration_application_in_mail
+                  - gutter: 2
+                    type: label_radio
+                    label: "No"
+                    id: 'mailed_no'
+                    classNames: 'span-text'
+                    value: false
+                    classNames: 'span-text'
+                    model: application
+                    name: is_requesting_voter_registration_application_in_mail
+                    attribute:  is_requesting_voter_registration_application_in_mail
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: "<b>PLEASE NOTE:</b> If you select 'No' you will be considered to have decided not to have requested a voter registration form at this time.<br><br>
+                    You may file a complaint if you believe that someone has interfered with: <br><br>
+                    * Your right to register or not register to vote <br>
+                    * Your right to privacy in deciding whether or not to register to vote <br>
+                    * Your right to choose your own political party or other political choice <br><br>
+
+                    <b>To file a complaint, contact:</b><br>
+                    DC Board of Elections<br>
+                    1015 Half Street, SE<br>
+                    Suite 750<br>
+                    Washington, DC 20003<br>
+                    Phone: (202) 727-2525 <br>"
+- step:
+    heading: Submit Your Application
+    heading_text: "This is the last step. Carefully read the information below. Select 'I agree' after each statement to acknowledge your agreement. Then, enter your name to electronically sign the application. When you're finished, select SUBMIT APPLICATION."
+    sections:
+      - section:
+          lines:
+            - cells:
+                  - gutter: 12
+                    type: raw_html
+                    classNames: 'small-padding-top-bottom'
+                    text: <b>I understand that eligibility for Medicaid or private health insurance, with or without financial assistance, will be reviewed every year.</b> <br><br> This process is called renewal. DC Health Link will review eligibility by checking its records and other electronic data sources including, with my consent, information about my federal tax returns from the IRS. DC Health Link will send me a notice that includes the information it has found by checking its records and other electronic data sources, and I will be able to correct information that is wrong. If found eligible for Medicaid or private health insurance coverage, with or without financial assistance, I may also be asked to provide additional information to extend coverage for another year for myself and/or other members of my application group.
+            - cells:
+                  - gutter: 12
+                    type: checkbox
+                    classNames: 'span-text'
+                    label: I agree *
+                    value: true
+                    required: true
+                    model: application
+                    name: medicaid_terms
+                    attribute: medicaid_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: span-text
+                  text: <b> I understand that I must report any changes that might affect my eligibility or the eligibility of a household member for health insurance. </b> <br> <br>
+                        I can report changes by going online and logging into "My Account", by calling DC Health Link's Contact Center toll free at (855) 532-5465 TTY&#58; 711,
+                        or by submitting information via mail or in-person at one of the Department of Human Services service centers. <br> <br>
+
+                        I'm the person whose name appears in the signature line below. I understand that I'm submitting an application for health insurance and that
+                        information that I provided will be used to decide eligibility for each member of my application group. <br> <br>
+
+                        I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I’m not truthful, there may be a penalty, including retroactive termination of my coverage and an obligation to repay all medical claims previous covered by the health insurance"
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I agree *
+                  value: true
+                  #required: true
+                  name: medicaid_terms
+                  model: application
+                  name: report_change_terms
+                  attribute: report_change_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'span-text'
+                  text: "If anyone in my application group is found eligible for Medicaid, I am authorizing the Medicaid agency to pursue and get any money from other health insurance, legal settlements, or other third parties that may be legally responsible for paying for any health care received by me or members of my applicant group. I am also giving to the Medicaid agency rights to pursue and get medical support from a spouse or parent."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I agree *
+                  value: true
+                  required: true
+                  classNames: 'span-text'
+                  model: application
+                  name: medicaid_insurance_collection_terms
+                  attribute: medicaid_insurance_collection_terms
+      - section:
+          lines:
+            - cells:
+              - gutter: 12
+                type: raw_html
+                text: <b>Does any child on this application have a parent living outside of the home?</b>
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: true
+                required: true
+                id: 'living_outside_yes'
+                label: 'Yes'
+                classNames: 'span-text'
+                model: application
+                name: parent_living_out_of_home_terms
+                attribute: parent_living_out_of_home_terms
+              - gutter: 2
+                type: label_radio
+                name: row1
+                value: false
+                required: true
+                id: 'living_outside_no'
+                label: 'No'
+                classNames: 'span-text'
+                model: application
+                name: parent_living_out_of_home_terms
+                attribute: parent_living_out_of_home_terms
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'span-text'
+                  text: "If yes, I know that, if anyone in my application group is found eligible for Medicaid, I will be asked to cooperate with the Child Support Agency to collect medical support from the parent who lives outside the home. If I think that cooperating to collect medical support will harm me or my children, I can tell my caseworker and I may not have to cooperate."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I agree *
+                  value: true
+                  classNames: 'span-text'
+                  model: application
+                  # name: attestation_terms
+                  attribute: attestation_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  classNames: 'small-padding-top-bottom'
+                  text: "I have reviewed the information in this application and I attest, under penalty of perjury, that it is accurate and complete to the best of my knowledge. I understand that if I am not truthful, there may be a penalty."
+            - cells:
+                - gutter: 12
+                  type: checkbox
+                  label: I agree *
+                  value: true
+                  required: true
+                  classNames: 'span-text'
+                  model: application
+                  name: submission_terms
+                  attribute: submission_terms
+      - section:
+          lines:
+            - cells:
+                - gutter: 12
+                  type: raw_html
+                  text: "<h5><b>Electronic Signature * (enter your name)</b></h5>"
+            - cells:
+                - gutter: 4
+                  type: signature_inputs
+                  id: 'first_name_thank_you'
+                  name: first_name_thank_you
+                  placeholder: First Name *
+                  required: true
+                - gutter: 4
+                  type: signature_inputs
+                  id: 'middle_name_thank_you'
+                  name: middle_name_thank_you
+                  placeholder: Middle Name
+                  required: false
+                - gutter: 4
+                  type: signature_inputs
+                  id: 'last_name_thank_you'
+                  name: last_name_thank_you
+                  placeholder: Last Name *
+                  required: true

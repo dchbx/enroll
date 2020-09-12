@@ -1,0 +1,5 @@
+stopEditingDeduction();
+<% if @applicant.deductions.of_kind(@deduction_kind).blank? %>
+	$('.deduction-checkbox-<%= @deduction_kind %>').prop('checked', false);
+	$('.add-more-link-<%=@deduction_kind%>').hide();
+<% end %>

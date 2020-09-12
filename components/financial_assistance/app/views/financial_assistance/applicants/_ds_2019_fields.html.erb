@@ -1,0 +1,8 @@
+<div id="immigration_DS_2019_fields_container">
+  <%= c.hidden_field :vlp_subject, value: 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/servis_id", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/i_94_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/passport_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "Passport"} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/country_of_citizenship", locals: {v: c} %>
+</div>

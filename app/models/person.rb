@@ -475,6 +475,10 @@ class Person
     write_attribute(:gender, new_gender.to_s.downcase)
   end
 
+  def financial_assistance_identifier
+    primary_family&.id
+  end
+
   # Get the {Family} where this {Person} is the primary family member
   #
   # family itegrity ensures only one active family can be the primary for a person

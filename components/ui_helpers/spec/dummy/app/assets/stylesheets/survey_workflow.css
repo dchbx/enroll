@@ -1,0 +1,193 @@
+body {
+    background-color:  #F2F2F2;
+}
+
+.darkblue {
+    color: #003260;
+}
+
+* {
+    font-size: 1em;
+    font-weight: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 200;
+    /*line-height: 1.6em;*/
+}
+
+.h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
+    line-height: 1.1;
+    color: inherit;
+}
+
+h1 {
+    display: block;
+    font-size: 2.7em !important;
+    -webkit-margin-before: 0.67em;
+    -webkit-margin-after: 0.67em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    font-weight: 300;
+    margin-bottom: 0.3em;
+    margin-top: 0.3em;
+}
+
+p {
+    font-size: 1em;
+}
+
+.form-group {
+    margin: 0px;
+    padding: 0px ;
+    border-radius: 0px;
+}
+
+.input-lg, .form-group-lg .form-control {
+    border-radius: 0;
+    border: none !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    padding-bottom: 8px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+.form-group-lg .form-control {
+    height: 46px;
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.3333333;
+    border-radius: 6px;
+}
+
+.form-group-lg .form-control {
+    height: 46px;
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.3333333;
+    border-radius: 6px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+button, input, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    border-radius: 0px !important;
+}
+
+input {
+    line-height: normal;
+    box-shadow: none !important;
+}
+
+button, input, optgroup, select, textarea {
+    margin: 0;
+    font: inherit;
+    color: inherit;
+}
+
+.row-form-wrapper:first-of-type, #email_info, #phone_info, #dependent_ul li {
+    border-top: 1px solid #ddd;
+}
+
+.row-form-wrapper {
+    border: 1px solid #ddd;
+    border-top: none;
+    padding: 3px;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out 0s;
+}
+
+label.label-floatlabel {
+    font-size: 10px !important;
+    top: 6px !important;
+    left: 10px !important;
+}
+
+input,
+input::-webkit-input-placeholder {
+    font-size: 12px;
+    line-height: 3;
+    color: #C3C3C3;
+}
+
+.module .selectric-labeled span, .modal .selectric-labeled span {
+    width: 100%;
+    max-width: 25%;
+    display: inline-block;
+    font-size: 10px;
+    color: #838780;
+    text-transform: uppercase;
+    text-align: left;
+    line-height: 1.2;
+}
+
+* {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.no_ssn {
+    color: #666;
+    font-size: 12px;
+}
+
+.selectric {
+    position: relative;
+    height: 46px;
+    max-width: 99%;
+}
+
+.selectric {
+    background: #fff !important;
+}
+
+.top-buffer {
+    margin-top: 15px;
+}
+
+.module .selectric-labeled .selectric-wrapper, .modal .selectric-labeled .selectric-wrapper {
+    width: 100%;
+    max-width: 75%;
+        display: -webkit-inline-box;
+}
+
+.module .selectric-labeled > *, .modal .selectric-labeled > * {
+    display: table-cell;
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+    white-space: normal;
+}
+
+.selectric-wrapper {
+    position: relative;
+    cursor: pointer;
+}
+
+.radio-label {
+    padding-left: 0px !important;
+    color: #414141 !important;
+    font-size: 14px !important;
+    opacity: 0.5;
+}

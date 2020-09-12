@@ -1,0 +1,64 @@
+<div aria-labelledby="aria-labelledby"class="tab-pane fade in active" id="home">
+  <div class="container" style="margin-top: 20px;">
+    <div class="row">
+    <div class="col-md-2">
+      <%= render 'ui-components/v1/navs/families_navigation' %>
+    </div>
+    <div class="col-md-10">
+      <h1 class="darkblue no-buffer">Cost Savings Applications</h1>
+      <h4>
+        If you started or completed an application for help paying for coverage, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.
+      </h4>
+      <div class="">
+        <%= form_tag({:action => 'create'}, {:method => 'post'}) do %>
+        <%if @applications.present? %>
+          <span class="tool-tip" data-toggle="tooltip" data-placement="top" title="You already have an application in progress.">
+            <%= submit_tag "Start new application", class: "btn btn-primary pull-right", disabled: true %>
+          </span>
+        <%else%>
+          <%= submit_tag "Start new application", class: "btn btn-primary pull-right"%>
+        <%end%>
+        <% end %>
+        <%= raw "&nbsp;" * 10%>
+      </div>
+      <%if @applications.present?%>
+      <table class="table table-striped mt10">
+        <thead class="form-heading">
+          <tr>
+            <th class="form-heading">ID</th>
+            <th class="form-heading">STATUS</th>
+            <th class="form-heading">STARTED ON</th>
+            <th class="form-heading">SUBMITTED ON</th>
+            <th class="form-heading">DETERMINATION</th>
+            <th class="form-heading">ACTIONS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @applications.each do |application| %>
+          <tr>
+            <td><%=application.hbx_id%></td>
+            <td><%=application.aasm_state%></td>
+            <td><%=to_est application.created_at%></td>
+            <td><%=to_est application.submitted_at%></td>
+            <td></td>
+            <%
+            dropdown = [
+            ['Update Application', edit_application_path(application), application.is_draft? ? 'static' : 'disabled'],
+            ['Copy to new application', copy_application_path(application), application.is_draft? ? 'disabled' : 'static'],
+            ['View Eligibility Determination', eligibility_results_application_path(application), application.is_determined? ? 'static' : 'disabled'],
+            ['Review Application', review_application_path(application), application.is_reviewable? ? 'static' : 'disabled']
+            ]
+            %>
+            <td>
+              <%= render partial: 'datatables/shared/dropdown', locals: {dropdowns: dropdown, row_actions_id: ""}, formats: :html%>
+
+            </td>
+          </tr>
+          <%end%>
+        </tbody>
+      </table>
+      <%end%>
+    </div>
+  </div>
+  </div>
+</div>

@@ -109,6 +109,23 @@ PATH
       webpacker (~> 4.0.2)
 
 PATH
+  remote: components/financial_assistance
+  specs:
+    financial_assistance (0.1.0)
+      aasm (~> 4.8)
+      config (~> 2.0)
+      devise (~> 4.5)
+      font-awesome-rails (~> 4.7)
+      haml-rails
+      money-rails (~> 1.13.3)
+      mongoid (~> 7.0.2)
+      mongoid-autoinc (~> 6.0)
+      pundit (~> 2.0)
+      rails (~> 5.2.3)
+      slim (~> 3.0)
+      symmetric-encryption (~> 3.9.1)
+
+PATH
   remote: components/notifier
   specs:
     notifier (0.0.1)
@@ -171,6 +188,12 @@ PATH
       rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
+
+PATH
+  remote: components/ui_helpers
+  specs:
+    ui_helpers (0.0.1)
+      rails (~> 5.2.3)
 
 PATH
   remote: project_gems/effective_datatables-2.6.14
@@ -473,6 +496,8 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffi (1.9.25)
+    font-awesome-rails (4.7.0.5)
+      railties (>= 3.2, < 6.1)
     forgery (0.7.0)
     gherkin (5.1.0)
     globalid (0.4.2)
@@ -945,6 +970,7 @@ DEPENDENCIES
   factory_bot_rails (~> 4.11)
   fakeredis (~> 0.7.0)
   fast_jsonapi
+  financial_assistance!
   forgery (~> 0.7.0)
   haml (~> 5.0)
   httparty (~> 0.16)
@@ -1020,6 +1046,7 @@ DEPENDENCIES
   transport_profiles!
   turbolinks (~> 5)
   uglifier (>= 4)
+  ui_helpers!
   unicorn (~> 4.8)
   virtus (~> 1.0)
   warden (~> 1.2.7)

@@ -1,0 +1,5 @@
+<%= label_tag cell.name.titleize.upcase%>
+<!--This is for Titleizing dropdown values with underscores -->
+<%dropdown_hash = {}; cell.values.each {|val| (val.class == String && val.include?('_')) ? (dropdown_hash[val.titleize] = val) : (dropdown_hash[val]  = val)}%>
+
+<%= select_tag(cell.name_attribute, options_for_select(dropdown_hash, selected: selected_value(@model, cell)), prompt: cell.prompt, disabled: cell.disabled, required: cell.required, class: "form-control") %>

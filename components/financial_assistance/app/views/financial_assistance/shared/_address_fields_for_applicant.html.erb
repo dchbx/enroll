@@ -1,0 +1,99 @@
+<% show_no_dc_address = (defined? show_no_dc_address) ? show_no_dc_address : false %>
+<div id="address_info" class="row no-buffer focus_effect personal-info-row">
+  <div class="col-md-12 no-pd col-sm-12 col-xs-12">
+      <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
+        <% kind = address.object.kind %>
+        <% style = "" %>
+        <% div_class = kind+"-div" %>
+        <% style = address.object.new_record? ? "display:none;" : "display:block;" if kind == 'mailing' %>
+
+        <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
+          <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
+            <button class="btn btn-new-address disabled">NEW ADDRESS</button>
+          </div>
+          <div class="col-md-7 col-sm-7 col-xs-12 form-group form-group-lg no-pd address">
+            <div class="form-group form-group-lg">
+              <div class="row" style="margin: 0;">
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+                <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
+                  <div class="dropdown">
+                    <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
+                      <label><%= kind.capitalize %> Address</label>
+                    </button>
+                  </div>
+                </div>
+                <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
+              </div>
+            </div>
+          </div>
+          <% if kind == 'home' && show_no_dc_address %>
+            <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+              <% target = f.object.class.to_s.downcase %>
+            </div>
+          <% end %>
+        </div>
+
+        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+          <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+            <%= address.hidden_field :kind %>
+            <% required = "required" if kind == 'home' && f.object.same_with_primary != 'true' %>
+
+            <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+          </div>
+          <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+            <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
+          </div>
+        </div>
+
+        <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+            <%= address.text_field :city, placeholder: "CITY #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+            <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE #{'*' if required.present?}"}, { required: required.present? }) %>
+          </div>
+          <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
+            <%= address.text_field :zip, placeholder: "ZIP #{'*' if required.present?}", class: "number floatlabel form-control zip #{required}", required: required.present? %>
+          </div>
+        </div>
+
+        <% if kind == 'home' %>
+          <% if f.object.no_dc_address.blank? or f.object.no_dc_address == false or f.object.no_dc_address == 'false' %>
+            <% style="display:none;" %>
+          <% end %>
+          <div style="<%= style %>" class="row no-buffer address-row show no-dc-address-reasons">
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+              <div class="address_checkbox">
+                <%= f.check_box :is_homeless %>
+                <label for="checkbox"><span>A homeless DC resident.</span></label>
+              </div>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+              <div class="address_checkbox">
+                <%= f.check_box :is_temporarily_out_of_state %>
+                <label for="checkbox">
+                  <span>Currently living outside of DC temporarily and plan to return.</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end%>
+    <%= render 'shared/error_warning' %>
+  </div>
+  <div class="col-md-2 key col-sm-3 col-xs-12"></div>
+</div>
+
+<% if f.object.addresses[1].present? %>
+  <span class="form-action btn btn-default">Remove Mailing Address</span>
+<% else %>
+  <span class="form-action btn btn-default">Add Mailing Address</span>
+<% end %>
+
+<script>
+$(document).ready(function () {
+  $('#state_id').change(function(){
+    if (!$("#no_dc_address").is(':checked') && $(this).val() != 'DC') {alert('You have selected a Non DC state, please check No DC Address')}
+  });
+});
+</script>

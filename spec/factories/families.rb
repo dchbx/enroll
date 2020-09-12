@@ -19,6 +19,24 @@ FactoryBot.define do
       family_members { people.map{|person| FactoryBot.build(:family_member, family: self, is_primary_applicant: (self.person == person), is_active: true, person: person) }}
     end
 
+    trait :with_nuclear_family do
+      before(:create) do |family, _evaluator|
+        FactoryBot.build(:family_member, is_primary_applicant: true, is_active: true, person: family.person, family: family)
+
+        { 'Kelly' => 'spouse', 'Danny' => 'child' }.each do |first_name, relationship|
+          person = FactoryBot.create(:person, :with_consumer_role, first_name: first_name, last_name: family.person.last_name)
+          family.person.person_relationships.push PersonRelationship.new(relative_id: person.id, kind: relationship)
+          person.save
+          FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, person: person, family: family)
+        end
+      end
+
+      after(:create) do |family, evaluator|
+        #new_person = FactoryBot.build :person, last_name: family.person.last_name
+        #family.family_members.push FactoryBot.build(:family_member, is_primary_applicant: false, is_active: true, person: new_person, relationship: 'spouse')
+      end
+    end
+
     after(:create) do |f, evaluator|
       f.households.first.add_household_coverage_member(f.family_members.first)
       f.save

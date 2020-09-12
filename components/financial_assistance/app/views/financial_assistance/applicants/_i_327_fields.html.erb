@@ -1,0 +1,5 @@
+<div id="immigration_i_327_fields_container">
+  <%= c.hidden_field :vlp_subject, value: "I-327 (Reentry Permit)" %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/alien_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "I-327"} %>
+</div>

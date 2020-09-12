@@ -1,0 +1,34 @@
+$('#dependents_info_wrapper h4:first').text("Please enter the information requested below. When you\'re finished, select \'Confirm Member\' at the bottom of the page.");
+$('#btn-continue').addClass('disabled');
+
+<% if @applicant.errors.present?  %>
+  var dependent_response = $("<%= escape_javascript(render 'dependent_form') %>");
+
+  if($("#dependent_ul").find("form#new_applicant .alert-error").length){
+      $("#dependent_ul").find("form#new_applicant .alert-error").replaceWith($(dependent_response).find(".alert-error"));
+  }else {
+      $("#dependent_ul").find("form#new_applicant").prepend($(dependent_response).find(".alert-error"));
+  }
+<% else %>
+  $("#new_employee_dependent_form").each(function(idx, ele) {
+      $(ele).remove();
+  });
+  $("#dependent_ul").append("<%= escape_javascript(render 'dependent_form') %>");
+<% end %>
+
+$("#add_member_list_<%= @applicant.id %>").attr('data-confirm', '');
+$("#add_member_list_<%= @applicant.id %> .close-2").attr('data-confirm', '');
+
+$("#dependent_buttons").addClass('hidden');
+$('.remove-new-employee-dependent').each(function(idx, ele) {
+  $(ele).click(function() {
+    var targetElementId = $(ele).attr("data-target");
+    $(targetElementId).remove();
+    $("#dependent_buttons").removeClass('hidden');
+    return false;
+  });
+});
+$('select').selectric();
+applyJQDatePickers();
+isApplyingCoverage("applicant");
+applyFaaListeners();
