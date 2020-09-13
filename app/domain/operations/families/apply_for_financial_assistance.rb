@@ -8,11 +8,19 @@ module Operations
     class ApplyForFinancialAssistance
       include Dry::Monads[:result, :do]
 
-      def call(family)
+      def call(family_id:)
+        family = yield find_family(family_id)
         execute(family: family)
       end
 
       private
+
+      def find_family(family_id)
+        family = Family.find(family_id)
+        Success(family)
+      rescue
+        Failure('Cannot find family')
+      end
 
       def execute(family:)
         Success(family.family_members.collect {|family_member| family_member_attributes(family_member)})

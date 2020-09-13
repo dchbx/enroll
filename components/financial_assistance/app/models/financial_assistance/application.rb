@@ -554,7 +554,7 @@ module FinancialAssistance
 
     def import_applicants
       # TODO: Remove this dependency
-      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family)
+      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: family_id)
       result.success.each {|member_attributes| applicants.build(member_attributes)} if result.success?
     end
 

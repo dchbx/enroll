@@ -10,7 +10,7 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
 
     before do
-      @result = subject.call(family)
+      @result = subject.call(family_id: family.id)
     end
 
     it 'should return success' do
