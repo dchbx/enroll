@@ -38,14 +38,6 @@ module Operations
         Success([family_member,dependents])
       end
 
-      def find_application(application_id)
-        application = FinancialAssistance::Application.find(application_id)
-
-        Success(application)
-      rescue Mongoid::Errors::DocumentNotFound
-        Failure("Unable to find Application with ID #{application_id}.")
-      end
-
       def fetch_person(verified_family_member)
         ssn = verified_family_member.person_demographics.ssn
         ssn = '' if ssn == '999999999'
