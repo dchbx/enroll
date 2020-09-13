@@ -243,7 +243,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context "'Yes' to is_applying_for_assistance" do
       it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
-        expect(response).to redirect_to(application_checklist_applications_path)
+        expect(response).to redirect_to(application_checklist_application_path(application))
         expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
       end
 
@@ -263,7 +263,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
         family.reload
         expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
-        expect(response).to redirect_to(application_checklist_applications_path)
+        expect(response).to redirect_to(application_checklist_application_path(assigns(:application)))
       end
     end
 
