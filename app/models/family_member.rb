@@ -7,6 +7,10 @@ class FamilyMember
 
   embedded_in :family
 
+  # Responsible for updating eligibility when family member is created/updated
+  after_create :deactivate_tax_households
+  after_update :deactivate_tax_households, if: :is_active_changed?
+
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
 
@@ -155,6 +159,10 @@ class FamilyMember
   end
 
   private
+
+  def deactivate_tax_households
+    Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(family_id: family.id, date: TimeKeeper.date_of_record)
+  end
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory
