@@ -29,6 +29,8 @@ Feature: CSR finishes shopping for Individual
       Then Individual should be on the Help Paying for Coverage page
       Then Individual does not apply for assistance and clicks continue
       Then CSR should see the dependents form
+      Then CSR should be on the Help Paying for Coverage page
+      Then CSR does not apply for assistance and clicks continue
       And I click on the header link to return to CSR page
       Then CSR should see the Agent Portal
       Then CSR should click on the Families tab
