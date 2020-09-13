@@ -28,7 +28,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   let!(:year) { TimeKeeper.date_of_record.year }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
   let!(:household) { family.households.first }
-  # let!(:tax_household) { FactoryBot.create(:tax_household, household: household) }
+  # let!(:) { FactoryBot.create(:tax_household, household: household) }
   # let!(:tax_household1) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
   # let!(:tax_household2) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
   # let!(:tax_household3) { FactoryBot.create(:tax_household, application_id: application.id, household: household) }
@@ -229,24 +229,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   describe '.current_csr_percent_as_integer' do
     it 'should return current csr percent' do
       application.eligibility_determination_for(ed1.id)
-      expect(application.current_csr_percent_as_integer(ed1.id)).to eq(ed1.eligibility_determinations.first.csr_percent_as_integer)
+      expect(application.current_csr_percent_as_integer(eligibility_determination1.id)).to eq(ed1.csr_percent_as_integer)
     end
 
     it 'should return right eligibility_determination' do
       ed = application.eligibility_determinations[0]
       expect(ed).to eq eligibility_determination1
-    end
-  end
-
-  describe '.tax_household_for_family_member' do
-    it 'returns tax household for family member' do
-      family_member_id = family_member2.id
-      expect(application.tax_household_for_family_member(family_member_id)).to eq tax_household2
-    end
-
-    it 'returns nil if no tax household for family member' do
-      family_member_id = family_member1.id
-      expect(application.tax_household_for_family_member(family_member_id)).to eq nil
     end
   end
 
@@ -311,7 +299,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
     it 'should returns true if application is ready_for_attestation' do
       allow(applicant_primary).to receive(:applicant_validation_complete?).and_return(true)
-      allow(family).to receive(:relationships_complete?).and_return(true)
+      allow(valid_application).to receive(:relationships_complete?).and_return(true)
       expect(valid_application.ready_for_attestation?).to be_truthy
     end
 
@@ -399,23 +387,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.active_determined_tax_households' do
-    it 'returns active determined tax_households' do
-      expect(application.active_determined_tax_households).to eq family.active_household.tax_households.where(application_id: application.id.to_s, is_eligibility_determined: true)
-    end
-
-    it 'verfies active determined tax_households count' do
-      expect(application.active_determined_tax_households.count).to eq family.active_household.tax_households.where(application_id: application.id.to_s, is_eligibility_determined: true).count
-    end
-  end
-
-  describe '.tax_households' do
-    it 'returns tax households of a given applicant' do
-      expect(application.tax_households).to eq family.active_household.tax_households.where(application_id: application.id.to_s)
-    end
-
-    it 'verfies tax households count of a given applicant' do
-      expect(application.tax_households.count).to eq family.active_household.tax_households.where(application_id: application.id.to_s).count
+  describe '.eligibility_determinations' do
+    it 'verifies eligibility_determinations count of a given applicant' do
+      expect(application.eligibility_determinations.count).to eq 3
     end
   end
 
@@ -519,29 +493,29 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
 
-    it 'should return all the tax households of the application' do
+    it 'should return all the eligibility determinations of the application' do
       expect(application.eligibility_determinations.count).to eq 3
-      expect(application.tax_households).to eq [tax_household1, tax_household2, tax_household3]
+      expect(application.eligibility_determinations).to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should not return wrong number of tax households of the application' do
-      expect(application.tax_households.count).not_to eq 4
-      expect(application.tax_households).not_to eq [tax_household1, tax_household2]
+    it 'should not return wrong number of eligibility determinations of the application' do
+      expect(application.eligibility_determinations.count).not_to eq 4
+      expect(application.eligibility_determinations).not_to eq [eligibility_determination1, eligibility_determination2]
     end
 
-    it 'should return the latest tax households' do
-      tax_household1.update_attributes('effective_ending_on' => nil)
-      tax_household2.update_attributes('effective_ending_on' => nil)
-      expect(application.latest_active_tax_households_with_year(year).count).to eq 2
-      expect(application.latest_active_tax_households_with_year(year)).to eq [tax_household1, tax_household2]
+    it 'should return the latest eligibility determinations' do
+      eligibility_determination1.update_attributes('effective_ending_on' => nil)
+      eligibility_determination2.update_attributes('effective_ending_on' => nil)
+      expect(application.latest_active_eligibility_determinations_with_year(year).count).to eq 2
+      expect(application.latest_active_eligibility_determinations_with_year(year)).to eq [eligibility_determination1, eligibility_determination2]
     end
 
-    it 'should only return latest tax households of application' do
-      expect(application.latest_active_tax_households_with_year(year).count).not_to eq 3
-      expect(application.latest_active_tax_households_with_year(year)).not_to eq [tax_household1, tax_household2, tax_household3]
+    it 'should only return latest eligibility_determinations of application' do
+      expect(application.latest_active_eligibility_determinations_with_year(year).count).not_to eq 3
+      expect(application.latest_active_eligibility_determinations_with_year(year)).not_to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should match correct eligibility for tax household' do
+    it 'should match correct eligibility' do
       expect(application.eligibility_determinations[0]).to eq eligibility_determination1
       expect(application.eligibility_determinations[1]).to eq eligibility_determination2
       expect(application.eligibility_determinations[2]).to eq eligibility_determination3
@@ -554,18 +528,18 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(ed1).not_to eq eligibility_determination3
     end
 
-    it 'should return unique tax households with active_approved_application applicants' do
-      expect(application.tax_households.count).to eq 3
-      expect(application.tax_households).to eq [tax_household1, tax_household2, tax_household3]
+    it 'should return unique eligibility determinations with active_approved_application applicants' do
+      expect(application.eligibility_determinations.count).to eq 3
+      expect(application.eligibility_determinations).to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should only return all unique tax_households' do
-      expect(application.tax_households.count).not_to eq 2
-      expect(application.tax_households).not_to eq [tax_household1, tax_household1, tax_household2]
+    it 'should only return all unique eligibility_determinations' do
+      expect(application.eligibility_determinations.count).not_to eq 2
+      expect(application.eligibility_determinations).not_to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
-    it 'should not return all tax_households' do
-      expect(application.tax_households).not_to eq applicant1.tax_household.to_a
+    it 'should not return all eligibility_determinations' do
+      expect(application.eligibility_determinations).not_to eq applicant1.eligibility_determination.to_a
     end
   end
 
@@ -604,8 +578,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family: family, aasm_state: 'draft', applicants: [applicant_primary2]) }
     let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: application, family_member_id: family_member1.id) }
     let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: application, family_member_id: family_member1.id) }
-    let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: household) }
-    let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: household) }
+    let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
+    let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
 
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
