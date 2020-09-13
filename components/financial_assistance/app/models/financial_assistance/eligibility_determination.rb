@@ -8,7 +8,7 @@ module FinancialAssistance
     include Mongoid::Timestamps
     include Mongoid::Autoinc
 
-    embedded_in :application
+    embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :eligibility_determinations
 
     field :max_aptc, type: Money, default: 0.00
     field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94

@@ -8,7 +8,6 @@ module FinancialAssistance
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
-    require 'pry'
 
     belongs_to :family, class_name: "Family"
 
@@ -89,7 +88,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :eligibility_determinations, inverse_of: :application
+    embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
