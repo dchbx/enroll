@@ -8,6 +8,7 @@ module FinancialAssistance
     include AASM
     include Acapi::Notifiers
     require 'securerandom'
+    require 'pry'
 
     belongs_to :family, class_name: "Family"
 
@@ -84,9 +85,11 @@ module FinancialAssistance
     field :determination_http_status_code, type: Integer
     field :determination_error_message, type: String
     field :has_eligibility_response, type: Boolean, default: false
+    field :eligibility_response_payload, type: String
 
     field :workflow, type: Hash, default: { }
 
+    embeds_many :eligibility_determinations, inverse_of: :application
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
     embeds_many :applicants, inverse_of: :application
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
@@ -191,11 +194,114 @@ module FinancialAssistance
       matrix
     end
 
+    def update_application_and_applicant_attributes(payload)
+      verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
+      verified_family.parse(payload)
+      verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+      verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+      primary_applicant = search_applicant(verified_primary_family_member)
+      if primary_applicant.blank?
+        return
+      end
+      active_verified_household = verified_family.households.max_by(&:start_date)
+
+      verified_dependents.each do |verified_family_member|
+        if search_applicant(verified_family_member).blank?
+          return
+        end
+      end
+      build_or_update_applicants_eligibility_determinations(verified_family, primary_applicant, active_verified_household)
+    end
+
+    def build_or_update_applicants_eligibility_determinations(verified_family, _primary_applicant, active_verified_household)
+      verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
+      return unless verified_tax_households.present?
+
+
+      ed_hbx_assigned_ids = []
+      eligibility_determinations.each { |ed| ed_hbx_assigned_ids << ed.hbx_assigned_id.to_s}
+      verified_tax_households.each do |vthh|
+        if ed_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
+          eligibility_determination = eligibility_determinations.select{|ed| ed.hbx_assigned_id == vthh.hbx_assigned_id.to_i}.first
+          #Update required attributes for that particular TaxHouseHold
+          eligibility_determination.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
+          #Applicant/TaxHouseholdMember block start
+          applicants_persons_hbx_ids = []
+          applicants.each { |appl| applicants_persons_hbx_ids << appl.person_hbx_id.to_s}
+          vthh.tax_household_members.each do |thhm|
+            next unless applicants_persons_hbx_ids.include?(thhm.person_id)
+            update_verified_applicants(self, verified_family, thhm)
+          end
+          update_eligibility_determinations(vthh, eligibility_determination) unless verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+        else
+          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
+        end
+      end
+      self.save!
+    end
+
+    def update_eligibility_determinations(vthh, eligibility_determination)
+      verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
+      #TODO: find the right source Curam/Haven.
+      source = "Faa"
+
+      verified_aptc = verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00
+      eligibility_determination.update_attributes(
+        max_aptc: verified_aptc,
+        csr_percent_as_integer: verified_eligibility_determination.csr_percent,
+        determined_at: verified_eligibility_determination.determination_date,
+        aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
+        aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
+        csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
+        source: source
+      )
+    end
+
+    def update_verified_applicants(application_in_context, verified_family, thhm)
+      applicant = application_in_context.applicants.select { |app| app.person_hbx_id == thhm.person_id }.first
+      verified_family.family_members.each do |verified_family_member|
+        next unless verified_family_member.person.hbx_id == thhm.person_id
+        applicant.update_attributes({medicaid_household_size: verified_family_member.medicaid_household_size,
+                                     magi_medicaid_category: verified_family_member.magi_medicaid_category,
+                                     magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
+                                     magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
+                                     magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
+                                     is_without_assistance: verified_family_member.is_without_assistance,
+                                     is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
+                                     is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
+                                     is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
+                                     is_totally_ineligible: verified_family_member.is_totally_ineligible})
+      end
+    end
+
+
+
     def find_existing_relationship(member_a_id, member_b_id)
       return 'self' if member_a_id == member_b_id
 
       rel = relationships.where(applicant_id: member_a_id, relative_id: member_b_id).first
       rel&.kind
+    end
+
+    def search_applicant(verified_family_member)
+      ssn = verified_family_member.person_demographics.ssn
+      ssn = '' if ssn == "999999999"
+      dob = verified_family_member.person_demographics.birth_date
+      last_name_regex = /^#{verified_family_member.person.name_last}$/i
+      first_name_regex = /^#{verified_family_member.person.name_first}$/i
+
+      if !ssn.blank?
+        applicants.where({
+                       :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
+                       :dob => dob
+                     }).first
+      else
+        applicants.where({
+                       :dob => dob,
+                       :last_name => last_name_regex,
+                       :first_name => first_name_regex
+                     }).first
+      end
     end
 
     def find_all_relationships(matrix)
@@ -226,6 +332,26 @@ module FinancialAssistance
       end
       missing_relationships
     end
+
+    def update_response_attributes(attrs)
+      update_attributes(attrs)
+    end
+
+    def add_eligibility_determination(message) # class method
+      update_response_attributes(message)
+
+      update_application_and_applicant_attributes(message[:eligibility_response_payload])
+
+      result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
+      result.failure? ? update_application(result.failure, 422) : determine!
+    end
+
+    def update_application(error_message, status_code)
+      set_determination_response_error!
+      update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
+      log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
+    end
+
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       missing_relationship = find_missing_relationships(matrix)
@@ -520,19 +646,8 @@ module FinancialAssistance
       true
     end
 
-    def active_determined_tax_households
-      tax_households.where(is_eligibility_determined: true)
-    end
-
-    def tax_households
-      family.active_household.tax_households.where(application_id: id.to_s)
-    end
-
-    def eligibility_determinations
-      tax_households.inject([]) do |ed, th|
-        ed << th.eligibility_determinations
-        ed.flatten
-      end
+    def active_determined_eligibility_determinations
+      eligibility_determinations.where(is_eligibility_determined: true)
     end
 
     def import_applicants
@@ -541,23 +656,23 @@ module FinancialAssistance
       family_payload.each { |member_attributes| applicants.build(member_attributes) }
     end
 
-    def current_csr_eligibility_kind(tax_household_id)
-      eligibility_determination = eligibility_determination_for_tax_household(tax_household_id)
-      eligibility_determination.present? ? eligibility_determination.csr_eligibility_kind : "csr_100"
+    def current_csr_percent_as_integer(eligibility_determination_id)
+      eligibility_determination = eligibility_determination_for(eligibility_determination_id)
+      eligibility_determination.present? ? eligibility_determination.csr_percent_as_integer : 0
     end
 
-    def eligibility_determination_for_tax_household(tax_household_id)
-      family.active_household.tax_households.where(id: tax_household_id).first.preferred_eligibility_determination
+    def eligibility_determination_for(eligibility_determination_id)
+      eligibility_determinations.where(id: eligibility_determination_id).first
     end
 
-    def tax_household_for_family_member(family_member_id)
-      tax_households.where(is_eligibility_determined: true).select {|th| th if th.active_applicants.where(family_member_id: family_member_id).present? }.first
+    def eligibility_determination_for_family_member(family_member_id)
+      eligibility_determinations.where(is_eligibility_determined: true).select {|th| th if th.active_applicants.where(family_member_id: family_member_id).present? }.first
     end
 
-    def latest_active_tax_households_with_year(year)
-      tax_households = active_determined_tax_households.tax_household_with_year(year)
-      tax_households = active_determined_tax_households.tax_household_with_year(year).active_tax_household if TimeKeeper.date_of_record.year == year
-      tax_households
+    def latest_active_eligibility_determinations_with_year(year)
+      eligibility_determinations = active_determined_eligibility_determinations.eligibility_determination_with_year(year)
+      eligibility_determinations = active_determined_eligibility_determinations.eligibility_determination_with_year(year).active_eligibility_determination if TimeKeeper.date_of_record.year == year
+      eligibility_determinations
     end
 
     def eligibility_determinations_for_year(year)
@@ -866,7 +981,7 @@ module FinancialAssistance
       set_submission_date
       set_assistance_year
       set_effective_date
-      create_tax_households
+      create_eligibility_determinations
       create_verification_documents
     end
 
@@ -874,41 +989,45 @@ module FinancialAssistance
       unset_submission_date
       unset_assistance_year
       unset_effective_date
-      delete_tax_households
+      delete_eligibility_determinations
       delete_verification_documents
     end
 
-    def create_tax_households
+    def create_eligibility_determinations
       ## Remove  when copy method is fixed to exclude copying Tax Household
-      active_applicants.each { |applicant| applicant.update_attributes!(tax_household_id: nil)  }
+      active_applicants.each { |applicant| applicant.update_attributes!(eligibility_determination_id: nil)  }
 
       non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
       tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
 
       non_tax_dependents.each do |applicant|
-        if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
-          # Assign joint filer to THH of Spouse.
-          # applicant.tax_household = applicant.tax_household_of_spouse
+        if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
+          applicant.eligibility_determination = applicant.eligibility_determination_of_spouse
           applicant.update_attributes!(tax_filer_kind: 'tax_filer')
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
-          # applicant.tax_household = family.active_household.tax_households.create!(application_id: id)
+          applicant.eligibility_determination = eligibility_determinations.create!
           applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
         end
       end
 
       tax_dependents.each do |applicant|
-        # Assign applicant to the same THH that the person claiming this dependent belongs to.
-        # thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).tax_household
-        # applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
+        thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).eligibility_determination
+        applicant.eligibility_determination = thh_of_claimer if thh_of_claimer.present?
+        applicant.update_attributes!(tax_filer_kind: 'dependent')
         applicant.update_attributes!(tax_filer_kind: 'dependent')
       end
+
+      empty_ed = eligibility_determinations.select do |ed|
+        active_applicants.map(&:eligibility_determination).exclude?(ed)
+      end
+      empty_ed.each(&:destroy)
     end
 
-    def delete_tax_households
-      # TODO remove this method when confirmed Enroll side gets updated
-      # tax_households.destroy_all
+
+    def delete_eligibility_determinations
+      eligibility_determinations.destroy_all
     end
 
     def create_verification_documents

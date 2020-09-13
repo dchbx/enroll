@@ -149,6 +149,8 @@ module FinancialAssistance
     field :status, type: String, default: "not submitted"
     # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
     # field :verification_type
+    field :is_consent_applicant, type: Boolean, default: false
+    field :is_tobacco_user, type: String, default: "unknown"
 
     field :assisted_income_validation, type: String, default: "pending"
     validates_inclusion_of :assisted_income_validation, :in => INCOME_VALIDATION_STATES, :allow_blank => false
@@ -161,7 +163,7 @@ module FinancialAssistance
 
     field :person_hbx_id, type: String
     field :family_member_id, type: BSON::ObjectId
-    field :tax_household_id, type: BSON::ObjectId
+    field :eligibility_determination_id, type: BSON::ObjectId
 
     field :is_active, type: Boolean, default: true
 
@@ -391,7 +393,7 @@ module FinancialAssistance
     end
 
     def is_not_in_a_tax_household?
-      tax_household.blank?
+      eligibility_determination.blank?
     end
 
     aasm do
@@ -477,11 +479,9 @@ module FinancialAssistance
       spouse_relationship.present?
     end
 
-    def tax_household_of_spouse
+    def eligibility_determination_of_spouse
       return nil unless has_spouse
-      spouse = Person.find(spouse_relationship.successor_id)
-      spouse_applicant = application.active_applicants.detect {|applicant| spouse == applicant.person }
-      spouse_applicant.tax_household
+      spouse_relationship.relative.eligibility_determination
     end
 
     #### Use Person.consumer_role values for following
@@ -541,13 +541,14 @@ module FinancialAssistance
       person.is_tobacco_user || "unknown"
     end
 
-    def tax_household=(thh)
-      self.tax_household_id = thh.id
+
+    def eligibility_determination=(eg)
+      self.eligibility_determination_id = eg.id
     end
 
-    def tax_household
-      return nil unless tax_household_id
-      application.tax_households.find(tax_household_id) if application.tax_households.present?
+    def eligibility_determination
+      return nil unless eligibility_determination_id
+      application.eligibility_determinations&.find(eligibility_determination_id)
     end
 
     def age_on_effective_date
@@ -566,14 +567,9 @@ module FinancialAssistance
       @age_on_effective_date = age
     end
 
-    def eligibility_determinations
-      return nil unless tax_household
-      tax_household.eligibility_determinations
-    end
 
     def preferred_eligibility_determination
-      return nil unless tax_household
-      tax_household.preferred_eligibility_determination
+      eligibility_determination
     end
 
     def applicant_validation_complete?

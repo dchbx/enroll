@@ -146,6 +146,79 @@ class Household
     th.save!
   end
 
+  def create_tax_households_and_members(verified_family, _primary_person, active_verified_household, application_in_context)
+    # verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
+    verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
+    return unless verified_tax_households.present? # && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+    if latest_active_tax_households.present?
+      latest_active_tax_households.each do |latest_tax_household|
+        latest_tax_household.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
+      end
+    end
+
+    benchmark_plan_id = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.slcsp
+    verified_tax_households.each do |vthh|
+      th = tax_households.build(hbx_assigned_id: vthh.hbx_assigned_id,
+                                effective_starting_on: vthh.start_date,
+                                is_eligibility_determined: true)
+
+      vthh.tax_household_members.each do |tax_household_member|
+        create_tax_household_members(th, tax_household_member, verified_family)
+      end
+      build_household_determinations(vthh, th, benchmark_plan_id) unless verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
+    end
+    self.save!
+  end
+
+  def create_tax_household_members(tax_household, verified_thhm, verified_family)
+
+    verified_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_thhm.person_id }
+
+    return unless verified_family_member
+    family_member = fetch_family_member(verified_thhm)
+    tax_household.tax_household_members.build(
+      applicant_id: family_member.id,
+      medicaid_household_size: verified_family_member.medicaid_household_size,
+      magi_medicaid_category: verified_family_member.magi_medicaid_category,
+      magi_as_percentage_of_fpl: verified_family_member.magi_as_percentage_of_fpl,
+      magi_medicaid_monthly_income_limit: verified_family_member.magi_medicaid_monthly_income_limit,
+      magi_medicaid_monthly_household_income: verified_family_member.magi_medicaid_monthly_household_income,
+      is_without_assistance: verified_family_member.is_without_assistance,
+      is_ia_eligible: verified_family_member.is_insurance_assistance_eligible,
+      is_medicaid_chip_eligible: verified_family_member.is_medicaid_chip_eligible,
+      is_non_magi_medicaid_eligible: verified_family_member.is_non_magi_medicaid_eligible,
+      is_totally_ineligible: verified_family_member.is_totally_ineligible
+    )
+  end
+
+  def fetch_family_member(verified_thhm)
+    person = Person.where(hbx_id: verified_thhm.person_id).first
+
+    family.family_members.where(person_id: person.id).first
+  end
+
+  def build_household_determinations(vthh, tax_household, benchmark_plan_id)
+    verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
+    #TODO: find the right source Curam/Haven.
+    source = "Faa"
+
+    verified_aptc = verified_eligibility_determination.maximum_aptc.to_f > 0.00 ? verified_eligibility_determination.maximum_aptc : 0.00
+    if tax_household.eligibility_determinations.build(
+      benchmark_plan_id: benchmark_plan_id,
+      max_aptc: verified_aptc,
+      csr_percent_as_integer: verified_eligibility_determination.csr_percent,
+      determined_at: verified_eligibility_determination.determination_date,
+      determined_on: verified_eligibility_determination.determination_date,
+      aptc_csr_annual_household_income: verified_eligibility_determination.aptc_csr_annual_household_income,
+      aptc_annual_income_limit: verified_eligibility_determination.aptc_annual_income_limit,
+      csr_annual_income_limit: verified_eligibility_determination.csr_annual_income_limit,
+      source: source
+    ).save
+    else
+      throw(:processing_issue, "Failed to create Eligibility Determinations")
+    end
+  end
+
   def effective_ending_on_gt_effective_starting_on
 
     return if effective_ending_on.nil?

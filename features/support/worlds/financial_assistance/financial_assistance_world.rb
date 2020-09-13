@@ -49,7 +49,7 @@ module FinancialAssistance
                                                determined_at: TimeKeeper.datetime_of_record - 30.days,
                                                premium_credit_strategy_kind: "allocated_lump_sum_credit",
                                                e_pdc_id: "3110344",
-                                               source: "Haven").save!
+                                               source: "Faa").save!
         txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true)
       end
       application.applicants.each { |applicant| applicant.update_attributes!(is_without_assistance: true) }
@@ -67,7 +67,7 @@ module FinancialAssistance
                                                determined_at: TimeKeeper.datetime_of_record - 30.days,
                                                premium_credit_strategy_kind: "allocated_lump_sum_credit",
                                                e_pdc_id: "3110344",
-                                               source: "Haven").save!
+                                               source: "Faa").save!
         txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false)
       end
       application.applicants.each { |applicant| applicant.update_attributes!(is_ia_eligible: true) }

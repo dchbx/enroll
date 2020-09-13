@@ -31,7 +31,7 @@ class TaxHousehold
   embeds_many :tax_household_members
   accepts_nested_attributes_for :tax_household_members
 
-  embeds_many :eligibility_determinations
+  #embeds_many :eligibility_determinations
 
   scope :tax_household_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
