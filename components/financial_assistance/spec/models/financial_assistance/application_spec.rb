@@ -228,8 +228,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.current_csr_percent_as_integer' do
     it 'should return current csr percent' do
-      application.eligibility_determination_for(ed1.id)
-      expect(application.current_csr_percent_as_integer(eligibility_determination1.id)).to eq(ed1.csr_percent_as_integer)
+      application.eligibility_determination_for(eligibility_determination1.id)
+      expect(application.current_csr_percent_as_integer(eligibility_determination1.id)).to eq(eligibility_determination1.csr_percent_as_integer)
     end
 
     it 'should return right eligibility_determination' do
@@ -504,8 +504,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
 
     it 'should return the latest eligibility determinations' do
-      eligibility_determination1.update_attributes('effective_ending_on' => nil)
-      eligibility_determination2.update_attributes('effective_ending_on' => nil)
+      eligibility_determination1.update_attributes('effective_starting_on' => Date.new(year,1,1), is_eligibility_determined: true)
+      eligibility_determination2.update_attributes('effective_starting_on' => Date.new(year,1,1), is_eligibility_determined: true)
       expect(application.latest_active_eligibility_determinations_with_year(year).count).to eq 2
       expect(application.latest_active_eligibility_determinations_with_year(year)).to eq [eligibility_determination1, eligibility_determination2]
     end
@@ -531,11 +531,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'should return unique eligibility determinations with active_approved_application applicants' do
       expect(application.eligibility_determinations.count).to eq 3
       expect(application.eligibility_determinations).to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
-    end
-
-    it 'should only return all unique eligibility_determinations' do
-      expect(application.eligibility_determinations.count).not_to eq 2
-      expect(application.eligibility_determinations).not_to eq [eligibility_determination1, eligibility_determination2, eligibility_determination3]
     end
 
     it 'should not return all eligibility_determinations' do
@@ -574,12 +569,12 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'check the validity of an application' do
 
-    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family: family, applicants: [applicant_primary]) }
-    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family: family, aasm_state: 'draft', applicants: [applicant_primary2]) }
-    let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: application, family_member_id: family_member1.id) }
-    let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: application, family_member_id: family_member1.id) }
+    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family: family) }
+    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family: family, aasm_state: 'draft') }
+    let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: valid_app) }
+    let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: invalid_app) }
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
-    let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
+    let!(:ed2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: invalid_app) }
 
     it 'should allow a sucessful state transition for valid application' do
       allow(valid_app).to receive(:is_application_valid?).and_return(true)
