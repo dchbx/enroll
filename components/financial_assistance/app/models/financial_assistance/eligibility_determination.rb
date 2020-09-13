@@ -28,6 +28,9 @@ module FinancialAssistance
     scope :eligibility_determination_with_year, ->(year) { where(effective_starting_on: (Date.new(year)..Date.new(year).end_of_year), is_eligibility_determined: true) }
     scope :active_eligibility_determination, ->{ where(effective_ending_on: nil, is_eligibility_determined: true) }
 
+    def applicants
+      application.applicants.in(eligibility_determination_id: id)
+    end
   end
 end
 

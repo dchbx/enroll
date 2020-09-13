@@ -1,0 +1,10 @@
+%address_line_1= address_fields.address_1
+- unless address_fields.address_2.blank?
+  %address_line_2= address_fields.address_2
+- unless address_fields.address_3.blank?
+  %address_line_3= address_fields.address_3
+%location_city_name= address_fields.city
+%location_state_code= address_fields.state
+%postal_code= address_fields.zip_without_extension
+- unless address_fields.zip_extension.blank?
+  %location_postal_extension_code= address_fields.zip_extension

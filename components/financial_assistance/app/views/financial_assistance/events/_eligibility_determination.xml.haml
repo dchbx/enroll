@@ -2,12 +2,12 @@
   %id
     %id= eligibility_determination.e_pdc_id
   %eligibility_determination_applicants
-    = render :partial => "financial_assistance/events/eligibility_determination_applicant", :collection => eligibility_determination.family_members, as: :eligibility_determination_applicant
+    = render :partial => "financial_assistance/events/eligibility_determination_applicant", :collection => eligibility_determination.applicants, as: :eligibility_determination_applicant
   / we currently do not have total_incomes_by_year implemented in the model as a field or a method. If we want it later it will need to be implemented.
   %total_incomes_by_year
     = render :partial => "financial_assistance/events/total_income_by_year", :collection => 
-  - if eligibility_determination.aasm_state
-    %household_state= "urn:openhbx:terms:v1:household_state##{eligibility_determination.aasm_state}"
+  / - if eligibility_determination.aasm_state
+  /   %household_state= "urn:openhbx:terms:v1:household_state##{eligibility_determination.aasm_state}"
   %maximum_aptc= '%.2f' % (eligibility_determination.max_aptc.round(2))
   %csr_percent= eligibility_determination.csr_percent_as_integer
   - if eligibility_determination.benchmark_plan_id

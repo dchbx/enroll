@@ -1,0 +1,13 @@
+%person
+  %id
+    %id= "urn:openhbx:hbx:dc0:resources:v1:person:hbx_id##{applicant.person_hbx_id}"
+  = render :partial => "financial_assistance/events/shared/applicant_name", :object => applicant
+  - if applicant.contact_addresses.any?
+    %addresses
+      = render :partial => "financial_assistance/events/addresses/address", :collection => applicant.contact_addresses
+  - if applicant.emails.any?
+    %emails
+      = render :partial => "financial_assistance/events/individuals/email", :collection => applicant.emails
+  - if applicant.phones.any?
+    %phones
+      = render :partial => "financial_assistance/events/phones/phone", :collection => applicant.phones
