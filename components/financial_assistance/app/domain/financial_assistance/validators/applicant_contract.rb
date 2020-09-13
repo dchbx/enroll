@@ -51,6 +51,8 @@ module FinancialAssistance
         required(:same_with_primary).filled(:bool)
         required(:is_applying_coverage).filled(:bool)
 
+        required(:is_primary_applicant).filled(:bool)
+
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)

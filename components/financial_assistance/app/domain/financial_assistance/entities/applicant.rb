@@ -51,6 +51,8 @@ module FinancialAssistance
       attribute :issuing_country, Types::String.optional.meta(omittable: true)
       attribute :status, Types::String.optional.meta(omittable: true)
 
+      attribute :is_primary_applicant, Types::Strict::Bool
+
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)
       attribute :phones, Types::Array.of(FinancialAssistance::Entities::Phone)
