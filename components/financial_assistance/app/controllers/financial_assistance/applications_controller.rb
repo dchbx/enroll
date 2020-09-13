@@ -24,10 +24,7 @@ module FinancialAssistance
     end
 
     def create
-      @application = ::FinancialAssistance::Application.create!(family_id: get_current_person.financial_assistance_identifier)
-      @application.import_applicants
-      @application.save!
-
+      @application = create_application_with_applicants
       redirect_to edit_application_path(@application)
     end
 
@@ -215,10 +212,7 @@ module FinancialAssistance
     def aqhp_flow
       @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
       if @application.blank?
-        @application = FinancialAssistance::Application.create!(family_id: get_current_person.financial_assistance_identifier)
-        binding.pry
-        @application.import_applicants
-        @application.save!
+        @application = create_application_with_applicants
       end
 
       redirect_to application_checklist_application_path(@application)
@@ -292,6 +286,13 @@ module FinancialAssistance
       else
         current_user.person
       end
+    end
+
+    def create_application_with_applicants
+      application = FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+      application.import_applicants
+      application.save!
+      application
     end
   end
 end
