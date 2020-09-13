@@ -21,7 +21,7 @@ module FinancialAssistance
 
           if application.success_status_codes?(payload_http_status_code.to_i)
             if eligibility_payload_schema_valid?(xml)
-              application.add_eligibility_determination(determination_http_status_code: 200, has_eligibility_response: true, haven_app_id: '1234', haven_ic_id: '124', eligibility_response_payload: xml)
+              application.add_eligibility_determination(determination_http_status_code: payload_http_status_code, has_eligibility_response: true, haven_app_id: stringed_key_payload['haven_application_id'], haven_ic_id: stringed_key_payload['haven_ic_id'], eligibility_response_payload: xml)
             else
               application.set_determination_response_error!
               application.update_attributes(determination_http_status_code: 422, has_eligibility_response: true, determination_error_message: 'Failed to validate Eligibility Determination response XML')
