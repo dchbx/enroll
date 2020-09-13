@@ -860,4 +860,12 @@ module ApplicationHelper
       csr_options << [ui_display, csr]
     end
   end
+
+  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
+      false
+    else
+      true
+    end
+  end
 end
