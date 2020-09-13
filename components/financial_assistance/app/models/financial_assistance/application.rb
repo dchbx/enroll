@@ -651,8 +651,15 @@ module FinancialAssistance
 
     def import_applicants
       # TODO: Remove this dependency
-      family_payload = ::Services::FamilyService.call(family_id)
-      family_payload.each { |member_attributes| applicants.build(member_attributes) }
+      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: family.id)
+      return unless result.success?
+
+      result.success.each do |member_attributes|
+        result_object = ::FinancialAssistance::Operations::Applicant::Build.new.call(params: member_attributes)
+        next unless result_object.success?
+        applicant_params = result_object.success.to_h
+        applicants.create!(applicant_params)
+      end
     end
 
     def current_csr_percent_as_integer(eligibility_determination_id)
