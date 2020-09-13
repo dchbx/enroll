@@ -136,7 +136,7 @@ Then(/^saves a YES answer to the question: Do you want to apply for Medicaid…$
 end
 
 Given(/^that the user is on the Application Checklist page$/) do
-  visit financial_assistance.application_checklist_applications_path
+  visit financial_assistance.application_checklist_application_path(application)
 end
 
 Then(/^the user will navigate to the FAA Household Infor: Family Members page$/) do

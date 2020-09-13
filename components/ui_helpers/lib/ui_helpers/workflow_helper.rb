@@ -68,7 +68,7 @@ module UIHelpers
                      elsif @model.is_a?(FinancialAssistance::Application)
                        @model.primary_applicant.first_name
                      else
-                       @applicant.family_member.person.first_name
+                       @model.first_name
                      end
 
         heading_text.sub! '<family-member-name-placeholder>', first_name.titleize # rubocop:disable Style/NestedTernaryOperator TODO: Remove this

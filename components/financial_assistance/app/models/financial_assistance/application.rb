@@ -888,32 +888,27 @@ module FinancialAssistance
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.tax_household_of_spouse.present?
           # Assign joint filer to THH of Spouse.
-          applicant.tax_household = applicant.tax_household_of_spouse
+          # applicant.tax_household = applicant.tax_household_of_spouse
           applicant.update_attributes!(tax_filer_kind: 'tax_filer')
         else
           # Create a new THH and assign it to the applicant
           # Need THH for Medicaid cases too
-          applicant.tax_household = family.active_household.tax_households.create!(application_id: id)
+          # applicant.tax_household = family.active_household.tax_households.create!(application_id: id)
           applicant.update_attributes!(tax_filer_kind: applicant.tax_filing? ? 'tax_filer' : 'non_filer')
         end
       end
 
       tax_dependents.each do |applicant|
         # Assign applicant to the same THH that the person claiming this dependent belongs to.
-        thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).tax_household
-        applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
+        # thh_of_claimer = non_tax_dependents.find(applicant.claimed_as_tax_dependent_by).tax_household
+        # applicant.tax_household = thh_of_claimer if thh_of_claimer.present?
         applicant.update_attributes!(tax_filer_kind: 'dependent')
       end
-
-      # delete THH without any applicant.
-      empty_th = tax_households.select do |th|
-        active_applicants.map(&:tax_household).exclude?(th)
-      end
-      empty_th.each(&:destroy)
     end
 
     def delete_tax_households
-      tax_households.destroy_all
+      # TODO remove this method when confirmed Enroll side gets updated
+      # tax_households.destroy_all
     end
 
     def create_verification_documents

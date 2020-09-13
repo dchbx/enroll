@@ -44,7 +44,6 @@ Scenario: Confirmation pop-up functionality
 
 Scenario: Can choose primary applicant claiming dependent from dropdown
   Given a plan year, with premium tables, exists
-  And the primary member exists
   When the user navigates to the Tax Info page for a given applicant
   And primary applicant completes application and marks they are required to file taxes
   When user clicks CONTINUE

@@ -57,7 +57,7 @@
         <div class="col-md-12 pz">
           <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
             <div class="col-md-11"><span></span>
-              <i class="fa fa-user blue-icon"></i> <%= applicant.person.full_name %>
+              <i class="fa fa-user blue-icon"></i> <%= applicant.full_name %>
             </div>
           </div>
 
@@ -76,11 +76,15 @@
               <tbody>
                 <tr class="noBorder">
                   <td><%= applicant.age_of_the_applicant %></td>
-                  <td><%= applicant.person.gender.humanize %></td>
-                  <td><%= applicant.family_member.relationship.humanize %></td>
-                  <td><%= applicant.person.format_citizen if applicant.person.citizen_status.present? %></td>
-                  <td><%= human_boolean applicant.person.is_incarcerated %></td>
-                  <td><%= human_boolean applicant.person.is_applying_coverage %></td>
+                  <td><%= applicant.gender.humanize %></td>
+                  <% if applicant.is_primary_applicant? %>
+                    <td></td>
+                  <% else %>
+                    <td><%= applicant.relationships.find_by(relative_id: @application.primary_applicant.id).kind.humanize %></td>
+                  <% end %>
+                  <td><%= applicant.format_citizen if applicant.citizen_status.present? %></td>
+                  <td><%= human_boolean applicant.is_incarcerated %></td>
+                  <td><%= human_boolean applicant.is_applying_coverage %></td>
                 </tr>
               </tbody>
             </table>

@@ -12,7 +12,7 @@ Given(/^at least two other household members exist$/) do
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   choose('radio_incarcerated_no', allow_label_click: true)
   choose('indian_tribe_member_no', allow_label_click: true)
   choose('applicant_us_citizen_true', allow_label_click: true)
@@ -29,7 +29,7 @@ Given(/^at least two other household members exist$/) do
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
   find(:xpath, '//label[@for="radio_male"]').click
-  find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
   choose('radio_incarcerated_no', allow_label_click: true)
   choose('indian_tribe_member_no', allow_label_click: true)
   choose('applicant_us_citizen_true', allow_label_click: true)
