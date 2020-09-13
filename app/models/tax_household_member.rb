@@ -23,6 +23,7 @@ class TaxHouseholdMember
   field :magi_medicaid_monthly_household_income, type: Money, default: 0.00
   field :magi_medicaid_monthly_income_limit, type: Money, default: 0.00
   field :medicaid_household_size, type: Integer
+  field :is_without_assistance, type: Boolean, default: false
 
   validate :strictly_boolean
 

@@ -146,7 +146,7 @@ class Household
     th.save!
   end
 
-  def create_tax_households_and_members(verified_family, _primary_person, active_verified_household, application_in_context)
+  def create_tax_households_and_members(verified_family, _primary_person, active_verified_household)
     # verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
     verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
     return unless verified_tax_households.present? # && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
@@ -257,6 +257,10 @@ class Household
   def latest_active_tax_household
     return tax_households.first if tax_households.length == 1
     tax_households.where(effective_ending_on: nil).sort_by(&:effective_starting_on).first
+  end
+
+  def latest_active_tax_households
+    tax_households.where(effective_ending_on: nil, is_eligibility_determined: true)
   end
 
   def latest_active_tax_household_with_year(year)
