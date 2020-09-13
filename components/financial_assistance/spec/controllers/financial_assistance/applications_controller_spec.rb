@@ -251,18 +251,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       let(:family_member){FactoryBot.build(:family_member, family: family, person: person1)}
 
       it "should redirect to app checklist by creating applicants to all family members of the family if answered 'yes'" do
-        family.applications.each { |app| app.update_attributes!(aasm_state: "determined") }
-        person.person_relationships.create!(predecessor_id: person.id, :successor_id => person1.id, :kind => "spouse", family_id: family.id, relative_id: person.id)
-        family_member.save!
-        # Not necessary for spec
-        last_family_member = family.family_members.last
-        last_person = last_family_member.person
-        last_family_member.destroy
-        last_person.destroy
-        family.save!
+        ::FinancialAssistance::Application.all.destroy_all
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
-        family.reload
-        expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
+        expect(::FinancialAssistance::Application.where(aasm_state: 'draft').first.applicants.count).to eq 1
         expect(response).to redirect_to(application_checklist_application_path(assigns(:application)))
       end
     end

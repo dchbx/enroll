@@ -29,9 +29,8 @@ RSpec.describe Operations::Families::ApplyForFinancialAssistance, type: :model, 
 
     it 'should have all the matching keys' do
       [:person_hbx_id, :is_applying_coverage, :citizen_status, :is_consumer_role,
-       :indian_tribe_member, :is_incarcerated, :addresses_attributes,
-       :phones_attributes, :emails_attributes, :family_member_id,
-       :is_primary_applicant].each do |key|
+       :indian_tribe_member, :is_incarcerated, :addresses, :phones, :emails,
+       :family_member_id, :is_primary_applicant].each do |key|
         expect(@result.success.first.keys).to include(key)
       end
     end

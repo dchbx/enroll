@@ -24,7 +24,7 @@ module FinancialAssistance
     end
 
     def create
-      @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+      @application = ::FinancialAssistance::Application.create!(family_id: get_current_person.financial_assistance_identifier)
       @application.import_applicants
       @application.save!
 
@@ -215,7 +215,8 @@ module FinancialAssistance
     def aqhp_flow
       @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
       if @application.blank?
-        @application = FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+        @application = FinancialAssistance::Application.create!(family_id: get_current_person.financial_assistance_identifier)
+        binding.pry
         @application.import_applicants
         @application.save!
       end

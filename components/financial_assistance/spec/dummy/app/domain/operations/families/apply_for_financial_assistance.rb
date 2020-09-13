@@ -33,17 +33,29 @@ module Operations
       end
 
       def person_attributes(person)
-        attrs = person.attributes.slice(:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :dob, :ssn, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user)
+        attrs = person.attributes.slice(:first_name,
+                                        :last_name,
+                                        :middle_name,
+                                        :name_pfx,
+                                        :name_sfx,
+                                        :gender,
+                                        :ethnicity,
+                                        :tribal_id,
+                                        :no_ssn,
+                                        :is_tobacco_user).symbolize_keys!
 
         attrs.merge({person_hbx_id: person.hbx_id,
+                     ssn: person.ssn,
+                     dob: person.dob.strftime("%d/%m/%Y"),
                      is_applying_coverage: person.consumer_role.is_applying_coverage,
                      citizen_status: person.citizen_status,
                      is_consumer_role: true,
+                     same_with_primary: false,
                      indian_tribe_member: person.consumer_role.is_tribe_member?,
                      is_incarcerated: person.is_incarcerated,
-                     addresses_attributes: construct_association_fields(person.addresses),
-                     phones_attributes: construct_association_fields(person.phones),
-                     emails_attributes: construct_association_fields(person.emails)})
+                     addresses: construct_association_fields(person.addresses),
+                     phones: construct_association_fields(person.phones),
+                     emails: construct_association_fields(person.emails)})
       end
 
       def construct_association_fields(records)
