@@ -19,7 +19,7 @@ module Operations
       private
 
       def find_family(family_id)
-        family = Family.find(id: family_id)
+        family = Family.find(family_id)
 
         Success(family)
       rescue Mongoid::Errors::DocumentNotFound

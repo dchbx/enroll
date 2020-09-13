@@ -161,6 +161,8 @@ class FamilyMember
   private
 
   def deactivate_tax_households
+    return unless family.persisted? && family.active_household.tax_households.present?
+
     Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(family_id: family.id, date: TimeKeeper.date_of_record)
   end
 
