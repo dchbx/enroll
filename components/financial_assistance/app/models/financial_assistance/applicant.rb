@@ -951,7 +951,7 @@ module FinancialAssistance
 
     #Income/MEC Verifications
     def notify_of_eligibility_change
-      CoverageHousehold.update_eligibility_for_family(family)
+      # CoverageHousehold.update_eligibility_for_family(family)
     end
   end
 end
