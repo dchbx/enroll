@@ -554,8 +554,8 @@ module FinancialAssistance
 
     def import_applicants
       # TODO: Remove this dependency
-      family_payload = ::Services::FamilyService.call(family)
-      family_payload.each { |member_attributes| applicants.build(member_attributes) }
+      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family)
+      result.success.each {|member_attributes| applicants.build(member_attributes)} if result.success?
     end
 
     def current_csr_eligibility_kind(tax_household_id)
