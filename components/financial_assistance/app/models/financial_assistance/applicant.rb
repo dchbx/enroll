@@ -5,7 +5,8 @@ module FinancialAssistance
     include Mongoid::Document
     include Mongoid::Timestamps
     include AASM
-    include ::Ssn
+    include Ssn
+    include UnsetableSparseFields
 
     embedded_in :application, class_name: "::FinancialAssistance::Application", inverse_of: :applicants
 
@@ -86,18 +87,6 @@ module FinancialAssistance
 
     NATURALIZATION_DOCUMENT_TYPES = ["Certificate of Citizenship", "Naturalization Certificate"].freeze
 
-    CITIZEN_KINDS = {
-      us_citizen: "US citizen",
-      naturalized_citizen: "Naturalized citizen",
-      alien_lawfully_present: "Alien lawfully present",
-      lawful_permanent_resident: "Lawful permanent resident",
-      undocumented_immigrant: "Undocumented immigrant",
-      not_lawfully_present_in_us: "Not lawfully present in US",
-      non_native_not_lawfully_present_in_us: "Non-native not lawfully present in US",
-      ssn_pass_citizenship_fails_with_SSA: "SSN pass citizenship fails with SSA",
-      non_native_citizen: "Non-native citizen"
-    }.freeze
-
     field :name_pfx, type: String
     field :first_name, type: String
     field :middle_name, type: String
@@ -127,6 +116,8 @@ module FinancialAssistance
     field :is_resident_role, type: Boolean
     field :same_with_primary, type: Boolean, default: false
     field :is_applying_coverage, type: Boolean
+    field :is_consent_applicant, type: Boolean, default: false
+    field :is_tobacco_user, type: String, default: 'unknown'
     field :vlp_document_id, type: String
 
     field :vlp_subject, type: String
