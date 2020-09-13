@@ -40,6 +40,10 @@ class EligibilityDetermination
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: 'csr_0'
 
+  field :aptc_csr_annual_household_income, type: Money, default: 0.00
+  field :aptc_annual_income_limit, type: Money, default: 0.00
+  field :csr_annual_income_limit, type: Money, default: 0.00
+
   field :determined_at, type: DateTime
 
   # DEPRECATED - use determined_at. See ticket 42408

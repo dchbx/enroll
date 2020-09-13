@@ -342,6 +342,7 @@ module FinancialAssistance
       update_application_and_applicant_attributes(message[:eligibility_response_payload])
 
       result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
+      binding.pry
       result.failure? ? update_application(result.failure, 422) : determine!
     end
 
@@ -598,7 +599,7 @@ module FinancialAssistance
       end
     end
 
-    # Compute the actual days a person worked during one year
+    # Compute the actual days a applicant worked during one year
     def compute_actual_days_worked(year, start_date, end_date)
       working_days_in_year = Float(52 * 5)
 
@@ -731,7 +732,7 @@ module FinancialAssistance
               :submitted_timestamp => TimeKeeper.date_of_record.strftime('%Y-%m-%dT%H:%M:%S'),
               :haven_application_id => haven_app_id,
               :haven_ic_id => haven_ic_id,
-              :primary_applicant_id => family.primary_applicant.hbx_id.to_s })
+              :primary_applicant_id => primary_applicant.person_hbx_id.to_s })
     end
 
     def ready_for_attestation?
@@ -806,7 +807,7 @@ module FinancialAssistance
                                       error: "Timed-out waiting for verification response",
                                       applicant_first_name: applicant.first_name,
                                       applicant_last_name: applicant.last_name,
-                                      applicant_id: applicant.hbx_id,
+                                      applicant_id: applicant.person_hbx_id,
                                       rejected_verification_types: type
                                     }),
                  :assistance_application_id => self._id.to_s,
