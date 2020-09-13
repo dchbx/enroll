@@ -262,8 +262,18 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   click_link "Continue Application"
 end
 
+Then(/\w+ should be on the Help Paying for Coverage page/) do
+  expect(page).to have_content("Help Paying for Coverage")
+end
+
+Then(/\w+ does not apply for assistance and clicks continue/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.interaction-click-control-continue').click
+end
+
 Then(/\w+ should see the dependents form/) do
   expect(page).to have_content('Add Member')
+  #expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 

@@ -50,6 +50,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click on none of the situations listed above apply checkbox
