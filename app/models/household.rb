@@ -280,6 +280,10 @@ class Household
     tax_households.tax_household_with_year(year).try(:last)
   end
 
+  def latest_tax_households_with_year(year)
+    tax_households.tax_household_with_year(year)
+  end
+
   def end_multiple_thh(options = {})
     all_active_thh = tax_households.active_tax_household
     all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
