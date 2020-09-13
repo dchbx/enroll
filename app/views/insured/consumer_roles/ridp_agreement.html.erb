@@ -1,5 +1,5 @@
 <% content_for :horizontal_status do %>
-  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} if show_component(request.path) %>
 <% end %>
 
 <div class="container <%=pundit_class Family, :updateable?%>">
