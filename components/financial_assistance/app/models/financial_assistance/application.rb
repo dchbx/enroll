@@ -342,7 +342,6 @@ module FinancialAssistance
       update_application_and_applicant_attributes(message[:eligibility_response_payload])
 
       result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
-      binding.pry
       result.failure? ? update_application(result.failure, 422) : determine!
     end
 
