@@ -13,7 +13,9 @@ module FinancialAssistance
       attribute :ssn, Types::String.optional
       attribute :gender, Types::String.optional
       attribute :dob, Types::Date.optional
-
+      attribute :is_primary_applicant, Types::Strict::Bool
+      attribute :family_member_id, Types::Bson
+      attribute :person_hbx_id, Types::String.optional
       attribute :is_incarcerated, Types::Strict::Bool
       attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
       attribute :ethnicity, Types::Strict::Array.meta(omittable: true)

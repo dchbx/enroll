@@ -14,6 +14,10 @@ module FinancialAssistance
         required(:gender).maybe(:string)
         required(:dob).filled(:date)
 
+        optional(:is_primary_applicant).maybe(:bool)
+        optional(:person_hbx_id).maybe(:string)
+        optional(:family_member_id).maybe(Types::Bson)
+
         required(:is_incarcerated).filled(:bool)
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
