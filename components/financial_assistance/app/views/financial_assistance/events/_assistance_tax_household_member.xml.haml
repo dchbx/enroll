@@ -21,13 +21,13 @@
         / %aptc_csr_annual_household_income
         / %aptc_annual_income_limit
         / %csr_annual_income_limit
-        - unless assistance_tax_household_member.person.is_disabled.blank? && assistance_tax_household_member.person.is_tobacco_user.blank?
+        - unless assistance_tax_household_member.is_disabled.blank? && assistance_tax_household_member.is_tobacco_user.blank?
           %person_health
-          - unless assistance_tax_household_member.person.is_tobacco_user.blank?
-            %is_tobacco_user= assistance_tax_household_member.person.is_tobacco_user
-    - unless true # TODO Fix this assistance_tax_household_member.person.consumer_role.blank?
-      - unless assistance_tax_household_member.person.consumer_role.lawful_presence_determination.citizen_status == 'us_citizen'
-        = render :partial => 'financial_assistance/events/lawful_presence/immigration_information', :object => assistance_tax_household_member.person, as: :person
+          - unless assistance_tax_household_member.is_tobacco_user.blank?
+            %is_tobacco_user= assistance_tax_household_member.is_tobacco_user
+    - unless assistance_tax_household_member.is_consumer_role
+      - unless assistance_tax_household_member.citizen_status == 'us_citizen'
+        = render :partial => 'financial_assistance/events/lawful_presence/immigration_information', :object => assistance_tax_household_member, as: :person
       = render :partial => 'financial_assistance/events/applicant_information', :object => assistance_tax_household_member, as: :applicant
     %incomes
       - if assistance_tax_household_member.incomes.size > 0

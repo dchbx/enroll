@@ -185,7 +185,7 @@ class Household
             verified_eligibility_determination = vthh.eligibility_determinations.max_by(&:determination_date) #Finding the right Eligilbilty Determination
 
             #TODO: find the right source Curam/Haven.
-            source = "Haven"
+            source = "Faa"
 
             if tax_household.eligibility_determinations.build(
               benchmark_plan_id: benchmark_plan_id,
