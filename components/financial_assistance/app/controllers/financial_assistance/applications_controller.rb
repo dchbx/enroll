@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class ApplicationsController < ApplicationController
+  class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
     before_action :set_primary_family

@@ -136,8 +136,6 @@ module FinancialAssistance
     field :expiration_date, type: DateTime
     # country which issued the document. e.g. passport issuing country
     field :issuing_country, type: String
-    # document verification status ::VlpDocument::VLP_DOCUMENTS_VERIF_STATUS
-    field :status, type: String, default: "not submitted"
     # verification type this document can support: Social Security Number, Citizenship, Immigration status, Native American status
     # field :verification_type
     field :is_consent_applicant, type: Boolean, default: false
@@ -527,6 +525,67 @@ module FinancialAssistance
       is_without_assistance
     end
 
+    def has_i327?
+      vlp_subject == "I-327 (Reentry Permit)" && alien_number.present?
+    end
+
+    def has_i571?
+      vlp_subject == 'I-571 (Refugee Travel Document)' && alien_number.present?
+    end
+
+    def has_cert_of_citizenship?
+      vlp_subject == "Certificate of Citizenship" && citizenship_number.present?
+    end
+
+    def has_cert_of_naturalization?
+      vlp_subject == "Naturalization Certificate" && naturalization_number.present?
+    end
+
+    def has_temp_i551?
+      vlp_subject == "Temporary I-551 Stamp (on passport or I-94)" && alien_number.present?
+    end
+
+    def has_i94?
+      i94_number.present? && (vlp_subject == "I-94 (Arrival/Departure Record)" || (vlp_subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && passport_number.present? && expiration_date.present?))
+    end
+
+    def has_i20?
+      vlp_subject == "I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)" && sevis_id.present?
+    end
+
+    def has_ds2019?
+      vlp_subject == "DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)" && sevis_id.present?
+    end
+
+    def i551
+      vlp_subject == 'I-551 (Permanent Resident Card)' && alien_number.present? && card_number.present?
+    end
+
+    def i766
+      # vlp_subject == 'I-766 (Employment Authorization Card)' && alien_number.present? && card_number.present? && expiration_date.present?
+      vlp_subject == 'I-766 (Employment Authorization Card)' && receipt_number.present? && expiration_.present?
+    end
+
+    def mac_read_i551
+      vlp_subject == "Machine Readable Immigrant Visa (with Temporary I-551 Language)" && passport_number.present? && alien_number.present?
+    end
+
+    def foreign_passport_i94
+      vlp_subject == "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport" && i94_number.present? && passport_number.present? && expiration_date.present?
+    end
+
+    def foreign_passport
+      vlp_subject == "Unexpired Foreign Passport" && passport_number.present? && expiration_date.present?
+    end
+
+    def case1
+      vlp_subject == "Other (With Alien Number)" && alien_number.present? && description.present?
+    end
+
+    def case2
+      vlp_subject == "Other (With I-94 Number)" && i94_number.present? && description.present?
+    end
+
     def full_name
       @full_name = [name_pfx, first_name, middle_name, last_name, name_sfx].compact.join(" ")
     end
@@ -566,6 +625,10 @@ module FinancialAssistance
       @age_on_effective_date = age
     end
 
+    def contact_addresses
+      return addresses if addresses.any? { |address| address.kind == "home" }
+      []
+    end
 
     def preferred_eligibility_determination
       eligibility_determination

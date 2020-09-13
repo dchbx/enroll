@@ -44,7 +44,7 @@ module Operations
                                         :no_ssn,
                                         :is_tobacco_user).symbolize_keys!
 
-        attrs.merge({person_hbx_id: person.hbx_id,
+        attrs.merge!(person_hbx_id: person.hbx_id,
                      ssn: person.ssn,
                      dob: person.dob.strftime("%d/%m/%Y"),
                      is_applying_coverage: person.consumer_role.is_applying_coverage,
@@ -55,7 +55,26 @@ module Operations
                      is_incarcerated: person.is_incarcerated,
                      addresses: construct_association_fields(person.addresses),
                      phones: construct_association_fields(person.phones),
-                     emails: construct_association_fields(person.emails)})
+                     emails: construct_association_fields(person.emails))
+
+        attrs.merge(vlp_document_params(person.consumer_role))
+      end
+
+      def vlp_document_params(consumer_role)
+        return {} unless consumer_role.active_vlp_document
+        consumer_role.active_vlp_document.attributes.slice(:vlp_subject,
+                                                           :alien_number,
+                                                           :i94_number,
+                                                           :visa_number,
+                                                           :passport_number,
+                                                           :sevis_id,
+                                                           :naturalization_number,
+                                                           :receipt_number,
+                                                           :citizenship_number,
+                                                           :card_number,
+                                                           :country_of_citizenship,
+                                                           :expiration_date,
+                                                           :issuing_country)
       end
 
       def construct_association_fields(records)

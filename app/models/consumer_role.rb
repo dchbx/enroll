@@ -355,6 +355,9 @@ class ConsumerRole
     Person.all_consumer_roles
   end
 
+  def active_vlp_document
+    vlp_documents.in(id: active_vlp_document_id).first
+  end
 
   def is_active?
     self.is_active

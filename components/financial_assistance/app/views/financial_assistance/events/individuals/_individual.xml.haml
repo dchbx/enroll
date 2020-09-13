@@ -1,0 +1,14 @@
+%id
+  %id= individual.person_hbx_id
+= render :partial => "financial_assistance/events/individuals/applicant", :object => individual
+- if individual.relationships.any?
+  %person_relationships
+    - individual.relationships.each do |rel|
+      %person_relationship
+        %subject_individual
+          %id= rel.relative.person_hbx_id
+        %relationship_uri= "urn:openhbx:terms:v1:individual_relationship##{vocab_relationship_map(rel.kind)}"
+        %object_individual
+          %id= individual.person_hbx_id
+= render :partial => "financial_assistance/events/individuals/person_demographics", :object => individual
+  
