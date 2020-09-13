@@ -19,7 +19,7 @@ module Operations
         yield check_if_dependents_exist_in_ea(dependents)
         yield set_integrated_case_id(family, parsed_object)
 
-        result = yield create_tax_households(active_household, parsed_object, primary_person, household_from_payload, application)
+        result = yield create_tax_households(active_household, parsed_object, primary_person, household_from_payload)
 
         Success(result)
       end
@@ -95,9 +95,8 @@ module Operations
         Success(family.save!)
       end
 
-      def create_tax_households(active_household, parsed_object, primary_person, household_from_payload, application)
-        result = active_household.create_tax_households_and_members(parsed_object, primary_person, household_from_payload,
-                                                                                                               application)
+      def create_tax_households(active_household, parsed_object, primary_person, household_from_payload)
+        result = active_household.create_tax_households_and_members(parsed_object, primary_person, household_from_payload)
         Success(result)
       rescue StandardError
         Failure('Failure to update tax household')
