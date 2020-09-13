@@ -347,6 +347,14 @@ module FinancialAssistance
       relationships.map(&:relative)
     end
 
+    def self.encrypt_ssn(val)
+      if val.blank?
+        return nil
+      end
+      ssn_val = val.to_s.gsub(/\D/, '')
+      SymmetricEncryption.encrypt(ssn_val)
+    end
+
     def relation_with_primary
       return 'self' if is_primary_applicant?
 

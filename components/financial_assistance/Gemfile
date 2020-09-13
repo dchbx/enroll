@@ -21,4 +21,5 @@ gem 'ui_helpers', path: '../ui_helpers'
 
 group :development, :test do
   gem 'rails-controller-testing'
+  gem 'nokogiri-happymapper', :require => 'happymapper'
 end
