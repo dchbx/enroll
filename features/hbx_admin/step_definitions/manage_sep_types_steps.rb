@@ -812,6 +812,8 @@ Given("Individual creates account and on home page") do
   step "Individual sees previously saved address"
   step "Individual agrees to the privacy agreeement"
   step "Individual should see identity verification page and clicks on submit"
+  step "Then Individual should be on the Help Paying for Coverage page"
+  step "Then Individual does not apply for assistance and clicks continue"
   step "Individual should see the dependents form"
   step "I click on continue button on household info form"
   step "I click on none of the situations listed above apply checkbox"
