@@ -19,10 +19,9 @@ module Operations
       end
 
       def family_member_attributes(family_member)
-        person_attributes(family_member.person).merge(
-          family_member_id: family_member.id,
-          is_primary_applicant: family_member.is_primary_applicant,
-          is_consent_applicant: family_member.is_consent_applicant)
+        person_attributes(family_member.person).merge(family_member_id: family_member.id,
+                                                      is_primary_applicant: family_member.is_primary_applicant,
+                                                      is_consent_applicant: family_member.is_consent_applicant)
       end
 
       def person_attributes(person)
