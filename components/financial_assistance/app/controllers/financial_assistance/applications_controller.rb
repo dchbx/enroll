@@ -112,8 +112,6 @@ module FinancialAssistance
         flash[:error] = "Please choose an option before you proceed."
         redirect_to help_paying_coverage_applications_path
       elsif params["is_applying_for_assistance"] == "true"
-        @family.is_applying_for_assistance = @assistance_status
-        @family.save!
         @assistance_status ? aqhp_flow : redirect_to_msg
       else
         uqhp_flow
@@ -130,9 +128,9 @@ module FinancialAssistance
     end
 
     def application_checklist
+      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
-      @application = @person.primary_family.application_in_progress
     end
 
     def review_and_submit
@@ -222,7 +220,7 @@ module FinancialAssistance
         @application.save!
       end
 
-      redirect_to application_checklist_applications_path
+      redirect_to application_checklist_application_path(@application)
     end
 
     # TODO: Remove dummy data before prod
