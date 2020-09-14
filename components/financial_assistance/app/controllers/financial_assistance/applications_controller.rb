@@ -91,6 +91,15 @@ module FinancialAssistance
       # rubocop:enable Metrics/BlockNesting
     end
 
+
+    #checklist
+    # - data to enroll
+    ##  -
+
+    # - data to faa
+    ## - if app in draft , update applicants
+    ## - if application not in draft , create new draft application from existing app and create/update respective applicants
+
     def copy
       service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
       @application = service.copy!
@@ -125,7 +134,7 @@ module FinancialAssistance
     end
 
     def application_checklist
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
+      @application = FinancialAssistance::Application.where(id: params[:id], family_id: get_current_person.financial_assistance_identifier).first
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
     end
@@ -205,15 +214,6 @@ module FinancialAssistance
       end
     end
 
-    def aqhp_flow
-      @application = FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier, aasm_state: "draft").first
-      if @application.blank?
-        @application = create_application_with_applicants
-      end
-
-      redirect_to application_checklist_applications_path(@application)
-    end
-
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
@@ -271,14 +271,6 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
-    end
-
-    def get_current_person # rubocop:disable Naming/AccessorMethodName
-      if current_user.try(:person).try(:agent?) && session[:person_id].present?
-        Person.find(session[:person_id])
-      else
-        current_user.person
-      end
     end
 
     def create_application_with_applicants

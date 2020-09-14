@@ -8,15 +8,28 @@ module Operations
     class DeactivateFinancialAssistanceEligibility
       send(:include, Dry::Monads[:result, :do])
 
-      def call(family_id:, date:)
-        family = yield find_family(family_id)
-        tax_households = yield find_tax_households(family, date)
-        result = yield deactivate_tax_households(tax_households, date)
+      #family_id , date
+      def call(params:)
+        values = validate(params)
+
 
         Success(result)
       end
 
       private
+
+      def validate(params)
+        #decouple params
+        #return  date and family id ---fail for not found family or invalid date format
+
+      end
+
+      def test
+        family = yield find_family(family_id)
+        tax_households = yield find_tax_households(family, date)
+        result = yield deactivate_tax_households(tax_households, date)
+
+      end
 
       def find_family(family_id)
         family = Family.find(family_id)
@@ -29,19 +42,15 @@ module Operations
       def find_tax_households(family, date)
         tax_households = family.active_household.latest_tax_households_with_year(date.year)
 
-        if tax_households.present?
-          Success(tax_households)
-        else
-          Failure('Unable to find active tax_households')
-        end
+        #check for success format
+        Success('message.....')
       end
 
       def deactivate_tax_households(tax_households, date)
         result = tax_households.update_all(effective_ending_on: date)
 
-        Success(result)
-      rescue StandardError
-        Failure('Failed to update tax households')
+        #check for success format
+        Success("message....")
       end
     end
   end
