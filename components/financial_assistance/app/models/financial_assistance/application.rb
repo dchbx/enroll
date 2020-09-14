@@ -191,6 +191,7 @@ module FinancialAssistance
       matrix
     end
 
+    #update method as validate payload
     def update_application_and_applicant_attributes(payload)
       verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
       verified_family.parse(payload)

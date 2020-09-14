@@ -10,12 +10,10 @@ module FinancialAssistance
       eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
       eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)
     end
-
     def eligible_applicants(application_id, eligibility_flag)
       application = FinancialAssistance::Application.find(application_id)
       application.active_applicants.where(eligibility_flag => true).map(&:full_name).map(&:titleize)
     end
-
     def any_csr_ineligible_applicants?(application_id)
       application = FinancialAssistance::Application.find(application_id)
       application.eligibility_determinations.inject([]) do |csr_eligible, ed_obj|

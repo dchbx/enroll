@@ -61,6 +61,8 @@ module FinancialAssistance
           end
         end
 
+        # change the operation name to request_eligibility_determination
+        #change the method name as request_eligibility_determination
         def publish(payload, application)
           notify("acapi.info.events.assistance_application.submitted", {
                    :correlation_id => SecureRandom.uuid.gsub("-",""),
