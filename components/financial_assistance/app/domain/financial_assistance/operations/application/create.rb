@@ -11,18 +11,25 @@ module FinancialAssistance
 
         def call(params:)
           values = yield validate(params)
-          result = yeild create(values)
-          #return application_id
+          result = yield create(values)
         end
 
         private
 
         def validate(params)
+          result = FinancialAssistance::Validators::ApplicationContract.new.call(params)
 
+          if result.success?
+            Success(result.to_h)
+          else
+            Failure(result)
+          end
         end
 
         def create(values)
+          application = FinancialAssistance::Entities::Application.new(values)
 
+          Success(application)
         end
       end
     end
