@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_dependency 'financial_assistance/application_controller'
+
 module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
@@ -24,8 +26,20 @@ module FinancialAssistance
     end
 
     def create
+<<<<<<< Updated upstream
       @application = create_application_with_applicants
       redirect_to edit_application_path(@application)
+=======
+      @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
+      @family_payload = params[:members]
+      # TODO Use praveeen's operation
+      @family_payload.each { |(_i, member_attributes)| @application.applicants.build(p(member_attributes.permit!)) }
+      if @application.save!
+        redirect_to edit_application_path(@application)
+      else
+        render 'financial_assistance/applications/application_checklist'
+      end
+>>>>>>> Stashed changes
     end
 
     def edit
@@ -84,11 +98,6 @@ module FinancialAssistance
     end
 
     def help_paying_coverage
-      @applications = ::FinancialAssistance::Application.where(family_id: get_current_person.financial_assistance_identifier)
-      load_support_texts
-      save_faa_bookmark(request.original_url)
-      set_admin_bookmark_url
-      @transaction_id = params[:id]
     end
 
     def render_message
