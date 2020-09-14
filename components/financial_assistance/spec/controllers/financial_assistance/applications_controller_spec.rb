@@ -34,8 +34,11 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
     let(:primary_member) {family.primary_applicant.person}
     let(:spouse) {FactoryBot.create(:family_member, family: family).person}
+    let!(:consumer_spouse) { FactoryBot.create(:consumer_role, person: spouse) }
     let(:child) {FactoryBot.create(:family_member, family: family).person}
+    let!(:consumer_child) { FactoryBot.create(:consumer_role, person: child) }
     let(:unrelated_member) {FactoryBot.create(:family_member, family: family).person}
+    let!(:consumer_unrelated_member) { FactoryBot.create(:consumer_role, person: unrelated_member) }
     let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
     let(:application) { FactoryBot.create :application, family: family, aasm_state: 'determined' }
 
@@ -114,7 +117,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
                                   is_primary_applicant: true,
                                   family_member_id: family.primary_applicant.id)
   end
-  let!(:application2) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
+  let!(:application2) { FactoryBot.create(:application, family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2, family_member_id: family.primary_applicant.id) }
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
@@ -126,7 +129,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      expect(assigns(:family)).to eq person.primary_family
       expect(assigns(:applications)).to eq family.applications
     end
   end
@@ -197,7 +199,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           }
         }
       }
-      new_app = application.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
+      new_app = application.reload.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
       expect(response).to redirect_to(edit_application_path(new_app.id))
     end
   end
@@ -290,7 +292,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     context "'Yes' to is_applying_for_assistance" do
       it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
-        expect(response).to redirect_to(application_checklist_application_path(application))
+        expect(response).to redirect_to(application_checklist_applications_path(application))
         expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
       end
 
@@ -301,7 +303,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
         ::FinancialAssistance::Application.all.destroy_all
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
         expect(::FinancialAssistance::Application.where(aasm_state: 'draft').first.applicants.count).to eq 1
-        expect(response).to redirect_to(application_checklist_application_path(assigns(:application)))
+        expect(response).to redirect_to(application_checklist_applications_path(assigns(:application)))
       end
     end
 
@@ -351,7 +353,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET wait_for_eligibility_response" do
     it "should redirect to eligibility_response_error if doesn't find the ED on wait_for_eligibility_response page" do
       get :wait_for_eligibility_response, params: { id: application.id }
-      expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
     end
   end
@@ -359,7 +360,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET eligibility_results" do
     it 'should get eligibility results' do
       get :eligibility_results, params: {:id => application.id, :cur => 1}
-      expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
       expect(response).to render_template(:financial_assistance_nav)
     end
@@ -368,7 +368,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "GET application_publish_error" do
     it 'should get application publish error' do
       get :application_publish_error, params: { id: application.id }
-      expect(assigns(:family)).to eq family
       expect(assigns(:application)).to eq application
       expect(response).to render_template(:financial_assistance_nav)
     end
