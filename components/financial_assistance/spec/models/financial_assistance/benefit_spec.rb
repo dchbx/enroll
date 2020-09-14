@@ -3,12 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each do
-  let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-  let(:application) {FactoryBot.create(:application, family: family)}
-  let(:household) {family.households.first}
+  let(:family_id) { BSON::ObjectId.new }
+  let(:application) { FactoryBot.create(:application, family_id: family_id) }
   let!(:eligibility_determination) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
-  let(:family_member) {family.primary_applicant}
-  let(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member.id)}
+  let(:family_member_id) { BSON::ObjectId.new }
+  let(:applicant) {FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination.id, application: application, family_member_id: family_member_id)}
   let(:benefit) {FinancialAssistance::Benefit.new(applicant: applicant)}
   let(:valid_params) do
     {
@@ -19,10 +18,6 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
       start_on: Date.today
     }
   end
-
-  # before :each do
-  #   allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
-  # end
 
   context 'valid benefit' do
     it 'should save benefit step_1 and submit' do

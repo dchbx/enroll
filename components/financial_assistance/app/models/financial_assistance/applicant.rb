@@ -244,7 +244,7 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :verification_types, class_name: "VerificationType", cascade_callbacks: true, validate: true
+    embeds_many :verification_types, class_name: "FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
     embeds_many :incomes,     class_name: "FinancialAssistance::Income"
     embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
     embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"

@@ -2,8 +2,7 @@
 
 require 'rails_helper'
 RSpec.describe ::FinancialAssistance::ApplicationHelper, :type => :helper, dbclean: :after_each do
-  # TODO: need to remove this once the belongs to association is removed.
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family: ::Family.new) }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: BSON::ObjectId.new) }
   let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:applicant) do
     FactoryBot.create(:financial_assistance_applicant,

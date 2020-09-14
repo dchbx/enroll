@@ -6,11 +6,13 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   routes { FinancialAssistance::Engine.routes }
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let!(:application) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family.primary_applicant.id) }
-  let!(:income) {FactoryBot.create(:financial_assistance_income, applicant: applicant)}
+  # let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
+  let!(:family_id) { BSON::ObjectId.new }
+  let!(:family_member_id) { BSON::ObjectId.new }
+  # let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
+  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
+  let!(:applicant) { FactoryBot.create(:applicant, application: application, family_member_id: family_member_id) }
+  let!(:income) { FactoryBot.create(:financial_assistance_income, applicant: applicant) }
   let!(:valid_job_income_params){ {"kind" => "wages_and_salaries", "employer_name" => "sfd", "amount" => "50001", "frequency_kind" => "quarterly", "start_on" => "11/08/2017", "end_on" => "11/08/2018", "employer_address" => {"kind" => "work", "address_1" => "2nd Main St", "address_2" => "sfdsf", "city" => "Washington", "state" => "DC", "zip" => "35467"}, "employer_phone" => {"kind" => "work", "full_phone_number" => "(301)-848-8053"}} }
   let!(:valid_self_employed_income_params){ {"kind" => "net_self_employment", "amount" => "23", "frequency_kind" => "monthly", "start_on" => "11/01/2017", "end_on" => "11/23/2017"} }
   let!(:valid_other_income_params){ {"kind" => "alimony_and_maintenance", "amount" => "45", "frequency_kind" => "biweekly", "start_on" => "11/01/2017", "end_on" => "11/30/2017"}}

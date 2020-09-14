@@ -7,18 +7,18 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:family_id) { family.id}
+
 
   describe "GET index" do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
 
     before(:each) do
       sign_in user
-      allow(person).to receive(:primary_family).and_return(family)
-      # allow_any_instance_of(FinancialAssistance::Application).to receive(:set_benchmark_plan_id)
     end
 
     it "assigns @applications" do
-      application = FinancialAssistance::Application.create(family_id: family.id)
+      application = FinancialAssistance::Application.create(family_id: family_id)
       application.import_applicants
       get :index
       expect(assigns(:applications).to_a).to eq([application])
@@ -31,72 +31,25 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "copy an application" do
-    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
-    let(:primary_member) {family.primary_applicant.person}
-    let(:spouse) {FactoryBot.create(:family_member, family: family).person}
-    let!(:consumer_spouse) { FactoryBot.create(:consumer_role, person: spouse) }
-    let(:child) {FactoryBot.create(:family_member, family: family).person}
-    let!(:consumer_child) { FactoryBot.create(:consumer_role, person: child) }
-    let(:unrelated_member) {FactoryBot.create(:family_member, family: family).person}
-    let!(:consumer_unrelated_member) { FactoryBot.create(:consumer_role, person: unrelated_member) }
-    let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-    let(:application) { FactoryBot.create :application, family: family, aasm_state: 'determined' }
+    let(:family1_id) { BSON::ObjectId.new }
+    let!(:application) { FactoryBot.create :financial_assistance_application, :with_applicants, family_id: family1_id, aasm_state: 'determined' }
 
     before(:each) do
-      spouse.add_relationship(primary_member, "spouse", family.id)
-      primary_member.add_relationship(spouse, "spouse", family.id)
-      child.add_relationship(primary_member, "child", family.id)
-      primary_member.add_relationship(child, "parent", family.id)
-      child.add_relationship(spouse, "child", family.id)
-      spouse.add_relationship(child, "parent", family.id)
-      unrelated_member.add_relationship(primary_member, "unrelated", family.id)
-      primary_member.add_relationship(unrelated_member, "unrelated", family.id)
-      family.build_relationship_matrix
       sign_in user
       get :copy, params: { :id => application.id }
+      @new_application = FinancialAssistance::Application.where(family_id: application.family_id, :id.ne => application.id).first
     end
 
     it "redirects to the new application copy" do
       expect(response).to redirect_to(edit_application_path(assigns(:application).reload))
     end
 
-    it "copies the application's primary application id" do
-      draft_application = assigns(:application)
-      original_primary_applicant = application.family.family_members.find_by(:is_primary_applicant => true)
-      copied_primary_applicant = draft_application.family.family_members.find_by(:is_primary_applicant => true)
-      expect(original_primary_applicant.id).to eq copied_primary_applicant.id
+    it 'create duplicate application' do
+      expect(@new_application.family_id).to eq application.family_id
     end
 
-    it "copies the application's primary_member - spouse relationship as spouse" do
-      expect(assigns(:application).family.find_existing_relationship(primary_member.id, spouse.id, family.id)).to eq "spouse"
-    end
-
-    it "copies the application's spouse - primary_member relationship as spouse" do
-      expect(assigns(:application).family.find_existing_relationship(spouse.id, primary_member.id, family.id)).to eq "spouse"
-    end
-
-    it "copies the application's primary member - child relationship as parent" do
-      expect(assigns(:application).family.find_existing_relationship(primary_member.id, child.id, family.id)).to eq "parent"
-    end
-
-    it "copies the application's child - primary_member relationship as child" do
-      expect(assigns(:application).family.find_existing_relationship(child.id, primary_member.id, family.id)).to eq "child"
-    end
-
-    it "copies the application's spouse - child relationship as parent" do
-      expect(assigns(:application).family.find_existing_relationship(spouse.id, child.id, family.id)).to eq "parent"
-    end
-
-    it "copies the application's child - spouse relationship as child" do
-      expect(assigns(:application).family.find_existing_relationship(child.id, spouse.id, family.id)).to eq "child"
-    end
-
-    it "copies the application's primary_member - unrelated_member relationship as unrelated" do
-      expect(assigns(:application).family.find_existing_relationship(primary_member.id, unrelated_member.id, family.id)).to eq "unrelated"
-    end
-
-    it "copies the application's unrelated_member - primary_member relationship as unrelated" do
-      expect(assigns(:application).family.find_existing_relationship(unrelated_member.id, primary_member.id, family.id)).to eq "unrelated"
+    it 'copies all the applicants' do
+      expect(@new_application.applicants.count).to eq application.applicants.count
     end
   end
 end
@@ -105,9 +58,10 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   routes { FinancialAssistance::Engine.routes }
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let!(:application) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let(:family_id) { family.id}
+  let(:family_member_id) { family.primary_applicant.id }
+  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) do
     FactoryBot.create(:applicant, application: application,
                                   is_claimed_as_tax_dependent: false,
@@ -115,21 +69,23 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
                                   has_daily_living_help: false,
                                   need_help_paying_bills: false,
                                   is_primary_applicant: true,
-                                  family_member_id: family.primary_applicant.id)
+                                  family_member_id: family_member_id)
   end
-  let!(:application2) { FactoryBot.create(:application, family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant2) { FactoryBot.create(:applicant, application: application2, family_member_id: family.primary_applicant.id) }
-  let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+  let!(:application2) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
+  let!(:applicant2) { FactoryBot.create(:applicant, application: application2, family_member_id: family_member_id) }
   let(:application_valid_params) { {"medicaid_terms" => "yes", "report_change_terms" => "yes", "medicaid_insurance_collection_terms" => "yes", "parent_living_out_of_home_terms" => "true", "attestation_terms" => "yes", "submission_terms" => "yes"} }
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
 
   before do
+    allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
     sign_in(user)
   end
 
   context "GET Index" do
     it "should assign applications", dbclean: :after_each do
       get :index
-      expect(assigns(:applications)).to eq family.applications
+      applications = FinancialAssistance::Application.where(family_id: family_id)
+      expect(assigns(:applications)).to eq applications
     end
   end
 
@@ -142,6 +98,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "POST create" do
     it "should redirect" do
+      allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
       existing_app_ids = [application.id, application2.id]
       post :create, params: {
         "members"=>{
@@ -199,7 +156,9 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
           }
         }
       }
-      new_app = application.reload.family.applications.reject{ |app| existing_app_ids.include? app.id }.first
+      application.reload
+      applications = FinancialAssistance::Application.where(family_id: application.family_id)
+      new_app = applications.reject{ |app| existing_app_ids.include? app.id }.first
       expect(response).to redirect_to(edit_application_path(new_app.id))
     end
   end
@@ -252,15 +211,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
 
   context "GET copy" do
     context "when there is not response from eligibility service" do
+
       before do
-        family.applications.each {|app| app.update_attributes(aasm_state: "determined")}
+        FinancialAssistance::Application.where(family_id: family_id).each {|app| app.update_attributes(aasm_state: "determined")}
       end
 
       it 'should copy applicant and redirect to financial assistance application edit path' do
         get :copy, params: { id: application.id }
-        family.reload
         existing_app_ids = [application.id, application2.id]
-        copy_app = application.family.applications.reject {|app| existing_app_ids.include? app.id}.first
+        copy_app = FinancialAssistance::Application.where(family_id: family_id).reject {|app| existing_app_ids.include? app.id}.first
         expect(response).to redirect_to(edit_application_path(copy_app.id))
       end
     end
@@ -293,7 +252,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
         expect(response).to redirect_to(application_checklist_applications_path(application))
-        expect(family.applications.where(aasm_state: "draft").first.applicants.count).to eq 1
+        expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").first.applicants.count).to eq 1
       end
 
       let(:person1) { FactoryBot.create(:person)}
@@ -322,7 +281,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   context "uqhp_flow" do
     it "should redirect to insured family members" do
       get :uqhp_flow
-      expect(family.applications.where(aasm_state: "draft").count).to eq 0
+      expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").count).to eq 0
       expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
     end
   end
