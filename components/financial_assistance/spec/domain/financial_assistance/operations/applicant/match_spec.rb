@@ -10,8 +10,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Match, dbclean: :afte
      :dob => Date.today - 10.years}
   end
 
-  # TODO: remove family association here once it is removed from the Application Model.
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family: ::Family.new) }
+  let(:family_id) { BSON::ObjectId.new }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
   let!(:applicant) do
     FactoryBot.create(:financial_assistance_applicant,
                       application: application,

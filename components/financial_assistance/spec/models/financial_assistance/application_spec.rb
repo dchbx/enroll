@@ -5,36 +5,19 @@ require 'aasm/rspec'
 
 RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after_each do
 
-  before :each do
-    primary_member.person_relationships.create(relative_id: person2.id, kind: 'child')
-    primary_member.person_relationships.create(relative_id: person4.id, kind: 'child')
-    primary_member.person_relationships.create(relative_id: person3.id, kind: 'spouse')
-    primary_member.save
-    family.save
-  end
-
-  let!(:primary_member) { FactoryBot.create(:person, :with_consumer_role, first_name: "hello") }
-  let(:user) { FactoryBot.create(:user, person: primary_member) }
-  let!(:family)  { FactoryBot.create(:family, :with_primary_family_member, person: primary_member) }
-  let!(:person2) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:person3) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:person4) { FactoryBot.create(:person, :with_consumer_role) }
-  let!(:family_member1) { FactoryBot.create(:family_member, family: family, person: person2) }
-  let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person3) }
-  let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person4) }
+  let(:family_id) { BSON::ObjectId.new }
   let!(:year) { TimeKeeper.date_of_record.year }
-  let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
-  let!(:household) { family.households.first }
+  let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
   let!(:eligibility_determination1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:eligibility_determination2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:eligibility_determination3) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
-  let!(:application2) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'denied') }
-  let!(:application3) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determination_response_error') }
-  let!(:application4) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
-  let!(:application5) { FactoryBot.create(:financial_assistance_application, family: family, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
-  let!(:applicant1) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family.primary_applicant.id) }
-  let!(:applicant2) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: family_member2.id) }
-  let!(:applicant3) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination3.id, application: application, family_member_id: family_member3.id) }
+  let!(:application2) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'denied') }
+  let!(:application3) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determination_response_error') }
+  let!(:application4) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
+  let!(:application5) { FactoryBot.create(:financial_assistance_application, family_id: family_id, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'determined') }
+  let!(:applicant1) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
+  let!(:applicant2) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: BSON::ObjectId.new) }
+  let!(:applicant3) { FactoryBot.create(:financial_assistance_applicant, eligibility_determination_id: eligibility_determination3.id, application: application, family_member_id: BSON::ObjectId.new) }
 
   describe '.modelFeilds' do
     it { is_expected.to have_field(:hbx_id).of_type(String) }
@@ -99,11 +82,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it 'embeds many workflow_state_transitions' do
       assc = described_class.reflect_on_association(:workflow_state_transitions)
       expect(assc.class).to eq Mongoid::Association::Embedded::EmbedsMany
-    end
-
-    it 'belongs to family' do
-      assc = described_class.reflect_on_association(:family)
-      expect(assc.class).to eq Mongoid::Association::Referenced::BelongsTo
     end
   end
 
@@ -261,7 +239,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:valid_application) do
       FactoryBot.create(
         :financial_assistance_application,
-        family: family,
+        family_id: BSON::ObjectId.new,
         hbx_id: '345332',
         applicant_kind: 'user and/or family',
         request_kind: 'request-kind',
@@ -280,9 +258,9 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       )
     end
     let!(:applicant_primary) do
-      FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member.id)
+      FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member_id)
     end
-    let(:family_member) { family.primary_family_member }
+    let(:family_member_id) { BSON::ObjectId.new }
 
     it 'should returns true if application is ready_for_attestation' do
       allow(applicant_primary).to receive(:applicant_validation_complete?).and_return(true)
@@ -366,8 +344,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.set_assistance_year' do
     let(:assistance_year) { TimeKeeper.date_of_record + 1.year}
-    let!(:family)  { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
+    let(:family_id)       { BSON::ObjectId.new }      
+    let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
       expect(application.assistance_year).to eq(assistance_year.year - 1)
@@ -381,8 +359,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'trigger eligibility notice' do
-    let(:family_member) { FactoryBot.create(:family_member, :primary, family: family) }
-    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member.id) }
+    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: BSON::ObjectId.new) }
     before do
       application.update_attributes(:aasm_state => 'submitted')
     end
@@ -394,8 +371,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'trigger ineligibilility notice' do
-    let(:family_member) { FactoryBot.create(:family_member, :primary, family: family) }
-    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member.id) }
+    let(:family_member_id) { BSON::ObjectId.new }
+    let!(:applicant) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member_id) }
     before do
       application.active_applicants.each do |applicant|
         applicant.is_totally_ineligible = true
@@ -411,8 +388,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe 'generates hbx_id for application' do
-    let(:new_family) { FactoryBot.build(:family, :with_primary_family_member) }
-    let(:new_application) { FactoryBot.build(:financial_assistance_application, family: new_family) }
+    let(:new_family_id) { BSON::ObjectId.new }
+    let(:new_application) { FactoryBot.build(:financial_assistance_application, family_id: new_family_id) }
 
     it 'creates an hbx id if do not exists' do
       expect(new_application.hbx_id).to eq nil
@@ -423,7 +400,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'for create_eligibility_determinations' do
     before :each do
-      application.update_attributes(family: family, hbx_id: '345334', applicant_kind: 'user and/or family', request_kind: 'request-kind',
+      application.update_attributes(family_id: family_id, hbx_id: '345334', applicant_kind: 'user and/or family', request_kind: 'request-kind',
                                     motivation_kind: 'motivation-kind', us_state: 'DC', is_ridp_verified: true, assistance_year: TimeKeeper.date_of_record.year, aasm_state: 'draft',
                                     medicaid_terms: true, attestation_terms: true, submission_terms: true, medicaid_insurance_collection_terms: true,
                                     report_change_terms: true, parent_living_out_of_home_terms: true)
@@ -556,8 +533,8 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe 'check the validity of an application' do
 
-    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family: family) }
-    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family: family, aasm_state: 'draft') }
+    let!(:valid_app) { FactoryBot.create(:financial_assistance_application, aasm_state: 'draft', family_id: family_id) }
+    let!(:invalid_app) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
     let!(:applicant_primary) { FactoryBot.create(:applicant, eligibility_determination_id: ed1.id, application: valid_app) }
     let!(:applicant_primary2) { FactoryBot.create(:applicant, eligibility_determination_id: ed2.id, application: invalid_app) }
     let!(:ed1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: valid_app) }
@@ -647,12 +624,13 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967', last_name: 'Test', first_name: 'Domtest34', ssn: '243108282', dob: Date.new(1984, 3, 8))
     end
 
-    let!(:family10)  { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
-    let!(:application10) { FactoryBot.create(:financial_assistance_application, family: family10, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
+    let(:family10_id) { BSON::ObjectId.new }
+    let(:family_member10_id) { BSON::ObjectId.new }
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family_id: family10_id, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
     let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
     let!(:applicant10) do
       FactoryBot.create(:applicant, application: application10,
-                                    family_member_id: family10.primary_applicant.id,
+                                    family_member_id: family_member10_id,
                                     person_hbx_id: person10.hbx_id,
                                     ssn: '243108282',
                                     dob: Date.new(1984, 3, 8),

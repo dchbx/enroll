@@ -4,10 +4,8 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Application::Publish, dbclean: :after_each do
 
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) do
-    application = FactoryBot.create(:financial_assistance_application, :with_applicants, family: family, aasm_state: 'draft')
+    application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft')
     application
   end
   let(:hbx_profile) {double}
@@ -33,7 +31,6 @@ RSpec.describe FinancialAssistance::Operations::Application::Publish, dbclean: :
   end
 
   describe 'When Application in non submitted state passed' do
-    # let(:status) { 'draft' }
     let(:result) { subject.call(application_id: application.id) }
 
     it 'should fail with mssage' do

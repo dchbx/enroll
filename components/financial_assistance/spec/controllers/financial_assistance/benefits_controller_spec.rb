@@ -6,9 +6,11 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
   routes { FinancialAssistance::Engine.routes }
   let(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:user) { FactoryBot.create(:user, :person => person) }
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:application) { FactoryBot.create(:application,family: family, aasm_state: 'draft',effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family.primary_applicant.id) }
+  let(:family_id) { BSON::ObjectId.new }
+  let(:family_member_id) { BSON::ObjectId.new }
+  # let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
+  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: 'draft',effective_date: TimeKeeper.date_of_record) }
+  let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family_member_id) }
   let!(:benefit) {FactoryBot.create(:financial_assistance_benefit, applicant: applicant)}
   let!(:valid_params1) do
     {

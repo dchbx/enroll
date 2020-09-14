@@ -6,10 +6,12 @@ RSpec.describe FinancialAssistance::ApplicantsController, dbclean: :after_each, 
   routes { FinancialAssistance::Engine.routes }
   let!(:user) { FactoryBot.create(:user, :person => person) }
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 40.years)}
-  let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
-  let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
-  let!(:application) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family.primary_applicant.id) }
+  let(:family_id) { BSON::ObjectId.new }
+  let(:family_member_id) { BSON::ObjectId.new }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, id: family_id, person: person) }
+  let!(:hbx_profile) { FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period) }
+  let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
+  let!(:applicant) { FactoryBot.create(:applicant, application: application, dob: TimeKeeper.date_of_record - 40.years, is_primary_applicant: true, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, family_member_id: family_member_id) }
   let(:financial_assistance_applicant_valid) do
     {
       "is_ssn_applied" => "false",
