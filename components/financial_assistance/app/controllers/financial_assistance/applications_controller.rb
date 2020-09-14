@@ -68,7 +68,7 @@ module FinancialAssistance
           if params[:commit] == "Submit Application"
             dummy_data_5_year_bar(@application)
             @application.submit! if @application.complete?
-            publish_result = FinancialAssistance::Operations::Application::Publish.new.call(application_id: @application.id)
+            publish_result = FinancialAssistance::Operations::Application::RequestDetermination.new.call(application_id: @application.id)
             if publish_result.success?
               #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
               redirect_to wait_for_eligibility_response_application_path(@application)

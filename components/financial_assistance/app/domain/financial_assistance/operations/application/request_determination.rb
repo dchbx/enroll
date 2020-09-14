@@ -6,7 +6,7 @@ require 'dry/monads/do'
 module FinancialAssistance
   module Operations
     module Application
-      class Publish
+      class RequestDetermination
         send(:include, Dry::Monads[:result, :do])
         include Acapi::Notifiers
         require 'securerandom'
