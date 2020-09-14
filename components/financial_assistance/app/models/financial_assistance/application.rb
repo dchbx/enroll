@@ -659,7 +659,8 @@ module FinancialAssistance
         result_object = ::FinancialAssistance::Operations::Applicant::Build.new.call(params: member_attributes)
         next unless result_object.success?
         applicant_params = result_object.success.to_h
-        applicants.build(applicant_params)
+        applicant = applicants.where(person_hbx_id: applicant_params[:person_hbx_id]).first
+        applicant ? applicant.assign_attributes(applicant_params) : applicants.build(applicant_params)
       end
     end
 
