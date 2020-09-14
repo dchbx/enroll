@@ -287,13 +287,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   end
 
   context "GET help_paying_coverage" do
-    it 'should assign application id to transaction id' do
-      get :help_paying_coverage, params: { id: application.id }
-      expect(assigns(:transaction_id)).to eq application.id.to_s
-    end
-  end
-
-  context "GET help_paying_coverage" do
     context "'Yes' to is_applying_for_assistance" do
       it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
         get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
