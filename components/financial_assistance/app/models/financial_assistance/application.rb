@@ -197,11 +197,19 @@ module FinancialAssistance
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       primary_applicant = search_applicant(verified_primary_family_member)
-      return if primary_applicant.blank?
+
+      if primary_applicant.blank?
+        update_application("Failed to find Primary Applicant on an Application", 422)
+        return false
+      end
+
       active_verified_household = verified_family.households.max_by(&:start_date)
 
       verified_dependents.each do |verified_family_member|
-        return if search_applicant(verified_family_member).blank?
+        if search_applicant(verified_family_member).blank?
+          update_application("Failed to find Dependent Applicant on an Application", 422)
+          return false
+        end
       end
       build_or_update_applicants_eligibility_determinations(verified_family, primary_applicant, active_verified_household)
     end
@@ -215,9 +223,8 @@ module FinancialAssistance
       verified_tax_households.each do |vthh|
         if ed_hbx_assigned_ids.include?(vthh.hbx_assigned_id)
           eligibility_determination = eligibility_determinations.select{|ed| ed.hbx_assigned_id == vthh.hbx_assigned_id.to_i}.first
-          #Update required attributes for that particular TaxHouseHold
+          #Update required attributes for that particular eligibility determination
           eligibility_determination.update_attributes(effective_starting_on: vthh.start_date, is_eligibility_determined: true)
-          #Applicant/TaxHouseholdMember block start
           applicants_persons_hbx_ids = []
           applicants.each { |appl| applicants_persons_hbx_ids << appl.person_hbx_id.to_s}
           vthh.tax_household_members.each do |thhm|
@@ -226,7 +233,8 @@ module FinancialAssistance
           end
           update_eligibility_determinations(vthh, eligibility_determination) unless verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
         else
-          throw(:processing_issue, "ERROR: Failed to find Tax Households in our DB with the ids in xml")
+          update_application("Failed to find eligibility determinations in our DB with the ids in xml", 422)
+          return false
         end
       end
       self.save!
@@ -327,12 +335,16 @@ module FinancialAssistance
       update_attributes(attrs)
     end
 
-    # class method
+
     def add_eligibility_determination(message)
       update_response_attributes(message)
-      update_application_and_applicant_attributes(message[:eligibility_response_payload])
+      ed_updated = update_application_and_applicant_attributes(message[:eligibility_response_payload])
+      return unless ed_updated
+
+      determine! # If successfully loaded ed's move the application to determined state
+
       result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
-      result.failure? ? update_application(result.failure, 422) : determine!
+      result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
 
     def update_application(error_message, status_code)
@@ -640,7 +652,7 @@ module FinancialAssistance
 
     def import_applicants
       # TODO: Remove this dependency
-      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: family.id)
+      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: family_id)
       return unless result.success?
 
       result.success.each do |member_attributes|
