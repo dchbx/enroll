@@ -55,7 +55,7 @@ module FinancialAssistance
         optional(:emails).maybe(:array)
       end
 
-      rule(:addresses).each do
+      rule(:addresses).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::AddressContract.new.call(value)
@@ -75,7 +75,7 @@ module FinancialAssistance
         end
       end
 
-      rule(:phones).each do
+      rule(:phones).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::PhoneContract.new.call(value)
@@ -86,7 +86,7 @@ module FinancialAssistance
         end
       end
 
-      rule(:emails).each do
+      rule(:emails).each do |key, value|
         if key? && value
           if value.is_a?(Hash)
             result = ::FinancialAssistance::Validators::EmailContract.new.call(value)
