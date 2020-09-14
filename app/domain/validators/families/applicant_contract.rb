@@ -10,7 +10,7 @@ module Validators
         optional(:middle_name).maybe(:string)
         required(:last_name).maybe(:string)
         optional(:name_sfx).maybe(:string)
-        required(:ssn).maybe(:string)
+        #required(:ssn).maybe(:string) -- not sure if this works
         required(:gender).maybe(:string)
         required(:dob).filled(:date)
 
@@ -22,8 +22,20 @@ module Validators
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
         optional(:race).maybe(:string)
-        required(:indian_tribe_member).filled(:bool)
+        optional(:indian_tribe_member).filled(:bool)
         optional(:tribal_id).maybe(:string)
+
+        required(:eligibility_determination_id).filled(Types::Bson)
+        required(:magi_medicaid_category).maybe(:string)
+        required(:magi_as_percentage_of_fpl).maybe(:float)
+        required(:magi_medicaid_monthly_income_limit).maybe(:hash)
+        required(:magi_medicaid_monthly_household_income).maybe(:hash)
+        required(:is_without_assistance).maybe(:bool)
+        required(:is_ia_eligible).maybe(:bool)
+        required(:is_medicaid_chip_eligible).maybe(:bool)
+        required(:is_non_magi_medicaid_eligible).maybe(:bool)
+        required(:is_totally_ineligible).maybe(:bool)
+        required(:medicaid_household_size).maybe(:integer)
 
         optional(:language_code).maybe(:string) # Fix Me
         optional(:no_dc_address).filled(:bool) # Fix Me

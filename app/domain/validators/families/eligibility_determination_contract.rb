@@ -3,24 +3,43 @@
 module Validators
   module Families
     class EligibilityDeterminationContract < Dry::Validation::Contract
-# this contract is an application attributes along with the below attributes expected by FAA
 
-# family_id
-#assistance_year
-#array of applicants ######validators::Families::ApplicantContract
-#array of eligibility_determinations
+      params do
+        required(:family_id).filled(Types::Bson)
+        required(:assistance_year).filled(:integer)
+        required(:benchmark_product_id).filled(Types::Bson)
+        required(:applicants).array(:hash)
+        required(:eligibility_determinations).array(:hash)
+      end
 
-#----bi directional main app - faa---
-#years_to_renew -  #renewal_consent_through_year family.rb
+      rule(:family_id) do
+        if key? && value
+          result = Operations::Families::Find.new.call(id: value)
+          key.failure(text: 'invalid family_id', error: result.errors.to_h) if result&.failure?
+        end
+      end
 
-#benchmark_product_id
-#is_ridp_verified
+      rule(:applicants).each do  |key, value|
+        if key? && value
+          if value.is_a?(Hash)
+            result = Validators::Families::ApplicantContract.new.call(value)
+            key.failure(text: "invalid applicant", error: result.errors.to_h) if result&.failure?
+          else
+            key.failure(text: "invalid applicant. Expected a hash.")
+          end
+        end
+      end
 
-#---#review-----are we using this in enroll?
-#is_requesting_voter_registration_application_in_mail
-
-
-#add rule to verify existing family id
+      rule(:eligibility_determinations).each do  |key, value|
+        if key? && value
+          if value.is_a?(Hash)
+            result = Validators::Families::DeterminationContract.new.call(value)
+            key.failure(text: "invalid determination", error: result.errors.to_h) if result&.failure?
+          else
+            key.failure(text: "invalid determination. Expected a hash.")
+          end
+        end
+      end
     end
   end
 end
