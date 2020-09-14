@@ -215,19 +215,16 @@ module FinancialAssistance
       coverage_year = HbxProfile.faa_application_applicable_year
       @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
-      @model.tax_households.each do |txh|
-        txh.update_attributes!(allocated_aptc: 200.00, is_eligibility_determined: true, effective_starting_on: Date.new(coverage_year, 0o1, 0o1))
-        txh.eligibility_determinations.build(max_aptc: 200.00,
-                                             csr_percent_as_integer: 73,
-                                             csr_eligibility_kind: "csr_73",
-                                             determined_on: TimeKeeper.datetime_of_record - 30.days,
-                                             determined_at: TimeKeeper.datetime_of_record - 30.days,
-                                             premium_credit_strategy_kind: "allocated_lump_sum_credit",
-                                             e_pdc_id: "3110344",
-                                             source: "Faa").save!
-        txh.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if txh.applicants.count > 0
-        txh.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if txh.applicants.count > 1
-        txh.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if txh.applicants.count > 2
+      @model.eligibility_determinations.each do |ed|
+        ed.update_attributes(max_aptc: 200.00,
+                             csr_percent_as_integer: 73,
+                             is_eligibility_determined: true,
+                             effective_starting_on: Date.new(coverage_year, 0o1, 0o1),
+                             determined_at: TimeKeeper.datetime_of_record - 30.days,
+                             source: "Faa")
+        ed.applicants.first.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: false, is_without_assistance: true) if ed.applicants.count > 0
+        ed.applicants.second.update_attributes!(is_medicaid_chip_eligible: false, is_ia_eligible: true, is_without_assistance: false) if ed.applicants.count > 1
+        ed.applicants.third.update_attributes!(is_medicaid_chip_eligible: true, is_ia_eligible: false, is_without_assistance: false) if ed.applicants.count > 2
 
         #Update the Income and MEC verifications to Outstanding
         @model.applicants.each do |applicant|
@@ -239,7 +236,7 @@ module FinancialAssistance
 
     # TODO: Remove dummy stuff before prod
     def dummy_data_5_year_bar(application)
-      return unless application.primary_applicant.present? && ["bar5"].include?(application.family.primary_applicant.person.last_name.downcase)
+      return unless application.primary_applicant.present? && ["bar5"].include?(application.primary_applicant&.last_name&.downcase)
       application.active_applicants.each { |applicant| applicant.update_attributes!(is_subject_to_five_year_bar: true, is_five_year_bar_met: false)}
     end
 
