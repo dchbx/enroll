@@ -247,37 +247,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
   end
 
-  context "GET help_paying_coverage" do
-    context "'Yes' to is_applying_for_assistance" do
-      it "should redirect to app checklist if 'yes' is answered to is_applying_for_assistance" do
-        get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
-        expect(response).to redirect_to(application_checklist_applications_path(application))
-        expect(FinancialAssistance::Application.where(family_id: family_id, aasm_state: "draft").first.applicants.count).to eq 1
-      end
-
-      let(:person1) { FactoryBot.create(:person)}
-      let(:family_member){FactoryBot.build(:family_member, family: family, person: person1)}
-
-      it "should redirect to app checklist by creating applicants to all family members of the family if answered 'yes'" do
-        ::FinancialAssistance::Application.all.destroy_all
-        get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "true" }
-        expect(::FinancialAssistance::Application.where(aasm_state: 'draft').first.applicants.count).to eq 1
-        expect(response).to redirect_to(application_checklist_applications_path(assigns(:application)))
-      end
-    end
-
-    it "should redirect to insured family members if 'no' is answered to is_applying_for_assistance" do
-      get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: "false" }
-      expect(response).to redirect_to(main_app.insured_family_members_path(consumer_role_id: person.consumer_role.id))
-    end
-
-    it "should remain on the same page and flash an error message if nothing is answered to is_applying_for_assistance" do
-      get :get_help_paying_coverage_response, params: { exit_after_method: false, is_applying_for_assistance: nil }
-      expect(response).to redirect_to(help_paying_coverage_applications_path)
-      expect(flash[:error]).to match(/Please choose an option before you proceed./)
-    end
-  end
-
   context "uqhp_flow" do
     it "should redirect to insured family members" do
       get :uqhp_flow

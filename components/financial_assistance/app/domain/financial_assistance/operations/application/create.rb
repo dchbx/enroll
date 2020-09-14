@@ -5,7 +5,7 @@ require 'dry/monads/do'
 
 module FinancialAssistance
   module Operations
-    module Applications
+    module Application
       class Create
         send(:include, Dry::Monads[:result, :do])
 
