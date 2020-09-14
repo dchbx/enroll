@@ -17,6 +17,11 @@ FactoryBot.define do
     tax_filer_kind "tax_filer"
     relationship nil
     is_consumer_role true
+    is_applying_coverage true
+    is_claimed_as_tax_dependent false
+    is_self_attested_blind false
+    has_daily_living_help false
+    need_help_paying_bills false
 
     trait :with_ssn do
       sequence(:ssn) { |n| 222_222_220 + n }

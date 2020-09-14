@@ -10,6 +10,7 @@ FactoryBot.define do
     assistance_year TimeKeeper.date_of_record.year
     submitted_at {2.months.ago}
     aasm_state "determined"
+    parent_living_out_of_home_terms false
 
     trait :with_applicants do
       applicants do
