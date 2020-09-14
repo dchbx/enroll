@@ -4,6 +4,7 @@ module Entities
   class Person < Dry::Struct
     transform_keys(&:to_sym)
 
+    attribute :hbx_id, Types::String.optional.meta(omittable: true)
     attribute :name_pfx, Types::String.optional.meta(omittable: true)
     attribute :first_name, Types::String.optional
     attribute :middle_name, Types::String.optional.meta(omittable: true)
