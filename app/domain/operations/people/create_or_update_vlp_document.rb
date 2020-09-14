@@ -35,11 +35,7 @@ module Operations
       def create_entity(values)
         result = Entities::VlpDocument.new(values.to_h)
 
-        if result.success?
-          Success(result)
-        else
-          Failure(result)
-        end
+        Success(result)
       end
 
       def create_or_update_vlp_document(vlp_document_params, person)
