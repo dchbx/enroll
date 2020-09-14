@@ -144,10 +144,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       expect(class_constants.include?(:SUBMITTED_STATUS)).to be_truthy
       expect(described_class::SUBMITTED_STATUS).to eq(%w[submitted verifying_income])
     end
-
-    it 'should have faa schema file path constant' do
-      expect(class_constants.include?(:FAA_SCHEMA_FILE_PATH)).to be_truthy
-    end
   end
 
   describe '.Scopes' do
@@ -206,7 +202,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
 
   describe '.primary_applicant' do
     it 'returns primary_applicant' do
-      primary_applicant = application.active_applicants.detect { |applicant| applicant.is_primary_applicant? }
+      primary_applicant = application.active_applicants.detect(&:is_primary_applicant?)
       expect(application.primary_applicant).to eq(primary_applicant)
     end
   end
@@ -648,25 +644,22 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
        haven_app_id: '1234', haven_ic_id: '124', eligibility_response_payload: xml}
     end
     let!(:person10) do
-      FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967',
-                        last_name: 'Test', first_name: 'Domtest34',
-                        ssn: '243108282', dob: Date.new(1984, 3, 8))
+      FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967', last_name: 'Test', first_name: 'Domtest34', ssn: '243108282', dob: Date.new(1984, 3, 8))
     end
 
     let!(:family10)  { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
     let!(:application10) { FactoryBot.create(:financial_assistance_application, family: family10, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
-    let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination,
-                                  application: application10,
-                                  csr_percent_as_integer: nil,
-                                  max_aptc: 0.0) }
-    let!(:applicant10) { FactoryBot.create(:applicant, application: application10,
-                                           family_member_id: family10.primary_applicant.id,
-                                           person_hbx_id: person10.hbx_id,
-                                           ssn: '243108282',
-                                           dob: Date.new(1984, 3, 8),
-                                           first_name: 'Domtest34',
-                                           last_name: 'Test',
-                                           eligibility_determination_id: ed.id) }
+    let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application10, csr_percent_as_integer: nil, max_aptc: 0.0) }
+    let!(:applicant10) do
+      FactoryBot.create(:applicant, application: application10,
+                                    family_member_id: family10.primary_applicant.id,
+                                    person_hbx_id: person10.hbx_id,
+                                    ssn: '243108282',
+                                    dob: Date.new(1984, 3, 8),
+                                    first_name: 'Domtest34',
+                                    last_name: 'Test',
+                                    eligibility_determination_id: ed.id)
+    end
 
     before do
       ed.update_attributes!(hbx_assigned_id: '205828')

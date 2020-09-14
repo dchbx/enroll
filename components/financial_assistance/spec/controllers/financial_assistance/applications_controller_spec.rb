@@ -105,7 +105,15 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile,:open_enrollment_coverage_period)}
   let!(:application) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
-  let!(:applicant) { FactoryBot.create(:applicant, application: application, is_claimed_as_tax_dependent: false, is_self_attested_blind: false, has_daily_living_help: false,need_help_paying_bills: false, is_primary_applicant: true, family_member_id: family.primary_applicant.id) }
+  let!(:applicant) do
+    FactoryBot.create(:applicant, application: application,
+                                  is_claimed_as_tax_dependent: false,
+                                  is_self_attested_blind: false,
+                                  has_daily_living_help: false,
+                                  need_help_paying_bills: false,
+                                  is_primary_applicant: true,
+                                  family_member_id: family.primary_applicant.id)
+  end
   let!(:application2) { FactoryBot.create(:application,family: family, aasm_state: "draft",effective_date: TimeKeeper.date_of_record) }
   let!(:applicant2) { FactoryBot.create(:applicant, application: application2, family_member_id: family.primary_applicant.id) }
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
@@ -159,6 +167,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     context "when params has application key" do
+      let(:success_result) { double(success?: true)}
       it "When model is saved" do
         post :step, params: { id: application.id, application: application_valid_params }
         expect(application.save).to eq true
@@ -172,8 +181,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       it "should successfully publish application and redirects to wait_for_eligibility" do
         allow(application).to receive(:complete?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
-        allow(application).to receive(:publish).and_return(true)
-        allow(subject).to receive(:generate_payload).and_return('')
+        allow(FinancialAssistance::Operations::Application::Publish).to receive_message_chain(:new, :call).and_return(success_result)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         post :step, params: { id: application.id, commit: "Submit Application", application: application_valid_params }
         expect(response).to redirect_to(wait_for_eligibility_response_application_path(application))
@@ -183,14 +191,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should render step if model is not saved" do
       post :step, params: { id: application.id }
       expect(response).to render_template 'workflow/step'
-    end
-  end
-
-  context "generate_payload" do
-    it "should execute action generate_payload" do
-      allow(controller).to receive(:render_to_string).with(
-        "events/financial_assistance_application", {:formats => ["xml"], :locals => { :financial_assistance_application => application }}
-      ).and_return(application)
     end
   end
 

@@ -54,15 +54,14 @@ module FinancialAssistance
           if params[:commit] == "Submit Application"
             dummy_data_5_year_bar(@application)
             @application.submit! if @application.complete?
-            payload = generate_payload(@application)
-            if @application.publish(payload)
+            publish_result = FinancialAssistance::Operations::Application::Publish.new.call(application_id: @application.id)
+            if publish_result.success?
               #dummy_data_for_demo(params) if @application.complete? && @application.is_submitted? #For_Populating_dummy_ED_for_DEMO #temporary
               redirect_to wait_for_eligibility_response_application_path(@application)
             else
               @application.unsubmit!
               redirect_to application_publish_error_application_path(@application)
             end
-
           else
             render 'workflow/step'
           end
@@ -76,14 +75,6 @@ module FinancialAssistance
         render 'workflow/step'
       end
       # rubocop:enable Metrics/BlockNesting
-    end
-
-    def generate_payload(_application)
-      ::FinancialAssistance::ApplicationController.new.render_to_string(
-        "financial_assistance/events/financial_assistance_application",
-        :formats => ["xml"],
-        :locals => { :financial_assistance_application => @application }
-      )
     end
 
     def copy
