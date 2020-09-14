@@ -28,7 +28,6 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
   end
 
   it 'exports a payload' do
-    binding.pry
     expect(result.success).to be_a_kind_of(FinancialAssistance::Entities::Application)
   end
 end
