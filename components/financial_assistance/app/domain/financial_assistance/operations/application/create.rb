@@ -12,6 +12,8 @@ module FinancialAssistance
         def call(params:)
           values = yield validate(params)
           result = yield create(values)
+
+          Success(result)
         end
 
         private
