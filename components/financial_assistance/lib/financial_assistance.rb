@@ -9,6 +9,7 @@ require 'dry-validation'
 require 'font-awesome-rails'
 require 'haml-rails'
 require 'money-rails'
+require FinancialAssistance::Engine.root.join('app/domain/financial_assistance/types')
 
 module FinancialAssistance
   # Isolate the namespace portion of the passed class
