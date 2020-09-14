@@ -6,22 +6,9 @@ module FinancialAssistance
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
     end
 
-    def total_aptc_sum(application_id)
-      application = FinancialAssistance::Application.find(application_id)
-      sum = 0.0
-      application.eligibility_determinations.each do |ed|
-        sum += ed.max_aptc
-      end
-      sum
-    end
-
     def total_aptc_across_eligibility_determinations(application_id)
-      application = FinancialAssistance::Application.find(application_id)
-      total_aptc = 0.0
-      application.eligibility_determinations.each do |ed|
-        total_aptc += ed.max_aptc
-      end
-      total_aptc
+      eds = FinancialAssistance::Application.find(application_id).eligibility_determinations
+      eds.map(&:max_aptc).flat_map(&:to_f).inject(:+)
     end
 
     def eligible_applicants(application_id, eligibility_flag)
@@ -30,12 +17,11 @@ module FinancialAssistance
     end
 
     def any_csr_ineligible_applicants?(application_id)
-      csr_eligible = []
       application = FinancialAssistance::Application.find(application_id)
-      application.eligibility_determinations.each do |ed|
-        csr_eligible << ed.csr_percent_as_integer
-      end
-      csr_eligible.include?(0) ? true : false
+      application.eligibility_determinations.inject([]) do |csr_eligible, ed_obj|
+        csr_eligible << ed_obj.csr_percent_as_integer
+        csr_eligible
+      end.include?(0)
     end
 
     def applicant_age(applicant)
