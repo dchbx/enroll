@@ -211,7 +211,7 @@ module FinancialAssistance
         @application = create_application_with_applicants
       end
 
-      redirect_to application_checklist_application_path(@application)
+      redirect_to application_checklist_applications_path(@application)
     end
 
     # TODO: Remove dummy data before prod
