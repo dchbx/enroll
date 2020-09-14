@@ -11,9 +11,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     primary_member.person_relationships.create(relative_id: person3.id, kind: 'spouse')
     primary_member.save
     family.save
-    # primary_member.add_relationship(person3, "spouse", family.id)
-    # primary_member.add_relationship(person4, "child", family.id)
-    # primary_member.add_relationship(person2, "child", family.id)
   end
 
   let!(:primary_member) { FactoryBot.create(:person, :with_consumer_role, first_name: "hello") }
@@ -28,10 +25,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   let!(:year) { TimeKeeper.date_of_record.year }
   let!(:application) { FactoryBot.create(:financial_assistance_application, family: family) }
   let!(:household) { family.households.first }
-  # let!(:) { FactoryBot.create(:tax_household, household: household) }
-  # let!(:tax_household1) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
-  # let!(:tax_household2) { FactoryBot.create(:tax_household, application_id: application.id, household: household, effective_ending_on: nil, is_eligibility_determined: true) }
-  # let!(:tax_household3) { FactoryBot.create(:tax_household, application_id: application.id, household: household) }
   let!(:eligibility_determination1) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:eligibility_determination2) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
   let!(:eligibility_determination3) { FactoryBot.create(:financial_assistance_eligibility_determination, application: application) }
@@ -42,7 +35,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   let!(:applicant1) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family.primary_applicant.id) }
   let!(:applicant2) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination2.id, application: application, family_member_id: family_member2.id) }
   let!(:applicant3) { FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination3.id, application: application, family_member_id: family_member3.id) }
-  let!(:plan) { FactoryBot.create(:plan, active_year: 2017, hios_id: '86052DC0400001-01') }
 
   describe '.modelFeilds' do
     it { is_expected.to have_field(:hbx_id).of_type(String) }
@@ -294,7 +286,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     let!(:applicant_primary) do
       FactoryBot.create(:applicant, eligibility_determination_id: eligibility_determination1.id, application: application, family_member_id: family_member.id)
     end
-    let!(:tax_household1) { family.latest_household.latest_active_tax_household }
     let(:family_member) { family.primary_family_member }
 
     it 'should returns true if application is ready_for_attestation' do
