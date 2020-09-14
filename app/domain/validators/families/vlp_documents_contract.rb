@@ -5,7 +5,7 @@ module Validators
     class VlpDocumentContract < Dry::Validation::Contract
       params do
 
-        optional(:subject).maybe(:string)
+        required(:subject).filled(:string)
         optional(:alien_number).maybe(:string)
         optional(:i94_number).maybe(:string)
         optional(:visa_number).maybe(:string)
