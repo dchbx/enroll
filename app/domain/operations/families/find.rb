@@ -8,9 +8,11 @@ module Operations
     class Find
       send(:include, Dry::Monads[:result, :do])
 
-      def call(params)
+      def call(id:)
         #validate
-        #find_family
+        family = find_family(id)
+
+        Success(family)
       end
 
       def find_family(family_id)
