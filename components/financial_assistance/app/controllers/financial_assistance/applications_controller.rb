@@ -6,7 +6,6 @@ module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
     before_action :set_current_person
-    before_action :set_primary_family
 
     include ::UIHelpers::WorkflowController
     include Acapi::Notifiers
@@ -93,7 +92,7 @@ module FinancialAssistance
     end
 
     def copy
-      service = FinancialAssistance::Services::ApplicationService.new(@family, {application_id: params[:id]})
+      service = FinancialAssistance::Services::ApplicationService.new(application_id: params[:id])
       @application = service.copy!
       redirect_to edit_application_path(@application)
     end
@@ -204,10 +203,6 @@ module FinancialAssistance
         @assistance_status = true
         @message = nil
       end
-    end
-
-    def set_primary_family
-      @family = @person.primary_family
     end
 
     def aqhp_flow

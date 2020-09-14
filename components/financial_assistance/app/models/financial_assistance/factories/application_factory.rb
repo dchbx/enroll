@@ -4,13 +4,12 @@ module FinancialAssistance
   module Factories
     # Modify application and sub models data
     class ApplicationFactory
-      attr_accessor :application, :family, :applicants
+      attr_accessor :application, :applicants
 
       EMBED_MODALS = [:incomes, :benefits, :deductions].freeze
 
       def initialize(application)
         @application = application
-        @family = application.family
         set_applicants
       end
 
@@ -83,18 +82,31 @@ module FinancialAssistance
       # should only sync draft application
       def sync_family_members_with_applicants
         return unless application.is_draft?
-        active_member_ids = family.active_family_members.map(&:id)
+        result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: @application.family_id)
+        return if result.failure?
+        members_attributes = result.success
+        active_member_ids = members_attributes.inject([]) do |fm_ids, member_param_hash|
+                              fm_ids << member_param_hash[:family_member_id]
+                            end
         applicants.each do |app|
           app.update_attributes(:is_active => false) unless active_member_ids.include?(app.family_member_id)
         end
         active_applicant_family_member_ids = application.active_applicants.map(&:family_member_id)
-        family.active_family_members.each do |fm|
-          next if active_applicant_family_member_ids.include?(fm.id)
-          applicant_in_context = applicants.where(family_member_id: fm.id)
+
+        active_member_ids.each do |fm_id|
+          next if active_applicant_family_member_ids.include?(fm_id)
+          applicant_in_context = applicants.where(family_member_id: fm_id)
           if applicant_in_context.present?
             applicant_in_context.first.update_attributes(is_active: true)
           else
-            applicants.create(family_member_id: fm.id)
+            applicant_params = members_attributes.detect { |member_attributes| member_attributes[fm_id] }
+            applicant_result = FinancialAssistance::Operations::Applicant::Match(params: applicant_params, application: self)
+            applicant = applicant_result.success? ? applicant_result.success : applicant_result.failure
+            if applicant?
+              applicant.update_attributes!(applicant_params)
+            else
+              applicants.create!(applicant_params)
+            end
           end
         end
       end
