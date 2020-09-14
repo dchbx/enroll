@@ -4,20 +4,32 @@ module FinancialAssistance
   module Services
     # service the application call from controllers
     class ApplicationService
-      attr_reader :family, :code, :application_id
+      attr_reader :code, :application_id
 
-      def initialize(family, opts = {})
-        @family = family
-        @application_id = opts[:application_id]
+      def initialize(application_id:)
+        @application_id = application_id
+        @application = fetch_application(application_id)
+      end
+
+      def fetch_application(application_id)
+        ::FinancialAssistance::Application.where(id: application_id.to_s).first
+      end
+
+      def applications
+        ::FinancialAssistance::Application.where(family_id: @application.family_id)
+      end
+
+      def latest_submitted_application
+        applications.order_by(:submitted_at => 'desc').first
       end
 
       def drafted_app
-        family.application_in_progress
+        ::FinancialAssistance::Application.where(family_id: @application.family_id, aasm_state: 'draft').first
       end
 
       def submitted_app
-        return family.latest_submitted_application if application_id.blank?
-        family.applications.find application_id
+        return latest_submitted_application if application_id.blank?
+        applications.find application_id
       end
 
       def sync!
