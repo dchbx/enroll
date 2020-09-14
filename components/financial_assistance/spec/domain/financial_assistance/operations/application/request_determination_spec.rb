@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe FinancialAssistance::Operations::Application::Publish, dbclean: :after_each do
+RSpec.describe FinancialAssistance::Operations::Application::RequestDetermination, dbclean: :after_each do
 
   let!(:application) do
     application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft')
