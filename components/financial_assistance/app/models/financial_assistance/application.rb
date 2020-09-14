@@ -27,8 +27,6 @@ module FinancialAssistance
     SUBMITTED_STATUS  = %w[submitted verifying_income].freeze
     REVIEWABLE_STATUSES = %w[submitted determination_response_error determined].freeze
 
-    FAA_SCHEMA_FILE_PATH     = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance.xsd')
-
     STATES_FOR_VERIFICATIONS = %w[submitted determination_response_error determined].freeze
 
     # TODO: Need enterprise ID assignment call for Assisted Application
@@ -199,15 +197,11 @@ module FinancialAssistance
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       primary_applicant = search_applicant(verified_primary_family_member)
-      if primary_applicant.blank?
-        return
-      end
+      return if primary_applicant.blank?
       active_verified_household = verified_family.households.max_by(&:start_date)
 
       verified_dependents.each do |verified_family_member|
-        if search_applicant(verified_family_member).blank?
-          return
-        end
+        return if search_applicant(verified_family_member).blank?
       end
       build_or_update_applicants_eligibility_determinations(verified_family, primary_applicant, active_verified_household)
     end
@@ -272,8 +266,6 @@ module FinancialAssistance
       end
     end
 
-
-
     def find_existing_relationship(member_a_id, member_b_id)
       return 'self' if member_a_id == member_b_id
 
@@ -290,15 +282,15 @@ module FinancialAssistance
 
       if !ssn.blank?
         applicants.where({
-                       :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
-                       :dob => dob
-                     }).first
+                           :encrypted_ssn => FinancialAssistance::Applicant.encrypt_ssn(ssn),
+                           :dob => dob
+                         }).first
       else
         applicants.where({
-                       :dob => dob,
-                       :last_name => last_name_regex,
-                       :first_name => first_name_regex
-                     }).first
+                           :dob => dob,
+                           :last_name => last_name_regex,
+                           :first_name => first_name_regex
+                         }).first
       end
     end
 
@@ -335,7 +327,8 @@ module FinancialAssistance
       update_attributes(attrs)
     end
 
-    def add_eligibility_determination(message) # class method
+    # class method
+    def add_eligibility_determination(message)
       update_response_attributes(message)
       update_application_and_applicant_attributes(message[:eligibility_response_payload])
       result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
@@ -347,7 +340,6 @@ module FinancialAssistance
       update_response_attributes(determination_http_status_code: status_code, has_eligibility_response: true, determination_error_message: error_message)
       log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{error_message}"})
     end
-
 
     def apply_rules_and_update_relationships(matrix) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity, Metrics/MethodLength
       missing_relationship = find_missing_relationships(matrix)
@@ -687,28 +679,8 @@ module FinancialAssistance
       is_application_valid? # && check for the validity of applicants too.
     end
 
-    def is_schema_valid?(faa_doc)
-      return false if faa_doc.blank?
-      faa_xsd = Nokogiri::XML::Schema(File.open(FAA_SCHEMA_FILE_PATH))
-      faa_xsd.valid?(faa_doc)
-    end
-
     def is_submitted?
       self.aasm_state == "submitted"
-    end
-
-    def publish(payload)
-      #return true #For DEMO purpose only #temporary
-      if (validity = self.is_schema_valid?(Nokogiri::XML.parse(payload)))
-        notify("acapi.info.events.assistance_application.submitted",
-               {:correlation_id => SecureRandom.uuid.gsub("-",""),
-                :body => payload,
-                :family_id => self.family_id.to_s,
-                :assistance_application_id => self.hbx_id.to_s})
-      else
-        false
-      end
-      validity
     end
 
     def send_failed_response
@@ -792,7 +764,7 @@ module FinancialAssistance
       [200, 203].include?(payload_http_status_code)
     end
 
-    def check_verification_response # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity TODO: Remove this
+    def check_verification_response # rubocop:disable Metrics/CyclomaticComplexity
       return unless !has_all_uqhp_applicants? && !has_atleast_one_medicaid_applicant? && !has_all_verified_applicants? && (TimeKeeper.datetime_of_record.prev_day > submitted_at)
       return unless timeout_response_last_submitted_at.blank? || (timeout_response_last_submitted_at.present? && (TimeKeeper.datetime_of_record.prev_day > timeout_response_last_submitted_at))
       self.update_attributes(timeout_response_last_submitted_at: TimeKeeper.datetime_of_record)
@@ -1027,7 +999,6 @@ module FinancialAssistance
       end
       empty_ed.each(&:destroy)
     end
-
 
     def delete_eligibility_determinations
       eligibility_determinations.destroy_all
