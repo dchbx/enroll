@@ -132,6 +132,18 @@ class HbxProfile
       end
       broker_agency_profiles
     end
+
+    def bcp_by_oe_dates(date = TimeKeeper.date_of_record)
+      current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        bcp.open_enrollment_contains?(date)
+      end
+    end
+
+    def bcp_by_effective_period(date = TimeKeeper.date_of_record)
+      current_hbx.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+        bcp.contains?(date)
+      end
+    end
   end
 
   ## Application-level caching
