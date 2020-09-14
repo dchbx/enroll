@@ -38,7 +38,7 @@
             </div>
             <div class="border-bottom-2px"></div>
             <div class="er-medicaid-prsn">
-              <p>These people are <span>eligible for savings of <%= total_aptc_across_tax_households(params[:id])%> per month</span> called an <span class="run-glossary">advance premium tax credit</span>. This means they won't have to pay full price for health insurance.</p>
+              <p>These people are <span>eligible for savings of <%= total_aptc_across_eligibility_determinations(params[:id])%> per month</span> called an <span class="run-glossary">advance premium tax credit</span>. This means they won't have to pay full price for health insurance.</p>
 
               <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
                 <div class="er-prsn mt-15">

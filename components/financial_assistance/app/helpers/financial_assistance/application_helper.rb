@@ -9,17 +9,17 @@ module FinancialAssistance
     def total_aptc_sum(application_id)
       application = FinancialAssistance::Application.find(application_id)
       sum = 0.0
-      application.tax_households.each do |thh|
-        sum += thh.preferred_eligibility_determination.max_aptc
+      application.eligibility_determinations.each do |ed|
+        sum += ed.max_aptc
       end
       sum
     end
 
-    def total_aptc_across_tax_households(application_id)
+    def total_aptc_across_eligibility_determinations(application_id)
       application = FinancialAssistance::Application.find(application_id)
       total_aptc = 0.0
-      application.tax_households.each do |thh|
-        total_aptc += thh.preferred_eligibility_determination.max_aptc
+      application.eligibility_determinations.each do |ed|
+        total_aptc += ed.max_aptc
       end
       total_aptc
     end
@@ -32,8 +32,8 @@ module FinancialAssistance
     def any_csr_ineligible_applicants?(application_id)
       csr_eligible = []
       application = FinancialAssistance::Application.find(application_id)
-      application.tax_households.each do |thh|
-        csr_eligible << thh.preferred_eligibility_determination.csr_percent_as_integer
+      application.eligibility_determinations.each do |ed|
+        csr_eligible << ed.csr_percent_as_integer
       end
       csr_eligible.include?(0) ? true : false
     end
