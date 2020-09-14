@@ -34,6 +34,14 @@ FactoryBot.define do
       end
     end
 
+    trait :male do
+      gender { "male" }
+    end
+
+    trait :female do
+      gender { "female" }
+    end
+
     trait :with_work_phone do
       phones { [FactoryBot.build(:phone, kind: "work")] }
     end

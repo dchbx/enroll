@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Application::Publish, dbclean: :after_each do
 
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
+  let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:application) do
     application = FactoryBot.create(:financial_assistance_application, :with_applicants, family: family, aasm_state: 'draft')
