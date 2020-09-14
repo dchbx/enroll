@@ -12,9 +12,9 @@ module Operations
         person_params = yield validate(params)
         person_entity = yield initialize_entities(person_params)
         person = yield match_or_create_person(person_entity)
-        consumer_role = yield create_or_update_consumer_role(person)
+        # consumer_role = yield create_or_update_consumer_role(person)
 
-        Success(result)
+        Success(person)
       end
 
       private
@@ -38,25 +38,25 @@ module Operations
       def match_or_create_person(person_entity)
         person_hash = person_entity.to_h
         matched_people = Person.where(
-            first_name: regex_for(person_hash[:first_name]),
-            last_name: regex_for(person_hash[:last_name]),
-            dob: person_hash[:dob],
-            encrypted_ssn: Person.encrypt_ssn(person_hash[:ssn])
+          first_name: regex_for(person_hash[:first_name]),
+          last_name: regex_for(person_hash[:last_name]),
+          dob: person_hash[:dob],
+          encrypted_ssn: Person.encrypt_ssn(person_hash[:ssn])
         )
         raise TooManyMatchingPeople if matched_people.count > 1
 
         person = if matched_people.count == 1
-                        matched_people.first
+                   matched_people.first
                  else
-                        Person.new(person_hash)
-                      end
+                   Person.new(person_hash)
+                 end
 
         person.save!
+
         Success(person)
       rescue StandardError => e
         error_on_save = person.errors.messages
-        error_on_save[:census_employee] = [e.summary] if person.errors.messages.blank? && e.present?
-        Failure([error_on_save, dont_update_ssn])
+        Failure([error_on_save])
       end
 
       def self.encrypt_ssn(val)
@@ -65,10 +65,6 @@ module Operations
         end
         ssn_val = val.to_s.gsub(/\D/, '')
         SymmetricEncryption.encrypt(ssn_val)
-      end
-
-      def to_key
-        @id
       end
 
       def dob=(val)
