@@ -4,6 +4,7 @@ module Validators
   class PersonContract < Dry::Validation::Contract
 
     params do
+      optional(:hbx_id).maybe(:string)
       optional(:name_pfx).maybe(:string)
       required(:first_name).maybe(:string)
       optional(:middle_name).maybe(:string)
@@ -26,7 +27,6 @@ module Validators
       optional(:is_temporarily_out_of_state).maybe(:bool)
 
       optional(:no_ssn).maybe(:string)
-      required(:citizen_status).maybe(:string)
       required(:same_with_primary).filled(:bool)
 
       optional(:addresses).maybe(:array)

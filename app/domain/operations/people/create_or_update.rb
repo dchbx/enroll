@@ -8,11 +8,11 @@ module Operations
     class CreateOrUpdate
       include Dry::Monads[:result, :do]
 
-      PersonCandidate = Struct.new(:ssn, :dob)
+      PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
 
       def call(params:)
-        person_params = yield validate(params)
-        person_entity = yield initialize_entities(person_params)
+        person_values = yield validate(params)
+        person_entity = yield create_entity(person_values)
         person = yield match_or_create_person(person_entity)
 
         Success(person)
@@ -20,8 +20,12 @@ module Operations
 
       private
 
+      def sanitize_params(params)
+        params.merge(:hbx_id => params[:person_hbx_id].delete)
+      end
+
       def validate(params)
-        result = Validators::PersonContract.new.call(params)
+        result = Validators::PersonContract.new.call(sanitize_params(params))
 
         if result.success?
           Success(result)
@@ -30,56 +34,47 @@ module Operations
         end
       end
 
-      def initialize_entities(values)
+      def create_entity(values)
         result = Entities::Person.new(values.to_h)
 
         Success(result)
       end
 
       def match_or_create_person(person_entity)
-        candidate = PersonCandidate.new(person_entity[:ssn], person_entity[:dob])
-        person = Person.match_existing_person(candidate)
+        person = if person_entity[:no_ssn] == "1"
+                   candidate = PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
+                   #find person
+                 else
+                   candidate = PersonCandidate.new(person_entity[:ssn], person_entity[:dob])
+                   Person.match_existing_person(candidate)
+                 end
 
         if person.blank?
-          person = Person.new(person_entity) #if person_valid_params.success?
-
-          return false unless try_create_person(person)
+          person = Person.new(person_entity.to_h) #if person_valid_params.success?
+          person.save!
+        else
+          create_or_update_associations(person, person_entity.to_h, :addresses)
+          create_or_update_associations(person, person_entity.to_h, :emails)
+          create_or_update_associations(person, person_entity.to_h, :phones)
         end
 
         Success(person)
       rescue StandardError => e
-        error_on_save = person.errors.messages
-        Failure([error_on_save])
+        Failure(person.errors.messages)
       end
 
-      def try_create_person(person)
-        person.save.tap do
-          bubble_person_errors(person)
+      def create_or_update_associations(person, applicant_params, assoc)
+        records = applicant_params[assoc.to_sym]
+        return if records.empty?
+
+        records.each do |attrs|
+          address_matched = person.send(assoc).detect {|adr| adr.kind == attrs[:kind]}
+          if address_matched
+            address_matched.update(attrs)
+          else
+            person.send(assoc).create(attrs)
+          end
         end
-      end
-
-      def bubble_person_errors(person)
-        self.errors.add(:ssn, person.errors[:ssn]) if person.errors.key?(:ssn)
-      end
-      #
-      # def self.encrypt_ssn(val)
-      #   if val.blank?
-      #     return nil
-      #   end
-      #   ssn_val = val.to_s.gsub(/\D/, '')
-      #   SymmetricEncryption.encrypt(ssn_val)
-      # end
-
-      def dob=(val)
-        @dob = begin
-          Date.strptime(val, "%Y-%m-%d")
-        rescue StandardError
-          nil
-        end
-      end
-
-      def regex_for(str)
-        ::Regexp.compile(::Regexp.escape(str.to_s))
       end
     end
   end
