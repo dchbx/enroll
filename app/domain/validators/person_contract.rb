@@ -17,19 +17,17 @@ module Validators
       optional(:is_disabled).filled(:bool)
       optional(:ethnicity).maybe(:array)
       optional(:race).maybe(:string)
-      required(:indian_tribe_member).filled(:bool)
+      optional(:indian_tribe_member).filled(:bool)
       optional(:tribal_id).maybe(:string)
 
-      optional(:language_code).maybe(:string) # Fix Me
-      optional(:no_dc_address).filled(:bool) # Fix Me
+      optional(:language_code).maybe(:string)
+      optional(:no_dc_address).filled(:bool)
       optional(:is_homeless).maybe(:bool)
       optional(:is_temporarily_out_of_state).maybe(:bool)
 
       optional(:no_ssn).maybe(:string)
       required(:citizen_status).maybe(:string)
-      required(:is_consumer_role).filled(:bool)
       required(:same_with_primary).filled(:bool)
-      required(:is_applying_coverage).filled(:bool)
 
       optional(:addresses).maybe(:array)
       optional(:phones).maybe(:array)
