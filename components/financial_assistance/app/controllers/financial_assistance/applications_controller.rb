@@ -113,17 +113,6 @@ module FinancialAssistance
       @message = params["message"]
     end
 
-    def get_help_paying_coverage_response # rubocop:disable Naming/AccessorMethodName
-      if params["is_applying_for_assistance"].blank?
-        flash[:error] = "Please choose an option before you proceed."
-        redirect_to help_paying_coverage_applications_path
-      elsif params["is_applying_for_assistance"] == "true"
-        @assistance_status ? aqhp_flow : redirect_to_msg
-      else
-        uqhp_flow
-      end
-    end
-
     def uqhp_flow
       ::FinancialAssistance::Application.where(aasm_state: "draft", family_id: get_current_person.financial_assistance_identifier).destroy_all
       redirect_to main_app.insured_family_members_path(consumer_role_id: @person.consumer_role.id)
