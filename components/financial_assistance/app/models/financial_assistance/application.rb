@@ -659,7 +659,7 @@ module FinancialAssistance
         result_object = ::FinancialAssistance::Operations::Applicant::Build.new.call(params: member_attributes)
         next unless result_object.success?
         applicant_params = result_object.success.to_h
-        applicant_result = FinancialAssistance::Operations::Applicant::Match(params: applicant_params, application: self)
+        applicant_result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: applicant_params, application: self)
         applicant = applicant_result.success? ? applicant_result.success : applicant_result.failure
         applicant ? applicant.assign_attributes(applicant_params) : applicants.build(applicant_params)
       end

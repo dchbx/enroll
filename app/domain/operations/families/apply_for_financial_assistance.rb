@@ -23,7 +23,7 @@ module Operations
       end
 
       def execute(family:)
-        Success(family.family_members.collect {|family_member| family_member_attributes(family_member)})
+        Success(family.active_family_members.collect {|family_member| family_member_attributes(family_member)})
       end
 
       def family_member_attributes(family_member)
