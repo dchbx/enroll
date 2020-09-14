@@ -216,7 +216,6 @@ module FinancialAssistance
       verified_tax_households = active_verified_household.tax_households.select{|th| th.primary_applicant_id == verified_family.primary_family_member_id}
       return unless verified_tax_households.present?
 
-
       ed_hbx_assigned_ids = []
       eligibility_determinations.each { |ed| ed_hbx_assigned_ids << ed.hbx_assigned_id.to_s}
       verified_tax_households.each do |vthh|
@@ -338,9 +337,7 @@ module FinancialAssistance
 
     def add_eligibility_determination(message) # class method
       update_response_attributes(message)
-
       update_application_and_applicant_attributes(message[:eligibility_response_payload])
-
       result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
       result.failure? ? update_application(result.failure, 422) : determine!
     end

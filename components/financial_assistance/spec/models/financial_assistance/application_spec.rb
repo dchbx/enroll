@@ -649,4 +649,45 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
       end
     end
   end
+
+  context 'add_eligibility_determination' do
+    let(:xml) { File.read(::FinancialAssistance::Engine.root.join('spec', 'test_data', 'haven_eligibility_response_payloads', 'verified_1_member_family.xml')) }
+    let(:message) do
+      {determination_http_status_code: 200, has_eligibility_response: true,
+       haven_app_id: '1234', haven_ic_id: '124', eligibility_response_payload: xml}
+    end
+    let!(:person10) do
+      FactoryBot.create(:person, :with_consumer_role, hbx_id: '20944967',
+                        last_name: 'Test', first_name: 'Domtest34',
+                        ssn: '243108282', dob: Date.new(1984, 3, 8))
+    end
+
+    let!(:family10)  { FactoryBot.create(:family, :with_primary_family_member, person: person10) }
+    let!(:application10) { FactoryBot.create(:financial_assistance_application, family: family10, hbx_id: '5979ec3cd7c2dc47ce000000', aasm_state: 'submitted') }
+    let!(:ed) { FactoryBot.create(:financial_assistance_eligibility_determination,
+                                  application: application10,
+                                  csr_percent_as_integer: nil,
+                                  max_aptc: 0.0) }
+    let!(:applicant10) { FactoryBot.create(:applicant, application: application10,
+                                           family_member_id: family10.primary_applicant.id,
+                                           person_hbx_id: person10.hbx_id,
+                                           ssn: '243108282',
+                                           dob: Date.new(1984, 3, 8),
+                                           first_name: 'Domtest34',
+                                           last_name: 'Test',
+                                           eligibility_determination_id: ed.id) }
+
+    before do
+      ed.update_attributes!(hbx_assigned_id: '205828')
+      application10.add_eligibility_determination(message)
+    end
+
+    it 'should update eligibility_determination object' do
+      expect(ed.max_aptc.to_f).to eq(47.78)
+    end
+
+    it 'should update applicant object' do
+      expect(applicant10.is_ia_eligible).to be_truthy
+    end
+  end
 end
