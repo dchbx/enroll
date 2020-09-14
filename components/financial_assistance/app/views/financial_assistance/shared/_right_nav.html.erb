@@ -1,12 +1,7 @@
-<% if show_faa_status %>
-    <div class = "faa-status">
-      <%= render partial: 'financial_assistance/shared/status', locals: { application: @application || @family.application_in_progress } %>
-    </div>
-<% end %>
 <% if content_for? :submit_button %>
   <%= yield :submit_button %>
 <% else %>
-    <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary  btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled) unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
+  <%= link_to 'Continue', next_url, class: 'btn btn-lg btn-primary btn-block', id: 'btn-continue', disabled: (local_assigns[:disabled].nil? ? false : disabled) unless (action_name == "eligibility_results" || action_name == "review") && (params.keys.exclude?"cur") %>
 <% end %>
 
 <ul class='list-unstyled list-right-section'>

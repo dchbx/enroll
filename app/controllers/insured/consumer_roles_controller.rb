@@ -270,6 +270,31 @@ class Insured::ConsumerRolesController < ApplicationController
     end
   end
 
+  def help_paying_coverage
+    set_current_person
+    load_support_texts
+    save_faa_bookmark(request.original_url)
+    set_admin_bookmark_url
+    @transaction_id = params[:id]
+  end
+
+  def help_paying_coverage_response
+    set_current_person
+    if params["is_applying_for_assistance"].blank?
+      flash[:error] = "Please choose an option before you proceed."
+      redirect_to help_paying_coverage_insured_consumer_role_index_path
+    elsif params["is_applying_for_assistance"] == "true"
+      @person.update_attributes is_applying_for_assistance: true
+      @family_payload = ::Services::FamilyService.call(@person.primary_family.id)
+      @previous_url = help_paying_coverage_insured_consumer_role_index_path
+      render 'financial_assistance/applications/application_checklist'
+      #redirect_to financial_assistance.application_checklist_applications_path, family: family_payload
+    else
+      @person.update_attributes is_applying_for_assistance: false
+      redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
+    end
+  end
+
   private
 
   def decrypt_params
@@ -378,5 +403,11 @@ class Insured::ConsumerRolesController < ApplicationController
 
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
+  end
+
+  def load_support_texts
+    file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+    raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
+    @support_texts = helpers.support_text_placeholders raw_support_text
   end
 end

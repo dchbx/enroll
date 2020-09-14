@@ -1,8 +1,29 @@
-<% content_for :horizontal_status do %>
-  <% if show_component(request.path) %>
-    <%= render :partial =>  'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% if defined? @family_payload %>
+    <% content_for :submit_button do %>
+      <%= form_tag financial_assistance.applications_path, method: :post do %>
+        <% @family_payload.each_with_index do |member, i| %>
+          <% member.each do |(attribute, value)| %>
+            <%= p(value) %>
+            <% p(value.inspect) %>
+            <% if attribute =~ /_attributes/ %>
+              <% value.each_with_index do |nested_attributes, j| %>
+                <% nested_attributes.each do |(nested_attribute, nested_value)| %>
+                  <%= hidden_field_tag "members[#{i}][#{attribute}][#{j}][#{nested_attribute}]", nested_value %>
+                <% end %>
+              <% end %>
+            <% elsif value.is_a?(Array) %>
+              <% value.each do |a_value| %>
+                <%= hidden_field_tag("members[#{i}][#{attribute}][]", a_value) unless a_value.blank? %>
+              <% end %>
+            <% else %>
+              <%= hidden_field_tag "members[#{i}][#{attribute}]", value %>
+            <% end %>
+          <% end %>
+        <% end %>
+        <%= submit_tag "Continue", id: 'btn-continue', class: 'btn btn-lg btn-primary btn-block' %>
+      <% end %>
+    <% end %>
   <% end %>
-<% end %>
   <div class="container">
     <div id="new_person_wrapper">
       <div class="row">
@@ -31,7 +52,7 @@
                     <h4>For Each Person in Your Household:</h4>
                     <div>You will need detailed information on each person in your household (even if they don't need coverage) to complete the application. This includes details like date of birth, income, and other health insurance available. <br> <br>
                     If you gather the information in advance, you can complete the application quickly.<br> <br>
-                    <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i><%= link_to ' View the Complete Application Checklist', checklist_pdf_applications_path, target: "_blank" %>
+                    <i class="fa fa-file-pdf-o fa-2x" aria-hidden="true"></i><%= link_to ' View the Complete Application Checklist', financial_assistance.checklist_pdf_applications_path, target: "_blank" %>
                     </div>
                   </div>
                 </div>
@@ -41,8 +62,8 @@
 
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
             <%= render partial: 'financial_assistance/shared/right_nav', locals: {
-              previous_url: help_paying_coverage_applications_path,
-              next_url: edit_application_path(@application)
+              previous_url: @previous_url,
+              next_url: financial_assistance.new_application_path
             } %>
           </div>
         </div>
