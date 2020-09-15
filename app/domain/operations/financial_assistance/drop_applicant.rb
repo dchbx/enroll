@@ -12,7 +12,8 @@ module Operations
       # Output: Dry::Monads::Result::Success
       def call(params)
         values              = yield validate(params)
-        fa_applicant_params = yield parse_family_member(values)
+        filtered_values     = yield filter(values)
+        fa_applicant_params = yield parse_family_member(filtered_values)
         result              = yield delete_applicant(fa_applicant_params)
 
         Success(result)
@@ -23,10 +24,16 @@ module Operations
       def validate(params)
         return Failure('family_member key does not exist') unless params.key?(:family_member)
         return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
-        return Failure('Given family member is an active object') if params[:family_member].is_active
-        return Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
 
         Success(params)
+      end
+
+      def filter(values)
+        return Failure('Given family member is an active object') if values[:family_member].is_active
+        return Failure('Given family member does not have a matching person') unless values[:family_member].person.present?
+        return Failure('Given family member does not have a matching consumer role') unless values[:family_member].person.consumer_role.present?
+
+        Success(values)
       end
 
       def parse_family_member(values)

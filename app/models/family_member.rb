@@ -166,13 +166,13 @@ class FamilyMember
 
   def family_member_updated
     deactivate_tax_households
-    # delete_financial_assistance_applicant unless is_active
+    delete_financial_assistance_applicant
   end
 
   def delete_financial_assistance_applicant
     ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self})
   rescue StandardError => e
-    # Log error message
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::DropApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
   end
 
   def deactivate_tax_households

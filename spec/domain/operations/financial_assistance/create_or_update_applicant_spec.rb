@@ -34,8 +34,8 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
       expect(@result).to be_a(Dry::Monads::Result::Success)
     end
 
-    it 'should return success' do
-      expect(@result.success?).to be_truthy
+    it 'should return success with a message' do
+      expect(@result.success).to eq('A successful call was made to FAA engine to create or update an applicant')
     end
   end
 end
