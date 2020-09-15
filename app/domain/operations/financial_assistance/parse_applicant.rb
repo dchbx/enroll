@@ -6,14 +6,15 @@ require 'dry/monads/do'
 module Operations
   module FinancialAssistance
     class ParseApplicant
-
+      include Dry::Monads[:result, :do]
       # Input: FamilyMember
       # Output: Ruby Hash Applicant
 
       def call(params)
         values              = yield validate(params)
-        financial_applicant = yield parse_family_member(values)
-        Success(financial_applicant)
+        applicant_hash      = yield parse_family_member(values)
+
+        Success(applicant_hash)
       end
 
       private
@@ -26,7 +27,7 @@ module Operations
       end
 
       def parse_family_member(values)
-        Success(family_member_attributes(family_member))
+        Success(family_member_attributes(values[:family_member]))
       end
 
       def family_member_attributes(family_member)
