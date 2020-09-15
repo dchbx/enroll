@@ -2,10 +2,17 @@
 
 Given(/^the user is on FAA Household Info: Family Members page$/) do
   login_as consumer, scope: :user
-  visit financial_assistance.applications_path
-  create_plan
-  assign_benchmark_plan_id(application)
-  click_button 'Start new application'
+  bcp = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship.current_benefit_coverage_period
+  ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+  bcp.update_attributes!(slcsp_id: ivl_product.id)
+  
+  visit help_paying_coverage_insured_consumer_role_index_path
+  find('button.interaction-click-control-continue')
+  choose('radio1', allow_label_click: true)
+  find('button.interaction-click-control-continue').click
+
+  # should be on checklist page now
+  find('a.interaction-click-control-continue').click
 end
 
 Given(/^all applicants are in Info Completed state with all types of income$/) do
