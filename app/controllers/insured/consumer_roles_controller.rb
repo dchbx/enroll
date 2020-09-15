@@ -149,6 +149,7 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def create
+  
     begin
       @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
       if @consumer_role.present?
@@ -284,8 +285,18 @@ class Insured::ConsumerRolesController < ApplicationController
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_insured_consumer_role_index_path
     elsif params["is_applying_for_assistance"] == "true"
-      application_id = Operations::FinancialAssistance::Apply.new.call(@person.primary_family.id)
-      redirect_to financial_assistance.application_checklist_application_path(id: application_id)
+      begin
+        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
+        if result.success
+          redirect_to financial_assistance.application_checklist_application_path(id: application_id)
+        else
+          flash[:error] = result.errors
+          redirect_back fallback_location: '/'
+        end
+      rescue StandardError => e
+        flash[:error] = "Failed to proceed, " + e.message
+        redirect_back fallback_location: '/'
+      end
     else
       @person.update_attributes is_applying_for_assistance: false
       redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
