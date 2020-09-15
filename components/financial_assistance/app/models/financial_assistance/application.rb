@@ -343,11 +343,9 @@ module FinancialAssistance
     def add_eligibility_determination(message)
       update_response_attributes(message)
       ed_updated = update_application_and_applicant_attributes(message[:eligibility_response_payload])
-      binding.pry
       return unless ed_updated
 
       determine! # If successfully loaded ed's move the application to determined state
-      binding.pry
       result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end

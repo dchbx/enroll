@@ -5,10 +5,10 @@ require 'dry/monads/do'
 
 module Operations
   module Families
-    class AddFinancialAssistanceEligibility
+    class AddFinancialAssistanceEligibilityDetermination
       send(:include, Dry::Monads[:result, :do])
 
-      def call(application:)
+      def call(params:)
         Success('result')
       end
     end

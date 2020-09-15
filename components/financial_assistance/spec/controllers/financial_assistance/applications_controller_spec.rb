@@ -196,7 +196,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
       it "should successfully publish application and redirects to wait_for_eligibility" do
         allow(application).to receive(:complete?).and_return(true)
         allow(application).to receive(:submit!).and_return(true)
-        allow(FinancialAssistance::Operations::Application::Publish).to receive_message_chain(:new, :call).and_return(success_result)
+        allow(FinancialAssistance::Operations::Application::RequestDetermination).to receive_message_chain(:new, :call).and_return(success_result)
         allow(FinancialAssistance::Application).to receive(:find_by).and_return(application)
         post :step, params: { id: application.id, commit: "Submit Application", application: application_valid_params }
         expect(response).to redirect_to(wait_for_eligibility_response_application_path(application))
