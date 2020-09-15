@@ -4,9 +4,7 @@ require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Validators::ApplicationContract,  dbclean: :after_each do
 
-  let(:person) { FactoryBot.create(:person, :with_family) }
-  let(:family) { person.primary_family }
-
+  let(:family_id) { BSON::ObjectId.new }
   let(:applicant) do
     {
       first_name: "James", last_name: "Bond", ssn: "101010101", gender: "male", dob: Date.new(1993, 3, 8),
@@ -17,7 +15,7 @@ RSpec.describe FinancialAssistance::Validators::ApplicationContract,  dbclean: :
 
   let(:required_params) do
     {
-      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new,
+      family_id: family_id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new,
       applicants: [applicant]
     }
   end
