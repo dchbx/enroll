@@ -5,11 +5,13 @@ require 'dry/monads/do'
 
 module Operations
   module FinancialAssistance
+    # This class constructs financial_assistance_applicant params_hash,
+    # then calls FinancialAssistance::Operations::Applicant::Delete
     class DropApplicant
       include Dry::Monads[:result, :do]
 
-      # Input: family_member
-      # Output: Dry::Monads::Result::Success
+      # @param [ FamilyMember ] family_member
+      # @return [ Dry::Monads::Result::Success ] success_message
       def call(params)
         values              = yield validate(params)
         filtered_values     = yield filter(values)

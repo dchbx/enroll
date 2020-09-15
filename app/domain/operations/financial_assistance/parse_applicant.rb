@@ -5,11 +5,12 @@ require 'dry/monads/do'
 
 module Operations
   module FinancialAssistance
+    # This class constructs financial_assistance_applicant params_hash.
     class ParseApplicant
       include Dry::Monads[:result, :do]
-      # Input: FamilyMember
-      # Output: Ruby Hash Applicant
 
+      # @param [ FamilyMember ] family_member
+      # @return [ Ruby Hash ] Applicant
       def call(params)
         values              = yield validate(params)
         applicant_hash      = yield parse_family_member(values)
@@ -39,7 +40,11 @@ module Operations
       end
 
       def person_attributes(person)
-        attrs = person.attributes.slice(:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user).symbolize_keys!
+        attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user].inject({}) do |att_hash, attribute|
+                  value = person.send(attribute)
+                  att_hash[attribute] = (attribute == :ethnicity && value.nil?) ? [] : value
+                  att_hash
+                end
         attrs.merge!(person_hbx_id: person.hbx_id,
                      ssn: person.ssn,
                      dob: person.dob.strftime("%d/%m/%Y"),
