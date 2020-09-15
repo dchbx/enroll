@@ -9,6 +9,7 @@ module FinancialAssistance
       class CreateOrUpdate
         send(:include, Dry::Monads[:result, :do])
 
+        #applicant attributes as type
         def call(params:, family_id:)
           values = yield validate(params)
           application = yield find_draft_application(family_id)
@@ -53,7 +54,7 @@ module FinancialAssistance
         def update(applicant, values)
           applicant.assign_attributes(values)
 
-          if applicant.save
+          if applicant.persist!
             Success(applicant)
           else
             Failure(applicant.errors)
