@@ -10,6 +10,7 @@ module Validators
         optional(:years_to_renew).maybe(:integer)
         optional(:renewal_consent_through_year).maybe(:integer)
         required(:benchmark_product_id).filled(Types::Bson)
+        required(:integrated_case_id).filled(:string)
         optional(:is_ridp_verified).maybe(:bool)
         required(:applicants).array(:hash)
       end
