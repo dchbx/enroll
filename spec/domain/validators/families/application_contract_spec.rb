@@ -17,7 +17,7 @@ RSpec.describe ::Validators::Families::ApplicationContract,  dbclean: :after_eac
 
   let(:required_params) do
     {
-      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new,
+      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new, integrated_case_id: '20000',
       years_to_renew: 2021, applicants: [applicant]
     }
   end

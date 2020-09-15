@@ -7,6 +7,7 @@ module Validators
       params do
         required(:family_id).filled(Types::Bson)
         required(:assistance_year).filled(:integer)
+        required(:integrated_case_id).filled(:string)
         required(:benchmark_product_id).filled(Types::Bson)
         required(:applicants).array(:hash)
         required(:eligibility_determinations).array(:hash)

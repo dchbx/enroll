@@ -77,6 +77,7 @@ module FinancialAssistance
     field :submission_terms, type: Boolean
 
     field :request_full_determination, type: Boolean
+    field :integrated_case_id, type: String
 
     field :is_ridp_verified, type: Boolean
     field :determination_http_status_code, type: Integer
@@ -195,6 +196,8 @@ module FinancialAssistance
     def update_application_and_applicant_attributes(payload)
       verified_family = Parsers::Xml::Cv::HavenVerifiedFamilyParser.new
       verified_family.parse(payload)
+
+      update_response_attributes(integrated_case_id: verified_family.integrated_case_id)
       verified_primary_family_member = verified_family.family_members.detect{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       verified_dependents = verified_family.family_members.reject{ |fm| fm.person.hbx_id == verified_family.primary_family_member_id }
       primary_applicant = search_applicant(verified_primary_family_member)
@@ -340,11 +343,12 @@ module FinancialAssistance
     def add_eligibility_determination(message)
       update_response_attributes(message)
       ed_updated = update_application_and_applicant_attributes(message[:eligibility_response_payload])
+      binding.pry
       return unless ed_updated
 
       determine! # If successfully loaded ed's move the application to determined state
-
-      result = ::Operations::Families::AddFinancialAssistanceEligibility.new.call(application: self)
+      binding.pry
+      result = ::Operations::Families::AddFinancialAssistanceEligibilityDetermination.new.call(params: self.attributes)
       result.failure? ? log(eligibility_response_payload, {:severity => 'critical', :error_message => "ERROR: #{result.failure}"}) : true
     end
 
