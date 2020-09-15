@@ -9,10 +9,11 @@ module FinancialAssistance
       class CreateOrUpdate
         send(:include, Dry::Monads[:result, :do])
 
-        def call(params:, application:)
+        def call(params:, family_id:)
           values = yield validate(params)
-          match = yield match(application, values)
-          result = yield update(match, values)
+          application = yield find_draft_application(family_id)
+          applicant = yield match_or_build(values, application)
+          result = yield update(applicant, values)
 
           Success(result)
         end
@@ -30,7 +31,16 @@ module FinancialAssistance
           end
         end
 
-        def match_or_build(application, values)
+        def find_draft_application(family_id)
+          application =  ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first
+          if application
+            Success(application)
+          else
+            Failure("Application Not Found")
+          end
+        end
+
+        def match_or_build(values, application)
           result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: values, application: application)
 
           if result.success?
@@ -41,12 +51,12 @@ module FinancialAssistance
         end
 
         def update(applicant, values)
-          match.assign_attributes(values)
+          applicant.assign_attributes(values)
 
-          if match.save
-            Success(match)
+          if applicant.save
+            Success(applicant)
           else
-            Failure(match.errors)
+            Failure(applicant.errors)
           end
         end
       end
