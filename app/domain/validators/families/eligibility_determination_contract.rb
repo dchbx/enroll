@@ -15,7 +15,7 @@ module Validators
 
       rule(:family_id) do
         if key? && value
-          result = Operations::Families::Find.new.call(id: value)
+          result = Operations::Families::Find.new.call(id: values[:family_id])
           key.failure(text: 'invalid family_id', error: result.errors.to_h) if result&.failure?
         end
       end

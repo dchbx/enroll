@@ -3,9 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Validators::Families::EligibilityDeterminationContract,  dbclean: :after_each do
+
+  let(:family)  { FactoryBot.create(:family, :with_primary_family_member) }
   let(:required_params) do
     {
-      family_id: BSON::ObjectId.new, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new, integrated_case_id: '200',
+      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new, integrated_case_id: '200',
       applicants: [], eligibility_determinations: []
     }
   end
@@ -34,6 +36,7 @@ RSpec.describe Validators::Families::EligibilityDeterminationContract,  dbclean:
 
 
   let(:all_params) { required_params }
+
 
   context "Given invalid parameter scenarios" do
     context "with empty parameters" do
