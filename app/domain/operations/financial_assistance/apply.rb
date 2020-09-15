@@ -8,15 +8,6 @@ module Operations
     class Apply
       include Dry::Monads[:result, :do]
 
-      # This operation will take family_id
-        # Call FAA Engine to create Application and Applicants matching FamilyMembers
-      # Build application_data from family object
-      # Call ParseApplicant for each family member.
-      # assistance_year + years_to_renew = renewal_consent_through_year
-      # FAA Engine Call.
-      # Sucess(application_id)
-      # Success(family.active_family_members.collect {|family_member| family_member_attributes(family_member)})
-
       def call(params)
         family_id                    = yield validate(params)
         financial_application_params = yield parse_family(family_id)
@@ -57,7 +48,7 @@ module Operations
       def application_attributes(family)
         application_attrs = {family_id: family.id,
                              assistance_year: family.application_applicable_year,
-                             years_to_renew: family.renewal_consent_through_year,
+                             years_to_renew: (family.renewal_consent_through_year - family.application_applicable_year),
                              benchmark_product_id: family.benchmark_product_id,
                              is_ridp_verified: family&.primary_person&.consumer_role&.identity_verified?}
 
