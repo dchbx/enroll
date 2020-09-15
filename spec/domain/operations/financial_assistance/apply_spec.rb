@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'rails_helper'
 RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :after_each do
   let!(:hbx_profile)   { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:person)        { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }

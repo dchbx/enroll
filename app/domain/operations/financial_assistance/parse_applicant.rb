@@ -35,7 +35,7 @@ module Operations
         person_attributes(family_member.person).merge(family_member_id: family_member.id,
                                                       is_primary_applicant: family_member.is_primary_applicant,
                                                       is_consent_applicant: family_member.is_consent_applicant,
-                                                      relationship: ::PersonRelationship::InverseMap[family_member.relationship])
+                                                      relationship: family_member.relationship)
       end
 
       def person_attributes(person)

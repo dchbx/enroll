@@ -8,12 +8,12 @@ module Operations
     class DropApplicant
       include Dry::Monads[:result, :do]
 
-      # This is called when we soft delete
-      def call(params:)
-        # Input: family_member
+      # Input: family_member
+      # Output: Dry::Monads::Result::Success
+      def call(params)
         values              = yield validate(params)
-        financial_applicant = yield parse_family_member(values)
-        result              = yield delete_applicant(financial_application)
+        fa_applicant_params = yield parse_family_member(values)
+        result              = yield delete_applicant(fa_applicant_params)
 
         Success(result)
       end
@@ -21,26 +21,23 @@ module Operations
       private
 
       def validate(params)
-        Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
-        Failure('Given family member is an active object') if params[:family_member].is_active
-        Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
+        return Failure('family_member key does not exist') unless params.key?(:family_member)
+        return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
+        return Failure('Given family member is an active object') if params[:family_member].is_active
+        return Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
 
         Success(params)
-
-        # check the class.
-        # check the field is_active is false.
-        # check if the object is persisted.
       end
 
       def parse_family_member(values)
+        @family_id = values[:family_member].family.id
         member_attrs_result = ::Operations::FinancialAssistance::ParseApplicant.new.call(values)
         member_attrs_result.success? ? Success(member_attrs_result.success) : Failure(member_attrs_result.failure)
       end
 
-      def create_or_update_applicant(financial_application)
-        # FAA Engine Call.
-        result = ::FinancialAssistance::Operations::Applicant::Delete.new.call({financial_applicant: financial_applicant})
-        result.success? ? Success(result.success) : Failure(result.failure)
+      def delete_applicant(fa_applicant_params)
+        ::FinancialAssistance::Operations::Applicant::Delete.new.call({financial_applicant: fa_applicant_params, family_id: @family_id})
+        Success('A successful call was made to FAA engine to delete an applicant')
       end
     end
   end
