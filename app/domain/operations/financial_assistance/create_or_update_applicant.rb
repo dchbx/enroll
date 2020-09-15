@@ -26,12 +26,13 @@ module Operations
       end
 
       def parse_family_member(values)
+        @family_id = values[:family_member].family.id
         member_attrs_result = ::Operations::FinancialAssistance::ParseApplicant.new.call(values)
         member_attrs_result.success? ? Success(member_attrs_result.success) : Failure(member_attrs_result.failure)
       end
 
       def create_or_update_applicant(financial_applicant)
-        # ::FinancialAssistance::Operations::Applicant::CreateOrUpdate.new.call(financial_applicant: financial_applicant)
+        ::FinancialAssistance::Operations::Applicant::CreateOrUpdate.new.call(params: financial_applicant, family_id: @family_id)
         Success('A successful call was made to FAA engine to create or update an applicant')
       end
     end
