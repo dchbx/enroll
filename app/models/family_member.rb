@@ -8,7 +8,7 @@ class FamilyMember
   embedded_in :family
 
   # Responsible for updating eligibility when family member is created/updated
-  after_create :family_member_created
+  # after_create :family_member_created
   after_update :family_member_updated, if: :is_active_changed?
 
   # Person responsible for this family
