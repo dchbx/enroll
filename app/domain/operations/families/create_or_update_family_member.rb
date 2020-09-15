@@ -74,7 +74,7 @@ module Operations
       def create_consumer_role(applicant_params, family_member)
         return unless applicant_params[:is_consumer_role]
         # assign_citizen_status
-        Operation::Families::ConsumerRoleCreateOrUpdate(params: {applicant_params: applicant_params, family_member: family_member})
+        Operation::Families::CreateOrUpdateConsumerRole(params: {applicant_params: applicant_params, family_member: family_member})
       end
 
       def create_or_update_family_member(person, family, applicant_params)
