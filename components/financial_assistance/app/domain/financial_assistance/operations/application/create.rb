@@ -29,9 +29,21 @@ module FinancialAssistance
         end
 
         def create(values)
-          application = FinancialAssistance::Entities::Application.new(values)
+          application = ::FinancialAssistance::Application.new(values.except(:applicants))
 
-          Success(application)
+          applicants_results = values[:applicants].map do |applicant|
+            FinancialAssistance::Operations::Applicant::Build.new.call(params: applicant.merge(application: application))
+          end
+
+          applicants_results.map do |result|
+            result.success? ? application.applicants.build(result.success.to_h) : result.failure
+          end
+
+          if application.save
+            Success(application.id)
+          else
+            Failure(application.errors)
+          end
         end
       end
     end

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :applicant, class: "::FinancialAssistance::Applicant" do
+  factory :applicant, class: "FinancialAssistance::Applicant" do
 
   end
 
-  factory :financial_assistance_applicant, class: "::FinancialAssistance::Applicant" do
+  factory :financial_assistance_applicant, class: "FinancialAssistance::Applicant" do
     association :application
 
     is_active true

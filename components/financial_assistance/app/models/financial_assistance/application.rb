@@ -60,7 +60,7 @@ module FinancialAssistance
     # when aplication is in a `draft state`.
     field :assistance_year, type: Integer
 
-    field :is_renewal_authorized, type: Boolean, default: true
+    field :is_renewal_authorized, type: Boolean, default: false
     field :renewal_base_year, type: Integer
     field :years_to_renew, type: Integer
 

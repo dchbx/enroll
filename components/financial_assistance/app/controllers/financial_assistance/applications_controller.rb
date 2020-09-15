@@ -25,21 +25,8 @@ module FinancialAssistance
     end
 
     def create
-      if params[:members].present?
-        @application = ::FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
-        @family_payload = params[:members]
-        # TODO Use praveeen's operation
-        @family_payload.each { |(_i, member_attributes)| @application.applicants.build(p(member_attributes.permit!)) }
-
-        if @application.save!
-          redirect_to edit_application_path(@application)
-        else
-          render 'financial_assistance/applications/application_checklist'
-        end
-      else
-        @application = create_application_with_applicants
-        redirect_to edit_application_path(@application)
-      end
+      @application = create_application_with_applicants
+      redirect_to edit_application_path(@application)
     end
 
     def edit
