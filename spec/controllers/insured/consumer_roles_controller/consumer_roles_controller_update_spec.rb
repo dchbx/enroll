@@ -73,4 +73,42 @@ RSpec.describe Insured::ConsumerRolesController do
       end
     end
   end
+
+  describe "help_paying_coverage" do
+    let(:user) { FactoryBot.create :user, :with_consumer_role }
+    before { sign_in user }
+
+    subject { get :help_paying_coverage }
+
+    it 'renders help_paying_coverage template' do
+      expect(subject).to render_template('insured/consumer_roles/help_paying_coverage')
+    end
+  end
+
+  describe "help_paying_for_coverage_response" do
+    let(:user) { FactoryBot.create :user, :with_consumer_role }
+    before { sign_in user }
+
+    subject { get :help_paying_coverage_response, params: params }
+
+    context "is_applying_for_assistance false" do
+      let(:params) { { is_applying_for_assistance: false } }
+
+      it 'redirects to insured_family_members_path' do
+        expect(subject).to redirect_to(insured_family_members_path(consumer_role_id: user.person.consumer_role.id))
+      end
+    end
+
+    context "is_applying_for_assistance true" do
+      let(:params) { { is_applying_for_assistance: true } }
+
+      it "redirects to financial assistance's checklist" do
+        expect(Operations::FinancialAssistance::Apply).to receive(:new) do
+          double(call: 1)
+        end
+
+        expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
+      end
+    end
+  end
 end

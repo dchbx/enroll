@@ -284,7 +284,7 @@ class Insured::ConsumerRolesController < ApplicationController
       flash[:error] = "Please choose an option before you proceed."
       redirect_to help_paying_coverage_insured_consumer_role_index_path
     elsif params["is_applying_for_assistance"] == "true"
-      application_id = Operations::Families::ApplyForFinancialAssistance.new.call(@person.primary_family.id)
+      application_id = Operations::FinancialAssistance::Apply.new.call(@person.primary_family.id)
       redirect_to financial_assistance.application_checklist_application_path(id: application_id)
     else
       @person.update_attributes is_applying_for_assistance: false
