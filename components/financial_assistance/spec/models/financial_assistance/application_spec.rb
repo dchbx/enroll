@@ -185,13 +185,6 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     end
   end
 
-  describe '.populate_applicants_for?' do
-    it 'returns populated applicants for family member' do
-      application.applicants.all.destroy
-      expect(application.tap(&:import_applicants).applicants).to eq(application.applicants)
-    end
-  end
-
   describe '.current_csr_percent_as_integer' do
     it 'should return current csr percent' do
       application.eligibility_determination_for(eligibility_determination1.id)
