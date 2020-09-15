@@ -11,7 +11,11 @@ RSpec.describe FinancialAssistance::BenefitsController, dbclean: :after_each, ty
   # let!(:family) { FactoryBot.create(:family, :with_primary_family_member,person: person) }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: 'draft',effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) { FactoryBot.create(:applicant, application: application,family_member_id: family_member_id) }
-  let!(:benefit) {FactoryBot.create(:financial_assistance_benefit, applicant: applicant)}
+  let!(:benefit) do
+    benefit = FactoryBot.build(:financial_assistance_benefit)
+    applicant.benefits << benefit 
+    benefit
+  end
   let!(:valid_params1) do
     {
       'kind' => 'is_eligible',
