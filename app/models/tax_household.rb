@@ -32,6 +32,8 @@ class TaxHousehold
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
+  validate :validate_dates
+
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last
   end
@@ -276,6 +278,12 @@ class TaxHousehold
   end
 
   private
+
+  def validate_dates
+    if effective_ending_on.present? && effective_starting_on > effective_ending_on
+      errors.add(:effective_ending_on, "can't occur before start date")
+    end
+  end
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory

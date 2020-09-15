@@ -224,7 +224,7 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   let!(:person) {FactoryBot.create(:person)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:household) {FactoryBot.create(:household, family: family)}
-  let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil)}
+  let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil, is_eligibility_determined: true)}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
   it 'should deactivate eligibility when member is updated' do
     family.active_household.tax_households << tax_household
@@ -235,18 +235,19 @@ describe FamilyMember, 'call back deactivate_tax_households on update', dbclean:
   end
 end
 
-describe FamilyMember, 'call back deactivate_tax_households on create', dbclean: :after_each do
-  let!(:person) {FactoryBot.create(:person)}
-  let!(:spouse)  { FactoryBot.create(:person)}
-  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:household) {FactoryBot.create(:household, family: family)}
-  let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil)}
-  let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
-  it 'should deactivate eligibility when member is updated' do
-    family.active_household.tax_households << tax_household
-    family.save!
-    family.family_members.create(is_primary_applicant: false, person: spouse)
-    family.reload
-    expect(family.active_household.tax_households.first.effective_ending_on).not_to eq nil
-  end
+# TODO: Renable the spec on the after hook is enabled on family_member model
+# describe FamilyMember, 'call back deactivate_tax_households on create', dbclean: :after_each do
+#   let!(:person) {FactoryBot.create(:person)}
+#   let!(:spouse)  { FactoryBot.create(:person)}
+#   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+#   let!(:household) {FactoryBot.create(:household, family: family)}
+#   let!(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(2020, 1, 1), effective_ending_on: nil, is_eligibility_determined: true)}
+#   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, csr_percent_as_integer: 10)}
+#   it 'should deactivate eligibility when member is updated' do
+#     family.active_household.tax_households << tax_household
+#     family.save!
+#     family.family_members.create(is_primary_applicant: false, person: spouse)
+#     family.reload
+#     expect(family.active_household.tax_households.first.effective_ending_on).not_to eq nil
+#   end
 end
