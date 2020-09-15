@@ -101,10 +101,11 @@ RSpec.describe Insured::ConsumerRolesController do
 
     context "is_applying_for_assistance true" do
       let(:params) { { is_applying_for_assistance: true } }
+      let(:result) { ::Dry::Monads::Result::Success.new(1) }
 
       it "redirects to financial assistance's checklist" do
         expect(Operations::FinancialAssistance::Apply).to receive(:new) do
-          double(call: 1)
+          double(call: result)
         end
 
         expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')

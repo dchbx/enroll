@@ -40,7 +40,7 @@ module Operations
 
         Success(true)
       rescue StandardError => e
-        Faliure("Failed to drop family_member due to #{e}")
+        Failure("Failed to drop family_member due to #{e}")
       end
     end
   end
