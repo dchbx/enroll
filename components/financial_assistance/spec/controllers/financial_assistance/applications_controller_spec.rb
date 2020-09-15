@@ -18,8 +18,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     end
 
     it "assigns @applications" do
-      application = FinancialAssistance::Application.create(family_id: family_id)
-      application.import_applicants
+      application = FinancialAssistance::Application.create!(family_id: family_id)
       get :index
       expect(assigns(:applications).to_a).to eq([application])
     end
@@ -93,73 +92,6 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
     it "should assign application" do
       get :new
       expect(assigns(:application).class).to eq FinancialAssistance::Application
-    end
-  end
-
-  context "POST create" do
-    it "should redirect" do
-      allow(person).to receive(:financial_assistance_identifier).and_return(family_id)
-      existing_app_ids = [application.id, application2.id]
-      post :create, params: {
-        "members"=>{
-          "0"=>{
-            "first_name"=>"Jack",
-            "last_name"=>"Johnson",
-            "middle_name"=>"",
-            "name_pfx"=>"",
-            "name_sfx"=>"",
-            "dob"=>"09/22/1981 00:00",
-            "gender"=>"male",
-            "ethnicity"=>["White"],
-            "tribal_id"=>"",
-            "no_ssn"=>"0",
-            "person_hbx_id"=>"eb790ca4e2f7443a92f000c23597e49b",
-            "is_applying_coverage"=>"true",
-            "citizen_status"=>"us_citizen",
-            "is_consumer_role"=>"true",
-            "indian_tribe_member"=>"false",
-            "is_incarcerated"=>"false",
-            "addresses_attributes"=>{
-              "0"=>{
-                "address_1"=>"3rd St",
-                "address_2"=>"",
-                "address_3"=>"",
-                "county"=>"",
-                "country_name"=>"",
-                "kind"=>"home",
-                "city"=>"Washington",
-                "state"=>"DC",
-                "zip"=>"20001"}
-            },
-            "phones_attributes"=>{
-              "0"=>{
-                "country_code"=>"",
-                "area_code"=>"301",
-                "number"=>"8488053",
-                "extension"=>"",
-                "full_phone_number"=>"3018488053",
-                "kind"=>"home"
-              }
-            },
-            "emails_attributes"=>{
-              "0"=>{
-                "kind"=>"home",
-                "address"=>"transue@gmail.com",
-              },
-              "1"=>{
-                "kind"=>"work",
-                "address"=>"transue@gmail.com",
-              }
-            },
-            "family_member_id"=>"5f5e7f77085560c29ba411f2",
-            "is_primary_applicant"=>"true"
-          }
-        }
-      }
-      application.reload
-      applications = FinancialAssistance::Application.where(family_id: application.family_id)
-      new_app = applications.reject{ |app| existing_app_ids.include? app.id }.first
-      expect(response).to redirect_to(edit_application_path(new_app.id))
     end
   end
 
