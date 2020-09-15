@@ -8,8 +8,6 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
     application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft')
     application
   end
-  let(:hbx_profile) {double}
-  let(:benefit_sponsorship) {double(earliest_effective_date: TimeKeeper.date_of_record - 2.months)}
   let(:create_elibility_determinations) do
     application.eligibility_determinations.delete_all
     application.eligibility_determinations.create({
@@ -41,9 +39,6 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
 
   describe 'When Application with valid information given' do
     before do
-      allow(HbxProfile).to receive(:faa_application_applicable_year).and_return(TimeKeeper.date_of_record.year)
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
       allow(application).to receive(:relationships_complete?).and_return(true)
       allow(subject).to receive(:notify).and_return(true)
       set_terms_on_application
@@ -61,9 +56,6 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
   describe 'When Application acceptance terms missing' do
 
     before do
-      allow(HbxProfile).to receive(:faa_application_applicable_year).and_return(TimeKeeper.date_of_record.year)
-      allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile
-      allow(hbx_profile).to receive(:benefit_sponsorship).and_return benefit_sponsorship
       allow(application).to receive(:relationships_complete?).and_return(true)
       allow(subject).to receive(:notify).and_return(true)
       application.submit!
