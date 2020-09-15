@@ -65,6 +65,8 @@ module Validators
         optional(:addresses).maybe(:array)
         optional(:phones).maybe(:array)
         optional(:emails).maybe(:array)
+
+        optional(:relationship).maybe(:string)
       end
 
       rule(:addresses).each do
