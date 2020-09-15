@@ -63,7 +63,6 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
   let(:application) { FinancialAssistance::Application.find(result.success) }
 
   it 'exports payload successfully' do
-    puts result.failure.inspect
     expect(result.success?).to be_truthy
   end
 
