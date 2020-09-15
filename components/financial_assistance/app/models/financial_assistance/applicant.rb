@@ -244,14 +244,14 @@ module FinancialAssistance
 
     field :workflow, type: Hash, default: { }
 
-    embeds_many :verification_types, class_name: "FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
-    embeds_many :incomes,     class_name: "FinancialAssistance::Income"
-    embeds_many :deductions,  class_name: "FinancialAssistance::Deduction"
-    embeds_many :benefits,    class_name: "FinancialAssistance::Benefit"
+    embeds_many :verification_types, class_name: "::FinancialAssistance::VerificationType"#, cascade_callbacks: true, validate: true
+    embeds_many :incomes,     class_name: "::FinancialAssistance::Income"
+    embeds_many :deductions,  class_name: "::FinancialAssistance::Deduction"
+    embeds_many :benefits,    class_name: "::FinancialAssistance::Benefit"
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
     embeds_many :addresses, cascade_callbacks: true, validate: true, class_name: "::FinancialAssistance::Locations::Address"
-    embeds_many :phones, class_name: "FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
-    embeds_many :emails, class_name: "FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
+    embeds_many :phones, class_name: "::FinancialAssistance::Locations::Phone", cascade_callbacks: true, validate: true
+    embeds_many :emails, class_name: "::FinancialAssistance::Locations::Email", cascade_callbacks: true, validate: true
     embeds_one :income_response, class_name: "EventResponse"
     embeds_one :mec_response, class_name: "EventResponse"
     

@@ -43,6 +43,7 @@ module FinancialAssistance
         optional(:country_of_citizenship).maybe(:string)
         optional(:expiration_date).maybe(:date)
         optional(:issuing_country).maybe(:string)
+        optional(:relationship).maybe(:string)
 
         optional(:no_ssn).maybe(:string)
         required(:citizen_status).maybe(:string)

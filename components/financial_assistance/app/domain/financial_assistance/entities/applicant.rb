@@ -49,6 +49,7 @@ module FinancialAssistance
       attribute :country_of_citizenship, Types::String.optional.meta(omittable: true)
       attribute :expiration_date, Types::Date.optional.meta(omittable: true)
       attribute :issuing_country, Types::String.optional.meta(omittable: true)
+      attribute :relationship, Types::String.optional.meta(omittable: true)
 
       attribute :addresses, Types::Array.of(FinancialAssistance::Entities::Address)
       attribute :emails, Types::Array.of(FinancialAssistance::Entities::Email)

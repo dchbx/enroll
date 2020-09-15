@@ -88,7 +88,7 @@ module FinancialAssistance
 
     embeds_many :eligibility_determinations, inverse_of: :application, class_name: '::FinancialAssistance::EligibilityDetermination'
     embeds_many :relationships, inverse_of: :application, class_name: '::FinancialAssistance::Relationship'
-    embeds_many :applicants, inverse_of: :application
+    embeds_many :applicants, inverse_of: :application, class_name: '::FinancialAssistance::Applicant'
     embeds_many :workflow_state_transitions, class_name: "WorkflowStateTransition", as: :transitional
 
     accepts_nested_attributes_for :applicants, :workflow_state_transitions
@@ -126,7 +126,7 @@ module FinancialAssistance
 
     def ensure_relationship_with_primary(applicant, relation_kind)
       update_or_build_relationship(applicant, primary_applicant, relation_kind)
-      update_or_build_relationship(primary_applicant, applicant, FinancialAssistance::Relationship::INVERSE_MAP[relation_kind])
+      update_or_build_relationship(primary_applicant, applicant, ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind])
     end
 
     def update_or_build_relationship(applicant, relative, relation_kind)
@@ -138,7 +138,7 @@ module FinancialAssistance
         return relationship
       end
 
-      self.relationships << FinancialAssistance::Relationship.new(
+      self.relationships << ::FinancialAssistance::Relationship.new(
         {
           kind: relation_kind,
           applicant_id: applicant.id,
