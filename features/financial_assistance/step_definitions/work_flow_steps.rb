@@ -136,6 +136,8 @@ Then(/^saves a YES answer to the question: Do you want to apply for Medicaid…$
 end
 
 Given(/^that the user is on the Application Checklist page$/) do
+  financial_identifier = Person.all.first.financial_assistance_identifier
+  application.update_attributes(family_id: financial_identifier)
   visit financial_assistance.application_checklist_application_path(application)
 end
 
