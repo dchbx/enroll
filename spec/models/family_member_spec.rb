@@ -250,4 +250,4 @@ end
 #     family.reload
 #     expect(family.active_household.tax_households.first.effective_ending_on).not_to eq nil
 #   end
-end
+# end
