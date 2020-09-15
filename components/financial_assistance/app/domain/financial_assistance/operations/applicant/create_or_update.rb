@@ -21,7 +21,7 @@ module FinancialAssistance
         private
 
         def validate(params)
-          result = ::FinancialAssistance::Validators::ApplicationContract.new.call(params)
+          result = ::FinancialAssistance::Validators::ApplicantContract.new.call(params)
 
 
           if result.success?
