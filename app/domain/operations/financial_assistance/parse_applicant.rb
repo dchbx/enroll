@@ -20,7 +20,8 @@ module Operations
       private
 
       def validate(params)
-        Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
+        return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
+
         Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
 
         Success(params)
