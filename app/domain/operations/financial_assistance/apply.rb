@@ -39,7 +39,7 @@ module Operations
         result = ::FinancialAssistance::Operations::Application::Create.new.call(params: financial_application_params)
 
         if result.success?
-          Success(result.success._id)
+          Success(result.success)
         else
           Failure(result.failure)
         end

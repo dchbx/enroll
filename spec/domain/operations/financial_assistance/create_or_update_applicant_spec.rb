@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-RSpec.describe ::Operations::FinancialAssistance::DropApplicant, type: :model, dbclean: :after_each do
+RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type: :model, dbclean: :after_each do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:person2) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
@@ -21,7 +21,7 @@ RSpec.describe ::Operations::FinancialAssistance::DropApplicant, type: :model, d
     end
 
     it 'should return a failure' do
-      expect(@result.failure).to eq('family_member key does not exist')
+      expect(@result.failure).to eq('Given family member is not a valid object')
     end
   end
 
