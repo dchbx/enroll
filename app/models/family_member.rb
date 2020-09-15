@@ -8,8 +8,8 @@ class FamilyMember
   embedded_in :family
 
   # Responsible for updating eligibility when family member is created/updated
-  after_create :deactivate_tax_households
-  after_update :deactivate_tax_households, if: :is_active_changed?
+  after_create :family_member_created
+  after_update :family_member_updated, if: :is_active_changed?
 
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
@@ -159,6 +159,24 @@ class FamilyMember
   end
 
   private
+
+  def family_member_created
+    deactivate_tax_households
+    create_financial_assistance_applicant
+  end
+
+  def family_member_updated
+    deactivate_tax_households
+    delete_financial_assistance_applicant unless is_active
+  end
+
+  def create_financial_assistance_applicant
+    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self})
+  end
+
+  def delete_financial_assistance_applicant
+    ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self})
+  end
 
   def deactivate_tax_households
     return unless family.persisted? && family.active_household.tax_households.present?
