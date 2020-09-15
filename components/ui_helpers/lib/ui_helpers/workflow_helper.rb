@@ -82,7 +82,7 @@ module UIHelpers
       return "" if text.nil?
       # set application applicable year placeholder
       if text.include? '<application-applicable-year-placeholder>'
-        text.sub! '<application-applicable-year-placeholder>', HbxProfile.faa_application_applicable_year.to_s
+        text.sub! '<application-applicable-year-placeholder>', FinancialAssistanceRegistry[:application_year].item.call.value!.to_s
       else
         text
       end

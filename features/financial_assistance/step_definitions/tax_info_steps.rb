@@ -2,9 +2,18 @@
 
 Given(/^that the user is on the FAA Household Info page$/) do
   login_as consumer, scope: :user
+
+  bcp = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship.current_benefit_coverage_period
+  ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+  bcp.update_attributes!(slcsp_id: ivl_product.id)
+
   visit help_paying_coverage_insured_consumer_role_index_path
+  find('button.interaction-click-control-continue')
   choose('radio1', allow_label_click: true)
-  click_link 'CONTINUE'
+  find('button.interaction-click-control-continue').click
+
+  # should be on checklist page now
+  find('a.interaction-click-control-continue').click
 end
 
 Given(/^the applicant has no saved data$/) do
@@ -66,10 +75,10 @@ Given(/^the user is on the Tax Info page for a given applicant$/) do
 end
 
 Given(/^the user is on the Tax Info page for a dependent applicant$/) do
-  application.applicants.create!(family_member_id: application.family.family_members.last.id,
-    first_name: application.family.family_members.last.first_name,
-    last_name: application.family.family_members.last.last_name,
-    dob: application.family.family_members.last.dob)
+  application.applicants.create!(family_member_id: consumer.primary_family.family_members.last.id,
+    first_name: consumer.primary_family.family_members.last.first_name,
+    last_name: consumer.primary_family.family_members.last.last_name,
+    dob: consumer.primary_family.family_members.last.dob)
   application.reload
   dependent_applicant = application.applicants.last
   visit financial_assistance.go_to_step_application_applicant_path(application, dependent_applicant, 1)
