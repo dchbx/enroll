@@ -26,6 +26,8 @@ module Operations
         end
       end
 
+      # should not fail for UQHP cases too
+      # returns Success(nil)
       def execute(values)
         family = Operations::Families::Find.new.call(id: BSON::ObjectId(values[:family_id]))
         tax_households = family.success.active_household.latest_active_tax_households
