@@ -2,8 +2,9 @@
 
 Given(/^that the user is on the FAA Household Info page$/) do
   login_as consumer, scope: :user
-  visit financial_assistance.applications_path
-  click_button "Start new application"
+  visit help_paying_coverage_insured_consumer_role_index_path
+  choose('radio1', allow_label_click: true)
+  click_link 'CONTINUE'
 end
 
 Given(/^the applicant has no saved data$/) do

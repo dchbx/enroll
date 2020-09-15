@@ -56,7 +56,7 @@ Given(/^all applicants fill all pages except other questions$/) do
 end
 
 Given(/^the user will navigate to the FAA Household Info page$/) do
-  visit financial_assistance.edit_application_path(application({aasm_state: 'draft'}).id.to_s)
+  visit financial_assistance.edit_application_path(application.id.to_s)
 end
 
 Given(/^the user SSN is nil$/) do
