@@ -5,16 +5,15 @@ require 'dry/monads/do'
 
 module Operations
   module FinancialAssistance
-    # Class documentation
-    # FamilyMember Demographic Updates
-    # FamilyMember add maps to event PersonUpdate where ConsumerRole Created.
-    # VLP results.
-    # Person updates
-    # (manages , ConsumerRole creation/updates, , Person updates)
-
+    # This class finds all family members associated with person
+    # and will call Operations::FinancialAssistance::CreateOrUpdateApplicant
+    # to update information on FinancialAssistance::Applicant objects within FAA Engine.
     class PersonCreateOrUpdateHandler
       include Dry::Monads[:result, :do]
 
+      # @param [ Person ] person
+      # @param [ String ] event_name
+      # @return [ Dry::Monads::Result::Success ] success_message
       def call(params)
         values          = yield validate(params)
         filtered_values = yield filter(values)
