@@ -5,9 +5,15 @@ require 'dry/monads/do'
 
 module Operations
   module FinancialAssistance
+    # This class constructs financial_assistance_application params_hash,
+    # then validates it against the ApplicationContract
+    # then calls FinancialAssistance::Operations::Application::Create
+    # gets back FinancialAssistance::Application object_id
     class Apply
       include Dry::Monads[:result, :do]
 
+      # @param [ FamilyId ] family_id bson_id of a family
+      # @return [ FinancialAssistance::Application ] application_id
       def call(params)
         family_id                    = yield validate(params)
         financial_application_params = yield parse_family(family_id)
