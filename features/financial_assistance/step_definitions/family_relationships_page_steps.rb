@@ -71,11 +71,16 @@ end
 
 
 Then(/^the relationship is saved$/) do
-  expect(@relationship.find(:css, ".selectric .label").text).to eq("Parent")
+  begin
+    expect(@relationship.find(:css, ".selectric .label").text).to eq("Parent")
+  rescue Selenium::WebDriver::Error::StaleElementReferenceError
+    sleep 10
+    expect(@relationship.find(:css, ".selectric .label").text).to eq("Parent")
+  end
 end
 
 And(/^all the relationships have been entered$/) do
-  find('.interaction-click-control-family-relationships').click
+  find('.interaction-click-control-continue').click
   expect(page).to have_no_css('.missing_relation')
   sleep 3
 end
