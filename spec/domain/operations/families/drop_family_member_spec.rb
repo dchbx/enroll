@@ -4,40 +4,50 @@ require 'rails_helper'
 
 RSpec.describe ::Operations::Families::DropFamilyMember, dbclean: :after_each do
 
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'john', last_name: 'adams', dob: 40.years.ago, ssn: '472743442') }
-  let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let!(:application) { FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: family.id) }
-  let(:applicant) { application.active_applicants.last }
-  let(:applicant_person) { FactoryBot.create(:person, first_name: applicant.first_name, last_name: applicant.last_name, dob: applicant.dob, ssn: applicant.ssn, gender: applicant.gender) }
-  let(:applicant_family_member) do
-    family_member = family.relate_new_member(applicant_person, applicant.relation_with_primary)
-    family.save!
-    family_member
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:person2) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    person.ensure_relationship_with(per, 'child')
+    person.save!
+    per
   end
-
-  let(:params) { {family_id: family.id, family_member_id: applicant_family_member.id} }
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
 
   describe 'drop family member' do
-    context 'when family member and family ids passed' do
+    context 'with valid arguments' do
+      let(:params) do
+        {family_id: family.id, family_member_id: family_member2.id}
+      end
 
-      it 'should return success and drop family member' do
-        expect(applicant_family_member.is_active).to be_truthy
-        result = subject.call(params: params)
-        expect(result).to be_a(Dry::Monads::Result::Success)
-        applicant_family_member.reload
-        expect(applicant_family_member.is_active).to be_falsey
+      before do
+        @result = subject.call(params: params)
+      end
+
+      it 'should return success object' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should return true' do
+        expect(@result.success).to be_truthy
       end
     end
 
-    context 'when invalid params passed' do
-      let(:second_person) { FactoryBot.create(:person, :with_consumer_role, :male, first_name: 'fredrick', last_name: 'homes', dob: 41.years.ago, ssn: '472740042') }
-      let(:second_family) { FactoryBot.create(:family, :with_primary_family_member, person: second_person)}
-      let(:params) { {family_id: second_family.id, family_member_id: applicant_family_member.id} }
+    context 'with invalid arguments' do
+      let(:params) do
+        {family_id: family.id, family_member_id: 'family_member2_id'}
+      end
 
-      it 'should return success with vlp document' do
-        result = subject.call(params: params)
-        expect(result).to be_a(Dry::Monads::Result::Failure)
-        expect(result.failure).to eq "Family and family member Id's does not match"
+      before do
+        @result = subject.call(params: params)
+      end
+
+      it 'should return failure object' do
+        expect(@result).to be_a(Dry::Monads::Result::Failure)
+      end
+
+      it 'should return failure with error message' do
+        expect(@result.failure).to eq("Family and family member Id's does not match")
       end
     end
   end

@@ -10,7 +10,7 @@ RSpec.describe ::Operations::People::CreateOrUpdateConsumerRole, dbclean: :after
   let(:applicant) { application.active_applicants.last }
   let(:applicant_person) { FactoryBot.create(:person, first_name: applicant.first_name, last_name: applicant.last_name, dob: applicant.dob, ssn: applicant.ssn, gender: applicant.gender) }
   let(:applicant_family_member) do
-    family_member = family.relate_new_member(applicant_person, applicant.relation_with_primary)
+    family_member = family.relate_new_member(applicant_person, 'child')
     family.save!
     family_member
   end
