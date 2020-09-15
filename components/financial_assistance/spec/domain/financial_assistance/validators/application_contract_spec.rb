@@ -18,7 +18,7 @@ RSpec.describe FinancialAssistance::Validators::ApplicationContract,  dbclean: :
   let(:required_params) do
     {
       family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new,
-      years_to_renew: 2021, applicants: [applicant]
+      applicants: [applicant]
     }
   end
   let(:optional_params) do
