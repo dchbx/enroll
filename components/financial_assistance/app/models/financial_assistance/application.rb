@@ -659,21 +659,6 @@ module FinancialAssistance
       eligibility_determinations.where(is_eligibility_determined: true)
     end
 
-    def import_applicants
-      # TODO: Remove this dependency
-      result = ::Operations::Families::ApplyForFinancialAssistance.new.call(family_id: family_id)
-      return unless result.success?
-
-      result.success.each do |member_attributes|
-        result_object = ::FinancialAssistance::Operations::Applicant::Build.new.call(params: member_attributes)
-        next unless result_object.success?
-        applicant_params = result_object.success.to_h
-        applicant_result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: applicant_params, application: self)
-        applicant = applicant_result.success? ? applicant_result.success : applicant_result.failure
-        applicant ? applicant.assign_attributes(applicant_params) : applicants.build(applicant_params)
-      end
-    end
-
     def current_csr_percent_as_integer(eligibility_determination_id)
       eligibility_determination = eligibility_determination_for(eligibility_determination_id)
       eligibility_determination.present? ? eligibility_determination.csr_percent_as_integer : 0

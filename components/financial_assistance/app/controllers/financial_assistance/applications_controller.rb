@@ -24,11 +24,6 @@ module FinancialAssistance
       @application = FinancialAssistance::Application.new
     end
 
-    def create
-      @application = create_application_with_applicants
-      redirect_to edit_application_path(@application)
-    end
-
     def edit
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
@@ -247,13 +242,6 @@ module FinancialAssistance
       current_person = get_current_person
       return if current_person.consumer_role.blank?
       current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
-    end
-
-    def create_application_with_applicants
-      application = FinancialAssistance::Application.new(family_id: get_current_person.financial_assistance_identifier)
-      application.import_applicants
-      application.save!
-      application
     end
   end
 end

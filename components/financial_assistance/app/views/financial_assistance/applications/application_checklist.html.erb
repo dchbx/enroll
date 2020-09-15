@@ -37,7 +37,7 @@
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12">
           <%= render partial: 'financial_assistance/shared/right_nav', locals: {
             previous_url: @previous_url,
-            next_url: financial_assistance.new_application_path
+            next_url: financial_assistance.edit_application_path(@application)
           } %>
         </div>
       </div>
