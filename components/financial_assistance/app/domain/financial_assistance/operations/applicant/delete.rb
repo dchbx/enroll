@@ -21,7 +21,12 @@ module FinancialAssistance
         private
 
         def find_draft_application(family_id)
-          Try { ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first }
+          application =  ::FinancialAssistance::Application.where(family_id: family_id, aasm_state: 'draft').first
+          if application
+            Success(application)
+          else
+            Failure("Application Not Found")
+          end
         end
 
         def match_applicant(financial_applicant, application)
@@ -30,7 +35,7 @@ module FinancialAssistance
         end
 
         def delete_applicant(applicant)
-          Try { applicant.destroy! }
+          Try { applicant&.destroy! }
         end
       end
     end
