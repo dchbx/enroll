@@ -8,10 +8,10 @@ module Operations
     class DeactivateFinancialAssistanceEligibility
       send(:include, Dry::Monads[:result, :do])
 
-      #family_id , date
+      #params: {family_id , date}
       def call(params:)
-        values = validate(params)
-
+        values = yield validate(params)
+        result = yield execute(values)
 
         Success(result)
       end
@@ -19,38 +19,35 @@ module Operations
       private
 
       def validate(params)
-        #decouple params
-        #return  date and family id ---fail for not found family or invalid date format
-
+        if params[:id]&.is_a?(BSON::ObjectId) && params[:date].present?
+          Success(params)
+        else
+          Failure('family_id is expected in BSON format and date in required')
+        end
       end
 
-      def test
-        family = yield find_family(family_id)
+      def execute(values)
+        family = yield get_family(values[:family_id])
         tax_households = yield find_tax_households(family, date)
         result = yield deactivate_tax_households(tax_households, date)
 
+        Success(result)
       end
 
-      def find_family(family_id)
-        family = Family.find(family_id)
-
-        Success(family)
-      rescue Mongoid::Errors::DocumentNotFound
-        Failure("Unable to find family with ID #{family_id}")
+      def get_family(family_id:)
+        Operations::Families::Find.new.call(id: BSON::ObjectId(family_id))
       end
 
       def find_tax_households(family, date)
-        tax_households = family.active_household.latest_tax_households_with_year(date.year)
+        result = family.active_household.latest_tax_households_with_year(date.year)
 
-        #check for success format
-        Success('message.....')
+        Success(result)
       end
 
       def deactivate_tax_households(tax_households, date)
         result = tax_households.update_all(effective_ending_on: date)
 
-        #check for success format
-        Success("message....")
+        Success(result)
       end
     end
   end

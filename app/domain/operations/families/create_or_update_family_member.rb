@@ -12,11 +12,11 @@ module Operations
       # @param [ Bson::ID ] family_id Family ID
       # @return [ Family ] family Family
 
-      def call(applicant_params:, family_id:)
-        family = yield get_family(family_id)
-        family, applicant_family_mapping = yield create_member(applicant_params, family)
+      def call(params)
+        family_result = yield get_family(family_id: params[:family_id])
+        family, applicant_family_mapping = yield create_member(params, family_result)
 
-        Success(family, applicant_family_mapping)
+        Success([family, applicant_family_mapping])
       end
 
       private
@@ -25,10 +25,15 @@ module Operations
         dob_value = applicant_params[:dob]
 
         applicant_params.merge!(dob: dob_value.strftime('%d/%m/%Y')) unless dob_value.is_a?(String)
+        applicant_params
       end
 
-      def get_family(family_id)
-        Operations::Families::Find.new.call(family_id)
+      def get_family(family_id:)
+        if family_id
+          Operations::Families::Find.new.call(id: BSON::ObjectId(family_id))
+        else
+          Failure("family id is required")
+        end
       end
 
       def create_member(applicant_attributes, family)
@@ -60,21 +65,13 @@ module Operations
       end
 
       def create_or_update_person(applicant_params)
-        # assign_person_address(existing_person)
-
-        person = Operations::People::CreateOrUpdate.new.call(applicant_params)
-
-        if person.success?
-          Success(person)
-        else
-          Failure(person)
-        end
+        Operations::People::CreateOrUpdate.new.call(params: applicant_params)
       end
 
-      def create_consumer_role(applicant_params, family_member)
+      def create_or_update_consumer_role(applicant_params, family_member)
         return unless applicant_params[:is_consumer_role]
         # assign_citizen_status
-        Operation::Families::CreateOrUpdateConsumerRole(params: {applicant_params: applicant_params, family_member: family_member})
+        Operations::People::CreateOrUpdateConsumerRole.new.call(params: {applicant_params: applicant_params, family_member: family_member})
       end
 
       def create_or_update_family_member(person, family, applicant_params)
@@ -85,7 +82,7 @@ module Operations
       end
 
       def create_or_update_vlp_document(applicant_params, person)
-        Operation::Families::CreateOrUpdateVlpDocument(params: {applicant_params: applicant_params, person: person})
+        Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params, person: person})
       end
     end
   end
