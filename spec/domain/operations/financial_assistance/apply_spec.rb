@@ -2,7 +2,12 @@
 
 RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :after_each do
   let!(:person)        { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
-  let!(:person2)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let!(:person2) do
+    per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
+    person.ensure_relationship_with(per, 'child')
+    person.save!
+    per
+  end
   let!(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
   let!(:hbx_profile)   { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
@@ -30,5 +35,4 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
       expect(result.success.is_a?(BSON::ObjectId)).to be_truthy
     end
   end
-
 end
