@@ -11,7 +11,12 @@ module FinancialAssistance
       attributes = traits.extract_options!
       attributes.merge!(family_id: consumer.primary_family.id)
       @application ||= FactoryBot.create(:financial_assistance_application, *traits, attributes).tap do |application|
-        application.import_applicants
+        consumer.primary_family.family_members.each do |member|
+          application.applicants.create first_name: member.first_name,
+                                        last_name: member.last_name,
+                                        dob: member.dob,
+                                        is_primary_applicant: member.is_primary_applicant?
+        end
         application.save
       end
     end
