@@ -1088,18 +1088,6 @@ describe Person, :dbclean => :after_each do
       it "creates family with households and tax_households" do
         expect(family1.households.first.tax_households).not_to be_empty
       end
-
-      it "true if person family households present" do
-        expect(@person_aqhp.check_households(family1)).to eq true
-      end
-
-      it "true if person family households tax_households present" do
-        expect(@person_aqhp.check_tax_households(family1)).to eq true
-      end
-
-      it "returns true if persons is AQHP" do
-        expect(@person_aqhp.is_aqhp?).to eq true
-      end
     end
   end
 

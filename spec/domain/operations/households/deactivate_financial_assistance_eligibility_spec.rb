@@ -18,17 +18,18 @@ RSpec.describe Operations::Households::DeactivateFinancialAssistanceEligibility,
     end
   end
 
+  # should not fail for UQHP cases too
   context 'no tax_households' do
-    it 'should return a failure' do
+    it 'should return success' do
       result = subject.call(params: {family_id: family2.id, date: Date.new(2020, 1, 1)})
-      expect(result.failure).to eq('family_id is expected in BSON format and date in required')
+      expect(result.success).to eq nil
     end
   end
 
   context 'update tax households' do
     it 'should success for update' do
       result = subject.call(params: {family_id: family.id, date: Date.new(2020, 1, 1)})
-      expect(result.success).to eq(nil)
+      expect(result.success).to eq nil
     end
   end
 end
