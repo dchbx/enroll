@@ -10,7 +10,7 @@ module Validators
       optional(:middle_name).maybe(:string)
       required(:last_name).maybe(:string)
       optional(:name_sfx).maybe(:string)
-      required(:ssn).maybe(:string)
+      optional(:ssn).maybe(:string)
       required(:gender).maybe(:string)
       required(:dob).filled(:date)
 

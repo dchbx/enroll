@@ -10,7 +10,7 @@ module Entities
     attribute :middle_name, Types::String.optional.meta(omittable: true)
     attribute :last_name, Types::String.optional
     attribute :name_sfx, Types::String.optional.meta(omittable: true)
-    attribute :ssn, Types::String.optional
+    attribute :ssn, Types::String.optional.meta(omittable: true)
     attribute :gender, Types::String.optional
     attribute :dob, Types::Date.optional
 
@@ -27,7 +27,6 @@ module Entities
     attribute :is_temporarily_out_of_state, Types::Strict::Bool.meta(omittable: true)
 
     attribute :no_ssn, Types::String.optional.meta(omittable: true)
-    attribute :citizen_status, Types::String.optional
     attribute :same_with_primary, Types::Strict::Bool
 
     attribute :addresses, Types::Array.of(Entities::Address)

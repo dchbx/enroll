@@ -13,7 +13,7 @@ module Operations
       def call(params:)
         person_values = yield validate(params)
         person_entity = yield create_entity(person_values)
-        person = yield match_or_create_person(person_entity)
+        person = yield match_or_create_person(person_entity.to_h)
 
         Success(person)
       end
@@ -21,7 +21,8 @@ module Operations
       private
 
       def sanitize_params(params)
-        params.merge(:hbx_id => params[:person_hbx_id].delete)
+        params[:hbx_id] = params.delete :person_hbx_id
+        params
       end
 
       def validate(params)
@@ -42,8 +43,9 @@ module Operations
 
       def match_or_create_person(person_entity)
         person = if person_entity[:no_ssn] == "1"
-                   candidate = PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
-                   #find person
+                   PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
+                   Person.where(first_name: /^#{person_entity[:first_name]}$/i, last_name: /^#{person_entity[:last_name]}$/i,
+                                dob: person_entity[:dob]).first # TODO Need to
                  else
                    candidate = PersonCandidate.new(person_entity[:ssn], person_entity[:dob])
                    Person.match_existing_person(candidate)
