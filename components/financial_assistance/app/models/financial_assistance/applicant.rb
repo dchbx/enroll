@@ -280,6 +280,16 @@ module FinancialAssistance
 
     before_save :generate_hbx_id
 
+    # Responsible for updating family member  when applicant is created/updated
+    # after_save :propagate_applicant
+    # after_update :propagate_applicant_update, if: :is_active_changed?
+
+    #save the instance without invoking call backs
+    def persist!
+      # FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
+      self.save
+    end
+
     def generate_hbx_id
       write_attribute(:person_hbx_id, HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
@@ -851,7 +861,7 @@ module FinancialAssistance
     end
 
     def attributes_for_export
-      applicant_params = attributes.slice(:_id,:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
+      applicant_params = attributes.slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
                                           :gender,:dob,:is_incarcerated,:is_disabled,:ethnicity,:race,:indian_tribe_member,:tribal_id,
                                           :language_code,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,:no_ssn,:citizen_status,
                                           :is_consumer_role,:vlp_document_id,:same_with_primary,:is_applying_coverage,:vlp_subject,
@@ -1015,6 +1025,11 @@ module FinancialAssistance
     #Income/MEC Verifications
     def notify_of_eligibility_change
       # CoverageHousehold.update_eligibility_for_family(family)
+    end
+
+    def propagate_applicant
+      # Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
+      # Operations::Families::DropMember.new.call(params: {family_id: application.family_id,  family_member_id: family_member_id}) if is_active_changed? && is_active == false
     end
   end
 end
