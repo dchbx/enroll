@@ -336,6 +336,11 @@ module FinancialAssistance
       relationships.map(&:relative)
     end
 
+    def relationship=(value)
+      return if is_primary_applicant?
+      application.ensure_relationship_with_primary(self, value)
+    end
+
     def self.encrypt_ssn(val)
       if val.blank?
         return nil

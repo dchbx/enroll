@@ -63,7 +63,7 @@ RSpec.describe FinancialAssistance::ApplicationsController, dbclean: :after_each
   let(:family_member_id) { family.primary_applicant.id }
   let!(:application) { FactoryBot.create(:application, family_id: family_id, aasm_state: "draft", effective_date: TimeKeeper.date_of_record) }
   let!(:applicant) do
-    FactoryBot.create(:applicant, application: application,
+    FactoryBot.create(:financial_assistance_applicant, application: application,
                                   is_claimed_as_tax_dependent: false,
                                   is_self_attested_blind: false,
                                   has_daily_living_help: false,
