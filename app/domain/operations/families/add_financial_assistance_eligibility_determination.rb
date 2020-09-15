@@ -16,7 +16,6 @@ module Operations
         Success(result)
       end
 
-
       private
 
       def validate(params)
@@ -27,7 +26,6 @@ module Operations
       def find_family(family_id)
         Operations::Families::Find.new.call(id: family_id)
       end
-
 
       def add_determination(family, values)
         deactivate_latest_tax_households(values)
@@ -62,7 +60,6 @@ module Operations
           source: faa_ed["source"]
         ).save
       end
-
 
       def create_tax_household_members(family, tax_household, applicant)
         family_member = fetch_family_member_from_applicant(family, applicant)

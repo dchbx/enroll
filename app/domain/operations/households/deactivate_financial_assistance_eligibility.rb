@@ -27,25 +27,9 @@ module Operations
       end
 
       def execute(values)
-        family = yield get_family(values[:family_id])
-        tax_households = yield find_tax_households(family, date)
-        result = yield deactivate_tax_households(tax_households, date)
-
-        Success(result)
-      end
-
-      def get_family(family_id:)
-        Operations::Families::Find.new.call(id: BSON::ObjectId(family_id))
-      end
-
-      def find_tax_households(family, date)
-        result = family.active_household.latest_tax_households_with_year(date.year)
-
-        Success(result)
-      end
-
-      def deactivate_tax_households(tax_households, date)
-        result = tax_households.update_all(effective_ending_on: date)
+        family = Operations::Families::Find.new.call(id: BSON::ObjectId(values[:family_id]))
+        tax_households = family.success.active_household.latest_active_tax_households
+        result = tax_households.update_all(effective_ending_on: values[:date]) if tax_households.present?
 
         Success(result)
       end
