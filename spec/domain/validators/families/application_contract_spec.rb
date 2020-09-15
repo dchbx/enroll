@@ -17,13 +17,13 @@ RSpec.describe ::Validators::Families::ApplicationContract,  dbclean: :after_eac
 
   let(:required_params) do
     {
-      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new, integrated_case_id: '20000',
-      years_to_renew: 2021, applicants: [applicant]
+      family_id: family.id, assistance_year: 2020, benchmark_product_id: BSON::ObjectId.new,
+       applicants: [applicant]
     }
   end
   let(:optional_params) do
     {
-      is_ridp_verified: false, renewal_consent_through_year: 2020
+      is_ridp_verified: false, renewal_consent_through_year: 2020, years_to_renew: 2021
     }
   end
   let(:all_params) { required_params.merge(optional_params)}
