@@ -5,13 +5,13 @@ require 'dry/monads/do'
 
 module Operations
   module People
-    class ConsumerRoleCreateOrUpdate
+    class CreateOrUpdateConsumerRole
       include Dry::Monads[:result, :do]
 
       def call(params:)
         values = yield validate(params[:applicant_params])
-        consumer_role_params = yield create_entity(values)
-        result = yield create_consumer_role(consumer_role_params, params[:family_member])
+        entity = yield create_entity(values)
+        result = yield create_consumer_role(entity, params[:family_member])
 
         Success(result)
       end
@@ -31,23 +31,23 @@ module Operations
       def create_entity(values)
         result = Entities::ConsumerRole.new(values.to_h)
 
-        if result.success?
-          Success(result)
-        else
-          Failure(result)
-        end
+        Success(result)
       end
 
-      def create_consumer_role(consumer_role_params, family_member)
-        result = family_member.family.build_consumer_role(family_member, consumer_role_params)
-
-        if result.success?
-          Success(result)
+      def create_consumer_role(entity, family_member)
+        person = family_member.person
+        
+        if person.consumer_role.present?
+          person.consumer_role.assign_attributes(entity.to_h)
         else
-          Failure(result)
+          person.build_consumer_role({:is_applicant => false}.merge(entity.to_h))
         end
+        person.save!
+        
+        Success(person.consumer_role)
+      rescue StandardError => e
+        Failure("Consumer role creation failed: #{e}")
       end
     end
   end
 end
-
