@@ -6,7 +6,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Export, dbclean: 
   let!(:application) do
     FactoryBot.build(:financial_assistance_application, :with_applicants, aasm_state: 'draft')
   end
-  let(:create_elibility_determinations) do
+  let!(:create_elibility_determinations) do
     application.eligibility_determinations.build({
                                                     max_aptc: 0,
                                                     csr_percent_as_integer: 0,
@@ -16,7 +16,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Export, dbclean: 
                                                     hbx_assigned_id: 10_001
                                                   })
   end
-  let(:set_terms_on_application) do
+  let!(:set_terms_on_application) do
     application.assign_attributes({
                                     :medicaid_terms => true,
                                     :submission_terms => true,
