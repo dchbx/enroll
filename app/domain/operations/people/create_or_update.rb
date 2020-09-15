@@ -42,7 +42,7 @@ module Operations
       end
 
       def match_or_create_person(person_entity)
-        person = if person_entity[:no_ssn] == "1"
+        person = if person_entity[:no_ssn] == '1'
                    PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
                    Person.where(first_name: /^#{person_entity[:first_name]}$/i, last_name: /^#{person_entity[:last_name]}$/i,
                                 dob: person_entity[:dob]).first # TODO Need to

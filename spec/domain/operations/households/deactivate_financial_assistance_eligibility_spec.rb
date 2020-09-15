@@ -13,21 +13,21 @@ RSpec.describe Operations::Households::DeactivateFinancialAssistanceEligibility,
 
   context 'invalid arguments' do
     it 'should return a failure' do
-      result = subject.call(family_id: 'family_id', date: Date.new(2020, 1, 1))
-      expect(result.failure).to eq('Unable to find family with ID family_id')
+      result = subject.call(params: {family_id: 'family_id', date: Date.new(2020, 1, 1)})
+      expect(result.failure).to eq('family_id is expected in BSON format and date in required')
     end
   end
 
   context 'no tax_households' do
     it 'should return a failure' do
-      result = subject.call(family_id: family2.id, date: Date.new(2020, 1, 1))
-      expect(result.failure).to eq('Unable to find active tax_households')
+      result = subject.call(params: {family_id: family2.id, date: Date.new(2020, 1, 1)})
+      expect(result.failure).to eq('family_id is expected in BSON format and date in required')
     end
   end
 
   context 'update tax households' do
     it 'should success for update' do
-      result = subject.call(family_id: family.id, date: Date.new(2020, 1, 1))
+      result = subject.call(params: {family_id: family.id, date: Date.new(2020, 1, 1)})
       expect(result.success).to eq(nil)
     end
   end

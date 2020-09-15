@@ -18,12 +18,13 @@ module Operations
 
       private
 
-      def sanatize_params(params)
-        params.merge(:subject => params.delete(:vlp_subject))
+      def sanitize_params(params)
+        params[:subject] = params.delete :vlp_subject
+        params
       end
 
       def validate(params)
-        result = Validators::Families::VlpDocumentContract.new.call(sanatize_params(params))
+        result = Validators::Families::VlpDocumentContract.new.call(sanitize_params(params))
 
         if result.success?
           Success(result)
