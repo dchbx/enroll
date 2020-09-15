@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :after_each do
+  let!(:hbx_profile)   { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let!(:person)        { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:person2) do
     per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
@@ -8,9 +9,12 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
     person.save!
     per
   end
-  let!(:family)        { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+  let!(:family) do
+    fmly = FactoryBot.create(:family, :with_primary_family_member, person: person)
+    fmly.update_attributes!(renewal_consent_through_year: fmly.application_applicable_year + 2)
+    fmly
+  end
   let!(:family_member) { FactoryBot.create(:family_member, family: family, person: person2) }
-  let!(:hbx_profile)   { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:product)        { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product) }
 
   before :each do
