@@ -162,20 +162,17 @@ class FamilyMember
 
   def family_member_created
     deactivate_tax_households
-    create_financial_assistance_applicant
   end
 
   def family_member_updated
     deactivate_tax_households
-    delete_financial_assistance_applicant unless is_active
-  end
-
-  def create_financial_assistance_applicant
-    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self})
+    # delete_financial_assistance_applicant unless is_active
   end
 
   def delete_financial_assistance_applicant
     ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self})
+  rescue StandardError => e
+    # Log error message
   end
 
   def deactivate_tax_households

@@ -287,8 +287,8 @@ class Insured::ConsumerRolesController < ApplicationController
     elsif params["is_applying_for_assistance"] == "true"
       begin
         result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
-        if result.success
-          redirect_to financial_assistance.application_checklist_application_path(id: application_id)
+        if result.success?
+          redirect_to financial_assistance.application_checklist_application_path(id: result.success)
         else
           flash[:error] = result.errors
           redirect_back fallback_location: '/'

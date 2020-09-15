@@ -10,13 +10,8 @@ module Validators
         optional(:years_to_renew).maybe(:integer)
         optional(:renewal_consent_through_year).maybe(:integer)
         required(:benchmark_product_id).filled(Types::Bson)
-        required(:integrated_case_id).filled(:string)
         optional(:is_ridp_verified).maybe(:bool)
         required(:applicants).array(:hash)
-      end
-
-      rule(:years_to_renew, :renewal_consent_through_year) do
-        key.failure('at least one must be provided') unless values[:years_to_renew] || values[:renewal_consent_through_year]
       end
 
       rule(:family_id) do

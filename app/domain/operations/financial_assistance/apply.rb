@@ -48,7 +48,6 @@ module Operations
       def application_attributes(family)
         application_attrs = {family_id: family.id,
                              assistance_year: family.application_applicable_year,
-                             years_to_renew: (family.renewal_consent_through_year - family.application_applicable_year),
                              benchmark_product_id: family.benchmark_product_id,
                              is_ridp_verified: family&.primary_person&.consumer_role&.identity_verified?}
 
