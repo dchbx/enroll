@@ -10,10 +10,12 @@ module Operations
 
       def call(id:)
         #validate
-        family = find_family(id)
+        family = yield find_family(id)
 
         Success(family)
       end
+
+      private
 
       def find_family(family_id)
         family = Family.find(family_id)
