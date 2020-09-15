@@ -11,6 +11,7 @@ require 'dry-monads'
 require 'font-awesome-rails'
 require 'haml-rails'
 require 'money-rails'
+require 'resource_registry'
 require FinancialAssistance::Engine.root.join('app/domain/financial_assistance/types')
 
 module FinancialAssistance

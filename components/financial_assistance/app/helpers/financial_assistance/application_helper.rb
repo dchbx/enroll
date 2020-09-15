@@ -2,6 +2,7 @@
 
 module FinancialAssistance
   module ApplicationHelper
+
     def to_est(datetime)
       datetime.in_time_zone("Eastern Time (US & Canada)") if datetime.present?
     end
@@ -161,7 +162,7 @@ module FinancialAssistance
     def support_text_placeholders(raw_support_text)
       # set <application-applicable-year> placeholdersr
       return [] if @application.nil?
-      assistance_year = HbxProfile.faa_application_applicable_year.to_s
+      assistance_year = calculated_application_year.to_s
 
       raw_support_text.update(raw_support_text).each do |_key, value|
         value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
@@ -233,6 +234,10 @@ module FinancialAssistance
 
     def humanize_relationships
       FinancialAssistance::Relationship::RELATIONSHIPS_UI.map {|r| [r.to_s.humanize, r.to_s] }
+    end
+
+    def calculated_application_year
+      FinancialAssistanceRegistry[:application_year].item.call.value!
     end
 
     def human_boolean(boolean)

@@ -193,7 +193,7 @@ module FinancialAssistance
     # TODO: Remove dummy data before prod
     def dummy_data_for_demo(_params)
       #Dummy_ED
-      coverage_year = HbxProfile.faa_application_applicable_year
+      coverage_year = FinancialAssistanceRegistry[:application_year].item.call.value!
       @model.update_attributes!(aasm_state: "determined", assistance_year: coverage_year, determination_http_status_code: 200)
 
       @model.eligibility_determinations.each do |ed|

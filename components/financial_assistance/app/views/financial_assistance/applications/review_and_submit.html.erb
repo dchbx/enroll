@@ -118,7 +118,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Will this person file taxes for <%= HbxProfile.faa_application_applicable_year %>? *</div>
+                  <div class="col-md-6">Will this person file taxes for <%= calculated_application_year %>? *</div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_required_to_file_taxes) %></div>
                 </div>
 
@@ -131,7 +131,7 @@
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Will this person be claimed as a tax dependent
-                    for <%= HbxProfile.faa_application_applicable_year %>? *
+                    for <%= calculated_application_year %>? *
                   </div>
                   <div class="col-md-6"><%= human_boolean(applicant.is_claimed_as_tax_dependent) %></div>
                 </div>
@@ -156,7 +156,7 @@
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
                   <div class="col-md-6">Does this person have income from an employer (wages, tips, bonuses, etc.)
-                      in <%= HbxProfile.faa_application_applicable_year %>?
+                      in <%= calculated_application_year %>?
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_job_income %></div>
                 </div>
@@ -210,7 +210,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person expect to have other types of income in <%= HbxProfile.faa_application_applicable_year %>?
+                  <div class="col-md-6">Does this person expect to have other types of income in <%= calculated_application_year %>?
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_other_income %></div>
                 </div>
@@ -227,7 +227,7 @@
                 </div>
 
                 <div class="row row-form-wrapper ptb no-buffer row-height form-content">
-                  <div class="col-md-6">Does this person expect to have adjustments to income in <%= HbxProfile.faa_application_applicable_year %>? *
+                  <div class="col-md-6">Does this person expect to have adjustments to income in <%= calculated_application_year %>? *
                   </div>
                   <div class="col-md-6"><%= human_boolean applicant.has_deductions %></div>
                 </div>
