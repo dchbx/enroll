@@ -3,8 +3,6 @@
 FactoryBot.define do
   factory :financial_assistance_income, class: 'FinancialAssistance::Income' do
 
-    association :applicant
-
     title 'Test'
     amount 10
     frequency_kind 'monthly'
