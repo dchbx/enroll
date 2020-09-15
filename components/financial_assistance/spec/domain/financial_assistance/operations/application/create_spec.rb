@@ -56,7 +56,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
          :family_member_id=>BSON::ObjectId.new,
          :is_primary_applicant=>false,
          :is_consent_applicant=>false,
-         :relationship=>"parent"}]}
+         :relationship=>"child"}]}
   end
 
   let(:result) { subject.call(params: params) }
@@ -72,7 +72,7 @@ RSpec.describe ::FinancialAssistance::Operations::Application::Create, dbclean: 
   end
 
   it 'creates relationships with the primary applicant' do
-    expect(application.relationships.find_by(relative_id: application.primary_applicant.id).kind).to eql("parent")
+    expect(application.relationships.find_by(relative_id: application.primary_applicant.id).kind).to eql("child")
   end
 
   it 'exports a payload' do

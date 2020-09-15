@@ -4,7 +4,6 @@ module FinancialAssistance
   class VerificationType
     include Mongoid::Document
     include Mongoid::Timestamps
-    include Mongoid::History::Trackable
 
     embedded_in :applicant, class_name: '::FinancialAssistance::Applicant'
 
@@ -25,15 +24,6 @@ module FinancialAssistance
     field :due_date_type, type: String # admin, notice
     field :updated_by
     field :inactive, type: Boolean #use this field (assign true) only if type was present but for some reason if is not applicable anymore
-
-    track_history :on => [:fields],
-                  # :scope => :person,
-                  :modifier_field => :modifier,
-                  :modifier_field_optional => true,
-                  :version_field => :tracking_version,
-                  :track_create => true,    # track document creation, default is false
-                  :track_update => true,    # track document updates, default is true
-                  :track_destroy => true
 
     scope :active, -> { where(:inactive.ne => true) }
     scope :by_name, ->(type_name) { where(:type_name => type_name) }

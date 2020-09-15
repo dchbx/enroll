@@ -19,7 +19,7 @@ module FinancialAssistance
         private
 
         def validate(params)
-          result = FinancialAssistance::Validators::ApplicationContract.new.call(params)
+          result = ::FinancialAssistance::Validators::ApplicationContract.new.call(params)
 
           if result.success?
             Success(result.to_h)
@@ -32,11 +32,16 @@ module FinancialAssistance
           application = ::FinancialAssistance::Application.new(values.except(:applicants))
 
           applicants_results = values[:applicants].map do |applicant|
-            FinancialAssistance::Operations::Applicant::Build.new.call(params: applicant.merge(application: application))
+            ::FinancialAssistance::Operations::Applicant::Build.new.call(params: applicant.merge(application: application))
           end
 
           applicants_results.map do |result|
-            result.success? ? application.applicants.build(result.success.to_h) : result.failure
+            if result.success?
+              applicant = application.applicants.build
+              applicant.assign_attributes(result.success.to_h)
+            else
+              result.failure
+            end
           end
 
           if application.save
