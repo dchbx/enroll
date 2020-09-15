@@ -35,6 +35,10 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
       expect(result.success[:person_hbx_id]).to eq person.hbx_id
     end
 
+    it 'should return hash with relationship' do
+      expect(result.success[:relationship]).to eq 'self'
+    end
+
     it 'should return hash with member hbx_id' do
       expect(result.success[:ssn]).to eq person.ssn
     end
