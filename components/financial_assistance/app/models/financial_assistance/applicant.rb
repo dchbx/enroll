@@ -282,7 +282,6 @@ module FinancialAssistance
 
     # Responsible for updating family member  when applicant is created/updated
     # after_save :propagate_applicant
-    # after_update :propagate_applicant_update, if: :is_active_changed?
 
     #save the instance without invoking call backs
     def persist!
@@ -1028,8 +1027,10 @@ module FinancialAssistance
     end
 
     def propagate_applicant
-      # Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
-      # Operations::Families::DropMember.new.call(params: {family_id: application.family_id,  family_member_id: family_member_id}) if is_active_changed? && is_active == false
+      Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
+      Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
+    rescue StandardError => e
+      e.message
     end
   end
 end
