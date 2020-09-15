@@ -25,6 +25,8 @@ module Operations
         Success(params)
       end
 
+      # TODO: skip the call if the change is not needed to FAA.
+
       def parse_family_member(values)
         @family_id = values[:family_member].family.id
         member_attrs_result = ::Operations::FinancialAssistance::ParseApplicant.new.call(values)
