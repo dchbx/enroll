@@ -10,6 +10,7 @@ require "sprockets/railtie"
 
 Bundler.require(*Rails.groups)
 require "devise"
+require 'resource_registry'
 require "financial_assistance"
 require "symmetric-encryption"
 
