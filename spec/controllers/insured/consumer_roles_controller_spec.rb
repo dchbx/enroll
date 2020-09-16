@@ -270,6 +270,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
@@ -321,10 +322,19 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to redirect_to(ridp_agreement_insured_consumer_role_index_path)
     end
 
-    it "should redirect to family members path when current user is admin & doing new paper app" do
+    it "should redirect to help paying for coverage path when current user is admin & doing new paper app" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return true
-      put :update, params: { person: person_params, id: "test" }
+      put :update, params: {person: person_params, id: 'test'}
+      expect(response).to have_http_status(:redirect)
+      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+    end
+
+    it "should redirect to family members page when current user is admin & doing new paper app and faa is disabled" do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return true
+      put :update, params: {person: person_params, id: 'test'}
       expect(response).to have_http_status(:redirect)
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
@@ -363,33 +373,48 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
   end
 
   context "PUT update as HBX Admin" do
+
     let(:person_params){{"family"=>{"application_type"=>"Curam"}, "dob"=>"1985-10-01", "first_name"=>"martin","gender"=>"male","last_name"=>"york","middle_name"=>"","name_sfx"=>"","ssn"=>"468389102","user_id"=>"xyz", us_citizen:"true", naturalized_citizen: "true"}}
     let(:person){ FactoryBot.create(:person, :with_family, :with_hbx_staff_role) }
 
     before(:each) do
       allow(ConsumerRole).to receive(:find).and_return(consumer_role)
       allow(consumer_role).to receive(:build_nested_models_for_person).and_return(true)
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(true)
       allow(consumer_role).to receive(:person).and_return(person)
       allow(user).to receive(:person).and_return person
       allow(person).to receive(:consumer_role).and_return consumer_role
       sign_in user
     end
 
-    it "should redirect to family members path when current user has application type as Curam" do
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
+    it "should redirect to help paying for coverage path  when current user has application type as Curam" do
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
-      put :update, params: { person: person_params, id: "test" }
+      put :update, params: {person: person_params, id: "test"}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      routes { FinancialAssistance::Engine.routes }
+      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
     end
 
-    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Curam' do
+    it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Curam' do
       person_params["family"]["application_type"] = "Curam"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
-      put :update, params: { person: person_params, id: "test" }
+      put :update, params: {person: person_params, id: "test"}
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_validation). to eq 'valid'
+      expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
+      expect(response).to have_http_status(:redirect)
+      routes { FinancialAssistance::Engine.routes }
+      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+    end
+
+    it "should update consumer identity and application fields to valid and redirect to family members page when current user has application type as Curam and faa is disabled" do
+      EnrollRegistry[:financial_assistance].feature.stub(:is_enabled).and_return(false)
+      person_params["family"]["application_type"] = "Curam"
+      allow(controller).to receive(:update_vlp_documents).and_return(true)
+      allow(controller).to receive(:is_new_paper_application?).and_return false
+      put :update, params: {person: person_params, id: "test"}
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
@@ -397,27 +422,27 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
     end
 
-    it "should redirect to family members path when current user has application type as Mobile" do
+    it "should redirect to help paying for coverage page when current user has application type as Mobile" do
       person_params["family"]["application_type"] = "Mobile"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
-      put :update, params: { person: person_params, id: "test" }
+      put :update, params: {person: person_params, id: "test"}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      routes { FinancialAssistance::Engine.routes }
+      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
     end
 
-    it 'should update consumer identity and application fields to valid and redirect to family members path when current user has application type as Mobile' do
+    it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Mobile' do
       person_params["family"]["application_type"] = "Mobile"
-      allow(consumer_role).to receive(:update_by_person).and_return(true)
       allow(controller).to receive(:update_vlp_documents).and_return(true)
       allow(controller).to receive(:is_new_paper_application?).and_return false
-      put :update, params: { person: person_params, id: "test" }
+      put :update, params: {person: person_params, id: "test"}
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_validation). to eq 'valid'
       expect(consumer_role.identity_update_reason). to eq 'Verified from Mobile'
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to(insured_family_members_path(consumer_role_id: consumer_role.id))
+      routes { FinancialAssistance::Engine.routes }
+      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
     end
   end
 
