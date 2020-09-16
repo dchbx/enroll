@@ -125,13 +125,6 @@ module FinancialAssistance
     alias is_joint_tax_filing? is_joint_tax_filing
     alias is_renewal_authorized? is_renewal_authorized
 
-    #save the instance without invoking call backs
-    def persist!
-      FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
-      self.save
-      FinancialAssistance::Applicant.set_callback(:save, :after, :propagate_applicant)
-    end
-
     def ensure_relationship_with_primary(applicant, relation_kind)
       update_or_build_relationship(applicant, primary_applicant, relation_kind)
       update_or_build_relationship(primary_applicant, applicant, ::FinancialAssistance::Relationship::INVERSE_MAP[relation_kind])
