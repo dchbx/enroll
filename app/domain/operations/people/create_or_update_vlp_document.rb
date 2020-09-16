@@ -44,7 +44,9 @@ module Operations
         vlp_document.assign_attributes(vlp_document_params.to_h)
 
         person.consumer_role.active_vlp_document_id = vlp_document.id
+        Person.skip_callback(:update, :after, :person_create_or_update_handler)
         person.save!
+        Person.set_callback(:update, :after, :person_create_or_update_handler)
 
         Success(vlp_document)
 

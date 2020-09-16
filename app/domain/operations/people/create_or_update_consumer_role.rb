@@ -36,14 +36,17 @@ module Operations
 
       def create_consumer_role(entity, family_member)
         person = family_member.person
-        
+
         if person.consumer_role.present?
           person.consumer_role.assign_attributes(entity.to_h)
         else
           person.build_consumer_role({:is_applicant => false}.merge(entity.to_h))
         end
+
+        Person.skip_callback(:update, :after, :person_create_or_update_handler)
         person.save!
-        
+        Person.set_callback(:update, :after, :person_create_or_update_handler)
+
         Success(person.consumer_role)
       rescue StandardError => e
         Failure("Consumer role creation failed: #{e}")
