@@ -130,6 +130,8 @@ module FinancialAssistance
       save_faa_bookmark(applications_path)
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
+
+      render layout: 'financial_assistance'
     end
 
     def eligibility_results
