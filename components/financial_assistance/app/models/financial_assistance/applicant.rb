@@ -110,7 +110,7 @@ module FinancialAssistance
     field :is_homeless, type: Boolean, default: false
     field :is_temporarily_out_of_state, type: Boolean, default: false
 
-    field :no_ssn, type: String
+    field :no_ssn, type: String, default: '0'
     field :citizen_status, type: String
     field :is_consumer_role, type: Boolean
     field :is_resident_role, type: Boolean
@@ -303,11 +303,6 @@ module FinancialAssistance
       @naturalized_citizen = (val.to_s == "true")
     end
 
-    def indian_tribe_member=(val)
-      self.tribal_id = nil if val.to_s == false
-      @indian_tribe_member = (val.to_s == "true")
-    end
-
     def eligible_immigration_status=(val)
       @eligible_immigration_status = (val.to_s == "true")
     end
@@ -322,12 +317,6 @@ module FinancialAssistance
       return @naturalized_citizen unless @naturalized_citizen.nil?
       return nil if citizen_status.blank?
       @naturalized_citizen ||= (::ConsumerRole::NATURALIZED_CITIZEN_STATUS == citizen_status)
-    end
-
-    def indian_tribe_member
-      return @indian_tribe_member unless @indian_tribe_member.nil?
-      return nil if citizen_status.blank?
-      @indian_tribe_member ||= !(tribal_id.nil? || tribal_id.empty?)
     end
 
     def eligible_immigration_status
