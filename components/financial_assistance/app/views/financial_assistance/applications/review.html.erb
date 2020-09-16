@@ -25,7 +25,7 @@
               <% @applicants.each do |applicant| %>
                 <% income_and_deductions_for(applicant).each do |embedded_document| %>
                   <tr>
-                    <td> <%= applicant.person.full_name %> </td>
+                    <td> <%= applicant.full_name %> </td>
                     <td> <%= embedded_document.kind.humanize %> </td>
                     <td> <%= embedded_document.frequency_kind.humanize %> </td>
                     <td>
