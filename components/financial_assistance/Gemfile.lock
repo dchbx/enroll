@@ -133,6 +133,7 @@ GEM
     crass (1.0.6)
     database_cleaner (1.8.5)
     deep_merge (1.2.1)
+    deepsort (0.4.5)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
     devise (4.7.2)
@@ -408,6 +409,7 @@ DEPENDENCIES
   acapi!
   capybara (~> 3.12)
   database_cleaner
+  deepsort
   factory_bot_rails (~> 4)
   financial_assistance!
   forgery (~> 0.7.0)

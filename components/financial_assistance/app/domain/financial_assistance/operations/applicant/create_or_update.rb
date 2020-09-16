@@ -63,7 +63,7 @@ module FinancialAssistance
           sanitized_applicant_hash.merge!({relationship: applicant.relation_with_primary, ssn: applicant.ssn})
           incoming_values = values.to_h.deep_symbolize_keys
 
-          if sanitized_applicant_hash.merge(incoming_values) == sanitized_applicant_hash
+          if sanitized_applicant_hash.merge(incoming_values).deep_sort == sanitized_applicant_hash.deep_sort
             Failure('No information is changed')
           else
             Success('Information has changed')
