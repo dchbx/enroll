@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'pry'
 
 RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbclean: :after_each do
 
@@ -8,18 +9,22 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
   let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
   let!(:applicant) do
     FactoryBot.create(:financial_assistance_applicant,
+                      :with_work_phone,
+                      :with_work_email,
+                      :with_home_address,
                       application: application,
                       ssn: '889984400',
                       dob: (Date.today - 10.years),
                       first_name: 'james',
-                      last_name: 'bond')
+                      last_name: 'bond',
+                      is_primary_applicant: true)
   end
 
   let(:applicant_params) do
     {:person_hbx_id=>"13cce9fe14b04209b2443330900108d8",
-     :ssn=>"705335062",
-     :dob=>"04/04/1972",
-     first_name: 'test',
+     :ssn=>"889984400",
+     :dob=>(Date.today - 10.years).strftime("%d/%m/%Y"),
+     first_name: 'james_test',
      last_name: 'bond',
      gender: 'male',
      :is_applying_coverage=>true,
@@ -28,7 +33,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
      :same_with_primary=>false,
      :indian_tribe_member=>false,
      :is_incarcerated=>true,
-     :addresses => [{"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4a'),
+     :addresses => [{
       "address_2"=>"#111",
       "address_3"=>"",
       "county"=>"Hampden",
@@ -39,7 +44,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       "state"=>"DC",
       "zip"=>"01001"}],
     :phones=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4e'),
+      {
        "country_code"=>"",
        "area_code"=>"202",
        "number"=>"1111111",
@@ -47,7 +52,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
        "full_phone_number"=>"20211111111",
        "kind"=>"home"}],
     :emails=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a52'), "kind"=>"home", "address"=>"example1@example.com"}],
+      {"kind"=>"home", "address"=>"example1@example.com"}],
     :family_member_id=>BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
     :is_primary_applicant=>true,
     :is_consent_applicant=>false,
