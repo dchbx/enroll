@@ -143,7 +143,7 @@ module FinancialAssistance
       def hash_app_data
         {
           aasm_state: 'draft',
-          hbx_id: HbxIdGenerator.generate_application_id,
+          hbx_id: FinancialAssistance::HbxIdGenerator.generate_application_id,
           determination_http_status_code: nil,
           determination_error_message: nil
         }
