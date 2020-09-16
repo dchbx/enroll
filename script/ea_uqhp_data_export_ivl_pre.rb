@@ -48,11 +48,11 @@ while offset < enrollment_count
       next if !(['unassisted_qhp', 'individual'].include? policy.kind) || policy.family.has_aptc_hbx_enrollment?
 
       person = policy.subscriber.person
-
-      add_to_csv(csv, policy, person, false)
+      primary_member = policy.family.primary_person
 
       policy.hbx_enrollment_members.each do |hbx_enrollment_member|
-        add_to_csv(csv, policy, hbx_enrollment_member.person, true) if hbx_enrollment_member.person != person
+        is_dependent = (primary_member.id != hbx_enrollment_member.person.id)
+        add_to_csv(csv, policy, hbx_enrollment_member.person, is_dependent)
       end
 
     rescue => e
