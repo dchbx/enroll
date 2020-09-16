@@ -14,7 +14,6 @@
           <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.age_on(Date.today) %></span>
         </div>
       </div>
-
       <div class="col-md-3 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
           <label class="static_label label-floatlabel"><%= l10n("gender").to_s.upcase %></label>
@@ -37,7 +36,7 @@
         </div>
       </div>
     </div>
-    <%= yield "person_#{dependent&.family_member&.person&.id}" %>
+    <%#= yield "person_#{dependent&.person&.id}" %>
 
     <div class="clearfix"></div>
   </div>

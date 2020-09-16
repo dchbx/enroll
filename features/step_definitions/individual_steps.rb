@@ -210,7 +210,7 @@ And(/should find alien number/) do
 end
 
 And(/Individual edits dependent/) do
-  find('.fa-edit').click
+  find(:xpath, './html/body/div[3]/div[2]/div/div/div[2]/div[4]/ul/li/div/div[2]/div[4]/div/div/a').click
   wait_for_ajax
 end
 
@@ -286,8 +286,8 @@ And(/Individual clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   click_link(@u.adult_dob.to_date.day)
   fill_in "dependent[ssn]", :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -306,8 +306,8 @@ And(/Individual again clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   click_link('15')
   fill_in 'dependent[ssn]', :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -671,6 +671,7 @@ Then(/^Aptc user goes to register as individual/) do
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
+  sleep 1
   step "Individual should see a form to enter personal information"
   screenshot("aptc_personal")
   find('.btn', text: 'CONTINUE').click
