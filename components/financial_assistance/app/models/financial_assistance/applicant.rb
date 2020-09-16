@@ -857,6 +857,7 @@ module FinancialAssistance
                                           :alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                           :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,:expiration_date,
                                           :issuing_country,:status).symbolize_keys
+      applicant_params.merge!(dob: dob.strftime('%d/%m/%Y'))
       applicant_params.merge!(ssn: ssn, relationship: relation_with_primary)
       applicant_params[:addresses] = construct_association_fields(addresses)
       applicant_params[:emails] = construct_association_fields(emails)
@@ -1018,7 +1019,7 @@ module FinancialAssistance
 
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
-      Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
+      Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id}) if is_active
       Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
     rescue StandardError => e
       e.message
