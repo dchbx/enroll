@@ -384,6 +384,15 @@ Then(/I click on back to my account$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
+And(/Aptc user signed in$/) do
+  sleep 2
+  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "aptc@dclink.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
+end
+
 And(/^I click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
