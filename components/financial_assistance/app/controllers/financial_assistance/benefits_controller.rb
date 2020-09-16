@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class BenefitsController < ApplicationController
+  class BenefitsController < FinancialAssistance::ApplicationController
     include ::UIHelpers::WorkflowController
     include NavigationHelper
-    include ApplicationHelper
 
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index, :create, :update]
@@ -121,13 +120,6 @@ module FinancialAssistance
 
     def find
       FinancialAssistance::Application.find(params[:application_id]).active_applicants.find(params[:applicant_id]).benefits.where(id: params[:id]).last || nil
-    end
-
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
     end
 
     def format_date_params(model_params)
