@@ -15,6 +15,7 @@ gemspec
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
 gem 'financial_assistance', path: '../financial_assistance'
 
 gem 'rspec-rails'
