@@ -327,7 +327,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       allow(controller).to receive(:is_new_paper_application?).and_return true
       put :update, params: {person: person_params, id: 'test'}
       expect(response).to have_http_status(:redirect)
-      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+      expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
     end
 
     it "should redirect to family members page when current user is admin & doing new paper app and faa is disabled" do
@@ -393,7 +393,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       put :update, params: {person: person_params, id: "test"}
       expect(response).to have_http_status(:redirect)
       routes { FinancialAssistance::Engine.routes }
-      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+      expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
     end
 
     it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Curam' do
@@ -406,7 +406,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(consumer_role.identity_update_reason). to eq 'Verified from Curam'
       expect(response).to have_http_status(:redirect)
       routes { FinancialAssistance::Engine.routes }
-      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+      expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
     end
 
     it "should update consumer identity and application fields to valid and redirect to family members page when current user has application type as Curam and faa is disabled" do
@@ -429,7 +429,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       put :update, params: {person: person_params, id: "test"}
       expect(response).to have_http_status(:redirect)
       routes { FinancialAssistance::Engine.routes }
-      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+      expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
     end
 
     it 'should update consumer identity and application fields to valid and redirect to help paying for coverage page when current user has application type as Mobile' do
@@ -442,7 +442,7 @@ RSpec.describe Insured::ConsumerRolesController, dbclean: :after_each, :type => 
       expect(consumer_role.identity_update_reason). to eq 'Verified from Mobile'
       expect(response).to have_http_status(:redirect)
       routes { FinancialAssistance::Engine.routes }
-      expect(response).to redirect_to '/financial_assistance/applications/help_paying_coverage'
+      expect(response).to redirect_to '/insured/consumer_role/help_paying_coverage'
     end
   end
 
