@@ -61,14 +61,24 @@ end
 
 Given(/^the user SSN is nil$/) do
   consumer.person.update_attributes(no_ssn: "1")
+  application&.applicants.each do |applicant|
+    applicant.update_attributes(no_ssn: '1') if applicant.ssn.nil?
+  end
 end
 
 Given(/^the user has an eligible immigration status$/) do
   consumer.person.consumer_role.update_attributes(citizen_status: "alien_lawfully_present")
+  application.applicants.each do |applicant|
+    applicant.update_attributes(citizen_status: 'alien_lawfully_present')
+  end
 end
 
 Given(/^the user has an age between (\d+) and (\d+) years old$/) do |_arg1, _arg2|
-  consumer.person.update_attributes(dob: TimeKeeper.date_of_record - 19.years)
+  dob = TimeKeeper.date_of_record - 19.years
+  consumer.person.update_attributes(dob: dob)
+  application.applicants.each do |applicant|
+    applicant.update_attributes(dob: dob)
+  end
 end
 
 Then(/^the have you applied for an SSN question should display$/) do
