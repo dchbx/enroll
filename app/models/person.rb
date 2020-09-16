@@ -308,6 +308,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+  after_update :person_create_or_update_handler
 
   def self.api_staff_roles
     Person.where(
@@ -419,7 +420,6 @@ class Person
 
   def notify_updated
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
-    person_create_or_update_handler
   end
 
   def person_create_or_update_handler

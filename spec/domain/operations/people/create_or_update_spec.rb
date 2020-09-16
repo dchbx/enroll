@@ -47,7 +47,7 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
         {first_name: person.first_name, last_name: person.last_name,
          dob: person.dob, no_ssn: '1',
          gender: 'male', is_incarcerated: false,
-         person_hbx_id: '23232323',
+         person_hbx_id: person.hbx_id,
          same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
          addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
                      city: 'was', county: '', state: 'DC', location_state_code: nil,
@@ -92,5 +92,29 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
         end
       end
     end
+    #
+    # context 'update person' do
+    # let(:person) {FactoryBot.create(:person)}
+
+    #   let(:person_params) do
+    #     {first_name: person.first_name, last_name: person.last_name,
+    #      dob: person.dob, ssn: person.ssn,
+    #      gender: 'male', is_incarcerated: false,
+    #      person_hbx_id: person.hbx_id,
+    #      same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
+    #      addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
+    #                  city: 'was', county: '', state: 'DC', location_state_code: nil,
+    #                  full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
+    #                  modifier_id: nil], phones: [], emails: []}
+    #
+    #   end
+    #
+    #   context 'valid params' do
+    #     it 'should return success' do
+    #       result = subject.call(params: person_params)
+    #       expect(result.success).to be_truthy
+    #     end
+    #   end
+    # end
   end
 end

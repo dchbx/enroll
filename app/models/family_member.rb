@@ -179,6 +179,8 @@ class FamilyMember
     return unless family.persisted? && family.active_household.tax_households.present?
 
     Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
+  rescue StandardError => e
+    Rails.logger.error {"Unable to do action Operations::Households::DeactivateFinancialAssistanceEligibility for family_member with object_id: #{self.id} due to #{e.message}"}
   end
 
   def product_factory

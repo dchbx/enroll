@@ -13,7 +13,7 @@ module Operations
       def call(params:)
         person_values = yield validate(params)
         person_entity = yield create_entity(person_values)
-        person = yield match_or_create_person(person_entity.to_h)
+        person = yield match_or_update_or_create_person(person_entity.to_h)
 
         Success(person)
       end
@@ -41,20 +41,24 @@ module Operations
         Success(result)
       end
 
-      def match_or_create_person(person_entity)
+      def match_or_update_or_create_person(person_entity)
         person = if person_entity[:no_ssn] == '1'
                    PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
                    Person.where(first_name: /^#{person_entity[:first_name]}$/i, last_name: /^#{person_entity[:last_name]}$/i,
                                 dob: person_entity[:dob]).first # TODO Need to
                  else
                    candidate = PersonCandidate.new(person_entity[:ssn], person_entity[:dob])
-                   Person.match_existing_person(candidate)
+                   person = Person.match_existing_person(candidate)
                  end
 
+        #create new person
         if person.blank?
           person = Person.new(person_entity.to_h) #if person_valid_params.success?
           person.save!
-        else
+        else #update existing person
+          # person.assign_attributes(person_entity.except(:dob, :first_name, :last_name, :ssn, :hbx_id))
+          # Person.skip_callback(:update, :after, :person_create_or_update_handler)
+          # person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)
           create_or_update_associations(person, person_entity.to_h, :phones)

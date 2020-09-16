@@ -281,12 +281,13 @@ module FinancialAssistance
     before_save :generate_hbx_id
 
     # Responsible for updating family member  when applicant is created/updated
-    # after_save :propagate_applicant
+    after_save :propagate_applicant
 
     #save the instance without invoking call backs
     def persist!
-      # FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
+      FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
       self.save
+      FinancialAssistance::Applicant.set_callback(:save, :after, :propagate_applicant)
     end
 
     def generate_hbx_id
@@ -1027,6 +1028,7 @@ module FinancialAssistance
     end
 
     def propagate_applicant
+      # return if incomes_changed? || benefits_changed? || deductions_changed?
       Operations::Families::CreateOrUpdateMember.new.call(params: self.attributes_for_export) if is_active
       Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
     rescue StandardError => e
