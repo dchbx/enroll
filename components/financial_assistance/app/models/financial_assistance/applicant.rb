@@ -291,7 +291,7 @@ module FinancialAssistance
     end
 
     def generate_hbx_id
-      write_attribute(:person_hbx_id, HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
+      write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
 
     def us_citizen=(val)
