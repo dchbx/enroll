@@ -75,13 +75,35 @@ RSpec.describe Insured::ConsumerRolesController do
   end
 
   describe "help_paying_coverage" do
-    let(:user) { FactoryBot.create :user, :with_consumer_role }
-    before { sign_in user }
 
-    subject { get :help_paying_coverage }
+    context 'when FAA feature enabled' do
+      let(:user) { FactoryBot.create :user, :with_consumer_role }
 
-    it 'renders help_paying_coverage template' do
-      expect(subject).to render_template('insured/consumer_roles/help_paying_coverage')
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        sign_in user
+      end
+
+      subject { get :help_paying_coverage }
+
+      it 'renders help_paying_coverage template' do
+        expect(subject).to render_template('insured/consumer_roles/help_paying_coverage')
+      end
+    end
+
+    context 'when FAA feature disabled' do
+      let(:user) { FactoryBot.create :user, :with_consumer_role }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+        sign_in user
+      end
+
+      subject { get :help_paying_coverage }
+
+      it 'renders help_paying_coverage template' do
+        expect(subject).to render_template(:file => "#{Rails.root}/public/404.html")
+      end
     end
   end
 
