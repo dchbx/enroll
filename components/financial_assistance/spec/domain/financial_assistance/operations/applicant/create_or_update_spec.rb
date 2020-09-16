@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'pry'
-
 RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbclean: :after_each do
   let(:family_id) { BSON::ObjectId.new }
 
@@ -35,26 +33,23 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
          :same_with_primary=>false,
          :indian_tribe_member=>false,
          :is_incarcerated=>true,
-         :addresses => [{
-                            "address_2"=>"#111",
-                            "address_3"=>"",
-                            "county"=>"Hampden",
-                            "country_name"=>"",
-                            "kind"=>"home",
-                            "address_1"=>"1111 Awesome Street",
-                            "city"=>"Washington",
-                            "state"=>"DC",
-                            "zip"=>"01001"}],
+         :addresses => [{"address_2"=>"#111",
+                         "address_3"=>"",
+                         "county"=>"Hampden",
+                         "country_name"=>"",
+                         "kind"=>"home",
+                         "address_1"=>"1111 Awesome Street",
+                         "city"=>"Washington",
+                         "state"=>"DC",
+                         "zip"=>"01001"}],
          :phones=>[
-             {
-                 "country_code"=>"",
-                 "area_code"=>"202",
-                 "number"=>"1111111",
-                 "extension"=>"1",
-                 "full_phone_number"=>"20211111111",
-                 "kind"=>"home"}],
-         :emails=>[
-             {"kind"=>"home", "address"=>"example1@example.com"}],
+             {"country_code"=>"",
+              "area_code"=>"202",
+              "number"=>"1111111",
+              "extension"=>"1",
+              "full_phone_number"=>"20211111111",
+              "kind"=>"home"}],
+         :emails=>[{"kind"=>"home", "address"=>"example1@example.com"}],
          :family_member_id=>BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
          :is_primary_applicant=>true,
          :is_consent_applicant=>false,
@@ -127,10 +122,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
 
       let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id, aasm_state: 'draft') }
       let!(:applicant) do
-        FactoryBot.create(:financial_assistance_applicant,
-                          :with_work_phone,
-                          :with_work_email,
-                          :with_home_address,
+        appl = FactoryBot.create(:financial_assistance_applicant,
                           application: application,
                           ssn: '889984400',
                           dob: (Date.today - 10.years),
@@ -147,14 +139,16 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :is_disabled => false,
                           :family_member_id=>BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
                           :relationship=>"child")
+        appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1=>'1111 Awesome Street', :address_2=>'#111', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'work', :state=>'DC', :zip=>'20001', county: '')]
+        appl.addresses << FactoryBot.build(:financial_assistance_address, :address_1=>'1112 Awesome Street', :address_2=>'#112', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'home', :state=>'DC', :zip=>'20001', county: '')
+        appl.phones = [FactoryBot.build(:phone, :area_code=>'202', :country_code=>'', :extension=>'1', :full_phone_number=>'', :kind=>'work', :number=>'1111111', :primary=>nil)]
+        appl.emails = [FactoryBot.build(:email, :address=>'example1@example.com', :kind=>'work')]
+        appl.save!
+        appl
       end
 
-      let!(:applicant_params){{
-                               :addresses=>[
-                                   {:address_1=>"1112 Awesome Street", :address_2=>"#112", :address_3=>"",
-                                    :city=>"Washington", :country_name=>"", :county=>"Hampden", :kind=>"work", :state=>"DC", :zip=>"01001"},
-                                   {:address_1=>"1111 Awesome Street", :address_2=>"#111", :address_3=>"",
-                                   :city=>"Washington", :country_name=>"", :county=>"Hampden", :kind=>"home", :state=>"DC", :zip=>"01001"}],
+      let!(:applicant_params){{:addresses=>[{:address_1=>'1112 Awesome Street', :address_2=>'#112', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'home', :state=>'DC', :zip=>'20001', county: ''},
+                                             {:address_1=>'1111 Awesome Street', :address_2=>'#111', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'work', :state=>'DC', :zip=>'20001', county: ''}],
                                :alien_number=>nil,
                                :card_number=>nil,
                                :citizen_status=>"us_citizen",
@@ -199,66 +193,37 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                                :relationship=>"self",
                                :ssn=>"889984400"}}
 
-      before do
-        applicant.addresses << FactoryBot.build(:financial_assistance_address, kind: "work")
-        applicant.save!
-
+      before :each do
         @result = subject.call(params: compare(applicant_params), family_id: family_id)
       end
 
-      it 'should return a success object' do
-
+      it 'should return a failure object' do
         expect(@result).to be_a(Dry::Monads::Result::Failure)
       end
 
-      it 'should return applicant object' do
-        expect(@result.failure).to eq("No information is changed")
+      it 'should return failure with a message' do
+        expect(@result.failure).to eq('No information is changed')
       end
 
-      it 'should create a applicant object' do
+      it 'should not create a applicant object' do
         expect(application.reload.applicants.count).to eq(1)
       end
-
     end
-
-
-    # context "and there's no difference between the incoming payload and existing attributes" do
-    #   it "should not update nor persist the record" do
-    #     @result = subject.call(params: applicant_params, family_id: family_id)
-    #     require 'pry';binding.pry
-    #   end
-    # end
-
   end
 
-  # describe 'when a draft application does not exist' do
-  #   before do
-  #     application.update_attributes!(aasm_state: 'submitted')
-  #     @result = subject.call(params: applicant_params, family_id: family_id)
-  #   end
-  #
-  #   it 'should return a failure object' do
-  #     expect(@result).to be_a(Dry::Monads::Result::Failure)
-  #   end
-  #
-  #   it 'should return failure message' do
-  #     expect(@result.failure).to eq('Application Not Found')
-  #   end
-  # end
-  #
-  # describe 'invalid params' do
-  #   before do
-  #     @result = subject.call(params: {test: 'test'}, family_id: family_id)
-  #   end
-  #
-  #   it 'should return a failure object' do
-  #     expect(@result).to be_a(Dry::Monads::Result::Failure)
-  #   end
-  #
-  #   it 'should return errors for failed applicant contract validation' do
-  #     expect(@result.failure.errors.present?).to be_truthy
-  #   end
-  # end
+  describe 'invalid params' do
+    before do
+      @result = subject.call(params: {test: 'test'}, family_id: family_id)
+    end
+
+    it 'should return a failure object' do
+      expect(@result).to be_a(Dry::Monads::Result::Failure)
+    end
+
+    it 'should return errors for failed applicant contract validation' do
+      expect(@result.failure.errors.present?).to be_truthy
+    end
+  end
 end
 
 def compare(applicant_db_hash)
