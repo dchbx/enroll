@@ -62,8 +62,9 @@ Given(/^at least one other household members exist$/) do
   find(:xpath, '//label[@for="is_applying_coverage_false"]').click
   find(".btn", text: "CONFIRM MEMBER").click
 
-
+  sleep 2
   expect(page).to have_content('ADD INCOME & COVERAGE INFO', count: 2)
+  application.update!(aasm_state: "draft")
 end
 
 Then(/^Family Relationships left section WILL display$/) do
@@ -75,34 +76,33 @@ When(/^all applicants are in Info Completed state$/) do
   until find_all(".btn", text: "ADD INCOME & COVERAGE INFO").empty?
     find_all(".btn", text: "ADD INCOME & COVERAGE INFO")[0].click
     # find("#is_required_to_file_taxes_yes").click
-    sleep 1
-    find("#is_required_to_file_taxes_no").click
-    sleep 1
-    find("#is_claimed_as_tax_dependent_no").click
-    find("#is_joint_tax_filing_no").click if page.all("#is_joint_tax_filing_no").present?
+    sleep 10
+    find("#is_required_to_file_taxes_no", wait: 10).click
+    find("#is_claimed_as_tax_dependent_no", wait: 10).click
+    find("#is_joint_tax_filing_no", wait: 10).click if page.all("#is_joint_tax_filing_no").present?
     find(:xpath, "//input[@value='CONTINUE'][@name='commit']").click
 
-    find("#has_job_income_false").click
-    find("#has_self_employment_income_false").click
-    find(:xpath, '//*[@id="btn-continue"]').click
+    find("#has_job_income_false", wait: 10).click
+    find("#has_self_employment_income_false", wait: 10).click
+    find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
-    find("#has_other_income_false").click
-    find(:xpath, '//*[@id="btn-continue"]').click
-    find("#has_deductions_false").click
-    find(:xpath, '//*[@id="btn-continue"]').click
+    find("#has_other_income_false", wait: 10).click
+    find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
+    find("#has_deductions_false", wait: 10).click
+    find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
-    find("#has_enrolled_health_coverage_false").click
-    find("#has_eligible_health_coverage_false").click
-    find(:xpath, '//*[@id="btn-continue"]').click
+    find("#has_enrolled_health_coverage_false", wait: 10).click
+    find("#has_eligible_health_coverage_false", wait: 10).click
+    find(:xpath, '//*[@id="btn-continue"]', wait: 10).click
 
-    find("#is_pregnant_no").click
-    find("#is_post_partum_period_no").click
-    find("#is_self_attested_blind_no").click
-    find("#has_daily_living_no").click
-    find("#need_help_paying_bills_no").click
-    find("#radio_physically_disabled_no").click
+    find("#is_pregnant_no", wait: 10).click
+    find("#is_post_partum_period_no", wait: 10).click
+    find("#is_self_attested_blind_no", wait: 10).click
+    find("#has_daily_living_no", wait: 10).click
+    find("#need_help_paying_bills_no", wait: 10).click
+    find("#radio_physically_disabled_no", wait: 10).click
     choose('is_veteran_or_active_military_no')
-    find('[name=commit]').click
+    find('[name=commit]', wait: 10).click
   end
 end
 
