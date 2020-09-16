@@ -46,4 +46,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-rspec',             '~> 1.31'
   spec.add_development_dependency 'shoulda-matchers',          '~> 3'
   spec.add_development_dependency 'test-prof',                 '~> 0.5.0'
+  spec.add_development_dependency 'pry-byebug'
+  spec.add_development_dependency "yard"
+
 end

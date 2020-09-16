@@ -1,12 +1,9 @@
 # frozen_string_literal: true
 
-require_dependency 'financial_assistance/application_controller'
-
 module FinancialAssistance
-  class IncomesController < ApplicationController
+  class IncomesController < FinancialAssistance::ApplicationController
     include ::UIHelpers::WorkflowController
     include NavigationHelper
-    include ApplicationHelper
 
     before_action :find_application_and_applicant
     before_action :load_support_texts, only: [:index, :other]
@@ -138,12 +135,6 @@ module FinancialAssistance
     def permit_params(attributes)
       return if attributes.blank?
       attributes.permit!
-    end
-
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = support_text_placeholders raw_support_text
     end
 
     def find

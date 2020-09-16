@@ -55,21 +55,32 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
   end
 
   describe 'when a draft application is present' do
+
     before do
       @result = subject.call(params: applicant_params, family_id: family_id)
     end
 
-    it 'should return a success object' do
-      expect(@result).to be_a(Dry::Monads::Result::Success)
+    context "and the incoming payload and existing attributes are different" do
+      it 'should return a success object' do
+        expect(@result).to be_a(Dry::Monads::Result::Success)
+      end
+
+      it 'should return applicant object' do
+        expect(@result.success).to be_a(::FinancialAssistance::Applicant)
+      end
+
+      it 'should create a applicant object' do
+        expect(application.reload.applicants.count).to eq(2)
+      end
     end
 
-    it 'should return applicant object' do
-      expect(@result.success).to be_a(::FinancialAssistance::Applicant)
-    end
+    # context "and there's no difference between the incoming payload and existing attributes" do
+    #   it "should not update nor persist the record" do
+    #     @result = subject.call(params: applicant_params, family_id: family_id)
+    #     require 'pry';binding.pry
+    #   end
+    # end
 
-    it 'should create a applicant object' do
-      expect(application.reload.applicants.count).to eq(2)
-    end
   end
 
   describe 'when a draft application does not exist' do
