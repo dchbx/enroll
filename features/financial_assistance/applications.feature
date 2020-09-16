@@ -5,8 +5,8 @@ Feature: Start a new Financial Assistance Application
     And a benchmark plan exists
 
   Scenario: A consumer wants to start a new financial assistance application
-    When the consumer views their applications
-    And they click 'Start New Application' button
+    When a consumer visits the Get Help Paying for coverage page
+    And selects yes they would like help paying for coverage
     Then they should see a new finanical assistance application
     And they should see each of their dependents listed
 
