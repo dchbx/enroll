@@ -760,7 +760,7 @@ module ApplicationHelper
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
-  def is_in_person_application?(current_user, app_type)
+  def is_new_in_person_application?(current_user, app_type)
     app_type = app_type&.humanize&.downcase
     current_user.has_hbx_staff_role? && app_type == "in person"
   end
