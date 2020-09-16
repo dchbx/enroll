@@ -35,7 +35,8 @@ module UIHelpers
     end
 
     def load_support_texts
-      @support_texts = YAML.load_file("app/views/financial_assistance/shared/support_text.yml")
+      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
+      @support_texts = YAML.load_file(file_path)
     end
 
     def current_step

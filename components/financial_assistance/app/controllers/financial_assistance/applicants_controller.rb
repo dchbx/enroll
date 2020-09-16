@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require_dependency 'financial_assistance/application_controller'
-
 module FinancialAssistance
-  class ApplicantsController < ApplicationController
+  class ApplicantsController < FinancialAssistance::ApplicationController
     include ::UIHelpers::WorkflowController
 
     before_action :find, :find_application, :except => [:age_of_applicant] #except the ajax requests
@@ -135,12 +133,6 @@ module FinancialAssistance
     end
 
     private
-
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = helpers.support_text_placeholders raw_support_text
-    end
 
     def format_date_params(model_params)
       model_params["pregnancy_due_on"] = Date.strptime(model_params["pregnancy_due_on"].to_s, "%m/%d/%Y") if model_params["pregnancy_due_on"].present?
