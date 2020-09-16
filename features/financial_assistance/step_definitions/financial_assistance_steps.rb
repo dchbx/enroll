@@ -400,7 +400,7 @@ Then(/^the consumer will navigate to the Cost Savings page$/) do
 end
 
 When(/^the consumer manually enters the "Help Paying for Coverage" url in the browser search bar$/) do
-  visit financial_assistance.help_paying_coverage_applications_path
+  visit help_paying_coverage_insured_consumer_role_index_path
 end
 
 Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
