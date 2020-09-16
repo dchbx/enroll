@@ -2,6 +2,9 @@
 
 Given(/^a consumer, with a family, exists$/) do
   consumer :with_nuclear_family
+  bcp = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship.current_benefit_coverage_period
+  ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+  bcp.update_attributes!(slcsp_id: ivl_product.id)
 end
 
 Given(/^is logged in$/) do
@@ -16,12 +19,25 @@ When(/^the consumer views their applications$/) do
   visit financial_assistance.applications_path
 end
 
+When(/^a consumer visits the Get Help Paying for coverage page$/) do
+  visit help_paying_coverage_insured_consumer_role_index_path
+end
+
+When(/^selects yes they would like help paying for coverage$/) do
+  find('button.interaction-click-control-continue')
+  choose('radio1', allow_label_click: true)
+  find('button.interaction-click-control-continue').click
+
+  # should be on checklist page now
+  find('a.interaction-click-control-continue').click
+end
+
 When(/^they click 'Start New Application' button$/) do
   click_button 'Start new application'
 end
 
 Then(/^they should see a new finanical assistance application$/) do
-  expect(page.current_url).to match("/applications/#{FinancialAssistance::Application.find_by(aasm_state: 'draft', family_id: consumer.primary_family.id).id}/edit")
+  expect(page.current_url).to match("/applications/.*/edit")
 end
 
 Then(/^they should see each of their dependents listed$/) do
