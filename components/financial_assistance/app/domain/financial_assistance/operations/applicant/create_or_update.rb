@@ -78,7 +78,7 @@ module FinancialAssistance
                       end
           applicant.assign_attributes(values.to_h)
 
-          if applicant.persist!
+          if applicant.save
             Success(applicant)
           else
             Failure(applicant.errors)

@@ -283,13 +283,6 @@ module FinancialAssistance
     # Responsible for updating family member  when applicant is created/updated
     after_save :propagate_applicant
 
-    #save the instance without invoking call backs
-    def persist!
-      FinancialAssistance::Applicant.skip_callback(:save, :after, :propagate_applicant)
-      self.save
-      FinancialAssistance::Applicant.set_callback(:save, :after, :propagate_applicant)
-    end
-
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
     end
@@ -850,13 +843,13 @@ module FinancialAssistance
     end
 
     def attributes_for_export
-      applicant_params = attributes.slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
+      applicant_params = attributes.transform_keys(&:to_sym).slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
                                           :gender,:dob,:is_incarcerated,:is_disabled,:ethnicity,:race,:indian_tribe_member,:tribal_id,
                                           :language_code,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,:no_ssn,:citizen_status,
                                           :is_consumer_role,:vlp_document_id,:same_with_primary,:is_applying_coverage,:vlp_subject,
                                           :alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                           :receipt_number,:citizenship_number,:card_number,:country_of_citizenship,:expiration_date,
-                                          :issuing_country,:status).symbolize_keys
+                                          :issuing_country,:status)
       applicant_params.merge!(dob: dob.strftime('%d/%m/%Y'))
       applicant_params.merge!(ssn: ssn, relationship: relation_with_primary)
       applicant_params[:addresses] = construct_association_fields(addresses)
