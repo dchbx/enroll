@@ -36,7 +36,7 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
     it { is_expected.to have_field(:effective_date).of_type(DateTime) }
     it { is_expected.to have_field(:timeout_response_last_submitted_at).of_type(DateTime) }
     it { is_expected.to have_field(:assistance_year).of_type(Integer) }
-    it { is_expected.to have_field(:is_renewal_authorized).of_type(Mongoid::Boolean).with_default_value_of(false) }
+    it { is_expected.to have_field(:is_renewal_authorized).of_type(Mongoid::Boolean).with_default_value_of(true) }
     it { is_expected.to have_field(:renewal_base_year).of_type(Integer) }
     it { is_expected.to have_field(:years_to_renew).of_type(Integer) }
     it { is_expected.to have_field(:is_requesting_voter_registration_application_in_mail).of_type(Mongoid::Boolean) }
