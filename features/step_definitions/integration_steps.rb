@@ -675,7 +675,7 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link("Add New Person", :visible => true)
+  click_link 'Add New Person'
 end
 
 Then(/^.+ should see the new dependent form$/) do
