@@ -10,12 +10,12 @@ module FinancialAssistance
         send(:include, Dry::Monads[:result, :do])
 
         # @param [ Hash ] params Applicant Attributes
-        # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
+        # @return [FinancialAssistance::Entities::Applicant ] applicant Applicant
         def call(params:)
-          values   = yield validate(params)
-          product  = yield build(values)
+          values     = yield validate(params)
+          applicant  = yield build(values)
 
-          Success(product)
+          Success(applicant)
         end
 
         private
@@ -31,9 +31,9 @@ module FinancialAssistance
         end
 
         def build(values)
-          benefit_sponsorship_entity = FinancialAssistance::Entities::Applicant.new(values)
+          applicant_entity = FinancialAssistance::Entities::Applicant.new(values)
 
-          Success(benefit_sponsorship_entity)
+          Success(applicant_entity)
         end
       end
     end

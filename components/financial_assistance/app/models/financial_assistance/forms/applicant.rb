@@ -127,7 +127,7 @@ module FinancialAssistance
           tribal_id: tribal_id,
           citizen_status: citizen_status,
           is_temporarily_out_of_state: is_temporarily_out_of_state
-        }.reject{|_k, val| val.nil?}
+        }#.reject{|_k, val| val.nil?}
 
         if same_with_primary == 'true'
           primary = application.primary_applicant
