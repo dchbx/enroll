@@ -756,12 +756,12 @@ module ApplicationHelper
   end
 
   def is_new_paper_application?(current_user, app_type)
-    app_type = app_type.downcase
+    app_type = app_type&.downcase
     current_user.has_hbx_staff_role? && app_type == "paper"
   end
 
   def is_in_person_application?(current_user, app_type)
-    app_type = app_type.humanize.downcase
+    app_type = app_type&.humanize&.downcase
     current_user.has_hbx_staff_role? && app_type == "in person"
   end
 
