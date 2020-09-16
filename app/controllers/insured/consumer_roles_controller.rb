@@ -272,11 +272,15 @@ class Insured::ConsumerRolesController < ApplicationController
   end
 
   def help_paying_coverage
-    set_current_person
-    load_support_texts
-    save_faa_bookmark(request.original_url)
-    set_admin_bookmark_url
-    @transaction_id = params[:id]
+    if EnrollRegistry.feature_enabled?(:financial_assistance)
+      set_current_person
+      load_support_texts
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      @transaction_id = params[:id]
+    else
+      render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
+    end
   end
 
   def help_paying_coverage_response

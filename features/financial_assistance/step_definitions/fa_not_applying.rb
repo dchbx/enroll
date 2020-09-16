@@ -31,8 +31,10 @@ And(/the primary member has filled mandatory information required$/) do
   fill_in "person_addresses_attributes_0_address_2", with: personal_information[:address_2]
   fill_in "person_addresses_attributes_0_city", with: personal_information[:city]
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
-  first('li', :text => 'DC', wait: 5).click
+  find('#address_info li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", with: personal_information[:zip]
+  
+  sleep 5
   find('.btn', text: 'CONTINUE').click
 end
 
