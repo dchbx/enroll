@@ -19,7 +19,7 @@ describe "insured/family_members/index.html.erb" do
 
   it "should have title" do
     render template: "insured/family_members/index.html.erb"
-    expect(rendered).to have_selector("h1", text: 'Family Members')
+    expect(rendered).to have_selector("h2", text: 'Household Info: Family Members')
   end
 
   it "should have memo to indicate required fields" do

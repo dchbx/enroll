@@ -5,13 +5,13 @@
       <div class="col-md-4 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
           <label class="static_label label-floatlabel">NAME</label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.full_name %></span>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= "#{dependent.first_name} #{dependent.middle_name} #{dependent.last_name}"%></span>
         </div>
       </div>
       <div class="col-md-2 col-sm-4 no-pd">
         <div class="form-group form-group-lg">
           <label class="static_label label-floatlabel">AGE</label>
-          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.person.age_on(Date.today) %></span>
+          <span class="field_value floatlabel form-control active-floatlabel"><%= dependent.age_on(Date.today) %></span>
         </div>
       </div>
 
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-    <%= yield "person_#{dependent.person.id}" %>
+    <%= yield "person_#{dependent&.family_member&.person&.id}" %>
 
     <div class="clearfix"></div>
   </div>
