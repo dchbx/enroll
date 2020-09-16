@@ -124,6 +124,15 @@ class FamilyMember
     self.is_coverage_applicant
   end
 
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+      age - 1
+    else
+      age
+    end
+  end
+
   def is_active?
     self.is_active
   end
