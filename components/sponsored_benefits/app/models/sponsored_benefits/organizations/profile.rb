@@ -33,6 +33,10 @@ module SponsoredBenefits
         benefit_sponsorships.first.initial_enrollment_period.begin
       end
 
+      def census_employees
+        benefit_sponsorships.first.census_employees
+      end
+
       def benefit_application
         bs = benefit_sponsorships.first
         bs.benefit_applications.first

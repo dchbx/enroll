@@ -1,4 +1,7 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefits.rb"
 
 module BenefitSponsors
   RSpec.describe Profiles::Employers::EmployerProfilesController, type: :controller, dbclean: :after_each do
@@ -9,7 +12,7 @@ module BenefitSponsors
     let(:person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, :person => person)}
 
-    let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:site)                  { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key: Settings.site.key) }
     let!(:benefit_sponsor)       { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)      { benefit_sponsor.employer_profile }
     let!(:rating_area)           { FactoryBot.create_default :benefit_markets_locations_rating_area }
@@ -240,6 +243,39 @@ module BenefitSponsors
           redirect_path = profiles_employers_employer_profile_path(benefit_sponsorship.profile.id) + "?tab=employees"
           expect(response).to redirect_to(redirect_path)
         end
+      end
+    end
+
+    describe 'GET export_census_employees',  dbclean: :after_each  do
+      include_context 'setup benefit market with market catalogs and product packages'
+      include_context 'setup initial benefit application'
+      include_context 'setup employees with benefits'
+
+      let!(:health_products) do
+        create_list(:benefit_markets_products_health_products_health_product,
+                    5, :with_renewal_product, :with_issuer_profile,
+                    application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+                    product_package_kinds: [:single_issuer, :metal_level, :single_product],
+                    assigned_site: site,
+                    service_area: service_area,
+                    renewal_service_area: renewal_service_area,
+                    metal_level_kind: :gold)
+      end
+      let(:effective_period_start_on) {TimeKeeper.date_of_record.end_of_month + 1.day - 2.month}
+      let(:current_effective_date) {effective_period_start_on}
+      let(:effective_period_end_on) {effective_period_start_on + 1.year - 1.day}
+
+      before :each do
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(100.0)
+        abc_profile.reload
+      end
+
+      it 'should render the view successfully with content as CSV' do
+        allow(controller).to receive(:authorize).and_return(true)
+        sign_in user
+        get :export_census_employees, params: {employer_profile_id: abc_profile.id.to_s}, format: :csv
+        assert_response :success
+        expect(response.header['Content-Type']).to eq 'text/csv'
       end
     end
   end

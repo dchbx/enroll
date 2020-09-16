@@ -279,5 +279,23 @@ module SponsoredBenefits
         end
       end
     end
+
+    describe "GET export_plan_design_employees" do
+      let(:person) do
+        FactoryBot.create(:person, :with_broker_role).tap do |person|
+          person.broker_role.update_attributes(broker_agency_profile_id: broker_agency_profile.id.to_s)
+        end
+      end
+      let!(:user_with_broker_role) { FactoryBot.create(:user, person: person) }
+      let(:prospect_plan_design_proposal) { plan_design_proposal}
+
+      it "should generate a CSV with success as response" do
+        benefit_application
+        sign_in user_with_broker_role
+        get :export_plan_design_employees, params: {plan_design_proposal_id: prospect_plan_design_proposal.id.to_s}, format: :csv
+        assert_response :success
+        expect(response.header['Content-Type']).to eq 'text/csv'
+      end
+    end
   end
 end

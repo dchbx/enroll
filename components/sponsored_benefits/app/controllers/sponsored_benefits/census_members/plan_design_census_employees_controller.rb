@@ -85,10 +85,13 @@ module SponsoredBenefits
     end
 
     def export_plan_design_employees
-      sponsorship = @plan_design_proposal.profile.benefit_sponsorships[0]
-     
-      respond_to do |format|
-        format.csv { send_data sponsorship.census_employees.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+      begin
+        employee_export = ::Services::CensusEmployeeRoster.new(@plan_design_proposal.profile, {action: 'download', feature: 'bqt'})
+        respond_to do |format|
+          format.csv { send_data employee_export.to_csv, filename: "#{@plan_design_proposal.plan_design_organization.legal_name.parameterize.underscore}_census_employees_#{TimeKeeper.date_of_record}.csv" }
+        end
+      rescue StandardError
+        format.html { redirect_to :back, :flash => {:error => "OOps! Error on Downloading Roster, please contact #{Settings.site.short_name} customer service"}}
       end
     end
 

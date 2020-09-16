@@ -2,7 +2,7 @@ module SponsoredBenefits
   module Organizations
     class AcaShopCcaEmployerProfile < Profile
       include Concerns::AcaRatingAreaConfigConcern
-      
+
       field  :sic_code, type: String
       embeds_one  :employer_attestation
       embedded_in :plan_design_proposal, class_name: "SponsoredBenefits::Organizations::PlanDesignProposal"

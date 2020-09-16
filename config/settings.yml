@@ -21,7 +21,7 @@ site:
   health_care_website_url: "https://www.healthcare.gov"
   short_name: "DC Health Link"
   byline: "Welcome to the District's Health Insurance Marketplace"
-  long_name: "District of Columbia Health Link"
+  long_name: "DC Health Link"
   header_message: "Welcome to the District's Health Insurance Marketplace"
   logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
