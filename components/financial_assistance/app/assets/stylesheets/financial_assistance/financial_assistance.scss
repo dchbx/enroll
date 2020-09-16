@@ -32,6 +32,18 @@ input[type="radio"]:checked + label span {
     background:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/210284/check_radio_sheet.png) -57px top no-repeat;
 }
 
+.deductions, .job_income, .new-other-income-form, .new-income-form {
+  .col-md-3, input {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  .col-md-3 .btn-danger {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+
 .knowmore {
   background-color:#fff;
   padding: 15px;
