@@ -18,7 +18,6 @@ gemspec
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'master'
 gem 'ui_helpers', path: '../ui_helpers'
-gem 'deepsort'
 
 group :development, :test do
   gem 'rails-controller-testing'
