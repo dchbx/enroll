@@ -408,5 +408,5 @@ Then(/^the consumer will navigate to the Help Paying for Coverage page$/) do
 end
 
 Then(/^the consumer will navigate to the Family Members page$/) do
-  expect(page).to have_selector('h1', text: 'Household Info: Family Members')
+  expect(page).to have_selector('h2', text: 'Household Info: Family Members')
 end
