@@ -232,7 +232,7 @@ class Insured::ConsumerRolesController < ApplicationController
         ].any? { |condition| condition == true }
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
           consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-          consumer_redirection_path = financial_assistance.help_paying_coverage_applications_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+          consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
           redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -259,7 +259,7 @@ class Insured::ConsumerRolesController < ApplicationController
     consumer = @person.consumer_role
     if @person.completed_identity_verification? || consumer.identity_verified?
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-      consumer_redirection_path = financial_assistance.help_paying_coverage_applications_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
       redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : consumer_redirection_path
     else
       set_consumer_bookmark_url
@@ -284,7 +284,7 @@ class Insured::ConsumerRolesController < ApplicationController
     ].any? { |condition| condition == true }
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
-      consumer_redirection_path = financial_assistance.help_paying_coverage_applications_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
       redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
     else
       redirect_back fallback_location: '/'

@@ -1139,6 +1139,10 @@ class Family
     application_type == 'In Person'
   end
 
+  def has_paper_paplication_type?
+    application_type == 'Paper'
+  end
+
   def set_due_date_on_verification_types
     family_members.each do |family_member|
       person = family_member.person
