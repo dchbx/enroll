@@ -62,11 +62,12 @@ module FinancialAssistance
                                      end
           sanitized_applicant_hash.merge!({relationship: applicant.relation_with_primary, ssn: applicant.ssn})
           incoming_values = values.to_h.deep_symbolize_keys
+          merged_params = sanitized_applicant_hash.merge(incoming_values)
 
-          if sanitized_applicant_hash.merge(incoming_values).deep_sort == sanitized_applicant_hash.deep_sort
-            Failure('No information is changed')
-          else
+          if any_information_changed?(merged_params, sanitized_applicant_hash)
             Success('Information has changed')
+          else
+            Failure('No information is changed')
           end
         end
 
@@ -83,6 +84,13 @@ module FinancialAssistance
           else
             Failure(applicant.errors)
           end
+        end
+
+        def any_information_changed?(merged_params, sanitized_applicant_hash)
+          return true unless merged_params.except(:addresses, :emails, :phones) == sanitized_applicant_hash.except(:addresses, :emails, :phones)
+          return true unless Set.new(merged_params[:addresses]) == Set.new(sanitized_applicant_hash[:addresses])
+          return true unless Set.new(merged_params[:emails]) == Set.new(sanitized_applicant_hash[:emails])
+          return true unless Set.new(merged_params[:phones]) == Set.new(sanitized_applicant_hash[:phones])
         end
       end
     end
