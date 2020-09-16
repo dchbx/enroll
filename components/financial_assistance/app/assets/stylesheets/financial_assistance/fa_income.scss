@@ -89,13 +89,22 @@ div.disabled {
   color: #909090;
 }
 
+.faa-amount {
+  margin-left: 10px
+}
+
 .fa-select {
+
+  .fa-frequency-kind {
+    width: 90%;
+  }
+
   .selectric
   {
     height: 20px;
     .label
     {
-      height: 14px;
+      height: 16px;
       line-height: 14px;
     }
 
