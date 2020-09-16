@@ -272,8 +272,8 @@ Then(/\w+ does not apply for assistance and clicks continue/) do
 end
 
 Then(/\w+ should see the dependents form/) do
-  expect(page).to have_content('Add Member')
-  #expect(page).to have_content('Add New Person')
+  #expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 
@@ -420,7 +420,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -430,7 +430,7 @@ Then(/^Individual fills in the form$/) do
   click_link(@u.adult_dob.to_date.day)
   click_outside_datepicker('Household Info: Family Members')
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.label', :text => 'This Person Is', :wait => 10).click
+  find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
