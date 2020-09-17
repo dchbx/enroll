@@ -1,6 +1,7 @@
 - step:
     heading: Tax Info for <family-member-name-placeholder>
     heading_text: Tell us about this person's tax info. When you're finished select CONTINUE.
+    title_icon: 'fa fa-pencil-square-o fa-2x'
     sections:
       - section:
           lines:

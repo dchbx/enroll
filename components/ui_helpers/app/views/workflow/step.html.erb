@@ -3,8 +3,19 @@
     <div class="col-md-9">
       <div class="">
         <% if !@current_step.heading.nil? %>
-        <p class="alert alert-error hide"></p>
-          <h2 class="darkblue"><%= personalize_heading_text(@current_step.heading) %></h2>
+          <p class="alert alert-error hide"></p>
+          <div class="row">
+            <div class="col-md-10">
+              <% if !@current_step.title_icon.nil? %>
+                <div class="title-icon">
+                  <span class="fa-icon fa-stack suitcase">
+                    <i class="<%= @current_step.title_icon %>"></i>
+                  </span>
+                </div>
+              <% end %>
+              <h2 class="fa-darkblue"><%= personalize_heading_text(@current_step.heading) %></h2>
+            </div>
+          </div>
           <% if !@current_step.heading_text.nil? %>
             <% if @current_step.heading_text.present? %>
               <p><%= @current_step.heading_text%></p>
