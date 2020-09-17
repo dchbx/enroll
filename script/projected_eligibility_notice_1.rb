@@ -32,15 +32,18 @@ file_name = if Rails.env.production?
 CSV.open(file_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |family_id, members|
-    subscriber = members.detect{ |m| m["dependent"].casecmp('NO').zero? }
-    dependents = members.select{|m| m["dependent"].casecmp('YES').zero? }
     primary_person = HbxEnrollment.by_hbx_id(members.first["applid"]).first.family.primary_person
+
+    primary_member = members.detect{ |m| m['person_hbx_id'] == primary_person.hbx_id}
+    non_primary_members = members.select{ |m| m['person_hbx_id'] != primary_person.hbx_id}
+
     next if primary_person.nil?
-    next if subscriber.present? && subscriber["resident"] && subscriber["resident"].casecmp('NO')&.zero?
+    next if primary_member.present? && primary_member["resident"] && primary_member["resident"].casecmp('NO')&.zero?
     next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES')&.zero? }.present?
     next if members.any?{ |m| m["citizen_status"].blank? || (m["citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["citizen_status"] == "not_lawfully_present_in_us")}
-
+    binding.pry
     consumer_role = primary_person.consumer_role
+  
     if consumer_role.present?
       begin
         @notifier = Services::NoticeService.new
@@ -49,8 +52,8 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           event_object: consumer_role,
           notice_event: 'projected_eligibility_notice',
           notice_params: {
-            primary_member: subscriber.to_hash,
-            dependents: dependents.map(&:to_hash),
+            primary_member: primary_member.to_hash,
+            dependents: non_primary_members.map(&:to_hash),
             uqhp_event: 'uqhp_projected_eligibility_notice_1'
           }
         )
@@ -66,6 +69,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     else
       puts "No consumer role for #{primary_person.hbx_id} -- #{e}" unless Rails.env.test?
     end
+    break
   rescue StandardError => e
     puts "Unable to process family_id: #{family_id} due to the following error #{e}" unless Rails.env.test?
   end
