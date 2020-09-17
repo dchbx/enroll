@@ -118,6 +118,10 @@
       </div>
     </div>
 
+  <%if @tab.nil?%>
+    <%= hidden_field_tag :page, "from_registration"%>
+  <% end %>
+
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
     <span class='btn btn-lg btn-primary btn-br' onclick='PersonValidations.manageRequiredValidations($(this));'><i class="fa fa-user-plus"></i> Save</span>
