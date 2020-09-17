@@ -26,7 +26,7 @@ module Operations
       private
 
       def validate(params)
-        return Failure('Missing keys') unless params.key?(:family_member) || params.key?(:event)
+        return Failure('Missing keys') unless params.key?(:family_member) && params.key?(:event)
         return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
         @event = params[:event]
 
