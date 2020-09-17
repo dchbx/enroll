@@ -2,6 +2,17 @@
 // ajax:success accounts for glossary terms in consumer forms after document ready
 // Rails 5 event: 'turbolinks:load' instead of 'page:change'
 $(document).on("turbolinks:load ajax:success", function() {
+  runGlossary();
+
+  // Added for partials loaded after turbolinks load
+  $('.close-2').click(function(e){
+    $(document).ajaxComplete(function() {
+      runGlossary();
+    });
+  });
+});
+
+function runGlossary() {
   if ($('.run-glossary').length) {
     // Certain glossary terms have been rearranged to avoid a smaller word being given a popover instead of the
     // full glossary term (e.g. Premium/ Premium Tax Credit)
@@ -1102,6 +1113,7 @@ $(document).on("turbolinks:load ajax:success", function() {
     // Because of the change to popover on click instead of hover, you need to
     // manually close each popover. This will close others if you click to open one
     // or click outside of a popover.
+
     $(document).click(function(e){
       if (e.target.className == 'glossary') {
         e.preventDefault();
@@ -1111,8 +1123,17 @@ $(document).on("turbolinks:load ajax:success", function() {
         $('.glossary').popover('hide');
       }
     });
+
+
+    //$.ajax({
+    //  cache: true,
+    //  type: 'json',
+    //  url: 'https://dchealthlink.com/glossary/json'
+    //}).done(function(data, textStatus, jqXHR) {
+    //});
   }
-});
+}
+
 
 function hideGlossaryPopovers() {
   $('.glossary').popover('hide');
