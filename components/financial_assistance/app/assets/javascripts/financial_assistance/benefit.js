@@ -77,7 +77,7 @@ document.addEventListener("turbolinks:load", function() {
           $(self).prop('checked', false);
 
           $(self).parents('.benefit-kind').find('.benefits-list > .benefit').each(function(i, benefit) {
-            var url = $(benefit).attr('id').replace('financial_assistance_benefit_', 'benefits/');
+            var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
             $(benefit).remove();
 
             $.ajax({
@@ -130,7 +130,8 @@ document.addEventListener("turbolinks:load", function() {
         $("#destroyBenefit").modal('hide');
         $(self).parents('.benefit').remove();
 
-        var url = $(self).parents('.benefit').attr('id').replace('financial_assistance_benefit_', 'benefits/')
+        var url = $(self).parents('.benefit').attr('id').replace('benefit_', 'benefits/')
+
         $.ajax({
           type: 'delete',
           url: url
@@ -157,7 +158,7 @@ document.addEventListener("turbolinks:load", function() {
           //$(self).prop('checked', false);
 
           $('.benefits-list.is_enrolled .benefit').each(function(i, benefit) {
-            var url = $(benefit).attr('id').replace('financial_assistance_benefit_', 'benefits/');
+            var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
             $(benefit).remove();
             $.ajax({
               type: 'DELETE',
@@ -186,7 +187,7 @@ document.addEventListener("turbolinks:load", function() {
           //$(self).prop('checked', false);
 
           $('.benefits-list.is_eligible .benefit').each(function(i, benefit) {
-            var url = $(benefit).attr('id').replace('financial_assistance_benefit_', 'benefits/');
+            var url = $(benefit).attr('id').replace('benefit_', 'benefits/');
             $(benefit).remove();
             $.ajax({
               type: 'DELETE',
@@ -268,7 +269,7 @@ document.addEventListener("turbolinks:load", function() {
       })
     });
   }
-    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_phone_full_phone_number', function (e) {
+    $('body').on('keyup keydown keypress', '#benefit_employer_phone_full_phone_number', function (e) {
         $(this).mask('(000) 000-0000');
         return (key == 8 ||
             key == 9 ||
@@ -279,7 +280,7 @@ document.addEventListener("turbolinks:load", function() {
 
     });
 
-    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_address_zip', function (e) {
+    $('body').on('keyup keydown keypress', '#benefit_employer_address_zip', function (e) {
         var key = e.which || e.keyCode || e.charCode;
         $(this).attr('maxlength', '5');
         return (key == 8 ||
@@ -290,7 +291,7 @@ document.addEventListener("turbolinks:load", function() {
             (key >= 96 && key <= 105) );
     });
 
-    $('body').on('keyup keydown keypress', '#financial_assistance_benefit_employer_id', function (e) {
+    $('body').on('keyup keydown keypress', '#benefit_employer_id', function (e) {
         var key = e.which || e.keyCode || e.charCode;
         $(this).mask("00-0000000");
         return (key == 8 ||

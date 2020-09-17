@@ -93,7 +93,7 @@ document.addEventListener("turbolinks:load", function() {
           //$(self).prop('checked', false);
 
           $('#job_income').find('.incomes-list > .income').each(function(i, job_income) {
-            var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+            var url = $(job_income).attr('id').replace('income_', 'incomes/');
             $(job_income).remove();
             $.ajax({
               type: 'DELETE',
@@ -123,7 +123,7 @@ document.addEventListener("turbolinks:load", function() {
           //$(self).prop('checked', false);
 
           $('#self_employed_incomes').find('.self-employed-incomes-list > .income').each(function(i, job_income) {
-            var url = $(job_income).attr('id').replace('financial_assistance_income_', 'incomes/');
+            var url = $(job_income).attr('id').replace('income_', 'incomes/');
             $(job_income).remove();
             $.ajax({
               type: 'DELETE',
@@ -160,7 +160,7 @@ document.addEventListener("turbolinks:load", function() {
         $("#DestroyJobIncomeWarning").modal('hide');
         $(self).parents('.income').remove();
 
-        var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
+        var url = $(self).parents('.income').attr('id').replace('income_', 'incomes/')
         $.ajax({
           type: 'delete',
           url: url
@@ -182,7 +182,7 @@ document.addEventListener("turbolinks:load", function() {
         $("#DestroySelfEmplyedIncomeWarning").modal('hide');
         $(self).parents('.income').remove();
 
-        var url = $(self).parents('.income').attr('id').replace('financial_assistance_income_', 'incomes/')
+        var url = $(self).parents('.income').attr('id').replace('income_', 'incomes/')
         $.ajax({
           type: 'delete',
           url: url
@@ -396,7 +396,7 @@ $(document).on('turbolinks:load', function () {
         $(self).parents('.other-income-kind').find('.interaction-click-control-add-more').addClass('hidden');
 
         $(self).parents('.other-income-kind').find('.other-incomes-list > .other-income').each(function(i, other_income) {
-          var url = $(other_income).attr('id').replace('financial_assistance_income_', '');
+          var url = $(other_income).attr('id').replace('income_', '');
           $(other_income).remove();
 
           $.ajax({
@@ -507,7 +507,7 @@ function validateForm(form) {
 }
 
 
-$('body').on('keyup keydown keypress', '#financial_assistance_income_employer_phone_full_phone_number', function (e) {
+$('body').on('keyup keydown keypress', '#income_employer_phone_full_phone_number', function (e) {
   var key = e.which || e.keyCode || e.charCode;
   $(this).mask('(000) 000-0000');
   return (key == 8 ||
@@ -518,7 +518,7 @@ $('body').on('keyup keydown keypress', '#financial_assistance_income_employer_ph
     (key >= 96 && key <= 105) );
 });
 
-$('body').on('keyup keydown keypress', '#financial_assistance_income_employer_address_zip', function (e) {
+$('body').on('keyup keydown keypress', '#income_employer_address_zip', function (e) {
   var key = e.which || e.keyCode || e.charCode;
   $(this).attr('maxlength', '5');
   return (key == 8 ||

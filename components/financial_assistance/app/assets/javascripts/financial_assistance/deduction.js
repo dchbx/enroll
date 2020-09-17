@@ -96,7 +96,7 @@ $(document).on('turbolinks:load', function () {
           $(self).parents('.deduction-kind').find('.deductions-list > .new-deduction-form').remove();
 
           $(self).parents('.deduction-kind').find('.deductions-list > .deduction').each(function(i, deduction) {
-            var url = $(deduction).attr('id').replace('financial_assistance_deduction_', 'deductions/');
+            var url = $(deduction).attr('id').replace('deduction_', 'deductions/');
             $(deduction).remove();
 
             $.ajax({
@@ -147,7 +147,7 @@ $(document).on('turbolinks:load', function () {
         $("#destroyDeduction").modal('hide');
         $(self).parents('.deduction').remove();
 
-        var url = $(self).parents('.deduction').attr('id').replace('financial_assistance_deduction_', 'deductions/');
+        var url = $(self).parents('.deduction').attr('id').replace('deduction_', 'deductions/');
         $.ajax({
           type: 'DELETE',
           url: url
@@ -174,7 +174,7 @@ $(document).on('turbolinks:load', function () {
           //$(self).prop('checked', false);
 
           $('.deductions-list > .deduction').each(function(i, deduction) {
-            var url = $(deduction).attr('id').replace('financial_assistance_deduction_', 'deductions/');
+            var url = $(deduction).attr('id').replace('deduction_', 'deductions/');
             $(deduction).remove();
             $.ajax({
               type: 'DELETE',
