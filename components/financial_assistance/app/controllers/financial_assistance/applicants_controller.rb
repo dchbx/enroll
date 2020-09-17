@@ -32,7 +32,7 @@ module FinancialAssistance
     end
 
     def edit
-      @applicant.addresses.build(kind: 'home') if @applicant.addresses.blank?
+      %w[home mailing].each{|kind| @applicant.addresses.build(kind: kind) if @applicant.addresses.in(kind: kind).blank?}
       @vlp_doc_subject = @applicant.vlp_subject
 
       respond_to do |format|
