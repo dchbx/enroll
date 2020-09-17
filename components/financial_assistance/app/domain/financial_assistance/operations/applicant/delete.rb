@@ -12,8 +12,8 @@ module FinancialAssistance
 
         def call(financial_applicant: , family_id: )
           values        = yield validate(financial_applicant)
-          application   = yield find_draft_application(family_id)
-          applicant     = yield match_applicant(values, application)
+          @application  = yield find_draft_application(family_id)
+          applicant     = yield match_applicant(values, @application)
           result        = yield delete_applicant(applicant)
 
           Success(result)
@@ -46,7 +46,12 @@ module FinancialAssistance
         end
 
         def delete_applicant(applicant)
-          Try { applicant&.destroy! }
+          Try {
+            applicant_id = applicant
+            applicant&.destroy!
+            @application.relationships.where(applicant_id: applicant_id).destroy_all
+            @application.relationships.where(relative_id: applicant_id).destroy_all
+          }
         end
       end
     end
