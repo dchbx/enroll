@@ -343,6 +343,11 @@ div#add-more-link {
   font-weight: bold;
 }
 
+.fa-align-elements {
+  display: flex;
+  align-items: center
+}
+
 .verti-line-trans {
   background: linear-gradient(to right,
     transparent calc(50% - 0.4px),
