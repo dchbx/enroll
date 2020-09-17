@@ -137,8 +137,8 @@ module FinancialAssistance
         attrs.merge!(vlp_parameters)
         attrs.merge({
                       addresses: nested_parameters[:addresses_attributes].values,
-                      phones: nested_parameters[:phones_attributes].values,
-                      emails: nested_parameters[:emails_attributes].values
+                      phones: nested_parameters[:phones_attributes]&.values || [],
+                      emails: nested_parameters[:emails_attributes]&.values || []
                     })
       end
 
@@ -156,11 +156,10 @@ module FinancialAssistance
         address_params = addresses_attributes.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
         address_params = primary_applicant_address_attributes if address_params.blank? && same_with_primary == 'true'
 
-        {
-          addresses_attributes: address_params,
-          phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?},
-          emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}
-        }
+        params = {addresses_attributes: address_params}
+        params.merge(phones_attributes: phones_attributes.reject{|_key, value| value[:full_phone_number].blank?}) if phones_attributes.present?
+        params.merge(emails_attributes: emails_attributes.reject{|_key, value| value[:address].blank?}) if emails_attributes.present?
+        params
       end
 
       def primary_applicant_address_attributes
