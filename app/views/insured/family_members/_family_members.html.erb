@@ -26,7 +26,7 @@
     <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
       <label class="static_label label-floatlabel" for="relation">RELATIONSHIP</label>
       <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= l10n(".self").to_s.upcase %></span>
-      <%= link_to main_app.personal_insured_families_path, remote: true, class: 'close close-2' do %>
+      <%= link_to personal_insured_families_path, remote: true, class: 'close close-2' do %>
         <i class="fas fa-pencil-alt"></i>
       <% end %>
     </div>

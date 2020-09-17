@@ -203,6 +203,10 @@ class Insured::ConsumerRolesController < ApplicationController
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+    respond_to do |format|
+      format.js
+      format.html
+    end
   end
 
   def update
