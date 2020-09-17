@@ -9,7 +9,6 @@ module Validators
       optional(:area_code).maybe(:string)
       optional(:number).maybe(:string)
       optional(:extension).maybe(:string)
-      optional(:primary).filled(:bool)
       required(:full_phone_number).maybe(:string)
     end
   end
