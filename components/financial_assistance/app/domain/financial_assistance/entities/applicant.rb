@@ -20,7 +20,7 @@ module FinancialAssistance
       attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
       attribute :ethnicity, Types::Array.optional.meta(omittable: true)
       attribute :race, Types::String.optional.meta(omittable: true)
-      attribute :indian_tribe_member, Types::Strict::Bool
+      attribute :indian_tribe_member, Types::Bool.optional.meta(omittable: true)
       attribute :tribal_id, Types::String.optional.meta(omittable: true)
 
       attribute :language_code, Types::String.optional.meta(omittable: true)
@@ -33,7 +33,7 @@ module FinancialAssistance
       attribute :is_consumer_role, Types::Strict::Bool
       attribute :is_resident_role, Types::Strict::Bool.meta(omittable: true)
       attribute :vlp_document_id, Types::String.optional.meta(omittable: true)
-      attribute :same_with_primary, Types::Strict::Bool
+      attribute :same_with_primary, Types::Bool.optional.meta(omittable: true)
       attribute :is_applying_coverage, Types::Strict::Bool
 
       attribute :vlp_subject, Types::String.optional.meta(omittable: true)

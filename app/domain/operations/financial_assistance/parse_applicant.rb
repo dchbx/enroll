@@ -81,7 +81,7 @@ module Operations
       end
 
       def construct_association_fields(records)
-        records.collect{|record| record.attributes.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version) }
+        records.collect{|record| record.attributes.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary) }
       end
     end
   end
