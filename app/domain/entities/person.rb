@@ -16,7 +16,7 @@ module Entities
 
     attribute :is_incarcerated, Types::Strict::Bool
     attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
-    attribute :ethnicity, Types::Strict::Array.meta(omittable: true)
+    attribute :ethnicity, Types::Array.optional.meta(omittable: true)
     attribute :race, Types::String.optional.meta(omittable: true)
     attribute :indian_tribe_member, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :tribal_id, Types::String.optional.meta(omittable: true)
