@@ -120,7 +120,7 @@
 
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">
     <button type="submit" class="btn btn-primary btn-br hidden"><i class="fa fa-user-plus"></i> Save</button>
-    <button type="button" class="btn btn-default close_member_form hide"> Cancel</button>
+    <button type="button" class="btn btn-default close_member_form hide cancel_<%=@applicant.id%>_edit"> Cancel</button>
     <span class='btn btn-primary btn-br save_member' onclick='PersonValidations.manageRequiredValidations($(this));'> Confirm member</span>
   </div>
 <% end %>
