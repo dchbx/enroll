@@ -527,6 +527,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           let(:minus_xml) { File.read(Rails.root.join("spec", "test_data", "verified_family_payloads", "valid_verified_4_member_family_minus_one_sample.xml")) }
 
           it "should not log any errors" do
+            person.reload
             expect(subject).not_to receive(:log)
             subject.call(nil, nil, nil, nil, minus_message)
           end
