@@ -41,8 +41,8 @@ module FinancialAssistance
         end
 
         def match_applicant(financial_applicant, application)
-          result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: financial_applicant, application: application)
-          result.success? ? Success(result.success) : Failure(result.failure)
+          result = application.applicants.where(person_hbx_id: financial_applicant[:person_hbx_id]).first
+          result.present? ? Success(result) : Failure('Unable to find applicant.')
         end
 
         def delete_applicant(applicant)

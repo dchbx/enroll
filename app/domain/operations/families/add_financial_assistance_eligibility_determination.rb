@@ -48,7 +48,8 @@ module Operations
       end
 
       def build_eligibility_determinations(tax_household, faa_ed, benchmark_plan_id)
-        verified_aptc = faa_ed["max_aptc"]["cents"].to_f > 0.00 ? faa_ed["max_aptc"]["cents"] : 0.00
+        max_aptc = Money.new(faa_ed["max_aptc"]["cents"], 'USD')
+        verified_aptc = max_aptc.to_f > 0.00 ? max_aptc.to_f : 0.00
         tax_household.eligibility_determinations.build(
           benchmark_plan_id: benchmark_plan_id,
           max_aptc: verified_aptc,

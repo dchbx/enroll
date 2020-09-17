@@ -8,8 +8,6 @@ module Operations
     class CreateOrUpdate
       include Dry::Monads[:result, :do]
 
-      PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
-
       def call(params:)
         person_values = yield validate(params)
         person_entity = yield create_entity(person_values)
@@ -42,21 +40,14 @@ module Operations
       end
 
       def match_or_update_or_create_person(person_entity)
-        person = if person_entity[:no_ssn] == '1'
-                   PersonCandidate.new(person_entity[:first_name], person_entity[:last_name], person_entity[:dob])
-                   Person.where(first_name: /^#{person_entity[:first_name]}$/i, last_name: /^#{person_entity[:last_name]}$/i,
-                                dob: person_entity[:dob]).first # TODO Need to
-                 else
-                   candidate = PersonCandidate.new(person_entity[:ssn], person_entity[:dob])
-                   person = Person.match_existing_person(candidate)
-                 end
+        person = Person.by_hbx_id(person_entity.to_h[:hbx_id]).first
 
         #create new person
         if person.blank?
           person = Person.new(person_entity.to_h) #if person_valid_params.success?
           person.save!
         else
-          person.assign_attributes(person_entity.except(:hbx_id))
+          person.assign_attributes(person_entity.to_h)
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)
