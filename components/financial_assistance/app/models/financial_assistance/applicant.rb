@@ -664,7 +664,7 @@ module FinancialAssistance
     def other_questions_complete?
       questions_array = []
 
-      questions_array << is_former_foster_care  if foster_age_satisfied?
+      questions_array << is_former_foster_care  if foster_age_satisfied? && is_applying_coverage
       questions_array << is_post_partum_period  unless is_pregnant
 
       (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
@@ -879,6 +879,7 @@ module FinancialAssistance
     end
 
     def other_questions_answers
+      return [] unless is_applying_coverage
       [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
         no_ssn_flag = no_ssn
 
@@ -888,7 +889,11 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      if is_applying_coverage
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      else
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      end
     end
 
     def driver_question_responses
@@ -939,6 +944,8 @@ module FinancialAssistance
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
+
+      return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?

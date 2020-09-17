@@ -17,7 +17,7 @@
       <p>Answer these questions for this person. When you're finished, select CONTINUE.</p>
       <p class="memo">* = required field</p>
 
-        <% if @applicant.present? && @applicant.no_ssn == "1" %>
+        <% if @applicant.present? && @applicant.no_ssn == "1" && @applicant.is_applying_coverage %>
           <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
             <div class='col-md-6'>
               <span class="fa-text-color">Has this person applied for an SSN *</span>
@@ -59,38 +59,36 @@
             <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_pregnant"} %>
           </div>
         </div>
+        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+          <div class='col-lg-6 col-md-6 top-buffer'>
+            <span class="fa-text-color">Pregnancy due date?</span>
+          </div>
+          <div class='col-lg-6 col-md-6'>
+            <%= f.text_field :pregnancy_due_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>
+          </div>
+        </div>
+        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+          <div class='col-md-6'>
+            <span class="fa-text-color">How many children is this person expecting?</span>
+          </div>
+          <div class='col-lg-3 col-md-3 fa-select select-box'>
+            <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, {:id => 'children_expected_count', :prompt => true}) %>
+          </div>
+        </div>
 
-      <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-        <div class='col-lg-6 col-md-6 top-buffer'>
-          <span class="fa-text-color">Pregnancy due date?</span>
+        <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
+          <div class='col-md-6'>
+            <span class="fa-text-color">Was this person pregnant in the last 60 days?</span>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_post_partum_period", true, class: "radio-yml", id: "is_post_partum_period_yes") %>
+            <label class="radio-yml" for="is_post_partum_period_yes">Yes</label>
+          </div>
+          <div class='col-md-2'>
+            <%= f.radio_button("is_post_partum_period", false, class: "radio-yml", id: "is_post_partum_period_no") %>
+              <label class="radio-yml" for="is_post_partum_period_no">No</label>
+          </div>
         </div>
-        <div class='col-lg-6 col-md-6'>
-          <%= f.text_field :pregnancy_due_on, class: "jq-datepicker floatlabel", id: "applicant_pregnancy_due_on", placeholder: "Due Date" %>
-        </div>
-      </div>
-
-      <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-        <div class='col-md-6'>
-          <span class="fa-text-color">How many children is this person expecting?</span>
-        </div>
-        <div class='col-lg-3 col-md-3 fa-select select-box'>
-          <%= f.select(:children_expected_count, options_for_select({'one'=>1, 'two'=>2, 'three'=>3, 'four'=>4, 'five'=>5, 'six'=>6, 'seven'=>7, 'eight'=>8, 'nine'=>9, 'ten'=>10}, selected: @applicant.children_expected_count), {:include_blank => "Choose"}, {:id => 'children_expected_count', :prompt => true}) %>
-        </div>
-      </div>
-
-      <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
-        <div class='col-md-6'>
-          <span class="fa-text-color">Was this person pregnant in the last 60 days?</span>
-        </div>
-        <div class='col-md-2'>
-          <%= f.radio_button("is_post_partum_period", true, class: "radio-yml", id: "is_post_partum_period_yes") %>
-          <label class="radio-yml" for="is_post_partum_period_yes">Yes</label>
-        </div>
-        <div class='col-md-2'>
-          <%= f.radio_button("is_post_partum_period", false, class: "radio-yml", id: "is_post_partum_period_no") %>
-            <label class="radio-yml" for="is_post_partum_period_no">No</label>
-        </div>
-      </div>
 
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class='col-lg-6 col-md-6 top-buffer'>
@@ -101,6 +99,7 @@
         </div>
       </div>
 
+      <% if @applicant.present? && @applicant.is_applying_coverage %>
       <div class="row row-form-wrapper no-buffer row-height fa-align-elements">
         <div class='col-md-6'>
           <span class="fa-text-color">Was this person on Medicaid during pregnancy?</span>
@@ -322,6 +321,7 @@
             <label class="radio-yml" for="is_vets_spouse_or_child_no">No</label>
           </div>
         </div>
+        <% end %>
         <br><br>
     </div>
 
