@@ -16,11 +16,11 @@ module FinancialAssistance
       attribute :is_primary_applicant, Types::Strict::Bool.meta(omittable: true)
       attribute :family_member_id, Types::Bson.optional.meta(omittable: true)
       attribute :person_hbx_id, Types::String.optional.meta(omittable: true)
-      attribute :is_incarcerated, Types::Strict::Bool
+      attribute :is_incarcerated, Types::Strict::Bool.optional.meta(omittable: true)
       attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
       attribute :ethnicity, Types::Strict::Array.meta(omittable: true)
       attribute :race, Types::String.optional.meta(omittable: true)
-      attribute :indian_tribe_member, Types::Strict::Bool
+      attribute :indian_tribe_member, Types::Strict::Bool.optional.meta(omittable: true)
       attribute :tribal_id, Types::String.optional.meta(omittable: true)
 
       attribute :language_code, Types::String.optional.meta(omittable: true)
