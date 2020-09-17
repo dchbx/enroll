@@ -47,11 +47,11 @@
             <span class="fa-text-color">Is this person pregnant? *</span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes", required: true) %>
+            <%= f.radio_button("is_pregnant", true, class: "radio-yml", id: "is_pregnant_yes") %>
             <label class="radio-yml" for="is_pregnant_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_pregnant", false, class: "radio-yml", id: "is_pregnant_no", required: true) %>
+            <%= f.radio_button("is_pregnant", false, class: "radio-yml", id: "is_pregnant_no") %>
             <label class="radio-yml" for="is_pregnant_no">No</label>
           </div>
           <div class='col-md-2 left-seprator'>
@@ -120,11 +120,11 @@
           <span class="fa-text-color">Was this person in foster care at age 18 or older? *</span>
         </div>
         <div class='col-md-2'>
-          <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes", required: true) %>
+          <%= f.radio_button("is_former_foster_care", true, class: "radio-yml", id: "is_former_foster_care_yes") %>
           <label class="radio-yml" for="is_former_foster_care_yes">Yes</label>
         </div>
         <div class='col-md-2'>
-          <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "is_former_foster_care_no", required: true) %>
+          <%= f.radio_button("is_former_foster_care", false, class: "radio-yml", id: "is_former_foster_care_no") %>
           <label class="radio-yml" for="is_former_foster_care_no">No</label>
         </div>
       </div>
@@ -155,12 +155,12 @@
           </div>
 
           <div class='col-md-2'>
-            <%= f.radio_button("had_medicaid_during_foster_care", true, class: "radio-yml", id: "had_medicaid_during_foster_care_yes", required: true)%>
+            <%= f.radio_button("had_medicaid_during_foster_care", true, class: "radio-yml", id: "had_medicaid_during_foster_care_yes")%>
             <label class="radio-yml" for="had_medicaid_during_foster_care_yes">Yes</label>
           </div>
 
           <div class='col-md-2'>
-            <%= f.radio_button("had_medicaid_during_foster_care", false, class: "radio-yml", id: "had_medicaid_during_foster_care_no", required: true) %>
+            <%= f.radio_button("had_medicaid_during_foster_care", false, class: "radio-yml", id: "had_medicaid_during_foster_care_no") %>
                 <label class="radio-yml" for="had_medicaid_during_foster_care_no">No</label>
           </div>
         </div>
@@ -213,11 +213,11 @@
             <span class="fa-text-color">Is this person blind? *</span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_self_attested_blind", true, class: "radio-yml", id: "is_self_attested_blind_yes", required: true) %>
+            <%= f.radio_button("is_self_attested_blind", true, class: "radio-yml", id: "is_self_attested_blind_yes") %>
             <label class="radio-yml" for="is_self_attested_blind_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_self_attested_blind", false, class: "radio-yml", id: "is_self_attested_blind_no", required: true )%>
+            <%= f.radio_button("is_self_attested_blind", false, class: "radio-yml", id: "is_self_attested_blind_no")%>
             <label class="radio-yml" for="is_self_attested_blind_no">No</label>
           </div>
           <div class='col-md-2 left-seprator'>
@@ -231,11 +231,11 @@
             <span class="fa-text-color">Does this person need help with daily life activities, such as dressing or bathing? *</span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("has_daily_living_help", true, class: "radio-yml", id: "has_daily_living_help_yes", required: true) %>
+            <%= f.radio_button("has_daily_living_help", true, class: "radio-yml", id: "has_daily_living_help_yes") %>
             <label class="radio-yml" for="has_daily_living_help_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("has_daily_living_help", false, class: "radio-yml", id: "has_daily_living_no", required: true) %>
+            <%= f.radio_button("has_daily_living_help", false, class: "radio-yml", id: "has_daily_living_no") %>
             <label class="radio-yml" for="has_daily_living_help_no">No</label>
           </div>
           <div class='col-md-2 left-seprator'>
@@ -249,11 +249,11 @@
             <span class="fa-text-color">Does this person need help paying for any medical bills from the last 3 months? *</span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("need_help_paying_bills", true, class: "radio-yml", id: "need_help_paying_bills_yes", required: true)%>
+            <%= f.radio_button("need_help_paying_bills", true, class: "radio-yml", id: "need_help_paying_bills_yes")%>
             <label class="radio-yml" for="need_help_paying_bills_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "need_help_paying_bills_no", required: true )%>
+            <%= f.radio_button("need_help_paying_bills", false, class: "radio-yml", id: "need_help_paying_bills_no")%>
             <label class="radio-yml" for="need_help_paying_bills_no">No</label>
           </div>
           <div class='col-md-2 left-seprator'>
@@ -267,11 +267,11 @@
             <span class="fa-text-color"><%= l10n("faa.other_ques.disability_question") %></span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes', required: true) %>
+            <%= f.radio_button("is_physically_disabled", true, class: "radio-yml", id: 'radio_physically_disabled_yes') %>
             <label class="radio-yml" for="radio_physically_disabled_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_physically_disabled", false, class: "radio-yml", id: 'radio_physically_disabled_no', required: true) %>
+            <%= f.radio_button("is_physically_disabled", false, class: "radio-yml", id: 'radio_physically_disabled_no') %>
             <label class="radio-yml" for="radio_physically_disabled_no">No</label>
           </div>
           <div class='col-md-2 left-seprator'>
@@ -285,11 +285,11 @@
               <span class="fa-text-color">Did you move to the U.S. on or after August 22, 1996?</span>
             </div>
             <div class='col-md-2'>
-              <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes", required: true) %>
+              <%= f.radio_button("is_resident_post_092296", true, class: "radio-yml", id: "is_resident_post_092296_yes") %>
               <label class="radio-yml" for="is_resident_post_092296_yes">Yes</label>
             </div>
             <div class='col-md-2'>
-              <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no", required: true) %>
+              <%= f.radio_button("is_resident_post_092296", false, class: "radio-yml", id: "is_resident_post_092296_no") %>
               <label class="radio-yml" for="is_resident_post_092296_no">No</label>
             </div>
           </div>
@@ -300,11 +300,11 @@
             <span class="fa-text-color">Are you an honorably discharged veteran or active duty member of the military?</span>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_veteran_or_active_military", true, class: "radio-yml", id: "is_veteran_or_active_military_yes", required: true) %>
+            <%= f.radio_button("is_veteran_or_active_military", true, class: "radio-yml", id: "is_veteran_or_active_military_yes") %>
             <label class="radio-yml" for="is_veteran_or_active_military_yes">Yes</label>
           </div>
           <div class='col-md-2'>
-            <%= f.radio_button("is_veteran_or_active_military", false, class: "radio-yml", id: "is_veteran_or_active_military_no", required: true) %>
+            <%= f.radio_button("is_veteran_or_active_military", false, class: "radio-yml", id: "is_veteran_or_active_military_no") %>
             <label class="radio-yml" for="is_veteran_or_active_military_no">No</label>
           </div>
         </div>

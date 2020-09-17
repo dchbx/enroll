@@ -70,7 +70,6 @@ module FinancialAssistance
         redirect_to edit_application_path(@application)
       else
         @applicant.save(validate: false)
-        @applicant.valid?(:other_qns)
         flash[:error] = build_error_messages_for_other_qns(@applicant)
         redirect_to other_questions_application_applicant_path(@application, @applicant)
       end
