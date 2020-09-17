@@ -40,7 +40,7 @@
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
         <div class="col-md-6">
-          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel ph-width fien_field" %>
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', class: "floatlabel ph-width fien_field" %>
         </div>
       </div>
     <% end %>
