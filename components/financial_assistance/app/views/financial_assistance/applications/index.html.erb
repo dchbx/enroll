@@ -10,12 +10,13 @@
         If you started or completed an application for help paying for coverage, it will be listed below. If the status says it’s a draft, that means you haven’t completed the application. Select ‘Actions’ to view or update an application.
       </h4>
       <div class="">
-        <%= form_tag({:action => 'create'}, {:method => 'post'}) do %>
+        <%= form_tag(main_app.help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
         <%if @applications.present? %>
           <span class="tool-tip" data-toggle="tooltip" data-placement="top" title="You already have an application in progress.">
             <%= submit_tag "Start new application", class: "btn btn-primary pull-right", disabled: true %>
           </span>
         <%else%>
+          <%= hidden_field_tag :is_applying_for_assistance, true %>
           <%= submit_tag "Start new application", class: "btn btn-primary pull-right"%>
         <%end%>
         <% end %>
