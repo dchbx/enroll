@@ -1,0 +1,102 @@
+.er-medicaid, .er-phi, .er-summary, .er-notqualify {
+  background-color: #ffffff;
+  border: 1px solid #c3c3c3;
+}
+.er-title h3 {
+  margin: 10px 15px 12px;
+  font-weight: 600;
+}
+.er-medicaid-prsn, .er-summary {
+  padding: 20px 30px 15px;
+}
+.er-medicaid-prsn span {
+  font-weight: bold;
+  &.glossary {
+    font-weight: inherit;
+  }
+}
+.er-medicaid-prsn p, .er-summary p {
+  color: #909090;
+}
+.er-prsn i, .er-prsn h4 {
+  display: inline-block;
+  vertical-align: middle;
+}
+.er-prsn i {
+  margin-right: 10px;
+}
+.er-prsn h4 {
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 500;
+}
+.er-warning {
+  padding: 10px 30px;
+}
+.er-warning div {
+  display: table-cell;
+  vertical-align: top;
+}
+.er-warning i, .er-success i {
+  margin-right: 10px;
+}
+.text-warning {
+  /*color: #EAAA00;*/
+  color: #8a6d3b
+}
+.text-warning span {
+  font-weight: bold;
+}
+.text-success {
+  color: #3c763d;
+}
+.er-success {
+  padding: 10px 30px 13px;
+}
+.er-success div {
+  display: table-cell;
+  vertical-align: middle;
+}
+.er-success .text-success span {
+  width: 415px;
+  display: block;
+}
+.er-downhist a i {
+  margin-right: 10px;
+}
+.er-downhist a:hover {
+  text-decoration: none;
+}
+.er-downhist a span:hover {
+  text-decoration: underline;
+}
+.er-downhist i {
+  font-size: 1.5em;
+}
+.fa, .knowmore h4 {
+  color: #007BC4;
+}
+.fa-2x {
+  font-size: 2em;
+}
+.border-bottom-1px {
+  border-bottom: 1px solid #c2c2c2;
+}
+.border-bottom-2px {
+  border-bottom: 2px solid #c2c2c2;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+.mt-10 {
+  margin-top: 10px;
+}
+.mt-15 {
+  margin-top: 15px;
+}
+.mb {
+  margin-bottom: 10px;
+}
