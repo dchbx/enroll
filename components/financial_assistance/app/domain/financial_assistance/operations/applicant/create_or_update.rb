@@ -36,8 +36,8 @@ module FinancialAssistance
         end
 
         def match_applicant(values, application)
-          result = ::FinancialAssistance::Operations::Applicant::Match.new.call(params: values.to_h, application: application)
-          result.success? ? Success(result.success) : Success(nil)
+          result = application.applicants.where(person_hbx_id: values.to_h[:person_hbx_id]).first
+          result.present? ? Success(result) : Success(nil)
         end
 
         def fetch_array_of_attrs_for_embeded_objects(data)

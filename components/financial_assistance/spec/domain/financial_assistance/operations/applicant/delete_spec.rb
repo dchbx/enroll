@@ -16,7 +16,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
   end
 
   let(:applicant_params) do
-    {:person_hbx_id=>"13cce9fe14b04209b2443330900108d8",
+    {:person_hbx_id=>applicant.person_hbx_id,
      :ssn=>"889984400",
      :dob=>"09/12/1993",
      first_name: 'james',

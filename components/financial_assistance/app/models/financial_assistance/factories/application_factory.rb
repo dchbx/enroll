@@ -100,8 +100,7 @@ module FinancialAssistance
             applicant_in_context.first.update_attributes(is_active: true)
           else
             applicant_params = members_attributes.detect { |member_attributes| member_attributes[:family_member_id] == fm_id }
-            applicant_result = FinancialAssistance::Operations::Applicant::Match.new.call(params: applicant_params, application: self)
-            applicant = applicant_result.success? ? applicant_result.success : applicant_result.failure
+            applicant = application.applicants.where(person_hbx_id: applicant_params.to_h[:person_hbx_id])
             if applicant.present?
               applicant.update_attributes!(applicant_params)
             else
