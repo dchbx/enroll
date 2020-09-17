@@ -97,6 +97,9 @@ class Person
   field :is_physically_disabled, type: Boolean
   field :is_applying_for_assistance, type: Boolean
 
+  field :is_homeless, type: Boolean, default: false
+  field :is_temporarily_out_of_state, type: Boolean, default: false
+
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
 
