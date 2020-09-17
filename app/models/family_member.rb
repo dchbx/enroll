@@ -8,7 +8,7 @@ class FamilyMember
   embedded_in :family
 
   # Responsible for updating eligibility when family member is created/updated
-  # after_create :family_member_created
+  after_create :family_member_created
   after_update :family_member_updated, if: :is_active_changed?
 
   # Person responsible for this family
@@ -171,6 +171,11 @@ class FamilyMember
 
   def family_member_created
     deactivate_tax_households
+    create_financial_assistance_applicant
+  end
+
+  def create_financial_assistance_applicant
+    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self})
   end
 
   def family_member_updated

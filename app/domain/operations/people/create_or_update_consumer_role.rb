@@ -43,9 +43,7 @@ module Operations
           person.build_consumer_role({:is_applicant => false}.merge(entity.to_h))
         end
 
-        Person.skip_callback(:update, :after, :person_create_or_update_handler)
         person.save!
-        Person.set_callback(:update, :after, :person_create_or_update_handler)
 
         Success(person.consumer_role)
       rescue StandardError => e
