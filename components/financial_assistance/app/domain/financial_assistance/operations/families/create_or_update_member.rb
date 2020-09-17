@@ -36,12 +36,13 @@ module FinancialAssistance
         end
 
         def create_or_update_family_member(applicant)
-          ::Operations::Families::CreateOrUpdateFamilyMember.new.call(applicant)
-
+          begin
+            result = ::Operations::Families::CreateOrUpdateFamilyMember.new.call(applicant)
+            return result if result.success?
+          rescue StandardError => e
+            Failure(e.message)
+          end
           Success('A successful call was made to enroll to create or update a family member')
-
-        rescue StandardError => e
-          Failure(e.message)
         end
       end
     end

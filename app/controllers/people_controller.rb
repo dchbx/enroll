@@ -210,8 +210,13 @@ class PeopleController < ApplicationController
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
         # if dual role, this will update both ivl and ee
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
-        format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
+        if params[:page].eql? "from_registration"
+          format.js
+          format.html{redirect_back(fallback_location: root_path)}
+        else
+          format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
+          format.json { head :no_content }
+        end
       else
         @person.addresses = @old_addresses
         if @person.is_consumer_role_active?
