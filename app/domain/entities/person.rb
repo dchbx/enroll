@@ -18,7 +18,6 @@ module Entities
     attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
     attribute :ethnicity, Types::Array.optional.meta(omittable: true)
     attribute :race, Types::String.optional.meta(omittable: true)
-    attribute :indian_tribe_member, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :tribal_id, Types::String.optional.meta(omittable: true)
 
     attribute :language_code, Types::String.optional.meta(omittable: true)
@@ -27,7 +26,6 @@ module Entities
     attribute :is_temporarily_out_of_state, Types::Strict::Bool.meta(omittable: true)
 
     attribute :no_ssn, Types::String.optional.meta(omittable: true)
-    attribute :same_with_primary, Types::Strict::Bool
 
     attribute :addresses, Types::Array.of(Entities::Address)
     attribute :emails, Types::Array.of(Entities::Email)
