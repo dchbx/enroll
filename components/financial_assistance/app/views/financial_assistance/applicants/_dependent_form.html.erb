@@ -151,7 +151,7 @@
                 <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
               </div>
               <label class="position-left"> of</label>
-              <div class="icon-rel">
+              <div class="icon-rel pl-1">
                 <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
                 <i class="fa fa-link" aria-hidden="true"></i>
                 <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
@@ -183,31 +183,6 @@
                   <%= render 'financial_assistance/shared/address_fields_for_applicant', f: f, show_no_dc_address: true %>
                 </div>
               </div>
-
-                <%=
-    unless f.object.phones.nil?
-      ["home","mobile","work","fax"].each do |kind|
-         f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
-      end
-    end
-
-    render 'financial_assistance/shared/phone_fields', f: f
-  %><br>
-
-    <% unless f.object.emails.nil?
-         ["home","work"].each do |kind|
-           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
-         end
-       end
-    %>
-
-    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
-      <div id="email_info" class="row row-form-wrapper no-buffer">
-      <%= render 'financial_assistance/shared/email_fields', f: email %>
-        </div><br>
-
-    <% end %>
-    
           <%# end %>
 
           <%= f.hidden_field :family_id %>

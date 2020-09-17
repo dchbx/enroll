@@ -78,15 +78,16 @@
     <%= render 'financial_assistance/shared/consumer_fields', f: f %><br>
   </div>
     <%= render 'financial_assistance/shared/consumer_home_address_fields', f: f %><br>
-  <%=
-    unless f.object.phones.nil?
-      ["home","mobile","work","fax"].each do |kind|
-         f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+  <% if f.object.is_primary_applicant %>
+    <%=
+      unless f.object.phones.nil?
+        ["home","mobile","work","fax"].each do |kind|
+           f.object.phones.build(kind: kind) if f.object.phones.select{|phone| phone.kind == kind}.blank?
+        end
       end
-    end
 
-    render 'financial_assistance/shared/phone_fields', f: f
-  %><br>
+      render 'financial_assistance/shared/phone_fields', f: f
+    %><br>
 
     <% unless f.object.emails.nil?
          ["home","work"].each do |kind|
@@ -101,11 +102,7 @@
         </div><br>
 
     <% end %>
-
-    <div>
-      <%#= render 'shared/contact_preferences', {f: f, role: :consumer_role} %></br>
-    </div>
-
+  <% end %>
     <div>
       <div class="no-buffer no-border-top">
         <div class="form-group form-group-lg">
