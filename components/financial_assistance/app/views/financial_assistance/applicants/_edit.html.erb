@@ -20,11 +20,12 @@
         </div>
 <!--     FIX ME: Add disabled attribute on DOB, SSN Fields. Removed due to fields not getting submitted issue. -->     
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH",
-                                             :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy'} %>
+          <div class="col-md-3 col-sm-3 col-xs-12 no-pd">
+            <div class="form-group form-group-lg">
+              <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "#{l10n("date_of_birth").to_s.upcase} *",
+                                               :'data-date-min' => "-110y", :'data-date-max' => "+0", required: true,  id: "family_member_dob_#{@applicant.id}"}, @applicant.dob %>
+            </div>
           </div>
-
          <div class="col-md-3 col-sm-3 no-pd">
            <div class="form-group form-group-lg">
              <%= f.text_field :ssn, class: "home required floatlabel form-control mask-ssn", placeholder: "#{l10n("social_security").to_s.upcase}" %>
@@ -68,7 +69,7 @@
           <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
             <span>Is <%= @applicant.first_name %> applying for coverage? *</span>
           </div>
-          <%= render 'shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
+          <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
         </div>
       </div>
     </div>
