@@ -42,7 +42,7 @@ module Operations
 
         if person_result.success?
           @person = person_result.success
-          @family_member = create_or_update_family_member(person, family, applicant_params)
+          @family_member = create_or_update_family_member(@person, family, applicant_params)
           create_or_update_consumer_role(applicant_params, @family_member)
           create_or_update_vlp_document(applicant_params, @person)
         else
