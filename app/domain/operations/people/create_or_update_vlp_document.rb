@@ -42,8 +42,8 @@ module Operations
       def create_or_update_vlp_document(vlp_document_params, person)
         vlp_document = person.consumer_role.find_document(vlp_document_params[:subject])
         return Success(vlp_document) if no_update_needed?({vlp_object: vlp_document, vlp_document_params: vlp_document_params})
-        vlp_document.assign_attributes(vlp_document_params.to_h)
 
+        vlp_document.assign_attributes(vlp_document_params.to_h)
         person.consumer_role.active_vlp_document_id = vlp_document.id
         person.save!
 
@@ -55,7 +55,7 @@ module Operations
 
       def no_update_needed?(params)
         vlp_db_hash = params[:vlp_object].serializable_hash
-        vlp_db_hash.merge(vlp_document_params) == vlp_db_hash
+        vlp_db_hash.merge(params[:vlp_document_params]) == vlp_db_hash
       end
     end
   end
