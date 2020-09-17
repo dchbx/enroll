@@ -43,7 +43,7 @@ module FinancialAssistance
         def fetch_array_of_attrs_for_embeded_objects(data)
           new_arr = []
           data.each do |special_hash|
-            new_arr << special_hash.except(:_id, :created_at, :updated_at, :tracking_version)
+            new_arr << special_hash.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)
           end
           new_arr
         end
@@ -63,7 +63,6 @@ module FinancialAssistance
           updated_applicant_hash.merge!({relationship: applicant.relation_with_primary, ssn: applicant.ssn})
           incoming_values = values.to_h.deep_symbolize_keys
           merged_params = updated_applicant_hash.merge(incoming_values)
-
           if any_information_changed?(merged_params, updated_applicant_hash)
             Success('Information has changed')
           else
