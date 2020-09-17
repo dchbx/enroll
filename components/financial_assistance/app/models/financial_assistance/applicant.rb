@@ -663,7 +663,7 @@ module FinancialAssistance
     end
 
     def other_questions_complete?
-      if foster_age_satisfied?
+      if foster_age_satisfied? && is_applying_coverage
         (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
       else
         other_questions_answers.include?(nil) ? false : true
@@ -879,6 +879,7 @@ module FinancialAssistance
     end
 
     def other_questions_answers
+      return [] unless is_applying_coverage
       [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
         no_ssn_flag = no_ssn
 
@@ -888,7 +889,11 @@ module FinancialAssistance
     end
 
     def validate_applicant_information
-      validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      if is_applying_coverage
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant, :is_self_attested_blind, :has_daily_living_help, :need_help_paying_bills #, :tax_household_id
+      else
+        validates_presence_of :has_fixed_address, :is_claimed_as_tax_dependent, :is_living_in_state, :is_temporarily_out_of_state, :is_pregnant
+      end
     end
 
     def driver_question_responses
@@ -938,6 +943,8 @@ module FinancialAssistance
         errors.add(:is_enrolled_on_medicaid, "' Was this person on Medicaid during pregnancy?' should be answered") if is_enrolled_on_medicaid.nil?
         errors.add(:pregnancy_end_on, "' Pregnancy End on date' should be answered") if pregnancy_end_on.blank?
       end
+
+      return unless is_applying_coverage
 
       if age_of_applicant > 18 && age_of_applicant < 26
         errors.add(:is_former_foster_care, "' Was this person in foster care at age 18 or older?' should be answered") if is_former_foster_care.nil?
