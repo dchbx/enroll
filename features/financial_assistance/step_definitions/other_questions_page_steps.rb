@@ -12,8 +12,8 @@ Given(/^all applicants fill all pages except other questions$/) do
     fill_in 'income[employer_name]', with: 'GloboGym'
     fill_in 'income[amount]', with: '100'
     fill_in 'income[start_on]', with: '1/1/2018'
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[2]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div[1]/div[2]/div[2]/div/div[3]/div/ul/li[2]').click
+    find_all("#job_income .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
+    find_all("#job_income li.interaction-choice-control-income-frequency-kind-7").first.click
     fill_in 'income[employer_address][address_1]', with: '1 K Street'
     fill_in 'income[employer_address][city]', with: 'Washington'
     fill_in 'income[employer_address][zip]', with: '20000'
@@ -23,8 +23,8 @@ Given(/^all applicants fill all pages except other questions$/) do
     click_button('Save')
     find('#has_self_employment_income_true').click
     fill_in 'income[amount]', with: '100.00'
-    find(:xpath, '//*[@id="new_income"]/div[1]/div/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div[1]/div/div[2]/div/div[3]/div/ul/li[3]').click
+    find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
+    find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
     fill_in 'income[start_on]', with: '01/01/2018'
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
@@ -34,8 +34,8 @@ Given(/^all applicants fill all pages except other questions$/) do
     find(:css, "#other_income_kind[value='interest']").set(true)
     fill_in 'income[amount]', with: '100'
     fill_in 'income[start_on]', with: '1/1/2018'
-    find(:xpath, '//*[@id="new_income"]/div/div[1]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_income"]/div/div[1]/div[2]/div/div[3]/div/ul/li[3]').click
+    find(".new-other-income-form.interest span.label").click
+    find(".new-other-income-form.interest li.interaction-choice-control-income-frequency-kind-7").click
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
 
@@ -43,8 +43,8 @@ Given(/^all applicants fill all pages except other questions$/) do
     find(:css, "#deduction_kind[value='moving_expenses']").set(true)
     fill_in 'deduction[amount]', with: '50'
     fill_in 'deduction[start_on]', with: '1/1/2018'
-    find(:xpath, '//*[@id="new_deduction"]/div/div[1]/div[2]/div/div[2]/b').click
-    find(:xpath, '//*[@id="new_deduction"]/div/div[1]/div[2]/div/div[3]/div/ul/li[5]').click
+    find(".new-deduction-form.moving_expenses span.label").click
+    find(".new-deduction-form.moving_expenses li.interaction-choice-control-deduction-frequency-kind-7").click
     click_button('Save')
     find(:xpath, '//*[@id="btn-continue"]').click
 
