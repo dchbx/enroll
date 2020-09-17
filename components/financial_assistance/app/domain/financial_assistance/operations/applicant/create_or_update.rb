@@ -52,7 +52,7 @@ module FinancialAssistance
           return Success(nil) unless applicant.present?
 
           applicant_db_hash = applicant.serializable_hash.deep_symbolize_keys
-          sanitized_applicant_hash = applicant_db_hash.inject({}) do |db_hash, element_hash|
+          updated_applicant_hash = applicant_db_hash.inject({}) do |db_hash, element_hash|
                                        db_hash[element_hash[0]] = if [:addresses, :emails, :phones].include?(element_hash[0])
                                                                     fetch_array_of_attrs_for_embeded_objects(element_hash[1])
                                                                   else
@@ -60,11 +60,11 @@ module FinancialAssistance
                                                                   end
                                        db_hash
                                      end
-          sanitized_applicant_hash.merge!({relationship: applicant.relation_with_primary, ssn: applicant.ssn})
+          updated_applicant_hash.merge!({relationship: applicant.relation_with_primary, ssn: applicant.ssn})
           incoming_values = values.to_h.deep_symbolize_keys
-          merged_params = sanitized_applicant_hash.merge(incoming_values)
+          merged_params = updated_applicant_hash.merge(incoming_values)
 
-          if any_information_changed?(merged_params, sanitized_applicant_hash)
+          if any_information_changed?(merged_params, updated_applicant_hash)
             Success('Information has changed')
           else
             Failure('No information is changed')
@@ -86,11 +86,11 @@ module FinancialAssistance
           end
         end
 
-        def any_information_changed?(merged_params, sanitized_applicant_hash)
-          return true unless merged_params.except(:addresses, :emails, :phones) == sanitized_applicant_hash.except(:addresses, :emails, :phones)
-          return true unless Set.new(merged_params[:addresses]) == Set.new(sanitized_applicant_hash[:addresses])
-          return true unless Set.new(merged_params[:emails]) == Set.new(sanitized_applicant_hash[:emails])
-          return true unless Set.new(merged_params[:phones]) == Set.new(sanitized_applicant_hash[:phones])
+        def any_information_changed?(merged_params, updated_applicant_hash)
+          return true if merged_params.except(:addresses, :emails, :phones) != updated_applicant_hash.except(:addresses, :emails, :phones)
+          return true if Set.new(merged_params[:addresses]) != Set.new(updated_applicant_hash[:addresses])
+          return true if Set.new(merged_params[:emails]) != Set.new(updated_applicant_hash[:emails])
+          return true if Set.new(merged_params[:phones]) != Set.new(updated_applicant_hash[:phones])
         end
       end
     end
