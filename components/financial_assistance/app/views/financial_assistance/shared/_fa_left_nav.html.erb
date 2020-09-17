@@ -63,18 +63,20 @@
           <% end %>
         </li>
 
-        <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
-          <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
-            <span class="fa fa-check applicant-check"></span>
-            <%= link_to financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "" do %>
-              Health Coverage
+        <% if @applicant.is_applying_coverage %>
+          <li class="list-box step-tabs <%= li_nav_classes_for(:health_coverage) %> applicant-nav">
+            <% if @applicant.embedded_document_section_entry_complete?(:health_coverage)%>
+              <span class="fa fa-check applicant-check"></span>
+              <%= link_to financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "" do %>
+                Health Coverage
+              <% end %>
+            <% else %>
+              <%= link_to financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check" do %>
+                Health Coverage
+              <% end %>
             <% end %>
-          <% else %>
-            <%= link_to financial_assistance.application_applicant_benefits_path(@application, @applicant), class: "no-check" do %>
-              Health Coverage
-            <% end %>
-          <% end %>
-        </li>
+          </li>
+        <% end %>
 
         <li class="list-box step-tabs <%= li_nav_classes_for(:other_questions) %> applicant-nav">
           <% if @applicant.other_questions_complete?%>
