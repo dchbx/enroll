@@ -63,19 +63,22 @@ module Operations
 
       def vlp_document_params(consumer_role)
         return {} unless consumer_role.active_vlp_document
-        consumer_role.active_vlp_document.attributes.slice(:vlp_subject,
-                                                           :alien_number,
-                                                           :i94_number,
-                                                           :visa_number,
-                                                           :passport_number,
-                                                           :sevis_id,
-                                                           :naturalization_number,
-                                                           :receipt_number,
-                                                           :citizenship_number,
-                                                           :card_number,
-                                                           :country_of_citizenship,
-                                                           :expiration_date,
-                                                           :issuing_country)
+        vlp_object = consumer_role.active_vlp_document
+        vlp_attrs = vlp_object.attributes.symbolize_keys.slice(:alien_number,
+                                                               :i94_number,
+                                                               :visa_number,
+                                                               :passport_number,
+                                                               :sevis_id,
+                                                               :naturalization_number,
+                                                               :receipt_number,
+                                                               :citizenship_number,
+                                                               :card_number,
+                                                               :country_of_citizenship,
+                                                               :expiration_date,
+                                                               :issuing_country)
+        vlp_attrs.merge!({expiration_date: vlp_attrs[:expiration_date].strftime("%d/%m/%Y")}) if vlp_attrs[:expiration_date].present?
+        vlp_attrs.merge!({vlp_subject: vlp_object[:subject]})
+        vlp_attrs
       end
 
       def construct_association_fields(records)

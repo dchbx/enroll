@@ -14,9 +14,9 @@ module Operations
 
       def call(params)
         family_result = yield get_family(family_id: params[:family_id])
-        family, applicant_family_mapping = yield create_member(params, family_result)
+        family, person_family_member_mapping = yield create_member(params, family_result)
 
-        Success([family, applicant_family_mapping])
+        Success([family, person_family_member_mapping])
       end
 
       private
@@ -37,31 +37,20 @@ module Operations
       end
 
       def create_member(applicant_attributes, family)
-        applicant_id_mappings = {}
+        binding.pry
         applicant_params = sanitize_params(applicant_attributes)
+        person_result = create_or_update_person(applicant_params)
 
-        if applicant_params[:family_member_id].present?
-          applicant_id_mappings[applicant_params[:_id]] = {
-              family_member_id: applicant_params[:family_member_id],
-              person_hbx_id: applicant_params[:person_hbx_id]
-          }
-
-          #update family member
+        if person_result.success?
+          @person = person_result.success
+          @family_member = create_or_update_family_member(person, family, applicant_params)
+          create_or_update_consumer_role(applicant_params, @family_member)
+          create_or_update_vlp_document(applicant_params, @person)
         else
-
-          person_result = create_or_update_person(applicant_params)
-
-          if person_result.success?
-            person = person_result.success
-            family_member = create_or_update_family_member(person, family, applicant_params)
-            create_or_update_consumer_role(applicant_params, family_member)
-            create_or_update_vlp_document(applicant_params, person)
-          else
-            return person
-          end
+          return @person
         end
 
-        Success([family, applicant_id_mappings])
+        Success([family, {family_member_id: @family_member.id, person_hbx_id: @person.hbx_id}])
       end
 
       def create_or_update_person(applicant_params)
@@ -75,9 +64,9 @@ module Operations
       end
 
       def create_or_update_family_member(person, family, applicant_params)
+        # TODO: Update matching family member
         family_member = family.relate_new_member(person, applicant_params[:relationship])
         family.save!
-
         family_member
       end
 
