@@ -28,11 +28,11 @@ FactoryBot.define do
     end
 
     trait :with_work_email do
-      emails { [FactoryBot.build(:email, kind: "work")] }
+      emails { [FactoryBot.build(:financial_assistance_email, kind: "work")] }
     end
 
     trait :with_work_phone do
-      phones { [FactoryBot.build(:phone, kind: "work")] }
+      phones { [FactoryBot.build(:financial_assistance_phone, kind: "work")] }
     end
 
     trait :male do

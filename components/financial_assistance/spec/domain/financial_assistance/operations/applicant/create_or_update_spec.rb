@@ -140,8 +140,8 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                           :relationship=>"child")
         appl.addresses = [FactoryBot.build(:financial_assistance_address, :address_1=>'1111 Awesome Street', :address_2=>'#111', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'work', :state=>'DC', :zip=>'20001', county: '')]
         appl.addresses << FactoryBot.build(:financial_assistance_address, :address_1=>'1112 Awesome Street', :address_2=>'#112', :address_3=>'', :city=>'Washington', :country_name=>'', :kind=>'home', :state=>'DC', :zip=>'20001', county: '')
-        appl.phones = [FactoryBot.build(:phone, :area_code=>'202', :country_code=>'', :extension=>'1', :full_phone_number=>'', :kind=>'work', :number=>'1111111', :primary=>nil)]
-        appl.emails = [FactoryBot.build(:email, :address=>'example1@example.com', :kind=>'work')]
+        appl.phones = [FactoryBot.build(:financial_assistance_phone, :area_code=>'202', :country_code=>'', :extension=>'1', :full_phone_number=>'20211111111', :kind=>'work', :number=>'1111111', :primary=>nil)]
+        appl.emails = [FactoryBot.build(:financial_assistance_email, :address=>'example1@example.com', :kind=>'work')]
         appl.save!
         appl
       end
@@ -180,7 +180,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                                :no_ssn=>"0",
                                :passport_number=>nil,
                                :person_hbx_id=> applicant.person_hbx_id,
-                               :phones=>[{:area_code=>"202", :country_code=>"", :extension=>"1", :full_phone_number=>"", :kind=>"work", :number=>"1111111", :primary=>nil}],
+                               :phones=>[{:area_code=>"202", :country_code=>"", :extension=>"1", :full_phone_number=>"20211111111", :kind=>"work", :number=>"1111111", :primary=>nil}],
                                :race=>nil,
                                :receipt_number=>nil,
                                :same_with_primary=>false,
