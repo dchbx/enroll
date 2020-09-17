@@ -90,7 +90,7 @@ module Operations
       def deactivate_latest_tax_households(values)
         primary_applicant = values[:applicants].select{|app| app["is_primary_applicant"]}.first
         ed = values[:eligibility_determinations].select{|ed| ed["_id"] == primary_applicant["eligibility_determination_id"]}.first
-        Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: values[:family_id].to_s, date: ed["effective_starting_on"]})
+        Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: values[:family_id], date: ed["effective_starting_on"]})
       end
 
       def update_family_attributes(family, case_id)
