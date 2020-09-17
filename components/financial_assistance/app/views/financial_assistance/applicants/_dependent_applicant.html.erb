@@ -39,9 +39,10 @@
     </div>
     
     <div id="edit_applicant_<%= dependent.id %>">
-    <%= yield "person_#{dependent.id}" %>
+      <%= yield "person_#{dependent.id}" %>
     </div>
-
+    <div id="edit_applicant_<%= dependent.id %>_form_section">
+    </div>
     <div class="clearfix"></div>
   </div>
   <script>
