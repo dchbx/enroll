@@ -3,8 +3,8 @@
 <% if individual_market_is_enabled? %>
   <div id="consumer_fields" class="focus_effect">
     <div class="row row-form-wrapper no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-        <label>Are you a US Citizen or US National? *</label>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
+        <label class="run-glossary">Are you a US Citizen or US National? *</label>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
@@ -25,7 +25,7 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
         <label>Are you a naturalized citizen? *</label>
       </div>
       <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
@@ -51,7 +51,7 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
-      <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
+      <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg top-buffer">
         <label>Do you have eligible immigration status? *</label>
       </div>
       <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
@@ -82,7 +82,7 @@
     <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
       <div class="row no-buffer">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
+          <label class="run-glossary">Are you a member of an American Indian or Alaskan Native tribe? *</label>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
           <div class="radio">
@@ -111,7 +111,7 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer">
         <label class="required no-pd">Are you currently incarcerated? *</label>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
