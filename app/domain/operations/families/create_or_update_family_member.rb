@@ -37,7 +37,6 @@ module Operations
       end
 
       def create_member(applicant_attributes, family)
-        binding.pry
         applicant_params = sanitize_params(applicant_attributes)
         person_result = create_or_update_person(applicant_params)
 
