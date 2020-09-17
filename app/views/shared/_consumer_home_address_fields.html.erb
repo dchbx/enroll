@@ -37,9 +37,6 @@
 
         <% if kind == 'home' %>
           <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <%= f.check_box :no_dc_address, {id: 'no_dc_address'}, "true", "false" %>
-            <% target = f.object.class.to_s.downcase %>
-            <span><i class='fa fa-question-circle' data-toggle="tooltip" title="Check this box if you’re homeless, stay in a shelter, have no fixed address or are temporarily living outside the District but consider yourself a District resident and intend to return."></i></span>
           </div>
         <% end %>
       </div>
