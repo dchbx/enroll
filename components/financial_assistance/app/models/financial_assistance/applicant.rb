@@ -281,7 +281,7 @@ module FinancialAssistance
     before_save :generate_hbx_id
 
     # Responsible for updating family member  when applicant is created/updated
-    after_save :propagate_applicant
+    after_update :propagate_applicant
 
     def generate_hbx_id
       write_attribute(:person_hbx_id, FinancialAssistance::HbxIdGenerator.generate_member_id) if person_hbx_id.blank?
