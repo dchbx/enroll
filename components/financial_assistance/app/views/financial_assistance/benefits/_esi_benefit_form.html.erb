@@ -45,7 +45,7 @@
       </div>
     <% end %>
 
-    <div class="row row-form-wrapper no-buffer">
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
         <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months? *</label>
       </div>
@@ -71,7 +71,7 @@
       </div>
     </div>
 
-    <div class="row row-form-wrapper no-buffer">
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
         <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard? *</label>
       </div>
@@ -98,7 +98,7 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6 fa-select select-box">
+      <div class="col-md-5 fa-select select-box">
         <%= f.label :esi_covered, 'Who can be covered? *', class: "label-color" %>
         <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
       </div>

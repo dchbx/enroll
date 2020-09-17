@@ -48,11 +48,11 @@
       </div>
     </div>
 
-    <div class="row row-form-wrapper radio-align no-buffer">
+    <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
         <span class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months ? *</span>
       </div>
-      <div class='col-md-6' style="line-height: 30px;">
+      <div class='col-md-6'>
         <div class='col-md-4'>
           <%= radio_button_tag("is_esi_waiting_period_#{benefit.id}", true, benefit.is_esi_waiting_period , class: "radio-yml" ) %>
           <label class="radio-yml" for="is_esi_waiting_period_yes">Yes</label>
@@ -67,11 +67,11 @@
       </div>
     </div>
 
-    <div class="row row-form-wrapper radio-align no-buffer">
+    <div class="row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
         <span class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard ? *</span>
       </div>
-      <div class='col-md-6' style="line-height: 30px;">
+      <div class='col-md-6'>
         <div class='col-md-4'>
           <%= radio_button_tag("is_esi_mec_met_#{benefit.id}", true, benefit.is_esi_mec_met,class: "radio-yml" ) %>
           <label class="radio-yml" for="is_esi_mec_met_yes">Yes</label>
