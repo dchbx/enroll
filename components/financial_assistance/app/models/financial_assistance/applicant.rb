@@ -844,10 +844,9 @@ module FinancialAssistance
 
     def attributes_for_export
       applicant_params = attributes.transform_keys(&:to_sym).slice(:family_member_id,:person_hbx_id,:name_pfx,:first_name,:middle_name,:last_name,:name_sfx,
-                                          :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:indian_tribe_member,:tribal_id,
-                                          :language_code,:no_dc_address,:is_homeless,:is_temporarily_out_of_state,:no_ssn,:citizen_status,
-                                          :is_consumer_role,:vlp_document_id,:same_with_primary,:is_applying_coverage,:vlp_subject,
-                                          :alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
+                                          :gender,:is_incarcerated,:is_disabled,:ethnicity,:race,:tribal_id,:language_code,:no_dc_address,:is_homeless,
+                                          :is_temporarily_out_of_state,:no_ssn,:citizen_status,:is_consumer_role,:vlp_document_id,:is_applying_coverage,
+                                          :vlp_subject,:alien_number,:i94_number,:visa_number,:passport_number,:sevis_id,:naturalization_number,
                                           :receipt_number,:citizenship_number,:card_number,:country_of_citizenship, :issuing_country,:status)
       applicant_params.merge!({dob: dob.strftime('%d/%m/%Y'), ssn: ssn, relationship: relation_with_primary})
       applicant_params.merge!(expiration_date: expiration_date.strftime('%d/%m/%Y')) if expiration_date.present?

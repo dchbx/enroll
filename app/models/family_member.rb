@@ -175,7 +175,7 @@ class FamilyMember
   end
 
   def create_financial_assistance_applicant
-    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self, event: :family_member_created})
+    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self, event: :family_member_created}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
   rescue StandardError => e
     Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::CreateOrUpdateApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
   end
@@ -187,7 +187,7 @@ class FamilyMember
   end
 
   def delete_financial_assistance_applicant
-    ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self})
+    ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
   rescue StandardError => e
     Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::DropApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
   end
