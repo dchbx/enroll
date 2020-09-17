@@ -15,7 +15,8 @@ module Operations
       # @return [ Dry::Monads::Result::Success ] success_message
       def call(params)
         values              = yield validate(params)
-        financial_applicant = yield parse_family_member(values)
+        filtered_values     = yield filter(values)
+        financial_applicant = yield parse_family_member(filtered_values)
         validated_applicant = yield validate_applicant_params(financial_applicant)
         result              = yield create_or_update_applicant(validated_applicant)
 
@@ -25,11 +26,19 @@ module Operations
       private
 
       def validate(params)
+        return Failure('Missing keys') unless params.key?(:family_member) || params.key?(:event)
         return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
-        return Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
-        return Failure('Given family member does not have a matching consumer role') unless params[:family_member].person.consumer_role.present?
+        @event = params[:event]
 
         Success(params)
+      end
+
+      def filter(values)
+        return Failure('Given family member is not an active object') unless values[:family_member].is_active
+        return Failure('Given family member does not have a matching person') unless values[:family_member].person.present?
+        return Failure('Given family member does not have a matching consumer role') unless values[:family_member].person.consumer_role.present?
+
+        Success(values)
       end
 
       def parse_family_member(values)

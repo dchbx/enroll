@@ -13,7 +13,7 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
 
   context 'invalid arguments' do
     before do
-      @result = subject.call({test: 'family_member'})
+      @result = subject.call({event: :family_member_created, test: 'family_member'})
     end
 
     it 'should return a failure object' do
@@ -21,13 +21,13 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
     end
 
     it 'should return a failure' do
-      expect(@result.failure).to eq('Given family member is not a valid object')
+      expect(@result.failure).to eq('Missing keys')
     end
   end
 
   context 'valid arguments' do
     before do
-      @result = subject.call({family_member: family_member})
+      @result = subject.call({event: :family_member_created, family_member: family_member})
     end
 
     it 'should return a success object' do
