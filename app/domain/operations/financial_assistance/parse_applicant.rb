@@ -41,8 +41,7 @@ module Operations
 
       def person_attributes(person)
         attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user].inject({}) do |att_hash, attribute|
-                  value = person.send(attribute)
-                  att_hash[attribute] = (attribute == :ethnicity && value.nil?) ? [] : value
+                  att_hash[attribute] = person.send(attribute)
                   att_hash
                 end
         attrs.merge!(person_hbx_id: person.hbx_id,
