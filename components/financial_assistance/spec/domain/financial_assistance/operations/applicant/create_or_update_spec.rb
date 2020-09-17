@@ -69,7 +69,6 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
       end
 
       it 'should create a applicant object' do
-        #relationship creation issue
         expect(application.reload.applicants.count).to eq(2)
       end
     end
@@ -240,7 +239,7 @@ end
 def fetch_array_of_attrs_for_embeded_objects(data)
   new_arr = []
   data.each do |special_hash|
-    new_arr << special_hash.except(:_id, :created_at, :updated_at, :tracking_version)
+    new_arr << special_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version)
   end
   new_arr
 end
