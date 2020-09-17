@@ -39,33 +39,31 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
       end
     end
 
-    context 'for success case if person already exists in db' do
+    # context 'for success case if person already exists in db' do
+    #   let!(:person) {FactoryBot.create(:person)}
+    #   let(:person_params) do
+    #     {first_name: person.first_name, last_name: person.last_name,
+    #      dob: person.dob, no_ssn: '1',
+    #      gender: 'male', is_incarcerated: false,
+    #      person_hbx_id: person.hbx_id,
+    #      same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
+    #      addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
+    #                  city: 'was', county: '', state: 'DC', location_state_code: nil,
+    #                  full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
+    #                  modifier_id: nil], phones: [], emails: []}
 
-      let(:person) {FactoryBot.create(:person)}
+    #   end
 
-      let(:person_params) do
-        {first_name: person.first_name, last_name: person.last_name,
-         dob: person.dob, no_ssn: '1',
-         gender: 'male', is_incarcerated: false,
-         person_hbx_id: person.hbx_id,
-         same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
-         addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
-                     city: 'was', county: '', state: 'DC', location_state_code: nil,
-                     full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
-                     modifier_id: nil], phones: [], emails: []}
+    #   context 'valid params' do
+    #     before :each do
+    #       @result = subject.call(params: person_params)
+    #     end
 
-      end
-
-      context 'valid params' do
-        before :each do
-          @result = subject.call(params: person_params)
-        end
-
-        it 'should return success' do
-          expect(@result).to be_a(Dry::Monads::Result::Success)
-        end
-      end
-    end
+    #     it 'should return success' do
+    #       expect(@result).to be_a(Dry::Monads::Result::Success)
+    #     end
+    #   end
+    # end
 
     context 'for failed case' do
 

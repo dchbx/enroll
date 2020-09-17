@@ -1,6 +1,7 @@
 Feature: User is not applying for financial assistance
   Background:
-    Given the user is applying for a CONSUMER role
+    Given the FAA feature configuration is enabled
+    When the user is applying for a CONSUMER role
     And the primary member has filled mandatory information required
     And the primary member authorizes system to call EXPERIAN
     And system receives a positive response from the EXPERIAN

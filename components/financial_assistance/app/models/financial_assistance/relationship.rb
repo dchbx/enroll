@@ -93,6 +93,8 @@ module FinancialAssistance
     field :applicant_id, type: BSON::ObjectId # predecessor or from
     field :relative_id, type: BSON::ObjectId # successor or to
 
+    after_create :propagate_applicant
+
     def applicant
       return @applicant if defined? @applicant
       @applicant = FinancialAssistance::Applicant.find(applicant_id)
@@ -101,6 +103,10 @@ module FinancialAssistance
     def relative
       return @relative if defined? @relative
       @relative = FinancialAssistance::Applicant.find(relative_id)
+    end
+
+    def propagate_applicant
+      FinancialAssistance::Operations::Application::RelationshipHandler.new.call({relationship: self})
     end
   end
 end

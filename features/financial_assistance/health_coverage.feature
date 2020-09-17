@@ -5,6 +5,7 @@ Feature: Start a new Financial Assistance Application and answers questions on h
   Background: User logs in and visits applicant's health coverage page
     Given a consumer, with a family, exists
     And is logged in
+    And the FAA feature configuration is enabled
     And the user will navigate to the FAA Household Info page
     When they click ADD INCOME & COVERAGE INFO for an applicant
     Then they should be taken to the applicant's Tax Info page (health coverage)

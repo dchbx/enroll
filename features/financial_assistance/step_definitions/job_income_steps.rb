@@ -102,8 +102,8 @@ end
 
 And(/^the user fills out the required self employment information$/) do
   fill_in 'income[amount]', with: '23.3'
-  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div").click
-  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div/div[3]/div/ul/li[3]").click
+  find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
+  find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
 end
@@ -112,8 +112,8 @@ Given(/^the user has entered at least one self employment information$/) do
   choose('has_self_employment_income_true')
   sleep 1
   fill_in 'income[amount]', with: '23.3'
-  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div").click
-  find(:xpath, "//*[@id='new_income']/div[1]/div/div[2]/div/div[3]/div/ul/li[3]").click
+  find_all("#self_employed_incomes .incomes-list .interaction-choice-control-income-frequency-kind span.label").first.click
+  find_all("#self_employed_incomes li.interaction-choice-control-income-frequency-kind-7").first.click
   fill_in 'income[start_on]', with: "11/11/2016"
   fill_in 'income[end_on]', with: "11/11/2017"
   find('.interaction-click-control-save').click

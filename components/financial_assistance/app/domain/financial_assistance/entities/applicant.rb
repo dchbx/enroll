@@ -13,7 +13,7 @@ module FinancialAssistance
       attribute :ssn, Types::String.optional
       attribute :gender, Types::String.optional
       attribute :dob, Types::Date.optional
-      attribute :is_primary_applicant, Types::Bool.default(false)
+      attribute :is_primary_applicant, Types::Strict::Bool.meta(omittable: true)
       attribute :family_member_id, Types::Bson.optional.meta(omittable: true)
       attribute :person_hbx_id, Types::String.optional.meta(omittable: true)
       attribute :is_incarcerated, Types::Strict::Bool

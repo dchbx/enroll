@@ -1,6 +1,7 @@
 Feature: A dedicated page that gives the user prior notice that that application will require a large amount of information for every member of the household.
 
   Background:
+    Given the FAA feature configuration is enabled
     Given the user is applying for a CONSUMER role
     And the primary member has filled mandatory information required
     And the primary member authorizes system to call EXPERIAN

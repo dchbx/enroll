@@ -27,6 +27,7 @@ module Operations
       def validate(params)
         return Failure('Given family member is not a valid object') unless params[:family_member].is_a?(::FamilyMember)
         return Failure('Given family member does not have a matching person') unless params[:family_member].person.present?
+        return Failure('Given family member does not have a matching consumer role') unless params[:family_member].person.consumer_role.present?
 
         Success(params)
       end

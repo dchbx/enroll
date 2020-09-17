@@ -5,12 +5,13 @@ require 'ui_helpers/workflow/section'
 module UIHelpers
   module Workflow
     class Step
-      attr_accessor :sections, :heading, :heading_text
+      attr_accessor :sections, :heading, :heading_text, :title_icon
 
       def initialize(step, number, steps)
         @steps = steps
         @heading = step['heading']
         @heading_text = step["heading_text"]
+        @title_icon = step['title_icon']
         @sections = step['sections'].map { |section| Workflow::Section.new section["section"] }
         @number = number
       end

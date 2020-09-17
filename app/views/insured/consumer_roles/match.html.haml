@@ -1,6 +1,8 @@
-= render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
+= content_for :horizontal_status do
+  - if show_component(request.path)
+    = render  partial: 'insured/families/horizontal_status.html.erb', locals: {step: 1}
 
-.container
+.container.pd-container
   #new_person_wrapper
     .row
       .col-lg-2.col-md-2.col-sm-2.col-xs-12

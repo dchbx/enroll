@@ -40,12 +40,12 @@
           <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
         </div>
         <div class="col-md-6">
-          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', required: true, class: "floatlabel ph-width fien_field" %>
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', class: "floatlabel ph-width fien_field" %>
         </div>
       </div>
     <% end %>
 
-    <div class="row row-form-wrapper no-buffer">
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
         <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months? *</label>
       </div>
@@ -65,13 +65,13 @@
           <% end %>
         </div>
       </div>
-      <div class='col-md-2 not-sure-margin'>
+      <div class='col-md-2'>
         <a href="#is_esi_waiting_period" data-toggle="modal" data-target="#is_esi_waiting_period_<%= benefit.id %>" id="is_esi_waiting_period_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not Sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_waiting_period", id: "is_esi_waiting_period_#{benefit.id}" } %>
       </div>
     </div>
 
-    <div class="row row-form-wrapper no-buffer">
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
       <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
         <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard? *</label>
       </div>
@@ -91,14 +91,14 @@
           <% end %>
         </div>
       </div>
-      <div class='col-md-2 not-sure-margin'>
+      <div class='col-md-2'>
         <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not Sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
       </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer row-height">
-      <div class="col-md-6 fa-select select-box">
+      <div class="col-md-5 fa-select select-box">
         <%= f.label :esi_covered, 'Who can be covered? *', class: "label-color" %>
         <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
       </div>

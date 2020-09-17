@@ -44,7 +44,7 @@ module FinancialAssistance
             end
           end
 
-          if application.persist!
+          if application.save
             Success(application.id)
           else
             Failure(application.errors)

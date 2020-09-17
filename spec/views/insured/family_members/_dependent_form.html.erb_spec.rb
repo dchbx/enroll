@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe "insured/family_members/_dependent_form.html.erb" do
@@ -17,6 +19,8 @@ describe "insured/family_members/_dependent_form.html.erb" do
       @request.env['HTTP_REFERER'] = 'consumer_role_id'
       allow(person).to receive(:is_consumer_role_active?).and_return true
       assign :person, person
+      assign :dependent, dependent
+      assign(:support_texts, {support_text_key: "support-text-description"})
       allow(view).to receive(:individual_market_is_enabled?).and_return(individual_market_is_enabled)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
@@ -35,7 +39,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       it "should have consumer_fields area" do
         expect(rendered).to have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
         expect(rendered).to have_selector("div#consumer_fields")
-        expect(rendered).to match /Are you a US Citizen or US National/
+        expect(rendered).to match(/Are you a US Citizen or US National/)
       end
 
       it "should have show tribal_container" do
@@ -44,7 +48,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       end
 
       it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is this person applying for coverage?/
+        expect(rendered).to match(/Does this person need coverage?/)
       end
     end
 
@@ -53,7 +57,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       it "should have consumer_fields area" do
         expect(rendered).to_not have_css('#consumer_fields .row:first-child label', text: 'Are you a US Citizen or US National?')
         expect(rendered).to_not have_selector("div#consumer_fields")
-        expect(rendered).to_not match /Are you a US Citizen or US National/
+        expect(rendered).to_not match(/Are you a US Citizen or US National/)
       end
 
       it "should have show tribal_container" do
@@ -68,7 +72,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
     it "should have no_ssn label" do
       expect(rendered).to have_selector('span.no_ssn')
-      expect(rendered).to match /have an SSN/
+      expect(rendered).to match(/have an SSN/)
     end
 
     it "should have dependent-address area" do
@@ -79,7 +83,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
   end
 
@@ -90,6 +94,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
       allow(person).to receive(:is_consumer_role_active?).and_return false
       allow(person).to receive(:has_active_employee_role?).and_return true
       assign :person, person
+      assign :dependent, dependent
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       render "insured/family_members/dependent_form", dependent: dependent, person: person
     end
@@ -100,7 +105,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
 
     it "should not have consumer_fields area" do
       expect(rendered).not_to have_selector("div#consumer_fields")
-      expect(rendered).not_to match /Are you a US Citizen or US National/
+      expect(rendered).not_to match(/Are you a US Citizen or US National/)
     end
 
     it "should not have dependent-address area" do
@@ -112,20 +117,22 @@ describe "insured/family_members/_dependent_form.html.erb" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
       end
-      expect(rendered).to have_selector("option", text: "This Person Is #{person.first_name}'s *")
+      expect(rendered).to have_selector("option", text: "choose")
     end
 
     it "should not display the is_applying_coverage field option" do
-      expect(rendered).not_to match /Is this person applying for coverage?/
+      expect(rendered).not_to match(/Is this person applying for coverage?/)
     end
 
     it "should display the affirmative message" do
-      expect(rendered).not_to match /Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other information to see who’s eligible for help with health coverage costs./
+      message = "Even if you don’t want health coverage for yourself, providing your SSN can be helpful since it can speed up the application process. We use SSNs to check income and other "\
+                "information to see who’s eligible for help with health coverage costs."
+      expect(rendered).not_to match(/#{message}/)
     end
 
     it "should have address info area" do
       expect(rendered).to have_selector('#address_info')
-      expect(rendered).to match /Home Address/
+      expect(rendered).to match(/Home Address/)
     end
   end
 end
