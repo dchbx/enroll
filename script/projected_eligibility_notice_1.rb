@@ -41,7 +41,6 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     next if primary_member.present? && primary_member["resident"] && primary_member["resident"].casecmp('NO')&.zero?
     next if members.select{ |m| m["incarcerated"] && m["incarcerated"].casecmp('YES')&.zero? }.present?
     next if members.any?{ |m| m["citizen_status"].blank? || (m["citizen_status"] == "non_native_not_lawfully_present_in_us") || (m["citizen_status"] == "not_lawfully_present_in_us")}
-    binding.pry
     consumer_role = primary_person.consumer_role
   
     if consumer_role.present?
@@ -69,7 +68,6 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
     else
       puts "No consumer role for #{primary_person.hbx_id} -- #{e}" unless Rails.env.test?
     end
-    break
   rescue StandardError => e
     puts "Unable to process family_id: #{family_id} due to the following error #{e}" unless Rails.env.test?
   end
