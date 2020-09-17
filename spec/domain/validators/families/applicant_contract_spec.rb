@@ -7,7 +7,7 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
   let(:required_params) do
     {
       first_name: "James", last_name: "Bond", gender: "male", dob: Date.new(1993, 3, 8),
-      is_incarcerated: false, citizen_status: "US citizen", is_consumer_role: true, same_with_primary:  true,
+      is_incarcerated: false, citizen_status: "US citizen", is_consumer_role: true,
       is_applying_coverage: true, eligibility_determination_id: BSON::ObjectId.new, magi_medicaid_category: 'test',
       magi_as_percentage_of_fpl: 23.3, magi_medicaid_monthly_income_limit: {}, magi_medicaid_monthly_household_income: {},
       is_without_assistance: true, is_ia_eligible: false, is_medicaid_chip_eligible: false, is_non_magi_medicaid_eligible: false,
@@ -23,7 +23,7 @@ RSpec.describe Validators::Families::ApplicantContract,  dbclean: :after_each do
       alien_number: nil, i94_number: nil, visa_number: nil, passport_number: nil, sevis_id: nil,
       naturalization_number: nil, receipt_number: nil, citizenship_number: nil, card_number: nil,
       country_of_citizenship: nil, expiration_date: nil, issuing_country: nil, no_ssn: nil,
-      addresses: [], phones: [], emails: []
+      addresses: [], phones: [], emails: [], same_with_primary:  true,
     }
   end
   let(:all_params) { required_params.merge(optional_params)}
