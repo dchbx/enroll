@@ -65,7 +65,7 @@
           <% end %>
         </div>
       </div>
-      <div class='col-md-2 not-sure-margin'>
+      <div class='col-md-2'>
         <a href="#is_esi_waiting_period" data-toggle="modal" data-target="#is_esi_waiting_period_<%= benefit.id %>" id="is_esi_waiting_period_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not Sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_waiting_period", id: "is_esi_waiting_period_#{benefit.id}" } %>
       </div>
@@ -91,7 +91,7 @@
           <% end %>
         </div>
       </div>
-      <div class='col-md-2 not-sure-margin'>
+      <div class='col-md-2'>
         <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not Sure?</a>
         <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
       </div>
