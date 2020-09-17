@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_dependency 'financial_assistance/application_controller'
-
 module FinancialAssistance
   class ApplicationsController < FinancialAssistance::ApplicationController
 
@@ -224,12 +222,6 @@ module FinancialAssistance
 
     def hash_to_param(param_hash)
       ActionController::Parameters.new(param_hash)
-    end
-
-    def load_support_texts
-      file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-      raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-      @support_texts = helpers.support_text_placeholders raw_support_text
     end
 
     def permit_params(attributes)

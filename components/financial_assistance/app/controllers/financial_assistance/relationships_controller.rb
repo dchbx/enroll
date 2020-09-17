@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module FinancialAssistance
-  class RelationshipsController < ApplicationController
+  class RelationshipsController < FinancialAssistance::ApplicationController
     before_action :find_application
 
     layout 'financial_assistance_nav'
