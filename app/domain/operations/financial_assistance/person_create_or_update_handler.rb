@@ -29,7 +29,7 @@ module Operations
         return Failure('Missing params') unless params.key?(:person) || params.key?(:event)
         return Failure('Event not found') unless [:person_updated].include?(params[:event])
         return Failure('Given object is not a Person') unless params[:person].is_a?(::Person)
-
+        @event = params[:event]
         Success(params)
       end
 
@@ -50,7 +50,7 @@ module Operations
 
       def create_or_update_applicants(family_members)
         family_members.each do |family_member|
-          ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: family_member})
+          ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: family_member, event: @event})
         rescue StandardError => e
           Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::CreateOrUpdateApplicant for family_member with object_id: #{family_member.id} due to #{e.message}"}
         end
