@@ -1,7 +1,7 @@
 // page:change accounts for turbolinks affecting JS on document ready
 // ajax:success accounts for glossary terms in consumer forms after document ready
 // Rails 5 event: 'turbolinks:load' instead of 'page:change'
-document.addEventListener("turbolinks:load", function() {
+$(document).on("turbolinks:load ajax:success", function() {
   runGlossary();
 
   // Added for partials loaded after turbolinks load 
