@@ -1011,8 +1011,14 @@ module FinancialAssistance
 
     def propagate_applicant
       # return if incomes_changed? || benefits_changed? || deductions_changed?
-      # TODO: On applicant create, I should get family_member id back to be able to update it on applicant.
-      Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id}) if is_active
+      if is_active
+        Operations::Families::CreateOrUpdateMember.new.call(params: {applicant_params: self.attributes_for_export, family_id: application.family_id})
+        if create_or_update_result.success?
+          response_family_member_id = create_or_update_result.success[:family_member_id]
+          update_attributes!(family_member_id: response_family_member_id) if family_member_id.nil?
+        end
+      end
+
       Operations::Families::DropMember.new.call(params: {family_id: application.family_id, family_member_id: family_member_id}) if is_active_changed? && is_active == false
     rescue StandardError => e
       e.message

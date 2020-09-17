@@ -14,9 +14,8 @@ module Operations
 
       def call(params)
         family_result = yield get_family(family_id: params[:family_id])
-        family, person_family_member_mapping = yield create_member(params, family_result)
-
-        Success([family, person_family_member_mapping])
+        person_family_member_mapping = yield create_member(params, family_result)
+        Success(person_family_member_mapping)
       end
 
       private
@@ -49,7 +48,7 @@ module Operations
           return @person
         end
 
-        Success([family, {family_member_id: @family_member.id, person_hbx_id: @person.hbx_id}])
+        Success({family_member_id: @family_member.id, person_hbx_id: @person.hbx_id})
       end
 
       def create_or_update_person(applicant_params)
