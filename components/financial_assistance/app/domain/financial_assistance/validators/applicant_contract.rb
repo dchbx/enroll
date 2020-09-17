@@ -18,7 +18,7 @@ module FinancialAssistance
         optional(:person_hbx_id).maybe(:string)
         optional(:family_member_id).maybe(Types::Bson)
 
-        required(:is_incarcerated).filled(:bool)
+        optional(:is_incarcerated).maybe(:bool)
         optional(:is_disabled).filled(:bool)
         optional(:ethnicity).maybe(:array)
         optional(:race).maybe(:string)
@@ -79,6 +79,13 @@ module FinancialAssistance
             key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
             key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
           end
+        end
+      end
+
+      rule(:is_applying_coverage) do
+        if values[:is_applying_coverage]
+          key.failure(text: "Incarceration question must be answered") if values[:is_incarcerated].blank?
+          key.failure(text: "Indian tribe member question must be answered") if values[:indian_tribe_member].blank?
         end
       end
 
