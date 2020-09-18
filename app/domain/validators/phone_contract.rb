@@ -10,7 +10,6 @@ module Validators
       optional(:number).maybe(:string)
       optional(:extension).maybe(:string)
       required(:full_phone_number).maybe(:string)
-      optional(:primary).maybe(:bool)
     end
   end
 end
