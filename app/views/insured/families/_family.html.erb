@@ -58,6 +58,8 @@
   </div>
 </div>
 
+<div id='faa_flow_info'></div>
+
 <div id="dependent_buttons" class="focus_effect personal-info-row <%= pundit_class Family, :updateable?%>">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12 icon-mtb" id="add-member-btn">
     <%= link_to new_insured_family_member_path(:family_id => @family.id), :remote => true do
