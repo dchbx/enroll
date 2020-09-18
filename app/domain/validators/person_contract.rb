@@ -18,7 +18,6 @@ module Validators
       optional(:is_disabled).filled(:bool)
       optional(:ethnicity).maybe(:array)
       optional(:race).maybe(:string)
-      optional(:indian_tribe_member).filled(:bool)
       optional(:tribal_id).maybe(:string)
 
       optional(:language_code).maybe(:string)
