@@ -8,6 +8,7 @@ module Notifier
     attribute :employee_responsible_amount, String
     attribute :employer_responsible_amount, String
     attribute :premium_amount, String
+    attribute :product, MergeDataModels::Product
     attribute :subscriber, MergeDataModels::Person
     attribute :dependents, Array[MergeDataModels::Person]
     attribute :employee_first_name, String
@@ -19,15 +20,19 @@ module Notifier
     attribute :waiver_plan_name, String
     attribute :waiver_enrolled_count, String
     attribute :waiver_coverage_end_on, String
-    # attribute :metal_level, String
     attribute :coverage_kind, String
-    # attribute :plan_carrier, String
     attribute :coverage_end_on_minus_60_days, String
     attribute :coverage_end_on_plus_60_days, String
 
     attribute :is_receiving_assistance, Boolean, :default => false
     attribute :aptc_amount, String
     attribute :responsible_amount, String
+    attribute :terminated_on, Date
+    attribute :submitted_at, Date
+    attribute :created_at, Date
+    attribute :kind, String
+    attribute :open_enrollment_start_on, Date
+    attribute :open_enrollment_end_on, Date
 
     def self.stubbed_object
       end_on = TimeKeeper.date_of_record.end_of_month
@@ -55,6 +60,7 @@ module Notifier
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
+      enrollment.product = Notifier::MergeDataModels::Product.stubbed_object
       enrollment.dependents = [Notifier::MergeDataModels::Person.stubbed_object]
       enrollment
     end

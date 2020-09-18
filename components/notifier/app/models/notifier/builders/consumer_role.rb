@@ -7,6 +7,7 @@ module Notifier
       include ActionView::Helpers::NumberHelper
       include Notifier::ApplicationHelper
       include Notifier::ConsumerRoleHelper
+      include Notifier::EnrollmentHelper
       include Notifier::VerificationHelper
       include Config::ContactCenterHelper
       include Config::SiteHelper
@@ -91,6 +92,96 @@ module Notifier
         payload['notice_params']['dependents'].each do |member|
           dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
           merge_model.dependents << dependent_hash(dependent, member)
+        end
+      end
+
+      def tax_households
+        primary_member = payload['notice_params']['primary_member']
+        return unless primary_member['aqhp_eligible'].upcase == "YES"
+
+        tax_household = ::Notifier::Services::TaxHoseholdService.new(primary_member)
+        merge_model.tax_households << tax_households_hash(tax_household)
+      end
+
+      # Renewing health enrollment
+      def renewing_health_enrollment
+        renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
+      end
+
+      # Renewing dental enrollment
+      def renewing_dental_enrollment
+        renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
+      end
+
+      # Current active health enrollment
+      def current_health_enrollment
+        active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      end
+
+      # Current active dental enrollment
+      def current_dental_enrollment
+        active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      end
+
+      # Renewing health enrollment
+      def renewing_health_product
+        renewing_health_enrollment.product
+      end
+
+      # Renewing dental product
+      def renewing_dental_product
+        renewing_dental_enrollment.product
+      end
+
+      # Current active health enrollment
+      def current_health_product
+        current_health_enrollment.product
+      end
+
+      # Current active dental product
+      def current_dental_product
+        current_dental_enrollment.product
+      end
+
+      # checks if individual is enrolled into same health product
+      def same_health_product
+        renewal_health_product_id = current_health_product.renewal_product.id rescue nil
+        passive_renewal_health_plan_id = renewing_health_product.id rescue nil
+        renewal_health_product_hios_base_id = current_health_product.renewal_product.hios_base_id rescue nil
+        passive_renewal_health_plan_hios_base_id = renewing_health_product.hios_base_id rescue nil
+
+        return false unless renewal_health_product_id && passive_renewal_health_plan_id
+
+        (renewal_health_product_id == passive_renewal_health_plan_id) && (renewal_health_product_hios_base_id == passive_renewal_health_plan_hios_base_id)
+      end
+
+      # checks if individual is enrolled into same dental product
+      def same_dental_product
+        renewal_dental_product_id = current_dental_product.renewal_product.id rescue nil
+        passive_renewal_dental_product_id = renewing_dental_product.id rescue nil
+        renewal_dental_product_hios_base_id = current_dental_product.hios_base_id rescue nil
+        passive_renewal_dental_product_hios_base_id = renewing_dental_product.hios_base_id rescue nil
+
+        return false unless renewal_dental_product_id && passive_renewal_dental_product_id
+
+        (renewal_dental_product_id == passive_renewal_dental_product_id) && (renewal_dental_product_hios_base_id == passive_renewal_dental_product_hios_base_id)
+      end
+
+
+
+      def enrollments
+        
+      end
+
+      def renewing_enrollments
+        payload['notice_params']['renewing_enrollment_ids'].collect do |hbx_id|
+          HbxEnrollment.by_hbx_id(hbx_id).first
+        end
+      end
+
+      def active_enrollments
+        payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
+          HbxEnrollment.by_hbx_id(hbx_id).first
         end
       end
 

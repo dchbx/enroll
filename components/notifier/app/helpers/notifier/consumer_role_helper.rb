@@ -76,6 +76,35 @@ module Notifier
       end
     end
 
+    def tax_households_hash(tax_hh)
+      MergeDataModels::TaxHousehold.new(
+        {
+          csr_percent_as_integer: tax_hh.csr_percent_as_integer,
+          max_aptc: tax_hh.max_aptc,
+          aptc_csr_annual_household_income: tax_hh.aptc_csr_annual_household_income,
+          aptc_csr_monthly_household_income: tax_hh.aptc_csr_monthly_household_income,
+          aptc_annual_income_limit: tax_hh.aptc_annual_income_limit,
+          csr_annual_income_limit: tax_hh.csr_annual_income_limit,
+          applied_aptc: tax_hh.applied_aptc
+        }
+      )
+    end
+
+    def phone_number(legal_name)
+      case legal_name
+      when "BestLife"
+        "(800) 433-0088"
+      when "CareFirst"
+        "(855) 444-3119"
+      when "Delta Dental"
+        "(800) 471-0236"
+      when "Dominion"
+        "(855) 224-3016"
+      when "Kaiser"
+        "(844) 524-7370"
+      end
+    end
+
     def filer_type(type)
       case type
       when "Filers"
@@ -100,10 +129,10 @@ module Notifier
       end
     end
 
-    def format_currency(value)
+    def format_currency(value, precision = 0)
       return '' if value.blank?
 
-      ActionController::Base.helpers.number_to_currency(value, :precision => 0)
+      ActionController::Base.helpers.number_to_currency(value, :precision => precision)
     end
 
     def format_date(date)

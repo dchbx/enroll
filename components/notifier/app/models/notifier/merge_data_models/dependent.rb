@@ -66,7 +66,6 @@ module Notifier
           aqhp_or_non_magi_medicaid_members_present: false,
           totally_ineligible_members_present: false,
           magi_medicaid_members_present: true,
-          actual_income: '12345.00',
           mec: 'mec',
           indian_conflict: true,
           is_medicaid_chip_eligible: true,
