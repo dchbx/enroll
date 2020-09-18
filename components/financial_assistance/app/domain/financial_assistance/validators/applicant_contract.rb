@@ -84,8 +84,8 @@ module FinancialAssistance
 
       rule(:is_applying_coverage) do
         if values[:is_applying_coverage]
-          key.failure(text: "Incarceration question must be answered") if values[:is_incarcerated].blank?
-          key.failure(text: "Indian tribe member question must be answered") if values[:indian_tribe_member].blank?
+          key.failure(text: "Incarceration question must be answered") if values[:is_incarcerated].to_s.blank?
+          key.failure(text: "Indian tribe member question must be answered") if values[:indian_tribe_member].to_s.blank?
         end
       end
 
