@@ -41,8 +41,7 @@ module Operations
 
       def person_attributes(person)
         attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user].inject({}) do |att_hash, attribute|
-                  value = person.send(attribute)
-                  att_hash[attribute] = (attribute == :ethnicity && value.nil?) ? [] : value
+                  att_hash[attribute] = person.send(attribute)
                   att_hash
                 end
         attrs.merge!(person_hbx_id: person.hbx_id,
@@ -63,23 +62,26 @@ module Operations
 
       def vlp_document_params(consumer_role)
         return {} unless consumer_role.active_vlp_document
-        consumer_role.active_vlp_document.attributes.slice(:vlp_subject,
-                                                           :alien_number,
-                                                           :i94_number,
-                                                           :visa_number,
-                                                           :passport_number,
-                                                           :sevis_id,
-                                                           :naturalization_number,
-                                                           :receipt_number,
-                                                           :citizenship_number,
-                                                           :card_number,
-                                                           :country_of_citizenship,
-                                                           :expiration_date,
-                                                           :issuing_country)
+        vlp_object = consumer_role.active_vlp_document
+        vlp_attrs = vlp_object.attributes.symbolize_keys.slice(:alien_number,
+                                                               :i94_number,
+                                                               :visa_number,
+                                                               :passport_number,
+                                                               :sevis_id,
+                                                               :naturalization_number,
+                                                               :receipt_number,
+                                                               :citizenship_number,
+                                                               :card_number,
+                                                               :country_of_citizenship,
+                                                               :expiration_date,
+                                                               :issuing_country)
+        vlp_attrs.merge!({expiration_date: vlp_attrs[:expiration_date].strftime("%d/%m/%Y")}) if vlp_attrs[:expiration_date].present?
+        vlp_attrs.merge!({vlp_subject: vlp_object[:subject]})
+        vlp_attrs
       end
 
       def construct_association_fields(records)
-        records.collect{|record| record.attributes.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version) }
+        records.collect{|record| record.attributes.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary) }
       end
     end
   end

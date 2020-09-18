@@ -77,8 +77,7 @@ module FinancialAssistance
     end
 
     def show_faa_status
-      return true if ((controller_name == 'applications') && (action_name == 'edit')) || (controller_name == 'family_relationships')
-      return true if (controller_name == 'family_members') && ((action_name == 'create') || (action_name == 'destroy')) # On AJAX renders for create / destory
+      return true if controller_name == 'applications' && action_name == 'edit'
       false
     end
 

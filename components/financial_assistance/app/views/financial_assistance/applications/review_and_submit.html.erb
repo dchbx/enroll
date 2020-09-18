@@ -403,50 +403,52 @@
         <br>
       <% end %>
 
-      <div class="row white-background">
-        <div class="col-md-12 pz">
-          <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
-            <div class="col-md-12"><span></span>
-              <i class="fa fa-user blue-icon"></i> <%= "Your Household" %>
-            </div>
-          </div>
-
-          <% if @all_relationships.present? %>
-            <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
-              <div class="col-md-11">FAMILY RELATIONSHIPS</div>
-              <div class="col-md-1">
-                <%= link_to financial_assistance.application_relationships_path(@application), id: 'edit-family-relationships-pencil' do %>
-                  <i class="fa fa-pencil fa-lg"></i>
-                <% end %>
+      <% if @application.applicants.count > 1 %>
+        <div class="row white-background">
+          <div class="col-md-12 pz">
+            <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
+              <div class="col-md-12"><span></span>
+                <i class="fa fa-user blue-icon"></i> <%= "Your Household" %>
               </div>
             </div>
 
-            <% @all_relationships.each do |er| %>
-              <div class="review-relations">
-                <div class="row review-relation-headers">
-                  <div class="col-lg-3">Name</div>
-                  <div class="col-lg-5">RELATIONSHIP</div>
-                  <div class="col-lg-4">HOUSEHOLD MEMBER</div>
-                </div>
-                <div class="row">
-                  <%#= TODO: Find member_by_id method and move it in %>
-                  <div class="col-lg-3"><%#=  member_name_by_id(er[:predecessor]) %></div>
-                  <div class="col-lg-5">
-                    <div class="select-relation rs_selection">
-                      <%= "is " + er.kind %>
-                    </div>
-                    <div style="float:left; margin-right: 10px;"> of</div>
-                    <div class="icon-rel">
-                      <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
-                      <i class="fa fa-link" aria-hidden="true"></i>
-                      <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
-                    </div>
-                  </div>
-                  <div class="col-lg-4">
-                    <%# = member_name_by_id(er[:successor]) %>
-                  </div>
+            <% if @all_relationships.present? %>
+              <div class="row row-form-wrapper ptb no-buffer row-height form-heading">
+                <div class="col-md-11">FAMILY RELATIONSHIPS</div>
+                <div class="col-md-1">
+                  <%= link_to financial_assistance.application_relationships_path(@application), id: 'edit-family-relationships-pencil' do %>
+                    <i class="fa fa-pencil fa-lg"></i>
+                  <% end %>
                 </div>
               </div>
+
+              <% @all_relationships.each do |er| %>
+                <div class="review-relations">
+                  <div class="row review-relation-headers">
+                    <div class="col-lg-3">Name</div>
+                    <div class="col-lg-5">RELATIONSHIP</div>
+                    <div class="col-lg-4">HOUSEHOLD MEMBER</div>
+                  </div>
+                  <div class="row">
+                    <%#= TODO: Find member_by_id method and move it in %>
+                    <div class="col-lg-3"><%#=  member_name_by_id(er[:predecessor]) %></div>
+                    <div class="col-lg-5">
+                      <div class="select-relation rs_selection">
+                        <%= "is " + er.kind %>
+                      </div>
+                      <div style="float:left; margin-right: 10px;"> of</div>
+                      <div class="icon-rel">
+                        <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                        <i class="fa fa-link" aria-hidden="true"></i>
+                        <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+                      </div>
+                    </div>
+                    <div class="col-lg-4">
+                      <%# = member_name_by_id(er[:successor]) %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
             <% end %>
           <% end %>
 

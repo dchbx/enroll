@@ -37,6 +37,7 @@ module IvlAssistanceWorld
   end
 
   def create_aptc_only_eligibilty_for_the_family
+    create_slcsp_product
     family = Family.all.first
     tax_household = create_tax_household_and_eligibility_determination(family)
     tax_household.tax_household_members << TaxHouseholdMember.new(
@@ -54,6 +55,17 @@ module IvlAssistanceWorld
     tax_household.save!
     family.active_household.save!
     family.save!
+  end
+
+  def create_slcsp_product
+    date = TimeKeeper.date_of_record
+    benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+    current_benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(date)}
+    future_benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(date + 1.year)}
+    current_silver_product = BenefitMarkets::Products::Product.all.aca_individual_market.by_year(date.year).by_metal_level_kind('silver').first
+    future_silver_product =  BenefitMarkets::Products::Product.all.aca_individual_market.by_year((date + 1.year).year).by_metal_level_kind('silver').first
+    current_benefit_coverage_period.update_attributes(slcsp_id: current_silver_product.id)
+    future_benefit_coverage_period.update_attributes(slcsp_id: future_silver_product.id)
   end
 
   def create_mixed_eligibilty_for_the_family

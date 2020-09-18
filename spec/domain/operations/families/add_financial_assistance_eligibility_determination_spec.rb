@@ -150,7 +150,7 @@ RSpec.describe Operations::Families::AddFinancialAssistanceEligibilityDeterminat
     end
 
     it 'should create Eligibility Determination object' do
-      expect(@thhs.first.latest_eligibility_determination.max_aptc.to_f).to eq(5826.0)
+      expect(@thhs.first.latest_eligibility_determination.max_aptc.to_f).to eq(58.26)
     end
   end
 

@@ -117,6 +117,7 @@ class Insured::FamiliesController < FamiliesController
     @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
+      format.js
     end
   end
 

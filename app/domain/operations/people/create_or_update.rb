@@ -47,7 +47,9 @@ module Operations
           person = Person.new(person_entity.to_h) #if person_valid_params.success?
           person.save!
         else
-          person.assign_attributes(person_entity.to_h)
+          return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
+
+          person.assign_attributes(person_entity.except(:addresses, :phones, :emails))
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)
@@ -72,7 +74,11 @@ module Operations
           end
         end
       end
+
+      def no_infomation_changed?(params:)
+        result = ::Operations::People::CompareForDataChange.new.call(params: params)
+        result.failure?
+      end
     end
   end
 end
-
