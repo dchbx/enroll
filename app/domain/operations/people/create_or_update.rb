@@ -49,7 +49,7 @@ module Operations
         else
           return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
 
-          person.assign_attributes(person_entity.to_h)
+          person.assign_attributes(person_entity.except(:addresses, :phones, :emails))
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)

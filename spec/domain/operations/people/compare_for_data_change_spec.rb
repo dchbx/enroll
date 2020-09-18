@@ -53,11 +53,11 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
         @result = subject.call(params: {attributes_hash: person_params, person: person})
       end
 
-      it 'should return a success object' do
+      it 'should return a failure object' do
         expect(@result).to be_a(Dry::Monads::Result::Failure)
       end
 
-      it 'should return applicant object' do
+      it 'should return failure with a message' do
         expect(@result.failure).to eq('No information is changed')
       end
     end
@@ -70,8 +70,8 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
          first_name: 'childfirst',
          last_name: 'childlast',
          gender: 'male',
-         :addresses=>[person.mailing_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version),
-                      person.home_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version)]}
+         :addresses=>[person.mailing_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary),
+                      person.home_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)]}
       end
 
       before :each do
@@ -103,8 +103,8 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
   end
 end
 
-def compare(applicant_db_hash)
-  sanitized_applicant_hash = applicant_db_hash.inject({}) do |db_hash, element_hash|
+def compare(person_db_hash)
+  sanitized_person_hash = person_db_hash.inject({}) do |db_hash, element_hash|
     db_hash[element_hash[0]] = if [:addresses, :emails, :phones].include?(element_hash[0])
                                  fetch_array_of_attrs_for_embeded_objects(element_hash[1])
                                else
@@ -117,7 +117,7 @@ end
 def fetch_array_of_attrs_for_embeded_objects(data)
   new_arr = []
   data.each do |special_hash|
-    new_arr << special_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version)
+    new_arr << special_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)
   end
   new_arr
 end

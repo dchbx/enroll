@@ -48,7 +48,7 @@ module FinancialAssistance
         optional(:no_ssn).maybe(:string)
         required(:citizen_status).maybe(:string)
         required(:is_consumer_role).filled(:bool)
-        required(:same_with_primary).filled(:bool)
+        optional(:same_with_primary).maybe(:bool)
         required(:is_applying_coverage).filled(:bool)
 
         optional(:addresses).maybe(:array)

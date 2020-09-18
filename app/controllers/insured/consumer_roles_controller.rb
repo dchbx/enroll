@@ -386,7 +386,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :tribal_id,
       :no_dc_address,
       :no_dc_address_reason,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :is_homeless,
+      :is_temporarily_out_of_state
     ]
   end
 

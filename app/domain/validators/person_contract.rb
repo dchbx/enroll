@@ -27,7 +27,6 @@ module Validators
       optional(:is_temporarily_out_of_state).maybe(:bool)
 
       optional(:no_ssn).maybe(:string)
-      required(:same_with_primary).filled(:bool)
 
       optional(:addresses).maybe(:array)
       optional(:phones).maybe(:array)

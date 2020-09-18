@@ -7,8 +7,7 @@ RSpec.describe FinancialAssistance::Validators::ApplicantContract,  dbclean: :af
   let(:required_params) do
     {
       first_name: "James", last_name: "Bond", ssn: "101010101", gender: "male", dob: Date.new(1993, 3, 8),
-      is_incarcerated: false, indian_tribe_member: false, citizen_status: "US citizen",
-      is_consumer_role: true, same_with_primary:  true, is_applying_coverage: true
+      is_incarcerated: false, citizen_status: "US citizen", is_consumer_role: true, is_applying_coverage: true
     }
   end
   let(:optional_params) do
@@ -19,7 +18,7 @@ RSpec.describe FinancialAssistance::Validators::ApplicantContract,  dbclean: :af
       alien_number: nil, i94_number: nil, visa_number: nil, passport_number: nil, sevis_id: nil, 
       naturalization_number: nil, receipt_number: nil, citizenship_number: nil, card_number: nil,
       country_of_citizenship: nil, expiration_date: nil, issuing_country: nil, no_ssn: nil,
-      addresses: [], phones: [], emails: []
+      addresses: [], phones: [], emails: [],same_with_primary:  true,indian_tribe_member: false
     }
   end
   let(:all_params) { required_params.merge(optional_params)}
