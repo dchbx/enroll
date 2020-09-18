@@ -137,7 +137,7 @@ module FinancialAssistance
       set_admin_bookmark_url
       @application = ::FinancialAssistance::Application.find_by(id: params[:id], family_id: get_current_person.financial_assistance_identifier)
 
-      render layout: 'financial_assistance_nav' if params.keys.include? "cur"
+      render layout: (params.keys.include?('cur') ? 'financial_assistance_nav' : 'financial_assistance')
     end
 
     def application_publish_error
