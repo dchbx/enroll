@@ -1,0 +1,14 @@
+<div id="faa_flow_info">
+  <div class="coverage-table">
+    <div class="initial-info notification-error-wrapper">
+      <div class="row no-buffer">
+        <div class="col-md-8">
+          <center><strong><%= l10n('insured.families.financial_assistance_add_or_remove_family_member') %></strong></center>
+        </div>
+        <% if @family.application_in_progress.present? %>
+            <%= link_to 'Continue', financial_assistance.edit_application_path(@family.application_in_progress.id), class: 'btn btn-default', id: 'faa_continue_button' %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
