@@ -221,11 +221,7 @@ class Insured::ConsumerRolesController < ApplicationController
       else
         if current_user.has_hbx_staff_role? && (@person.primary_family.application_type == "Paper" || @person.primary_family.application_type == "In Person")
           redirect_to upload_ridp_document_insured_consumer_role_index_path
-        elsif [@person.primary_family.has_curam_or_mobile_application_type?,
-               @person.primary_family.has_paper_paplication_type?,
-               @person.primary_family.has_in_person_application_type?,
-               is_new_paper_application?(current_user, session[:original_application_type]),
-               is_new_in_person_application?(current_user, session[:original_application_type])].any? { |condition| condition == true }
+        elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
           consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
           # rubocop:disable Metrics/BlockNesting
@@ -273,16 +269,12 @@ class Insured::ConsumerRolesController < ApplicationController
   def update_application_type
     set_current_person
     application_type = params[:consumer_role][:family][:application_type]
-    @person.primary_family.update_attributes!(application_type: application_type)
-    if [@person.primary_family.has_curam_or_mobile_application_type?,
-        @person.primary_family.has_paper_paplication_type?,
-        @person.primary_family.has_in_person_application_type?,
-        is_new_paper_application?(current_user, session[:original_application_type]),
-        is_new_in_person_application?(current_user, session[:original_application_type])].any? { |condition| condition == true }
+    @person.primary_family.update_attributes(application_type: application_type)
+    if @person.primary_family.has_curam_or_mobile_application_type?
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
       consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
       consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
-      redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+      redirect_to consumer_redirection_path
     else
       redirect_back fallback_location: '/'
     end
