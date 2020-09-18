@@ -25,8 +25,7 @@ module Validators
       let(:params) do
         {is_applying_coverage: nil, is_active: nil, is_applicant: nil }
       end
-      let(:error_message) {{:is_applying_coverage => ['must be filled'], :is_active => ['must be filled'], :is_applicant => ['must be filled']}}
-
+      let(:error_message) {{:is_applying_coverage => ['must be filled'], :is_applicant => ['must be filled']}}
 
       it 'fails' do
         expect(subject).not_to be_success

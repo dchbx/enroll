@@ -239,7 +239,7 @@ end
 def fetch_array_of_attrs_for_embeded_objects(data)
   new_arr = []
   data.each do |special_hash|
-    new_arr << special_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)
+    new_arr << special_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id)
   end
   new_arr
 end

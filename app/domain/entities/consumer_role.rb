@@ -3,8 +3,6 @@
 module Entities
   class ConsumerRole < Dry::Struct
     transform_keys(&:to_sym)
-
-    attribute :is_active, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :is_applying_coverage, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :is_applicant, Types::Strict::Bool.optional.meta(omittable: true)
     attribute :is_state_resident, Types::Strict::Bool.optional.meta(omittable: true)
