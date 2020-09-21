@@ -19,9 +19,10 @@
           %person_health
           - unless assistance_tax_household_member.is_tobacco_user.blank?
             %is_tobacco_user= assistance_tax_household_member.is_tobacco_user
-    %citizen_status= assistance_tax_household_member.citizen_status
-    - unless assistance_tax_household_member.citizen_status == 'us_citizen'
-      = render :partial => 'financial_assistance/events/lawful_presence/immigration_information', :object => assistance_tax_household_member, as: :applicant
+    - if assistance_tax_household_member.is_applying_coverage
+      %citizen_status= assistance_tax_household_member.citizen_status
+      - if assistance_tax_household_member.citizen_status != 'us_citizen'
+        = render :partial => 'financial_assistance/events/lawful_presence/immigration_information', :object => assistance_tax_household_member, as: :applicant
     = render :partial => 'financial_assistance/events/applicant_information', :object => assistance_tax_household_member, as: :applicant
     %incomes
       - if assistance_tax_household_member.incomes.size > 0
