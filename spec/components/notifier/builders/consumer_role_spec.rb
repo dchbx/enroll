@@ -29,6 +29,12 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
     context "Model attributes" do
 
+      context 'primary_member' do
+        it "should return primary member" do
+          expect(subject.primary_member).to eq("")
+        end
+      end
+
       context 'first name' do
         it 'should get first name from person object for projected uqhp notice' do
           allow(subject).to receive(:uqhp_notice?).and_return(true)
