@@ -79,7 +79,7 @@ module FinancialAssistance
           applicant.assign_attributes(values.to_h)
 
           if applicant.save
-            @application.ensure_relationship_with_primary(@application.primary_applicant, applicant) unless applicant.is_primary_applicant
+            @application.ensure_relationship_with_primary(applicant, values.to_h[:relationship]) unless applicant.is_primary_applicant
             @application.save!
 
             Success(applicant)
