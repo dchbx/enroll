@@ -283,7 +283,6 @@ class Insured::ConsumerRolesController < ApplicationController
   def help_paying_coverage
     if EnrollRegistry.feature_enabled?(:financial_assistance)
       set_current_person
-      load_support_texts
       save_faa_bookmark(request.original_url)
       set_admin_bookmark_url
       @transaction_id = params[:id]

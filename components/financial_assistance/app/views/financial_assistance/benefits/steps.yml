@@ -31,7 +31,7 @@
                   classNames: 'span-text'
                 - gutter: 3
                   type: raw_html
-                  text: '| &nbsp <a> Not Sure? </a>'
+                  text: '| &nbsp <a> Not sure? </a>'
                   classNames: 'span-text'
                   model: benefit
                   attribute: is_enrolled
@@ -247,7 +247,7 @@
                   attribute: is_esi_waiting_period
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a> Not Sure? </a>'
+                  text: '| &nbsp <a> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
@@ -274,7 +274,7 @@
                   attribute: is_esi_mec_met
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a> Not Sure? </a>'
+                  text: '| &nbsp <a> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 8
@@ -283,7 +283,7 @@
                   classNames: 'span-text'
                 - gutter: 2
                   type: raw_html
-                  text: '| &nbsp <a> Not Sure? </a>'
+                  text: '| &nbsp <a> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6

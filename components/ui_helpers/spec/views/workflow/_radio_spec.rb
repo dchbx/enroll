@@ -19,15 +19,15 @@ describe 'workflow/_radio' do
     expect(rendered).to have_css('input[type=radio]')
   end
 
-  context 'with no Not Sure? help' do
+  context 'with no Not sure? help' do
     let(:line) do
       UIHelpers::Workflow::Line.new "cells" => [{'text' => 'Yo?',
                                                  'values' => ['Yo!', 'No!'],
                                                  'options' => { 'not_sure' => true, 'help_link' => '/help_me' }}]
     end
 
-    it 'does not have a Not Sure help link' do
-      expect(rendered).not_to have_xpath("//a[@href='/help_me'][contains(text(), 'Not Sure?')]")
+    it 'does not have a Not sure help link' do
+      expect(rendered).not_to have_xpath("//a[@href='/help_me'][contains(text(), 'Not sure?')]")
     end
   end
 end

@@ -53,7 +53,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 3
@@ -137,7 +137,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
             - cells:
@@ -185,7 +185,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
             - cells:
@@ -211,7 +211,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 - step:
     sections:
@@ -758,7 +758,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -799,7 +799,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
@@ -824,7 +824,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 - step:
     sections:
@@ -855,7 +855,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
@@ -880,7 +880,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
@@ -928,7 +928,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
 - step:
@@ -960,7 +960,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 6
@@ -1134,7 +1134,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
 - step:
@@ -1166,7 +1166,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1366,7 +1366,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
 - step:
@@ -1398,7 +1398,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1477,7 +1477,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
 
 - step:
@@ -1509,7 +1509,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 12
@@ -1736,7 +1736,7 @@
                   classNames: 'span-text'
                 - gutter: 4
                   type: raw_html
-                  text: '| &nbsp <a href=""> Not Sure? </a>'
+                  text: '| &nbsp <a href=""> Not sure? </a>'
                   classNames: 'span-text'
             - cells:
                 - gutter: 12

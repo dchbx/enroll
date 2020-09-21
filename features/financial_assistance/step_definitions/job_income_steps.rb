@@ -139,7 +139,7 @@ Given(/^the user is on the Job Income page$/) do
   expect(page).to have_content("Job Income for")
 end
 
-When(/^the user clicks the Not Sure link next to the (.*) income question$/) do |income_type|
+When(/^the user clicks the Not sure link next to the (.*) income question$/) do |income_type|
   sleep 2
   links = page.all('a')
   case income_type

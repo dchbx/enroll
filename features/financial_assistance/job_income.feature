@@ -78,9 +78,9 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
   
   Scenario: "Not sure?" popups open as expected
     Given the user is on the Job Income page
-    When the user clicks the Not Sure link next to the employer income question
+    When the user clicks the Not sure link next to the employer income question
     Then the user should see the popup for the employer income question
     And the user closes the open income question modal
-    When the user clicks the Not Sure link next to the self employment income question
+    When the user clicks the Not sure link next to the self employment income question
     Then the user should see the popup for the self employment income question
 

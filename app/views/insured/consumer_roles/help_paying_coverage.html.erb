@@ -29,9 +29,9 @@
                   <label class="radio-label" for="radio2"><span>No</span></label>
                 </div>
                 <div class="col-md-2 not-sure-margin left-seprator">
-                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not Sure?</a>
+                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
                   <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
-                    <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_applying_for_assistance"} %>
+                    <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
                   <% end %>
                 </div>
               </div>
