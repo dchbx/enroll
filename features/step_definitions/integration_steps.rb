@@ -650,7 +650,6 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
-  click_link 'Add New Person'
   expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
