@@ -64,7 +64,7 @@ function getDate(){
   return today;
 }
 
-if("<%= @qle.qle_event_date_kind %>" == 'submitted_at' && "<%= @qle.title %>" == 'COVID-19' ){
+if("<%= @qle.qle_event_date_kind %>" == 'submitted_at' && "<%= @qle.reason %>" == 'covid-19' ){
   $('#event_date').val("<%= TimeKeeper.date_of_record.to_s %>");
   $('#event_date').attr('readonly',true);
   $('#event_date').each(function (){ this.style.pointerEvents = 'none'; });

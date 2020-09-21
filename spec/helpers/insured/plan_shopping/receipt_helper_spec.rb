@@ -44,6 +44,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
   end
 
+
   describe "Carrier with NO payment options" do
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let(:product) do
@@ -111,8 +112,44 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
 
-    it 'return true if household has kaiser enrollments in current benefit coverage period' do
-      expect(helper.has_any_previous_kaiser_enrollments?).to eq true
+    it 'return false if household has kaiser enrollments in current benefit coverage period with same subscriber' do
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is shopping state' do
+      hbx_enrollment.update_attributes(aasm_state: 'shopping')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is canceled state' do
+      hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is inactive state' do
+      hbx_enrollment.update_attributes(aasm_state: 'inactive')
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment is inactive state' do
+      hbx_enrollment.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false previous enrollment has no product' do
+      hbx_enrollment.unset(:product_id)
+      hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'return false if household has kaiser enrollments in current benefit coverage period' do
+      hbx_enrollment.update_attributes(kind: "employer_sponsored")
+      hbx_enrollment1.update_attributes(kind: "employer_sponsored")
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
 
     it 'return false if household has kaiser enrollments in a previous benefit coverage period year' do
@@ -122,6 +159,12 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
 
     it 'return false if household had no kaiser enrollments in current benefit coverage period' do
       issuer_profile.update_attributes(legal_name: 'Something')
+      expect(helper.has_any_previous_kaiser_enrollments?).to eq false
+    end
+
+    it 'should return false if enrollments do not have product' do
+      hbx_enrollment.update_attributes(product_id: "")
+      hbx_enrollment1.update_attributes(product_id: "")
       expect(helper.has_any_previous_kaiser_enrollments?).to eq false
     end
   end
@@ -227,16 +270,20 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
 
     before :each do
+      hbx_enrollment.workflow_state_transitions << WorkflowStateTransition.new(
+        from_state: hbx_enrollment.aasm_state,
+        to_state: "coverage_selected"
+      )
       assign(:enrollment, hbx_enrollment)
     end
 
-    it 'should return false if enrollment submitted_at is less than 15 minutes' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record - 15.minutes)
-      expect(helper.pay_now_button_timed_out?).to eq false
+    it 'should return true if transition time is greater 15 minutes' do
+      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 20.minutes)
+      expect(helper.pay_now_button_timed_out?).to eq true
     end
 
-    it 'should return true if enrollment submitted_at is greater than 15 minutes' do
-      hbx_enrollment.update_attributes(aasm_state: 'coverage_terminated', submitted_at: TimeKeeper.datetime_of_record)
+    it 'should return false if transition time is within 15 minutes' do
+      hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
       expect(helper.pay_now_button_timed_out?).to eq true
     end
   end

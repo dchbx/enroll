@@ -24,7 +24,13 @@ class SamlInformation
     'account_conflict_url',
     'account_recovery_url',
     'iam_login_url',
-    'curam_broker_dashboard'
+    'curam_broker_dashboard',
+    'kp_pay_now_issuer',
+    'kp_pay_now_url',
+    'kp_pay_now_relay_state',
+    'kp_pay_now_private_key_location',
+    'kp_pay_now_x509_cert_location',
+    'kp_pay_now_audience'
   ]
 
   attr_reader :config

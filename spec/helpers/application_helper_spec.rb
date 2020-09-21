@@ -426,6 +426,53 @@ RSpec.describe ApplicationHelper, :type => :helper do
     end
   end
 
+  describe 'can_show_covid_message_on_sep_carousel?' do
+    let(:person) {FactoryBot.create(:person)}
+    let(:shop_employer) {double(BenefitSponsors::Organizations::AcaShopDcEmployerProfile.new, id: BSON::ObjectId.new)}
+    let(:fehb_employer) {double(BenefitSponsors::Organizations::FehbEmployerProfile.new, id: BSON::ObjectId.new)}
+
+    let(:census_employee_1) {double("CensusEmployee", benefit_sponsors_employer_profile_id: shop_employer.id)}
+    let(:census_employee_2) {double("CensusEmployee", benefit_sponsors_employer_profile_id: fehb_employer.id)}
+
+    let(:active_shop_employee) {double("EmployeeRole", :census_employee => census_employee_1, employer_profile: shop_employer, market_kind: 'shop')}
+    let(:active_fehb_employee) {double("EmployeeRole", :census_employee => census_employee_2, employer_profile: fehb_employer, market_kind: 'fehb')}
+
+    it 'should return false if feature is disabled' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return false
+      expect(helper.can_show_covid_message_on_sep_carousel?(person)).to eq false
+    end
+
+    it 'should return false if person is not present' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return true
+      expect(helper.can_show_covid_message_on_sep_carousel?(nil)).to eq false
+    end
+
+    it 'should return true if person is a consumer' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return true
+      allow(person).to receive(:consumer_role).and_return(double)
+      expect(helper.can_show_covid_message_on_sep_carousel?(person)).to eq true
+    end
+
+    it 'should return true if person is a resident' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return true
+      allow(person).to receive(:resident_role).and_return(double)
+      expect(helper.can_show_covid_message_on_sep_carousel?(person)).to eq true
+    end
+
+    it 'should return true if person is a shop employee' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return true
+      allow(person).to receive(:active_employee_roles).and_return([active_shop_employee])
+      allow(shop_employer).to receive(:is_a?).and_return BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+      expect(helper.can_show_covid_message_on_sep_carousel?(person)).to eq true
+    end
+
+    it 'should return false if person is a fehb employee' do
+      allow(helper).to receive(:sep_carousel_message_enabled?).and_return true
+      allow(person).to receive(:active_employee_roles).and_return([active_fehb_employee])
+      expect(helper.can_show_covid_message_on_sep_carousel?(person)).to eq false
+    end
+  end
+
 
   describe 'shopping_group_premium' do
     it 'should return cost without session' do
@@ -571,7 +618,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 end
 
-  describe "Enabled/Disabled IVL market" do
+describe "Enabled/Disabled IVL market" do
     shared_examples_for "IVL market status" do |value|
        if value == true
         it "should return true if IVL market is enabled" do

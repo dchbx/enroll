@@ -27,7 +27,19 @@ registry:
             item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
-
+      - key: :pay_now_functionality
+        item: "kaiser_enabled"
+        is_enabled: true
+        settings:
+        - key: :carriers
+          item: 'Kaiser'
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
+
+      - key: :sep_carousel_message
+        item: :sep_carousel
+        is_enabled: true
+        settings:
+          - key: :effective_period
+            item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>

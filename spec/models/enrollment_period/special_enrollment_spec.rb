@@ -186,7 +186,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
         # Need to revert the qle_on_date with following changes back on 5/1/2020
         let(:qle_on_date)         { today.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? today.beginning_of_month - 1.day : today }
         #let(:qle_on_date) { today.day <= 15 ? today.beginning_of_month - 1.day : today }
-        let(:fifteenth_of_month_rule_date)  { qle_on_date.next_month.end_of_month + 1.day }
+        let(:fifteenth_of_month_rule_date)  { qle_on_date.end_of_month + 1.day }
         before do
           TimeKeeper.set_date_of_record_unprotected!(Date.new(2015,10,20))
           ivl_qle_sep.qle_on = qle_on_date

@@ -1,13 +1,13 @@
 #Rake to run it on production: RAILS_ENV=production bundle exec rake creating_enrollment:update_with_reference_enrollment subscriber_hbx_id="19858750" reference_enrollment_hbx_id="1166378" effective_on="12/1/2018" terminated_on="11/30/2019" aasm_state="coverage_expired"
 
-namespace :creating_enrollment do 
+namespace :creating_enrollment do
 
   desc "Creating a new enrollment with given reference enrollment details"
   task :update_with_reference_enrollment => :environment do
 
     people = Person.where(hbx_id: ENV['subscriber_hbx_id'])
 
-    if people.size !=1 
+    if people.size !=1
       puts "Check hbx_id. Found no (or) more than 1 persons" unless Rails.env.test?
       raise
     end
@@ -36,6 +36,7 @@ namespace :creating_enrollment do
       enrollment.predecessor_enrollment_id = reference_enrollment.id,
       enrollment.plan_id = reference_enrollment.plan_id
       enrollment.rating_area_id = reference_enrollment.rating_area_id
+      enrollment.consumer_role_id = person.consumer_role.id if person.consumer_role.present?
 
       if aasm_state.blank? || !((["inactive", "renewing_waived"]).include? aasm_state)
         family_members = person.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }
@@ -56,7 +57,7 @@ namespace :creating_enrollment do
       enrollment.update_attributes(aasm_state: aasm_state)
       #silent update without triggering event
       enrollment.workflow_state_transitions.create!(from_state: "shopping", to_state: aasm_state, comment: "manual generation", transition_at: (TimeKeeper.date_of_record - 1.day))
-      
+
       puts "Created a new shop enrollment(hbx_id: #{enrollment.hbx_id}) with #{aasm_state || "coverage_selected"} state & with #{effective_on} as effective_on date" unless Rails.env.test?
     rescue => e
       puts "#{e}"

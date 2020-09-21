@@ -781,6 +781,13 @@ module ApplicationHelper
     end
   end
 
+  def can_show_covid_message_on_sep_carousel?(person)
+    return false unless sep_carousel_message_enabled?
+    return false unless person.present?
+    return true if person.consumer_role.present? || person.resident_role.present?
+    person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
+  end
+
   def transition_family_members_link_type row, allow
     if Settings.aca.individual_market.transition_family_members_link
       allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'

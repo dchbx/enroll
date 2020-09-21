@@ -96,7 +96,7 @@ $(function () {
     init_qle_message();
     $('#qle_flow_info #qle-menu').hide();
     
-    if($(this).data('title') == 'COVID-19'){
+    if($(this).data('reason') == 'covid-19'){
       $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
     } else {
       $('.qle-details-title').html($(this).data('title'));
@@ -139,7 +139,7 @@ $(function () {
     $('.seps-panel').addClass('hidden');
     $('#no_qle_checkbox').parent().addClass('hidden');
     $('#qle_flow_info #qle-menu').hide();
-    if($(this).data('title') == 'COVID-19'){
+    if($(this).data('reason') == 'covid-19'){
       $('.qle-details-title').html("<u>"+$(this).data('title')+"</u>");
     } else {
       $('.qle-details-title').html($(this).data('title'));

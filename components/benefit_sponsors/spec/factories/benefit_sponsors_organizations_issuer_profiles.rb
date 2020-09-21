@@ -20,5 +20,9 @@ FactoryBot.define do
     after(:build) do |profile, evaluator|
       profile.office_locations << build_list(:benefit_sponsors_locations_office_location, evaluator.office_locations_count, :primary)
     end
+
+    trait :kaiser_profile do
+      legal_name        { "Kaiser" }
+    end
   end
 end

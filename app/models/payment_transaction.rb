@@ -24,7 +24,7 @@ class PaymentTransaction
 
   def update_enrollment_details(enrollment)
     self.enrollment_id = enrollment.id
-    self.carrier_id =  enrollment.plan.carrier_profile_id
+    self.carrier_id =  enrollment.product.issuer_profile_id
     self.enrollment_effective_date = enrollment.effective_on
     self.save!
   end

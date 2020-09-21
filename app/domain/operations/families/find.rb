@@ -11,6 +11,7 @@ module Operations
       def call(id:)
         family_id = yield validate(id)
         family    = yield find_family(family_id)
+
         Success(family)
       end
 
@@ -30,6 +31,9 @@ module Operations
       rescue StandardError
         Failure("Unable to find Family with ID #{family_id}.")
       end
+
+
+      # 1- rule to check for family
     end
   end
 end

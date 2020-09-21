@@ -103,6 +103,10 @@ module Config::AcaHelper
     ::EnrollRegistry.feature_enabled?(:residency_self_attestation) && ::EnrollRegistry[:residency_self_attestation].setting(:effective_period).item.cover?(TimeKeeper.date_of_record)
   end
 
+  def sep_carousel_message_enabled?
+    ::EnrollRegistry.feature_enabled?(:sep_carousel_message) && ::EnrollRegistry[:sep_carousel_message].setting(:effective_period).item.cover?(TimeKeeper.date_of_record)
+  end
+
   def fehb_market_is_enabled?
     @fehb_market_is_enabled ||= Settings.aca.market_kinds.include?("fehb")
   end

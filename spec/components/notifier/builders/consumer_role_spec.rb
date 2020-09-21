@@ -6,7 +6,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
   describe "A new model instance" do
     let(:payload) do
-      file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_2019_test_data.csv")
+      file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
       data = csv.to_a
 
@@ -208,7 +208,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
   describe "A uqhp_eligible in aqhp event" do
     let(:payload2) {
-      file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_2019_test_data.csv")
+      file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
       data = csv.to_a
 

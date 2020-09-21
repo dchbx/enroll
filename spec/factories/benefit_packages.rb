@@ -11,7 +11,7 @@ FactoryBot.define do
     benefit_categories { ["health"]}
 
     after :build do |bp, evaluator|
-      issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
+      issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, :kaiser_profile)
       ivl_bronze = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                      title: 'IVL Test Plan Bronze',
                                      benefit_market_kind: :aca_individual,

@@ -264,6 +264,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.upload_document' => "Upload Document",
   :'en.insured.families.documents_index_verify_information' => "We verify the information you give us using electronic data sources. If the data sources do not match the information you gave us, we need you to provide documents to prove what you told us.",
   :'en.insured.families.special_enrollment_period' => "Special Enrollment Period",
+  :'en.insured.families.covid_sep_carousel_message' => "Choose the reason you are enrolling. If you are uninsured,&nbsp;&nbsp;choose COVID-19.",
   :'en.insured.families.final_sep_experienced_any_events' => "Have you or anyone in your household recently experienced any of the following events?",
   :'en.insured.families.final_sep_none_of_the_situations_listed' => "None of the situations listed above apply.",
   :'en.insured.families.outside_open_enrollment' => "Outside Open Enrollment",

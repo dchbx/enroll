@@ -67,7 +67,8 @@ class Insured::PlanShoppingsController < ApplicationController
     # employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
-
+    @kp_pay_now_url = SamlInformation.kp_pay_now_url
+    @kp_relay_state = SamlInformation.kp_pay_now_relay_state
     send_receipt_emails if @person.emails.first
   end
 

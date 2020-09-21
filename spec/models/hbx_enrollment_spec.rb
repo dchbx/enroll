@@ -596,6 +596,8 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         let(:application) {double(:start_on => TimeKeeper.date_of_record.beginning_of_month, :end_on => (TimeKeeper.date_of_record.beginning_of_month + 1.year) - 1.day, :aasm_state => :active)}
         let(:package) {double("BenefitPackage", :is_a? => BenefitSponsors::BenefitPackages::BenefitPackage, :_id => "id", :plan_year => application, :benefit_application => application, start_on: Date.new(Time.current.year,4,1),end_on: Date.new(2020,3,31))}
         let(:existing_shop_enrollment) {FactoryBot.create(:hbx_enrollment, :shop, household: family.active_household, family: family)}
+        let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+        let!(:existing_shop_enrollment1) {FactoryBot.create(:hbx_enrollment, :shop, product: product, household: family.active_household, family: family)}
 
         before :each do
           existing_shop_enrollment
@@ -604,6 +606,11 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         it "should include proper scopes" do
           expect(HbxEnrollment.cancel_eligible.include?(existing_shop_enrollment)).to eq(true)
+        end
+
+        it "should have enrollments only with product id" do
+          expect(HbxEnrollment.unscoped.count).to eq 2
+          expect(HbxEnrollment.unscoped.with_product.count).to eq 1
         end
       end
     end
