@@ -17,7 +17,7 @@ module Notifier
           coverage_kind: enrollment.coverage_kind,
           aptc_amount: enrollment.applied_aptc_amount,
           is_receiving_assistance: is_receiving_assistance?(enrollment),
-          responsible_amount: responsible_amount(enrollment),
+          responsible_amount: responsible_amount(enrollment)
         }
       )
     end
@@ -63,7 +63,7 @@ module Notifier
     end
 
     # TODO: Fix this if the token is used any where
-    def is_csr(product)
+    def is_csr(_product)
       false
     end
   end

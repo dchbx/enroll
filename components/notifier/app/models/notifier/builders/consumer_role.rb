@@ -155,10 +155,10 @@ module Notifier
 
       # checks if individual is enrolled into same health product
       def same_health_product
-        renewal_health_product_id = current_health_product.renewal_product.id rescue nil
-        passive_renewal_health_plan_id = renewing_health_product.id rescue nil
-        renewal_health_product_hios_base_id = current_health_product.renewal_product.hios_base_id rescue nil
-        passive_renewal_health_plan_hios_base_id = renewing_health_product.hios_base_id rescue nil
+        renewal_health_product_id = current_health_product.renewal_product&.id
+        passive_renewal_health_plan_id = renewing_health_product.id
+        renewal_health_product_hios_base_id = current_health_product.renewal_product&.hios_base_id
+        passive_renewal_health_plan_hios_base_id = renewing_health_product.hios_base_id
 
         return false unless renewal_health_product_id && passive_renewal_health_plan_id
 
@@ -167,10 +167,10 @@ module Notifier
 
       # checks if individual is enrolled into same dental product
       def same_dental_product
-        renewal_dental_product_id = current_dental_product.renewal_product.id rescue nil
-        passive_renewal_dental_product_id = renewing_dental_product.id rescue nil
-        renewal_dental_product_hios_base_id = current_dental_product.hios_base_id rescue nil
-        passive_renewal_dental_product_hios_base_id = renewing_dental_product.hios_base_id rescue nil
+        renewal_dental_product_id = current_dental_product.renewal_product&.id
+        passive_renewal_dental_product_id = renewing_dental_product.id
+        renewal_dental_product_hios_base_id = current_dental_product.renewal_product&.hios_base_id
+        passive_renewal_dental_product_hios_base_id = renewing_dental_product.hios_base_id
 
         return false unless renewal_dental_product_id && passive_renewal_dental_product_id
 

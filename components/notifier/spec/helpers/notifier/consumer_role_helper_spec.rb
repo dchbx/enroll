@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Notifier::ConsumerRoleHelper, :type => :helper do
   context "#tax_households_hash" do
     let(:tax_hh) do

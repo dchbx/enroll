@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe Notifier::EnrollmentHelper, :type => :helper do
   let!(:hbx_enrollment)  do
     double(
