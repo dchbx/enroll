@@ -158,7 +158,6 @@ module FinancialAssistance
 
     field :has_fixed_address, type: Boolean, default: true
     field :is_living_in_state, type: Boolean, default: false
-    field :is_temporarily_out_of_state, type: Boolean, default: false
 
     field :is_required_to_file_taxes, type: Boolean
     field :tax_filer_kind, type: String, default: "tax_filer" # change to the response of is_required_to_file_taxes && is_joint_tax_filing
