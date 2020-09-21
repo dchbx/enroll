@@ -40,7 +40,9 @@ module Operations
       end
 
       def person_attributes(person)
-        attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx, :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user].inject({}) do |att_hash, attribute|
+        attrs = [:first_name, :last_name, :middle_name, :name_pfx, :name_sfx,
+                 :gender, :ethnicity, :tribal_id, :no_ssn, :is_tobacco_user,
+                 :is_homeless, :is_temporarily_out_of_state].inject({}) do |att_hash, attribute|
                   att_hash[attribute] = person.send(attribute)
                   att_hash
                 end
