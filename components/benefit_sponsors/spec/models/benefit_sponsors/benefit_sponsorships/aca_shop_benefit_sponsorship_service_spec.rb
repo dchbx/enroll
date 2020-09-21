@@ -60,8 +60,6 @@ module BenefitSponsors
 
     let(:current_date)                    { Date.new(this_year,3,14) }
 
-    before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
-    after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
     subject { BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService }
 
     # We are not moving benefit applications to ineligible status automatically if binder payment is missed
