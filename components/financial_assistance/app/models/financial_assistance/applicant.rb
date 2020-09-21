@@ -53,7 +53,6 @@ module FinancialAssistance
 
     DRIVER_QUESTION_ATTRIBUTES = [:has_job_income, :has_self_employment_income, :has_other_income,
                                   :has_deductions, :has_enrolled_health_coverage, :has_eligible_health_coverage].freeze
-
     #list of the documents user can provide to verify Immigration status
     VLP_DOCUMENT_KINDS = [
         "I-327 (Reentry Permit)",
@@ -632,11 +631,18 @@ module FinancialAssistance
     end
 
     def applicant_validation_complete?
+      if is_applying_coverage
       valid?(:submission) &&
         incomes.all? {|income| income.valid? :submission} &&
         benefits.all? {|benefit| benefit.valid? :submission} &&
         deductions.all? {|deduction| deduction.valid? :submission} &&
         other_questions_complete?
+      else
+      valid?(:submission) &&
+        incomes.all? {|income| income.valid? :submission} &&
+        deductions.all? {|deduction| deduction.valid? :submission} &&
+        other_questions_complete?
+      end
     end
 
     def clean_conditional_params(model_params)
@@ -898,6 +904,8 @@ module FinancialAssistance
 
     def driver_question_responses
       DRIVER_QUESTION_ATTRIBUTES.each do |attribute|
+        next if [:has_enrolled_health_coverage, :has_eligible_health_coverage].include?(attribute) && !is_applying_coverage
+
         instance_type = attribute.to_s.gsub('has_', '')
         instance_check_method = instance_type + "_exists?"
 

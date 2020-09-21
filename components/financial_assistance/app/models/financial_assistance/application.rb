@@ -974,8 +974,8 @@ module FinancialAssistance
       ## Remove  when copy method is fixed to exclude copying Tax Household
       active_applicants.each { |applicant| applicant.update_attributes!(eligibility_determination_id: nil)  }
 
-      non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false).where(is_applying_coverage: true)
-      tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true).where(is_applying_coverage: true)
+      non_tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: false)
+      tax_dependents = active_applicants.where(is_claimed_as_tax_dependent: true)
 
       non_tax_dependents.each do |applicant|
         if applicant.is_joint_tax_filing? && applicant.is_not_in_a_tax_household? && applicant.eligibility_determination_of_spouse.present?
