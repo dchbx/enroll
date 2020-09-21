@@ -40,6 +40,14 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
       expect(result.success[:person_hbx_id]).to eq person.hbx_id
     end
 
+    it 'should return hash with is_homeless' do
+      expect(result.success[:is_homeless]).to eq person.is_homeless
+    end
+
+    it 'should return hash with is_temporarily_out_of_state' do
+      expect(result.success[:is_temporarily_out_of_state]).to eq person.is_temporarily_out_of_state
+    end
+
     it 'should return hash with relationship' do
       expect(result.success[:relationship]).to eq 'self'
     end
