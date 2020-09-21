@@ -6,7 +6,7 @@ class Notifier::Services::DependentService
 
   include Notifier::ConsumerRoleHelper
 
-  def initialize(is_uqhp_notice, member)
+  def initialize(is_uqhp_notice, member, renewing_enrollments)
     @is_uqhp_notice = is_uqhp_notice
     @payload_member = member
     @person = person_details
@@ -17,7 +17,7 @@ class Notifier::Services::DependentService
     @is_uqhp_eligible = uqhp_eligible?
     @is_aqhp_eligible = aqhp_eligible?
     @is_magi_medicaid_eligibile = medicaid_eligible?
-    @is_enrolled = is_enrolled?
+    @is_enrolled = is_enrolled?(renewing_enrollments)
   end
 
   attr_accessor :is_uqhp_notice, :payload_member, :age, :is_aqhp_eligible, :is_magi_medicaid_eligibile
@@ -62,7 +62,9 @@ class Notifier::Services::DependentService
     is_uqhp_notice.presence || payload_member['magi_medicaid'].casecmp('YES').zero?
   end
 
-  def is_enrolled?
+  def is_enrolled?(renewing_enrollments)
+    return nil unless renewing_enrollments.present?
+
     renewing_enrollments.any? do |enrollment|
       enrollment.hbx_enrollment_members.detect { |hbx_enrollment_member| hbx_enrollment_member.hbx_id == payload_member['person_hbx_id']}
     end
