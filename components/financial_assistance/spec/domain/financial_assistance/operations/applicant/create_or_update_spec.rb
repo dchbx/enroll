@@ -104,11 +104,11 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
         @result = subject.call(params: compare(applicant_params), family_id: family_id)
       end
 
-      it 'should return a success object' do
+      it 'should return a failure object' do
         expect(@result).to be_a(Dry::Monads::Result::Failure)
       end
 
-      it 'should return applicant object' do
+      it 'should return failure with message' do
         expect(@result.failure).to eq("No information is changed")
       end
 

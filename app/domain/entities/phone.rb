@@ -10,6 +10,5 @@ module Entities
     attribute :number, Types::String.optional.meta(omittable: true)
     attribute :extension, Types::String.optional.meta(omittable: true)
     attribute :full_phone_number, Types::String.optional
-
   end
 end
