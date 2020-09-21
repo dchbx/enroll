@@ -6,6 +6,6 @@ $('#family_error_messages').append("<%= escape_javascript render partial: 'destr
   $('#qle_flow_info').removeClass('hidden');
 <% end %>
 
-<% if @family&.application_in_progress.present? &&  (['destroy'].include? controller.action_name)  %>
+<% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['destroy'].include? controller.action_name)  %>
   $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
 <% end %>
