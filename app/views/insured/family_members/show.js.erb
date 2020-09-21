@@ -11,6 +11,6 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 
 $("#dependent_buttons").removeClass('hidden');
 
-<% if @family&.application_in_progress.present? &&  (['create', 'update', 'destroy'].include? controller.action_name)  %>
+<% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name)  %>
   $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
 <% end %>

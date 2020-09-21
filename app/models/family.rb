@@ -1182,10 +1182,6 @@ class Family
     bcp.present? ? bcp.start_on.year : TimeKeeper.date_of_record.year
   end
 
-  def application_in_progress
-    ::FinancialAssistance::Application.where(family_id: id, aasm_state: 'draft').first
-  end
-
 private
   def build_household
     if households.size == 0
