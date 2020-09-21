@@ -28,6 +28,7 @@ module Notifier
       attribute :magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :uqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
+      attribute :ineligible_applicants, Array[MergeDataModels::Dependent]
       attribute :addresses, Array[MergeDataModels::Address]
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
@@ -86,13 +87,14 @@ module Notifier
         notice.addresses = [notice.mailing_address]
         notice.tax_households = [Notifier::MergeDataModels::TaxHousehold.stubbed_object]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.ineligible_applicants = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice
       end
 
       def collections
-        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members]
+        %w[addresses tax_households dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members ineligible_applicants]
       end
 
       def conditions
@@ -104,6 +106,10 @@ module Notifier
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
             aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present?
         ]
+      end
+
+      def totally_ineligible_members_present?
+        ineligible_applicants.present?
       end
 
       def aqhp_eligible?

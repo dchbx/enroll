@@ -88,6 +88,16 @@ module Notifier
         merge_model.mailing_address = address_hash(mailing_address)
       end
 
+      def primary_member
+        member = payload['notice_params']['primary_member']
+        dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
+        dependent_hash(dependent, member)
+      end
+
+      def family_members
+        dependents << primary_member
+      end
+
       def dependents
         payload['notice_params']['dependents'].each do |member|
           dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member)
@@ -167,12 +177,6 @@ module Notifier
         (renewal_dental_product_id == passive_renewal_dental_product_id) && (renewal_dental_product_hios_base_id == passive_renewal_dental_product_hios_base_id)
       end
 
-
-
-      def enrollments
-        
-      end
-
       def renewing_enrollments
         payload['notice_params']['renewing_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
@@ -183,6 +187,10 @@ module Notifier
         payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
         end
+      end
+
+      def ineligible_applicants
+        family_members.select(&:is_totally_ineligible)
       end
 
       def magi_medicaid_members

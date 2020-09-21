@@ -15,6 +15,7 @@ module Notifier
           tax_household_size: member['tax_hh_count'],
           incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
           other_coverage: member["mec"].presence || 'No',
+          is_enrolled: dependent.is_enrolled?,
           mec: check_format(member['mec']),
           aptc: member['aptc'],
           indian_conflict: check_format(member['indian']),

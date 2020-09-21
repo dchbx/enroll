@@ -14,6 +14,7 @@ module Notifier
     attribute :expected_income_for_coverage_year, String #actual_income
     attribute :aptc, String
     attribute :other_coverage, String
+    attribute :is_enrolled, Boolean
     attribute :aqhp_eligible, Boolean
     attribute :uqhp_eligible, Boolean
     attribute :totally_ineligible, Boolean
@@ -55,12 +56,13 @@ module Notifier
           previous_coverage_year: 2019,
           incarcerated: 'No',
           other_coverage: 'No',
+          is_enrolled: true,
           aptc: nil,
-          totally_ineligible: 'No',
-          non_magi_medicaid: 'No',
-          magi_medicaid: 'Yes',
-          aqhp_eligible: 'No',
-          uqhp_eligible: 'No',
+          totally_ineligible: false,
+          non_magi_medicaid: false,
+          magi_medicaid: true,
+          aqhp_eligible: false,
+          uqhp_eligible: true,
           aqhp_event: true,
           uqhp_event: false,
           aqhp_or_non_magi_medicaid_members_present: false,
