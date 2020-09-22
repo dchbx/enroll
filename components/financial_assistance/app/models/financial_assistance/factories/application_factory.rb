@@ -114,8 +114,7 @@ module FinancialAssistance
 
       def claiming_applicant(new_applicant)
         old_applicant = @application.applicants.find(new_applicant.claimed_as_tax_dependent_by)
-        person_id = old_applicant.person.id
-        new_applicant.application.applicants.detect{ |app| app.person.id.to_s == person_id.to_s } if person_id
+        new_applicant.application.applicants.detect{ |applicant| applicant.person_hbx_id == old_applicant.person_hbx_id } if old_applicant&.person_hbx_id
       end
 
       def application_params
