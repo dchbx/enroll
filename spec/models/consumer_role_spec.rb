@@ -965,22 +965,22 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       it "should return true if there is a change in address from non-dc to dc" do
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq true
       end
 
       it "should return false if there is a change in address from dc to non-dc" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: false)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "true", is_temporarily_out_of_state: "false", dc_status: false)).to eq false
       end
 
       it "should return false if there is a change in address from dc to dc" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: false)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: false)).to eq false
       end
 
       it "should return false if there is a change in address from non-dc to non-dc" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "true", dc_status: true)).to eq false
       end
     end
 
@@ -991,19 +991,19 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       end
 
       it "should return true if age > 18" do
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq true
       end
 
       it "should return false if age = 18" do
         person.update_attributes(dob: TimeKeeper.date_of_record - 18.years)
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq false
       end
 
       it "should return false if age < 18" do
         consumer_role.person.update_attributes(dob: TimeKeeper.date_of_record - 15.years)
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq false
       end
     end
 
@@ -1014,13 +1014,13 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       it "should return true if has an active coverage" do
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq true
       end
 
       it "should return false if no active coverage" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "verified")
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq false
       end
     end
 
@@ -1031,25 +1031,25 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       it "should return true if residency status is unverified" do
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq true
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "true", is_temporarily_out_of_state: "false", dc_status: true)).to eq true
       end
 
       it "should return false if residency status is not unverified" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [nil]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq false
       end
 
       it "should return true if residency status is not unverified & address change from non-dc to dc" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "false", dc_status: true)).to eq true
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "false", dc_status: true)).to eq true
       end
 
       it "should return false if residency status is not unverified & address change from non-dc to non-dc" do
         consumer_role.verification_types.by_name("DC Residency").first.update_attributes(validation_status: "outstanding")
         allow(enrollment).to receive_message_chain(:hbx_enrollment_members, :family_member, :person).and_return [consumer_role.person]
-        expect(consumer_role.can_trigger_residency?(family, no_dc_address: "true", dc_status: true)).to eq false
+        expect(consumer_role.can_trigger_residency?(family, is_homeless: "false", is_temporarily_out_of_state: "true", dc_status: true)).to eq false
       end
     end
   end

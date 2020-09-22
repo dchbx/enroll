@@ -75,7 +75,7 @@ module VlpDoc
     if role
       params_hash = params.permit!.to_h
       info_changed = role.sensitive_information_changed?(params_hash[:person] || params_hash[:dependent])
-      dc_status = role.person.no_dc_address
+      dc_status = (role.person.is_homeless ||  role.person.is_temporarily_out_of_state)
       return info_changed, dc_status
     end
   end

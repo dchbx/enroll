@@ -674,7 +674,7 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address && (is_homeless? || is_temporarily_out_of_state?)
+    is_homeless? || is_temporarily_out_of_state?
   end
 
   def age_on(date)
@@ -686,9 +686,16 @@ class Person
     end
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   def is_dc_resident?
-    return false if no_dc_address == true && (is_homeless? && is_temporarily_out_of_state?)
-    return true if no_dc_address == true && (is_homeless? || is_temporarily_out_of_state?)
+    return true if is_homeless? || is_temporarily_out_of_state?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}

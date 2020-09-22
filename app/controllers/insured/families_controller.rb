@@ -429,7 +429,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.is_consumer_role_active?
-      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      if !(@person.addresses.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path

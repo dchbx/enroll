@@ -205,7 +205,7 @@ class PeopleController < ApplicationController
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
         if @person.is_consumer_role_active?
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
-          @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
+          @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, is_homeless: person_params["is_homeless"], is_temporarily_out_of_state: person_params["is_temporarily_out_of_state"], dc_status: @dc_status)
         end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
         # if dual role, this will update both ivl and ee
@@ -378,7 +378,8 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :id,
       :consumer_role,
       :is_applying_coverage

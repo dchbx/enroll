@@ -35,7 +35,8 @@ class Person
                         :race,
                         :tribal_id,
                         :no_dc_address,
-                        :no_dc_address_reason,
+                        :is_homeless,
+                        :is_temporarily_out_of_state,
                         :is_active,
                         :no_ssn],
                 :modifier_field => :modifier,
@@ -685,7 +686,7 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    is_homeless? || is_temporarily_out_of_state?
   end
 
   def age_on(date)
@@ -697,13 +698,20 @@ class Person
     end
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   def is_dc_resident?
-    return false if no_dc_address == true && no_dc_address_reason.blank?
-    return true if no_dc_address == true && no_dc_address_reason.present?
+    return true if is_homeless? || is_temporarily_out_of_state?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
-    return false
+    false
   end
 
   def current_individual_market_transition

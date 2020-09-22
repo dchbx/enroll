@@ -821,7 +821,7 @@ class ConsumerRole
   def can_trigger_residency?(family, opts) # trigger for change in address
     person.age_on(TimeKeeper.date_of_record) > 18 && family.person_has_an_active_enrollment?(person) &&
     ((opts[:dc_status] &&
-      opts[:no_dc_address] == "false") || (person.is_consumer_role_active? && verification_types.by_name("DC Residency").first.validation_status == "unverified"))
+      opts[:is_homeless] == "false" && opts[:is_temporarily_out_of_state] == "false") || (person.is_consumer_role_active? && verification_types.by_name("DC Residency").first.validation_status == "unverified"))
   end
 
   def add_type_history_element(params)
@@ -829,7 +829,7 @@ class ConsumerRole
   end
 
   def can_start_residency_verification? # initial trigger check for coverage purchase
-    !person.no_dc_address && person.age_on(TimeKeeper.date_of_record) > 18
+    !(person.is_homeless || person.is_temporarily_out_of_state) && person.age_on(TimeKeeper.date_of_record) > 18
   end
 
   def invoke_residency_verification!

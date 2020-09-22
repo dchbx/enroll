@@ -48,8 +48,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       "Person",
       id: "test",
       addresses: [],
-      no_dc_address: false,
-      no_dc_address_reason: "",
+      is_homeless: false,
+      is_temporarily_out_of_state: false,
       is_consumer_role_active?: false,
       has_active_employee_role?: true,
       has_multiple_roles?: false,
@@ -625,7 +625,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "with a person with an address" do
-      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "", agent?: false) }
+      let(:person) { double("Person", id: "test", addresses: true, is_homeless: false, is_temporarily_out_of_state: false, agent?: false) }
 
       it "should be a success" do
         expect(response).to have_http_status(:success)
