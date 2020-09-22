@@ -19,9 +19,9 @@ module Notifier
         @applied_aptc = applied_aptc
       end
 
-      # attr_accessor :csr_percent_as_integer, :max_aptc, :aptc_csr_annual_household_income
-      # attr_accessor :primary_member, :aptc_csr_monthly_household_income, :aptc_annual_income_limit
-      # attr_accessor :csr_annual_income_limit, :applied_aptc
+      attr_accessor :csr_percent_as_integer, :max_aptc, :aptc_csr_annual_household_income
+      attr_accessor :primary_member, :aptc_csr_monthly_household_income, :aptc_annual_income_limit
+      attr_accessor :csr_annual_income_limit, :applied_aptc, :primary_member
 
       private
 

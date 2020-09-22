@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :after_each do
 
   describe "A new model instance" do
+    let(:active_enrollment) { HbxEnrollment.new(id: "1") }
     let(:payload) do
       file = Rails.root.join("spec", "test_data", "notices", "proj_elig_report_aqhp_test_data.csv")
       csv = CSV.open(file, "r", :headers => true)
@@ -31,7 +32,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
       context 'primary_member' do
         it "should return primary member" do
-          expect(subject.primary_member).to eq("")
+          expect(subject.primary_member.class).to eq(Notifier::MergeDataModels::Dependent)
         end
       end
 
@@ -207,6 +208,81 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       context "Model address attributes" do
         it "should have address " do
           expect(address.address_1.present?)
+        end
+      end
+    end
+
+    context "loops" do
+      let(:enrollments) { [HbxEnrollment.new(effective_on: Date.today + 1.year)] }
+
+      before :each do
+        allow_any_instance_of(Notifier::Builders::ConsumerRole).to receive(:renewing_enrollments).and_return(enrollments)
+      end
+
+      it "should return tax households" do
+        expect(subject.tax_households.class).to eq(Notifier::Services::TaxHouseholdService)
+      end
+
+      it "should return a single renewing health enrollment" do
+        # TODO: Notice is undefined in components/notifier/app/models/notifier/builders/consumer_role.rb
+        expect(subject.renewing_health_enrollment.class).to eq(HbxEnrollment)
+      end
+
+      it "should return a single renewing dental enrollment" do
+        expect(subject.renewing_dental_enrollment.class).to eq(HbxEnrollment)
+      end
+
+      it "should return current health enrollment" do
+        expect(subject.current_health_enrollment.class).to eq(HbxEnrollment)
+      end
+
+      it "should return current dental enrollment" do
+        expect(subject.current_dental_enrollment.class).to eq(HbxEnrollment)
+      end
+
+      it "should return nil if renewing health products present" do
+        expect(subject.renewing_health_products).to eq(nil)
+      end
+
+      it "should return nil if no renewing dental products present" do
+        expect(subject.renewing_dental_products).to eq(nil)
+      end
+
+      it "should return nil if no current health products present" do
+        expect(subject.current_health_products).to eq(nil)
+      end
+
+      it "should return nil if no current dental products present" do
+        expect(subject.current_dental_products).to eq(nil)
+      end
+
+      context "#same_health_product" do
+        context "current and renewing health products present" do
+          it "should check if individual is enrolled into same health product" do
+            expect(subject.same_health_product).to eq("")
+          end
+        end
+
+        it "should return nil if no renewal_health_product_ids present" do
+        end
+      end
+
+      it "should check if individual is enrolled into same dental product" do
+        expect(subject.same_dental_product).to eq("")
+      end
+
+      it "should return ineligible family members" do
+        expect(subject.ineligible_applicants).to eq("'")
+      end
+
+      context "enrollments" do
+        # TODO: This is stubbed at the moment
+        it "should return renewing enrollments if notice_param renewing_enrollment_ids present" do
+          expect(subject.renewing_enrollments.first.class).to eq(HbxEnrollment)
+        end
+
+        it "should return nil if no payload notice param active_enrollment_ids" do
+          expect(subject.active_enrollments).to eq(nil)
         end
       end
     end

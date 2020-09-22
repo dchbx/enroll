@@ -116,48 +116,57 @@ module Notifier
         primary_member = payload['notice_params']['primary_member']
         return unless primary_member['aqhp_eligible'].upcase == "YES"
 
-        tax_household = ::Notifier::Services::TaxHoseholdService.new(primary_member)
+        tax_household = ::Notifier::Services::TaxHouseholdService.new(primary_member)
         merge_model.tax_households << tax_households_hash(tax_household)
       end
 
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollment
-      def renewing_health_enrollments
-        renewing_enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
+
+      def renewing_health_enrollment
+        return nil unless renewing_enrollments.present?
+        renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == coverage_year}
       end
 
       # Renewing dental enrollment
-      def renewing_dental_enrollments
-        renewing_enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
+      def renewing_dental_enrollment
+        return nil unless renewing_enrollments.present?
+        renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == coverage_year}
       end
 
       # Current active health enrollment
-      def current_health_enrollments
-        active_enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      def current_health_enrollment
+        return nil unless active_enrollments.present?
+        active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
       # Current active dental enrollment
-      def current_dental_enrollments
-        active_enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      def current_dental_enrollment
+        return nil unless active_enrollments.present?
+        active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
       # Renewing health product
       def renewing_health_products
+        return nil unless renewing_health_enrollments.present?
         renewing_health_enrollments.map(&:product)
       end
 
       # Renewing dental product
       def renewing_dental_products
+        return nil unless renewing_dental_enrollments.present?
         renewing_dental_enrollments.map(&:product)
       end
 
       # Current active health products
       def current_health_products
+        return nil unless current_health_enrollments.present?
         current_health_enrollments.map(&:product)
       end
 
       # Current active dental product
       def current_dental_products
+        return nil unless current_dental_enrollments.present?
         current_dental_enrollments.map(&:product)
       end
 
@@ -193,12 +202,32 @@ module Notifier
         end
       end
 
+      def renewing_health_enrollments
+        return nil unless renewing_enrollments.present?
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' }
+      end
+
+      def renewing_dental_enrollments
+        return nil unless renewing_enrollments.present?
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' }
+      end
+
       def active_enrollments
         return nil unless payload['notice_params']['active_enrollment_ids'].present?
 
         payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
         end
+      end
+
+      def current_health_enrollments
+        return nil unless active_enrollments.present?
+        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
+      end
+
+      def current_dental_enrollments
+        return nil unless active_enrollments.present?
+        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
       def ineligible_applicants

@@ -44,7 +44,7 @@ module Notifier
 
     def reasons_for_ineligibility(member)
       reason_for_ineligibility = []
-      reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." if member['dc_resident'].capitalize == 'NO'
+      reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." if member['dc_resident']&.capitalize == 'NO'
       reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." unless member['incarcerated'] == 'N'
       if lawful_presence_outstanding?(member)
         reason_for_ineligibility << "this person doesn’t have an eligible immigration status,
