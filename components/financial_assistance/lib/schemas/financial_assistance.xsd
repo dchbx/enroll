@@ -32,7 +32,7 @@
 			<xs:element name="tax_filer_type" type="TaxFilerNameType"/>
 			<xs:element name="is_joint_tax_filing" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_claimed_as_tax_dependent" type="xs:boolean"/>
-			<xs:element name="has_insurance" type="xs:boolean"/>
+			<xs:element name="has_insurance" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="had_prior_insurance" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="has_state_health_benefit" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_medicare_eligible" type="xs:boolean" minOccurs="0"/>
@@ -44,10 +44,10 @@
 			<xs:element name="is_ia_eligible" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_medicaid_chip_eligible" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_magi_medicaid" type="xs:boolean" minOccurs="0"/>
-			<xs:element name="is_self_attested_blind" type="xs:boolean"/>
+			<xs:element name="is_self_attested_blind" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_self_attested_disabled" type="xs:boolean"/>
 			<xs:element name="is_self_attested_long_term_care" type="xs:boolean"/>
-			<xs:element name="is_veteran" type="xs:boolean"/>
+			<xs:element name="is_veteran" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_refugee" type="xs:boolean"/>
 			<xs:element name="is_trafficking_victim" type="xs:boolean"/>
 			<xs:element name="is_former_foster_care" type="xs:boolean" minOccurs="0"/>
@@ -65,8 +65,8 @@
 			<xs:element name="is_forty_quarters" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_ssn_applied" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="non_ssn_apply_reason" type="xs:string" minOccurs="0"/>
-			<xs:element name="has_daily_living_help" type="xs:boolean"/>
-			<xs:element name="has_bill_pay_3_month_help" type="xs:boolean"/>
+			<xs:element name="has_daily_living_help" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="has_bill_pay_3_month_help" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_resident_post_092296" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="is_vets_spouse_or_child" type="xs:boolean" minOccurs="0"/>
 			<xs:element name="incomes">
