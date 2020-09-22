@@ -16,7 +16,8 @@ module FinancialAssistance
                                         last_name: member.last_name,
                                         gender: member.gender,
                                         dob: member.dob,
-                                        is_primary_applicant: member.is_primary_applicant?
+                                        is_primary_applicant: member.is_primary_applicant?,
+                                        is_applying_coverage: true
           next if member.is_primary_applicant?
           application.ensure_relationship_with_primary(applicant, member.relationship)
         end
