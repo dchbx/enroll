@@ -33,7 +33,7 @@ module Notifier
           issuer_profile_name: product.issuer_profile.legal_name,
           hsa_eligibility: product.hsa_eligibility,
           renewal_plan_type: nil,
-          is_csr: is_csr(product),
+          is_csr: product.is_csr?,
           deductible: product.deductible,
           family_deductible: product.family_deductible,
           carrier_phone: phone_number(product.issuer_profile.legal_name)
@@ -59,12 +59,7 @@ module Notifier
     end
 
     def is_receiving_assistance?(enrollment)
-      enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr? ? true : false
-    end
-
-    # TODO: Fix this if the token is used any where
-    def is_csr(_product)
-      false
+      enrollment.applied_aptc_amount > 0 || enrollment.product.is_csr?
     end
   end
 end
