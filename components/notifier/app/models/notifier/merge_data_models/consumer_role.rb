@@ -114,15 +114,15 @@ module Notifier
 
       # there can be multiple health and dental enrollments for the same coverage year
       def renewing_health_enrollments
-        enrollments.select { |enrollment| enrollment.health? }
+        enrollments.select(&:health?)
       end
 
       def renewing_dental_enrollments
-        enrollments.select { |enrollment| enrollment.dental? }
+        enrollments.select(&:dental?)
       end
 
       def tax_hh_with_csr
-        tax_households.select{ |thh| thh.csr_percent_as_integer != 100}
+        tax_households.reject{ |thh| thh.csr_percent_as_integer = 100}
       end
 
       def aqhp_eligible?
@@ -258,8 +258,8 @@ module Notifier
         (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
       end
 
-      def eligibiltiy_notice_display_csr(ivl)
-        (!ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) || (ivl.indian_conflict && (ivl.magi_as_percentage_of_fpl <= 300 || ivl.magi_as_percentage_of_fpl > 300)) || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_csr_because_of_tax || ivl.no_csr_because_of_mec
+      def eligibility_notice_display_csr(ivl)
+        (!ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) || ivl.indian_conflict || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_csr_because_of_tax || ivl.no_csr_because_of_mec
       end
     end
   end

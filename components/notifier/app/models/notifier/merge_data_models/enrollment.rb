@@ -103,7 +103,7 @@ module Notifier
       coverage_kind == 'health'
     end
 
-    def health?
+    def dental?
       coverage_kind == 'dental'
     end
 
