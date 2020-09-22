@@ -14,7 +14,7 @@ module Validators
       required(:gender).maybe(:string)
       required(:dob).filled(:date)
 
-      required(:is_incarcerated).filled(:bool)
+      optional(:is_incarcerated).maybe(:bool)
       optional(:is_disabled).filled(:bool)
       optional(:ethnicity).maybe(:array)
       optional(:race).maybe(:string)
@@ -30,6 +30,9 @@ module Validators
       optional(:addresses).maybe(:array)
       optional(:phones).maybe(:array)
       optional(:emails).maybe(:array)
+
+      # Need this attribute in contract to be able to conditionally validate other params.
+      optional(:is_applying_coverage).maybe(:bool)
     end
 
     rule(:addresses).each do
@@ -63,6 +66,10 @@ module Validators
           key.failure(text: "invalid emails. Expected a hash.")
         end
       end
+    end
+
+    rule(:is_applying_coverage) do
+      key.failure(text: "Incarceration question must be answered") if values[:is_incarcerated].to_s.blank? if key? && values[:is_applying_coverage]
     end
   end
 end

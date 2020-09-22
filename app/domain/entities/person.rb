@@ -14,7 +14,7 @@ module Entities
     attribute :gender, Types::String.optional
     attribute :dob, Types::Date.optional
 
-    attribute :is_incarcerated, Types::Strict::Bool
+    attribute :is_incarcerated, Types::Bool.optional.meta(omittable: true)
     attribute :is_disabled, Types::Strict::Bool.meta(omittable: true)
     attribute :ethnicity, Types::Array.optional.meta(omittable: true)
     attribute :race, Types::String.optional.meta(omittable: true)
