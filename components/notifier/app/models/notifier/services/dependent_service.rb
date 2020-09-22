@@ -41,25 +41,29 @@ class Notifier::Services::DependentService
   def calculate_age
     if is_uqhp_notice
       person.age_on(TimeKeeper.date_of_record).presence || nil
-    else
+    elsif payload_member['dob']
       age_of_aqhp_person(TimeKeeper.date_of_record, Date.strptime(payload_member['dob'], '%m/%d/%Y'))
     end
   end
 
   def aqhp_eligible?
-    is_uqhp_notice ? false : payload_member['aqhp_eligible'].casecmp('YES').zero?
+    return payload_member['aqhp_eligible'] if payload_member['aqhp_eligible'].is_a?(FalseClass) || payload_member['aqhp_eligible'].is_a?(TrueClass)
+    is_uqhp_notice ? false : payload_member['aqhp_eligible']&.casecmp('YES')&.zero?
   end
 
   def totally_ineligible?
-    is_uqhp_notice ? false : payload_member['totally_inelig'].casecmp('YES').zero?
+    return payload_member['totally_ineligible'] if payload_member['totally_ineligible'].is_a?(FalseClass) || payload_member['totally_ineligible'].is_a?(TrueClass)
+    is_uqhp_notice ? false : payload_member['totally_ineligible']&.casecmp('YES')&.zero?
   end
 
   def uqhp_eligible?
-    is_uqhp_notice.presence || payload_member['uqhp_eligible'].casecmp('YES').zero?
+    return payload_member['uqhp_eligible'] if payload_member['uqhp_eligible'].is_a?(FalseClass) || payload_member['uqhp_eligible'].is_a?(TrueClass)
+    is_uqhp_notice.presence || payload_member['uqhp_eligible']&.casecmp('YES')&.zero?
   end
 
   def medicaid_eligible?
-    is_uqhp_notice.presence || payload_member['magi_medicaid'].casecmp('YES').zero?
+    return payload_member['magi_medicaid'] if payload_member['magi_medicaid'].is_a?(FalseClass) || payload_member['magi_medicaid'].is_a?(TrueClass)
+    is_uqhp_notice.presence || payload_member['magi_medicaid']&.casecmp('YES')&.zero?
   end
 
   def is_enrolled?(renewing_enrollments)

@@ -29,6 +29,9 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "Model attributes" do
+      it "should return notice date" do
+        expect(subject.notice_date).to include(Date.today.year.to_s)
+      end
 
       context 'primary_member' do
         it "should return primary member" do
@@ -127,8 +130,8 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         expect(subject.aqhp_eligible?).to eq(true)
       end
 
-      it "should be totally_ineligible?" do
-        expect(subject.totally_ineligible?).to eq(false)
+      it "should return falsey if not totally_ineligible?" do
+        expect(subject.totally_ineligible?).to be_falsey
       end
 
       it "should be uqhp_eligible?" do
@@ -213,8 +216,8 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "loops" do
-      it "should return tax households" do
-        expect(subject.tax_households.class).to eq(Notifier::Services::TaxHouseholdService)
+      it "should return blank array if no households present" do
+        expect(subject.tax_households).to_not be(nil)
       end
 
       it "should return a nil if no renewing health enrollments present" do

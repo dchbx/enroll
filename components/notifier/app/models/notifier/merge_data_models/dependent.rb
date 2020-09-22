@@ -7,7 +7,7 @@ module Notifier
     attribute :mailing_address, MergeDataModels::Address
     attribute :age, Integer
     attribute :dc_resident, String
-    attribute :citizenship, String
+    attribute :citizen_status, String
     attribute :incarcerated, String
     attribute :federal_tax_filing_status, String
     attribute :tax_household_size, Integer
@@ -44,7 +44,16 @@ module Notifier
     attribute :non_applicant, Boolean
     attribute :person_hbx_id, String
     attribute :dob, Date
-
+    attribute :filer_type, String
+    attribute :actual_income, String
+    attribute :resident, String
+    attribute :tax_hh_count, String
+    attribute :indian, String
+    attribute :medicaid_monthly_income_limit, String
+    attribute :magi_as_fpl, String
+    attribute :nonmedi_reason, String
+    attribute :nonaptc_reason, String
+    attribute :noncsr_reason, String
     # TODO: person_hbx_id and dob missing, what to do?
 
     def self.stubbed_object
@@ -95,6 +104,10 @@ module Notifier
           dob: (Date.today - 20.years)
         }
       )
+    end
+
+    def tax_hh_count
+      tax_household_size
     end
 
     def collections
