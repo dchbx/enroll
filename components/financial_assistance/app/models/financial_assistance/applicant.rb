@@ -885,12 +885,15 @@ module FinancialAssistance
     end
 
     def other_questions_answers
-      return [] unless is_applying_coverage
-      [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
-        no_ssn_flag = no_ssn
+      if is_applying_coverage
+        [:has_daily_living_help, :need_help_paying_bills, :is_ssn_applied].inject([]) do |array, question|
+          no_ssn_flag = no_ssn
 
-        array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
-        array
+          array << send(question) if question != :is_ssn_applied || (question == :is_ssn_applied && no_ssn_flag == '1')
+          array
+        end
+      else
+        [:is_pregnant, :is_post_partum_period].collect{|question| send(question)}
       end
     end
 
