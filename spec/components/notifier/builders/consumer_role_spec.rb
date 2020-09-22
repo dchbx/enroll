@@ -213,31 +213,25 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
     end
 
     context "loops" do
-      let(:enrollments) { [HbxEnrollment.new(effective_on: Date.today + 1.year)] }
-
-      before :each do
-        allow_any_instance_of(Notifier::Builders::ConsumerRole).to receive(:renewing_enrollments).and_return(enrollments)
-      end
-
       it "should return tax households" do
         expect(subject.tax_households.class).to eq(Notifier::Services::TaxHouseholdService)
       end
 
-      it "should return a single renewing health enrollment" do
+      it "should return a nil if no renewing health enrollments present" do
         # TODO: Notice is undefined in components/notifier/app/models/notifier/builders/consumer_role.rb
-        expect(subject.renewing_health_enrollment.class).to eq(HbxEnrollment)
+        expect(subject.renewing_health_enrollment).to eq(nil)
       end
 
-      it "should return a single renewing dental enrollment" do
-        expect(subject.renewing_dental_enrollment.class).to eq(HbxEnrollment)
+      it "should return a nil if no renewing dental enrollment present" do
+        expect(subject.renewing_dental_enrollment).to eq(nil)
       end
 
-      it "should return current health enrollment" do
-        expect(subject.current_health_enrollment.class).to eq(HbxEnrollment)
+      it "should return nil if no current health enrollment present" do
+        expect(subject.current_health_enrollment).to eq(nil)
       end
 
-      it "should return current dental enrollment" do
-        expect(subject.current_dental_enrollment.class).to eq(HbxEnrollment)
+      it "should return nil if no current dental enrollment present" do
+        expect(subject.current_dental_enrollment).to eq(nil)
       end
 
       it "should return nil if renewing health products present" do
@@ -258,25 +252,54 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
       context "#same_health_product" do
         context "current and renewing health products present" do
-          it "should check if individual is enrolled into same health product" do
-            expect(subject.same_health_product).to eq("")
+          let(:current_product1) { double(id: 1, hios_base_id: 2, renewal_product: renewing_product1) }
+          let(:renewing_product1) { double(id: 1, hios_base_id: 2) }
+
+          it "should return true if individual is enrolled into same health product" do
+            allow(subject).to receive(:current_health_products).and_return([current_product1])
+            allow(subject).to receive(:renewing_health_products).and_return([renewing_product1])
+            expect(subject.same_health_product).to eq(true)
           end
         end
 
-        it "should return nil if no renewal_health_product_ids present" do
+        it "should return false if no renewal_dental_product_ids && passive_renewal_dental_product_ids" do
+          allow(subject).to receive(:current_health_products).and_return([])
+          allow(subject).to receive(:renewing_health_products).and_return([])
+          expect(subject.same_health_product).to eq(false)
         end
       end
 
-      it "should check if individual is enrolled into same dental product" do
-        expect(subject.same_dental_product).to eq("")
+      context "#same_dental_product" do
+        context "current and renewing dental products present" do
+          let(:current_product1) { double(id: 1, hios_base_id: 2, renewal_product: renewing_product1) }
+          let(:renewing_product1) { double(id: 1, hios_base_id: 2) }
+
+          it "should return true if individual is enrolled into same dental product" do
+            allow(subject).to receive(:current_dental_products).and_return([current_product1])
+            allow(subject).to receive(:renewing_dental_products).and_return([renewing_product1])
+            expect(subject.same_dental_product).to eq(true)
+          end
+        end
+
+        it "should return false if no renewal_dental_product_ids && passive_renewal_dental_product_ids" do
+          allow(subject).to receive(:current_dental_products).and_return([])
+          allow(subject).to receive(:renewing_dental_products).and_return([])
+          expect(subject.same_dental_product).to eq(false)
+        end
       end
 
-      it "should return ineligible family members" do
-        expect(subject.ineligible_applicants).to eq("'")
+      it "should return nil if no ineligible family members present" do
+        expect(subject.ineligible_applicants).to eq(nil)
       end
 
       context "enrollments" do
         # TODO: This is stubbed at the moment
+        let(:enrollments) { [HbxEnrollment.new(effective_on: Date.today + 1.year)] }
+
+        before :each do
+          allow_any_instance_of(Notifier::Builders::ConsumerRole).to receive(:renewing_enrollments).and_return(enrollments)
+        end
+
         it "should return renewing enrollments if notice_param renewing_enrollment_ids present" do
           expect(subject.renewing_enrollments.first.class).to eq(HbxEnrollment)
         end

@@ -42,6 +42,10 @@ module Notifier
     attribute :no_csr_because_of_tax, Boolean
     attribute :no_csr_because_of_mec, Boolean
     attribute :non_applicant, Boolean
+    attribute :person_hbx_id, String
+    attribute :dob, Date
+
+    # TODO: person_hbx_id and dob missing, what to do?
 
     def self.stubbed_object
       Notifier::MergeDataModels::Dependent.new(
@@ -86,7 +90,9 @@ module Notifier
           no_csr_because_of_income: true,
           no_csr_because_of_tax: true,
           no_csr_because_of_mec: true,
-          non_applicant: true
+          non_applicant: true,
+          person_hbx_id: 1,
+          dob: (Date.today - 20.years)
         }
       )
     end

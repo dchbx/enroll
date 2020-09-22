@@ -175,7 +175,7 @@ module Notifier
         renewal_health_product_ids = current_health_products.map(&:renewal_product).map(&:id).compact
         passive_renewal_health_plan_ids = renewing_health_products.map(&:id).compact
         renewal_health_product_hios_base_ids = current_health_products.map(&:renewal_product).map(&:hios_base_id).compact
-        passive_renewal_health_plan_hios_base_ids = renewing_health_products.map(&:hios_base_id).compact
+        passive_renewal_health_plan_hios_base_ids = renewing_health_products&.map(&:hios_base_id).compact
 
         return false unless renewal_health_product_ids.present? && passive_renewal_health_plan_ids.present?
 
@@ -189,8 +189,8 @@ module Notifier
         renewal_dental_product_hios_base_ids = current_dental_products.map(&:renewal_product).map(&:hios_base_id).compact
         passive_renewal_dental_product_hios_base_ids = renewing_dental_products.map(&:hios_base_id).compact
 
-        return false unless renewal_dental_product_ids && passive_renewal_dental_product_ids
-
+        return false unless renewal_dental_product_ids.present? && passive_renewal_dental_product_ids.present?
+        
         (renewal_dental_product_ids.sort == passive_renewal_dental_product_ids.sort) && (renewal_dental_product_hios_base_ids.sort == passive_renewal_dental_product_hios_base_ids.sort)
       end
 
@@ -231,6 +231,7 @@ module Notifier
       end
 
       def ineligible_applicants
+        return nil unless family_members.present?
         family_members.select(&:is_totally_ineligible)
       end
 
