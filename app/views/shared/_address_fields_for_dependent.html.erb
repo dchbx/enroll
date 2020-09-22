@@ -59,7 +59,7 @@
         </div>
 
         <% if kind == 'home' %>
-          <% style="display:none;" if f.object.no_dc_address.blank? || f.object.no_dc_address == false || f.object.no_dc_address == 'false' %>
+          <% style="display:none;" if f.object.is_homeless.blank? || f.object.is_homeless == false || f.object.is_homeless == 'false' %>
           <div style="<%= style %>" class="row no-buffer address-row show <%= div_class %> no-dc-address-reasons">
             <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
               <div class="is_homeless">

@@ -93,10 +93,10 @@ describe FakesController do
 
   context "#sensitive_info_changed?" do
 
-    let(:person_params) { { person:  { no_dc_address: "true" } } }
+    let(:person_params) { { person:  { is_homeless: "true" } } }
     let(:params) { ActionController::Parameters.new(person_params)}
 
-    let(:person) { FactoryBot.create(:person, :with_consumer_role, :no_dc_address => false)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :is_homeless => false)}
 
     before do
       allow(subject).to receive(:params).and_return params
@@ -117,7 +117,7 @@ describe FakesController do
     end
 
     it "should return true as dc_status if the past addreess is in non-dc" do
-      person.update_attributes(no_dc_address: true)
+      person.update_attributes(is_homeless: true)
       expect(subject.sensitive_info_changed?(person.consumer_role)[1]).to eq true
     end
   end
