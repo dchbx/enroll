@@ -9,20 +9,22 @@
 - unless applicant.is_joint_tax_filing.nil?
   %is_joint_tax_filing= applicant.is_joint_tax_filing
 %is_claimed_as_tax_dependent= applicant.is_claimed_as_tax_dependent
-%has_insurance= applicant.is_enrolled_in_insurance?
+- if applicant.is_applying_coverage?
+  %has_insurance= applicant.is_enrolled_in_insurance?
 - if (applicant.had_prior_insurance?).present?
   %had_prior_insurance= applicant.had_prior_insurance?
-%has_state_health_benefit= applicant.has_state_health_benefit?
+- if applicant.is_applying_coverage?
+  %has_state_health_benefit= applicant.has_state_health_benefit?
 %is_medicare_eligible= applicant.is_medicare_eligible
-- unless applicant.is_physically_disabled.nil?
+- unless applicant.is_physically_disabled.nil? || !applicant.is_applying_coverage?
   %is_physically_disabled= applicant.is_physically_disabled
-- unless applicant.is_student.nil?
+- unless applicant.is_student.nil? || !applicant.is_applying_coverage?
   %is_student= applicant.is_student
-- unless applicant.student_kind.blank?
+- unless applicant.student_kind.blank? || !applicant.is_applying_coverage?
   %student_type= "urn:openhbx:terms:v1:student##{applicant.student_kind.downcase.gsub(" ","_")}"
-- unless applicant.student_school_kind.blank?
+- unless applicant.student_school_kind.blank? || !applicant.is_applying_coverage?
   %school_type= "urn:openhbx:terms:v1:student_school##{applicant.student_school_kind.downcase.gsub(" ","_")}"
-- if applicant.student_status_end_on.present?
+- if applicant.student_status_end_on.present? && applicant.is_applying_coverage?
   %student_status_end_on= simple_date_for(Time.strptime(applicant.student_status_end_on,'%m/%d/%Y'))
 - unless applicant.is_ia_eligible.nil?
   %is_ia_eligible= applicant.is_ia_eligible
@@ -30,19 +32,21 @@
   %is_medicaid_chip_eligible= applicant.is_medicaid_chip_eligible
 - unless applicant.is_magi_medicaid.nil?
   %is_magi_medicaid= applicant.is_magi_medicaid
-%is_self_attested_blind= applicant.is_self_attested_blind
+- if applicant.is_applying_coverage?
+  %is_self_attested_blind= applicant.is_self_attested_blind
 %is_self_attested_disabled= applicant.is_self_attested_disabled
 %is_self_attested_long_term_care= applicant.is_self_attested_long_term_care
-%is_veteran= applicant.is_veteran
+- if applicant.is_applying_coverage?
+  %is_veteran= applicant.is_veteran
 %is_refugee= applicant.is_refugee
 %is_trafficking_victim= applicant.is_trafficking_victim
-- unless applicant.is_former_foster_care.nil?
+- unless applicant.is_former_foster_care.nil? || !applicant.is_applying_coverage?
   %is_former_foster_care= applicant.is_former_foster_care
-- unless applicant.age_left_foster_care.blank?
+- unless applicant.age_left_foster_care.blank? || !applicant.is_applying_coverage?
   %age_left_foster_care= applicant.age_left_foster_care
-- unless applicant.foster_care_us_state.blank?
+- unless applicant.foster_care_us_state.blank? || !applicant.is_applying_coverage?
   %foster_care_us_state= "urn:openhbx:terms:v1:us_state##{State::NAME_IDS.detect do |state| state.last==applicant.foster_care_us_state.upcase end.first.downcase.gsub(' ','_')}"
-- unless applicant.had_medicaid_during_foster_care.blank?
+- unless applicant.had_medicaid_during_foster_care.blank? || !applicant.is_applying_coverage?
   %had_medicaid_during_foster_care= applicant.had_medicaid_during_foster_care
 - unless applicant.is_pregnant.nil?
   %is_pregnant= applicant.is_pregnant
@@ -65,9 +69,10 @@
   %is_ssn_applied= applicant.is_ssn_applied
 - if applicant.non_ssn_apply_reason.present?
   %non_ssn_apply_reason= applicant.non_ssn_apply_reason
-%has_daily_living_help= applicant.has_daily_living_help
-%has_bill_pay_3_month_help= applicant.need_help_paying_bills
+- if applicant.is_applying_coverage?
+  %has_daily_living_help= applicant.has_daily_living_help
+  %has_bill_pay_3_month_help= applicant.need_help_paying_bills
 - unless applicant.is_resident_post_092296.nil?
   %is_resident_post_092296= applicant.is_resident_post_092296
-- unless applicant.is_vets_spouse_or_child.nil?
+- unless applicant.is_vets_spouse_or_child.nil? || !applicant.is_applying_coverage?
   %is_vets_spouse_or_child= applicant.is_vets_spouse_or_child
