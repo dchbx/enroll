@@ -14,6 +14,8 @@ module Notifier
     attribute :expected_income_for_coverage_year, String #actual_income
     attribute :aptc, String
     attribute :other_coverage, String
+    attribute :csr, Boolean
+    attribute :reasons_for_ineligibility, Array[String]
     attribute :is_enrolled, Boolean
     attribute :aqhp_eligible, Boolean
     attribute :uqhp_eligible, Boolean

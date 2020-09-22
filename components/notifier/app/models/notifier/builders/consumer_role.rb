@@ -105,6 +105,13 @@ module Notifier
         end
       end
 
+      # Loading only renewing enrollments
+      def enrollments
+        renewing_enrollments.each do |enrollment|
+          merge_model.enrollments << enrollment_hash(enrollment)
+        end
+      end
+
       def tax_households
         primary_member = payload['notice_params']['primary_member']
         return unless primary_member['aqhp_eligible'].upcase == "YES"
@@ -113,68 +120,69 @@ module Notifier
         merge_model.tax_households << tax_households_hash(tax_household)
       end
 
+      # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollment
-      def renewing_health_enrollment
-        renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
+      def renewing_health_enrollments
+        renewing_enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.coverage_year}
       end
 
       # Renewing dental enrollment
-      def renewing_dental_enrollment
-        renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
+      def renewing_dental_enrollments
+        renewing_enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.coverage_year}
       end
 
       # Current active health enrollment
-      def current_health_enrollment
-        active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      def current_health_enrollments
+        active_enrollments.select{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == notice.previous_coverage_year}
       end
 
       # Current active dental enrollment
-      def current_dental_enrollment
-        active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.previous_coverage_year}
+      def current_dental_enrollments
+        active_enrollments.select{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == notice.previous_coverage_year}
       end
 
-      # Renewing health enrollment
-      def renewing_health_product
-        renewing_health_enrollment.product
+      # Renewing health product
+      def renewing_health_products
+        renewing_health_enrollments.map(&:product)
       end
 
       # Renewing dental product
-      def renewing_dental_product
-        renewing_dental_enrollment.product
+      def renewing_dental_products
+        renewing_dental_enrollments.map(&:product)
       end
 
-      # Current active health enrollment
-      def current_health_product
-        current_health_enrollment.product
+      # Current active health products
+      def current_health_products
+        current_health_enrollments.map(&:product)
       end
 
       # Current active dental product
-      def current_dental_product
-        current_dental_enrollment.product
+      def current_dental_products
+        current_dental_enrollments.map(&:product)
       end
 
       # checks if individual is enrolled into same health product
       def same_health_product
-        renewal_health_product_id = current_health_product.renewal_product&.id
-        passive_renewal_health_plan_id = renewing_health_product.id
-        renewal_health_product_hios_base_id = current_health_product.renewal_product&.hios_base_id
-        passive_renewal_health_plan_hios_base_id = renewing_health_product.hios_base_id
+        renewal_health_product_ids = current_health_products.map(&:renewal_product).map(&:id).compact
+        passive_renewal_health_plan_ids = renewing_health_products.map(&:id).compact
+        renewal_health_product_hios_base_ids = current_health_products.map(&:renewal_product).map(&:hios_base_id).compact
+        passive_renewal_health_plan_hios_base_ids = renewing_health_products.map(&:hios_base_id).compact
 
-        return false unless renewal_health_product_id && passive_renewal_health_plan_id
+        return false unless renewal_health_product_ids.present? && passive_renewal_health_plan_ids.present?
 
-        (renewal_health_product_id == passive_renewal_health_plan_id) && (renewal_health_product_hios_base_id == passive_renewal_health_plan_hios_base_id)
+        (renewal_health_product_ids.sort == passive_renewal_health_plan_ids.sort) && (renewal_health_product_hios_base_ids.sort == passive_renewal_health_plan_hios_base_ids.sort)
       end
 
       # checks if individual is enrolled into same dental product
       def same_dental_product
-        renewal_dental_product_id = current_dental_product.renewal_product&.id
-        passive_renewal_dental_product_id = renewing_dental_product.id
-        renewal_dental_product_hios_base_id = current_dental_product.renewal_product&.hios_base_id
-        passive_renewal_dental_product_hios_base_id = renewing_dental_product.hios_base_id
+        renewal_dental_product_ids = current_dental_products.map(&:renewal_product).map(&:id).compact
+        passive_renewal_dental_product_ids = renewing_dental_products.map(&:id).compact
+        renewal_dental_product_hios_base_ids = current_dental_products.map(&:renewal_product).map(&:hios_base_id).compact
+        passive_renewal_dental_product_hios_base_ids = renewing_dental_products.map(&:hios_base_id).compact
 
-        return false unless renewal_dental_product_id && passive_renewal_dental_product_id
+        return false unless renewal_dental_product_ids && passive_renewal_dental_product_ids
 
-        (renewal_dental_product_id == passive_renewal_dental_product_id) && (renewal_dental_product_hios_base_id == passive_renewal_dental_product_hios_base_id)
+        (renewal_dental_product_ids.sort == passive_renewal_dental_product_ids.sort) && (renewal_dental_product_hios_base_ids.sort == passive_renewal_dental_product_hios_base_ids.sort)
       end
 
       def renewing_enrollments

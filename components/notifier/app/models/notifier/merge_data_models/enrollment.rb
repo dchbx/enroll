@@ -99,6 +99,14 @@ module Notifier
       number_to_currency(employee_responsible_amount.to_f)
     end
 
+    def health?
+      coverage_kind == 'health'
+    end
+
+    def health?
+      coverage_kind == 'dental'
+    end
+
     def premium
       number_to_currency(premium_amount.to_f)
     end
