@@ -34,6 +34,7 @@ module Operations
         return Failure('Given family member is an active object') if values[:family_member].is_active
         return Failure('Given family member does not have a matching person') unless values[:family_member].person.present?
         return Failure('Given family member does not have a matching consumer role') unless values[:family_member].person.consumer_role.present?
+        return Failure('There is no draft application matching with this family') unless draft_application_exists?(values)
 
         Success(values)
       end
@@ -47,6 +48,12 @@ module Operations
       def delete_applicant(fa_applicant_params)
         ::FinancialAssistance::Operations::Applicant::Delete.new.call({financial_applicant: fa_applicant_params, family_id: @family_id})
         Success('A successful call was made to FAA engine to delete an applicant')
+      end
+
+      def draft_application_exists?(values)
+        family_id = values[:family_member].family.id
+        result = ::FinancialAssistance::Operations::Application::FindDraft.new.call(params: {family_id: family_id})
+        result.success?
       end
     end
   end

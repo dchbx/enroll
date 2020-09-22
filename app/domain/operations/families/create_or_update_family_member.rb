@@ -62,14 +62,25 @@ module Operations
       end
 
       def create_or_update_family_member(person, family, applicant_params)
-        # TODO: Update matching family member
-        family_member = family.relate_new_member(person, applicant_params[:relationship])
+        create_or_update_relationship(person, family, applicant_params[:relationship])
+        family_member = family.family_members.detect {|fm| fm.person_id.to_s == person.id.to_s}
+        return family_member if family_member && (applicant_params.key?(:is_active) ? family_member.is_active == applicant_params[:is_active] : true)
+        family_member = family.add_family_member(person)
+        family_member.save!
         family.save!
         family_member
       end
 
       def create_or_update_vlp_document(applicant_params, person)
         Operations::People::CreateOrUpdateVlpDocument.new.call(params: {applicant_params: applicant_params, person: person})
+      end
+
+      def create_or_update_relationship(person, family, relationship_kind)
+        primary_person = family.primary_person
+        exiting_relationship = primary_person.person_relationships.detect{|rel| rel.relative_id.to_s == person.id.to_s}
+        return if exiting_relationship && exiting_relationship.kind == relationship_kind
+
+        primary_person.ensure_relationship_with(person, relationship_kind)
       end
     end
   end

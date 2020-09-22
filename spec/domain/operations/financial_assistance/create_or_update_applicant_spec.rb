@@ -25,8 +25,23 @@ RSpec.describe ::Operations::FinancialAssistance::CreateOrUpdateApplicant, type:
     end
   end
 
+  context 'for draft application does not exists' do
+    before do
+      @result = subject.call({event: :family_member_created, family_member: family_member})
+    end
+
+    it 'should return a failure object' do
+      expect(@result).to be_a(Dry::Monads::Result::Failure)
+    end
+
+    it 'should return failure with a message' do
+      expect(@result.failure).to eq('There is no draft application matching with this family')
+    end
+  end
+
   context 'valid arguments' do
     before do
+      FactoryBot.create(:financial_assistance_application, family_id: family.id, aasm_state: 'draft')
       @result = subject.call({event: :family_member_created, family_member: family_member})
     end
 

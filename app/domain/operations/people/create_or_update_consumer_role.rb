@@ -36,9 +36,11 @@ module Operations
 
       def create_consumer_role(entity, family_member)
         person = family_member.person
-
         if person.consumer_role.present?
-          person.consumer_role.assign_attributes(entity.to_h)
+          consumer_role_params = entity.to_h
+          consumer_role = person.consumer_role
+          return Success(consumer_role) if consumer_role.citizen_status == consumer_role_params[:citizen_status] && consumer_role.is_applying_coverage == consumer_role_params[:is_applying_coverage]
+          person.consumer_role.assign_attributes(consumer_role_params)
         else
           person.build_consumer_role({:is_applicant => false}.merge(entity.to_h))
         end
