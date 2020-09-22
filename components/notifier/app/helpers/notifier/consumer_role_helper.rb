@@ -15,7 +15,7 @@ module Notifier
           tax_household_size: member['tax_hh_count'],
           incarcerated: member['incarcerated'] == 'N' ? 'No' : 'Yes',
           other_coverage: member["mec"].presence || 'No',
-          reasons_for_ineligibility: reasons_for_ineligibility(member),
+          reasons_for_ineligibility: reasons_for_ineligibility(dependent.person),
           is_enrolled: dependent.is_enrolled,
           mec: check_format(member['mec']),
           aptc: member['aptc'],
@@ -42,11 +42,13 @@ module Notifier
       )
     end
 
-    def reasons_for_ineligibility(member)
+    def reasons_for_ineligibility(person)
       reason_for_ineligibility = []
-      reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." if member['dc_resident']&.capitalize == 'NO'
-      reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." unless member['incarcerated'] == 'N'
-      if lawful_presence_outstanding?(member)
+      return reason_for_ineligibility unless person.present?
+
+      reason_for_ineligibility << "this person isn’t a resident of the District of Columbia. Go to healthcare.gov to learn how to apply for coverage in the right state." unless person.is_dc_resident?
+      reason_for_ineligibility << "this person is currently serving time in jail or prison for a criminal conviction." if person.is_incarcerated
+      if lawful_presence_outstanding?(person)
         reason_for_ineligibility << "this person doesn’t have an eligible immigration status,
                                   but may be eligible for a local medical assistance program
                                   called the DC Health Care Alliance. For more information, please
@@ -55,9 +57,8 @@ module Notifier
       reason_for_ineligibility
     end
 
-    # TODO: Fix this method
-    def lawful_presence_outstanding?(_member)
-      false
+    def lawful_presence_outstanding?(person)
+      person.consumer_role.types_include_to_notices.include?('Citizenship')
     end
 
     def member_hash(fam_member)

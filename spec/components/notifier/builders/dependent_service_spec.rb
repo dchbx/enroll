@@ -33,7 +33,7 @@ RSpec.describe 'Components::Notifier::Builders::DependentService', :dbclean => :
         payload['notice_params']['dependents'].select { |m| m['member_id'] == person.hbx_id }.first
       end
 
-      let(:aqhp_dependent) { ::Notifier::Services::DependentService.new(false, member) }
+      let(:aqhp_dependent) { ::Notifier::Services::DependentService.new(false, member, nil) }
 
       context "Model attributes" do
         it "should have first name from payload" do
