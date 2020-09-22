@@ -33,7 +33,7 @@ RSpec.describe Insured::FamilyMembersController do
     let(:consumer_role) do
       instance_double(
         ConsumerRole,
-        person: double(no_dc_address: false)
+        person: double(is_homeless: false, is_temporarily_out_of_state: false)
       )
     end
 
@@ -48,7 +48,7 @@ RSpec.describe Insured::FamilyMembersController do
       allow(Family).to receive(:find).with(family_id).and_return(family)
       allow(dependent).to receive(:update_attributes).with(dependent_controller_parameters).and_return(true)
       allow(consumer_role).to receive(:sensitive_information_changed?).with(dependent_update_properties).and_return(false)
-      allow(consumer_role).to receive(:check_for_critical_changes).with(family, info_changed: false, no_dc_address: nil, dc_status: false)
+      allow(consumer_role).to receive(:check_for_critical_changes).with(family, info_changed: false, is_homeless: nil, is_temporarily_out_of_state: nil, dc_status: false)
     end
 
     describe "when the value for 'is_applying_coverage' is provided" do
