@@ -91,7 +91,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       person.emails.build(kind: 'home')
       render :template => "people/landing_pages/_personal.html.erb"
       expect(rendered).to have_selector('div#email_info')
-      expect(rendered).to match /Home Email Address/
+      expect(rendered).to match /Personal Email Address/
     end
 
     it "should show work email address" do
