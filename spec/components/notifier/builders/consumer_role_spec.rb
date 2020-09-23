@@ -224,9 +224,9 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         expect(subject.renewing_health_enrollments).to eq(nil)
       end
 
-      it "should return a nil if no renewing health enrollment present" do
+      it "should return a nil if no renewing health enrollments present" do
         # TODO: Notice is undefined in components/notifier/app/models/notifier/builders/consumer_role.rb
-        expect(subject.renewing_health_enrollment).to eq(nil)
+        expect(subject.renewing_health_enrollments).to eq(nil)
       end
 
       it "should return nil if no renewing dental enrollments present" do
@@ -234,15 +234,15 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       end
 
       it "should return a nil if no renewing dental enrollment present" do
-        expect(subject.renewing_dental_enrollment).to eq(nil)
+        expect(subject.renewing_dental_enrollments).to eq(nil)
       end
 
-      it "should return nil if no current health enrollment present" do
-        expect(subject.current_health_enrollment).to eq(nil)
+      it "should return nil if no current health enrollments present" do
+        expect(subject.current_health_enrollments).to eq(nil)
       end
 
-      it "should return nil if no current dental enrollment present" do
-        expect(subject.current_dental_enrollment).to eq(nil)
+      it "should return nil if no current dental enrollments present" do
+        expect(subject.current_dental_enrollments).to eq(nil)
       end
 
       it "should return nil if renewing health products present" do
@@ -299,12 +299,12 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         end
       end
 
-      it "should return nil if no ineligible family members present" do
-        expect(subject.ineligible_applicants).to eq(nil)
+      it "should return a hash of family member info ineligible family members present" do
+        expect(subject.ineligible_applicants.length).to be > 1
+        expect(subject.ineligible_applicants.first["applid"].length).to be > 1
       end
 
       context "enrollments" do
-        # TODO: This is stubbed at the moment
         let(:enrollments) { [HbxEnrollment.new(effective_on: Date.today + 1.year)] }
 
         before :each do
