@@ -7,7 +7,8 @@ Feature: User should be able to pay for plan
     Then Hbx Admin logs out
 
   Scenario Outline: Hbx Admin uploads and verifies application document
-    Given that a person exists in EA
+    Given the FAA feature configuration is disabled
+    And that a person exists in EA
     And the person has an active <role>
     And the person goes plan shopping in the individual for a new plan
     When the person enrolls in a Kaiser plan
@@ -24,7 +25,8 @@ Feature: User should be able to pay for plan
   | resident role |
 
   Scenario Outline: Hbx Admin uploads and verifies application document
-    Given that a person exists in EA
+    Given the FAA feature configuration is disabled
+    And that a person exists in EA
     And the person has an active <role>
     And the person goes plan shopping in the individual for a new plan
     When the person enrolls in a Kaiser plan

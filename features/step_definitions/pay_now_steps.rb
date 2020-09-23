@@ -33,7 +33,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   find('.btn', text: 'CONTINUE', wait: 10).click
   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
-  find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
+  find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
   find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
@@ -118,7 +118,9 @@ end
 And(/^tries to purchase with a break in coverage$/) do
   find('.btn', text: 'CONTINUE').click
   person = Person.where(first_name: /John/i, last_name: /Smith/i).to_a.first
-  person.primary_family.hbx_enrollments.first.update_attributes(aasm_state: "coverage_terminated", terminated_on: (TimeKeeper.date_of_record - 5.day))
+  enrollment = person.primary_family.hbx_enrollments.first
+  enrollment.update_attributes(aasm_state: "coverage_terminated", terminated_on: (TimeKeeper.date_of_record - 5.day)) if enrollment
+  sleep 3
   click_button "Shop for Plans"
   click_link "Shop Now"
   find('.btn', text: 'CONTINUE').click
@@ -168,7 +170,7 @@ And(/^creates a consumer with SEP$/) do
   find('.btn', text: 'CONTINUE', wait: 10).click
   expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
-  find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
+  find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
   find(:xpath, '//label[@for="person_us_citizen_true"]', wait: 10).click
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
