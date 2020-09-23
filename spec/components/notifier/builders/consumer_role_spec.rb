@@ -220,9 +220,17 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         expect(subject.tax_households).to_not be(nil)
       end
 
-      it "should return a nil if no renewing health enrollments present" do
+      it "should return nil if no renewing health enrollments present" do
+        expect(subject.renewing_health_enrollments).to eq(nil)
+      end
+
+      it "should return a nil if no renewing health enrollment present" do
         # TODO: Notice is undefined in components/notifier/app/models/notifier/builders/consumer_role.rb
         expect(subject.renewing_health_enrollment).to eq(nil)
+      end
+
+      it "should return nil if no renewing dental enrollments present" do
+        expect(subject.renewing_dental_enrollments).to eq(nil)
       end
 
       it "should return a nil if no renewing dental enrollment present" do

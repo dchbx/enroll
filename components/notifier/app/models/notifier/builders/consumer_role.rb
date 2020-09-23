@@ -204,12 +204,12 @@ module Notifier
 
       def renewing_health_enrollments
         return nil unless renewing_enrollments.present?
-        renewing_enrollments.select { |e| e.coverage_kind == 'health' }
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == notice.coverage_year}
       end
 
       def renewing_dental_enrollments
         return nil unless renewing_enrollments.present?
-        renewing_enrollments.select { |e| e.coverage_kind == 'dental' }
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == notice.coverage_year }
       end
 
       def active_enrollments
