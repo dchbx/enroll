@@ -49,16 +49,33 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
          gender: 'male'}
       end
 
-      before do
-        @result = subject.call(params: {attributes_hash: person_params, person: person})
+      context 'matching hbx_id' do
+        before do
+          @result = subject.call(params: {attributes_hash: person_params, person: person})
+        end
+
+        it 'should return a failure object' do
+          expect(@result).to be_a(Dry::Monads::Result::Failure)
+        end
+
+        it 'should return failure with a message' do
+          expect(@result.failure).to eq('No information is changed')
+        end
       end
 
-      it 'should return a failure object' do
-        expect(@result).to be_a(Dry::Monads::Result::Failure)
-      end
+      context 'different hbx_id' do
+        before do
+          person_params.merge!({hbx_id: '11aaa1aa11a11111a1111111111111a1'})
+          @result = subject.call(params: {attributes_hash: person_params, person: person})
+        end
 
-      it 'should return failure with a message' do
-        expect(@result.failure).to eq('No information is changed')
+        it 'should return a failure object' do
+          expect(@result).to be_a(Dry::Monads::Result::Failure)
+        end
+
+        it 'should return failure with a message' do
+          expect(@result.failure).to eq('No information is changed')
+        end
       end
     end
 

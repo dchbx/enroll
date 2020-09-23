@@ -8,6 +8,8 @@ module Operations
     class CreateOrUpdate
       include Dry::Monads[:result, :do]
 
+      PersonCandidate = Struct.new(:ssn, :dob, :first_name, :last_name)
+
       def call(params:)
         person_values = yield validate(params)
         person_entity = yield create_entity(person_values)
@@ -40,8 +42,7 @@ module Operations
       end
 
       def match_or_update_or_create_person(person_entity)
-        person = Person.by_hbx_id(person_entity.to_h[:hbx_id]).first
-
+        person = find_existing_person(person_entity.to_h)
         #create new person
         if person.blank?
           person = Person.new(person_entity.to_h) #if person_valid_params.success?
@@ -49,7 +50,7 @@ module Operations
         else
           return Success(person) if no_infomation_changed?({params: {attributes_hash: person_entity, person: person}})
 
-          person.assign_attributes(person_entity.except(:addresses, :phones, :emails))
+          person.assign_attributes(person_entity.except(:addresses, :phones, :emails, :hbx_id))
           person.save!
           create_or_update_associations(person, person_entity.to_h, :addresses)
           create_or_update_associations(person, person_entity.to_h, :emails)
@@ -78,6 +79,19 @@ module Operations
       def no_infomation_changed?(params:)
         result = ::Operations::People::CompareForDataChange.new.call(params: params)
         result.failure?
+      end
+
+      def find_existing_person(params)
+        person = Person.by_hbx_id(params[:hbx_id]).first
+        return person if person.present?
+        candidate = PersonCandidate.new(params[:ssn], params[:dob], params[:first_name], params[:last_name])
+
+        if params[:no_ssn] == '1'
+          Person.where(first_name: /^#{candidate.first_name}$/i, last_name: /^#{candidate.last_name}$/i,
+                       dob: candidate.dob).first
+        else
+          Person.match_existing_person(candidate)
+        end
       end
     end
   end

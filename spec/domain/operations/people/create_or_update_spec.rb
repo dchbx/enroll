@@ -99,17 +99,36 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
        phones: person.serializable_hash.deep_symbolize_keys[:phones], emails: person.serializable_hash.deep_symbolize_keys[:emails]}
     end
 
-    before :each do
-      @result = subject.call(params: person_params)
-    end
-
-    context 'valid params' do
-      it 'should return success' do
-        expect(@result).to be_a(Dry::Monads::Result::Success)
+    context 'matching hbx_id' do
+      before :each do
+        @result = subject.call(params: person_params)
       end
 
-      it 'should update gender' do
-        expect(@result.success.gender).to eq 'female'
+      context 'valid params' do
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
+
+        it 'should update gender' do
+          expect(person.reload.gender).to eq 'female'
+        end
+      end
+    end
+
+    context 'different hbx_id' do
+      before :each do
+        person_params.merge!({person_hbx_id: '100asd29'})
+        @result = subject.call(params: person_params)
+      end
+
+      context 'valid params' do
+        it 'should return success' do
+          expect(@result).to be_a(Dry::Monads::Result::Success)
+        end
+
+        it 'should update gender' do
+          expect(person.reload.gender).to eq 'female'
+        end
       end
     end
   end

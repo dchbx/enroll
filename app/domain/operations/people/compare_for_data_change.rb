@@ -54,7 +54,7 @@ module Operations
       end
 
       def any_information_changed?(merged_params, updated_person_hash)
-        return true if merged_params.except(:addresses, :emails, :phones) != updated_person_hash.except(:addresses, :emails, :phones)
+        return true if merged_params.except(:addresses, :emails, :phones, :hbx_id) != updated_person_hash.except(:addresses, :emails, :phones, :hbx_id)
         return true if Set.new(merged_params[:addresses]) != Set.new(updated_person_hash[:addresses])
         return true if Set.new(merged_params[:emails]) != Set.new(updated_person_hash[:emails])
         return true if Set.new(merged_params[:phones]) != Set.new(updated_person_hash[:phones])
