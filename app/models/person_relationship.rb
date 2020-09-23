@@ -115,9 +115,19 @@ class PersonRelationship
             inclusion: {in: Kinds, message: "%{value} is not a valid person relationship"}
 
   after_save :notify_updated
+  after_update :relationship_updated, if: :kind_changed?
 
   def notify_updated
     person.notify_updated
+  end
+
+  # On dependent's relationship to primary update, we do not update
+  # Dependent's Person(and its embedded docs)/FamilyMember. We update
+  # PrimaryPerson's PersonRelationship's Kind and this will not trigger a change on dependent.
+  # This is the reason why we have to call person_create_or_update_handler on relative
+  # to be able to notify FAA engine with the relationship change.
+  def relationship_updated
+    relative&.person_create_or_update_handler
   end
 
   def parent
