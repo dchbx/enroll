@@ -28,9 +28,51 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       consumer
     end
 
+    context "members" do
+      context "magi_medicaid_members" do
+        it "should return array of hashes of members information" do
+          expect(subject.magi_medicaid_members.class).to eq(Array)
+          expect(subject.magi_medicaid_members.first["actual_income"].length).to be > 1
+        end
+      end
+      context "aqhp_or_non_magi_medicaid_members" do
+        it "should return array of hashes of members information" do
+          expect(subject.aqhp_or_non_magi_medicaid_members.class).to eq(Array)
+          expect(subject.aqhp_or_non_magi_medicaid_members.first["actual_income"].length).to be > 1
+        end
+      end
+
+      context "uqhp_or_non_magi_medicaid_members" do
+        it "should return an array of members information" do
+          expect(subject.uqhp_or_non_magi_medicaid_members.class).to eq(Array)
+          expect(subject.uqhp_or_non_magi_medicaid_members.first["actual_income"].length).to be > 1
+        end
+      end
+    end
+
     context "Model attributes" do
+      it "should return dc_resident status" do
+        expect(subject.dc_resident).to eq("Yes")
+      end
+
+      it "should return expected_income_for_coverage_year" do
+        expect(subject.expected_income_for_coverage_year.length).to be > 1
+      end
+
+      it "should return federal_tax_filing_status" do
+        expect(subject.federal_tax_filing_status).to eq("Tax Filer")
+      end
+
       it "should return notice date" do
         expect(subject.notice_date).to include(Date.today.year.to_s)
+      end
+
+      it "should return citizenship" do
+        expect(subject.citizenship).to eq("US Citizen")
+      end
+
+      it "should return tax_household_size" do
+        expect(subject.tax_household_size).to be > 1
       end
 
       context 'primary_member' do
@@ -96,6 +138,30 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
         it 'should get age from payload for projected aqhp notice' do
           allow(subject).to receive(:uqhp_notice?).and_return(false)
           expect(subject.irs_consent).to eq(payload['notice_params']['primary_member']['irs_consent'].casecmp('YES').zero?)
+        end
+      end
+
+      context 'magi_medicaid' do
+        it "should receive return false if uqhp_notice?" do
+          expect(subject.magi_medicaid).to eq(false)
+        end
+
+        it "should return true if payload says Yes" do
+          allow(subject).to receive(:uqhp_notice?).and_return(nil)
+          allow(subject).to receive(:payload).and_return({'notice_params' => {'primary_member' => {'magi_medicaid' => "YES"}}})
+          expect(subject.magi_medicaid).to eq(true)
+        end
+      end
+
+      context "non_magi_medicaid" do
+        it "should receive return false if uqhp_notice?" do
+          expect(subject.non_magi_medicaid).to eq(false)
+        end
+
+        it "should return true if payload says Yes" do
+          allow(subject).to receive(:uqhp_notice?).and_return(nil)
+          allow(subject).to receive(:payload).and_return({'notice_params' => {'primary_member' => {'non_magi_medicaid' => "YES"}}})
+          expect(subject.non_magi_medicaid).to eq(true)
         end
       end
     end
