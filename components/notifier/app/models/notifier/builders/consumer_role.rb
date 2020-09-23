@@ -232,7 +232,7 @@ module Notifier
 
       def ineligible_applicants
         return nil unless family_members.present?
-        family_members.select { |fm_hash| fm_hash["totally_ineligible"] || fm_hash&.totally_ineligible? }
+        family_members.select { |fm_hash| fm_hash["totally_ineligible"] || fm_hash&.totally_ineligible&.present? }
       end
 
       def magi_medicaid_members
