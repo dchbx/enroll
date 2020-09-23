@@ -657,17 +657,17 @@ module FinancialAssistance
 
     def foster_age_satisfied?
       # TODO: Look into this. Seems like this is only relevant if pregnant?
-      return true if is_pregnant == true
       # Age greater than 18 and less than 26
       (19..25).cover? age_of_applicant
     end
 
     def other_questions_complete?
-      if foster_age_satisfied?
-        (other_questions_answers << is_former_foster_care).include?(nil) ? false : true
-      else
-        other_questions_answers.include?(nil) ? false : true
-      end
+      questions_array = []
+
+      questions_array << is_former_foster_care  if foster_age_satisfied?
+      questions_array << is_post_partum_period  unless is_pregnant
+
+      (other_questions_answers << questions_array).flatten.include?(nil) ? false : true
     end
 
     def tax_info_complete?
