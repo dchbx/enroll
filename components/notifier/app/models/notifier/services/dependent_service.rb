@@ -47,22 +47,18 @@ class Notifier::Services::DependentService
   end
 
   def aqhp_eligible?
-    return payload_member['aqhp_eligible'] if payload_member['aqhp_eligible'].is_a?(FalseClass) || payload_member['aqhp_eligible'].is_a?(TrueClass)
     is_uqhp_notice ? false : payload_member['aqhp_eligible']&.casecmp('YES')&.zero?
   end
 
   def totally_ineligible?
-    return payload_member['totally_ineligible'] if payload_member['totally_ineligible'].is_a?(FalseClass) || payload_member['totally_ineligible'].is_a?(TrueClass)
     is_uqhp_notice ? false : payload_member['totally_ineligible']&.casecmp('YES')&.zero?
   end
 
   def uqhp_eligible?
-    return payload_member['uqhp_eligible'] if payload_member['uqhp_eligible'].is_a?(FalseClass) || payload_member['uqhp_eligible'].is_a?(TrueClass)
     is_uqhp_notice.presence || payload_member['uqhp_eligible']&.casecmp('YES')&.zero?
   end
 
   def medicaid_eligible?
-    return payload_member['magi_medicaid'] if payload_member['magi_medicaid'].is_a?(FalseClass) || payload_member['magi_medicaid'].is_a?(TrueClass)
     is_uqhp_notice.presence || payload_member['magi_medicaid']&.casecmp('YES')&.zero?
   end
 

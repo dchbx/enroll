@@ -7,7 +7,7 @@ module Notifier
     attribute :mailing_address, MergeDataModels::Address
     attribute :age, Integer
     attribute :dc_resident, String
-    attribute :citizen_status, String
+    attribute :citizenship, String
     attribute :incarcerated, String
     attribute :federal_tax_filing_status, String
     attribute :tax_household_size, Integer
