@@ -12,6 +12,7 @@ module FinancialAssistance
         require 'securerandom'
 
         FAA_SCHEMA_FILE_PATH = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance.xsd')
+        FAA_FLEXIBLE_SCHEMA_FILE_PATH = File.join(FinancialAssistance::Engine.root, 'lib', 'schemas', 'financial_assistance_flexible.xsd')
 
         # @param [ Hash ] params Applicant Attributes
         # @return [ BenefitMarkets::Entities::Applicant ] applicant Applicant
@@ -50,14 +51,19 @@ module FinancialAssistance
           Success(payload)
         end
 
-        def validate_payload(payload_str)
-          payload_xml = Nokogiri::XML.parse(payload_str)
-          faa_xsd = Nokogiri::XML::Schema(File.open(FAA_SCHEMA_FILE_PATH))
-
-          if faa_xsd.valid?(payload_xml)
-            Success(payload_str)
+        def validate_payload(payload)
+          payload_xml = Nokogiri::XML.parse(payload)
+          schema_path = if payload_xml.xpath("//xmlns:is_coverage_applicant").collect(&:text).include?('false')
+            FAA_FLEXIBLE_SCHEMA_FILE_PATH
           else
-            Failure(faa_xsd.validate(payload_xml).map(&:message))
+            FAA_SCHEMA_FILE_PATH
+          end
+
+          xml_schema = Nokogiri::XML::Schema(File.open(schema_path))
+          if xml_schema.valid?(payload_xml)
+            Success(payload)
+          else
+            Failure(xml_schema.validate(payload_xml).map(&:message))
           end
         end
 
