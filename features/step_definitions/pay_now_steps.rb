@@ -31,7 +31,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
   find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
@@ -168,7 +168,7 @@ And(/^creates a consumer with SEP$/) do
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
   find('span.label', text: 'choose *', wait: 10).click
   find("li", :text => "Paper").click
