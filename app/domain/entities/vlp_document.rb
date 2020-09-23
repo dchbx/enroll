@@ -17,6 +17,6 @@ module Entities
     attribute :country_of_citizenship, Types::String.optional.meta(omittable: true)
     attribute :expiration_date, Types::Date.optional.meta(omittable: true)
     attribute :issuing_country, Types::String.optional.meta(omittable: true)
-
+    attribute :description, Types::String.optional.meta(omittable: true)
   end
 end

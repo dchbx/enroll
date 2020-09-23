@@ -35,6 +35,6 @@
       %document_foreign_passport
       = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
     - if applicant.case1
-      %other_case_1_document_description= applicant.case1.alien_number
+      %other_case_1_document_description= applicant.alien_number
     - if applicant.case2
-      %other_case_2_document_description= applicant.case2.i94_number
+      %other_case_2_document_description= applicant.i94_number

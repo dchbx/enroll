@@ -20,6 +20,7 @@ module Operations
 
       def sanitize_params(params)
         params[:subject] = params.delete :vlp_subject
+        params[:description] = params.delete :vlp_description
         params
       end
 

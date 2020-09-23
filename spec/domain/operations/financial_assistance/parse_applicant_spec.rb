@@ -67,5 +67,9 @@ RSpec.describe Operations::FinancialAssistance::ParseApplicant, type: :model, db
     it 'should return hash with vlp subject' do
       expect(result.success[:vlp_subject]).to eq(person.consumer_role.active_vlp_document.subject)
     end
+
+    it 'should return hash with key vlp_description' do
+      expect(result.success.keys).to include(:vlp_description)
+    end
   end
 end

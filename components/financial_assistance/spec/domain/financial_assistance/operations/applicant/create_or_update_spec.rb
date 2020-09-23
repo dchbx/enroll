@@ -189,6 +189,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::CreateOrUpdate, dbcle
                                :visa_number=>nil,
                                :vlp_document_id=>nil,
                                :vlp_subject=>nil,
+                               :vlp_description=>nil,
                                :relationship=>"self",
                                :ssn=>"889984400"}}
 

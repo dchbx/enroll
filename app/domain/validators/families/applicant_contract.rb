@@ -43,6 +43,7 @@ module Validators
         optional(:is_temporarily_out_of_state).maybe(:bool)
 
         optional(:vlp_subject).maybe(:string)
+        optional(:vlp_description).maybe(:string)
         optional(:alien_number).maybe(:string)
         optional(:i94_number).maybe(:string)
         optional(:visa_number).maybe(:string)

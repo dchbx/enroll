@@ -37,6 +37,7 @@ module FinancialAssistance
       attribute :is_applying_coverage, Types::Strict::Bool
 
       attribute :vlp_subject, Types::String.optional.meta(omittable: true)
+      attribute :vlp_description, Types::String.optional.meta(omittable: true)
       attribute :alien_number, Types::String.optional.meta(omittable: true)
       attribute :i94_number, Types::String.optional.meta(omittable: true)
       attribute :visa_number, Types::String.optional.meta(omittable: true)

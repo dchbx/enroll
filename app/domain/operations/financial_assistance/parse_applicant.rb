@@ -78,7 +78,7 @@ module Operations
                                                                :expiration_date,
                                                                :issuing_country)
         vlp_attrs.merge!({expiration_date: vlp_attrs[:expiration_date].strftime("%d/%m/%Y")}) if vlp_attrs[:expiration_date].present?
-        vlp_attrs.merge!({vlp_subject: vlp_object[:subject]})
+        vlp_attrs.merge!({vlp_subject: vlp_object[:subject], vlp_description: vlp_object[:description]})
         vlp_attrs
       end
 
