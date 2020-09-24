@@ -51,7 +51,7 @@ class Notifier::Services::DependentService
   end
 
   def totally_ineligible?
-    is_uqhp_notice ? false : payload_member['totally_ineligible']&.casecmp('YES')&.zero?
+    is_uqhp_notice ? false : payload_member['totally_inelig']&.casecmp('YES')&.zero?
   end
 
   def uqhp_eligible?

@@ -100,18 +100,22 @@ module Notifier
       end
 
       def family_members
-        dependents << primary_member
+        return @family_members if defined? @family_members
+        @family_members = dependents + [primary_member]
       end
 
       def dependents
-        payload['notice_params']['dependents'].each do |member|
-          dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
-          merge_model.dependents << dependent_hash(dependent, member)
-        end
+        merge_model.dependents =
+          payload['notice_params']['dependents'].collect do |member|
+            dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
+            dependent_hash(dependent, member)
+          end
       end
 
       # Loading only renewing enrollments
       def enrollments
+        return [] unless renewing_enrollments.present?
+
         renewing_enrollments.each do |enrollment|
           merge_model.enrollments << enrollment_hash(enrollment)
         end
@@ -199,7 +203,7 @@ module Notifier
       end
 
       def renewing_enrollments
-        return nil unless payload['notice_params']['renewing_enrollment_ids'].present?
+        return [] unless payload['notice_params']['renewing_enrollment_ids'].present?
 
         payload['notice_params']['renewing_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
@@ -207,7 +211,7 @@ module Notifier
       end
 
       def active_enrollments
-        return nil unless payload['notice_params']['active_enrollment_ids'].present?
+        return [] unless payload['notice_params']['active_enrollment_ids'].present?
 
         payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
@@ -216,7 +220,7 @@ module Notifier
 
       def ineligible_applicants
         return nil unless family_members.present?
-        family_members.select(&:is_totally_ineligible)
+        family_members.select(&:totally_ineligible)
       end
 
       def magi_medicaid_members

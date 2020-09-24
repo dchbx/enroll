@@ -25,6 +25,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       consumer = Notifier::Builders::ConsumerRole.new
       consumer.payload = payload
       consumer.consumer_role = person.consumer_role
+      consumer.append_data
       consumer
     end
 
@@ -168,8 +169,8 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
 
     context "Model dependent attributes" do
       it "should have dependent filer type attributes" do
-        expect(subject.dependents.first['filer_type']).to eq('Filers')
-        expect(subject.dependents.last['filer_type']).to eq('Married Filing Separately')
+        expect(subject.dependents.first['federal_tax_filing_status']).to eq('Tax Filer')
+        expect(subject.dependents.last['federal_tax_filing_status']).to eq('Married Filing Separately')
         expect(subject.dependents.count).to eq(2)
       end
 
@@ -287,44 +288,44 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       end
 
       it "should return nil if no renewing health enrollments present" do
-        expect(subject.renewing_health_enrollments).to eq(nil)
+        expect(subject.renewing_health_enrollments).to eq([])
       end
 
       it "should return a nil if no renewing health enrollments present" do
         # TODO: Notice is undefined in components/notifier/app/models/notifier/builders/consumer_role.rb
-        expect(subject.renewing_health_enrollments).to eq(nil)
+        expect(subject.renewing_health_enrollments).to eq([])
       end
 
       it "should return nil if no renewing dental enrollments present" do
-        expect(subject.renewing_dental_enrollments).to eq(nil)
+        expect(subject.renewing_dental_enrollments).to eq([])
       end
 
       it "should return a nil if no renewing dental enrollment present" do
-        expect(subject.renewing_dental_enrollments).to eq(nil)
+        expect(subject.renewing_dental_enrollments).to eq([])
       end
 
       it "should return nil if no current health enrollments present" do
-        expect(subject.current_health_enrollments).to eq(nil)
+        expect(subject.current_health_enrollments).to eq([])
       end
 
       it "should return nil if no current dental enrollments present" do
-        expect(subject.current_dental_enrollments).to eq(nil)
+        expect(subject.current_dental_enrollments).to eq([])
       end
 
       it "should return nil if renewing health products present" do
-        expect(subject.renewing_health_products).to eq(nil)
+        expect(subject.renewing_health_products).to eq([])
       end
 
       it "should return nil if no renewing dental products present" do
-        expect(subject.renewing_dental_products).to eq(nil)
+        expect(subject.renewing_dental_products).to eq([])
       end
 
       it "should return nil if no current health products present" do
-        expect(subject.current_health_products).to eq(nil)
+        expect(subject.current_health_products).to eq([])
       end
 
       it "should return nil if no current dental products present" do
-        expect(subject.current_dental_products).to eq(nil)
+        expect(subject.current_dental_products).to eq([])
       end
 
       context "#same_health_product" do
@@ -366,24 +367,7 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       end
 
       it "should return a hash of family member info ineligible family members present" do
-        expect(subject.ineligible_applicants.length).to be > 1
-        expect(subject.ineligible_applicants.first["applid"].length).to be > 1
-      end
-
-      context "enrollments" do
-        let(:enrollments) { [HbxEnrollment.new(effective_on: Date.today + 1.year)] }
-
-        before :each do
-          allow_any_instance_of(Notifier::Builders::ConsumerRole).to receive(:renewing_enrollments).and_return(enrollments)
-        end
-
-        it "should return renewing enrollments if notice_param renewing_enrollment_ids present" do
-          expect(subject.renewing_enrollments.first.class).to eq(HbxEnrollment)
-        end
-
-        it "should return nil if no payload notice param active_enrollment_ids" do
-          expect(subject.active_enrollments).to eq(nil)
-        end
+        expect(subject.ineligible_applicants.length).to be > 0
       end
     end
   end
