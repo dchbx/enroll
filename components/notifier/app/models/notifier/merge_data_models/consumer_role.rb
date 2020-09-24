@@ -126,11 +126,11 @@ module Notifier
 
       # there can be multiple renewing health and dental enrollments for the same coverage year
       def current_health_enrollments
-        enrollments.select { |enrollment| enrollment.health? && enrollment.coverage_year == coverage_year-1 }
+        enrollments.select { |enrollment| enrollment.health? && enrollment.coverage_year == coverage_year - 1 }
       end
 
       def current_dental_enrollments
-        enrollments.select { |enrollment| enrollment.dental? && enrollment.coverage_year == coverage_year-1 }
+        enrollments.select { |enrollment| enrollment.dental? && enrollment.coverage_year == coverage_year - 1 }
       end
 
       def renewing_enrollments

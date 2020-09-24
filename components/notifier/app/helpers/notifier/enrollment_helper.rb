@@ -44,7 +44,7 @@ module Notifier
     end
 
     def deductible(enrollment)
-      enrollment.hbx_enrollment_members.size > 0 ? enrollment.product.family_deductible : enrollment.product.deductible
+      enrollment.hbx_enrollment_members.size > 1 ? enrollment.product.family_deductible : enrollment.product.deductible
     end
 
     def enrollment_members_hash(enrollment)
