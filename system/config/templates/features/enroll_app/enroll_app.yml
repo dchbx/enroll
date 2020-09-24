@@ -27,6 +27,8 @@ registry:
             item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
+          - key: :submit_docs_url
+            item: "https://www.dchealthlink.com/submit-docs"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true

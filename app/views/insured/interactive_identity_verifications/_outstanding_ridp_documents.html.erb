@@ -89,7 +89,7 @@
 
 <div class="row">
   <div class="col-xs-12">
-    <%= link_to 'Documents FAQ', "https://www.dchealthlink.com/submit-docs", class: "btn btn-default btn-small pull-right", target: '_blank' %>
+    <%= link_to 'Documents FAQ', ::EnrollRegistry[:enroll_app].setting(:submit_docs_url).item, class: "btn btn-default btn-small pull-right", target: '_blank' %>
   </div>
 </div>
 
