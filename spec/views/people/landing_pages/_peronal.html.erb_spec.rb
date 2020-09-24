@@ -37,7 +37,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       end
 
       it "should display the is_applying_coverage field option" do
-        expect(rendered).to match /Is #{person.first_name} applying for coverage?/
+        expect(rendered).to match /Does #{person.first_name} applying for coverage?/
       end
 
       it "should display the affirmative message" do
@@ -67,7 +67,7 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
       end
 
       it "should not display the is_applying_coverage field option" do
-        expect(rendered).not_to match /Is this person applying for coverage?/
+        expect(rendered).not_to match /Does this person applying for coverage?/
       end
 
       it "should display the affirmative message" do

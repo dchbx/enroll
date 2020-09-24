@@ -21,7 +21,7 @@
 
         <div class="row row-form-wrapper no-buffer">
           <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
-            <span>Is <%= @applicant.first_name %> applying for coverage? *</span>
+            <span>Does <%= @applicant.first_name %> applying for coverage? *</span>
           </div>
           <%= render 'financial_assistance/shared/is_applying_for_coverage', f: f, first_checked: @applicant.is_applying_coverage, second_checked: !@applicant.is_applying_coverage %>
         </div>

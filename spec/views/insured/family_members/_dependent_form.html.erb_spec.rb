@@ -121,7 +121,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should not display the is_applying_coverage field option" do
-      expect(rendered).not_to match(/Is this person applying for coverage?/)
+      expect(rendered).not_to match(/Does this person applying for coverage?/)
     end
 
     it "should display the affirmative message" do
