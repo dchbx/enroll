@@ -71,32 +71,33 @@
             </div>
           </div>
         </div>
-        <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
-            <label class="static_label label-floatlabel mt-label">NAME</label>
-            <label id="is_applying_coverage_value_dep_1" class= "ml-label">
-              <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
-            </label>
-          </div>
-          <div class="col-md-5 mt18">
-            <div class="select-positioning ml-label"> <label>is</label> </div>
-            <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
-            <div class="select-relation rs_selection">
-              <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
+        <% unless @applicant.is_primary_applicant? %>
+          <div class="row row-form-wrapper no-buffer">
+            <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3 form-group form-group-lg mt18">
+              <label class="static_label label-floatlabel mt-label">NAME</label>
+              <label id="is_applying_coverage_value_dep_1" class= "ml-label">
+                <%= @applicant.first_name.present? ? @applicant.first_name : 'this person' %>
+              </label>
             </div>
-            <label class="position-left">&nbsp;&nbsp;of</label>
-            <div class="icon-rel">
-              <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
-              <i class="fa fa-link" aria-hidden="true"></i>
-              <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+            <div class="col-md-5 mt18">
+              <div class="select-positioning ml-label"> <label>is</label> </div>
+              <label class="static_label label-floatlabel mt-label">RELATIONSHIP</label>
+              <div class="select-relation rs_selection">
+                <%= f.select :relationship, faa_relationship_options(f.object, request.referer), :class => "floatlabel form-control", :prompt => 'choose' %>
+              </div>
+              <label class="position-left">&nbsp;&nbsp;of</label>
+              <div class="icon-rel">
+                <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                <i class="fa fa-link" aria-hidden="true"></i>
+                <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="col-lg-4 mt18 static-font">
+              <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
+              <span class="position-full-name"> <%= @applicant.full_name %> </span>
             </div>
           </div>
-          <div class="col-lg-4 mt18 static-font">
-            <label class="static_label label-floatlabel mt-label">ACCOUNT HOLDER</label>
-            <span class="position-full-name"> <%= @applicant.full_name %> </span>
-          </div>
-        </div>
-
+        <% end %>
       </div>
     </div>
   </div>
