@@ -22,7 +22,7 @@ module Notifier
       builder.event_name = event_name if is_employee? || is_employer? || is_consumer?
       builder.payload = payload
       builder.append_contact_details
-      builder.dependents if is_consumer?
+      builder.append_data if is_consumer?
       template.data_elements.each do |element|
         elements = element.split('.')
         next if is_consumer? && elements.first == 'dependent'

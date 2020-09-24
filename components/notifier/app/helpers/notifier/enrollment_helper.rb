@@ -8,8 +8,9 @@ module Notifier
       MergeDataModels::Enrollment.new(
         {
           coverage_start_on: enrollment.effective_on,
+          coverage_year: enrollment.effective_on.year,
           premium_amount: enrollment.total_premium,
-          product: product_hash(enrollment.product),
+          product: product_hash(enrollment),
           dependents: enrollment_members_hash(enrollment),
           kind: enrollment.kind,
           enrolled_count: enrollment.hbx_enrollment_members.count,
@@ -22,7 +23,8 @@ module Notifier
       )
     end
 
-    def product_hash(product)
+    def product_hash(enrollment)
+      product = enrollment.product
       MergeDataModels::Product.new(
         {
           coverage_start_on: product.application_period.min,
@@ -34,11 +36,15 @@ module Notifier
           hsa_eligibility: product.hsa_eligibility,
           renewal_plan_type: nil,
           is_csr: product.is_csr?,
-          deductible: product.deductible,
+          deductible: deductible(enrollment),
           family_deductible: product.family_deductible,
           carrier_phone: phone_number(product.issuer_profile.legal_name)
         }
       )
+    end
+
+    def deductible(enrollment)
+      enrollment.hbx_enrollment_members > 0 ? product.family_deductible : product.deductible
     end
 
     def enrollment_members_hash(enrollment)

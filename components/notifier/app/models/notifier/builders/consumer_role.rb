@@ -27,6 +27,11 @@ module Notifier
         @consumer_role = resource
       end
 
+      def append_data
+        dependents
+        enrollments
+      end
+
       def notice_date
         merge_model.notice_date = TimeKeeper.date_of_record
                                             .strftime('%B %d, %Y')
@@ -121,57 +126,56 @@ module Notifier
       end
 
       # there can be multiple health and dental enrollments for the same coverage year
-      # Renewing health enrollment
-
-      def renewing_health_enrollment
-        return nil unless renewing_enrollments.present?
-        renewing_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == coverage_year}
+      # Renewing health enrollments
+      def renewing_health_enrollments
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == notice.coverage_year}
       end
 
-      # Renewing dental enrollment
-      def renewing_dental_enrollment
-        return nil unless renewing_enrollments.present?
-        renewing_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == coverage_year}
+      # Renewing dental enrollments
+      def renewing_dental_enrollments
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == notice.coverage_year }
       end
 
-      # Current active health enrollment
-      def current_health_enrollment
-        return nil unless active_enrollments.present?
-        active_enrollments.detect{ |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
+      # Current active health enrollments
+      def current_health_enrollments
+        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
-      # Current active dental enrollment
-      def current_dental_enrollment
-        return nil unless active_enrollments.present?
-        active_enrollments.detect{ |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
+      # Current active dental enrollments
+      def current_dental_enrollments
+        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
       # Renewing health product
       def renewing_health_products
-        return nil unless renewing_health_enrollments.present?
         renewing_health_enrollments.map(&:product)
       end
 
       # Renewing dental product
       def renewing_dental_products
-        return nil unless renewing_dental_enrollments.present?
         renewing_dental_enrollments.map(&:product)
       end
 
       # Current active health products
       def current_health_products
-        return nil unless current_health_enrollments.present?
         current_health_enrollments.map(&:product)
       end
 
       # Current active dental product
       def current_dental_products
-        return nil unless current_dental_enrollments.present?
         current_dental_enrollments.map(&:product)
       end
 
-      # checks if individual is enrolled into same health product
       def same_health_product
+        merge_model.same_health_product = same_health_product?
+      end
+
+      def same_dental_product
+        merge_model.same_dental_product = same_dental_product?
+      end
+
+      # checks if individual is enrolled into same health product
+      def same_health_product?
         renewal_health_product_ids = current_health_products.map(&:renewal_product).map(&:id).compact
         passive_renewal_health_plan_ids = renewing_health_products.map(&:id).compact
         renewal_health_product_hios_base_ids = current_health_products.map(&:renewal_product).map(&:hios_base_id).compact
@@ -183,7 +187,7 @@ module Notifier
       end
 
       # checks if individual is enrolled into same dental product
-      def same_dental_product
+      def same_dental_product?
         renewal_dental_product_ids = current_dental_products.map(&:renewal_product).map(&:id).compact
         passive_renewal_dental_product_ids = renewing_dental_products.map(&:id).compact
         renewal_dental_product_hios_base_ids = current_dental_products.map(&:renewal_product).map(&:hios_base_id).compact
@@ -202,32 +206,12 @@ module Notifier
         end
       end
 
-      def renewing_health_enrollments
-        return nil unless renewing_enrollments.present?
-        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == notice.coverage_year}
-      end
-
-      def renewing_dental_enrollments
-        return nil unless renewing_enrollments.present?
-        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == notice.coverage_year }
-      end
-
       def active_enrollments
         return nil unless payload['notice_params']['active_enrollment_ids'].present?
 
         payload['notice_params']['active_enrollment_ids'].collect do |hbx_id|
           HbxEnrollment.by_hbx_id(hbx_id).first
         end
-      end
-
-      def current_health_enrollments
-        return nil unless active_enrollments.present?
-        active_enrollments.select { |e| e.coverage_kind == "health" && e.effective_on.year.to_s == previous_coverage_year}
-      end
-
-      def current_dental_enrollments
-        return nil unless active_enrollments.present?
-        active_enrollments.select { |e| e.coverage_kind == "dental" && e.effective_on.year.to_s == previous_coverage_year}
       end
 
       def ineligible_applicants

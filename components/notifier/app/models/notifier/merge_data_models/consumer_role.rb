@@ -45,6 +45,8 @@ module Notifier
       attribute :uqhp_or_non_magi_medicaid_members_present, Boolean
       attribute :totally_ineligible_members_present, Boolean
       attribute :irs_consent_not_needed, Boolean
+      attribute :same_health_product, Boolean # checks if family is enrolled into same health product
+      attribute :same_dental_product, Boolean # checks if family is enrolled into same dental product
 
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
@@ -58,7 +60,7 @@ module Notifier
             citizenship: 'US Citizen',
             incarcerated: 'No',
             other_coverage: 'No',
-            coverage_year: 2020,
+            coverage_year: 2021,
             previous_coverage_year: 2019,
             federal_tax_filing_status: 'Married Filing Jointly',
             expected_income_for_coverage_year: "$25,000",
@@ -90,6 +92,7 @@ module Notifier
         notice.ineligible_applicants = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice.aqhp_or_non_magi_medicaid_members = [notice]
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
+        notice.enrollments = [Notifier::MergeDataModels::Enrollment.stubbed_object]
         notice
       end
 
@@ -112,17 +115,34 @@ module Notifier
         ineligible_applicants.present?
       end
 
-      # there can be multiple health and dental enrollments for the same coverage year
+      # there can be multiple renewing health and dental enrollments for the same coverage year
       def renewing_health_enrollments
-        enrollments.select(&:health?)
+        enrollments.select { |enrollment| enrollment.health? && enrollment.coverage_year == coverage_year }
       end
 
       def renewing_dental_enrollments
-        enrollments.select(&:dental?)
+        enrollments.select { |enrollment| enrollment.dental? && enrollment.coverage_year == coverage_year }
+      end
+
+      # there can be multiple renewing health and dental enrollments for the same coverage year
+      def current_health_enrollments
+        enrollments.select { |enrollment| enrollment.health? && enrollment.coverage_year == coverage_year-1 }
+      end
+
+      def current_dental_enrollments
+        enrollments.select { |enrollment| enrollment.dental? && enrollment.coverage_year == coverage_year-1 }
+      end
+
+      def renewing_enrollments
+        enrollments.select { |enrollment| enrollment.coverage_year == coverage_year }
       end
 
       def tax_hh_with_csr
-        tax_households.reject{ |thh| thh.csr_percent_as_integer = 100}
+        tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
+      end
+
+      def has_atleast_one_csr_member?
+        csr? || dependents.any? { |dependent| dependent.csr == true }
       end
 
       def aqhp_eligible?
@@ -255,11 +275,11 @@ module Notifier
       end
 
       def eligibility_notice_display_aptc(ivl)
-        (ivl.tax_household.max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
+        (tax_households[0].max_aptc > 0) || ivl.no_aptc_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_aptc_because_of_mec || ivl.no_aptc_because_of_tax || ivl.is_ia_eligible
       end
 
       def eligibility_notice_display_csr(ivl)
-        (!ivl.indian_conflict && ivl.tax_household.csr_percent_as_integer != 100) || ivl.indian_conflict || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_csr_because_of_tax || ivl.no_csr_because_of_mec
+        (!ivl.indian_conflict && tax_households[0].csr_percent_as_integer != 100) || ivl.indian_conflict || ivl.no_csr_because_of_income || ivl.is_medicaid_chip_eligible || ivl.no_csr_because_of_tax || ivl.no_csr_because_of_mec
       end
     end
   end

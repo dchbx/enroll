@@ -73,6 +73,7 @@ module Notifier
           other_coverage: 'No',
           is_enrolled: true,
           aptc: nil,
+          csr: true,
           totally_ineligible: false,
           non_magi_medicaid: false,
           magi_medicaid: true,
@@ -99,7 +100,7 @@ module Notifier
           no_csr_because_of_income: true,
           no_csr_because_of_tax: true,
           no_csr_because_of_mec: true,
-          non_applicant: true,
+          non_applicant: false,
           person_hbx_id: 1,
           dob: (Date.today - 20.years)
         }

@@ -4,6 +4,7 @@ module Notifier
     include ActionView::Helpers::NumberHelper
 
     attribute :coverage_start_on, String
+    attribute :coverage_year, Integer
     attribute :plan_name, String
     attribute :employee_responsible_amount, String
     attribute :employer_responsible_amount, String
@@ -38,6 +39,7 @@ module Notifier
       end_on = TimeKeeper.date_of_record.end_of_month
       enrollment = Notifier::MergeDataModels::Enrollment.new({
         coverage_start_on: TimeKeeper.date_of_record.next.beginning_of_month.strftime('%m/%d/%Y'),
+        coverage_year: 2021,
         coverage_end_on: end_on,
         plan_name: 'Aetna GOLD',
         employer_responsible_amount: '$250.0',
@@ -55,8 +57,8 @@ module Notifier
         waiver_enrolled_count: '2',
         waiver_coverage_end_on: end_on,
         is_receiving_assistance: false,
-        aptc_amount: '',
-        responsible_amount: ''
+        aptc_amount: '5',
+        responsible_amount: '458'
       })
 
       enrollment.subscriber = Notifier::MergeDataModels::Person.stubbed_object
