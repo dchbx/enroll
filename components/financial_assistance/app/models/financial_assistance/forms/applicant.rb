@@ -9,7 +9,7 @@ module FinancialAssistance
 
       attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
       attr_accessor :application_id, :applicant_id
-      attr_accessor :gender, :relationship
+      attr_accessor :gender, :relationship, :relation_with_primary
       attr_accessor :no_dc_address, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
       attr_accessor :addresses, :phones, :emails
       attr_accessor :addresses_attributes, :phones_attributes, :emails_attributes

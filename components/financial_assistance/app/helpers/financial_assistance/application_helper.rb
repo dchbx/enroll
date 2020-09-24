@@ -192,7 +192,7 @@ module FinancialAssistance
 
     def faa_relationship_options(dependent, _referer)
       relationships = FinancialAssistance::Relationship::RELATIONSHIPS_UI
-      options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: FinancialAssistance::Relationship::INVERSE_MAP[dependent.applicant&.relationship])
+      options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.relation_with_primary)
     end
 
     def show_naturalized_citizen_container(applicant)
