@@ -65,11 +65,12 @@ def valid_enrollments(person)
 end
 
 def get_family(dependents)
-  dep_families = dependents.inject({}) do |dependent_families, dependent|
+  dependent_families = {}
+  dep_families = dependents.each do |dependent|
     families = get_families_for(dependent)
     dependent_families[dependent] = families.map(&:id) if families.present?
   end
-  family_ids = dep_families.values.compact.inject(:&)
+  family_ids = dependent_families.values.compact.inject(:&)
   (return Family.find(family_ids.first.to_s)) if family_ids.count == 1
 end
 
@@ -116,7 +117,7 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
   csv << field_names
   @data_hash.each do |ic_number , members|
     begin
-      (next if members.any?{ |m| @excluded_list.include?(m["member_id"]) }) if InitialEvents.include?(event)
+      next if InitialEvents.include?(event) && members.any?{ |m| @excluded_list.include?(m["member_id"]) }
       subscriber = members.detect{ |m| m["dependent"].present? && m["dependent"].upcase == "NO"}
       next if subscriber.nil?
 
