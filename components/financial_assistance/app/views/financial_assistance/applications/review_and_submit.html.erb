@@ -403,9 +403,9 @@
         <br>
       <% end %>
 
-      <% if @application.applicants.count > 1 %>
-        <div class="row white-background">
-          <div class="col-md-12 pz">
+      <div class="row white-background">
+        <div class="col-md-12 pz">
+          <% if @application.applicants.count > 1 %>
             <div class="row row-form-wrapper ptb no-buffer row-height main-heading form-bottom-border">
               <div class="col-md-12"><span></span>
                 <i class="fa fa-user blue-icon"></i> <%= "Your Household" %>
