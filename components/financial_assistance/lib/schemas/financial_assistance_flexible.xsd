@@ -8,6 +8,18 @@
 	<xs:complexType name="FinancialAssistanceApplicantType">
 		<xs:sequence>
 			<xs:element name="individual" type="FinancialAssistanceApplicantIndivdualType"/>
+      <xs:element name='citizen_status' minOccurs='0'>
+        <xs:simpleType>
+          <xs:restriction base='xs:anyURI'>
+            <xs:enumeration value='us_citizen'/>
+            <xs:enumeration value='naturalized_citizen'/>
+            <xs:enumeration value='alien_lawfully_present'/>
+            <xs:enumeration value='not_lawfully_present_in_us'/>
+            <xs:enumeration value='non_native_not_lawfully_present_in_us'/>
+            <xs:enumeration value='lawful_permanent_resident'/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
 			<xs:element name="immigration_information" type="ImmigrationInformationType" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation>Individual's immigration information and documentation</xs:documentation>
