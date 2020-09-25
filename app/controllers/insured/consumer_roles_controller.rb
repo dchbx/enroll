@@ -425,10 +425,4 @@ class Insured::ConsumerRolesController < ApplicationController
     @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
   end
-
-  def load_support_texts
-    file_path = lookup_context.find_template("financial_assistance/shared/support_text.yml").identifier
-    raw_support_text = YAML.safe_load(File.read(file_path)).with_indifferent_access
-    @support_texts = helpers.support_text_placeholders raw_support_text
-  end
 end

@@ -22,5 +22,12 @@ module FinancialAssistance
       return render(file: 'public/404.html', status: 404) unless ::EnrollRegistry.feature_enabled?(:financial_assistance)
       true
     end
+
+    def support_text_placeholders(raw_support_text)
+      return [] if @application.nil?
+      raw_support_text.update(raw_support_text).each do |_key, value|
+        value.gsub! '<application-applicable-year>', @application.assistance_year.to_s if value.include? '<application-applicable-year>'
+      end
+    end
   end
 end

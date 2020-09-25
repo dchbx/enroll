@@ -18,7 +18,7 @@
 
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this person have <b> income from an employer</b>(wages, tips, bonuses, etc.) in <%= calculated_application_year %>?*</span>
+        <span class="fa-text-color">Does this person have <b> income from an employer</b>(wages, tips, bonuses, etc.) in <%= @application.assistance_year %>?*</span>
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>
@@ -53,7 +53,7 @@
 
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
       <div class='col-md-6 labelforcoverage'>
-        <span class="fa-text-color">Does this person expect to receive <b>self-employment income</b> in <%= calculated_application_year %>? *</span>
+        <span class="fa-text-color">Does this person expect to receive <b>self-employment income</b> in <%= @application.assistance_year %>? *</span>
       </div>
       <div class='col-md-6 mt11'>
         <div class='col-md-3 no-padding'>

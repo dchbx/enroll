@@ -158,16 +158,6 @@ module FinancialAssistance
       end
     end
 
-    def support_text_placeholders(raw_support_text)
-      # set <application-applicable-year> placeholdersr
-      return [] if @application.nil?
-      assistance_year = calculated_application_year.to_s
-
-      raw_support_text.update(raw_support_text).each do |_key, value|
-        value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
-      end
-    end
-
     def show_net_amount_for(other_income)
       other_income.kind == "capital_gains" || other_income.kind == "farming_and_fishing"
     end

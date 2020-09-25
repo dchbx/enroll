@@ -114,14 +114,4 @@ module ConsumerRolesHelper
         end
     end
   end
-
-  def support_text_placeholders(raw_support_text)
-    # set <application-applicable-year> placeholdersr
-    return [] if @application.nil?
-    assistance_year = FinancialAssistanceRegistry[:application_year].item.call.value!.to_s
-
-    raw_support_text.update(raw_support_text).each do |_key, value|
-      value.gsub! '<application-applicable-year>', assistance_year if value.include? '<application-applicable-year>'
-    end
-  end
 end
