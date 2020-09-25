@@ -215,6 +215,51 @@ describe Forms::FamilyMember do
   end
 end
 
+describe Forms::FamilyMember, 'with no ssn' do
+  let(:family_id) { double }
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:ssn) { nil }
+  let(:dob) { "2007-06-09" }
+  let(:existing_family_member_id) { double }
+  let(:relationship) { double }
+  let(:existing_family_member) { nil }
+  let(:existing_person) { nil }
+
+  let(:person_properties) {
+    {
+      :first_name => "aaa",
+      :last_name => "bbb",
+      :middle_name => "ccc",
+      :name_pfx => "ddd",
+      :name_sfx => "eee",
+      :gender => "male",
+      :dob => dob,
+      :no_ssn => "0",
+      :race => "race",
+      :ethnicity => ["ethnicity"],
+      :language_code => "english",
+      :is_incarcerated => "no",
+      :tribal_id => "test",
+      :is_homeless => nil,
+      :is_temporarily_out_of_state => false
+    }
+  }
+
+  before(:each) do
+    allow(Family).to receive(:find).with(family_id).and_return(family)
+  end
+
+  subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
+
+
+  it 'should throw an error if ssn or no ssn values are blank' do
+    subject.validate
+    expect(subject).not_to be_valid
+    expect(subject.errors[:base].first).to match /ssn is required/
+  end
+
+end
+
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
   let(:family_id) { double }
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
@@ -412,6 +457,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
       :name_pfx => "ddd",
       :name_sfx => "eee",
       :ssn => "123456778",
+      :no_ssn => '0',
       :gender => "male",
       :dob => Date.strptime(dob, "%Y-%m-%d"),
       :race => "race",
@@ -463,7 +509,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
@@ -471,7 +517,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
     end
 
     it "should update the attributes of the person" do
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>nil, :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)

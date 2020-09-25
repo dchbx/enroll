@@ -30,6 +30,7 @@ module Forms
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
     validate :consumer_fields_validation
+    validate :ssn_validation
 
     attr_reader :dob
 
@@ -62,6 +63,12 @@ module Forms
           self.errors.add(:base, "Incarceration status is required")
         end
       end
+    end
+
+    def ssn_validation
+      return true unless individual_market_is_enabled?
+
+      self.errors.add(:base, "ssn is required") if @ssn.blank? && @no_ssn == '0'
     end
 
     def dob=(val)
@@ -227,6 +234,7 @@ module Forms
         :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
         :ssn => found_family_member.ssn,
+        :no_ssn => found_family_member.no_ssn,
         :race => found_family_member.race,
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,

@@ -50,6 +50,7 @@ class FamilyMember
   delegate :date_of_birth, to: :person, allow_nil: true
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
+  delegate :no_ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
   # consumer fields
   delegate :race, to: :person, allow_nil: true
