@@ -156,7 +156,7 @@ function showOnly(selected) {
 function changeApplyingCoverageText() {
   $('#applicant_first_name').change(function() {
     var text = $('#applicant_first_name').val() == '' ? 'this person' : $('#applicant_first_name').val()
-    $('#is_applying_coverage_value_dep').text('Does '+ text +' applying for coverage? *');
+    $('#is_applying_coverage_value_dep').text('Does '+ text +' need coverage? *');
   });
 }
 

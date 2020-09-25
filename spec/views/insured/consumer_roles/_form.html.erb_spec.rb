@@ -32,7 +32,7 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
     end
 
     it "should display the is_applying_coverage field option" do
-      expect(rendered).to match /Does this person applying for coverage?/
+      expect(rendered).to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do
