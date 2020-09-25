@@ -6,6 +6,7 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
 
   let!(:application) do
     application = FactoryBot.create(:financial_assistance_application, :with_applicants, family_id: BSON::ObjectId.new, aasm_state: 'draft')
+    application.applicants.each { |applicant| applicant.update_attributes!(citizen_status: 'alien_lawfully_present')}
     application
   end
   let(:create_elibility_determinations) do
