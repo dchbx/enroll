@@ -2,7 +2,7 @@ include VerificationHelper
 
 puts "-------------------------------------- Start of rake: #{TimeKeeper.datetime_of_record} --------------------------------------" unless Rails.env.test?
 
-InitialEvents = ["final_eligibility_notice_uqhp"]
+InitialEvents = []
 
 unless ARGV[0].present? && ARGV[1].present?
   raise "Please include mandatory arguments: File name and Event name. Example: rails runner script/final_eligibility_notice_script.rb <file_name> <event_name>"
@@ -11,8 +11,6 @@ end
 begin
   file_name = ARGV[0]
   event = ARGV[1]
-  # file_name = Rails.root.join("spec", "test_data", "notices", "ivl_fel_aqhp_test_data.csv")
-  # event = 'final_eligibility_notice_aqhp'
   @data_hash = {}
   CSV.foreach(file_name,:headers =>true).each do |d|
     if @data_hash[d["ic_number"]].present?
@@ -141,7 +139,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
             primary_member: subscriber.to_hash,
             dependents: members.map(&:to_hash),
             active_enrollment_ids: active_enrollments.pluck(:hbx_id),
-            renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id)
+            renewing_enrollment_ids: renewing_enrollments.pluck(:hbx_id),
+            uqhp_event: 'uqhp_projected_eligibility_notice_1'
           }
         )
 

@@ -106,7 +106,7 @@ module Notifier
 
       def dependents
         merge_model.dependents =
-          payload['notice_params']['dependents'].collect do |member|
+          payload['notice_params']['dependents'].uniq { |dependent| dependent['member_id'] }.collect do |member|
             dependent = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
             dependent_hash(dependent, member)
           end
@@ -123,21 +123,29 @@ module Notifier
 
       def tax_households
         primary_member = payload['notice_params']['primary_member']
-        return unless primary_member['aqhp_eligible'].upcase == "YES"
+        return [] unless primary_member['aqhp_eligible']&.upcase == "YES"
 
         tax_household = ::Notifier::Services::TaxHouseholdService.new(primary_member)
         merge_model.tax_households << tax_households_hash(tax_household)
       end
 
+      def tax_hh_with_csr
+        tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
+      end
+
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollments
       def renewing_health_enrollments
-        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == notice.coverage_year}
+        renewing_enrollments.select { |e| e.coverage_kind == 'health' && e.effective_on.year.to_s == coverage_year}
+      end
+
+      def renewing_health_enrollments_present?
+        renewing_health_enrollments.present?
       end
 
       # Renewing dental enrollments
       def renewing_dental_enrollments
-        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == notice.coverage_year }
+        renewing_enrollments.select { |e| e.coverage_kind == 'dental' && e.effective_on.year.to_s == coverage_year }
       end
 
       # Current active health enrollments
@@ -220,7 +228,8 @@ module Notifier
 
       def ineligible_applicants
         return nil unless family_members.present?
-        family_members.select(&:totally_ineligible)
+
+        merge_model.ineligible_applicants = family_members.select(&:totally_ineligible)
       end
 
       def magi_medicaid_members
@@ -366,6 +375,10 @@ module Notifier
 
       def csr
         merge_model.csr = payload['notice_params']['primary_member']['csr'].casecmp('YES').zero?
+      end
+
+      def has_atleast_one_csr_member?
+        csr? || dependents.any? { |dependent| dependent.csr == true }
       end
 
       def aqhp_event

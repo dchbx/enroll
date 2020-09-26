@@ -27,7 +27,8 @@ class Notifier::Services::DependentService
   private
 
   def person_details
-    Person.by_hbx_id(payload_member['person_hbx_id']).first
+    hbx_id = payload_member['person_hbx_id'] || payload_member['member_id']
+    Person.by_hbx_id(hbx_id).first
   end
 
   def f_name

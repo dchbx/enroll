@@ -111,13 +111,13 @@ module Notifier
         ]
       end
 
-      def totally_ineligible_members_present?
-        ineligible_applicants.present?
-      end
-
       # there can be multiple renewing health and dental enrollments for the same coverage year
       def renewing_health_enrollments
         enrollments.select { |enrollment| enrollment.health? && enrollment.coverage_year == coverage_year }
+      end
+
+      def renewing_health_enrollments_present?
+        renewing_health_enrollments.present?
       end
 
       def renewing_dental_enrollments
