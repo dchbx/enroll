@@ -418,6 +418,7 @@ module Notifier
         date.strftime('%B %d, %Y')
       end
 
+      # TODO: is this misspelled?
       def depents
         true
       end

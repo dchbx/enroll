@@ -108,6 +108,7 @@ module Notifier
             aqhp_event_and_irs_consent_no? csr_is_73? csr_is_87?
             csr_is_94? csr_is_100? csr_is_zero? csr_is_nil? non_magi_medicaid?
             aptc_is_zero? totally_ineligible? aqhp_event? uqhp_event? totally_ineligible_members_present?
+            documents_needed?
         ]
       end
 
@@ -143,6 +144,21 @@ module Notifier
 
       def has_atleast_one_csr_member?
         csr? || dependents.any? { |dependent| dependent.csr == true }
+      end
+
+      def documents_needed?
+        # TODO: Figure out how to do this
+        # there's no person hbxid on this model
+        # outstanding_people = []
+        # family = consumer_role&.person&.primary_family
+        # return false unless family.present?
+        # people = family.family_members.map { |fm| fm.person }
+        # people.each do |person|
+        #   if person.consumer_role && person.consumer_role.outstanding_verification_types.present?
+        #     outstanding_people << person
+        #  end
+        #end
+        # outstanding_people.present? ? true : false
       end
 
       def aqhp_eligible?
