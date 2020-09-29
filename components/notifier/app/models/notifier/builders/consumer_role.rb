@@ -133,6 +133,10 @@ module Notifier
         tax_households.reject{ |thh| thh.csr_percent_as_integer == 100}
       end
 
+      def aqhp_enrollments
+        enrollments.select{ |enrollment| enrollment.is_receiving_assistance == true}
+      end
+
       # there can be multiple health and dental enrollments for the same coverage year
       # Renewing health enrollments
       def renewing_health_enrollments
