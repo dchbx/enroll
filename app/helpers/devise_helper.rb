@@ -5,19 +5,14 @@ module DeviseHelper
     resource.errors.messages[:username] = resource.errors.messages.delete(:oim_id) if resource.errors.messages.keys.include?(:oim_id)
 
     messages = resource.errors.full_messages.map { |msg| content_tag(:li, msg) }.join
-    sentence = I18n.t("errors.messages.not_saved",
-                      count: resource.errors.count,
-                      resource: resource.class.model_name.human.downcase)
-
     html = <<-HTML
     <div class="alert alert-error module registration-rules" role="alert">
       <div class="text-center">
         <strong>
-          You need to correct the following errors to create an account:
+         #{l10n("devise.errors.message")}
         </strong>
       </div>
       <br/>
-      <strong>#{sentence}</strong>
       <ul>#{messages}</ul>
     </div>
     HTML

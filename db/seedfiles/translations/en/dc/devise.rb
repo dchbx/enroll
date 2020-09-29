@@ -13,4 +13,5 @@ DEVISE_TRANSLATIONS = {
   "en.devise.shared.links.sign_in_with_provider" => "Sign in with %{provider}",
   "en.devise.registrations.new.optional" => "optional",
   "en.devise.registrations.new.password_confirmation" => "Password confirmation",
+  "en.devise.errors.message" => " You need to correct the following errors to create an account:",
 }
