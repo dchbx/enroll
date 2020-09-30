@@ -82,7 +82,7 @@ end
 
 Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
-  expect(page).to have_css("#gender_tooltip")
+  expect(page).to have_css("#gender-tooltip")
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do

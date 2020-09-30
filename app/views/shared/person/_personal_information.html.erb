@@ -42,11 +42,11 @@
     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio">
         <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female', required: true %>
-        <label for="radio_female"><span>FEMALE</span></label>
+        <label  class="female" for="radio_female"><span>FEMALE</span></label>
       </div>
     </div>
     <span>
-      <i id="gender_tooltip" class='fa fa-question-circle no-pd pull-right'  style='margin-top:20px;' data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+      <i id="gender-tooltip" class='fa fa-question-circle no-pd pull-right'  data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
     </span>
   </div>
 </div>
