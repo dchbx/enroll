@@ -11,6 +11,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
+  @flaky
   Scenario: Admin has ability to sort the SEP Types and saves the positions to the database
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Sort SEPs button

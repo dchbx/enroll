@@ -12,6 +12,7 @@ describe "exchanges/scheduled_events/index.html.erb" do
            can_access_user_account_tab?: true,
            begin_resident_enrollment?: true,
            access_new_consumer_application_sub_tab?: true,
+           can_send_secure_message?: true,
            can_manage_qles?: true)
   end
   before :each do

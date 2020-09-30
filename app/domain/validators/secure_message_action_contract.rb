@@ -10,6 +10,7 @@ module Validators
       required(:subject).value(:string)
       required(:body).value(:string)
       optional(:file)
+      optional(:document)
     end
 
     rule(:resource_id) do
