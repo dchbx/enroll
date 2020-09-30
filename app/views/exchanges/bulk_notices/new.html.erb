@@ -1,0 +1,36 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<div class="container" data-controller="bulk-notice">
+
+  <h4>New Message</h4>
+  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+  <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path, html: { multipart: true }) do |f| %>
+    <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
+    <table class='table table-message-wrapper'>
+      <tbody>
+        <tr>
+          <th style="text-transform: capitalize;">Recipients:</th>
+          <td data-target="bulk-notice.recipientList">
+            <div id='recipient-list'></div>
+            <%= f.text_area :audience_identifiers, rows: 1, data: { reflex: 'blur->BulkNotice#new_identifier' }, placeholder: 'FEINs or HBX IDs, comma separated', id: 'bulk-notice-audience-identifiers' %>
+          </td>
+        </tr>
+        <tr>
+          <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+          <td><%= f.text_field :subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+          <td><%= f.text_area :body, rows: 5, placeholder: 'Write here...', required: true  %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
+          <td><%= file_field_tag :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <%= f.submit "Preview", class: 'btn btn-alt-blue col-2 offset-10' %>
+  <% end %>
+</div>
