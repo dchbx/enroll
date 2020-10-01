@@ -212,7 +212,7 @@ module Notifier
 
     def file_name
       if initial_invoice?
-        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
+        "#{resource.organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime('%m%d%Y')}_INVOICE_R.pdf"
       end
     end
 

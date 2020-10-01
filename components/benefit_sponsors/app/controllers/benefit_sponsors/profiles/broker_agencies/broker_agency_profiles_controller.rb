@@ -22,7 +22,7 @@ module BenefitSponsors
           "4"     => "employer_profile.aasm_state",
           "5"     => "employer_profile.plan_years.start_on"
         }
-        
+
         def create
           json = request.body.read
           body_json = JSON.parse(json)

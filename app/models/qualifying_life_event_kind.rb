@@ -5,7 +5,7 @@ class QualifyingLifeEventKind
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
-  ### added enumerations to EffectiveOnKinds with following definitions:
+  ### added enumerations to EFFECTIVE_ON_KINDS with following definitions:
   ###   exact_date: specific date provided
   ###   date_of_event: specific date upon which the QLE occurred
   ###   first_of_month: first of month following the 15th of month rule
@@ -17,11 +17,11 @@ class QualifyingLifeEventKind
   ## added event_kind_label -- use to populate label for collecting event_on date
   ## renamed property: kind to action_kind (also renamed associated constant)
 
-  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member]
+  ACTION_KINDS = %w[add_benefit add_member drop_member change_benefit terminate_benefit administrative transition_member].freeze
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date)
+  EFFECTIVE_ON_KINDS = %w[date_of_event first_of_month first_of_this_month first_of_next_month fixed_first_of_next_month exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -94,7 +94,7 @@ class QualifyingLifeEventKind
   #           presence: true,
   #           allow_blank: false,
   #           allow_nil:   false,
-  #           inclusion: {in: EffectiveOnKinds}
+  #           inclusion: {in: EFFECTIVE_ON_KINDS}
 
   validates :market_kind,
             presence: true,
@@ -263,7 +263,7 @@ class QualifyingLifeEventKind
     return false unless is_active
     end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
   end
-  
+
   private
 
   def qle_date_guards

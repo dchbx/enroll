@@ -108,7 +108,7 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
-    raise ArgumentError.new("Qualifying life event kind is expired")  unless new_qualifying_life_event_kind.active?
+    raise ArgumentError.new("Qualifying life event kind is expired") unless new_qualifying_life_event_kind.active? # rubocop:disable Style/RaiseArgs
 
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
@@ -221,19 +221,19 @@ private
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
-    when "date_of_event"
-      qle_on
-    when "exact_date"
-      qle_on
-    when "first_of_month"
-      first_of_month_effective_date
-    when "first_of_this_month"
-      first_of_this_month_effective_date
-    when "first_of_next_month"
-      first_of_next_month_effective_date
-    when "fixed_first_of_next_month"
-      fixed_first_of_next_month_effective_date
-    end
+                        when "date_of_event"
+                          qle_on
+                        when "exact_date"
+                          qle_on
+                        when "first_of_month"
+                          first_of_month_effective_date
+                        when "first_of_this_month"
+                          first_of_this_month_effective_date
+                        when "first_of_next_month"
+                          first_of_next_month_effective_date
+                        when "fixed_first_of_next_month"
+                          fixed_first_of_next_month_effective_date
+                        end
   end
 
   def first_of_month_effective_date
@@ -314,5 +314,4 @@ private
     # Passes validation if end_on == start_date
     errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
   end
-
 end

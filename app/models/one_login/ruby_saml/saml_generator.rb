@@ -13,16 +13,16 @@ require 'xml_security/document'
 module OneLogin
   module RubySaml
     class SamlGenerator < SamlMessage
-      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information']
+      REQUIRED_ATTRIBUTES = ['Payment Transaction ID', 'Market Indicator', 'Assigned QHP Identifier', 'Total Amount Owed', 'Premium Amount Total', 'APTC Amount', 'Proposed Coverage Effective Date', 'First Name', 'Last Name', 'Partner Assigned Consumer ID','Street Name 1', 'City Name', 'State', 'Zip Code','Additional Information'].freeze
       ASSERTION = 'urn:oasis:names:tc:SAML:2.0:assertion'
       PROTOCOL = 'urn:oasis:names:tc:SAML:2.0:protocol'
       SUCCESS =  'urn:oasis:names:tc:SAML:2.0:status:Success'
       NAME_ID_FORMAT = 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
       SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sendervouches'
       NAME_FORMAT = 'urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified'
-      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'
-      PRIVATE_KEY_LOCATION = '/var/www/deployments/enroll/current/config/ssl/wfpk.pem'
-      X509_CERT_LOCATION = '/var/www/deployments/enroll/current/config/ssl/x509.pem'
+      PASSWORD = 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password'.freeze
+      PRIVATE_KEY_LOCATION = '/var/www/deployments/enroll/current/config/ssl/wfpk.pem'.freeze
+      X509_CERT_LOCATION = '/var/www/deployments/enroll/current/config/ssl/x509.pem'.freeze
 
       attr_reader :transaction_id, :hbx_enrollment, :private_key, :cert
 
@@ -76,7 +76,7 @@ module OneLogin
         subject.add_element 'saml:SubjectConfirmation', { 'Method' => SENDER_VOUCHES }
 
         # conditions
-        assertion.add_element 'saml:Conditions', { 'NotBefore' => "#{not_before}",  'NotOnOrAfter' => "#{not_on_or_after_condition}" }
+        assertion.add_element 'saml:Conditions', { 'NotBefore' => not_before.to_s,  'NotOnOrAfter' => not_on_or_after_condition.to_s }
 
         # auth statements
         auth_statement = assertion.add_element 'saml:AuthnStatement', { 'AuthnInstant' => "#{now_iso}",  'SessionIndex' => "_#{generate_uuid}", 'SessionNotOnOrAfter' => "#{not_on_or_after_condition}" }
@@ -156,7 +156,7 @@ module OneLogin
       end
 
       def not_on_or_after_condition
-        iso { now + 86400 }
+        iso { now + 86_400 }
       end
 
       def generate_uuid

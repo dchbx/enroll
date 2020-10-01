@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 Given(/^the user is on the Main Page$/) do
   visit exchanges_hbx_profiles_root_path
   expect(current_path).to eq exchanges_hbx_profiles_root_path
 end
 
-Given(/^the user with a (.*?) role(?: with (.*?) subrole)? updates permisssions to time travel$/) do |type, subrole|
+Given(/^the user with a (.*?) role(?: with (.*?) subrole)? updates permisssions to time travel$/) do |_type, subrole|
   user = admin(subrole)
   user.person.hbx_staff_role.permission.update_attributes(can_submit_time_travel_request: true)
 end

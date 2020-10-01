@@ -516,43 +516,45 @@ RSpec.describe ApplicationHelper, :type => :helper do
       expect(helper.show_default_ga?(general_agency_profile, broker_agency_profile)).to eq false
     end
   end
-   describe "#show_oop_pdf_link" , dbclean: :after_each do
-       context 'valid aasm_state' do
-         it "should return true" do
-           BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.each do |state|
-             expect(helper.show_oop_pdf_link(state)).to be true
-           end
-         end
-       end
-
-        context 'invalid aasm_state' do
-          it "should return false" do
-            ["draft", "renewing_draft"].each do |state|
-              expect(helper.show_oop_pdf_link(state)).to be false
-            end
-          end
+  describe "#show_oop_pdf_link", dbclean: :after_each do
+    context 'valid aasm_state' do
+      it "should return true" do
+        BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES.each do |state|
+          expect(helper.show_oop_pdf_link(state)).to be true
         end
-     end
+      end
+    end
+
+    context 'invalid aasm_state' do
+      it "should return false" do
+        ["draft", "renewing_draft"].each do |state|
+          expect(helper.show_oop_pdf_link(state)).to be false
+        end
+      end
+    end
+  end
 
 
   describe "find_plan_name", dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-    let(:shop_enrollment) { FactoryBot.create(:hbx_enrollment,
-                                        household: family.active_household,
-                                        family:family,
-                                        kind: "employer_sponsored",
-                                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
-                                        created_at: TimeKeeper.datetime_of_record - 3.days
-                                )}
-    let(:ivl_enrollment)    { FactoryBot.create(:hbx_enrollment,
-                                        household: family.latest_household,
-                                        family:family,
-                                        coverage_kind: "health",
-                                        effective_on: TimeKeeper.datetime_of_record - 10.days,
-                                        enrollment_kind: "open_enrollment",
-                                        kind: "individual",
-                                        submitted_at: TimeKeeper.datetime_of_record - 20.days
-                            )}
+    let(:shop_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: family.active_household,
+                        family: family,
+                        kind: "employer_sponsored",
+                        submitted_at: TimeKeeper.datetime_of_record - 3.days,
+                        created_at: TimeKeeper.datetime_of_record - 3.days)
+    end
+    let(:ivl_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: family.latest_household,
+                        family: family,
+                        coverage_kind: "health",
+                        effective_on: TimeKeeper.datetime_of_record - 10.days,
+                        enrollment_kind: "open_enrollment",
+                        kind: "individual",
+                        submitted_at: TimeKeeper.datetime_of_record - 20.days)
+    end
     let(:valid_shop_enrollment_id)  { shop_enrollment.id }
     let(:valid_ivl_enrollment_id)   { ivl_enrollment.id }
     let(:invalid_enrollment_id)     {  }
@@ -571,17 +573,17 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 end
 
-  describe "Enabled/Disabled IVL market" do
-    shared_examples_for "IVL market status" do |value|
-       if value == true
-        it "should return true if IVL market is enabled" do
-          expect(helper.individual_market_is_enabled?).to eq  true
-        end
-       else
-        it "should return false if IVL market is disabled" do
-          expect(helper.individual_market_is_enabled?).to eq  false
-        end
-       end
+describe "Enabled/Disabled IVL market" do
+  shared_examples_for "IVL market status" do |value|
+    if value == true
+      it "should return true if IVL market is enabled" do
+        expect(helper.individual_market_is_enabled?).to eq  true
+      end
+    else
+      it "should return false if IVL market is disabled" do
+        expect(helper.individual_market_is_enabled?).to eq  false
+      end
+    end
     it_behaves_like "IVL market status", Settings.aca.market_kinds.include?("individual")
   end
 
