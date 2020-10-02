@@ -5,7 +5,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class AddContributionModelsToProductPackage < MongoidMigrationTask
 
   def migrate
-    date = Date.new(2020,1,1)
+    date = Date.new(2021,1,1)
+    puts "creating contribution models for year #{date.year}" unless Rails.env.test?
     site = BenefitSponsors::Site.by_site_key(Settings.site.key).first
 
     title_percentage_pair = {
@@ -29,6 +30,7 @@ class AddContributionModelsToProductPackage < MongoidMigrationTask
     end
 
     benefit_market_catalog.save!
+    puts "created contribution models for year #{date.year}"  unless Rails.env.test?
   end
 
   def create_contribution_model(contribution_model)

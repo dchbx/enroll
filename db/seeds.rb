@@ -143,6 +143,9 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
+
+  system "bundle exec rake migrations:add_contribution_models_to_product_package"
+
   puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
