@@ -26,79 +26,11 @@
                 <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
               </div>
 
-            <% when "Fallon Health" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <strong><a href= <%=l10n('plans.fh_href_phone')%> ><%=l10n("plans.fh_phone")%></a></strong> <br>
-                <strong><%=l10n("plans.tty")%></strong> <%=l10n("plans.fh_tty_number")%><br>
-                <strong><%=l10n("plans.email")%></strong> <%=l10n("plans.fh_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.fh_hours")%>
-              </div>
-
-            <% when "Health New England" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <strong><%=l10n("plans.local")%></strong> <a href=<%=l10n('plans.hne_href_local')%> ><%=l10n("plans.hne_local_phone")%></a> <br>
-                <strong><%=l10n("plans.toll_free")%></strong><a href=<%=l10n('plans.hne_href_toll')%> ><%=l10n("plans.hne_toll_free")%></a> <br>
-                <strong><%=l10n("plans.ttd/tty")%></strong><a href=<%=l10n('plans.hne_href_tty')%> ><%=l10n("plans.hne_tty")%></a> <br>
-                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hne_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hne_hours")%><br/>
-              </div>
-
-            <% when "Blue Cross Blue Shield MA" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <strong><%=l10n("plans.bcbs_ivl")%><strong><a href=<%=l10n('plans.bcbs_href_ivl_phone')%> ><%=l10n("plans.bcbs_ivl_phone")%></a><br>
-                <strong><%=l10n("plans.bcbs_small")%></strong><a href=<%=l10n('plans.bcbs_small_href_phone')%> ><%=l10n("plans.bcbs_small_phone")%></a> <br>
-                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
-                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.bcbs_email")%><br/>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.bcbs_hours")%><br>
-              </div>
-
-            <% when "Harvard Pilgrim Health Care" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <a href=<%=l10n('plans.hphc_href_phone')%> ><%=l10n("plans.hphc_phone")%></a><br>
-                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
-                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.hphc_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.hphc_hours")%><br/>
-              </div>
-
-            <% when "AllWays Health Partners" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <a href=<%=l10n('plans.ahp_href_phone')%> ><%=l10n("plans.ahp_phone")%></a> <br>
-                <strong><%=l10n("plans.tty")%></strong><%=l10n("plans.tty_num")%><br>
-                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.ahp_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.ahp_hours")%><br/>
-              </div>
-
             <% when "United Healthcare" %>
               <div>
                <%=l10n("plans.uh_phone")%><br/>
                 <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br/><br/>
                 <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
-              </div>
-
-              <% when "Tufts Health Direct" %>
-              <div>
-                <strong><%=l10n("plans.call")%></strong>
-                <a href=<%=l10n('plans.thd_href_phone')%> ><%=l10n("plans.thd_phone")%>(<%=l10n("plans.tty")%><%=l10n("plans.tty_num")%>)</a><br>
-                <strong><%=l10n("plans.email")%></strong><%=l10n("plans.thd_email")%><br>
-                <strong><%=l10n("plans.hours")%></strong><%=l10n("plans.thd_hours")%><br/>
-              </div>
-
-            <% when "Tufts Health Premier" %>
-              <div>
-                <strong><%=l10n("plans.thpp_ph")%></strong>
-                <a href=<%=l10n("plans.thd_href_phone")%> > <%=l10n("plans.thpp_phone")%></a> <br>
-                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br>
-                <strong><%=l10n("plans.hours")%> </strong> <%=l10n("plans.thpp_hours")%><br>
-                <strong><%=l10n("plans.email")%> </strong> <%= site_tufts_premier_link %> <%=l10n("plans.thpp_under")%><br/>
-                <strong><%=l10n("plans.thpp_bh")%> </strong>
-                <a href=<%=l10n("plans.thpp_bh_tel")%> > <%=l10n("plans.thpp_bh_phone")%></a> <br>
-                <%=l10n("plans.thpp_time")%> <br>
-                <strong><%=l10n("plans.thpp_nurseline")%> </strong><%=l10n("plans.thpp_nurseline_number")%><br>
               </div>
 
             <% when "CareFirst" %>
@@ -140,12 +72,6 @@
               <strong>
                 <a href=<%=l10n('plans.kaiser_href_phone')%> ><%=l10n("plans.kaiser_phone")%></a>
               </strong>
-              </div>
-            <% when "UnitedHealthcare" %>
-              <div>
-               <%=l10n("plans.uh_phone")%><br/>
-                <strong><%=l10n('plans.tty')%></strong> <%=l10n("plans.tty_num")%><br/><br/>
-                <strong><%=l10n("plans.hours")%></strong> <%=l10n("plans.uh_hours")%>
               </div>
             <% end %>
           </div>
