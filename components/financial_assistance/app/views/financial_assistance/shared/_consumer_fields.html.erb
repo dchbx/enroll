@@ -19,6 +19,10 @@
         <% end %>
       </div>
     </div>
+    <div class="col-md-2 not-sure-margin left-seprator">
+      <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen">Not sure?</a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "us_citizen"} %>
+    </div>
   </div>
 
   <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
@@ -121,6 +125,10 @@
         <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
         <label for="radio_incarcerated_no"><span class="yes_no_pair">No</span></label>
       </div>
+    </div>
+    <div class="col-md-2 not-sure-margin left-seprator">
+      <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not sure?</a>
+      <%= render partial: 'financial_assistance/shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
     </div>
   </div>
 </div>

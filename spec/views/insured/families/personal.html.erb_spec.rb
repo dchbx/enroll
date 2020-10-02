@@ -23,7 +23,7 @@ RSpec.describe "insured/families/personal.html.erb" do
     end
 
     it "should display notice of action title " do
-      expect(rendered).to have_selector('p', text: "How would you like to receive information? (OPTIONAL)")
+      expect(rendered).to have_selector('p', text: "#{l10n('insured.contact_preference')}")
     end
   end
 
