@@ -15,6 +15,7 @@ module Parser
     element :plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan"
     element :plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan"
     element :plan_id_2020_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2020_for_enrollees_aging_off_catastrophic_or_child_only_plan"
+    element :plan_id_2021_for_enrollees_aging_off_catastrophic_or_child_only_plan, String, tag: "plan_id_2021_for_enrollees_aging_off_catastrophic_or_child_only_plan"
     element :are_you_prohibited_from_selling_or_issuing_the_2018_qhp_to_someone_enrolled_in_medicare_as_set_forth_in_section_1882d_of_the_social_security_act, String, tag: "Are_you_prohibited_from_selling_or_issuing_the_2018_QHP_to_someone_enrolled_in_Medicare_as_set_forth_in_Section_1882d_of_the_Social_Security_Act"
     # element :Does_re-enrollment_in_the_2018_QHP_represent_an_enrollment_into_a_new_policy_or_contract_under_state_law_for_enrollees_in_the_2017_QHP, String, tag: "Does_re-enrollment_in_the_2018_QHP_represent_an_enrollment_into_a_new_policy_or_contract_under_state_law_for_enrollees_in_the_2017_QHP"
 
@@ -31,6 +32,7 @@ module Parser
         plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2018_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
         plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2019_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
         plan_id_2020_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2020_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2020_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
+        plan_id_2021_for_enrollees_aging_off_catastrophic_or_child_only_plan: plan_id_2021_for_enrollees_aging_off_catastrophic_or_child_only_plan.present? ? plan_id_2021_for_enrollees_aging_off_catastrophic_or_child_only_plan.gsub(/\n/,'').strip : "",
         are_you_prohibited_from_selling_or_issuing_the_2018_qhp_to_someone_enrolled_in_medicare_as_set_forth_in_section_1882d_of_the_social_security_act: are_you_prohibited_from_selling_or_issuing_the_2018_qhp_to_someone_enrolled_in_medicare_as_set_forth_in_section_1882d_of_the_social_security_act.present? ? are_you_prohibited_from_selling_or_issuing_the_2018_qhp_to_someone_enrolled_in_medicare_as_set_forth_in_section_1882d_of_the_social_security_act.gsub(/\n/,'').strip : "",
         # "Does_re-enrollment_in_the_2018_QHP_represent_an_enrollment_into_a_new_policy_or_contract_under_state_law_for_enrollees_in_the_2017_QHP" => "Does_re-enrollment_in_the_2018_QHP_represent_an_enrollment_into_a_new_policy_or_contract_under_state_law_for_enrollees_in_the_2017_QHP".gsub(/\n/,'').strip,
       }
