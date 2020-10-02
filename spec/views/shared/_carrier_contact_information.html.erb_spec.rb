@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "shared/_carrier_contact_information.html.erb", dbclean: :after_each do
+describe "shared/_#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information.html.erb", dbclean: :after_each do
   let(:plan) {
     double('Product',
       id: "122455",
