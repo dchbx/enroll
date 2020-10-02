@@ -28,7 +28,7 @@ namespace :load_service_reference do
   desc "dc service areas"
   task :dc_service_areas, [:active_year] => :environment do |t, args|
     if Settings.site.key.to_s == "dc"
-      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2020)
+      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2021)
       years.each do |year|
         puts "Creating Service areas for new model #{year}" unless Rails.env.test?
         ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|

@@ -13,7 +13,7 @@
 namespace :import do
   task :common_data_from_master_xml, [:file] => :environment do |task, args|
     NATIONWIDE_NETWORK = ["Nationwide In-Network", "Nationwide"]
-    DC_IN_NETWORK = ["DC Metro In-Network", "DC-Metro In-Network", "DC-Metro", "DC, MD (not available in VA)"]
+    DC_IN_NETWORK = ["DC Metro In-Network", "DC-Metro In-Network", "DC-Metro", "DC, MD (not available in VA)", "DC Metro"]
     files = Rails.env.test? ? [args[:file]] : Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{Settings.aca.state_abbreviation.downcase}/master_xml", "**", "*.xlsx"))
 
     if Settings.aca.state_abbreviation.downcase == "dc" # DC
@@ -168,7 +168,7 @@ namespace :import do
   def assign_headers
     @headers = Hash.new
     @header_row.each_with_index {|header,i|
-      @headers[header.to_s.underscore] = i
+      @headers[header.to_s.underscore.strip] = i
     }
     @headers
   end

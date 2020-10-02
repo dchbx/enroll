@@ -27,7 +27,7 @@ namespace :load_rating_factors do
   desc "DC rating factors"
   task :dc_rating_factors, [:active_year] => :environment do |t, args|
     if Settings.site.key.to_s == "dc"
-      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2020)
+      years = args[:active_year].present? ? [args[:active_year].to_i] : (2014..2021)
       years.each do |year|
         puts "creating dc rating factors for #{year}" unless Rails.env.test?
         ::BenefitSponsors::Organizations::Organization.issuer_profiles.each do |issuer_organization|
