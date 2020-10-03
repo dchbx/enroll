@@ -123,7 +123,7 @@
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <label>Is this person a member of an American Indian or Alaskan Native tribe? *</label>
+      <label>Is this person a member of an American Indian or Alaskan Native Tribe? *</label>
     </div>
 
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
