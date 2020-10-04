@@ -13,14 +13,14 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: New insured user purchases on individual market
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -54,14 +54,14 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -87,7 +87,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -101,7 +101,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Individual should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -113,7 +113,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Dependents should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -133,7 +133,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Dependents should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -153,7 +153,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Individual should see immigration details even after changing radio options
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
@@ -162,7 +162,7 @@ Feature: Insured Plan Shopping on Individual market
     Then select I-551 doc and fill details
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then click citizen yes
     Then click citizen no
@@ -173,7 +173,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping

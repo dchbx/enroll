@@ -374,13 +374,13 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
-And(/^.+ click on sign in existing account$/) do
+And(/^.+ click on Sign In$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
 end
 
 And(/I signed in$/) do
   sleep 2
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -400,7 +400,7 @@ end
 
 And(/Aptc user signed in$/) do
   sleep 2
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "aptc@dclink.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -617,7 +617,7 @@ When(/^\w+ visits the Consumer portal$/i) do
 end
 
 When(/^(\w+) signs in$/) do |person|
-  click_link 'Sign In Existing Account'
+  click_link 'Sign In'
   fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
   fill_in 'user[password]', with: "aA1!aA1!aA1!"

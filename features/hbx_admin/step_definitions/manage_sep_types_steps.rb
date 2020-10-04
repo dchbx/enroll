@@ -226,7 +226,7 @@ When("Individual with known qles visits the Insured portal outside of open enrol
 end
 
 And("Employee signed in") do
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "patrick.doe@dc.gov"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -807,7 +807,7 @@ Given("Individual creates account and on home page") do
   step "Individual should see a form to enter personal information"
   step "Individual clicks on Save and Exit"
   step "Individual resumes enrollment"
-  step "Individual click on sign in existing account"
+  step "Individual click on Sign In"
   step "I signed in"
   step "Individual sees previously saved address"
   step "Individual agrees to the privacy agreeement"

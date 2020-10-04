@@ -15,7 +15,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -51,7 +51,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -65,7 +65,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should land on home page
     And I click on log out link
     Then Individual resumes enrollment
-    And I click on sign in existing account
+    And I click on Sign In
     And I signed in
     Then I should land on home page
     Then Individual logs out
@@ -83,7 +83,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -99,7 +99,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should land on home page
     When I click on log out link
     Then Individual resumes enrollment
-    And I click on sign in existing account
+    And I click on Sign In
     And I signed in
     Then I should land on home page
     Then Individual logs out
@@ -117,7 +117,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement

@@ -12,7 +12,7 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
 
   Scenario Outline: The ability to enter my document information for my <document type> Document and successfully validates the inputs
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual selects eligible immigration status
@@ -44,7 +44,7 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
 
   Scenario Outline: The ability to enter my document information for my <document type> Document and should not able to validates the inputs
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual selects eligible immigration status

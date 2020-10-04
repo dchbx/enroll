@@ -233,8 +233,8 @@ When(/^(.*) login in for (.*)$/) do |named_person, role|
   email_address = person[:email]
   password = person[:password]
 
-  if page.has_link?('Sign In Existing Account')
-    click_link "Sign In Existing Account"
+  if page.has_link?('Sign In')
+    click_link "Sign In"
   end
   expect(page).to have_content('Sign In')
 

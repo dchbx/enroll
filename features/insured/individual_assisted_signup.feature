@@ -12,7 +12,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And Aptc user signed in
     Then Individual sees previously saved address
     When Individual clicks on Individual and Family link should be on privacy agreeement page

@@ -12,7 +12,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should be able to succesfully add a valid alphanumeric i94 number for I-94 (Arrival/Departure Record).
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -26,7 +26,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should not be able to succesfully add an invalid alphanumeric i94 number for I-94 (Arrival/Departure Record).
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -40,7 +40,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should be able to succesfully add a valid alphanumeric i94 number for I-94 (Arrival/Departure Record) in Unexpired Foreign Passport.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -54,7 +54,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should not be able to succesfully add an invalid alphanumeric i94 number for I-94 (Arrival/Departure Record) in Unexpired Foreign Passport.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -68,7 +68,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should be able to succesfully add a valid alphanumeric i94 number for Other With I-94 Number.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -82,7 +82,7 @@ Feature: Insured VLP Verification for Individual market
 
   Scenario: Individual should not be able to succesfully add an invalid alphanumeric i94 number for Other With I-94 Number.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information

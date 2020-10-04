@@ -14,7 +14,7 @@ Feature: CSR finishes shopping for Individual
       Then Individual should see a form to enter personal information
       When Individual clicks on Save and Exit
       Then Individual resumes enrollment
-      And Individual click on sign in existing account
+      And Individual click on Sign In
       And I signed in
       Then Individual sees previously saved address
       Then Individual asks for help

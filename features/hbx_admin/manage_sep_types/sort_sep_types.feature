@@ -53,7 +53,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -82,7 +82,7 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And listed Individual SEP Types ordinal postions should change
     And Hbx Admin logs out
     Then Individual resumes enrollment
-    And I click on sign in existing account
+    And I click on Sign In
     And I signed in
     Then I should land on home page
     Then I should see the "Married" at the top of the ivl qle list
