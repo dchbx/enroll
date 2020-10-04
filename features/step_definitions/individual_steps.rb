@@ -111,7 +111,7 @@ Then(/Individual should see a form to enter personal information$/) do
   expect(page).to have_content("Is this person a member of an American Indian")
   expect(page).to have_content("Is this person currently incarcerated")
   expect(page).to have_content("What is your race/ethnicity? (OPTIONAL - check all that apply)")
-  expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply)")
+  expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)")
   expect(page).to have_css("#us_citizen", visible: false)
   expect(page).to have_css("#is_incarcerated", visible: false)
   sleep 2
