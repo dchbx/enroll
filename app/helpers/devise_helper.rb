@@ -4,7 +4,9 @@ module DeviseHelper
 
     resource.errors.messages[:username] = resource.errors.messages.delete(:oim_id) if resource.errors.messages.keys.include?(:oim_id)
 
-    messages = resource.errors.full_messages.map { |msg| content_tag(:li, msg) }.join
+    messages = resource.errors.messages.map do |_key, value|
+      value.map { |v| content_tag(:li, v) }
+    end.join
     html = <<-HTML
     <div class="alert alert-error module registration-rules" role="alert">
       <div class="text-center">
