@@ -312,7 +312,7 @@ var Register = ( function( window, undefined ) {
       } else {
         $('#conf_pass').parent('.form-group').addClass('has-error');
         $('.error-block').show();
-        $('.alert').removeClass('alert-success').addClass('alert-danger').text("Confirm password didn't match. Please try again.");
+        $('.alert').removeClass('alert-success').addClass('alert-danger').text("Your password confirmation didn’t match. Try again.");
         return false;
       }
     }

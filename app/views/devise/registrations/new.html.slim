@@ -5,7 +5,7 @@
       h2.text-center.heading-text Create Account
       #pwError.d-none
         .alert.alert-danger
-          | Confirm password didn't match. Please try again.
+          | Your password confirmation didn’t match. Try again.
       = form_for(resource, as: resource_name, url: registration_path(resource_name), html: {class: 'needs-validation', data: {controller:'signup', action: "keyup->signup#validateInput keydown->signup#preventEnterSubmission"}, novalidate: true }) do |f|
         = devise_error_messages!
         .row.error-block.d-none
