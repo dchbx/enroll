@@ -1,16 +1,17 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 describe "shared/_#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information.html.erb", dbclean: :after_each do
-  let(:plan) {
+  let(:plan) do
     double('Product',
-      id: "122455",
-      issuer_profile: issuer_profile
-      )
-  }
+           id: "122455",
+           issuer_profile: issuer_profile)
+  end
 
-  let(:issuer_profile){
+  let(:issuer_profile) do
     double("IssuerProfile")
-  }
+  end
 
   let!(:person)          { FactoryBot.create(:person, :with_consumer_role) }
   let!(:family)          { FactoryBot.create(:family, :with_primary_family_member, person: person) }
