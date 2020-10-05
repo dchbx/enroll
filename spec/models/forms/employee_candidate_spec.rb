@@ -33,7 +33,7 @@ describe Forms::EmployeeCandidate, "asked to match a census employee" do
 
   subject {
     Forms::EmployeeCandidate.new({
-                                     :dob => "2012-10-12",
+                                     :dob => "10/12/2012",
                                      :ssn => "123-45-6789",
                                      :first_name => "Tom",
                                      :last_name => "Baker",
@@ -86,7 +86,7 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
 
   subject {
     Forms::EmployeeCandidate.new({
-                                     :dob => "2012-10-12",
+                                     :dob => "10/12/2012",
                                      :ssn => "123-45-6789",
                                      :first_name => "yo",
                                      :last_name => "guy",
@@ -162,7 +162,7 @@ describe "match a person in db" do
                                  })
   }
 
-  let(:search_params) { double(dob: db_person.dob.strftime("%Y-%m-%d"), ssn: db_person.ssn, )}
+  let(:search_params) { double(dob: db_person.dob.strftime("%m/%d/%Y"), ssn: db_person.ssn, )}
   let(:search_param_name) { double( first_name: db_person.first_name, last_name: db_person.last_name)}
 
   after(:each) do
