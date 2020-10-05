@@ -68,7 +68,15 @@ describe "qhp builder" do
       Products::Qhp.all.delete
 
       @product2 = FactoryBot.create(:benefit_markets_products_health_products_health_product, hios_id: "42690MA1234502-01", hios_base_id: "42690MA1234502", csr_variant_id: "01", application_period: Date.new(2019, 1, 1)..Date.new(2019, 12, 31))
-      products_qhp = FactoryBot.create(:products_qhp, issuer_id: "42690", standard_component_id: "42690MA1234502", plan_marketing_name: "Test Blue Premium", hios_product_id: "42690MA234", network_id: "MAN001", service_area_id: @service_area_id, active_year: 2019)
+      products_qhp = FactoryBot.create(
+        :products_qhp,
+        issuer_id: "42690",
+        standard_component_id: "42690MA1234502",
+        plan_marketing_name: "Test Blue Premium",
+        hios_product_id: "42690MA234", network_id: "MAN001",
+        service_area_id: @service_area_id,
+        active_year: 2019
+      )
       products_qhp.qhp_cost_share_variances.create(hios_plan_and_variant_id: "42690MA1234502-01", plan_marketing_name: "Test Blue Premium", metal_level: "Platinum", csr_variation_type: "Standard Platinum On Exchange Plan", product_id: @product2.id)
     end
 
