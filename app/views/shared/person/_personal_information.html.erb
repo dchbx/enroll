@@ -21,9 +21,7 @@
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0",
-                                                 required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
+      <%= f.text_field :dob, placeholder:'DATE OF BIRTH *', required:'true', id:'dob', readonly: f.object.is_a?(Forms::EmployeeRole), class:'floatlabel form-control', onblur:'validDob(this)' %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: f.object.no_ssn == "1" ? false : true, :disabled => f.object.no_ssn == "1" ? true : false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
@@ -56,5 +54,17 @@
     if ($('#person_no_ssn').prop('checked')) {
       $('#person_ssn').prop('disabled', true);
     }
+    Freebies.floatlabels();
+    initDatepicker('dob',new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month %>'))
+    var cleave = new Cleave('#inputDOB', {
+      date: true,
+      datePattern: ['m', 'd', 'Y']
+    });
   });
+  function validDob(element) {
+    if (element.value && element.value.length < 10) {
+      $('.memo').html("<div class='alert-plan-year alert-error'><h4><b>Invalid date format.</b> You must enter 2 numbers for the month, 2 numbers for the day, and 4 numbers for the year. Example: 05/09/1980.</h4></div>");
+      element.value = ''
+    }
+  }
 </script>
