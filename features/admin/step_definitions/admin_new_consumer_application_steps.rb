@@ -37,7 +37,7 @@ end
 When(/^user registers as an individual$/) do
   fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
-  fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
+  fill_in "person[dob]", with: "11/11/1991"
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click

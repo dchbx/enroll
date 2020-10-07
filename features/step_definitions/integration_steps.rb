@@ -541,7 +541,7 @@ When(/^.+ enters? the identifying info of (.*)$/) do |named_person|
 
   fill_in 'person[first_name]', :with => person[:first_name]
   fill_in 'person[last_name]', :with => person[:last_name]
-  fill_in 'jq_datepicker_ignore_person[dob]', :with => person[:dob]
+  fill_in 'person[dob]', :with => person[:dob]
   fill_in 'person[ssn]', :with => person_ssn
   find(:xpath, '//label[@for="radio_male"]').click
 

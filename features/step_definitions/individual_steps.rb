@@ -64,7 +64,7 @@ end
 When(/user goes to register as an individual$/) do
   fill_in 'person[first_name]', :with => (@u.first_name :first_name)
   fill_in 'person[last_name]', :with => (@u.last_name :last_name)
-  fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
+  fill_in 'person[dob]', :with => (@u.adult_dob :adult_dob)
   fill_in 'person[ssn]', :with => (@u.ssn :ssn)
   find(:xpath, '//label[@for="radio_male"]').click
 
