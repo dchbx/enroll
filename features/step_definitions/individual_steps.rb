@@ -809,6 +809,10 @@ When("consumer visits home page") do
   visit "/families/home"
 end
 
+When(/^the OE SEP feature configuration is set to dchbx setting$/) do
+  allow(EnrollRegistry[:product_selection_effects].settings(:operation)).to receive(:item).and_return('::Operations::ProductSelectionEffects::DchbxProductSelectionEffects')
+end
+
 When(/^\w+ checks? the Insured portal open enrollment dates$/) do
   current_day = TimeKeeper.date_of_record
   if (Date.new(current_day.year - 1, 11, 1)..Date.new(current_day.year, 1, 31)).include?(current_day)

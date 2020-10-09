@@ -181,6 +181,7 @@ Feature: Insured Plan Shopping on Individual market
   @flaky
   Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
     Given Individual resumes enrollment
+    When the OE SEP feature configuration is set to dchbx setting
     And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
