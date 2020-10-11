@@ -1,7 +1,7 @@
 Feature: Insured Plan Shopping on Individual market
   Background:
     Given the FAA feature configuration is enabled
-  
+
   Scenario: New insured user purchases on individual market
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment
@@ -28,6 +28,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual ads address for dependent
     And Individual logs out
 
+  @flaky
   Scenario: New insured user should be on privacy agreeement/verification page on clicking Individual and Family link on respective pages.
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment

@@ -11,6 +11,7 @@ Feature: Insured Plan Shopping on Individual market
     When user clicks on continue button
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -52,6 +53,7 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -99,6 +101,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see identity verification page and clicks on submit
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -111,6 +114,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -131,6 +135,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
     And Individual click on Sign In
@@ -151,6 +156,7 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should not see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see immigration details even after changing radio options
     Given Individual resumes enrollment
     And Individual click on Sign In

@@ -74,10 +74,10 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then I should <action> input field to enter the Sep Type date
     And Admin logs out
 
-  Examples:
-    | user_attestation |  action  |
-    | Self Service     |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_attestation | action  |
+      | Self Service     | see     |
+      | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking self attestation option for <user_attestation>
     Given Admin can navigate to the Manage SEPs screen
@@ -129,7 +129,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then Admin should <action> input field to enter the Sep Type date
     And Admin logs out
 
-  Examples:
-    | user_attestation |  action  |
-    | Self Service     |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_attestation | action  |
+      | Self Service     | see     |
+      | Admin Only       | not see |

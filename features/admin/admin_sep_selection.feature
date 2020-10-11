@@ -1,5 +1,6 @@
 Feature: Update DOB and SSN
 
+  @flaky
   Scenario: Admin purchases the an insured user through sep
     Given Individual has not signed up as an HBX user
     When the FAA feature configuration is enabled
@@ -10,7 +11,7 @@ Feature: Update DOB and SSN
     When user goes to register as an individual
     When user clicks on continue button
     Then user should see heading labeled personal information
-    Then Individual should click on Individual market for plan shopping #TODO re-write this step
+    Then Individual should click on Individual market for plan shopping
     Then Individual should see a form to enter personal information
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
@@ -19,7 +20,7 @@ Feature: Update DOB and SSN
     Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
-    And Individual again clicks on add member button #TODO re-write this step
+    And Individual again clicks on add member button
     And I click on continue button on household info form
     And I click on continue button on group selection page
     And I select three plans to compare

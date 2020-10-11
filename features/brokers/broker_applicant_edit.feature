@@ -5,7 +5,7 @@ Feature: HBX Admin Edits a Broker Applicant
     Given all permissions are present
     And the Plans exist
     And there is a Broker Agency exists for District Brokers Inc
-    And the broker Max Planck is primary broker for District Brokers Inc 
+    And the broker Max Planck is primary broker for District Brokers Inc
 
     Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
     # Skipped the steps here due to constant intermittent failures with clicking links

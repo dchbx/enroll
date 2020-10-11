@@ -5,6 +5,7 @@ Feature: Consumer requests enrollment in CoverAll
   be enrolled in CoverAll. The HBX admin can then enter their information and
   process their application through the families index page.
 
+  @flaky
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should see link DC Resident Application
     Given a Hbx admin with super admin access exists
     When Hbx Admin logs on to the Hbx Portal
@@ -41,11 +42,11 @@ Feature: Consumer requests enrollment in CoverAll
     And Hbx Admin logs out
 
   Scenario: When we login as Hbx admin with read and write permissions then on family tab we should not see link New DC Resident Application
-     Given a Hbx admin with super admin access exists
-     When Hbx Admin logs on to the Hbx Portal
-     When Hbx Admin click Families dropdown
-     Then Hbx Admin should not see an New DC Resident Application link
-     And Hbx Admin logs out
+    Given a Hbx admin with super admin access exists
+    When Hbx Admin logs on to the Hbx Portal
+    When Hbx Admin click Families dropdown
+    Then Hbx Admin should not see an New DC Resident Application link
+    And Hbx Admin logs out
 
   Scenario: When we login as Hbx admin then on family tab admin should not see link New Consumer Phone Application and New Consumer Paper Application
     Given a Hbx admin with read and write permissions exists

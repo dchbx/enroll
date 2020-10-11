@@ -7,7 +7,7 @@ Feature: Employee of a Sole Source Employer Shopping During Open Enrollment
     And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
- 
+
   Scenario: Group Selection During Open Enrollment
     When Patrick Doe clicks "Shop for Plans" on my account page
     Then Employee should see the group selection page

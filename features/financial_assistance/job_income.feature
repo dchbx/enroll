@@ -69,6 +69,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
     And the user saves the self employment information
     Then the self employment information should be saved on the page
 
+  @flaky
   Scenario: User enters self employment information with end date less than start date
     Given the user answers yes to having self employment income
     And the user fills out the required self employment information with incorrect dates
@@ -89,7 +90,7 @@ Feature: Start a new Financial Assistance Application and fills out the job and 
   Scenario: Confirmation pop-up functionality
     When the user clicks the BACK TO ALL HOUSEHOLD MEMBERS link
     Then a modal should show asking the user are you sure you want to leave this page
-  
+
   Scenario: "Not sure?" popups open as expected
     Given the user is on the Job Income page
     When the user clicks the Not sure link next to the employer income question

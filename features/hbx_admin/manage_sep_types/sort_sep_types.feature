@@ -1,6 +1,6 @@
 Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their positions in DB
-    User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
-    User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
+  User will create an account through HBx Portal to sign as Consumer and checks the re arranged positions of SEP Type on Qle carousel
+  User will create an account through HBx Portal to sign as Employee and checks the re arranged positions of SEP Type on Qle carousel
 
   Background:
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
@@ -220,8 +220,8 @@ Feature: Admin has ability to sort SEP Types on Sort SEPs Page and save their po
     And Admin should see the Entered into a legal domestic partnership in the <market_kind> qle list
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |

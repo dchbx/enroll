@@ -8,6 +8,7 @@ Feature: User Account page
     And that a user with a Employer Role role exists and is not logged in
     And that a user with a Broker role exists and is not logged in
 
+  @flaky
   Scenario: Search for Employer by Role filter
     Given user visits the Hbx Portal
     And Hbx Admin click on User Accounts
@@ -22,7 +23,7 @@ Feature: User Account page
     Then I should only see user with broker role
     When I click All button
     Then I should see users with any role
-  
+
   Scenario: Search for Employer by Locked filter
     Given user with Employee Role role is locked
     And user with Broker role is unlocked

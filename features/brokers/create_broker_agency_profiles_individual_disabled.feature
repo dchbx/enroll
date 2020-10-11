@@ -22,7 +22,7 @@ Feature: Create Primary Broker and Broker Agency
     And Primary Broker enters office location for default_office_location
     Then Primary Broker should see broker registration successful message
 
-  @more_than_sole_source
+  @broken
   Scenario: Primary Broker has not signed up on the HBX
     When Primary Broker visits the HBX Broker Registration form
     Given a valid ach record exists
@@ -52,7 +52,7 @@ Feature: Create Primary Broker and Broker Agency
     When Primary Broker registers with valid information
     Then Primary Broker should see successful message with broker agency home page
     And Primary Broker select the all security question and give the answer
-    When Primary Broker have submit the security questions    
+    When Primary Broker have submit the security questions
     And Primary Broker logs out
 
     Given Employer has not signed up as an HBX user

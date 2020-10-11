@@ -15,16 +15,16 @@ Feature: Admin has ability to Expire the Active SEP Type
     When Hbx Admin clicks Action button
     Then Admin should see Expire dropdown button
     When Admin clicks on Expire button of an Active SEP Type
-    And Admin changes the end on date of an Active SEP Type to expire 
+    And Admin changes the end on date of an Active SEP Type to expire
     And Admin clicks on Expire button
     Then Admin should see a successful message of an Expire
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind |
-    | individual  |
-    | shop        |
-    | fehb        |
+    Examples:
+      | market_kind |
+      | individual  |
+      | shop        |
+      | fehb        |
 
   Scenario Outline: Admin will get failure reason while expiring an Active <market_kind> market SEP type with end date earlier than start date
     Given Admin can navigate to the Manage SEPs screen
@@ -39,11 +39,11 @@ Feature: Admin has ability to Expire the Active SEP Type
     Then Admin should see a failure reason of an Expire
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind |
-    | individual  |
-    | shop        |
-    | fehb        |
+    Examples:
+      | market_kind |
+      | individual  |
+      | shop        |
+      | fehb        |
 
   Scenario Outline: Admin will get failure reason while expiring an Active <market_kind> market SEP type with past end date
     Given Admin can navigate to the Manage SEPs screen

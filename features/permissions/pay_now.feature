@@ -12,7 +12,7 @@ Feature: Hbx Admin creates a New Consumer Application for ivl users
     And I click on purchase confirm button for matched person
     Then I should <action> pay now button
 
-  Examples:
-  | subrole      |   action   |
-  | super admin  |    see     |
-  | tier 3       |    see     |
+    Examples:
+      | subrole     | action |
+      | super admin | see    |
+      | tier 3      | see    |

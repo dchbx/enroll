@@ -13,7 +13,7 @@ Feature: Shop Employees can purchase coverage through covid QLE
     And employee Patrick Doe has past hired on date
 
   Scenario: Employee should able to purchase through covid QLE using first_of_this_month effective date
-    
+
     Given Employee has not signed up as an HBX user
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     Then Employee should see the "Covid-19" at the top of the shop qle list
@@ -32,7 +32,7 @@ Feature: Shop Employees can purchase coverage through covid QLE
     Then Patrick Doe should see "my account" page with enrollment
 
   Scenario: Employee should able to purchase through covid QLE using fixed_first_of_next_month effective date
-    
+
     Given Employee has not signed up as an HBX user
     And employee Patrick Doe already matched with employer Acme Inc. and logged into employee portal
     Then Employee should see the "Covid-19" at the top of the shop qle list

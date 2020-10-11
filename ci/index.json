@@ -1,0 +1,1442 @@
+[
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:1]",
+    "description": "should have title",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should have title",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 13,
+    "run_time": 0.923028,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:2]",
+    "description": "should show general_agencies fields",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should show general_agencies fields",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 16,
+    "run_time": 0.909913,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:3]",
+    "description": "should show general_agency_profile info",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should show general_agency_profile info",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 20,
+    "run_time": 0.858839,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:4]",
+    "description": "should have status bar",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should have status bar",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 23,
+    "run_time": 0.846676,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:5]",
+    "description": "should show the state of general_agency_profile",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should show the state of general_agency_profile",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 31,
+    "run_time": 0.818234,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_index.html.erb_spec.rb[1:1:6]",
+    "description": "should have input for status",
+    "full_description": "general_agencies/profiles/_families.html.erb individual market is enabled should have input for status",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_index.html.erb_spec.rb",
+    "line_number": 34,
+    "run_time": 0.821881,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_show.html.erb_spec.rb[1:1]",
+    "description": "should have title",
+    "full_description": "general_agencies/profiles/_show.html.erb should have title",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_show.html.erb_spec.rb",
+    "line_number": 20,
+    "run_time": 1.626452,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_show.html.erb_spec.rb[1:2]",
+    "description": "should have status bar",
+    "full_description": "general_agencies/profiles/_show.html.erb should have status bar",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_show.html.erb_spec.rb",
+    "line_number": 24,
+    "run_time": 1.067162,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_staffs.html.erb_spec.rb[1:1]",
+    "description": "should have title",
+    "full_description": "general_agencies/profiles/_staffs.html.erb should have title",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_staffs.html.erb_spec.rb",
+    "line_number": 13,
+    "run_time": 0.931641,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/_staffs.html.erb_spec.rb[1:2]",
+    "description": "should show staff info",
+    "full_description": "general_agencies/profiles/_staffs.html.erb should show staff info",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/_staffs.html.erb_spec.rb",
+    "line_number": 17,
+    "run_time": 0.862167,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/edit.html.erb_spec.rb[1:1]",
+    "description": "should have title",
+    "full_description": "general_agencies/profiles/edit.html.erb should have title",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/edit.html.erb_spec.rb",
+    "line_number": 20,
+    "run_time": 2.739942,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/edit.html.erb_spec.rb[1:2]",
+    "description": "should have language select",
+    "full_description": "general_agencies/profiles/edit.html.erb should have language select",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/edit.html.erb_spec.rb",
+    "line_number": 24,
+    "run_time": 1.217339,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/general_agencies/edit.html.erb_spec.rb[1:3]",
+    "description": "should have organization details displayed",
+    "full_description": "general_agencies/profiles/edit.html.erb should have organization details displayed",
+    "status": "passed",
+    "file_path": "./spec/views/general_agencies/edit.html.erb_spec.rb",
+    "line_number": 27,
+    "run_time": 1.00287,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:1:1]",
+    "description": "Should display the Editing APTC/CSR text",
+    "full_description": "hbx_admin/_edit_aptc_csr without enrollment Should display the Editing APTC/CSR text",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 30,
+    "run_time": 2.008067,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:1:2]",
+    "description": "Should display Person Demographics Information",
+    "full_description": "hbx_admin/_edit_aptc_csr without enrollment Should display Person Demographics Information",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 35,
+    "run_time": 0.192067,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:1:3]",
+    "description": "Should display the Household Information",
+    "full_description": "hbx_admin/_edit_aptc_csr without enrollment Should display the Household Information",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 43,
+    "run_time": 0.192836,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:2:1]",
+    "description": "Should display the Editing APTC/CSR text",
+    "full_description": "hbx_admin/_edit_aptc_csr with enrollment Should display the Editing APTC/CSR text",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 85,
+    "run_time": 0.306656,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:2:2]",
+    "description": "Should display Person Demographics Information",
+    "full_description": "hbx_admin/_edit_aptc_csr with enrollment Should display Person Demographics Information",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 90,
+    "run_time": 0.282003,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb[1:2:3]",
+    "description": "Should display the Household Information",
+    "full_description": "hbx_admin/_edit_aptc_csr with enrollment Should display the Household Information",
+    "status": "passed",
+    "file_path": "./spec/views/hbx_admin/_edit_aptc_csr_spec.rb",
+    "line_number": 98,
+    "run_time": 0.293655,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/layout/horizontal_status.html.erb_spec.rb[1:1]",
+    "description": "should display the horizontal status bar with step value 2",
+    "full_description": "insured/families/_horizontal_status.html.erb should display the horizontal status bar with step value 2",
+    "status": "passed",
+    "file_path": "./spec/views/layout/horizontal_status.html.erb_spec.rb",
+    "line_number": 4,
+    "run_time": 0.046786,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_alph_paginate_remote.html.erb_spec.rb[1:1:1:1]",
+    "description": "adds url_params to href url",
+    "full_description": "shared/_alph_paginate_remote.html.erb ALL link to be added url_params are present adds url_params to href url",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_alph_paginate_remote.html.erb_spec.rb",
+    "line_number": 9,
+    "run_time": 0.028473,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_alph_paginate_remote.html.erb_spec.rb[1:1:2:1]",
+    "description": "adds url_params to href url",
+    "full_description": "shared/_alph_paginate_remote.html.erb ALL link to be added url_params are absent adds url_params to href url",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_alph_paginate_remote.html.erb_spec.rb",
+    "line_number": 19,
+    "run_time": 0.001538,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:1:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for BMC HealthNet Plan should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 26,
+    "run_time": 0.215389,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:2:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for Fallon Health should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 41,
+    "run_time": 0.195024,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:3:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for Health New England should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 56,
+    "run_time": 0.19683,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:4:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for United Healthcare should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 71,
+    "run_time": 0.157613,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:5:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for Harvard Pilgrim Health Care should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 85,
+    "run_time": 0.16623,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:6:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for AllWays Health Partners should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 100,
+    "run_time": 0.186056,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:7:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for Altus Dental should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 115,
+    "run_time": 0.168606,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb[1:8:1]",
+    "description": "should display the carrier name and number",
+    "full_description": "shared/_carrier_contact_information.html.erb for Delta Dental should display the carrier name and number",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_carrier_contact_information.html.erb_spec.rb",
+    "line_number": 130,
+    "run_time": 0.160217,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:1:1]",
+    "description": "should not have coinsurance text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = dental should not have coinsurance text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 57,
+    "run_time": 0.894084,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:1:2]",
+    "description": "should not have copay text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = dental should not have copay text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 61,
+    "run_time": 0.83433,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:1:3]",
+    "description": "should not have download link",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = dental should not have download link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 65,
+    "run_time": 0.599272,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:1]",
+    "description": "should have a link to open the sbc pdf",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have a link to open the sbc pdf",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 81,
+    "run_time": 0.659221,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:2]",
+    "description": "should contain some readable text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should contain some readable text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 85,
+    "run_time": 0.669258,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:3]",
+    "description": "should have print area",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have print area",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 91,
+    "run_time": 0.596932,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:4]",
+    "description": "should not have plan details text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should not have plan details text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 95,
+    "run_time": 0.665191,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:5]",
+    "description": "should have download link",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have download link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 99,
+    "run_time": 0.594394,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:6]",
+    "description": "should not have Out of Network text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should not have Out of Network text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 103,
+    "run_time": 0.663631,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:7]",
+    "description": "should have cost sharing text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have cost sharing text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 107,
+    "run_time": 0.619309,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:8]",
+    "description": "should not have copay text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should not have copay text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 111,
+    "run_time": 0.635329,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:9]",
+    "description": "should have title text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have title text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 115,
+    "run_time": 0.632413,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:10]",
+    "description": "should have plan data",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have plan data",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 119,
+    "run_time": 0.609173,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:11]",
+    "description": "should have print link",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have print link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 123,
+    "run_time": 0.633263,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:2:12]",
+    "description": "should have title and other text",
+    "full_description": "shared/_comparison.html.erb with no rx_formulary_url and provider urls for coverage_kind = health should have title and other text",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 127,
+    "run_time": 0.639447,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:3:1]",
+    "description": "should have rx formulary url coverage_kind = health",
+    "full_description": "shared/_comparison.html.erb provider_directory_url and rx_formulary_url should have rx formulary url coverage_kind = health",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 141,
+    "run_time": 0.59461,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:3:3]",
+    "description": "should have provider directory url if nationwide = true",
+    "full_description": "shared/_comparison.html.erb provider_directory_url and rx_formulary_url should have provider directory url if nationwide = true",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 162,
+    "run_time": 0.645649,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:3:4]",
+    "description": "should not have provider directory url if nationwide = false",
+    "full_description": "shared/_comparison.html.erb provider_directory_url and rx_formulary_url should not have provider directory url if nationwide = false",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 168,
+    "run_time": 0.640316,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_comparison.html.erb_spec.rb[1:3:2:1]",
+    "description": "should not have rx_formulary_url coverage_kind = dental",
+    "full_description": "shared/_comparison.html.erb provider_directory_url and rx_formulary_url for dental coverage should not have rx_formulary_url coverage_kind = dental",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_comparison.html.erb_spec.rb",
+    "line_number": 154,
+    "run_time": 0.69564,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_dependents_list_modal.html.erb_spec.rb[1:1]",
+    "description": "shoud have a table with rows",
+    "full_description": "shared/_dependents_list_modal.html.erb shoud have a table with rows",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_dependents_list_modal.html.erb_spec.rb",
+    "line_number": 17,
+    "run_time": 0.170906,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_email_fields.html.erb_spec.rb[1:1]",
+    "description": "should have email area",
+    "full_description": "shared/_email_fields.html.erb should have email area",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_email_fields.html.erb_spec.rb",
+    "line_number": 14,
+    "run_time": 0.028514,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_email_fields.html.erb_spec.rb[1:2]",
+    "description": "should have a hidden input field",
+    "full_description": "shared/_email_fields.html.erb should have a hidden input field",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_email_fields.html.erb_spec.rb",
+    "line_number": 18,
+    "run_time": 0.001645,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_email_fields.html.erb_spec.rb[1:3]",
+    "description": "should have a required input field",
+    "full_description": "shared/_email_fields.html.erb should have a required input field",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_email_fields.html.erb_spec.rb",
+    "line_number": 22,
+    "run_time": 0.001368,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_email_fields.html.erb_spec.rb[1:4]",
+    "description": "should have a required input field with asterisk",
+    "full_description": "shared/_email_fields.html.erb should have a required input field with asterisk",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_email_fields.html.erb_spec.rb",
+    "line_number": 26,
+    "run_time": 0.001295,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_network_data.html.erb_spec.rb[1:1:1]",
+    "description": "should have nationwide as true",
+    "full_description": "shared/_network_data.html.erb DC Plan should have nationwide as true",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_network_data.html.erb_spec.rb",
+    "line_number": 10,
+    "run_time": 0.001098,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_network_data.html.erb_spec.rb[1:1:2]",
+    "description": "should have dc metro as true",
+    "full_description": "shared/_network_data.html.erb DC Plan should have dc metro as true",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_network_data.html.erb_spec.rb",
+    "line_number": 16,
+    "run_time": 0.001033,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_network_data.html.erb_spec.rb[1:2:1]",
+    "description": "should have network information",
+    "full_description": "shared/_network_data.html.erb MA plan should have network information",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_network_data.html.erb_spec.rb",
+    "line_number": 26,
+    "run_time": 0.00091,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_search.html.erb_spec.rb[1:1]",
+    "description": "should have broker_agency_profile.id in id field",
+    "full_description": "shared/_search.html.erb should have broker_agency_profile.id in id field",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_search.html.erb_spec.rb",
+    "line_number": 12,
+    "run_time": 0.09522,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_search.html.erb_spec.rb[1:2]",
+    "description": "should have search box with id=q",
+    "full_description": "shared/_search.html.erb should have search box with id=q",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_search.html.erb_spec.rb",
+    "line_number": 16,
+    "run_time": 0.065227,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:1:1]",
+    "description": "shouldn't display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 1 shouldn't display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 12,
+    "run_time": 0.038084,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:2:1]",
+    "description": "shouldn't display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 2 shouldn't display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 22,
+    "run_time": 0.031663,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:3:1]",
+    "description": "shouldn't display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 3 shouldn't display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 32,
+    "run_time": 0.002189,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:4:1]",
+    "description": "shouldn't display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 4 shouldn't display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 42,
+    "run_time": 0.001894,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:5:1]",
+    "description": "should display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 5 should display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 50,
+    "run_time": 0.002278,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:5:2]",
+    "description": "should not display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 5 should not display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 56,
+    "run_time": 0.001906,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:6:1]",
+    "description": "should display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 6 should display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 73,
+    "run_time": 0.002489,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:6:2]",
+    "description": "should not display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 6 should not display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 79,
+    "run_time": 0.002472,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:6:3:1]",
+    "description": "should disable the purchase button",
+    "full_description": "shared/_signup_progress.html.haml step 6 when enrollment cannot be completed should disable the purchase button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 91,
+    "run_time": 0.001806,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_signup_progress.html.haml_spec.rb[1:7:1]",
+    "description": "shouldn't display the waive button",
+    "full_description": "shared/_signup_progress.html.haml step 7 shouldn't display the waive button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_signup_progress.html.haml_spec.rb",
+    "line_number": 103,
+    "run_time": 0.001522,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/_tab_panel.html.erb_spec.rb[1:1]",
+    "description": "should not display the link of announcement",
+    "full_description": "shared/_tab_panel.html.erb should not display the link of announcement",
+    "status": "passed",
+    "file_path": "./spec/views/shared/_tab_panel.html.erb_spec.rb",
+    "line_number": 7,
+    "run_time": 0.027689,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/census_dependent_fields.html.erb_spec.rb[1:1]",
+    "description": "should have two radio options",
+    "full_description": "shared/census_dependent_fields.html.erb should have two radio options",
+    "status": "passed",
+    "file_path": "./spec/views/shared/census_dependent_fields.html.erb_spec.rb",
+    "line_number": 17,
+    "run_time": 0.057959,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/census_dependent_fields.html.erb_spec.rb[1:2]",
+    "description": "should not have checked checkbox option",
+    "full_description": "shared/census_dependent_fields.html.erb should not have checked checkbox option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/census_dependent_fields.html.erb_spec.rb",
+    "line_number": 21,
+    "run_time": 0.026554,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:1]",
+    "description": "should have a selection option for platinum",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for platinum",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 20,
+    "run_time": 0.052946,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:2]",
+    "description": "should have a selection option for gold",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for gold",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 24,
+    "run_time": 0.025553,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:3]",
+    "description": "should have a selection option for silver",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for silver",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 28,
+    "run_time": 0.026107,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:4]",
+    "description": "should have a selection option for bronze",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for bronze",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 32,
+    "run_time": 0.025479,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:5]",
+    "description": "should have a selection option for dental",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for dental",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 36,
+    "run_time": 0.025049,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:6]",
+    "description": "should not have a selection option for catastrophic",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should not have a selection option for catastrophic",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 41,
+    "run_time": 0.024777,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:7]",
+    "description": "should have loading selection option",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have loading selection option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 45,
+    "run_time": 0.026004,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:8]",
+    "description": "should have a selection option for carrier_profile1",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for carrier_profile1",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 49,
+    "run_time": 0.025923,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb[1:9]",
+    "description": "should have a selection option for carrier_profile2",
+    "full_description": "shared/_edit_reference_plans_list.html.erb should have a selection option for carrier_profile2",
+    "status": "passed",
+    "file_path": "./spec/views/shared/edit_reference_plans_list.html.erb_spec.rb",
+    "line_number": 53,
+    "run_time": 0.027246,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/home_address_fields.html.erb_spec.rb[1:1]",
+    "description": "should have address info",
+    "full_description": "shared/_home_address_fields.html.erb should have address info",
+    "status": "passed",
+    "file_path": "./spec/views/shared/home_address_fields.html.erb_spec.rb",
+    "line_number": 15,
+    "run_time": 0.056864,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/home_address_fields.html.erb_spec.rb[1:2]",
+    "description": "should not have delete option",
+    "full_description": "shared/_home_address_fields.html.erb should not have delete option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/home_address_fields.html.erb_spec.rb",
+    "line_number": 20,
+    "run_time": 0.001951,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/my_portal_links.html.erb_spec.rb[1:1:1]",
+    "description": "should have one portal link",
+    "full_description": "shared/_my_portal_links.html.haml with employee role should have one portal link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/my_portal_links.html.erb_spec.rb",
+    "line_number": 9,
+    "run_time": 0.183719,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/my_portal_links.html.erb_spec.rb[1:2:1]",
+    "description": "should have one portal links and popover",
+    "full_description": "shared/_my_portal_links.html.haml with employer role \u0026 employee role should have one portal links and popover",
+    "status": "passed",
+    "file_path": "./spec/views/shared/my_portal_links.html.erb_spec.rb",
+    "line_number": 32,
+    "run_time": 0.275892,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/my_portal_links.html.erb_spec.rb[1:3:1]",
+    "description": "should have one portal links and popover",
+    "full_description": "shared/_my_portal_links.html.haml with employer roles \u0026 employee role should have one portal links and popover",
+    "status": "passed",
+    "file_path": "./spec/views/shared/my_portal_links.html.erb_spec.rb",
+    "line_number": 57,
+    "run_time": 0.283692,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/my_portal_links.html.erb_spec.rb[1:4:1]",
+    "description": "should have one portal link",
+    "full_description": "shared/_my_portal_links.html.haml with general agency staff role should have one portal link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/my_portal_links.html.erb_spec.rb",
+    "line_number": 86,
+    "run_time": 0.156549,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/my_portal_links.html.erb_spec.rb[1:5:1]",
+    "description": "should have one portal link",
+    "full_description": "shared/_my_portal_links.html.haml with general agency staff and employer role should have one portal link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/my_portal_links.html.erb_spec.rb",
+    "line_number": 108,
+    "run_time": 0.225434,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:1]",
+    "description": "identifies HBX Staff",
+    "full_description": "layouts/_header.html.erb identifies HBX Staff",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 21,
+    "run_time": 0.143143,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:2]",
+    "description": "identifies Brokers",
+    "full_description": "layouts/_header.html.erb identifies Brokers",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 27,
+    "run_time": 0.158421,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:3]",
+    "description": "identifies Employers",
+    "full_description": "layouts/_header.html.erb identifies Employers",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 36,
+    "run_time": 0.12551,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:4]",
+    "description": "identifies Customer Service Staff",
+    "full_description": "layouts/_header.html.erb identifies Customer Service Staff",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 45,
+    "run_time": 0.083285,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:5]",
+    "description": "identifies Certified Applicant Counselor",
+    "full_description": "layouts/_header.html.erb identifies Certified Applicant Counselor",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 52,
+    "run_time": 0.110788,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:6]",
+    "description": "identifies Assisters",
+    "full_description": "layouts/_header.html.erb identifies Assisters",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 59,
+    "run_time": 0.077694,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/portal_title_spec.rb[1:7]",
+    "description": "identifies default controller",
+    "full_description": "layouts/_header.html.erb identifies default controller",
+    "status": "passed",
+    "file_path": "./spec/views/shared/portal_title_spec.rb",
+    "line_number": 66,
+    "run_time": 0.078634,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:1:1]",
+    "description": "should have li option for Plan Selection",
+    "full_description": "shared/_qle_progress.html.erb step 1 should have li option for Plan Selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 15,
+    "run_time": 0.057772,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:1:2]",
+    "description": "should have li option for household",
+    "full_description": "shared/_qle_progress.html.erb step 1 should have li option for household",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 19,
+    "run_time": 0.027114,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:1:3]",
+    "description": "should have 25% complete",
+    "full_description": "shared/_qle_progress.html.erb step 1 should have 25% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 23,
+    "run_time": 0.026633,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:2:1]",
+    "description": "should have 75% complete",
+    "full_description": "shared/_qle_progress.html.erb step 3 should have 75% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 38,
+    "run_time": 0.05755,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:2:2]",
+    "description": "should have li option for household",
+    "full_description": "shared/_qle_progress.html.erb step 3 should have li option for household",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 42,
+    "run_time": 0.058287,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:2:3]",
+    "description": "should have purchase button",
+    "full_description": "shared/_qle_progress.html.erb step 3 should have purchase button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 46,
+    "run_time": 0.05874,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:2:4]",
+    "description": "should have previous option",
+    "full_description": "shared/_qle_progress.html.erb step 3 should have previous option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 50,
+    "run_time": 0.059195,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:2:5]",
+    "description": "should not have disabled link",
+    "full_description": "shared/_qle_progress.html.erb step 3 should not have disabled link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 54,
+    "run_time": 0.059547,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:3:1]",
+    "description": "should have 75% complete",
+    "full_description": "shared/_qle_progress.html.erb step 3 Consumer should have 75% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 69,
+    "run_time": 0.088624,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:3:2]",
+    "description": "should have li option for household",
+    "full_description": "shared/_qle_progress.html.erb step 3 Consumer should have li option for household",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 73,
+    "run_time": 0.058838,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:3:3]",
+    "description": "should have purchase button",
+    "full_description": "shared/_qle_progress.html.erb step 3 Consumer should have purchase button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 77,
+    "run_time": 0.060345,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:3:4]",
+    "description": "should have previous option",
+    "full_description": "shared/_qle_progress.html.erb step 3 Consumer should have previous option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 81,
+    "run_time": 0.05915,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/qle_progress.html.erb_spec.rb[1:3:5]",
+    "description": "should have disabled link",
+    "full_description": "shared/_qle_progress.html.erb step 3 Consumer should have disabled link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/qle_progress.html.erb_spec.rb",
+    "line_number": 85,
+    "run_time": 0.060865,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:1:1]",
+    "description": "should have li option for Plan Selection",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 1 should have li option for Plan Selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 14,
+    "run_time": 0.032133,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:1:2]",
+    "description": "should have 33% complete",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 1 should have 33% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 18,
+    "run_time": 0.001125,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:2:1]",
+    "description": "should have 66% complete",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 2 should have 66% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 33,
+    "run_time": 0.08416,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:2:2]",
+    "description": "should have li option for plan selection",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 2 should have li option for plan selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 37,
+    "run_time": 0.062606,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:3:1]",
+    "description": "should have 85% complete",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 3 should have 85% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 54,
+    "run_time": 0.058584,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:3:2]",
+    "description": "should have confirm button",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 3 should have confirm button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 58,
+    "run_time": 0.059447,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:3:3]",
+    "description": "should have previous option",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 3 should have previous option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 62,
+    "run_time": 0.058923,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:4:1]",
+    "description": "should have 100% complete",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 4 should have 100% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 78,
+    "run_time": 0.05711,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:4:2]",
+    "description": "should have confirm button",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 4 should have confirm button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 82,
+    "run_time": 0.057405,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb[1:4:3]",
+    "description": "should have link to family home page",
+    "full_description": "shared/_sep_shop_for_plans_progress.html.haml step 4 should have link to family home page",
+    "status": "passed",
+    "file_path": "./spec/views/shared/sep_shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 86,
+    "run_time": 0.057843,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:1:1]",
+    "description": "should have li option for Plan Selection",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 1 should have li option for Plan Selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 14,
+    "run_time": 0.030719,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:1:2]",
+    "description": "should have 33% complete",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 1 should have 33% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 18,
+    "run_time": 0.000962,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:2:1]",
+    "description": "should have 66% complete",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 should have 66% complete",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 34,
+    "run_time": 0.063812,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:2:2]",
+    "description": "should have li option for plan selection",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 should have li option for plan selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 38,
+    "run_time": 0.058485,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:2:3]",
+    "description": "should have purchase button",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 should have purchase button",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 42,
+    "run_time": 0.057404,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:2:4]",
+    "description": "should have previous option",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 should have previous option",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 46,
+    "run_time": 0.057089,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:3:1]",
+    "description": "should have confirm button initially disabled for IVL",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 - Confirm Button should have confirm button initially disabled for IVL",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 60,
+    "run_time": 0.057587,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:3:2]",
+    "description": "should have confirm button styling not disabled for shop ",
+    "full_description": "shared/_shop_for_plans_progress.html.erb step 2 - Confirm Button should have confirm button styling not disabled for shop ",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 66,
+    "run_time": 0.05769,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:4:1]",
+    "description": "should show waive coverage link",
+    "full_description": "shared/_shop_for_plans_progress.html.erb waive button with employee role should show waive coverage link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 81,
+    "run_time": 0.083011,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:4:2]",
+    "description": "should not show waive coverage link",
+    "full_description": "shared/_shop_for_plans_progress.html.erb waive button with employee role should not show waive coverage link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 86,
+    "run_time": 0.06063,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:5:1]",
+    "description": "should show waive coverage link",
+    "full_description": "shared/_shop_for_plans_progress.html.erb waive button without employee role should show waive coverage link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 101,
+    "run_time": 0.001678,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb[1:5:2]",
+    "description": "should not show waive coverage link",
+    "full_description": "shared/_shop_for_plans_progress.html.erb waive button without employee role should not show waive coverage link",
+    "status": "passed",
+    "file_path": "./spec/views/shared/shop_for_plans_progress.html.erb_spec.rb",
+    "line_number": 106,
+    "run_time": 0.001216,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/signup_progress.html.erb_spec.rb[1:1]",
+    "description": "should have li option for Plan Selection",
+    "full_description": "shared/_signup_progress.html.erb should have li option for Plan Selection",
+    "status": "passed",
+    "file_path": "./spec/views/shared/signup_progress.html.erb_spec.rb",
+    "line_number": 9,
+    "run_time": 0.053323,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/update_browser_warning.html.erb_spec.rb[1:1:1]",
+    "description": "should display a title",
+    "full_description": "shared/_update_browser_warning.html.erb valid user should display a title",
+    "status": "passed",
+    "file_path": "./spec/views/shared/update_browser_warning.html.erb_spec.rb",
+    "line_number": 13,
+    "run_time": 0.372864,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/update_browser_warning.html.erb_spec.rb[1:1:2]",
+    "description": "should display the browser update mesage",
+    "full_description": "shared/_update_browser_warning.html.erb valid user should display the browser update mesage",
+    "status": "passed",
+    "file_path": "./spec/views/shared/update_browser_warning.html.erb_spec.rb",
+    "line_number": 17,
+    "run_time": 0.038865,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/update_browser_warning.html.erb_spec.rb[1:1:3]",
+    "description": "should display links to download chrome, safari, and firefox",
+    "full_description": "shared/_update_browser_warning.html.erb valid user should display links to download chrome, safari, and firefox",
+    "status": "passed",
+    "file_path": "./spec/views/shared/update_browser_warning.html.erb_spec.rb",
+    "line_number": 21,
+    "run_time": 0.038506,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/waive.html.erb_spec.rb[1:1]",
+    "description": "should have enrollment status",
+    "full_description": "shared/census_dependent_fields.html.erb should have enrollment status",
+    "status": "passed",
+    "file_path": "./spec/views/shared/waive.html.erb_spec.rb",
+    "line_number": 11,
+    "run_time": 0.027287,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/waive.html.erb_spec.rb[1:2]",
+    "description": "should show waiver reason",
+    "full_description": "shared/census_dependent_fields.html.erb should show waiver reason",
+    "status": "passed",
+    "file_path": "./spec/views/shared/waive.html.erb_spec.rb",
+    "line_number": 15,
+    "run_time": 0.000996,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/shared/waive.html.erb_spec.rb[1:3]",
+    "description": "should show waiver date",
+    "full_description": "shared/census_dependent_fields.html.erb should show waiver date",
+    "status": "passed",
+    "file_path": "./spec/views/shared/waive.html.erb_spec.rb",
+    "line_number": 19,
+    "run_time": 0.000829,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:1:1]",
+    "description": "should has current_user oim_id",
+    "full_description": "welcome/index.html.slim a signed in user should has current_user oim_id",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 11,
+    "run_time": 0.070037,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:1:1]",
+    "description": "shows registration if not signed in",
+    "full_description": "welcome/index.html.slim not signed in user with general agency enabled shows registration if not signed in",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 27,
+    "run_time": 1.866823,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:2:1]",
+    "description": "does not show general agency related links",
+    "full_description": "welcome/index.html.slim not signed in user with general agency disabled does not show general agency related links",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 38,
+    "run_time": 0.028878,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:3:1]",
+    "description": "shows the Consumer portal link",
+    "full_description": "welcome/index.html.slim not signed in user with enabled IVL market shows the Consumer portal link",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 53,
+    "run_time": 1.875433,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:3:2]",
+    "description": "shows the Assistest consumer portal link",
+    "full_description": "welcome/index.html.slim not signed in user with enabled IVL market shows the Assistest consumer portal link",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 57,
+    "run_time": 1.863813,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:4:1]",
+    "description": "does not show the Consumer portal links",
+    "full_description": "welcome/index.html.slim not signed in user with disabled IVL market does not show the Consumer portal links",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 68,
+    "run_time": 0.031607,
+    "pending_message": null
+  },
+  {
+    "id": "./spec/views/welcome/index.html.slim_spec.rb[1:2:4:2]",
+    "description": "does not show the Assisted consumer portal link",
+    "full_description": "welcome/index.html.slim not signed in user with disabled IVL market does not show the Assisted consumer portal link",
+    "status": "passed",
+    "file_path": "./spec/views/welcome/index.html.slim_spec.rb",
+    "line_number": 71,
+    "run_time": 0.027681,
+    "pending_message": null
+  }
+]

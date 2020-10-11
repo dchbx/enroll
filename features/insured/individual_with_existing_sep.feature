@@ -1,5 +1,6 @@
 Feature: Consumer shops for plan with existing seps
 
+  @flaky
   Scenario: Consumer work flow if he selects existing sep
     Given Individual has not signed up as an HBX user
     When the FAA feature configuration is enabled

@@ -33,11 +33,11 @@ Feature: Admin has ability to update a Draft SEP Type
     Then Admin should see Successfully publish message
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |
 
   Scenario Outline: Admin should able to Create and Publish new SEP Type with Active SEP Type reason
     Given Admin can navigate to the Manage SEPs screen
@@ -68,8 +68,8 @@ Feature: Admin has ability to update a Draft SEP Type
     Examples:
       | market_kind | action |
       | individual  | cannot |
-      | shop        |  can   |
-      | fehb        |  can   |
+      | shop        | can    |
+      | fehb        | can    |
 
 
   Scenario Outline: Failure scenario to Publish a newly created <market_kind> market SEP type
@@ -98,8 +98,8 @@ Feature: Admin has ability to update a Draft SEP Type
     Then Admin should see failure title while publishing a new SEP Type
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |

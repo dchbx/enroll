@@ -37,7 +37,7 @@ Feature: Employee while terminating active enrollment should able to see and pic
     Then Patrick Doe should see a confirmation message of Waive Coverage Successful
     And Patrick Doe logs out
 
-  Examples: 
-    | shopping_button|
-    | Shop For Plans |
-    |  make changes  |
+    Examples:
+      | shopping_button |
+      | Shop For Plans  |
+      | make changes    |

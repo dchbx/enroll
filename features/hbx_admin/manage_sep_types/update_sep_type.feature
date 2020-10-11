@@ -34,11 +34,11 @@ Feature: Admin has ability to update a Draft SEP Type
     Then Admin should see Successfully updated message
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |
 
   Scenario Outline: Admin will see a failure reason while updating <market_kind> SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -67,8 +67,8 @@ Feature: Admin has ability to update a Draft SEP Type
     Then Admin should see a failure reason of an Update
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |

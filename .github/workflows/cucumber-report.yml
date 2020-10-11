@@ -1,0 +1,51 @@
+name: cucumber report
+on: workflow_dispatch
+
+jobs:
+  cucumber-report:
+    name: cucumber report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: ruby/setup-ruby@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
+      - uses: wbari/start-mongoDB@v0.2
+        with:
+          mongoDBVersion: '3.6'
+      - name: Restore project gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Restore Node Modules
+        id: npm-cache
+        uses: actions/cache@v2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-${{ hashFiles('yarn.lock') }}
+      - name: Install node dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: yarn install
+      - name: run webpack
+        run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
+      - name: Run tests
+        run: bundle exec cucumber --format json --out ci/cucumber/gh-cucumber-report.json
+      - name: Commit file
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add ci/cucumber/gh-cucumber-report.json
+          git commit -m "update cucumber report"
+          git pull --rebase
+          git push

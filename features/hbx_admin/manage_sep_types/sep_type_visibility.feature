@@ -8,6 +8,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
+  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility>
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
@@ -71,10 +72,10 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And I should see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
 
-  Examples:
-    | user_visibility  |  action  |
-    | Customer & Admin |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_visibility  | action  |
+      | Customer & Admin | see     |
+      | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Individual market SEP type by picking visibility option for <user_visibility> with future date
     Given Admin can navigate to the Manage SEPs screen
@@ -139,10 +140,10 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the ivl qle list
     And Admin logs out
 
-  Examples:
-    | user_visibility  |
-    | Customer & Admin |
-    | Admin Only       |
+    Examples:
+      | user_visibility  |
+      | Customer & Admin |
+  # | Admin Only       |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility>
     Given Admin can navigate to the Manage SEPs screen
@@ -190,10 +191,10 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And I should see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Admin logs out
 
-  Examples:
-    | user_visibility  |  action  |
-    | Customer & Admin |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_visibility  | action  |
+      | Customer & Admin | see     |
+      | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking visibility option for <user_visibility> with future date
     Given Admin can navigate to the Manage SEPs screen
@@ -241,7 +242,7 @@ Feature: Admin has ability to create a new SEP Type with visibility options for 
     And I should not see the "Entered into a legal domestic partnership" at the bottom of the shop qle list
     And Admin logs out
 
-  Examples:
-    | user_visibility  |
-    | Customer & Admin |
-    | Admin Only       |
+    Examples:
+      | user_visibility  |
+      | Customer & Admin |
+      | Admin Only       |

@@ -11,6 +11,7 @@ Feature: Functionality for the Family Relationships page
     And user clicks CONTINUE
     Then the user will navigate to Family Relationships page
 
+  @flaky
   Scenario: Navigation to Review Your Application page
     Given that the user is on the FAA Family Relationships page
     And there is a nil value for at least one relationship
