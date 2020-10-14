@@ -270,10 +270,6 @@ Then(/(.*) should see the receipt page with renewing plan year start date as eff
   end
 end
 
-When(/Employee click the "(.*?)" in qle carousel/) do |qle_event|
-  click_link "#{qle_event}"
-end
-
 When(/Employee select a past qle date/) do
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
@@ -284,7 +280,7 @@ When(/Employee select a past qle date/) do
   end
 end
 
-When(/Employee select a current qle date/) do
+When(/(.*) select a current qle date/) do |_person|
   expect(page).to have_content "Married"
   screenshot("past_qle_date")
   fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")

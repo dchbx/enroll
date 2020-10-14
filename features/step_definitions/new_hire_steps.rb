@@ -182,6 +182,7 @@ Then(/(.*) should see active enrollment with their spouse/) do |named_person|
   enrollment = page.all('.hbx-enrollment-panel').detect{|e| e.find('.panel-heading .text-right').text == 'Coverage Selected' }
 
   expect(enrollment.find('.family-members')).to have_content 'Cynthia'
+  sleep 5
 end
 
 Then(/(.*) should see active enrollment with his daughter/) do |named_person|
