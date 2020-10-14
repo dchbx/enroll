@@ -31,7 +31,7 @@ module Operations
         year = TimeKeeper.date_of_record.year + 1
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
         renewal_enrollments.each do |enr|
-          enr.cancel_ivl_enrollment if enr&.subscriber&.applicant_id == enrollment&.subscriber&.applicant_id && enr.effective_on == enrollment.effective_on.next_year
+          enr.cancel_ivl_enrollment if enr&.subscriber&.applicant_id == enrollment&.subscriber&.applicant_id && enr.effective_on == enrollment.effective_on.next_year.beginning_of_year
         end
       end
     end
