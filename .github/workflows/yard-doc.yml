@@ -6,21 +6,26 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
-      - uses: ruby/set-ruby@v1
-      with:
-        ruby-version: "2.5.1"
-      - name: Cache Gems
-        uses: actions/cache@v1
+      - uses: nelonoel/branch-name@v1
+      - uses: ruby/setup-ruby@v1
+      - name: Restore project gems
+        uses: actions/cache@v2
         with:
           path: vendor/bundle
-          key: ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
           restore-keys: |
-            ${{ runner.os }}-gems-rubocop-${{ hashFiles('**/Gemfile.lock') }}
-      - name: bundle install
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
         run: |
-          gem update --system
-          gem install bundler -v '2.0.1'
           bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
-      - name: Run rubocop
-        run: yard doc
+          bundle install
+      - name: Run yard
+        run: bundle exec yard doc
+      - name: Deploy to S3
+        uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: doc
+          DEST_DIR: ${{ env.BRANCH_NAME }}
