@@ -252,7 +252,7 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
         # Will occur the day after the date here
-        day_of_month: 15
+        day_of_month: 16
       appeal_period_after_application_denial:
         days: 30
       # After submitting an ineligible plan year application, time period an Employer must wait
@@ -266,7 +266,7 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
         # Will occur the day after the date here
-        day_of_month: 15
+        day_of_month: 16
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
       application_submission_soft_deadline: 5
