@@ -59,8 +59,8 @@ registry:
             item: 26
           - key: :relationship_kinds
             item: ['child', 'ward', 'foster_child', 'adopted_child']
-      - key: :fehb_dependent_age_off
-        item: Operations::Shop::DependentAgeOff.new
+      - key: :aca_fehb_dependent_age_off
+        item: Operations::Fehb::DependentAgeOff.new
         is_enabled: true
         settings:
           - key: :period

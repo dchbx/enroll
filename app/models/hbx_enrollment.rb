@@ -515,8 +515,9 @@ class HbxEnrollment
     end
 
     def terminate_dep_age_off_enrollments
-      ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
-      ::EnrollRegistry[:aca_individual_dependent_age_off] { {new_date: TimeKeeper.date_of_record} }
+      ::EnrollRegistry[:aca_shop_dependent_age_off] { {new_date: TimeKeeper.date_of_record - 1.day} }
+      ::EnrollRegistry[:aca_individual_dependent_age_off] { {new_date: TimeKeeper.date_of_record - 1.day} }
+      ::EnrollRegistry[:aca_fehb_dependent_age_off] { {new_date: TimeKeeper.date_of_record - 1.day} }
     end
 
     def enrollments_for_display(family_id)
@@ -592,7 +593,7 @@ class HbxEnrollment
       #     end
       #   end
       # end
-      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.end_of_month
+      HbxEnrollment.terminate_dep_age_off_enrollments if TimeKeeper.date_of_record == TimeKeeper.date_of_record.beginning_of_month
       HbxEnrollment.terminate_scheduled_enrollments
     end
 
