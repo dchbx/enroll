@@ -19,7 +19,7 @@ And(/the primary member has filled mandatory information required$/) do
   click_link "CONTINUE"
   fill_in "person_first_name", with: personal_information[:first_name]
   fill_in "person_last_name", with: personal_information[:last_name]
-  fill_in "jq_datepicker_ignore_person_dob", with: personal_information[:dob].to_s
+  fill_in "person[dob]", with: personal_information[:dob].to_s
   fill_in "person_ssn", with: personal_information[:ssn]
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="is_applying_coverage_true"]').click

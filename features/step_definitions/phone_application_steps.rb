@@ -8,7 +8,7 @@ end
 And(/^the Admin is on the Personal Info page for the family$/) do
 	fill_in "person_first_name", with: "John"
   fill_in "person_last_name", with: "Smith"
-  fill_in "jq_datepicker_ignore_person_dob", with: "11/11/1991"
+  fill_in "person[dob]", with: "11/11/1991"
   fill_in "person_ssn", with: '212-31-3131'
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click

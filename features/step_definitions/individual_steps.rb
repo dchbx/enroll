@@ -64,7 +64,7 @@ end
 When(/user goes to register as an individual$/) do
   fill_in 'person[first_name]', :with => (@u.first_name :first_name)
   fill_in 'person[last_name]', :with => (@u.last_name :last_name)
-  fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
+  fill_in 'person[dob]', :with => (@u.adult_dob :adult_dob)
   fill_in 'person[ssn]', :with => (@u.ssn :ssn)
   find(:xpath, '//label[@for="radio_male"]').click
 
@@ -177,7 +177,6 @@ end
 And(/should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details/) do
   fill_in 'SEVIS ID', with: '1234567891'
   fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
   find('label[for=indian_tribe_member_no]', wait: 20).click
   find('label[for=radio_incarcerated_no]', wait: 10).click
   choose 'radio_incarcerated_no', visible: false, allow_label_click: true
@@ -197,7 +196,6 @@ Then(/select I-551 doc and fill details/) do
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
   fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day)
 end
 
 Then(/click citizen yes/) do

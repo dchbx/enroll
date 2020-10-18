@@ -5,7 +5,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
   let!(:person) { create(:person, :with_ssn, user: user) }
 
   let!(:params) { {
-    :dob => "2012-10-12",
+    :dob => "10/12/2012",
     :ssn => person.reload.ssn,
     :first_name => "yo",
     :last_name => "guy",
@@ -58,7 +58,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
     end
 
     context 'when ssn & dob combination did not match with existing person' do
-      let(:params) { {:ssn => person.reload.ssn, :dob => "2012-10-12"} }
+      let(:params) { {:ssn => person.reload.ssn, :dob => "10/12/2012"} }
 
       it "should add errors" do
         subject.uniq_ssn_dob
@@ -68,7 +68,7 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
 
     context "does not add errors when ssn & dob matches with existing person record" do
 
-      let(:params) { {:ssn => person.ssn, :dob => person.dob.strftime("%Y-%m-%d")} }
+      let(:params) { {:ssn => person.ssn, :dob => person.dob.strftime("%m/%d/%Y")} }
 
       it 'should not add errors' do
         subject.uniq_ssn_dob
@@ -92,7 +92,7 @@ describe "match a person in db" do
                                  })
   }
 
-  let(:search_params) { double(dob: db_person.dob.strftime("%Y-%m-%d"), ssn: db_person.ssn, )}
+  let(:search_params) { double(dob: db_person.dob.strftime("%m/%d/%Y"), ssn: db_person.ssn, )}
   let(:search_param_name) { double( first_name: db_person.first_name, last_name: db_person.last_name)}
 
   after(:each) do
@@ -152,7 +152,7 @@ describe Forms::ConsumerCandidate, "ssn validations" do
   end
 
   context "is applying coverage is TRUE" do
-    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+    subject { Forms::ConsumerCandidate.new({:dob => "10/12/2012", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
                                         :gender => "m", :user_id => 20, :is_applying_coverage => "true" })}
 
     it "add errors when SSN is blank" do
@@ -171,7 +171,7 @@ describe Forms::ConsumerCandidate, "ssn validations" do
   end
 
   context "is applying coverage is FALSE" do
-    subject { Forms::ConsumerCandidate.new({:dob => "2012-10-12", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
+    subject { Forms::ConsumerCandidate.new({:dob => "10/12/2012", :ssn => "453213333", :first_name => "yo", :last_name => "guy",
                                     :gender => "m", :user_id => 20, :is_applying_coverage => "false" })}
 
     it "doesnt add errors when SSN is blank" do

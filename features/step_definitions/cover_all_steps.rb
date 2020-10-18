@@ -31,7 +31,7 @@ When(/HBX Admin goes to register an user as individual$/) do
   step "I use unique values"
   fill_in 'person[first_name]', :with => "Carlos"
   fill_in 'person[last_name]', :with => "Devina"
-  fill_in 'jq_datepicker_ignore_person[dob]', :with => (@u.adult_dob :adult_dob)
+  fill_in 'person[dob]', :with => (@u.adult_dob :adult_dob)
   find(:xpath, '//label[@for="radio_male"]').click
   find('.btn', text: 'CONTINUE').click
 end

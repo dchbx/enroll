@@ -16,7 +16,6 @@ Then(/(.*) selects i327 document and fills required details (.*)$/) do |text, co
   find('li', :text => "I-327 – Reentry permit", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
   fill_in 'I-327 Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 
@@ -32,7 +31,6 @@ Then(/(.*) selects i551 document and fills required details (.*)$/) do |text, co
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
   fill_in 'Card Number', with: (correct_or_incorrect == 'correctly' ? 'AAA0000000000' : '23#AAA0000000000')
   fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 
@@ -47,7 +45,6 @@ Then(/(.*) selects i571 document and fills required details (.*)$/) do |text, co
   find('li', :text => "I-571 – Refugee travel document", match: :prefer_exact, wait: 10).click
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
   fill_in 'I-571 Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 Then("Individual should see the i571 document text") do
@@ -60,7 +57,6 @@ Then(/(.*) selects i766 document and fills required details (.*)$/) do |text, co
   fill_in 'Alien Number', with: (correct_or_incorrect == 'correctly' ? '123456789' : '@23#5678901')
   fill_in 'Card Number', with: (correct_or_incorrect == 'correctly' ? 'AAA0000000000' : '23#AAA0000000000')
   fill_in 'I-766 Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 Then("Individual should see the i766 document text") do
@@ -129,7 +125,6 @@ Then(/(.*) selects i94 in Unexpired Foreign Passport document and fills required
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: (correct_or_incorrect == 'correctly' ? 'L282824' : '@23#5678901')
   fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 Then("Individual should see the i94 in Unexpired Foreign Passport document text") do
@@ -142,7 +137,6 @@ Then(/(.*) selects Unexpired Foreign Passport document and fills required detail
   find('li', :text => "Unexpired foreign passport", exact_text: true, match: :prefer_exact, wait: 10).click
   fill_in 'Passport Number', with: (correct_or_incorrect == 'correctly' ? 'L282824' : '@23#5678901')
   fill_in 'Passport Expiration Date', with: TimeKeeper.date_of_record.to_s
-  click_link((TimeKeeper.date_of_record + 10.days).day.to_s)
 end
 
 Then("Individual should see the Unexpired Foreign Passport document text") do

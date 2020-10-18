@@ -1,7 +1,6 @@
 <div id="personal_info" class="focus_effect module">
   <%= hidden_field "people","id" %>
   <%= f.hidden_field :dob_check  %>
-
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
@@ -19,7 +18,6 @@
       </div>
     </div>
   </div>
-
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
       <label id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? *</label>
@@ -27,17 +25,13 @@
     <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
     <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
   </div>
-
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0",
-                                                 required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
+      <%= f.text_field :dob, placeholder:'DATE OF BIRTH *', required:'true', id:'dob', readonly: f.object.is_a?(Forms::EmployeeRole), class:'form-control' %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-7 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>
-
     <div class="col-lg-3 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
       <%= f.check_box :no_ssn %>
       <%= f.label :no_ssn, :value => true do %>
@@ -45,7 +39,6 @@
       <% end %>
       <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
     </div>
-
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
       <div class="radio">
         <%= f.radio_button :gender, "male", class: "required floatlabel", id: 'radio_male', required: true %>
@@ -63,13 +56,15 @@
     </span>
   </div>
 </div>
-
 <%= render 'shared/ssn_coverage_msg' %>
-
-
 <script type="text/javascript">
   $(document).ready(function(){
     $('.field_with_errors > *').unwrap();
     Freebies.floatlabels();
+  });
+  $(function() {
+    $( "#dob" ).datepicker({
+      dateFormat: 'mm/dd/yy'
+    });
   });
 </script>

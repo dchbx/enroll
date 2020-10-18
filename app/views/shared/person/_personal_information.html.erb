@@ -1,6 +1,5 @@
 <div id="personal_info" class="focus_effect module">
   <%= hidden_field "people","id" %>
-
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :first_name, class: "required floatlabel form-control", required: true, placeholder: 'FIRST NAME *', autocomplete: :off %>
@@ -18,12 +17,9 @@
       </div>
     </div>
   </div>
-
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= datepicker_control f, :dob, {:class => "floatlabel form-control", :placeholder => "DATE OF BIRTH *",
-                                                 :'data-date-min' => "-110y", :'data-date-max' => "+0",
-                                                 required: true, readonly: f.object.is_a?(Forms::EmployeeRole) } %>
+      <%= f.text_field :dob, placeholder:'DATE OF BIRTH *', required:'true', id:'dob', readonly: f.object.is_a?(Forms::EmployeeRole), class:'floatlabel form-control' %>
     </div>
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: f.object.no_ssn == "1" ? false : true, :disabled => f.object.no_ssn == "1" ? true : false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
@@ -50,11 +46,15 @@
     </span>
   </div>
 </div>
-
 <script type="text/javascript">
   $(document).ready(function() {
     if ($('#person_no_ssn').prop('checked')) {
       $('#person_ssn').prop('disabled', true);
     }
+  });
+  $(function() {
+    $( "#dob" ).datepicker({
+      dateFormat: 'mm/dd/yy'
+    });
   });
 </script>
