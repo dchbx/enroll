@@ -256,6 +256,22 @@ class QualifyingLifeEventKind
                                                                    event: aasm.current_event)
   end
 
+  def qle_eligible_start
+    if self.coverage_start_on.present?
+      TimeKeeper.date_of_record.yday
+    else
+      pre_event_sep_in_days
+    end
+  end
+
+  def qle_eligible_end
+    if self.coverage_end_on.present?
+      (self.coverage_end_on - TimeKeeper.date_of_record).numerator
+    else
+      post_event_sep_in_days
+    end
+  end
+
   class << self
 
     def advance_day(new_date)

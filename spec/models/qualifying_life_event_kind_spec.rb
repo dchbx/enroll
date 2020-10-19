@@ -98,6 +98,31 @@ RSpec.describe QualifyingLifeEventKind, :type => :model, dbclean: :after_each do
         expect(QualifyingLifeEventKind.individual_market_events.first.is_self_attested == false)
       end
     end
+
+    context "should give eligible days based on start and end dates of qle" do
+      let!(:shop_self_attested) { create(:qualifying_life_event_kind, market_kind: "shop", is_self_attested: true)}
+      let!(:date) { TimeKeeper.date_of_record }
+
+      it "should give qle_eligible_start for qle with start on date." do
+        shop_self_attested.update_attributes(coverage_start_on: date.beginning_of_month, coverage_end_on: date.end_of_year)
+        expect(shop_self_attested.qle_eligible_start).to eq date.yday
+        expect(shop_self_attested.qle_eligible_start).not_to eq shop_self_attested.pre_event_sep_in_days
+      end
+
+      it "should give qle_eligible_end for qle with end on date." do
+        shop_self_attested.update_attributes(coverage_start_on: date.beginning_of_month, coverage_end_on: date.end_of_year)
+        expect(shop_self_attested.qle_eligible_end).to eq((shop_self_attested.coverage_end_on - TimeKeeper.date_of_record).numerator)
+      end
+
+      it "should give qle_eligible_start for qle when no start on date." do
+        expect(shop_self_attested.qle_eligible_start).not_to eq date.yday
+        expect(shop_self_attested.qle_eligible_start).to eq shop_self_attested.pre_event_sep_in_days
+      end
+
+      it "should give qle_eligible_end for qle when no end on date." do
+        expect(shop_self_attested.qle_eligible_end).to eq shop_self_attested.post_event_sep_in_days
+      end
+    end
   end
 
   context 'new ivl coverall qles'do
