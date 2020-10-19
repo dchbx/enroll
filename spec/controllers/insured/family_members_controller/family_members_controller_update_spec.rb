@@ -37,7 +37,7 @@ RSpec.describe Insured::FamilyMembersController do
         ConsumerRole,
         person: double(is_homeless: false, is_temporarily_out_of_state: false, no_dc_address: false),
         local_residency_validation: nil,
-        residency_determined_at: nil,
+        residency_determined_at: nil
       )
     end
 
