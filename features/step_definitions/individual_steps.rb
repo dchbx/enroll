@@ -372,6 +372,7 @@ Then(/I should land on home page$/) do
 end
 
 And(/I click on log out link$/) do
+  find('#dropdownMenuLink').click
   find('.interaction-click-control-logout').click
 end
 
