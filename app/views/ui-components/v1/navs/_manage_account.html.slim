@@ -1,0 +1,8 @@
+nav
+  ul#uic-families-right-menu
+    li
+      = link_to 'Home', '#'
+    li
+      = link_to 'Personal Info', main_app.personal_info_person_path(id: current_user&.person&.id)
+    li
+      = link_to 'My Portals', '#'

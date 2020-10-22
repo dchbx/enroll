@@ -604,6 +604,9 @@ Rails.application.routes.draw do
 
     member do
       get 'get_member'
+      get 'manage_account'
+      get 'personal_info'
+      put 'update_personal_info'
     end
 
   end
