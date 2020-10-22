@@ -3,6 +3,8 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
+  layout 'two_column', :only => [:manage_account, :personal_info]
+
   def new
     @person = Person.new
     build_nested_models
@@ -274,6 +276,23 @@ class PeopleController < ApplicationController
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
+  end
+
+  def manage_account
+    @person = Person.find(params[:id])
+    respond_to do |format|
+      format.html
+    end
+  end
+
+  def personal_info
+    @person = Person.find(params[:id])
+  end
+
+  def update_personal_info
+    @person = Person.find(params[:id])
+    @person.update_attributes(person_params)
+    redirect_back fallback_location: '/'
   end
 
   def enroll_family
