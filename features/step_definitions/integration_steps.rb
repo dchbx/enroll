@@ -477,7 +477,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find('#dropdownMenuLink').click();
+  find('#dropdownMenuLink').click
   find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
