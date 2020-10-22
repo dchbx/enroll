@@ -1,0 +1,11 @@
+<% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/manage_account' %>
+<% end %>
+
+<div class="documents-tab" style="padding-top: 0px !important;">
+  <h1> Personal Information</h1>
+
+  <p> Edit Information, When finished, select "Save Changes" to continue.</p>
+
+  <%= render partial: 'people/person_information' %>
+</div>

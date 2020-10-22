@@ -108,6 +108,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.last_name' => "Last Name",
   :'en.middle_name' => "Middle Name",
   :'en.first_name' => "First Name",
+  :'en.suffix' => "Suffix",
   :'en.invalid_first_name' => "Please provide a first name.",
   :'en.invalid_last_name' => "Please provide a last name.",
   :'en.invalid_dob' => "Please provide a date of birth.",
