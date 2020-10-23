@@ -50,6 +50,12 @@ module Effective
           }, :filter => false, :sortable => false
         end
 
+        if attributes["off_cycle"]
+          table_column :off_cycle_benefit_package, :label => 'Off-Cycle Benefit Package', :proc => proc { |row|
+            row.off_cycle_benefit_group_assignment.benefit_package.title.capitalize if row.off_cycle_benefit_group_assignment.present?
+          }, :filter => false, :sortable => false
+        end
+
         table_column :enrollment_status, :proc => Proc.new { |row|
             enrollment_state(row)
         }, :sortable => false, :filter => false
@@ -58,6 +64,12 @@ module Effective
         if attributes["renewal"] && attributes["is_submitted"]
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
+          }, :filter => false, :sortable => false
+        end
+
+        if attributes["off_cycle"] && attributes["is_off_cycle_submitted"]
+          table_column :off_cycle_enrollment_status, :proc => proc { |row|
+            off_cycle_enrollment_state(row)
           }, :filter => false, :sortable => false
         end
 

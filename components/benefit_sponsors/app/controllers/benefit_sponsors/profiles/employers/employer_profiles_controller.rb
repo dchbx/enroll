@@ -233,9 +233,25 @@ module BenefitSponsors
             renewal: true
           }) if @employer_profile.renewal_benefit_application.present?
 
+          if @employer_profile.off_cycle_benefit_application.present?
+            data_table_params.merge!(
+              {
+                off_cycle: true
+              }
+            )
+          end
+
           data_table_params.merge!({
             is_submitted: true
           }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+
+          if @employer_profile&.off_cycle_benefit_application&.is_submitted?
+            data_table_params.merge!(
+              {
+                is_off_cycle_submitted: true
+              }
+            )
+          end
 
           data_table_params
         end
