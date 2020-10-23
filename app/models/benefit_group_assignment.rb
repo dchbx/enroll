@@ -85,7 +85,8 @@ class BenefitGroupAssignment
       assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
       if assignments_with_end_on.present?
-        valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
+        valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }.presence ||
+                                        assignments_with_end_on.select { |assignment| assignment.start_on > date }
         if valid_assignments_with_end_on.present?
           valid_assignments_with_end_on.detect { |assignment| assignment.end_on.to_date > date.to_date  } ||
             valid_assignments_with_end_on.last
