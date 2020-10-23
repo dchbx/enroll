@@ -35,8 +35,12 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       }
 
       let!(:enrollment_1) {
-        create_enrollment(family: employee_A.person.primary_family, benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_A,
-                            submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 10.day)
+        create_enrollment(
+          family: employee_A.person.primary_family,
+          benefit_group_assignment: employee_A.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_A,
+          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 10.day
+        )
       }
 
       let(:employee_B) {
@@ -45,11 +49,23 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       }
 
       let!(:enrollment_2) {
-        create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_B, submitted_at: effective_on - 22.days, status: 'coverage_canceled')
+        create_enrollment(
+          family: employee_B.person.primary_family,
+          benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_B,
+          submitted_at: effective_on - 22.days,
+          status: 'coverage_canceled'
+        )
       }
 
       let!(:enrollment_3) {
-        create_enrollment(family: employee_B.person.primary_family, benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_B, submitted_at: effective_on - 20.days, status: 'inactive')
+        create_enrollment(
+          family: employee_B.person.primary_family,
+          benefit_group_assignment: employee_B.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_B,
+          submitted_at: effective_on - 20.days,
+          status: 'inactive'
+        )
       }
 
       let(:employee_C) {
@@ -58,21 +74,42 @@ describe "a monthly shop enrollment query", dbclean: :after_each do
       }
 
       let!(:enrollment_4) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_C, submitted_at: effective_on - 24.days)
+        create_enrollment(
+          family: employee_C.person.primary_family,
+          benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_C,
+          submitted_at: effective_on - 24.days
+        )
       }
 
       let!(:enrollment_5) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_C, submitted_at: effective_on - 23.days, coverage_kind: 'dental')
+        create_enrollment(
+          family: employee_C.person.primary_family,
+          benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_C,
+          submitted_at: effective_on - 23.days,
+          coverage_kind: 'dental'
+        )
       }
 
       let!(:enrollment_6) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_C, submitted_at: effective_on - 23.days, status: 'inactive')
+        create_enrollment(
+          family: employee_C.person.primary_family,
+          benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_C,
+          submitted_at: effective_on - 23.days,
+          status: 'inactive'
+        )
       }
 
-      let!(:enrollment_7) {
-        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on), employee_role: employee_C,
-                            submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 1.day)
-      }
+      let!(:enrollment_7) do
+        create_enrollment(
+          family: employee_C.person.primary_family,
+          benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment(effective_on),
+          employee_role: employee_C,
+          submitted_at: employee_A.census_employee.active_benefit_group_assignment(effective_on).plan_year.open_enrollment_end_on - 1.day
+        )
+      end
 
       let(:feins) {
         [initial_employer.fein]
