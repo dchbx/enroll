@@ -596,7 +596,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment(coverage_date = TimeKeeper.date_of_record)
-    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.reject { |bga| bga.activated_at.present? }.sort_by(&:start_on).reverse.last
+    benefit_package_assignment_on(coverage_date) || benefit_group_assignments.detect(&:is_active?)
   end
 
   # Pass in active coverage_date to get the renewal benefit group assignment
@@ -611,8 +611,9 @@ class CensusEmployee < CensusMember
   def off_cycle_benefit_group_assignment
     return unless active_benefit_group_assignment
 
-    benefit_package_ids = benefit_sponsorship.off_cycle_benefit_application.benefit_packages.map(&:id)
-    benefit_group_assignments.where(:start_on.gt => active_benefit_group_assignment.start_on, :benefit_package_id => benefit_package_ids).first
+    off_cycle_app = benefit_sponsorship.off_cycle_benefit_application
+    benefit_package_ids = off_cycle_app.benefit_packages.map(&:id)
+    benefit_group_assignments.detect { |benefit_group_assignment| benefit_package_ids.include?(benefit_group_assignment.benefit_package.id) && benefit_group_assignment.is_active?(off_cycle_app.start_on) }
   end
 
   # DEPRECATE IF POSSIBLE
@@ -844,6 +845,20 @@ class CensusEmployee < CensusMember
     if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
       create_benefit_group_assignment(benefit_packages)
     end
+  end
+
+  def off_cycle_benefit_group_assignment=(benefit_package_id)
+    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
+      :"benefit_packages._id" => benefit_package_id
+    ).first || employer_profile.active_benefit_sponsorship.off_cycle_benefit_application
+
+    if benefit_application.present?
+      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
+    end
+
+    return unless benefit_packages.present? && (off_cycle_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(off_cycle_benefit_group_assignment.benefit_package.id))
+
+    create_benefit_group_assignment(benefit_packages)
   end
 
   def renewal_benefit_group_assignment=(renewal_package_id)

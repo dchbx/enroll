@@ -82,7 +82,7 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && bga.activated_at.blank? && !bga.canceled? }
+      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
       if assignments_with_end_on.present?
         valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
@@ -287,6 +287,7 @@ class BenefitGroupAssignment
 
   def canceled?
     return false if end_on.blank?
+
     start_on == end_on
   end
 
@@ -364,6 +365,8 @@ class BenefitGroupAssignment
   end
 
   def is_active?(date = TimeKeeper.date_of_record)
+    return false if start_on.blank? || canceled?
+
     end_date = end_on || start_on.next_year.prev_day
     (start_on..end_date).cover?(date)
   end

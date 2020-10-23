@@ -434,7 +434,7 @@ module BenefitSponsors
     end
 
     def published_benefit_application
-      benefit_applications.submitted.last
+      benefit_applications.submitted.where(:id.ne => off_cycle_benefit_application&.id).last
     end
 
     def submitted_benefit_application
@@ -502,7 +502,12 @@ module BenefitSponsors
     # Renewal_benefit_application's predecessor is always current benefit application
     # most_recent_benefit_application will always be their current benefit_application if no renewal
     def current_benefit_application
-      renewal_benefit_application.present? ? renewal_benefit_application.predecessor : most_recent_benefit_application
+      current_benefit_application_by_date || renewal_benefit_application&.predecessor || most_recent_benefit_application
+    end
+
+    def current_benefit_application_by_date(date = TimeKeeper.date_of_record)
+      applications = Array.new([renewal_benefit_application&.predecessor, most_recent_benefit_application, off_cycle_benefit_application])
+      applications.compact.detect { |application| application.effective_period.cover?(date) }
     end
 
     def dt_display_benefit_application
@@ -510,14 +515,6 @@ module BenefitSponsors
     end
 
     def off_cycle_benefit_application
-      # Second to last benefit application is in termination pending and current one is in active or draft
-      # if !self.benefit_applications[-2].nil? &&
-      #   self.benefit_applications[-2]&.aasm_state == :termination_pending &&
-      #   (::BenefitSponsors::BenefitApplications::BenefitApplication::SUBMITTED_STATES + ::BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_DRAFT_STATES).reject do |state|
-      #     state == :termination_pending
-      #   end.include?(benefit_applications.last.aasm_state)
-      #   benefit_applications.last
-      # end
       recent_bas = benefit_applications.order_by(:created_at.asc).to_a.last(3)
       termed_or_ineligible_app = recent_bas.detect(&:is_termed_or_ineligible?)
       return nil unless termed_or_ineligible_app
@@ -553,7 +550,9 @@ module BenefitSponsors
     end
 
     def most_recent_benefit_application
-      published_benefit_application || benefit_applications.order(updated_at: :desc).non_terminated_non_imported.first || benefit_applications.order_by(:"updated_at".desc).non_imported.first
+      published_benefit_application ||
+        benefit_applications.order(updated_at: :desc).non_terminated_non_imported.where(:id.ne => off_cycle_benefit_application&.id).first ||
+        benefit_applications.order_by(:updated_at.desc).non_imported.where(:id.ne => off_cycle_benefit_application&.id).first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck
