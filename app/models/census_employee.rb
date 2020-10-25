@@ -674,10 +674,6 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def is_covered_or_waived?
-    ["coverage_selected", "coverage_waived"].include?(active_benefit_group_assignment.hbx_enrollment.aasm_state)
-  end
-
   def terminate_employment(employment_terminated_on)
     begin
       terminate_employment!(employment_terminated_on)

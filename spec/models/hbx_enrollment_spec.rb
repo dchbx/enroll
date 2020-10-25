@@ -1796,25 +1796,27 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
         let(:new_enrollment_product_id) { passive_renewal.product_id }
 
-        let(:new_enrollment) { FactoryBot.create(:hbx_enrollment,
-          household: shop_family.latest_household,
-          coverage_kind: "health",
-          family: shop_family,
-          effective_on: enrollment_effective_on,
-          enrollment_kind: enrollment_kind,
-          kind: "employer_sponsored",
-          submitted_at: TimeKeeper.date_of_record,
-          benefit_sponsorship_id: benefit_sponsorship.id,
-          sponsored_benefit_package_id: benefit_package.id,
-          sponsored_benefit_id: benefit_package.sponsored_benefits[0].id,
-          employee_role_id: employee_role.id,
-          benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
-          predecessor_enrollment_id: passive_renewal.id,
-          product_id: new_enrollment_product_id,
-          special_enrollment_period_id: special_enrollment_period_id,
-          aasm_state: 'shopping'
+        let(:new_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            household: shop_family.latest_household,
+            coverage_kind: "health",
+            family: shop_family,
+            effective_on: enrollment_effective_on,
+            enrollment_kind: enrollment_kind,
+            kind: "employer_sponsored",
+            submitted_at: TimeKeeper.date_of_record,
+            benefit_sponsorship_id: benefit_sponsorship.id,
+            sponsored_benefit_package_id: benefit_package.id,
+            sponsored_benefit_id: benefit_package.sponsored_benefits[0].id,
+            employee_role_id: employee_role.id,
+            benefit_group_assignment_id: census_employee.renewal_benefit_group_assignment.id,
+            predecessor_enrollment_id: passive_renewal.id,
+            product_id: new_enrollment_product_id,
+            special_enrollment_period_id: special_enrollment_period_id,
+            aasm_state: 'shopping'
           )
-        }
+        end
 
         before do
           allow(benefit_package).to receive(:is_renewal_benefit_available?).and_return(true)
