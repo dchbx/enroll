@@ -258,7 +258,7 @@ class Employers::CensusEmployeesController < ApplicationController
   end
 
   def off_cycle_benefit_group_id
-    params[:census_employee][:off_cycle_benefit_group_assignments][:benefit_group_id] if params[:census_employee][:off_cycle_benefit_group_assignments].present?
+    params[:census_employee][:off_cycle_benefit_group_assignments][:benefit_group_id] if params[:census_employee] && params[:census_employee][:off_cycle_benefit_group_assignments].present?
   end
 
   def census_employee_params
