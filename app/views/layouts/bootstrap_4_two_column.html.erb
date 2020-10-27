@@ -8,7 +8,7 @@
 
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= javascript_pack_tag 'application' %>
-    <%= stylesheet_pack_tag 'application' %>
+    <%= stylesheet_link_tag 'bootstrap_4' %>
     <%= csrf_meta_tags %>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
@@ -25,8 +25,7 @@
 
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
 
-
-    <div aria-labelledby="home-tab" id="home" class="tab-pane fade in active" role="tabpanel">
+    <div class="content <%= controller_name %> content-bottom nm-content">
       <div class="container" style="margin-top: 20px;">
        <div class="row">
         <div class="col-md-2">
@@ -38,7 +37,7 @@
           </div>
           <%= yield %>
         </div>
-
+       </div>
       </div>
     </div>
 
