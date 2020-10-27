@@ -15,7 +15,7 @@
 
         <div class="col-md-3 mb-1">
           <label for="inputLastname" class="personal-info-label"><%= l10n("last_name")%><span class="red-star">*</span></label>
-          <i class="fa fa-info-circle pull-right"></i>
+          <i class="fas fa-info-circle pull-right"></i>
           <%=f.text_field :last_name, id: "last-name", class: "form-control", placeholder: "Last Name" %>
         </div>
 
@@ -81,11 +81,11 @@
     <% end %>
 
     <div class="col-md-12 no-pd">
-      <button class="col-md-6 btn btn-default" onclick="return false;"> Add Contact Method</button>
+      <button class="col-md-6 btn btn-outline-primary" onclick="return false;"> Add Contact Method</button>
     </div>
 
     <div class="col-md-12 no-pd mt-3">
-      <button class="col-md-2 btn btn-default" onclick="return false;"> Cancel </button>
+      <button class="col-md-2 btn btn-outline-primary" onclick="return false;"> Cancel </button>
 
       <button class="col-md-2 btn btn-primary pull-right"  type="submit"> Save Changes </button>
     </div>
