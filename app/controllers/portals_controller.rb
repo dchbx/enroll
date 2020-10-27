@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PortalsController < ApplicationController
 
   layout 'bootstrap_4_two_column'
@@ -8,9 +10,7 @@ class PortalsController < ApplicationController
     @person = Person.find(params[:id])
   end
 
-  def show
-
-  end
+  def show; end
 
 
   private
