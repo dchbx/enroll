@@ -611,7 +611,7 @@ Rails.application.routes.draw do
 
   end
 
-  resources :portals, only: [ :new, :create, :index, :show]
+  resources :portals, only: [:new, :create, :index, :show]
 
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
