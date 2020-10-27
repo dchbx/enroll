@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
-  layout 'two_column', :only => [:manage_account, :personal_info]
+  layout 'bootstrap_4_two_column', :only => [:manage_account, :personal_info]
 
   def new
     @person = Person.new
