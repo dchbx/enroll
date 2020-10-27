@@ -611,6 +611,8 @@ Rails.application.routes.draw do
 
   end
 
+  resources :portals, only: [ :new, :create, :index, :show]
+
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]

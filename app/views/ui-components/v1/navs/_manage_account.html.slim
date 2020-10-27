@@ -5,4 +5,4 @@ nav
     li
       = link_to 'Personal Info', main_app.personal_info_person_path(id: current_user&.person&.id)
     li
-      = link_to 'My Portals', '#'
+      = link_to 'My Portals', main_app.portals_path(id: current_user&.person&.id)
