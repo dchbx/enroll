@@ -19,3 +19,7 @@ end
 Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
   find_link('Edit APTC / CSR').visible?
 end
+
+Then(/^Hbx Admin should not see an Edit APTC \/ CSR link$/) do
+  find_link('Edit APTC / CSR').visible? == false
+end
