@@ -57,11 +57,10 @@ module Services
         @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
         count = 0
         ivl_enrollments.no_timeout.each do |enrollment|
-          if enrollment.may_begin_coverage?
-            enrollment.begin_coverage!
-            count += 1
-            @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-          end
+          next unless enrollment.may_begin_coverage?
+          enrollment.begin_coverage!
+          count += 1
+          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         end
         ivl_enrollments_2_1.no_timeout.each do |enrollment|
           next unless enrollment.may_begin_coverage?
