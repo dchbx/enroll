@@ -65,6 +65,10 @@ class GeneralAgencyStaffRole
     event :general_agency_terminate, :after => :record_transition do
       transitions from: [:active, :general_agency_pending], to: :general_agency_terminated
     end
+    
+    event :general_agency_active, :after => :record_transition do
+      transitions from: :general_agency_terminated, to: :active
+    end
 
     event :general_agency_pending, :after => :record_transition do
       transitions from: [:general_agency_terminated, :applicant], to: :general_agency_pending
