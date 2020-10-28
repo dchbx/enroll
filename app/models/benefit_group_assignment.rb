@@ -368,9 +368,9 @@ class BenefitGroupAssignment
     make_active(date)
   end
 
-  def is_active
-    is_active?
-  end
+  # def is_active
+  #   is_active?
+  # end
 
   def is_active?(date = TimeKeeper.date_of_record)
     return false if start_on.blank? || canceled?
