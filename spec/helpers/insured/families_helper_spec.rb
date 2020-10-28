@@ -30,9 +30,8 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
       let(:catastrophic_product) { double(metal_level_kind: :catastrophic) }
       let(:catastrophic_enrollment) { double(product: catastrophic_product) }
       it "should return false" do
-
+        expect(helper.display_change_tax_credits_button?(catastrophic_enrollment)).to eq(false)
       end
-
     end
   end
 
