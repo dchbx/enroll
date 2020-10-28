@@ -88,7 +88,7 @@ class BenefitGroupAssignment
       if assignments_with_end_on.present?
         valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
         if valid_assignments_with_end_on.present?
-          valid_assignments_with_end_on.detect { |assignment| assignment.end_on.to_date > date.to_date  } ||
+          valid_assignments_with_end_on.select { |assignment| assignment.end_on.to_date > date.to_date  }.max_by(&:created_at) ||
             valid_assignments_with_end_on.last
         elsif assignments_with_no_end_on.present?
           filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
@@ -111,7 +111,7 @@ class BenefitGroupAssignment
         end
       return assignment if assignment.present?
 
-      perspective_assignments.last
+      perspective_assignments.max_by(&:created_at)
     end
 
     def by_benefit_group_id(bg_id)
