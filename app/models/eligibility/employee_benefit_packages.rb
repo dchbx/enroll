@@ -32,14 +32,10 @@ module Eligibility
 
     def add_renew_benefit_group_assignment(renewal_benefit_packages)
       if renewal_benefit_packages.present?
-        benefit_group_assignments.renewing.each do |benefit_group_assignment|
-          if renewal_benefit_packages.map(&:id).include?(benefit_group_assignment.benefit_package.id)
-            benefit_group_assignment.destroy
-          end
+        benefit_group_assignments.where(start_on: renewal_benefit_packages.first.start_on).each do |benefit_group_assignment|
+          benefit_group_assignment.end_benefit(benefit_group_assignment.start_on)
         end
-
-        bga = BenefitGroupAssignment.new(benefit_group: renewal_benefit_packages.first, start_on: renewal_benefit_packages.first.start_on)
-        benefit_group_assignments << bga
+        add_benefit_group_assignment(renewal_benefit_packages.first, renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)
       end
     end
 

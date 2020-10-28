@@ -2398,8 +2398,10 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     include_context "setup renewal application"
 
     let(:renewal_benefit_group) { renewal_application.benefit_packages.first}
+    let(:renewal_product_package2) { renewal_application.benefit_sponsor_catalog.product_packages.detect {|package| package.package_kind != renewal_benefit_group.plan_option_kind} }
+    let!(:renewal_benefit_group2) { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: renewal_product_package2, benefit_application: renewal_application, title: 'Benefit Package 2 Renewal')}
     let(:census_employee) {FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship)}
-    let(:benefit_group_assignment_two) { BenefitGroupAssignment.on_date(census_employee, renewal_effective_date) }
+    let!(:benefit_group_assignment_two) { BenefitGroupAssignment.on_date(census_employee, renewal_effective_date) }
 
 
     it "should select the latest renewal benefit group assignment" do
@@ -2433,6 +2435,25 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         it 'should return assignment with coverage associated' do
           expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
         end
+      end
+    end
+
+    context 'when new benefit package is assigned' do
+
+      it 'should cancel the previous benefit group assignment' do
+        previous_bga = census_employee.renewal_benefit_group_assignment
+        census_employee.renewal_benefit_group_assignment = renewal_benefit_group2.id
+        census_employee.save
+        census_employee.reload
+        expect(previous_bga.canceled?).to be_truthy
+      end
+
+      it 'should create new benefit group assignment' do
+        previous_bga = census_employee.renewal_benefit_group_assignment
+        census_employee.renewal_benefit_group_assignment = renewal_benefit_group2.id
+        census_employee.save
+        census_employee.reload
+        expect(census_employee.renewal_benefit_group_assignment).not_to eq previous_bga
       end
     end
   end
