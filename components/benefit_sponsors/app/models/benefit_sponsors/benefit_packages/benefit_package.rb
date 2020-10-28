@@ -420,7 +420,7 @@ module BenefitSponsors
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
-              hbx_enrollment.cancel_coverage!(enrollment_term_date(term_date))
+              hbx_enrollment.cancel_coverage!
               hbx_enrollment.notify_enrollment_cancel_or_termination_event(enrollment_notify_flag(enroll_notify)) unless hbx_enrollment.inactive?
             end
           end
