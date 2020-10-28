@@ -291,8 +291,14 @@ class PeopleController < ApplicationController
 
   def update_personal_info
     @person = Person.find(params[:id])
-    @person.update_attributes(person_params)
-    redirect_back fallback_location: '/'
+    respond_to do |format|
+      if @person.update_attributes(person_params)
+        format.html {  redirect_back fallback_location: '/', notice: 'Person was successfully updated.' }
+      else
+        person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
+        format.html { redirect_back fallback_location: '/',  alert: "Person update failed. #{person_error_megs}" }
+      end
+    end
   end
 
   def enroll_family
