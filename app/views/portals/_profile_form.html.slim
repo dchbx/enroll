@@ -30,7 +30,20 @@ fieldset.mt-2
         .invalid-feedback
           |
             Please select a entity kind.
+      - if display_sic_field_for_employer?
+        .col-md-4.pl-0
+          label for="inputSIC"  SIC Code *
+          = f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+          .invalid-feedback
+            |
+              Please provide a SIC code.
+        .col-md-1.pl-0
+          a#sicHelperToggle
+            i.fas.fa-question.mt-3.fa-lg style="padding-top:5px"
+      #sicHelperWrapper.hidden.row.row-form-wrapper.no-buffer style="margin-top:90px"
+        = render "benefit_sponsors/profiles/registrations/sic_help" , sicFieldId: 'organization_sic_code'
 
+      br
       = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
 
       - if display_referred_by_field_for_employer?
@@ -45,7 +58,7 @@ fieldset.mt-2
       h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
       = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
 
-      = f.submit "Add Portal", type: "button", class: "btn btn-primary pull-right mt-2"
+      = f.submit "Add Portal", class: "btn btn-primary pull-right mt-2", id: 'employer_registration_form'
 
       input type="hidden" name="employer_id" id="employer_id"
 

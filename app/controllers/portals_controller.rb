@@ -2,8 +2,8 @@
 
 class PortalsController < ApplicationController
 
-  layout 'two_column', except: [:index, :show]
-  layout 'bootstrap_4_two_column', only: [:index, :show]
+
+  layout 'bootstrap_4_two_column'
 
   before_action :find_person
 
@@ -15,7 +15,6 @@ class PortalsController < ApplicationController
 
   def new
     @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
-    render 'new', :layout => 'two_column'
   end
 
 
