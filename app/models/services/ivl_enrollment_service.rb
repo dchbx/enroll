@@ -66,18 +66,6 @@ module Services
             @logger.info "Processed enrollment: #{enrollment.hbx_id}"
           end
         end
-        ivl_enrollments_2_1.no_timeout.each do |enrollment|
-          next unless enrollment.may_begin_coverage?
-          enrollment.begin_coverage!
-          count += 1
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        end
-        ivl_enrollments_3_1.no_timeout.each do |enrollment|
-          next unless enrollment.may_begin_coverage?
-          enrollment.begin_coverage!
-          count += 1
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        end
       rescue Exception => e
         begin
           family = enrollment.family
