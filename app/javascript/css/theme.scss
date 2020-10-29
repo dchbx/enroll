@@ -12,6 +12,17 @@
   border-bottom-width: medium;
 }
 
+.btn-default {
+  color: $secondary-button-text;
+  background-color: $secondary-button-background;
+  border-color: $secondary-button-border;
+  text-transform: $secondary-button-text-casing;
+  font-weight: $primary-bold;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
 .heading-text {
   font-weight: 400;
   color: $dc-dark-blue;
