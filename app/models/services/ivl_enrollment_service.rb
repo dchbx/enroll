@@ -42,17 +42,7 @@ module Services
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       cbp_start = current_benefit_period.start_on
       ivl_enrollments = HbxEnrollment.where(
-        :effective_on.gte => cbp_start,
-        :kind.in => ['individual', 'coverall'],
-        :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
-      )
-      ivl_enrollments_2_1 = HbxEnrollment.where(
-        :effective_on => current_benefit_period.start_on + 1.month,
-        :kind.in => ['individual', 'coverall'],
-        :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
-      )
-      ivl_enrollments_3_1 = HbxEnrollment.where(
-        :effective_on => current_benefit_period.start_on + 2.months,
+        :effective_on.in => [cbp_start, cbp_start + 1.month, cbp_start + 2.months],
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )
@@ -65,18 +55,6 @@ module Services
             count += 1
             @logger.info "Processed enrollment: #{enrollment.hbx_id}"
           end
-        end
-        ivl_enrollments_2_1.no_timeout.each do |enrollment|
-          next unless enrollment.may_begin_coverage?
-          enrollment.begin_coverage!
-          count += 1
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        end
-        ivl_enrollments_3_1.no_timeout.each do |enrollment|
-          next unless enrollment.may_begin_coverage?
-          enrollment.begin_coverage!
-          count += 1
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         end
       rescue Exception => e
         begin
