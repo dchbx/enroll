@@ -218,7 +218,6 @@ class PeopleController < ApplicationController
           format.json { head :no_content }
         end
       else
-        @person.addresses = @old_addresses
         if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
