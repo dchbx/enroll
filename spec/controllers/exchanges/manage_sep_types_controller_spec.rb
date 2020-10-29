@@ -87,6 +87,9 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       event_kind_label: 'event kind label',
                                                       is_visible: true,
                                                       qle_event_date_kind: :qle_on,
+                                                      updated_by: '',
+                                                      published_by: '',
+                                                      created_by: current_user.id,
                                                       date_options_available: true }}
 
       end
@@ -249,6 +252,9 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                       event_kind_label: 'event kind label',
                                                       qle_event_date_kind: :qle_on,
                                                       is_visible: true,
+                                                      updated_by: '',
+                                                      published_by: '',
+                                                      created_by: current_user.id,
                                                       date_options_available: true }}
       end
 
@@ -314,6 +320,9 @@ if EnrollRegistry.feature_enabled?(:sep_types)
                                                         qle_event_date_kind: :qle_on,
                                                         is_visible: true,
                                                         publish: "Publish",
+                                                        updated_by: '',
+                                                        published_by: current_user.id,
+                                                        created_by: current_user.id,
                                                         date_options_available: true }}
         end
 

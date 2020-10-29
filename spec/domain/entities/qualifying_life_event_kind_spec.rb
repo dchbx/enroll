@@ -26,6 +26,9 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
         qle_event_date_kind: 'qle_on',
         is_visible: true,
         termination_on_kinds: [],
+        updated_by: '',
+        published_by: '',
+        created_by: '',
         date_options_available: true }
     end
 
@@ -51,6 +54,39 @@ RSpec.describe ::Entities::QualifyingLifeEventKind, dbclean: :after_each do
     context 'for end_on as optional' do
       before do
         input_params.merge!({end_on: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for updated_by as optional' do
+      before do
+        input_params.merge!({updated_by: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for published_by as optional' do
+      before do
+        input_params.merge!({published_by: nil})
+        @result = ::Entities::QualifyingLifeEventKind.new(input_params)
+      end
+
+      it 'should initialize the entity' do
+        expect(@result).to be_a Entities::QualifyingLifeEventKind
+      end
+    end
+
+    context 'for created_by as optional' do
+      before do
+        input_params.merge!({created_by: nil})
         @result = ::Entities::QualifyingLifeEventKind.new(input_params)
       end
 

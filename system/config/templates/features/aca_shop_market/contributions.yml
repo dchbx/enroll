@@ -226,7 +226,7 @@ registry:
         is_enabled: true
         settings:
           - key: :contribution_model_key
-            item: :fifty_percent_sponsor_fixed_percent_contribution_model
+            item: :zero_percent_sponsor_fixed_percent_contribution_model
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period

@@ -972,7 +972,6 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
           get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
-          expect(assigns(:effective_on_options)).to eq effective_on_options
         end
       end
     end

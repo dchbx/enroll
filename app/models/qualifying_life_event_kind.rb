@@ -22,7 +22,7 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EFFECTIVE_ON_KINDS = %w[date_of_event exact_date first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+  EFFECTIVE_ON_KINDS = %w[date_of_event first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
 
   TERMINATION_ON_KINDS = %w[end_of_event_month date_before_event end_of_reporting_month end_of_last_month_of_reporting exact_date].freeze
 
@@ -111,6 +111,9 @@ class QualifyingLifeEventKind
   field :termination_on_kinds, type: Array, default: []
   field :coverage_start_on, type: Date
   field :coverage_end_on, type: Date
+  field :updated_by, type: BSON::ObjectId
+  field :published_by, type: BSON::ObjectId
+  field :created_by, type: BSON::ObjectId
 
   index({action_kind: 1})
   index({market_kind: 1, ordinal_position: 1 })

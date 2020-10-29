@@ -41,11 +41,12 @@ module BenefitSponsors
     end
 
     def renew(new_product_package)
+      new_contribution_model = new_product_package.contribution_model
       new_sponsor_contribution = BenefitSponsors::SponsoredBenefits::SponsorContribution.sponsor_contribution_for(new_product_package)
       new_sponsor_contribution.contribution_levels.each do |new_contribution_level|
         current_contribution_level = contribution_levels.detect{|cl| cl.display_name == new_contribution_level.display_name}
         # TODO: Fix this so that this copies all relevent attributes.
-        new_contribution_level.renew_from(current_contribution_level)
+        new_contribution_level.renew_from(current_contribution_level, new_contribution_model)
       end
       new_sponsor_contribution
     end

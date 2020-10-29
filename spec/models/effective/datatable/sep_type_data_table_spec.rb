@@ -82,5 +82,26 @@ describe Effective::Datatables::SepTypeDataTable, dbclean: :after_each do
       end
     end
   end
+
+  context "find_user", dbclean: :after_each do
+
+    context "when qlek has published by id", dbclean: :after_each do
+      let(:person) {FactoryBot.create(:person)}
+      let(:user) {FactoryBot.create(:user, person: person)}
+      let!(:qlek){FactoryBot.create(:qualifying_life_event_kind, is_active: true, published_by: user.id)}
+
+      it "should return person name" do
+        expect(subject.find_user(qlek)).to eq user.person.full_name
+      end
+    end
+
+    context "when qlek has no published by id", dbclean: :after_each do
+      let!(:qlek){FactoryBot.create(:qualifying_life_event_kind, is_active: true)}
+
+      it "should return system admin" do
+        expect(subject.find_user(qlek)).to eq 'admin'
+      end
+    end
+  end
 end
 

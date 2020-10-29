@@ -12,7 +12,7 @@ else{
   $('#next_poss_effective_date').removeClass("disabled-input");
 }
 
-function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, cdate) {
+function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_days, eligibilty_start_date, eligibilty_end_date, cdate) {
   var target = $('.qle-date-picker');
   if("<%= @qle.is_self_attested %>" == 'false'){
     dateMin = '-110y';
@@ -23,7 +23,7 @@ function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_d
     var cur_date = new Date(splitdate[2], splitdate[0]-1, splitdate[1]);
     var idays = Math.ceil((cur_date - new Date())/1000/60/60/24);
     var post_days = (idays - post_event_sep_in_days);
-    var pre_days = (pre_event_sep_in_days + idays);
+    var pre_days = (idays + pre_event_sep_in_days);
     if (post_days >= 0){
       dateMin = '+' + post_days + 'd';
     }else{
@@ -33,6 +33,10 @@ function init_datepicker_for_qle_date(pre_event_sep_in_days, post_event_sep_in_d
       dateMax = '+' + pre_days + 'd';
     }else{
       dateMax = pre_days + 'd';
+    }
+    if ("<%= @qle.coverage_start_on.present? && @qle.coverage_start_on.present? %>" == 'true'){
+      dateMin = eligibilty_start_date
+      dateMax = eligibilty_end_date
     }
   }
   $(target).val('');
@@ -72,7 +76,7 @@ if("<%= @qle.qle_event_date_kind %>" == 'submitted_at' && "<%= @qle.reason %>" =
 } else {
   $('#event_date').attr('readonly',false);
   $('#event_date').each(function (){ this.style.pointerEvents = 'auto'; });
-  init_datepicker_for_qle_date('<%= @qle.pre_event_sep_in_days %>', '<%= @qle.post_event_sep_in_days %>', getDate())
+  init_datepicker_for_qle_date('<%= @qle.pre_event_sep_in_days %>', '<%= @qle.post_event_sep_in_days %>','<%= @qle.coverage_start_on %>', '<%= @qle.coverage_end_on %>', getDate())
   $('.admin_effective_on_kind_options').hide();
 }
 

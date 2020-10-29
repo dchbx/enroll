@@ -492,12 +492,14 @@ module BenefitSponsors
     # end
 
     describe ".renew" do
+      before(:each) do
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+        ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
+      end
 
       context "when renewal benefit sponsor catalog available" do
-
         # Create site
         # Create benefit market
-
         # Create employer organization with profile
         # Create benefit sponsorships
         # Create benefit applications
@@ -507,32 +509,27 @@ module BenefitSponsors
         let(:current_effective_date) { renewal_effective_date.prev_year }
         let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
         let(:package_kind)            { :single_issuer }
-
-        # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
-
-        # let(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-        #   title: "SHOP Benefits for #{current_effective_date.year}",
-        #   application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
-        # )}
-
-        # let(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
-        #   title: "SHOP Benefits for #{renewal_effective_date.year}",
-        #   application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
-        # )}
-
-        # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
-
         let(:application_period_next_year)        { (Date.new(renewal_effective_date.year,1,1))..(Date.new(renewal_effective_date.year,12,31)) }
         let!(:employer_profile) {benefit_sponsorship.profile}
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-        let(:benefit_package)   { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
+        let(:benefit_package)   do
+          bp = create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application)
+          reference_product = bp.sponsored_benefits.first.reference_product
+          reference_product.renewal_product = product
+          reference_product.save!
+          bp
+        end
         let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id, is_active:true)}
         let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
-
-        let(:renewal_application) {initial_application.renew}
+        let(:renewal_application) do
+          application = initial_application.renew
+          application.save
+          application
+        end
         let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
-
+        let(:renewal_product_package)    { benefit_market_catalog_next_year.product_packages.detect { |package| package.package_kind == package_kind } }
+        let(:product) { renewal_product_package.products[0] }
 
         it "should generate renewal application" do
           expect(renewal_application.predecessor).to eq initial_application
@@ -639,6 +636,55 @@ module BenefitSponsors
           xit "should deactivate active benefit group assignment" do
             expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
+        end
+
+        context "based on exchange's rules" do
+
+          context 'when current benefit application has flex rules and renewals are not allowed to get flex rules' do
+            let(:flex_setting) do
+              renewal_application.start_on.yday == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_application.start_on.year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_application.start_on.year}"]
+            end
+            let(:flex_contribution_setting) { flex_setting.setting(:contribution_model_key) }
+            let(:flex_period) { flex_setting.setting(:effective_period).item }
+            let(:flex_setting_enabled) { EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_application.start_on.year}") }
+            let(:contribution_model1) { renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model }
+
+            before :each do
+              allow(flex_contribution_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
+            end
+
+            it "should set minimum contributions percentage" do
+              expect(contribution_model1.key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model if flex_setting_enabled && flex_period.cover?(renewal_application.start_on)
+            end
+          end
+
+          context 'when current benefit application doesnt have flex rules and renewals are allowed to get flex rules' do
+            let(:renewal_effective_period) { effective_period.min.next_year..effective_period.max.next_year }
+            let(:renewal_start_on_year) { renewal_effective_period.min.year }
+            let(:initial_flex_setting) do
+              effective_period.min.yday == 1 ? EnrollRegistry["initial_sponsor_jan_default_#{effective_period.min.year}"] : EnrollRegistry["initial_sponsor_default_#{effective_period.min.year}"]
+            end
+            let(:initial_flex_contribution_setting) { initial_flex_setting.setting(:contribution_model_key) }
+            let(:initial_flex_period) { flex_setting.setting(:effective_period).item }
+
+            let(:renewal_flex_setting) do
+              renewal_effective_period.min.yday == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_start_on_year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_start_on_year}"]
+            end
+            let(:renewal_flex_contribution_setting) { renewal_flex_setting.setting(:contribution_model_key) }
+            let(:renewal_flex_period) { renewal_flex_setting.setting(:effective_period).item }
+            let(:renewal_flex_setting_enabled) { EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_start_on_year}") }
+            let(:contribution_model2) { renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model }
+
+            before :each do
+              allow(initial_flex_contribution_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
+              allow(renewal_flex_contribution_setting).to receive(:item).and_return(:zero_percent_sponsor_fixed_percent_contribution_model)
+            end
+
+            it "should set minimum contributions percentage" do
+              expect(contribution_model2.key).to eq :zero_percent_sponsor_fixed_percent_contribution_model if renewal_flex_setting_enabled && renewal_flex_period.cover?(renewal_effective_period.min)
+            end
+          end
+
         end
       end
     end

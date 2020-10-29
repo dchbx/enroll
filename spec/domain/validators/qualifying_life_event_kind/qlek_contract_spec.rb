@@ -139,6 +139,35 @@ RSpec.describe Validators::QualifyingLifeEventKind::QlekContract, type: :model, 
         expect(@result.errors.empty?).to be_truthy
       end
     end
+
+    context 'with auditing attributes' do
+      context "with create params" do
+        before do
+          contract_params.merge!({market_kind: 'shop', published_by: '1', updated_by: '', created_by: '1'})
+          @result = subject.call(contract_params)
+        end
+
+        it 'should return success' do
+          expect(@result.success?).to be_truthy
+        end
+
+        it 'should not have any errors' do
+          expect(@result.errors.empty?).to be_truthy
+        end
+
+        it 'should have created by value' do
+          expect(@result[:created_by]).to eq '1'
+        end
+
+        it 'should not have published_by value' do
+          expect(@result[:published_by]).to eq nil
+        end
+
+        it 'should not have updated_by value' do
+          expect(@result[:updated_by]).to eq nil
+        end
+      end
+    end
   end
 
   context 'failure case' do

@@ -36,11 +36,14 @@ module BenefitSponsors
         @contribution_unit = contribution_model.find_contribution_unit(contribution_unit_id)
       end
 
-      def renew_from(current_contribution_level)
+      # We are setting the minimum contribution factor from the latest contribution model
+      # Because the eligiblity around minimum contribution might change every year
+      def renew_from(current_contribution_level, new_contribution_model)
+        new_cu = new_contribution_model.contribution_units.detect { |contribution_unit| contribution_unit.display_name == display_name }
         if current_contribution_level.present?
           self.is_offered = current_contribution_level.is_offered
           self.contribution_factor = current_contribution_level.contribution_factor
-          self.min_contribution_factor = current_contribution_level.min_contribution_factor
+          self.min_contribution_factor = new_cu.minimum_contribution_factor
           self.contribution_cap = current_contribution_level.contribution_cap
           self.flat_contribution_amount = current_contribution_level.flat_contribution_amount
         end

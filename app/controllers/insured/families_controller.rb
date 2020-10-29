@@ -148,7 +148,6 @@ class Insured::FamiliesController < FamiliesController
       @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
       start_date = today - @qle.post_event_sep_in_days.try(:days)
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(@qle_event_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
@@ -500,5 +499,4 @@ class Insured::FamiliesController < FamiliesController
     end
 
   end
-
 end

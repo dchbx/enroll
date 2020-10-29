@@ -122,7 +122,8 @@ module Exchanges
 
     def format_expire_sep_type(params)
       params.permit!
-      params.merge!({end_on: params.to_h[:qualifying_life_event_kind][:end_on]})
+      params.merge!({end_on: params.to_h[:qualifying_life_event_kind][:end_on],
+                     updated_by: params.to_h[:qualifying_life_event_kind][:updated_by]})
     end
 
     def updateable?

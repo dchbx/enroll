@@ -32,6 +32,9 @@ module Forms
     attribute :draft, Types::Bool
     attribute :other_reason, Types::String
     attribute :qlek_reasons, Types::Array.of(Types::String)
+    attribute :updated_by, Types::String
+    attribute :created_by, Types::String
+    attribute :published_by, Types::String
 
     def self.for_new(params = {})
       if params.blank?

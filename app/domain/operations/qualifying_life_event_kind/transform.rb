@@ -12,6 +12,7 @@ module Operations
         qlek              = yield fetch_qlek_object(params)
         end_on            = yield parse_date(qlek, params)
         _date_valid       = yield validate_dates(qlek, end_on)
+        _updated_by       = yield updated_by(qlek, params)
         transformed_qle   = yield tranform_qlek(qlek, end_on)
 
         Success(transformed_qle)
@@ -39,11 +40,16 @@ module Operations
         elsif end_on < TimeKeeper.date_of_record - 1.day
           Failure([qlek, "End on: Expiration date must be on or after #{TimeKeeper.date_of_record - 1.day}"])
         elsif ::QualifyingLifeEventKind.by_market_kind(qlek.market_kind).by_date(end_on).active_by_state.where(:id.ne => qlek.id).pluck(:title).map(&:parameterize).uniq.include?(qlek.title.parameterize)
-          active_qlek = ::QualifyingLifeEventKind.by_market_kind(qlek.market_kind).by_date(end_on).active_by_state.where(title: qlek.title).first
+          active_qlek = ::QualifyingLifeEventKind.by_market_kind(qlek.market_kind).by_date(end_on).active_by_state.where(title: qlek.title, :id.ne => qlek.id).first
           Failure([qlek, "End on: Expiration date overlaps with Active SEP Type. Expiration date must be on or before #{active_qlek.start_on - 1.day}"])
         else
           Success('')
         end
+      end
+
+      def updated_by(qlek, params)
+        qlek.updated_by = params[:updated_by]
+        Success(qlek)
       end
 
       def tranform_qlek(qlek, end_on)

@@ -27,6 +27,9 @@ module Validators
         optional(:publish).maybe(:string)
         required(:qle_event_date_kind).maybe(:string)
         optional(:other_reason).maybe(:string)
+        optional(:updated_by).maybe(:string)
+        optional(:published_by).maybe(:string)
+        optional(:created_by).maybe(:string)
 
         before(:value_coercer) do |result|
           result_hash = result.to_h
@@ -36,6 +39,8 @@ module Validators
           other_params[:reason] = result_hash[:other_reason].parameterize.underscore if result_hash[:reason] == 'other'
           other_params[:reason] = (other_params[:reason] ? other_params : result_hash)[:reason]
           other_params[:termination_on_kinds] = [] if result_hash[:market_kind].to_s == 'individual' || result_hash[:termination_on_kinds].nil?
+          other_params[:published_by] = '' if result_hash[:publish] != 'Publish'
+          other_params[:updated_by] = ''
           result_hash.merge(other_params)
         end
       end

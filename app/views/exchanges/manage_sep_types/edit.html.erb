@@ -72,6 +72,9 @@
         <div class="form-group">
           <div class="col-sm-offset-2 col-sm-10">
             <% if @qle.draft %>
+              <%= f.hidden_field :published_by, value: current_user.id %>
+              <%= f.hidden_field :created_by, value: current_user.id %>
+              <%= f.hidden_field :updated_by, value: '' %>
               <%= f.submit l10n("exchange.manage_sep_types.update_sep_types"), class:'btn btn-outline-primary' %>
               <%= f.submit l10n('exchange.manage_sep_types.publish'), name: (f&.object_name.to_s + "[publish]"), value: l10n('exchange.manage_sep_types.publish'), class:'btn btn-outline-primary' %>
             <% end %>
