@@ -22,20 +22,32 @@ module Eligibility
 
     def create_benefit_group_assignment(benefit_packages)
       if benefit_packages.present?
-
-        benefit_group_assignments.where(start_on: benefit_packages.first.start_on).each do |benefit_group_assignment|
-          benefit_group_assignment.is_active? ? benefit_group_assignment.end_benefit(TimeKeeper.date_of_record) : benefit_group_assignment.end_benefit(benefit_group_assignment.start_on)
+        if active_benefit_group_assignment.present?
+          end_date, new_start_on =
+            if active_benefit_group_assignment.start_on > TimeKeeper.date_of_record
+              [active_benefit_group_assignment.start_on, benefit_packages.first.start_on]
+            else
+              [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
+            end
+          active_benefit_group_assignment.end_benefit(end_date)
         end
-        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.start_on, benefit_packages.first.end_on)
+        add_benefit_group_assignment(benefit_packages.first, new_start_on || benefit_packages.first.start_on, benefit_packages.first.end_on)
       end
     end
 
     def add_renew_benefit_group_assignment(renewal_benefit_packages)
+      new_start_on = renewal_benefit_packages.first.start_on
       if renewal_benefit_packages.present?
-        benefit_group_assignments.where(start_on: renewal_benefit_packages.first.start_on).each do |benefit_group_assignment|
-          benefit_group_assignment.end_benefit(benefit_group_assignment.start_on)
+        if renewal_benefit_group_assignment.present?
+          end_date, new_start_on =
+            if renewal_benefit_group_assignment.start_on > TimeKeeper.date_of_record
+              [renewal_benefit_group_assignment.start_on, renewal_benefit_packages.first.start_on]
+            else
+              [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
+            end
+          renewal_benefit_group_assignment.end_benefit(end_date)
         end
-        add_benefit_group_assignment(renewal_benefit_packages.first, renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)
+        add_benefit_group_assignment(renewal_benefit_packages.first, new_start_on || renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)
       end
     end
 
