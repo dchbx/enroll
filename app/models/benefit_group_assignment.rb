@@ -82,7 +82,7 @@ class BenefitGroupAssignment
     end
 
     def on_date(census_employee, date)
-      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.persisted? && !bga.canceled? }
+      assignments = census_employee.benefit_group_assignments.select{ |bga| bga.created_at.present? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
       perspective_assignments_with_end_on = assignments_with_end_on.select { |assignment| assignment.start_on > date }
       if assignments_with_end_on.present?
