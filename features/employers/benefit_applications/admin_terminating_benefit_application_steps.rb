@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
 Then(/^the user will select benefit application to terminate$/) do
-  find(:xpath, '//input[@name="plan_year_radio"]').click
+  find(:xpath, '//input[@status="active"]').click
 end
 
 When(/^the user clicks Actions for that benefit application$/) do
-  find('.py-btn-grp', text: 'Actions').click
+  find_all('.py-btn-grp', text: 'Actions').detect { |element| element[:class].exclude?('disabled') }.click
 end
 
 When(/^the user clicks Actions for current benefit application$/) do
-  find('.py-btn-grp', text: 'Actions').click
+  find_all('.py-btn-grp', text: 'Actions').detect { |element| element[:class].exclude?('disabled') }.click
   sleep 2
   buttons = page.all('button')
   actions_button = buttons.detect { |button| button[:class].include?('py-btn-grp') && button.text == 'Actions' }

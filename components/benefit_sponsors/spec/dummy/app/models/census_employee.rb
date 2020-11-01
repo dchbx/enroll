@@ -326,21 +326,38 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def create_benefit_group_assignment(benefit_packages)
-
+  def create_benefit_group_assignment(benefit_packages, off_cycle = false)
+    assignment = off_cycle ? off_cycle_benefit_group_assignment : active_benefit_group_assignment
     if benefit_packages.present?
-      bg_assignments = benefit_group_assignments.where(:benefit_package_id.in => benefit_packages.map(&:_id)).order_by(:'created_at'.desc)
-      # TODO: Need to figure out if this should be considered
-      if bg_assignments.present?
-        valid_bg_assignment =  bg_assignments.select { |bga| HbxEnrollment::ENROLLED_STATUSES.include?(bga.hbx_enrollment&.aasm_state) }.last || bg_assignments.first
-        valid_bg_assignment.make_active
-      else
-        add_benefit_group_assignment(benefit_packages.first, benefit_packages.first.plan_year.start_on)
+      if assignment.present?
+        end_date, new_start_on =
+          if assignment.start_on > TimeKeeper.date_of_record
+            [assignment.start_on, benefit_packages.first.start_on]
+          else
+            [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
+          end
+        assignment.end_benefit(end_date)
       end
+      add_benefit_group_assignment(benefit_packages.first, new_start_on || benefit_packages.first.start_on, benefit_packages.first.end_on)
     end
   end
 
-  def add_benefit_group_assignment(new_benefit_group, start_on = nil)
+  def add_renew_benefit_group_assignment(renewal_benefit_packages)
+    if renewal_benefit_packages.present?
+      if renewal_benefit_group_assignment.present?
+        end_date, new_start_on =
+          if renewal_benefit_group_assignment.start_on > TimeKeeper.date_of_record
+            [renewal_benefit_group_assignment.start_on, renewal_benefit_packages.first.start_on]
+          else
+            [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
+          end
+        renewal_benefit_group_assignment.end_benefit(end_date)
+      end
+      add_benefit_group_assignment(renewal_benefit_packages.first, new_start_on || renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)
+    end
+  end
+
+  def add_benefit_group_assignment(new_benefit_group, start_on = nil, end_on = nil)
     raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitSponsors::BenefitPackages::BenefitPackage)
     reset_active_benefit_group_assignments(new_benefit_group)
     benefit_group_assignments << BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: (start_on || new_benefit_group.start_on))

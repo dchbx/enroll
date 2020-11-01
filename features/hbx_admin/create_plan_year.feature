@@ -77,7 +77,7 @@ Feature: Create Benefit Application by admin UI
     And employer filled all the fields on benefit application form
     And employer clicked on continue button
     Then employer should see form for benefit package
-    And employer filled all the fields on benefit package form
+    And employer filled all the fields on benefit package form for off-cycle application
     And employer selected by metal level plan offerings
     Then employer should see gold metal level type
     And employer clicked on gold metal level

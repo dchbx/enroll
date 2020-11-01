@@ -125,7 +125,7 @@ module BenefitSponsors
         ra.benefit_packages.build(title: "Fake Title", probation_period_kind: ::BenefitMarkets::PROBATION_PERIOD_KINDS.sample).save!
         new_benefit_package = ra.benefit_packages.last
         renewal_benefit_package.benefit_sponsorship.census_employees.each do |census_employee|
-          census_employee.create_benefit_group_assignment([new_benefit_package])
+          census_employee.add_renew_benefit_group_assignment([new_benefit_package])
           census_employee.benefit_group_assignments.each do |bga|
             allow(bga).to receive(:start_on).and_return(ra.start_on)
           end

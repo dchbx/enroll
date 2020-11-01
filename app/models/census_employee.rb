@@ -854,7 +854,7 @@ class CensusEmployee < CensusMember
 
     return unless benefit_packages.present? && (off_cycle_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(off_cycle_benefit_group_assignment.benefit_package.id))
 
-    create_benefit_group_assignment(benefit_packages)
+    create_benefit_group_assignment(benefit_packages, true)
   end
 
   def renewal_benefit_group_assignment=(renewal_package_id)
