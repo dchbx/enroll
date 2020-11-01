@@ -623,8 +623,9 @@ And /^employer should see form for benefit package$/ do
   expect(page).to have_content "Benefit Package - Set Up"
 end
 
-And /^employer filled all the fields on benefit package form$/ do
-  fill_in 'benefit_package[title]', with: "Benefit Package"
+And(/^employer filled all the fields on benefit package form for (.*) application$/) do |sponsor_type|
+  title = sponsor_type == 'off-cycle' ? 'Off-Cycle BP' : 'Benefit Package'
+  fill_in 'benefit_package[title]', with: title
   fill_in 'benefit_package[description]', with: "Benefit Package"
 end
 
