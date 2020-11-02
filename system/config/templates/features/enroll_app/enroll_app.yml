@@ -45,3 +45,7 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+
+      - key: :manage_account_functionality
+        item: "manage_account"
+        is_enabled: true
