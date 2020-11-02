@@ -60,21 +60,24 @@ module BenefitSponsors
           [false, nil]
         else
           #build cca/dc application
+          applications = applications_for_cancel
           benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
           save_result, persisted_object = store(form, benefit_application)
           if save_result
-            cancel_draft_and_ineligible_applications(persisted_object)
+            cancel_draft_and_ineligible_applications(applications)
             benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
           end
           [save_result, persisted_object]
         end
       end
 
-      def cancel_draft_and_ineligible_applications(benefit_application)
-        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
-        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a
+      def applications_for_cancel
+        applications  = benefit_sponsorship.benefit_applications.draft_and_exception
+        applications += benefit_sponsorship.benefit_applications.enrollment_ineligible.select { |application| !application.is_renewing? }.to_a
+      end
 
-        applications_for_cancel.each do |application|
+      def cancel_draft_and_ineligible_applications(applications)
+        applications.each do |application|
           application.cancel! if application.may_cancel?
         end
       end
