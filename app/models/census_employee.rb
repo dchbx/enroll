@@ -609,7 +609,7 @@ class CensusEmployee < CensusMember
   end
 
   def off_cycle_benefit_group_assignment
-    return unless active_benefit_group_assignment
+    return if active_benefit_group_assignment.nil? || benefit_sponsorship.nil?
 
     off_cycle_app = benefit_sponsorship.off_cycle_benefit_application
     benefit_package_ids = off_cycle_app.benefit_packages.map(&:id)
