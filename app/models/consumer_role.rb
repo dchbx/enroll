@@ -1030,6 +1030,7 @@ class ConsumerRole
   end
 
   def pass_lawful_presence(*args)
+    return if lawful_presence_authorized?
     lawful_presence_determination.authorize!(*args)
     verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.pass_type }
   end
