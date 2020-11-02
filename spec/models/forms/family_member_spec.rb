@@ -221,7 +221,6 @@ describe Forms::FamilyMember, 'with no ssn' do
   let(:ssn) { nil }
   let(:dob) { "2007-06-09" }
   let(:existing_family_member_id) { double }
-  let(:relationship) { double }
   let(:existing_family_member) { nil }
   let(:existing_person) { nil }
 
@@ -241,6 +240,7 @@ describe Forms::FamilyMember, 'with no ssn' do
       :is_incarcerated => "no",
       :tribal_id => "test",
       :is_homeless => nil,
+      :relationship => "spouse",
       :is_temporarily_out_of_state => false
     }
   }
@@ -249,15 +249,25 @@ describe Forms::FamilyMember, 'with no ssn' do
     allow(Family).to receive(:find).with(family_id).and_return(family)
   end
 
-  subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :relationship => relationship })) }
+  context "is applying coverage is TRUE" do
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :is_applying_coverage => "true"})) }
 
-
-  it 'should throw an error if ssn or no ssn values are blank' do
-    subject.validate
-    expect(subject).not_to be_valid
-    expect(subject.errors[:base].first).to match /ssn is required/
+    it 'should throw an error if ssn or no ssn values are blank' do
+      subject.validate
+      expect(subject).not_to be_valid
+      expect(subject.errors[:base].first).to eq "ssn is required"
+    end
   end
 
+  context "is applying coverage is FALSE" do
+    subject { Forms::FamilyMember.new(person_properties.merge({:family_id => family_id, :is_applying_coverage => "false"})) }
+
+    it 'should throw an error if ssn or no ssn values are blank' do
+      subject.ssn_validation
+      expect(subject).to be_valid
+      expect(subject.errors.messages.present?).to eq false
+    end
+  end
 end
 
 describe Forms::FamilyMember, "which describes a new family member, and has been saved" do
