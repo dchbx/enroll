@@ -10,6 +10,28 @@ Given /^a general agency agent visits the DCHBX$/ do
   visit '/'
 end
 
+And(/^user clicks the trash icon to remove a general agency role$/) do
+  trashcan = page.all('i').detect { |i| i[:class] == "far fa-trash-alt fa-2x role-trashcan right center" }
+  trashcan.click
+end
+
+And(/^user clicks Add General Agency Staff Role$/) do
+  click_link 'Add General Agency Staff Role'
+end
+
+Then(/^the terminated general agency staff role will be reactivated$/) do
+  terminated_ga_people = Person.all.map { |person| person.general_agency_staff_roles }.flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }
+  expect(terminated_ga_people.blank?).to eq(true)
+end
+
+And(/^user enters information for that terminated general agency staff and clicks save$/) do
+  terminated_ga_person = Person.all.map { |person| person.general_agency_staff_roles }.flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }.person
+  fill_in 'staff[first_name]', with: terminated_ga_person.first_name
+  fill_in 'staff[last_name]', with: terminated_ga_person.last_name
+  fill_in 'staff[dob]', with: terminated_ga_person.dob.to_s
+  click_button 'Save'
+end
+
 When /^they click the 'New General Agency' button$/ do
   click_link 'General Agency Registration'
 end
