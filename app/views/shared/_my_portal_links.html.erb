@@ -10,8 +10,8 @@
  <i class="far fa-user-circle fa-lg" aria-hidden="true"></i>&nbsp;<a href="#" class="dropdown-toggle" id="dropdownMenuLink"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" onclick="myFunction()" ><strong><%= user_first_name_last_name_and_suffix %></strong></a>
 
   <ul class="dropdown-menu menu-list" aria-labelledby="dropdownMenuLink">
-    <% if current_user.person.present? %>
-      <li><%= link_to 'Manage Account', main_app.manage_account_person_path(id: current_user&.person.id), class: 'dropdown-item'  unless current_user.person.hbx_staff_role %></li>
+    <% if current_user.person.present? && ::EnrollRegistry.feature_enabled?(:manage_account_functionality) %>
+      <li><%= link_to 'Manage Account', main_app.manage_account_person_path(id: current_user&.person.id), class: 'dropdown-item'%></li>
     <% end %>
 
     <% if portal_count == 1 %>
