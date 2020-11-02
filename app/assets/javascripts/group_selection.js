@@ -191,11 +191,14 @@ function disableIvlIneligible() {
 function enableIvlEligibleForCoverall() {
   //debugger;
   $('#coverage-household tr').filter("[class^=ineligible_]").not(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
+    //$('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
 
   $('#coverage-household tr').filter(".ineligible_ivl_row").each(function() {
-    if ($(this).children().filter('td:contains(active_individual_role)').length) {
+    var error_element = $(this).children().filter('td.ivl_errors').find('div')
+    if (error_element.length && error_element.text() === "eligibility failed on active_individual_role") {
       $(this).find('input').prop({'checked': true, 'disabled': false});
-      $(this).children().filter('td:contains(active_individual_role)').empty()
+      error_element.hide();
+
     }else {
       $(this).find('input').prop({'checked': false, 'disabled': true});
     }
