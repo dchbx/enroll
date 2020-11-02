@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GAWorld
   def general_agency(*traits)
     attributes = traits.extract_options!
@@ -20,12 +22,12 @@ And(/^user clicks Add General Agency Staff Role$/) do
 end
 
 Then(/^the terminated general agency staff role will be reactivated$/) do
-  terminated_ga_people = Person.all.map { |person| person.general_agency_staff_roles }.flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }
+  terminated_ga_people = Person.all.map(&:general_agency_staff_roles).flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }
   expect(terminated_ga_people.blank?).to eq(true)
 end
 
 And(/^user enters information for that terminated general agency staff and clicks save$/) do
-  terminated_ga_person = Person.all.map { |person| person.general_agency_staff_roles }.flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }.person
+  terminated_ga_person = Person.all.map(&:general_agency_staff_roles).flatten.detect { |ga| ga.aasm_state == "general_agency_terminated" }.person
   fill_in 'staff[first_name]', with: terminated_ga_person.first_name
   fill_in 'staff[last_name]', with: terminated_ga_person.last_name
   fill_in 'staff[dob]', with: terminated_ga_person.dob.to_s
@@ -157,9 +159,7 @@ And /^a broker exists$/ do
   person.broker_agency_staff_roles << ::BrokerAgencyStaffRole.new({broker_agency_profile: broker_agency, aasm_state: 'active'})
   person.save
   user.roles << "broker" unless user.roles.include?("broker")
-  if !user.roles.include?("broker_agency_staff")
-    user.roles << "broker_agency_staff"
-  end
+  user.roles << "broker_agency_staff" unless user.roles.include?("broker_agency_staff")
   user.save
   broker_role = person.broker_role
   broker_role.approve
@@ -403,14 +403,14 @@ When /^the broker click the link of clear default ga$/ do
 end
 
 Then(/^he should be able to see the Assign link under his profile$/) do
- expect(page).to have_selector('#assign-tab')
+  expect(page).to have_selector('#assign-tab')
 end
 
 Then(/^he should not be able to see the Assign link under his profile$/) do
-expect(page).not_to have_selector('#assign-tab')
+  expect(page).not_to have_selector('#assign-tab')
 end
 
-When(/^the ga clicks on EDIT GENERAL AGENCY button\/link$/) do
+When(%r{^the ga clicks on EDIT GENERAL AGENCY button/link$}) do
   click_link "Edit General Agency"
 end
 
