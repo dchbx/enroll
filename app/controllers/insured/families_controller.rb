@@ -117,6 +117,7 @@ class Insured::FamiliesController < FamiliesController
     @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
+      format.js
     end
   end
 
@@ -147,7 +148,6 @@ class Insured::FamiliesController < FamiliesController
       @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
       start_date = today - @qle.post_event_sep_in_days.try(:days)
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(@qle_event_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
@@ -161,7 +161,6 @@ class Insured::FamiliesController < FamiliesController
                       else
                         (start_date..end_date).cover?(@qle_date)
                       end
-
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > today) ? true : false
     end
@@ -428,7 +427,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.is_consumer_role_active?
-      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      if !(@person.addresses.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -500,5 +499,4 @@ class Insured::FamiliesController < FamiliesController
     end
 
   end
-
 end

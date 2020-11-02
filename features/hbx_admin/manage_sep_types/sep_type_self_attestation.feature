@@ -3,10 +3,12 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     When Hbx Admin logs on to the Hbx Portal
     Given the Admin is on the Main Page
+    And the FAA feature configuration is enabled
     And Qualifying life events of all markets are present
     And the Admin will see the Manage SEPs under admin dropdown
     And Admin can click Manage SEPs link
 
+  @flaky
   Scenario Outline: Admin will create a new Individual market SEP type by picking self attestation option for <user_attestation>
     Given Admin can navigate to the Manage SEPs screen
     And expired Qualifying life events of individual market is present
@@ -45,11 +47,12 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And I click on continue button on household info form
     When I click on none of the situations listed above apply checkbox
@@ -72,10 +75,10 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then I should <action> input field to enter the Sep Type date
     And Admin logs out
 
-  Examples:
-    | user_attestation |  action  |
-    | Self Service     |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_attestation | action  |
+      | Self Service     | see     |
+      | Admin Only       | not see |
 
   Scenario Outline: Admin will create a new Shop market SEP type by picking self attestation option for <user_attestation>
     Given Admin can navigate to the Manage SEPs screen
@@ -127,7 +130,7 @@ Feature: Admin has ability to create a new SEP Type with self attestation option
     Then Admin should <action> input field to enter the Sep Type date
     And Admin logs out
 
-  Examples:
-    | user_attestation |  action  |
-    | Self Service     |   see    |
-    | Admin Only       | not see  |
+    Examples:
+      | user_attestation | action  |
+      | Self Service     | see     |
+      | Admin Only       | not see |

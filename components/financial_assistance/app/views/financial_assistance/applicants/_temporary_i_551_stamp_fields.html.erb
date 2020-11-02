@@ -1,0 +1,7 @@
+<div id="immigration_temporary_i_551_stamp_fields_container">
+  <%= c.hidden_field :vlp_subject, value: "Temporary I-551 Stamp (on passport or I-94)" %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/alien_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/passport_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "Temporary I-551 Stamp"} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/country_of_citizenship", locals: {v: c} %>
+</div>

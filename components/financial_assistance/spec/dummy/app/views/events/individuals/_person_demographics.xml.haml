@@ -1,0 +1,15 @@
+%person_demographics
+  - unless person_demographics.ssn.blank?
+    %ssn= person_demographics.ssn
+  - if person_demographics.gender.blank?
+    %sex= "urn:openhbx:terms:v1:gender#unknown"
+  - else
+    %sex= "urn:openhbx:terms:v1:gender##{person_demographics.gender}"
+  %birth_date= simple_date_for(person_demographics.dob)
+  - if !person_demographics.is_incarcerated.present?
+    %is_incarcerated= "false"
+  - else
+    %is_incarcerated= person_demographics.is_incarcerated.to_s
+  - if !person_demographics.race.blank?
+    %race= person_demographics.race
+  = render :partial => "events/shared/versioned_resource", :object => person_demographics

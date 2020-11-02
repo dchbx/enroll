@@ -33,8 +33,8 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     Examples:
       | market_kind | term_action |
       | individual  | cannot      |
-      | shop        |  can        |
-      | fehb        |  can        |
+      | shop        | can         |
+      | fehb        | can         |
 
   Scenario Outline: Admin can clone an InActive <market_kind> market SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -62,8 +62,8 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     Examples:
       | market_kind | term_action |
       | individual  | cannot      |
-      | shop        |  can        |
-      | fehb        |  can        |
+      | shop        | can         |
+      | fehb        | can         |
 
   Scenario Outline: Admin can see clone action button for Active SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -75,10 +75,10 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     And Hbx Admin logs out
 
     Examples:
-      | market_kind  |  action    |
-      | individual   |  can       |
-      | shop         |  can       |
-      | fehb         |  can       |
+      | market_kind | action |
+      | individual  | can    |
+      | shop        | can    |
+      | fehb        | can    |
 
   Scenario Outline: Admin can see clone action button for InActive SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -90,10 +90,10 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     And Hbx Admin logs out
 
     Examples:
-      | market_kind  |  action    |
-      | individual   |  can       |
-      | shop         |  can       |
-      | fehb         |  can       |
+      | market_kind | action |
+      | individual  | can    |
+      | shop        | can    |
+      | fehb        | can    |
 
   Scenario Outline: Admin can't see clone action button for Draft SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -105,7 +105,7 @@ Feature: Admin has ability to Clone the Active/InActive SEP Type
     And Hbx Admin logs out
 
     Examples:
-      | market_kind  |  action    |
-      | individual   |  cannot    |
-      | shop         |  cannot    |
-      | fehb         |  cannot    |
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | cannot |
+      | fehb        | cannot |

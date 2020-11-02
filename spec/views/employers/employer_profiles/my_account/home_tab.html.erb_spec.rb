@@ -229,6 +229,7 @@ RSpec.describe "employers/employer_profiles/my_account/_home_tab.html.erb" do
 
     def sponsored_benefit
       double("BenefitSponsors::SponsoredBenefits::SponsoredBenefit",
+             id: "123456789",
              product_kind: "rspec_kind",
              reference_product: reference_product,
              product_package_kind: :single_product,

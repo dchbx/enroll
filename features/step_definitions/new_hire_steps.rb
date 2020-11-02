@@ -283,7 +283,7 @@ end
 
 Then(/Employee should see \"may not enroll until eligible\" error message/) do
   screenshot("new_hire_not_eligible_exception")
-  find('.alert', text: "You may not enroll until you're eligible under an enrollment period.")
+  find('.alert', text: "You may not enroll unless it’s open enrollment or you’re eligible for a special enrollment period.")
   visit '/families/home'
 end
 

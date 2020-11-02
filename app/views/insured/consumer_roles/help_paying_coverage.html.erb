@@ -1,0 +1,50 @@
+<%= form_tag(help_paying_coverage_response_insured_consumer_role_index_path, method: :get) do %>
+  <div class="container">
+    <div id="new_person_wrapper">
+      <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <%= render :partial => 'shared/left_nav' %>
+        </div>
+        <input type='hidden' name='exit_after_method' value='false' id='exit_after_method'>
+        <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+          <div class="bottom-pd">
+            <h2 class="darkblue">Help Paying for Coverage</h2>
+            <p><b>You can get help paying for coverage if you qualify.</b><span class="run-glossary"> This includes Medicaid, tax credits that help you pay for your health plan, and cost-sharing reductions that lower your share of the costs for many health services. Select your choice, then select CONTINUE.</span></p>
+
+            <p class="memo">* = required field</p>
+
+            <div id="help_paying_coverage" class="focus_effect module">
+
+              <div class="row row-form-wrapper no-buffer">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
+                  <span class="fa-text-color" >Do you want to apply for <span href="#" class="run-glossary" >Medicaid</span>, <span href="#" class="run-glossary">tax credit</span> savings, and <span href="#" class="run-glossary">cost-sharing reduction</span>s? *</span>
+                </div>
+
+                <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
+                  <input class=" " id="radio1"  type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
+                  <label class="radio-label" for="radio1"><span>Yes</span></label>
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
+                  <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
+                  <label class="radio-label" for="radio2"><span>No</span></label>
+                </div>
+                <div class="col-md-2 not-sure-margin left-seprator">
+                  <a href="#is_applying_for_assistance" data-toggle="modal" data-target="#is_applying_for_assistance">Not sure?</a>
+                  <% if EnrollRegistry.feature_enabled?(:financial_assistance) %>
+                    <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_applying_for_assistance"} %>
+                  <% end %>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+          <%= render  partial: 'shared/individual_progress', locals: {step: 'help_paying_coverage'} %>
+        </div>
+      </div>
+    </div>
+  </div>
+<%end%>

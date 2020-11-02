@@ -225,7 +225,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     is_ivl_coverage, errors = rule.satisfied?
     person = family_member.person
-    incarcerated = person.is_consumer_role_active? && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
+    incarcerated = person.is_consumer_role_active? && family_member.is_applying_coverage && person.is_incarcerated.nil? ? "incarcerated_not_answered" : family_member.person.is_incarcerated
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 

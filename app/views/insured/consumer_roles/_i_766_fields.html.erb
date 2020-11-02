@@ -3,8 +3,8 @@
   <%= c.fields_for 'vlp_documents', document do |v| %>
     <%= v.hidden_field :subject %>
     <%= v.hidden_field :id %>
-    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v} %>
-    <%= render :partial => "insured/consumer_roles/docs_shared/card_number", locals: {v: v} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/alien_number", locals: {v: v, name: "I-766"} %>
+    <%= render :partial => "insured/consumer_roles/docs_shared/card_number", locals: {v: v, name: 'I-766'} %>
     <%= render :partial => "insured/consumer_roles/docs_shared/expiration_date", locals: {v: v, name: "I-766"} %>
   <% end %>
 </div>

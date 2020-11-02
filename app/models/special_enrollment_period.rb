@@ -188,11 +188,11 @@ class SpecialEnrollmentPeriod
     when 'date_before_event'
       qle_on - 1.day
     when 'end_of_last_month_of_reporting'
-      created_at.prev_month.end_of_month.to_date
+      [created_at.prev_month.end_of_month.to_date, qle_on.end_of_month].max
     when 'end_of_reporting_month'
-      created_at.end_of_month.to_date
+      [created_at.end_of_month.to_date, qle_on.end_of_month].max
     when 'end_of_month_before_last'
-      (created_at - 2.months).end_of_month.to_date
+      [(created_at - 2.months).end_of_month.to_date, qle_on.end_of_month].max
     when 'exact_date'
       qle_on
     end
@@ -255,40 +255,58 @@ private
     self.effective_on = case effective_on_kind
                         when "date_of_event"
                           qle_on
-                        when "exact_date"
-                          qle_on
+                        when "date_of_event_plus_one"
+                          qle_on.next_day
                         when "first_of_month"
                           first_of_month_effective_date
                         when "first_of_this_month"
                           first_of_this_month_effective_date
                         when "first_of_next_month"
                           first_of_next_month_effective_date
+                        when "first_of_next_month_coinciding"
+                          first_of_next_month_coinciding_effective_date
+                        when "first_of_next_month_plan_selection"
+                          first_of_next_month_plan_selection_effective_date
                         when "fixed_first_of_next_month"
                           fixed_first_of_next_month_effective_date
-                        when "first_of_month_plan_selection"
-                          first_of_month_plan_selection_effective_date
-                        when "fifteenth_of_month_plan_selection"
-                          fifteenth_of_month_plan_selection_effective_date
                         when "first_of_reporting_month"
                           first_of_reporting_month_effective_date
-                        when "fixed_first_of_next_month_reporting"
-                          fixed_first_of_next_month_reporting_effective_date
-                        when "fifteenth_of_the_month"
-                          fifteenth_of_the_month_effective_date
+                        when "first_of_next_month_reporting"
+                          first_of_next_month_reporting_effective_date
                         end
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
+    if reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
-      @earliest_effective_date.end_of_month + 1.day
+      earliest_effective_date.end_of_month + 1.day
     else
-      @earliest_effective_date.next_month.end_of_month + 1.day
+      earliest_effective_date.next_month.end_of_month + 1.day
     end
   end
 
   def first_of_this_month_effective_date
     qle_on.beginning_of_month
+  end
+
+  def reference_date
+    [submitted_at.to_date, end_on].min
+  end
+
+  def earliest_effective_date
+    [reference_date, qle_on].max
+  end
+
+  def first_of_next_month_plan_selection_effective_date
+    earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_next_month_coinciding_effective_date
+    if qle_on == qle_on.beginning_of_month
+      qle_on
+    else
+      qle_on.end_of_month + 1.day
+    end
   end
 
   def first_of_next_month_effective_date
@@ -335,32 +353,12 @@ private
     end
   end
 
-  def first_of_month_plan_selection_effective_date
-    TimeKeeper.date_of_record.end_of_month + 1.day
-  end
-
-  def fifteenth_of_month_plan_selection_effective_date
-    if TimeKeeper.date_of_record.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
-      TimeKeeper.date_of_record.end_of_month + 1.day
-    else
-      TimeKeeper.date_of_record.next_month.end_of_month + 1.day
-    end
-  end
-
   def first_of_reporting_month_effective_date
-    (self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month, qle_on.end_of_month + 1.day].max
   end
 
-  def fixed_first_of_next_month_reporting_effective_date
-    (self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day
-  end
-
-  def fifteenth_of_the_month_effective_date
-    if qle_on.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
-      qle_on.end_of_month + 1.day
-    else
-      qle_on.next_month.end_of_month + 1.day
-    end
+  def first_of_next_month_reporting_effective_date
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day, qle_on.end_of_month + 1.day].max
   end
 
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for

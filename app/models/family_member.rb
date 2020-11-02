@@ -7,6 +7,10 @@ class FamilyMember
 
   embedded_in :family
 
+  # Responsible for updating eligibility when family member is created/updated
+  after_create :family_member_created
+  after_update :family_member_updated, if: :is_active_changed?
+
   # Person responsible for this family
   field :is_primary_applicant, type: Boolean, default: false
 
@@ -46,6 +50,7 @@ class FamilyMember
   delegate :date_of_birth, to: :person, allow_nil: true
   delegate :dob, to: :person, allow_nil: true
   delegate :ssn, to: :person, allow_nil: true
+  delegate :no_ssn, to: :person, allow_nil: true
   delegate :gender, to: :person, allow_nil: true
   # consumer fields
   delegate :race, to: :person, allow_nil: true
@@ -120,6 +125,15 @@ class FamilyMember
     self.is_coverage_applicant
   end
 
+  def age_on(date)
+    age = date.year - dob.year
+    if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+      age - 1
+    else
+      age
+    end
+  end
+
   def is_active?
     self.is_active
   end
@@ -155,6 +169,37 @@ class FamilyMember
   end
 
   private
+
+  def family_member_created
+    deactivate_tax_households
+    create_financial_assistance_applicant
+  end
+
+  def create_financial_assistance_applicant
+    ::Operations::FinancialAssistance::CreateOrUpdateApplicant.new.call({family_member: self, event: :family_member_created}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::CreateOrUpdateApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
+  end
+
+  def family_member_updated
+    deactivate_tax_households
+    delete_financial_assistance_applicant
+    create_financial_assistance_applicant
+  end
+
+  def delete_financial_assistance_applicant
+    ::Operations::FinancialAssistance::DropApplicant.new.call({family_member: self}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::DropApplicant for family_member with object_id: #{self.id} due to #{e.message}"}
+  end
+
+  def deactivate_tax_households
+    return unless family.persisted? && family.active_household.tax_households.present?
+
+    Operations::Households::DeactivateFinancialAssistanceEligibility.new.call(params: {family_id: family.id, date: TimeKeeper.date_of_record})
+  rescue StandardError => e
+    Rails.logger.error {"Unable to do action Operations::Households::DeactivateFinancialAssistanceEligibility for family_member with object_id: #{self.id} due to #{e.message}"}
+  end
 
   def product_factory
     ::BenefitMarkets::Products::ProductFactory

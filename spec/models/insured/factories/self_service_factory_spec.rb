@@ -120,6 +120,40 @@ module Insured
         expect(enrollment.applied_aptc_amount.to_f).to eq 1274.44
       end
     end
+    # rubocop:disable Lint/UselessAssignment
+    describe "update enrollment for renewing enrollments" do
+
+      before :each do
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year,12,15))
+        effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
+        tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
+        eligibility_determination = FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000, determined_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
+        tax_household_member1 = tax_household10.tax_household_members.create(applicant_id: family.primary_applicant.id, is_subscriber: true, is_ia_eligible: true)
+        tax_household_member2 = tax_household10.tax_household_members.create(applicant_id: family.family_members[1].id, is_ia_eligible: true)
+
+        @product = BenefitMarkets::Products::Product.all.where(benefit_market_kind: :aca_individual).first
+        @product.update_attributes(ehb: 0.9844, application_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
+        premium_table = @product.premium_tables.first
+        premium_table.update_attributes(effective_period: Date.new(effective_on.year, 1, 1)..Date.new(effective_on.year, 1, 1).end_of_year)
+        @product.save!
+        enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
+        hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(TimeKeeper.date_of_record), 'R-DC001').and_return(679.8)
+      end
+
+      it 'should return the updated enrollment' do
+        subject.update_aptc(enrollment.id, 1000)
+        enrollment.reload
+        family.reload
+        expect(enrollment.aasm_state).to eq "coverage_canceled"
+        expect(family.active_household.hbx_enrollments.last.aasm_state).to eq "coverage_selected"
+      end
+
+      after do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+    end
+    # rubocop:enable Lint/UselessAssignment
 
     describe "build_form_params" do
       let!(:tax_household10) {FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil)}

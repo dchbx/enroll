@@ -28,6 +28,7 @@ MANAGE_SEP_TYPES_TRANSLATIONS = {
   "en.datatables.sep_type_data_table.market" => "Market",
   "en.datatables.sep_type_data_table.start_date" => "Start Date",
   "en.datatables.sep_type_data_table.state" => "State",
+  "en.datatables.sep_type_data_table.published_by" => "Published By",
   "en.datatables.sep_type_data_table.publish" => "Publish",
   "en.datatables.sep_type_data_table.expire" => "Expire",
   "en.datatables.sep_type_data_table.clone" => "Clone",

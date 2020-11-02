@@ -49,12 +49,13 @@ Then(/HBX Admin should see a form to enter personal information$/) do
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+  expect(page).to have_css("#home_address_tooltip")
   find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Hbx Admin should see text Household Info$/) do
-  expect(page).to have_content('Household Info')
-  expect(page).to have_content('get insurance coverage for other members of your household')
+  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content('get health insurance coverage for other members of your family')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click
 end

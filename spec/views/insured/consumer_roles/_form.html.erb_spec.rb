@@ -31,12 +31,8 @@ RSpec.describe "insured/consumer_roles/_form.html.erb" do
       expect(rendered).to have_selector('p.memo', text: '* = required field')
     end
 
-    it "should display only one no_dc_address" do
-      expect(rendered).to have_selector('input#no_dc_address', count: 1)
-    end
-
     it "should display the is_applying_coverage field option" do
-      expect(rendered).to match /Is this person applying for coverage?/
+      expect(rendered).to match /Does this person need coverage?/
     end
 
     it "should display the affirmative message" do

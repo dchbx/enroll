@@ -9,13 +9,15 @@ Feature: Add Sep with read only permissions
     When Hbx Admin click Families link
     And the Hbx Admin clicks on the Action button
 
+  @flaky
   Scenario: Click on Add Sep
     Then the Add SEP option should be disabled
 
+  @flaky
   Scenario: Click on Cancel Enrollment
     Then the Cancel Enrollment option should be disabled
 
   Scenario: Click on Terminate Enrollment
     Then the Terminate Enrollment option should be disabled
 
-  #TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented
+#TODO: Need to a similar test for the Edit APTC/CSR link when APTC functionality is implemented

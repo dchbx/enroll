@@ -22,7 +22,7 @@ module BenefitMarkets
         #   end
         # end
 
-        # rule(:product_packages).each do |key, value|
+        # rule(:product_packages).each do
         #   if key? && value
         #     result = BenefitMarkets::Validators::Products::ProductPackageContract.new.call(value)
         #     key.failure(text: "invalid product package", error: result.errors.to_h) if result&.failure?

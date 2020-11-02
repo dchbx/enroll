@@ -37,7 +37,7 @@ module ErrorBubble
   end
 
   def bubble_address_errors_by_person(person)
-    addresses = person.addresses.select {|a| !a.valid?}
+    addresses = person.addresses.select {|a| has_any_address_fields_present?(a) && !a.valid?}
     if person.errors.has_key?(:addresses) && addresses.present?
       addresses.each do |address|
         address.errors.each do |k, v|
@@ -46,5 +46,9 @@ module ErrorBubble
       end
       person.errors.delete(:addresses)
     end
+  end
+
+  def has_any_address_fields_present?(address)
+    address.address_1.present? || address.city.present? || address.state.present? || address.zip.present?
   end
 end

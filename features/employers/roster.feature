@@ -32,6 +32,7 @@ Feature: Employer can view their employees
     And employer should see employee roaster
     Then employer clicks logout
 
+  @flaky
   Scenario: Employer views their employees and this ER has linked EEs
     Given employer clicks on linked employee with address
     Then employer should not see the address on the roster

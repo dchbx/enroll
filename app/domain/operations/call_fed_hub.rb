@@ -3,8 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-# Call Fed Hub for Verification for Consumer Document Verification
 module Operations
+  # Call Fed Hub for Verification for Consumer Document Verification
   class CallFedHub
     send(:include, Dry::Monads[:result, :do])
 

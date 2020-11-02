@@ -20,7 +20,7 @@
     - bg.sponsored_benefits.each do |sb|
       div class="#{sb.product_kind.downcase}"
         div style="float:right"
-          button#showhidebutton type="button" data-toggle="collapse" data-target="#collapse#{sb.product_kind.downcase}" aria-expanded="false" aria-controls="collapse#{sb.product_kind.downcase}"
+          button#showhidebutton type="button" data-toggle="collapse" data-target="#collapse#{sb.id.to_s}" aria-expanded="false" aria-controls="collapse#{sb.id.to_s}"
             | View Details
             a
               i.fa.fa-chevron-down.fa-lg
@@ -43,7 +43,7 @@
             td = sb.reference_product.metal_level.titleize
             td = selected_benefit_plan(sb.product_package_kind)
             / Health plan collapsible: start
-        .collapse id="collapse#{sb.product_kind.downcase}"
+        .collapse id="collapse#{sb.id.to_s}"
           = render :partial => 'ui-components/v1/tables/benefit_package_summary', locals: { sb: sb }
           .panel.benefitgroup.col-xs-12.referenceplan.home.est
             .plan-details

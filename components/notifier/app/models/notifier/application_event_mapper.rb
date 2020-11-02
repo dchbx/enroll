@@ -11,7 +11,8 @@ module Notifier
         binder_paid: :benefit_coverage_initial_binder_paid
       },
       consumer_role: {
-        projected_eligibility_notice: :projected_eligibility_notice
+        projected_eligibility_notice: :projected_eligibility_notice,
+        final_eligibility_notice: :final_eligibility_notice
       }
     }
 

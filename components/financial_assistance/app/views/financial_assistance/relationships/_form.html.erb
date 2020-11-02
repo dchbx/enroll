@@ -1,0 +1,47 @@
+<h1 class="darkblue">Family Relationships</h1>
+<p>We need to understand how members of your household are related. Select the relationship for each person listed
+  below. Then select CONTINUE.</p>
+<%= form_tag application_relationships_path(@application), remote: form_remote do %>
+    <% @all_relationships.each do |er| %>
+        <% house_hold_class = er[:relation].present? ? "household" : "household missing_relation" %>
+        <div class="<%= house_hold_class %>" id="<%= "#{er[:applicant] }_#{er[:relative]}" %>">
+          <div class="usercard">
+            <div class="row card-detail-titles">
+              <div class="col-lg-3">Name</div>
+              <div class="col-lg-5">Relationship</div>
+              <div class="col-lg-4">Household Member</div>
+            </div>
+            <div class="row">
+              <div class="col-lg-3"><%= @application.applicants.find(er[:applicant]).first_name %></div>
+              <div class="col-lg-5">
+                <div class="select-positioning"> is</div>
+                <div class="select-relation rs_selection">
+                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant], "data-relative": er[:relative]%>
+                </div>
+                <div style="float:left; margin-right: 10px;"> of</div>
+                <div class="icon-rel">
+                  <i class="fa fa-user icn-out fa-2x" aria-hidden="true"></i>
+                  <i class="fa fa-link" aria-hidden="true"></i>
+                  <i class="fa fa-user icn-out fa-lg" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="col-lg-4">
+                <%= @application.applicants.find(er[:relative]).first_name %>
+              </div>
+            </div>
+          </div>
+        </div>
+        <br/>
+    <% end %>
+<% end %>
+<%= submit_tag "", class: "" , :style => "display: none;" %>
+
+<script >
+  $(function() {
+    if(<%= missing_relationships.present? %>){
+      $('#btn-continue').addClass('disabled');
+    } else {
+      $('#btn-continue').removeClass('disabled');
+    }
+  });
+</script>

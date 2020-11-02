@@ -1,0 +1,122 @@
+<div class="container">
+  <div id="new_person_wrapper">
+    <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12">
+      <div class="eligibility-results">
+        <h1 class="darkblue">Eligibility Results</h1>
+        <p><b>We have your results!</b></p>
+
+        <%if eligible_applicants(params[:id], :is_medicaid_chip_eligible).present?%>
+          <div class="er-medicaid mt-20">
+            <div class="er-title">
+              <h3>Medicaid</h3>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="er-medicaid-prsn run-glossary">
+              <p>These people <span>appear to be eligible</span> for Medicaid:</p>
+
+              <%eligible_applicants(params[:id], :is_medicaid_chip_eligible).each do |applicant_name| %>
+              <div class='er-prsn'>
+                <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                <h4><%=applicant_name%></h4>
+              </div>
+              <%end%>
+            </div>
+            <div class="border-bottom-1px"></div>
+            <div class="er-warning bg-warning">
+              <div><i class="fa fa-exclamation-triangle fa-lg text-warning" aria-hidden="true"></i></div>
+              <div class="text-warning ">
+                <span>PLEASE NOTE: The DC Department of Human Services (DHS) will make a final decision on whether those listed qualify for <span class="run-glossary">Medicaid</span>.</span> They will send you a letter, and may ask you to provide documents. If you haven’t heard from DHS within 45 days, you may want to ask for an update by calling us at (855) 532-5465.
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <%if eligible_applicants(params[:id], :is_ia_eligible).present?%>
+          <div class="er-phi mt-20">
+            <div class="er-title">
+              <h3>Help paying for private health insurance</h3>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="er-medicaid-prsn">
+              <p>These people are <span>eligible for savings of <%= total_aptc_across_eligibility_determinations(params[:id])%> per month</span> called an <span class="run-glossary">advance premium tax credit</span>. This means they won't have to pay full price for health insurance.</p>
+
+              <%eligible_applicants(params[:id], :is_ia_eligible).each do |applicant_name| %>
+                <div class="er-prsn mt-15">
+                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                  <h4><%=applicant_name%></h4>
+                </div>
+              <%end%>
+              <%  unless any_csr_ineligible_applicants?(params[:id]) %>
+                <p class="mt-10 mb-0 run-glossary">They also qualify for extra savings called cost-sharing reductions - a benefit that lowers other costs like the annual deductible and copayments. This benefit is only available if these people select a silver plan. Look for this check mark <i class="fa fa-check-square-o col-green" aria-hidden="true"></i> on plans that have this benefit.</p>
+              <% end %>
+            </div>
+            <div class="border-bottom-1px"></div>
+            <div class="er-success bg-success">
+              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+              <div class="text-success">
+                <span><b>NEXT STEP:</b> Pick a health insurance plan.</span>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <%if eligible_applicants(params[:id], :is_totally_ineligible).present?%>
+          <div class="er-notqualify mt-20">
+            <div class="er-title">
+              <h3>Does not qualify</h3>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="er-medicaid-prsn">
+              <p> These people <span> likely don't qualify for <span class="run-glossary">Medicaid</span>, </span> and don't qualify for private health insurance through DC Health Link: </p>
+              <%eligible_applicants(params[:id], :is_totally_ineligible).each do |applicant_name| %>
+                <div class='er-prsn mb'>
+                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                  <h4><%=applicant_name%></h4>
+                </div>
+              <%end%>
+            </div>
+          </div>
+        <%end%>
+
+        <%if eligible_applicants(params[:id], :is_without_assistance).present?%>
+          <div class="er-notqualify mt-20">
+            <div class="er-title">
+              <h3>Private health insurance</h3>
+            </div>
+            <div class="border-bottom-2px"></div>
+            <div class="er-medicaid-prsn">
+              <p> These people <span> qualify to enroll </span> in a private health insurance plan:</p>
+              <%eligible_applicants(params[:id], :is_without_assistance).each do |applicant_name| %>
+                <div class='er-prsn mb'>
+                  <i class="fa fa-user fa-2x" aria-hidden="true"></i>
+                  <h4><%=applicant_name%></h4>
+                </div>
+              <%end%>
+            </div>
+            <div class="border-bottom-1px"></div>
+            <div class="er-success bg-success">
+              <div><i class="fa fa-info-circle fa-lg text-success" aria-hidden="true"></i></div>
+              <div class="text-success">
+                <span><b>NEXT STEP:</b> Pick a health insurance plan.</span>
+              </div>
+            </div>
+          </div>
+        <%end%>
+
+        <div class="er-summary mt-20">
+          <p class="mt-10">If you do not agree with this determination, you have the right to appeal. <a href="">Find out more about the appeal process</a> or <a href="">get assistance</a> by contacting us directly.</p>
+          <p class="mb-0">Your application reference number is <b><%= @application.hbx_id %></b>.</p>
+          <br />
+          <div><%= link_to "View my Applications", applications_path, class: "btn btn-small btn-primary" %></div>
+        </div>
+      </div>
+    </div>
+
+    <div class='col-md-2'>
+      <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+          previous_url: applications_path,
+          next_url: main_app.find_sep_insured_families_path(consumer_role_id: @person.consumer_role.id)
+        } %>
+    </div>
+  </div>
+</div>

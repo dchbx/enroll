@@ -1,0 +1,6 @@
+<div id="immigration_i_766_fields_container">
+  <%= c.hidden_field :vlp_subject, value: "I-766 (Employment Authorization Card)" %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/alien_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/card_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "I-766"} %>
+</div>

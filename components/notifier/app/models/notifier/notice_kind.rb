@@ -51,7 +51,8 @@ module Notifier
     end
 
     def conditional_tokens
-      template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/if|else|end|else if|elsif/i, '')}.map(&:strip).reject{|elem| elem.blank?}.uniq
+      keywords = {'if' => '', 'else' => '', 'end' => '', 'elsif' => '', 'unless' => ''}
+      template.raw_body.scan(/\[\[([\s|\w|\.|?]*)/).flatten.map(&:strip).collect{|ele| ele.gsub(/\w+/) { |m| keywords.fetch(m,m) }}.map(&:strip).reject(&:blank?).uniq
     end
 
     def set_data_elements

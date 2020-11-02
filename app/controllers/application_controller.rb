@@ -394,6 +394,20 @@ class ApplicationController < ActionController::Base
       session[:last_market_visited] = 'resident'
     end
 
+    def save_faa_bookmark(url)
+      current_person = get_current_person
+      return if current_person.consumer_role.blank?
+      current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
+    end
+
+    def get_current_person # rubocop:disable Naming/AccessorMethodName
+      if current_user.try(:person).try(:agent?) && session[:person_id].present?
+        Person.find(session[:person_id])
+      else
+        current_user.person
+      end
+    end
+
     def stashed_user_password
       session["stashed_password"]
     end

@@ -1,165 +1,218 @@
 require 'rails_helper'
 require 'csv'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-  RSpec.describe IvlNotices::FinalEligibilityNoticeUqhp, :dbclean => :after_each do
+  RSpec.describe "FinalEligibilityNoticeUqhp", :dbclean => :after_each do
+    include_context 'setup benefit market with market catalogs and product packages'
 
-    file = "#{Rails.root}/spec/test_data/notices/final_eligibility_notice_uqhp_test_data.csv"
-    csv = CSV.open(file,"r",:headers =>true)
-    data = csv.to_a
-    year = TimeKeeper.date_of_record.year + 1
-    let(:person) { FactoryBot.create(:person, :with_consumer_role, :hbx_id => "48574857")}
-    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
-    let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
-    let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
-    let!(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.households.first, kind: "individual", product: product, aasm_state: "auto_renewing", effective_on: Date.new(year,1,1))}
-    let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-    let!(:hbx_enrollment_member_1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx_enrollment_1, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
-    let!(:hbx_enrollment_1) do
-      FactoryBot.create(:hbx_enrollment,
-                        family: family,
-                        household: family.households.first,
-                        kind: "individual",
-                        product: product,
-                        is_any_enrollment_member_outstanding: true,
-                        aasm_state: "coverage_selected",
-                        special_verification_period: TimeKeeper.date_of_record + 95.days,
-                        effective_on: Date.new(2017,1,1))
-    end
-    let(:application_event){ double("ApplicationEventKind",{
-                              :name =>'Final Eligibility Notice for UQHP individuals',
-                              :notice_template => 'notices/ivl/final_eligibility_notice_uqhp',
-                              :notice_builder => 'IvlNotices::FinalEligibilityNoticeUqhp',
-                              :event_name => 'final_eligibility_notice_uqhp',
-                              :mpi_indicator => 'IVL_FEL',
-                              :data => data,
-                              :person =>  person,
-                              :title => "Your Final Eligibility Results, Plan, And Option TO Change Plans"})
-                            }
-    let(:valid_params) do
-      {
-        :subject => application_event.title,
-        :mpi_indicator => application_event.mpi_indicator,
-        :event_name => application_event.event_name,
-        :template => application_event.notice_template,
-        :data => data,
-        :person => person
-      }
+    let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "5519383", first_name: "Bahu", last_name: "Bali") }
+    let!(:person4) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "5519384", first_name: "Ballala", last_name: "Deva") }
+    let!(:family3) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person3) }
+    let!(:family_member4) { FactoryBot.create(:family_member, family: family3, person: person4) }
+    let!(:dependents) { family3.family_members }
+    let!(:consumer_role) { person3.consumer_role }
+
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_year }
+    let(:application_period) { effective_on..effective_on.end_of_year }
+
+    let(:hbx_en_member3) do
+      FactoryBot.build(
+        :hbx_enrollment_member,
+        eligibility_date: effective_on,
+        coverage_start_on: effective_on,
+        applicant_id: dependents[0].id
+      )
     end
 
-    before do
-      allow(person.consumer_role).to receive("person").and_return(person)
+    let(:hbx_en_member4) do
+      FactoryBot.build(
+        :hbx_enrollment_member,
+        eligibility_date: effective_on,
+        coverage_start_on: effective_on,
+        applicant_id: dependents[1].id
+      )
     end
 
-    describe "New" do
-      context "valid params" do
-        it "should initialze" do
-          expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)}.not_to raise_error
+    let!(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
+
+    let(:product) do
+      FactoryBot.create(
+        :benefit_markets_products_health_products_health_product,
+        :with_renewal_product,
+        :with_issuer_profile,
+        benefit_market_kind: :aca_individual,
+        kind: :health,
+        assigned_site: site,
+        service_area: service_area,
+        renewal_service_area: renewal_service_area,
+        csr_variant_id: '01',
+        application_period: application_period
+      )
+    end
+
+    let(:current_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family3,
+        product: product,
+        household: family3.active_household,
+        coverage_kind: "health",
+        effective_on: effective_on,
+        kind: 'individual',
+        hbx_enrollment_members: [hbx_en_member3, hbx_en_member4],
+        aasm_state: 'coverage_selected'
+      )
+    end
+
+    let(:renewal_product) do
+      renewal_product = product.renewal_product
+      renewal_product.issuer_profile_id = issuer_profile.id
+      renewal_product.save!
+      renewal_product
+    end
+
+    let(:renewing_enrollment) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        family: family3,
+        product: renewal_product,
+        household: family3.active_household,
+        coverage_kind: "health",
+        effective_on: effective_on.next_year,
+        kind: 'individual',
+        hbx_enrollment_members: [hbx_en_member3, hbx_en_member4],
+        aasm_state: 'auto_renewing'
+      )
+    end
+
+    let!(:input_file) { Rails.root.join("spec", "test_data", "notices", "ivl_fel_uqhp_test_data.csv") }
+
+    describe "NoticeBuilder" do
+      let(:data_elements) do
+        [
+          "consumer_role.notice_date",
+          "consumer_role.coverage_year",
+          "consumer_role.ivl_oe_end_date",
+          "consumer_role.magi_medicaid?",
+          "consumer_role.aqhp_or_non_magi_medicaid_members_present?",
+          "consumer_role.aqhp_eligible?",
+          "consumer_role.tax_households",
+          "consumer_role.has_atleast_one_csr_member?",
+          "consumer_role.tax_hh_with_csr",
+          "consumer_role.uqhp_or_non_magi_medicaid_members_present?",
+          "consumer_role.totally_ineligible_members_present?",
+          "consumer_role.ineligible_applicants",
+          "consumer_role.renewing_health_enrollments_present?",
+          "consumer_role.renewing_dental_enrollments",
+          "consumer_role.renewing_health_enrollments",
+          "consumer_role.same_health_product",
+          "consumer_role.same_dental_product"
+        ]
+      end
+
+      let(:merge_model) { subject.construct_notice_object }
+      let(:recipient)   { "Notifier::MergeDataModels::ConsumerRole" }
+      let(:template)    { Notifier::Template.new(data_elements: data_elements) }
+      let(:data_hash)  { build_data_hash }
+      let(:members)    { data_hash.select { |_k,v| v.any? { |x| x['member_id'] == '5519383' } }.first[1] }
+      let(:subscriber) { members.detect{ |m| m["dependent"].casecmp('NO').zero? } }
+      let(:dependents_array) { members.select{|m| m["dependent"].casecmp('YES').zero? } }
+
+      let(:payload) do
+        {
+          "event_object_kind" => "ConsumerRole",
+          "event_object_id" => consumer_role.id,
+          "notice_params" => {
+            "primary_member" => subscriber.to_hash,
+            "dependents" => dependents_array.map(&:to_hash),
+            "active_enrollment_ids" => [current_enrollment.hbx_id],
+            "renewing_enrollment_ids" => [renewing_enrollment.hbx_id],
+            "uqhp_event" => 'uqhp'
+          }
+        }
+      end
+
+      context "when notice event received" do
+
+        subject { Notifier::NoticeKind.new(template: template, recipient: recipient) }
+
+        before do
+          allow(subject).to receive(:resource).and_return(consumer_role)
+          allow(subject).to receive(:payload).and_return(payload)
         end
-      end
 
-      context "invalid params" do
-        [:mpi_indicator,:subject,:template].each do  |key|
-          it "should NOT initialze with out #{key}" do
-            valid_params.delete(key)
-            expect{IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)}.to raise_error(RuntimeError,"Required params #{key} not present")
-          end
+        it "should retrun merge model" do
+          expect(merge_model).to be_a(recipient.constantize)
         end
-      end
-    end
 
-    describe "#pick_enrollments" do
-      before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
-        person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-        @final_eligibility_notice.append_data
-      end
+        it 'should return the date of the notice and coverage year' do
+          expect(merge_model.notice_date).to eq TimeKeeper.date_of_record.strftime('%B %d, %Y')
+          expect(merge_model.coverage_year).to eq TimeKeeper.date_of_record.next_year.year
+        end
 
-      it "returns all auto_renewing enrollments" do
-        @final_eligibility_notice.pick_enrollments
-        expect(@final_eligibility_notice.notice.enrollments.size).to eq 1
-      end
+        it 'should return ivl oe end date' do
+          end_date = Settings.aca.individual_market.upcoming_open_enrollment.end_on.strftime('%B %d, %Y')
+          expect(merge_model.ivl_oe_end_date).to eq end_date
+        end
 
-      it "returns nil when there are no auto_renewing enrollments" do
-        hbx_enrollment.update_attributes!(:aasm_state => "coverage_expired")
-        @final_eligibility_notice.pick_enrollments
-        expect(@final_eligibility_notice.notice.enrollments.size).to eq 0
-      end
-    end
+        it 'should return if it is magi medicaid' do
+          expect(merge_model.magi_medicaid?).to eq false
+        end
 
-    describe "#append_data" do
-      before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
-        @final_eligibility_notice.append_data
-      end
+        it 'should return a boolean if aqhp or uqhp' do
+          expect(merge_model.aqhp_or_non_magi_medicaid_members_present?).to eq false
+          expect(merge_model.uqhp_or_non_magi_medicaid_members_present?).to eq true
+        end
 
-      it "should return coverage year" do
-        expect(@final_eligibility_notice.notice.coverage_year).to eq hbx_enrollment.effective_on.year.to_s
-      end
-      it "should return notification type" do
-        expect(@final_eligibility_notice.notice.notification_type).to eq application_event.event_name
-      end
-      it "should return ivl open enrollment start on" do
-        expect(@final_eligibility_notice.notice.ivl_open_enrollment_start_on).to eq Settings.aca.individual_market.open_enrollment.start_on
-      end
-      it "should return ivl open enrollment end on" do
-        expect(@final_eligibility_notice.notice.ivl_open_enrollment_end_on).to eq Settings.aca.individual_market.open_enrollment.end_on
-      end
-      it "should return person first name" do
-        expect(@final_eligibility_notice.notice.primary_firstname).to eq person.first_name
-      end
-    end
+        it 'should return if aqhp eligible' do
+          expect(merge_model.aqhp_eligible?).to eq false
+        end
 
-    describe "#generate_pdf_notice" do
-      before do
-        @final_eligibility_notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person.consumer_role, valid_params)
-      end
+        it 'should return tax households if any' do
+          expect(merge_model.tax_households).to all(be_a(Notifier::MergeDataModels::TaxHousehold))
+        end
 
-      it "should render the final eligibility notice template" do
-        expect(@final_eligibility_notice.template).to eq "notices/ivl/final_eligibility_notice_uqhp"
-      end
+        it 'should return if there is any csr member' do
+          expect(merge_model.has_atleast_one_csr_member?).to eq false
+        end
 
-      it "should generate pdf" do
-        person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-        @final_eligibility_notice.build
-        file = @final_eligibility_notice.generate_pdf_notice
-        expect(File.exist?(file.path)).to be true
-      end
+        it 'should return tah households with csr if any' do
+          expect(merge_model.tax_hh_with_csr).to eq []
+        end
 
-      it "should delete generated pdf" do
-        person.consumer_role.update_attributes!(:aasm_state => "verification_outstanding")
-        @final_eligibility_notice.build
-        file = @final_eligibility_notice.generate_pdf_notice
-        @final_eligibility_notice.clear_tmp(file.path)
-        expect(File.exist?(file.path)).to be false
-      end
-    end
+        it 'should return if any ineligible applicants' do
+          expect(merge_model.totally_ineligible_members_present?).to eq false
+          expect(merge_model.ineligible_applicants).to eq []
+        end
 
-    describe "for recipient, recipient_document_store", dbclean: :after_each do
-      let!(:person100)          { FactoryBot.create(:person, :with_consumer_role, :with_work_email) }
-      let!(:dep_family1)        { FactoryBot.create(:family, :with_primary_family_member, person: FactoryBot.create(:person, :with_consumer_role, :with_work_email)) }
-      let!(:dep_family_member)  { FactoryBot.create(:family_member, family: dep_family1, person: person100) }
-      let!(:family100)          { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
-      let(:dep_fam_primary)     { dep_family1.primary_applicant.person }
+        it 'should return renewing enrollments' do
+          expect(merge_model.renewing_health_enrollments_present?).to eq true
+          expect(merge_model.renewing_health_enrollments).to all(be_a(Notifier::MergeDataModels::Enrollment))
+          expect(merge_model.renewing_dental_enrollments).to eq []
+        end
 
-      before :each do
-        valid_params.merge!({:person => person100})
-        @notice = IvlNotices::FinalEligibilityNoticeUqhp.new(person100.consumer_role, valid_params)
-      end
-
-      it "should have person100 as the recipient for the enrollment notice as this person is the primary" do
-        expect(@notice.recipient).to eq person100
-        expect(@notice.person).to eq person100
-        expect(@notice.recipient_document_store).to eq person100
-        expect(@notice.to).to eq person100.work_email_or_best
-      end
-
-      it "should not pick the dep_family1's primary person" do
-        expect(@notice.recipient).not_to eq dep_fam_primary
-        expect(@notice.person).not_to eq dep_fam_primary
-        expect(@notice.recipient_document_store).not_to eq dep_fam_primary
-        expect(@notice.to).not_to eq dep_fam_primary.work_email_or_best
+        it 'should return if it is a same product' do
+          expect(merge_model.same_health_product).to eq true
+          expect(merge_model.same_dental_product).to eq false
+        end
       end
     end
   end
+end
+
+private
+
+def build_data_hash
+  @data_hash = {}
+
+  CSV.foreach(input_file,:headers => true).each do |d|
+    if @data_hash[d["ic_number"]].present?
+      @data_hash[d["ic_number"]] << d
+    else
+      @data_hash[d["ic_number"]] = [d]
+    end
+  end
+  @data_hash
 end

@@ -1,20 +1,24 @@
 <% vlp_doc_subject = (defined? @vlp_doc_subject) ? @vlp_doc_subject : nil %>
 <div id="consumer_fields" class="focus_effect">
   <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-      <label class="required no-pd">Are you currently incarcerated? *</label>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer">
+      <label class="required no-pd">Is this person currently incarcerated? *</label>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
+    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
       <div class="radio">
         <%= f.radio_button :is_incarcerated, true, class: "required floatlabel", id: 'radio_incarcerated_yes', required: true %>
-        <label for="radio_incarcerated_yes"><span>Yes</span></label>
+        <label for="radio_incarcerated_yes"><span class="yes_no_pair">Yes</span></label>
       </div>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio">
         <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
-        <label for="radio_incarcerated_no"><span>No</span></label>
+        <label for="radio_incarcerated_no"><span class="yes_no_pair">No</span></label>
       </div>
+    </div>
+    <div class="col-md-2 not-sure-margin left-seprator">
+      <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not sure?</a>
+      <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
     </div>
   </div>
 </div>

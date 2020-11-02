@@ -19,4 +19,4 @@ Feature: As a Super Admin I will be the only user
       | HBX Staff     | not see |
       | HBX Read Only | not see |
       | Developer     | not see |
-      | HBX Tier3     | see |
+      | HBX Tier3     | see     |

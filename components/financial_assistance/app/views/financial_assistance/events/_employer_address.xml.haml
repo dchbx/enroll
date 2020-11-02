@@ -1,0 +1,12 @@
+%employer_address
+  %type= "urn:openhbx:terms:v1:address_type##{address.kind}"
+  %address_line_1= address.address_1
+  - unless address.address_2.blank?
+    %address_line_2= address.address_2
+  - unless address.address_3.blank?
+    %address_line_3= address.address_3
+  %location_city_name= address.city
+  %location_state_code= address.state
+  %postal_code= address.zip_without_extension
+  - unless address.zip_extension.blank?
+    %location_postal_extension_code= address.zip_extension

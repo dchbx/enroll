@@ -20,13 +20,15 @@ registry:
           - key: :policies_url
             item: "https://dchealthlink.com/"
           - key: :faqs_url
-            item: "https://www.dchealthlink.com/Frequently-Asked-Questions"
+            item: "https://dchealthlink.com/help"
           - key: :help_url
             item: "https://www.dchealthlink.com/help"
           - key: :business_resource_center_url
             item: "https://dchealthlink.com/smallbusiness/"
           - key: :nondiscrimination_notice_url
             item: "https://www.dchealthlink.com/nondiscrimination"
+          - key: :submit_docs_url
+            item: "https://www.dchealthlink.com/submit-docs"
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true

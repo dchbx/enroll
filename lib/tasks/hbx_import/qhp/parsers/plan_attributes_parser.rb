@@ -51,7 +51,7 @@ module Parser
         standard_component_id: standard_component_id.gsub(/\n/,'').strip,
         plan_marketing_name: plan_marketing_name.gsub(/\n/,'').strip,
         hios_product_id: hios_product_id.gsub(/\n/,'').strip,
-        hpid: hpid.gsub(/\n/,'').strip,
+        hpid: hpid.present? ? hpid.gsub(/\n/,'').strip : "",
         network_id: network_id.gsub(/\n/,'').strip,
         service_area_id: service_area_id.gsub(/\n/,'').strip,
         formulary_id: formulary_id.gsub(/\n/,'').strip,
@@ -87,7 +87,7 @@ module Parser
         national_network: national_network.gsub(/\n/,'').strip,
         ehb_percent_premium: (ehb_percent_premium.present? ? ehb_percent_premium.gsub(/\n/,'').strip : ""),
         summary_benefit_and_coverage_url: (summary_benefit_and_coverage_url.gsub(/\n/,'').strip rescue ""),
-        enrollment_payment_url: enrollment_payment_url.gsub(/\n/,'').strip,
+        enrollment_payment_url: enrollment_payment_url.present? ? enrollment_payment_url.gsub(/\n/,'').strip : "",
         plan_brochure: (plan_brochure.gsub(/\n/,'').strip rescue "")
       }
     end

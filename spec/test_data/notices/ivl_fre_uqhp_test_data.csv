@@ -1,0 +1,2 @@
+ic_number,policy.id,policy.subscriber.coverage_start_on,policy.aasm_state,policy.plan.coverage_kind,policy.plan.metal_level,policy.plan.plan_name,policy.total_premium,deductible,family_deductible,subscriber_id,member_id,first_name,last_name,incarcerated,citizen_status,outstanding_verification_types,document_due_date,resident,dependent,uqhp_eligible
+5619c9be5472,1391803,1/1/20,auto_renewing,health,silver,"BluePreferred Standard Silver $4,000",635.72,"$4,000.00",$8000 per group,141890,141890,John,Smith,John Smith,,,,Yes,No,Yes

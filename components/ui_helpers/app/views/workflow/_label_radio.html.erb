@@ -1,0 +1,2 @@
+<%= radio_button_tag cell.name_attribute, cell.value, radio_checked?(@model, cell), class: "radio-yml", id: cell.id, required: cell.required %>
+<%= label_tag cell.id, cell.label ,class: "radio-yml " + cell.class_names %>

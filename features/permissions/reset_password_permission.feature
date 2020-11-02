@@ -37,5 +37,5 @@ Feature: Only HBX Staff will be able to see & access the Reset Password Feature.
     When Hbx Admin click on Reset Password link in action drop down
 
     Examples:
-      | subrole       | action  |
-      | HBX Staff     | see     |
+      | subrole   | action |
+      | HBX Staff | see    |

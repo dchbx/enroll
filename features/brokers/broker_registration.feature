@@ -48,12 +48,12 @@ Feature: Broker Agency Registration
     When Hbx Admin click approve broker button
     Then Hbx Admin should see the broker successfully approved message
     And Hbx Admin logs out
-    
+
     # Set up employer
     And benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
-    # And Acme Inc. employer has a staff role 
+    # And Acme Inc. employer has a staff role
     And there is a census employee record and employee role for Ricky Martin for employer Acme Inc.
     And census employee Ricky Martin is a newly_designated_eligible employee
     And this employer Acme Inc. has first_of_month rule

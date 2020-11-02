@@ -1,0 +1,21 @@
+<% insurance_kinds = FinancialAssistance::Benefit::INSURANCE_KINDS %>
+<% insurance_kinds.each do |insurance_kind| %>
+  <% benefits = applicant.benefits.where(kind: kind).of_insurance_kind(insurance_kind) %>
+  <% if benefits.present? %>
+    <div class="row ptb no-buffer row-height form-heading row-form-wrapper text-bold verti-line-trans">
+      <div class="col-md-6">TYPE</div>
+      <div class="col-md-6">DATES</div>
+    </div>
+  <% end %>
+
+  <% benefits.each do |benefit| %>
+    <div class="row ptb no-buffer row-height row-benefit-form-wrapper verti-line">
+      <div class="col-md-6 form-heading"><%= FinancialAssistance::Benefit::INSURANCE_TYPE[benefit.insurance_kind.to_sym] %></div>
+      <div class="col-md-6 form-content"><%= start_to_end_dates(benefit) %></div>
+    </div>
+
+    <% if benefit.insurance_kind == 'employer_sponsored_insurance' %>
+      <%= render partial: 'financial_assistance/applications/review_esi_benefit', locals: {benefit: benefit} %>
+    <% end %>
+  <% end %>
+<% end %>

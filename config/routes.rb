@@ -9,6 +9,7 @@ Rails.application.routes.draw do
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
+  mount FinancialAssistance::Engine,  at: '/financial_assistance'
   mount ActionCable.server => "/cable"
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
@@ -302,6 +303,8 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      get :help_paying_coverage, to: 'consumer_roles/help_paying_coverage', on: :collection, as: :help_paying_coverage
+      get :help_paying_coverage_response, to: 'consumer_roles/help_paying_coverage_response', on: :collection, as: :help_paying_coverage_response
       post :update_application_type
       get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection

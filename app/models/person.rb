@@ -35,7 +35,8 @@ class Person
                         :race,
                         :tribal_id,
                         :no_dc_address,
-                        :no_dc_address_reason,
+                        :is_homeless,
+                        :is_temporarily_out_of_state,
                         :is_active,
                         :no_ssn],
                 :modifier_field => :modifier,
@@ -95,6 +96,10 @@ class Person
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
+  field :is_applying_for_assistance, type: Boolean
+
+  field :is_homeless, type: Boolean, default: false
+  field :is_temporarily_out_of_state, type: Boolean, default: false
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
@@ -307,6 +312,7 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+  after_update :person_create_or_update_handler
 
   def self.api_staff_roles
     Person.where(
@@ -420,21 +426,10 @@ class Person
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
-  def is_aqhp?
-    family = self.primary_family if self.primary_family
-    if family
-      check_households(family) && check_tax_households(family)
-    else
-      false
-    end
-  end
-
-  def check_households family
-    family.households.present? ? true : false
-  end
-
-  def check_tax_households family
-    family.households.first.tax_households.present? ? true : false
+  def person_create_or_update_handler
+    ::Operations::FinancialAssistance::PersonCreateOrUpdateHandler.new.call({person: self, event: :person_updated}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::PersonCreateOrUpdateHandler for person with object_id: #{self.id} due to #{e.message}"}
   end
 
   def completed_identity_verification?
@@ -473,6 +468,10 @@ class Person
 
   def gender=(new_gender)
     write_attribute(:gender, new_gender.to_s.downcase)
+  end
+
+  def financial_assistance_identifier
+    primary_family&.id
   end
 
   # Get the {Family} where this {Person} is the primary family member
@@ -687,7 +686,7 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    is_homeless? || is_temporarily_out_of_state?
   end
 
   def age_on(date)
@@ -699,13 +698,20 @@ class Person
     end
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   def is_dc_resident?
-    return false if no_dc_address == true && no_dc_address_reason.blank?
-    return true if no_dc_address == true && no_dc_address_reason.present?
+    return true if is_homeless? || is_temporarily_out_of_state?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
-    return false
+    false
   end
 
   def current_individual_market_transition
@@ -1291,9 +1297,9 @@ class Person
   end
 
   def native_american_validation
-    self.errors.add(:base, "American Indian / Alaskan Native status is required.") if indian_tribe_member.to_s.blank?
+    self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
     if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+      self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
     elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
     end

@@ -10,7 +10,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And renewal employer ACME Widgets, Inc. has imported and renewal enrollment_open benefit applications
     And ACME Widgets, Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer ACME Widgets, Inc.
-    
+
     Given staff role person logged in
     And ACME Widgets, Inc. employer visit the Employee Roster
     Then Employer logs out
@@ -72,7 +72,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given Qualifying life events are present
     And there is an employer ABC Widgets
     And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
-    
+
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
@@ -98,54 +98,54 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
 
 
-     When Employee clicks on New Hire Badge
-     When Employee clicks continue on the group selection page
-     Then Employee should see the list of plans
-     # And I should not see any plan which premium is 0
-     When Employee selects a plan on the plan shopping page
-     When Employee clicks on Confirm button on the coverage summary page
-     And Employee sees Enrollment Submitted and clicks Continue
+    When Employee clicks on New Hire Badge
+    When Employee clicks continue on the group selection page
+    Then Employee should see the list of plans
+    # And I should not see any plan which premium is 0
+    When Employee selects a plan on the plan shopping page
+    When Employee clicks on Confirm button on the coverage summary page
+    And Employee sees Enrollment Submitted and clicks Continue
 
-     Then Patrick Doe should see enrollment on my account page
-  
+    Then Patrick Doe should see enrollment on my account page
+
   # Is this needed?
   # Scenario: Existing Employee should not get effective date before renewing plan year start date
-    # Given Conversion Employer for Soren White exists with active and renewing plan year
-      # And Employee has not signed up as an HBX user
-      # And Soren White visits the employee portal
-      # When Soren White creates an HBX account
-      # And I select the all security question and give the answer
-      # When I have submitted the security questions
-      # And I select the all security question and give the answer
-      # When I have submitted the security questions
-      # When Employee goes to register as an employee
-      # Then Employee should see the employee search page
-      # When Employee enters the identifying info of Soren White
-      # Then Employee should see the matched employee record form
-      # Then Employee Soren White should have the renewing plan year start date as earliest effective date
-      # Then Employee Soren White should not see earliest effective date on the page
+  # Given Conversion Employer for Soren White exists with active and renewing plan year
+  # And Employee has not signed up as an HBX user
+  # And Soren White visits the employee portal
+  # When Soren White creates an HBX account
+  # And I select the all security question and give the answer
+  # When I have submitted the security questions
+  # And I select the all security question and give the answer
+  # When I have submitted the security questions
+  # When Employee goes to register as an employee
+  # Then Employee should see the employee search page
+  # When Employee enters the identifying info of Soren White
+  # Then Employee should see the matched employee record form
+  # Then Employee Soren White should have the renewing plan year start date as earliest effective date
+  # Then Employee Soren White should not see earliest effective date on the page
 
   # These is essentially the same scenarios as those on lines 35 and 52
   # Scenario: Existing Employee can't buy coverage before open enrollment of renewing plan year
-      # Given Conversion Employer for Soren White exists with active and renewing plan year
-      # And Employer for Soren White published renewing plan year
-      # And Soren White already matched and logged into employee portal
-      # When Employee clicks "Shop for Plans" on my account page
-      # When Employee clicks continue on the group selection page
-      # Then Soren White should see "open enrollment not yet started" error message
+  # Given Conversion Employer for Soren White exists with active and renewing plan year
+  # And Employer for Soren White published renewing plan year
+  # And Soren White already matched and logged into employee portal
+  # When Employee clicks "Shop for Plans" on my account page
+  # When Employee clicks continue on the group selection page
+  # Then Soren White should see "open enrollment not yet started" error message
 
   # This is essentially the same scenario as the one on line 70
   # Scenario: Existing Employee can't buy coverage under off-exchange plan year using QLE
-    # Given Conversion Employer for Soren White exists with active and renewing plan year
-    # And Employer for Soren White published renewing plan year
-    # And Soren White already matched and logged into employee portal
-    # When Employee click the "Married" in qle carousel
-    # And Employee select a past qle date
-    # Then Employee should see confirmation and clicks continue
-    # Then Employee should see family members page and clicks continue
-    # Then Employee should see the group selection page
-    # When Employee clicks continue on the group selection page
-    # Then Soren White should see "open enrollment not yet started" error message
+  # Given Conversion Employer for Soren White exists with active and renewing plan year
+  # And Employer for Soren White published renewing plan year
+  # And Soren White already matched and logged into employee portal
+  # When Employee click the "Married" in qle carousel
+  # And Employee select a past qle date
+  # Then Employee should see confirmation and clicks continue
+  # Then Employee should see family members page and clicks continue
+  # Then Employee should see the group selection page
+  # When Employee clicks continue on the group selection page
+  # Then Soren White should see "open enrollment not yet started" error message
 
   Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year using QLE
     Given a CCA site exists with a benefit market
@@ -153,7 +153,7 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
     Given Qualifying life events are present
     And there is an employer ABC Widgets
     And renewal employer ABC Widgets has imported and renewal enrollment_open benefit applications
-    
+
     Given there exists Patrick Doe employee for employer ABC Widgets
     And employee Patrick Doe has current hired on date
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
@@ -171,19 +171,19 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
 
     Then Patrick Doe should see enrollment on my account page start date as effective date
 
-  # This should be covered on line 91
-  # Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year
-      # Given Conversion Employer for Soren White exists with active and renewing plan year
-      # And Employer for Soren White is under open enrollment
-      # And Soren White already matched and logged into employee portal
-      # When Employee clicks "Shop for Plans" on my account page
-      # When Employee clicks continue on the group selection page
-      # Then Employee should see the list of plans
-      # And I should not see any plan which premium is 0
-      # When Employee selects a plan on the plan shopping page
-      # Then Soren White should see coverage summary page with renewing plan year start date as effective date
-      # Then Soren White should see the receipt page with renewing plan year start date as effective date
-      # Then Employee should see "my account" page with enrollment
+# This should be covered on line 91
+# Scenario: Existing Employee can buy coverage during open enrollment of renewing plan year
+# Given Conversion Employer for Soren White exists with active and renewing plan year
+# And Employer for Soren White is under open enrollment
+# And Soren White already matched and logged into employee portal
+# When Employee clicks "Shop for Plans" on my account page
+# When Employee clicks continue on the group selection page
+# Then Employee should see the list of plans
+# And I should not see any plan which premium is 0
+# When Employee selects a plan on the plan shopping page
+# Then Soren White should see coverage summary page with renewing plan year start date as effective date
+# Then Soren White should see the receipt page with renewing plan year start date as effective date
+# Then Employee should see "my account" page with enrollment
 
 #  Scenario: Existing Employee can buy coverage from multiple employers during open enrollment of renewing plan year
 #

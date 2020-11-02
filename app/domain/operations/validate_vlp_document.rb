@@ -3,8 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 
-# Validate latest VLP Document against V37 Contract for a given person
 module Operations
+  # Validate latest VLP Document against V37 Contract for a given person
   class ValidateVlpDocument
     send(:include, Dry::Monads[:result, :do])
 

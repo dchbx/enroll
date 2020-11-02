@@ -1,0 +1,196 @@
+- step:
+    heading: Income for <family-member-name-placeholder>
+    heading_text: Tell us about this person's other income. When you're finished select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: What Kind of income is this?*
+                  required: true
+                - gutter: 6
+                  type: 'dropdown'
+                  name: 'income_kind'
+                  id: 'income_kind_dropdown'
+                  required: true
+                  id: 'income_kind'
+                  values:
+                    - wages_and_salaries
+                    - alimony_and_maintenance
+                    - american_indian_and_alaskan_native
+                    - capital_gains
+                    - dividend
+                    - employer_funded_disability
+                    - estate_trust
+                    - farming_and_fishing
+                    - foreign
+                    - interest
+                    - lump_sum_amount
+                    - military
+                    - net_self_employment
+                    - other
+                    - pension_retirement_benefits
+                    - permanent_workers_compensation
+                    - prizes_and_awards
+                    - rental_and_royalty
+                    - scholorship_payments
+                    - social_security_benefit
+                    - supplemental_security_income
+                    - tax_exempt_interest
+                    - unemployment_insurance
+                    - income_from_irs
+                  model: income
+                  attribute: kind
+            - cells:
+                - gutter: 3
+                  type: input
+                  name: amount
+                  placeholder: AMOUNT *
+                  required: true
+                  model: income
+                  attribute: amount
+                - gutter: 3
+                  type: dropdown
+                  name: How Often *
+                  required: true
+                  prompt: Select One
+                  values:
+                    - biweekly 
+                    - daily 
+                    - half_yearly 
+                    - monthly 
+                    - quarterly 
+                    - weekly 
+                    - yearly
+                  model: income
+                  attribute: frequency_kind 
+                - gutter: 3
+                  type: input_date
+                  name: start_on
+                  placeholder: FROM *
+                  required: true
+                  model: income
+                  attribute: start_on
+                - gutter: 3
+                  type: input_date
+                  name: end_on
+                  placeholder: TO
+                  model: income
+                  attribute: end_on
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_name
+                  placeholder: EMPLOYER NAME *
+                  #required: true
+                  model: income
+                  attribute: employer_name
+                - gutter: 6
+                  type: input
+                  name: employer_phone
+                  placeholder: EMPLOYER PHONE *
+                  model: employer_phone
+                  accessor:
+                    - employer_phone
+                  attribute: full_phone_number
+            - cells:
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_1
+                  placeholder: EMP ADD LINE 1 *
+                  #required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_1
+                - gutter: 6
+                  type: input
+                  name: employer_address_line_2
+                  placeholder: EMP ADD LINE 2
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: address_2
+            - cells:
+                - gutter: 4
+                  type: input
+                  name: city
+                  placeholder: CITY *
+                  #required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: city
+                - gutter: 4
+                  type: 'dropdown'
+                  name: 'STATE *'
+                  prompt: Choose State
+                  #required: true
+                  values:
+                    - AL
+                    - AK
+                    - AZ
+                    - AR
+                    - CA
+                    - CO
+                    - CT
+                    - DE
+                    - DC
+                    - FL
+                    - GA
+                    - HI
+                    - ID
+                    - IL
+                    - IN
+                    - IA
+                    - KS
+                    - KY
+                    - LA
+                    - ME
+                    - MD
+                    - MA
+                    - MI
+                    - MN
+                    - MS
+                    - MO
+                    - MT
+                    - NE
+                    - NV
+                    - NH
+                    - NJ
+                    - NY
+                    - NC
+                    - ND
+                    - OH
+                    - OK
+                    - OR
+                    - PA
+                    - PR
+                    - RI
+                    - SC
+                    - SD
+                    - TN
+                    - TX
+                    - UT
+                    - VA
+                    - VI
+                    - VT
+                    - WA
+                    - WV
+                    - WI
+                    - WY
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: state
+                - gutter: 4
+                  type: input
+                  name: zip
+                  placeholder: ZIP *
+                  #required: true
+                  model: employer_address
+                  accessor:
+                    - employer_address
+                  attribute: zip
+            

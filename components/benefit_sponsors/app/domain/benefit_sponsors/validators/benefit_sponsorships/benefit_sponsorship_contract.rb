@@ -26,7 +26,7 @@ module BenefitSponsors
           optional(:benefit_applications).array(:hash)
         end
 
-        rule(:benefit_applications).each do |key, value|
+        rule(:benefit_applications).each do
           if key? && value
             result = Validators::BenefitApplications::BenefitApplicationContract.new.call(value)
             key.failure(text: "invalid benefit application", error: result.errors.to_h) if result&.failure?

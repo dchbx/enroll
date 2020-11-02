@@ -90,7 +90,7 @@
         </div>
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
-          <% if @tax_household.present? && params[:market_kind]=='individual'%>
+          <% if @tax_household.present? && params[:market_kind]=='individual' && params[:coverage_kind] == 'health' %>
             <% eligibility_kind = @tax_household.valid_csr_kind(@hbx_enrollment) %>
             <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != 'csr_0' && plan.metal_level != "silver" %>
               <%= link_to l10n("select_plan"), "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;

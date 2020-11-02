@@ -14,23 +14,23 @@ Feature: Employer terminates borker and hires new broker
     And ABC Widgets employer has a staff role
     And initial employer ABC Widgets has draft benefit application
 
-    Scenario: Employer assigns broker agency
-      And staff role person logged in
-      And ABC Widgets goes to the brokers tab
-      Then Employer should see no active broker
-      When Employer clicks on Browse Brokers button
-      Then Employer should see broker agencies index view
+  Scenario: Employer assigns broker agency
+    And staff role person logged in
+    And ABC Widgets goes to the brokers tab
+    Then Employer should see no active broker
+    When Employer clicks on Browse Brokers button
+    Then Employer should see broker agencies index view
 
-      When Employer searches broker agency District Brokers Inc
-      Then Employer should see broker agency District Brokers Inc
+    When Employer searches broker agency District Brokers Inc
+    Then Employer should see broker agency District Brokers Inc
 
-      When Employer searches broker agency Browns Inc
-      Then Employer should see broker agency Browns Inc
+    When Employer searches broker agency Browns Inc
+    Then Employer should see broker agency Browns Inc
 
-      When Employer searches primary broker Max Planck
-      Then Employer should see broker agency District Brokers Inc
+    When Employer searches primary broker Max Planck
+    Then Employer should see broker agency District Brokers Inc
 
-      When Employer searches primary broker Jane Goodall
-      Then Employer should see broker agency Browns Inc
+    When Employer searches primary broker Jane Goodall
+    Then Employer should see broker agency Browns Inc
 
-      And Employer logs out
+    And Employer logs out

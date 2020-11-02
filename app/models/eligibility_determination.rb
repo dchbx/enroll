@@ -6,7 +6,8 @@ class EligibilityDetermination
 
   embedded_in :tax_household
 
-  SOURCE_KINDS = %w[Curam Admin Renewals].freeze
+
+  SOURCE_KINDS = %w[Curam Admin Renewals Faa].freeze # TODO change "Renewals" source kind
 
   CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited)
 
@@ -38,6 +39,10 @@ class EligibilityDetermination
   # Available to households with income between 100-250% of FPL and enrolled in Silver plan.
   field :csr_percent_as_integer, type: Integer, default: 0  #values in DC: 0, 73, 87, 94
   field :csr_eligibility_kind, type: String, default: 'csr_0'
+
+  field :aptc_csr_annual_household_income, type: Money, default: 0.00
+  field :aptc_annual_income_limit, type: Money, default: 0.00
+  field :csr_annual_income_limit, type: Money, default: 0.00
 
   field :determined_at, type: DateTime
 

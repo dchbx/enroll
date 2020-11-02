@@ -66,6 +66,14 @@ module BenefitSponsors
       let(:later_date) { Date.new(2019, 1, 28) }
       let(:both_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1)] }
       let(:dc_dates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1), Date.new(2019, 4, 1)] }
+      let(:dc_dates_with_late_rates) { [Date.new(2019, 2, 1), Date.new(2019, 3, 1)] }
+      let(:dates) do
+        if previous_date.day > Settings.aca.shop_market.initial_application.earliest_start_prior_to_effective_on.day_of_month
+          dc_dates
+        else
+          dc_dates_with_late_rates
+        end
+      end
 
       context 'after open_enrollment_minimum_begin_day_of_month' do
         before :each do
@@ -103,7 +111,7 @@ module BenefitSponsors
             if Settings.site.key == :cca
               expect(subject.calculate_start_on_dates).to eq both_dates
             else
-              expect(subject.calculate_start_on_dates).to eq dc_dates
+              expect(subject.calculate_start_on_dates).to eq dates
             end
           end
         end
@@ -113,7 +121,7 @@ module BenefitSponsors
             if Settings.site.key == :cca
               expect(subject.calculate_start_on_dates(true)).to eq both_dates
             else
-              expect(subject.calculate_start_on_dates(true)).to eq dc_dates
+              expect(subject.calculate_start_on_dates(true)).to eq dates
             end
           end
         end

@@ -180,15 +180,15 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2019,11,1) %>
-      end_on: <%= Date.new(2020,9,15) %>
+      start_on: <%= Date.new(2020,11,1) %>
+      end_on: <%= Date.new(2021,1,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
       # transition_family_members_link: true
     upcoming_open_enrollment:
-      start_on: <%= Date.new(2020,11,1) %>
-      end_on: <%= Date.new(2021,01,31) %>
+      start_on: <%= Date.new(2021,11,1) %>
+      end_on: <%= Date.new(2022,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
@@ -251,6 +251,7 @@ aca:
       non_binder_paid_notice_day_of_month: 16
       earliest_start_prior_to_effective_on:
         months: -3
+        # Will occur the day after the date here
         day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
@@ -265,7 +266,7 @@ aca:
       earliest_start_prior_to_effective_on:
         months: -3
         # Will occur the day after the date here
-        day_of_month: 15
+        day_of_month: 0
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
       application_submission_soft_deadline: 5

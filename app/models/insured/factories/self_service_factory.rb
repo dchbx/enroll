@@ -43,17 +43,17 @@ module Insured
         # field :applied_aptc_amount, type: Money, default: 0.0
         enrollment = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
 
-        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)"))
+        new_effective_date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         reinstatement = Enrollments::Replicator::Reinstatement.new(enrollment, new_effective_date, applied_aptc_amount).build
         reinstatement.save!
         update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
+
         reinstatement.select_coverage!
       end
 
       def self.update_enrollment_for_apcts(reinstatement, applied_aptc_amount)
         applicable_aptc_by_member = member_level_aptc_breakdown(reinstatement, applied_aptc_amount)
         cost_decorator = UnassistedPlanCostDecorator.new(reinstatement.product, reinstatement, applied_aptc_amount)
-
         reinstatement.hbx_enrollment_members.each do |enrollment_member|
           member_aptc_value = applicable_aptc_by_member[enrollment_member.applicant_id.to_s]
           next enrollment_member unless member_aptc_value
@@ -111,7 +111,7 @@ module Insured
           family: family,
           qle: qle,
           is_aptc_eligible: is_aptc_eligible(enrollment, family),
-          new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(DateTime.now.in_time_zone("Eastern Time (US & Canada)")),
+          new_effective_on: Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date,
           available_aptc: available_aptc,
           default_tax_credit_value: default_tax_credit_value,
           elected_aptc_pct: elected_aptc_pct,
@@ -124,20 +124,27 @@ module Insured
         Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, enrollment.id)
       end
 
-      def self.find_enrollment_effective_on_date(hbx_created_datetime)
-        # offset_month = hbx_created_datetime.day <= 15 ? 1 : 2
-        offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
-        year = hbx_created_datetime.year
-        month = hbx_created_datetime.month + offset_month
-        if month > 12
-          year = year + 1
-          month = month - 12
-        end
+      def self.find_enrollment_effective_on_date(hbx_created_datetime, current_enrollment_effective_on)
         day = 1
         hour = hbx_created_datetime.hour
         min = hbx_created_datetime.min
         sec = hbx_created_datetime.sec
-        return DateTime.new(year, month, day, hour, min, sec)
+        # this condition is for self service APTC feature ONLY.
+        if current_enrollment_effective_on.year != hbx_created_datetime.year
+          condition = (Date.new(hbx_created_datetime.year, 11, 1)..Date.new(hbx_created_datetime.year, 12, 15)).include?(hbx_created_datetime.to_date)
+          offset_month = condition ? 0 : 1
+          year = current_enrollment_effective_on.year
+          month = current_enrollment_effective_on.month + offset_month
+        else
+          offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
+          year = hbx_created_datetime.year
+          month = hbx_created_datetime.month + offset_month
+          if month > 12
+            year += 1
+            month -= 12
+          end
+        end
+        DateTime.new(year, month, day, hour, min, sec)
       end
 
       private

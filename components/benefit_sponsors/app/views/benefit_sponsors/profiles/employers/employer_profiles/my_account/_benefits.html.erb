@@ -161,7 +161,7 @@
             </div>
           </div>
         <% end %>
-
+        <% next if benefit_application.benefit_packages.blank? && benefit_application.canceled? %>
         <% benefit_application.benefit_packages.each do |package| %>
         <div class="benefit-group">
           <% # next if package.reference_plan_id.blank? %>

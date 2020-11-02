@@ -84,9 +84,6 @@ Metrics/AbcSize:
 Metrics/ClassLength:
   Max: 300
 
-Metrics/ModuleLength:
-  Max: 300
-
 Metrics/CyclomaticComplexity:
   Max: 8
 
@@ -145,6 +142,9 @@ Style/StringLiterals:
 Style/SymbolArray:
   Enabled: false
 
+Style/TernaryParentheses:
+  Enabled: false
+
 Style/WordArray:
   Enabled: false
 
@@ -152,7 +152,8 @@ Bundler/OrderedGems:
   Enabled: false
 
 Gemspec/OrderedDependencies:
-  Enabled: false
+  Enabled:
+    false
 
 require:
   - ./cops/lint/empty_rescue_clause.rb

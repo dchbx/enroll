@@ -1,7 +1,0 @@
-default: --format pretty --strict --tags  'not @wip' --tags 'not @ma_only' --tags 'not @quoting_enabled' --tags 'not @edit_aptc' --tags  'not @more_than_sole_source' -r features --profile semaphoreci
-wip: --tags @wip:11 --wip features
-rerun: -format rerun --out rerun.txt --strict --tags ~@wip
-first_rerun: --format 'pretty' --format rerun --out tmp/cucumber_failures_2.log
-second_rerun: --format 'pretty' --format rerun --out tmp/cucumber_failures_3.log
-screenshots: -r features SCREENSHOTS=true
-semaphoreci: --format rerun --out rerun.txt --format json --out=cucumber_report.json

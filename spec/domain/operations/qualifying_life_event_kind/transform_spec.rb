@@ -143,11 +143,12 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
   end
 
   context 'for expire case with current date - 1.day' do
+    let(:user) {FactoryBot.create(:user)}
     before :each do
       qlek.update_attributes!(aasm_state: :active,
                               start_on: (TimeKeeper.date_of_record - 30.days),
                               end_on: (TimeKeeper.date_of_record - 10.days))
-      @result = subject.call(params: {qle_id: qlek.id.to_s, end_on: (TimeKeeper.date_of_record - 1.day).strftime("%Y-%m-%d")})
+      @result = subject.call(params: {qle_id: qlek.id.to_s, updated_by: user.id, end_on: (TimeKeeper.date_of_record - 1.day).strftime("%Y-%m-%d")})
       qlek.reload
     end
 
@@ -162,5 +163,10 @@ RSpec.describe Operations::QualifyingLifeEventKind::Transform, type: :model, dbc
     it 'should tranform the qlek object to expired state' do
       expect(qlek.aasm_state).to eq(:expired)
     end
+
+    it 'should set updated by id' do
+      expect(qlek.updated_by).to eq user.id
+    end
+
   end
 end

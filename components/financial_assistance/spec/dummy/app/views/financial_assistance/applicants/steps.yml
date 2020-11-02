@@ -1,0 +1,480 @@
+- step:
+    heading: Tax Info for <family-member-name-placeholder>
+    heading_text: Tell us about this person's tax info. When you're finished select CONTINUE.
+    sections:
+      - section:
+          lines:
+            - cells:
+                - gutter: 5
+                  type: text
+                  text: Will this person file taxes for <application-applicable-year-placeholder>? *
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'is_required_to_file_taxes_yes'
+                  required: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_required_to_file_taxes
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'is_required_to_file_taxes_no'
+                  required: true
+                  label: 'No'
+                  model: applicant
+                  attribute: is_required_to_file_taxes
+                - gutter: 3
+                  type: support_text_raw_html
+                  support_text_key: is_required_to_file_taxes
+            - cells:
+                - gutter: 5
+                  type: text
+                  text: Will this person be filing jointly?
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'is_joint_tax_filing_yes'
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_joint_tax_filing
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'is_joint_tax_filing_no'
+                  label: 'No'
+                  model: applicant
+                  attribute: is_joint_tax_filing
+                - gutter: 3
+                  type: support_text_raw_html
+                  support_text_key: is_joint_tax_filing
+            - cells:
+                - gutter: 5
+                  type: text
+                  text: Will this person be claimed as a tax dependent for <application-applicable-year-placeholder>? *
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: true
+                  id: 'is_claimed_as_tax_dependent_yes'
+                  required: true
+                  label: 'Yes'
+                  model: applicant
+                  attribute: is_claimed_as_tax_dependent
+                - gutter: 2
+                  type: label_radio
+                  name: row2
+                  value: false
+                  id: 'is_claimed_as_tax_dependent_no'
+                  required: true
+                  label: 'No'
+                  model: applicant
+                  attribute: is_claimed_as_tax_dependent
+                - gutter: 3
+                  type: support_text_raw_html
+                  support_text_key: is_claimed_as_tax_dependent
+            - cells:
+                - gutter: 6
+                  type: text
+                  text: This person will be claimed as a dependent by
+                  required: true
+                - gutter: 3
+                  type: 'claimed_as_dependent_by_dropdown'
+                  name: ''
+                  values:
+                    - Select who will claim this person
+                  model: applicant
+                  attribute: claimed_as_tax_dependent_by
+                - gutter: 3
+                  type: support_text_raw_html
+                  support_text_key: claimed_as_tax_dependent_by
+# - step:
+#     heading: Other Questions for <family-member-name-placeholder>
+#     heading_text: Tell us about this person's other questions. When you're finished select CONTINUE.
+#     sections:
+#       - section:
+#           lines:
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Has this person applied for an SSN *
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   id: 'is_ssn_applied_yes'
+#                   required: true
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: is_ssn_applied
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   id: 'is_ssn_applied_no'
+#                   required: true
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: is_ssn_applied
+
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Is this person pregnant? *
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   id: 'is_pregnant_yes'
+#                   required: true
+#                   id: 'is_pregnant_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: is_pregnant
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   id: 'is_pregnant_no'
+#                   required: true
+#                   id: 'is_pregnant_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: is_pregnant
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Pregnancy Due date
+#                 - gutter: 2
+#                   type: input_date
+#                   placeholder: Due date
+#                   id: 'yes2'
+#                   model: applicant
+#                   attribute: pregnancy_due_on
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text:  How many children is this person expecting?
+#                 - gutter: 3
+#                   type: 'dropdown'
+#                   name: ''
+#                   values:
+#                     - one
+#                     - two
+#                     - three
+#                   id: 'applicant_children_expected_count'
+#                   model: applicant
+#                   attribute: children_expected_count
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Was this person pregnant in the last 60 days?
+#                   classNames: 'span-text'
+#                 - gutter: 2
+#                   type: label_radio
+#                   value: true
+#                   id: 'is_post_partum_period_yes'
+#                   label: 'Yes'
+#                   classNames: 'span-text'
+#                   model: applicant
+#                   attribute: is_post_partum_period
+#                 - gutter: 2
+#                   type: label_radio
+#                   value: false
+#                   id: 'is_post_partum_period_no'
+#                   label: 'No'
+#                   classNames: 'span-text'
+#                   model: applicant
+#                   attribute: is_post_partum_period
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Pregnancy End on date
+#                 - gutter: 2
+#                   type: input_date
+#                   placeholder: End on date
+#                   id: 'yes2'
+#                   model: applicant
+#                   attribute: pregnancy_end_on
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Was this person on Medicaid during pregnancy?
+#                   classNames: 'span-text'
+#                 - gutter: 2
+#                   type: label_radio
+#                   value: true
+#                   id: 'medicaid_pregnancy_yes'
+#                   label: 'Yes'
+#                   classNames: 'span-text'
+#                   model: applicant
+#                   attribute: is_enrolled_on_medicaid
+#                 - gutter: 2
+#                   type: label_radio
+#                   value: false
+#                   id: 'medicaid_pregnancy_no'
+#                   label: 'No'
+#                   classNames: 'span-text'
+#                   model: applicant
+#                   attribute: is_enrolled_on_medicaid
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Was this person in foster care at age 18 or older? *
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   id: 'former_foster_care_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: is_former_foster_care
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   id: 'former_foster_care_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: is_former_foster_care
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text:  Where was this person in foster care?
+#                 - gutter: 2
+#                   type: 'dropdown'
+#                   name: ''
+#                   values:
+#                     - Choose State
+#                     - AL
+#                     - AK
+#                     - AZ
+#                     - AR
+#                     - CA
+#                     - CO
+#                     - CT
+#                     - DE
+#                     - DC
+#                     - FL
+#                     - GA
+#                     - HI
+#                     - ID
+#                     - IL
+#                     - IN
+#                     - IA
+#                     - KS
+#                     - KY
+#                     - LA
+#                     - ME
+#                     - MD
+#                     - MA
+#                     - MI
+#                     - MN
+#                     - MS
+#                     - MO
+#                     - MT
+#                     - NE
+#                     - NV
+#                     - NH
+#                     - NJ
+#                     - NY
+#                     - NC
+#                     - ND
+#                     - OH
+#                     - OK
+#                     - OR
+#                     - PA
+#                     - PR
+#                     - RI
+#                     - SC
+#                     - SD
+#                     - TN
+#                     - TX
+#                     - UT
+#                     - VT
+#                     - WA
+#                     - WV
+#                     - WI
+#                     - WY
+#                   id: 'kind'
+#                   model: applicant
+#                   attribute: foster_care_us_state
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text:  How old was this person when they left foster care?
+#                 - gutter: 2
+#                   type: 'age_left_foster_care_dropdown'
+#                   name: ''
+#                   values:
+#                     # - xx
+#                   id: 'kind'
+#                   model: applicant
+#                   attribute: age_left_foster_care
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Was this person enrolled in Medicaid when they left foster care?
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   id: 'had_medicaid_during_foster_care_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: had_medicaid_during_foster_care
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   id: 'had_medicaid_during_foster_care_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: had_medicaid_during_foster_care
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Is this person a student? *
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   required: true
+#                   id: 'is_student_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: is_student
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   required: true
+#                   id: 'is_student_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: is_student
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text:  What is the type of student?
+#                 - gutter: 3
+#                   type: 'dropdown'
+#                   name: ''
+#                   values:
+#                     - Dropout
+#                     - Full Time
+#                     - Graduated
+#                     - Half Time
+#                     - Part Time
+#                     - Not In School
+#                   id: 'student_kind_id'
+#                   model: applicant
+#                   attribute: student_kind
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Student status end on date?
+#                 - gutter: 2
+#                   type: input_date
+#                   placeholder: End on
+#                   id: 'student_status_end_on'
+#                   model: applicant
+#                   attribute: student_status_end_on
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text:  What type of school do you go to?
+#                 - gutter: 3
+#                   type: 'dropdown'
+#                   name: ''
+#                   values:
+#                     - Pre School
+#                     - Graduate School
+#                     - English Language Institute
+#                     - Open University
+#                     - Primary
+#                     - Elementary
+#                     - GED
+#                     - Junior School
+#                     - Secondary (High School)
+#                     - Equivalent Vocational/Tech
+#                     - Vocational
+#                     - Technical
+#                     - Undergraduate
+#                   id: 'student_school_kind'
+#                   model: applicant
+#                   attribute: student_school_kind
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Is this person blind? * #is_self_attested_blind_or_disabled
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   required: true
+#                   id: 'is_self_attested_blind_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: is_self_attested_blind
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   required: true
+#                   id: 'is_self_attested_blind_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: is_self_attested_blind
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Does this person need help with daily life activities, such as dressing or bathing? * #has_daily_living_help
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   required: true
+#                   id: 'has_daily_living_help_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: has_daily_living_help
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   required: true
+#                   id: 'has_daily_living_help_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: has_daily_living_help
+#             - cells:
+#                 - gutter: 6
+#                   type: text
+#                   text: Does this person need help paying for any medical bills from the last 3 months? * #need_help_paying_bills
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: true
+#                   required: true
+#                   id: 'need_help_paying_bills_yes'
+#                   label: 'Yes'
+#                   model: applicant
+#                   attribute: need_help_paying_bills
+#                 - gutter: 2
+#                   type: label_radio
+#                   name: row2
+#                   value: false
+#                   required: true
+#                   id: 'need_help_paying_bills_no'
+#                   label: 'No'
+#                   model: applicant
+#                   attribute: need_help_paying_bills
+#             - cells:
+#                 - gutter: 12
+#                   type: raw_html
+#                   text: 'Help may include <span href="#" data-toggle="tooltip" title="Medicaid is a joint federal-state health program that provides health care coverage to low-income and disabled adults, children and families. To be eligible for DC Medicaid, you must be a District resident and must meet non-financial and financial eligibility requirements. Medicaid covers many services, including doctor visits, hospital care, prescription drugs, mental health services, transportation and many other services at little or no cost to the individual. Currently, 1 out of every 3 District residents receives quality health care coverage through the Medicaid program. Learn more about DC Medicaid." class= "dottedline test" >Medicaid</span>, <span href="#" data-toggle="tooltip" title="An informal way of referring to the Advance Premium Tax Credit for individuals or families or the Small Business Tax Credit." class= "dottedline test">tax credits</span>, or <span href="#" data-toggle="tooltip" title="A discount that lowers your costs for deductibles, coinsurance, copayments, and also lowers what you have to pay to reach your out-of-pocket limit. To get these savings, you must apply for financial assistance. DC Health Link will help you determine if you qualify as part of the application process. Then you can enroll. Most customers must enroll in a Silver Health Plan to receive cost-sharing reductions. Native Americans receive additional cost-sharing reductions regardless of a plan''s metal level." class= "dottedline test">cost-sharing reductions</span>'

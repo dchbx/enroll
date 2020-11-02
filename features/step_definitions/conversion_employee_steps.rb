@@ -308,6 +308,6 @@ Then(/Employee should see confirmation and clicks continue/) do
 end
 
 Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "Household Info: Family Members"
+  expect(page).to have_content "#{l10n('family_information')}"
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end

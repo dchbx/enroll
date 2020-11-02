@@ -1,0 +1,5 @@
+stopEditingOtherIncome();
+<% if @applicant.incomes.of_kind(@income.kind).blank? %>
+	$('.other-income-checkbox-<%= @income.kind %>').prop('checked', false);
+	$('.add-more-link-<%=@income.kind%>').addClass("hidden");
+<% end %>

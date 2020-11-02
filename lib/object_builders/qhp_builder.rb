@@ -250,9 +250,6 @@ class QhpBuilder
           if product.present?
             product.update_attributes(title: cost_share_variance.plan_marketing_name.squish!)
           else
-            issuer_id = cost_share_variance.hios_plan_and_variant_id[0..4]
-            carrier_profile = CarrierProfile.for_issuer_hios_id(issuer_id).first
-            carrier_profile_id = carrier_profile.nil? ? nil : carrier_profile.id
             shared_attributes ={
               benefit_market_kind: "aca_#{parse_market}",
               title: cost_share_variance.plan_marketing_name.squish!,

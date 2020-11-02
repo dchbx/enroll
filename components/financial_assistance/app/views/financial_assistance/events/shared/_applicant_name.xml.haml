@@ -1,0 +1,9 @@
+%person_name
+  %person_surname= applicant_name.last_name
+  %person_given_name= applicant_name.first_name
+  - if !applicant_name.middle_name.blank?
+    %person_middle_name= applicant_name.middle_name
+  - if !applicant_name.name_pfx.blank?
+    %person_name_prefix_text= applicant_name.name_pfx
+  - if !applicant_name.name_sfx.blank?
+    %person_name_suffix_text= applicant_name.name_sfx

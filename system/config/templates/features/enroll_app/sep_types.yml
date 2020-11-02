@@ -123,16 +123,14 @@ registry:
             meta:
               label: Effective Date Rules *
               enum: [{date_of_event: Date of Event},
+              {date_of_event_plus_one: Date of event + 1},
               {first_of_this_month: First of Event Month},
               {fixed_first_of_next_month: First of Month after Event},
-              {fifteenth_of_the_month: Event First of Next Month},
-              {first_of_month_plan_selection: First of the Month following Plan Selection},
-              {fifteenth_of_month_plan_selection: 15th of Month Plan Shopping},
               {first_of_reporting_month: First of Reporting Month},
-              {fixed_first_of_next_month_reporting: First of Month after Reporting},
-              {exact_date: Exact Date},
-              {first_of_month: First of Month},
-              {first_of_next_month: First of Next Month}]
+              {first_of_next_month_reporting: First of Month after Reporting},
+              {first_of_month: 15th of the Month},
+              {first_of_next_month_coinciding: First of Next Month (Coinciding)},
+              {first_of_next_month_plan_selection: First of Next Month (Plan Selection)}]
               content_type: :checkbox_select
               default: ''
               description: ''

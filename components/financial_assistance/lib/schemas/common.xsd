@@ -1,0 +1,2050 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 (x64) (http://www.altova.com) by Dan Thomas (Private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" xmlns:altova="http://www.altova.com/xml-schema-extensions" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified" version="1.0">
+	<xs:complexType name="AddressListType">
+		<xs:sequence>
+			<xs:element name="address" type="AddressType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="nonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="addresses" type="AddressListType">
+		<xs:annotation>
+			<xs:documentation>Collection of places where an individual or organization is situated</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="alias_ids">
+		<xs:annotation>
+			<xs:documentation>Additional keys or system identifiers for a known resource</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="alias_id" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="id" type="xs:anyURI">
+								<xs:annotation>
+									<xs:documentation>Dereferenceable ID for this resource</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="is_authoritative" type="xs:boolean" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Indicates this record is: 1) obtained from the authority source for this resource, and 2) this instance is the authority record for this individual</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="approvals">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="approval" type="ApprovalType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="comments">
+		<xs:annotation>
+			<xs:documentation>Collection of comment instances</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="comment" type="CommentType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="contacts">
+		<xs:annotation>
+			<xs:documentation>Collection of official representatives and communication channels</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="contact" type="ContactType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="emails">
+		<xs:annotation>
+			<xs:documentation>Collection of email addresses for an individual or organization</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="email" type="EmailType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="extended_resource_instance_uri" type="xs:anyURI">
+		<xs:annotation>
+			<xs:documentation>Optional, additional dereferenceable resource identifier(s)</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:element name="phones">
+		<xs:annotation>
+			<xs:documentation>Collection of phone numbers for an individual or oranization</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="phone" type="PhoneType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="rates">
+		<xs:annotation>
+			<xs:documentation>Factors and price of a particular plan</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="rate" type="RateType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="resource_instance_uri" type="IdentifierSimpleType">
+		<xs:annotation>
+			<xs:documentation>Dereferenceable resource identifier</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:group name="HbxIdentifierGroup">
+		<xs:annotation>
+			<xs:documentation>Resource identifier that is unique across all Exchanges</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="identifier" type="IdentifierType"/>
+			<xs:element ref="alias_ids" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="ResourceTimestampGroup">
+		<xs:sequence>
+			<xs:element name="created_at" type="xs:dateTime"/>
+			<xs:element name="modified_at" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="version" type="xs:integer" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="OptionalResourceTimestampGroup">
+		<xs:sequence>
+			<xs:element name="created_at" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="modified_at" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="version" type="xs:integer" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="CommentedActiveResourceGroup">
+		<xs:sequence>
+			<xs:element name="is_active" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates this resource is operative on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="comments" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="SubmittedCommentedActiveResourceGroup">
+		<xs:sequence>
+			<xs:element name="submitted_at" type="xs:dateTime" minOccurs="0"/>
+			<xs:group ref="CommentedActiveResourceGroup"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="ServiceEndpointGroup">
+		<xs:annotation>
+			<xs:documentation>Identifier pair for a single Exchange resource in both enterprise URI and local service form</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="urn" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Unique reference for this service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="uri" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Derefernceable URI for this service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:simpleType name="AddressKindType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:address_type#home"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:address_type#mailing"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:address_type#work"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="LocationStateCodeType">
+		<xs:annotation>
+			<xs:documentation>US Postal 2-Letter State Code</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AddressType">
+		<xs:annotation>
+			<xs:documentation>Physical street or mailing address</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type" type="AddressKindType"/>
+			<xs:element name="address_line_1" type="nonEmptyString"/>
+			<xs:element name="address_line_2" type="xs:string" minOccurs="0"/>
+			<xs:element name="address_line_3" type="xs:string" minOccurs="0"/>
+			<xs:element name="location_city_name" type="xs:string"/>
+			<xs:element name="location_county_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name for the county, parish, or other administrative unit in which this address exists.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="location_county_code" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Assigned code for the county, parish, or other administrative unit in which this address exists. In the US this would be a FIPS county code.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="location_state" type="UsStateNameType" minOccurs="0"/>
+			<xs:element name="location_state_code" type="LocationStateCodeType" minOccurs="1"/>
+			<xs:element name="postal_code" type="xs:integer"/>
+			<xs:element name="location_postal_extension_code" type="xs:integer" minOccurs="0"/>
+			<xs:element name="location_country_name" type="xs:string" minOccurs="0"/>
+			<xs:element name="location_country_code" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="address_full_text" type="xs:string" minOccurs="0"/>
+			<xs:element name="location" type="LocationNameType" minOccurs="0"/>
+			<xs:element name="is_preferred" type="xs:boolean" default="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag indicating this is contact number of choice</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ApprovalType">
+		<xs:annotation>
+			<xs:documentation>Base type to manage a resource's acceptance status</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="status">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#pending"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#approved"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#denied"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:approval_type#appealed"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="determined_by" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Individual, Representative or agent who adjudicated approval</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="determination_date" type="xs:dateTime" minOccurs="0"/>
+			<xs:element name="notes" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CommentType">
+		<xs:sequence>
+			<xs:element name="content" type="xs:string"/>
+			<xs:element name="author" type="xs:string"/>
+			<xs:element name="date" type="SimpleDateType"/>
+			<xs:element name="is_priority" type="xs:boolean"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ContactType">
+		<xs:complexContent>
+			<xs:restriction base="PersonType">
+				<xs:sequence>
+					<xs:element name="id" type="IdentifierType"/>
+					<xs:element name="person_name" type="PersonNameType"/>
+					<xs:element name="job_title" type="xs:string" minOccurs="0"/>
+					<xs:element name="department" type="xs:string" minOccurs="0"/>
+					<xs:element ref="addresses" minOccurs="0"/>
+					<xs:element ref="emails" minOccurs="0"/>
+					<xs:element ref="phones" minOccurs="0"/>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="CurrencyAmountPerAnnumType">
+		<xs:annotation>
+			<xs:documentation>Sum of currency amount for a calendar year</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="calendar_year" type="CalendarYearType"/>
+			<xs:element name="total_amount" type="CurrencyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DateRangeType">
+		<xs:annotation>
+			<xs:documentation>Date period expressed to precision of one day</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="begin_date" type="SimpleDateType"/>
+			<xs:element name="end_date" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="number_of_days" type="xs:integer" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="DateTimeRangeType">
+		<xs:annotation>
+			<xs:documentation>DateTime period</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="begin_datetime" type="xs:dateTime"/>
+			<xs:element name="end_datetime" type="xs:dateTime"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmailType">
+		<xs:annotation>
+			<xs:documentation>Email communication address and kind</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:email_type#home"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:email_type#work"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="email_address" type="nonEmptyString"/>
+			<xs:element name="is_preferred" type="xs:boolean" default="false" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Flag indicating this is contact number of choice</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdentifierBaseType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>List of all known record IDs (including this one) for this resource</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hbx_id" type="HbxCmsNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Identifier for Exchange where this record originated (CMS-assigned ID)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="id" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Dereferenceable ID for this resource</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="is_authoritative" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicates this record is: 1) obtained from the authority source for this resource, and 2) this instance is the authority record for this individual</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="alias_ids" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IdentifierFullyQualifiedType">
+		<xs:complexContent>
+			<xs:restriction base="IdentifierBaseType">
+				<xs:sequence>
+					<xs:element name="hbx_id" type="HbxCmsNameType">
+						<xs:annotation>
+							<xs:documentation>Identifier for Exchange where this record originated (CMS-assigned ID)</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="id" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>Dereferenceable ID for this resource</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="is_authoritative" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Indicates this record is: 1) obtained from the authority source for this resource, and 2) this instance is the authority record for this individual</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IdentifierSimpleType">
+		<xs:complexContent>
+			<xs:restriction base="IdentifierBaseType">
+				<xs:sequence>
+					<xs:element name="id" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>Dereferenceable ID for this resource</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="IdentifierType">
+		<xs:complexContent>
+			<xs:restriction base="IdentifierBaseType">
+				<xs:sequence>
+					<xs:element name="id" type="xs:anyURI">
+						<xs:annotation>
+							<xs:documentation>Dereferenceable ID for this resource</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="is_authoritative" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Indicates this record is: 1) obtained from the authority source for this resource, and 2) this instance is the authority record for this individual</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="alias_ids" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="LocationNameType">
+		<xs:sequence>
+			<xs:element name="rating_area" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Adminstrative area for determining individual or family premium amounts</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:length value="7"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="coordinates" type="PositionPointType" minOccurs="0"/>
+			<xs:element name="census_tract" type="xs:string" minOccurs="0"/>
+			<xs:element name="county" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonLinkType">
+		<xs:complexContent>
+			<xs:restriction base="PersonType">
+				<xs:sequence>
+					<xs:element name="id" type="IdentifierType"/>
+					<xs:element name="person_name" type="PersonNameType"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PersonNameType">
+		<xs:annotation>
+			<xs:documentation>Base type for components of an individual's name</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="person_surname" type="nonEmptyString"/>
+			<xs:element name="person_given_name" type="nonEmptyString"/>
+			<xs:element name="person_middle_name" type="xs:string" minOccurs="0"/>
+			<xs:element name="person_full_name" type="xs:string" minOccurs="0"/>
+			<xs:element name="person_name_prefix_text" type="xs:string" minOccurs="0"/>
+			<xs:element name="person_name_suffix_text" type="xs:string" minOccurs="0"/>
+			<xs:element name="person_alternate_name" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PersonType">
+		<xs:annotation>
+			<xs:documentation>Name and contact information for an individual</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="person_name" type="PersonNameType"/>
+			<xs:element name="job_title" type="xs:string" minOccurs="0"/>
+			<xs:element name="department" type="xs:string" minOccurs="0"/>
+			<xs:element ref="addresses" minOccurs="0"/>
+			<xs:element ref="emails" minOccurs="0"/>
+			<xs:element ref="phones" minOccurs="0"/>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PhoneType">
+		<xs:annotation>
+			<xs:documentation>Telephone communication number and kind</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="type">
+				<xs:simpleType>
+					<xs:restriction base="xs:anyURI">
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#home"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#work"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#mobile"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#pager"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#main"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#fax"/>
+						<xs:enumeration value="urn:openhbx:terms:v1:phone_type#other"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="country_code" minOccurs="0"/>
+			<xs:element name="area_code" minOccurs="0"/>
+			<xs:element name="phone_number" type="TelephoneNumberType" minOccurs="0"/>
+			<xs:element name="full_phone_number"/>
+			<xs:element name="extension" type="xs:string" minOccurs="0"/>
+			<xs:element name="is_preferred" type="xs:boolean" default="false">
+				<xs:annotation>
+					<xs:documentation>Flag indicating this is contact number of choice</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PositionPointType">
+		<xs:annotation>
+			<xs:documentation>Location cooordinate expressed as a GeoJSON Point.  See: http://www.geojson.org/geojson-spec.html#positions</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="x" type="xs:float"/>
+			<xs:element name="y" type="xs:float"/>
+			<xs:element name="z" type="xs:float" minOccurs="0"/>
+			<xs:element name="coordinate_system_reference" type="xs:anyURI" default=" urn:ogc:def:crs:EPSG::4326"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="RateType">
+		<xs:sequence>
+			<xs:element name="age"/>
+			<xs:element name="effective_date" type="SimpleDateType"/>
+			<xs:element name="expire_date" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="rate" type="CurrencyType"/>
+			<xs:element name="rating_area" minOccurs="0"/>
+			<xs:element name="tobacco_use" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceBodyType">
+		<xs:annotation>
+			<xs:documentation>Base type of body component properties for a SOA service call or response</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceEndPointType">
+		<xs:annotation>
+			<xs:documentation>Attributes for registering and publishing a service on the system</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Name for this service in free form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="version" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Release number associated with this service instance</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0"/>
+			<xs:group ref="ServiceEndpointGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceErrorType"/>
+	<xs:complexType name="ServiceEventType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type to publish resource events to message systems</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="event_name" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Uniform Resource Name (URN) for this event, e.g.; urn:openhbx:events:v1:individual#added</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="qualifying_reason" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>URN for the regulatory or policy basis enabling this change </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="resource_instance_uri" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>URN(s) for the resource instance that is subject of this event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="extended_resource_instance_uri" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>URN(s) for other resource instances assocated with this event</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="header" type="EnvelopeHeaderType" minOccurs="0"/>
+			<xs:element name="body" type="ServiceBodyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EnvelopeHeaderType">
+		<xs:annotation>
+			<xs:documentation>Base type of header component properties for all messages.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="hbx_id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="submitted_timestamp" type="xs:dateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>UTC date and time when event occured</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="authorization" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Authentication/authorization credentials</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="ServiceStatusType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="message_id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Value that uniqely identifies message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The urn of the requesting service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Designates the consumer service endpoint where to transmit response</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fault_to" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Endpoint to transmit unrecoverable error</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="application_header_properties" type="xs:anyType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Application-specific header key/value pairs</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceHeaderType">
+		<xs:annotation>
+			<xs:documentation>Base type of header component properties for SOA service call or response</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="EnvelopeHeaderType">
+				<xs:sequence>
+					<xs:element name="hbx_id" type="xs:string">
+						<xs:annotation>
+							<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="submitted_timestamp" type="xs:dateTime">
+						<xs:annotation>
+							<xs:documentation>UTC date and time when event occured</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="authorization" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Authentication/authorization credentials</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="status" type="ServiceStatusType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="message_id" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Value that uniqely identifies message</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>The urn of the requesting service</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Designates the consumer service endpoint where to transmit response</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="fault_to" type="xs:anyURI" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Endpoint to transmit unrecoverable error</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="application_header_properties" type="xs:anyType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Application-specific header key/value pairs</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ServiceMetadataType">
+		<xs:annotation>
+			<xs:documentation>Base type of descriptive data about the data returned in a service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="result_set" type="ServiceResultSetType"/>
+			<xs:any namespace="##any" processContents="lax" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Wildcard to support schema extension</xs:documentation>
+				</xs:annotation>
+			</xs:any>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceStatusType">
+		<xs:annotation>
+			<xs:documentation>Base type of status result properties for SOA service call </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="return_status">
+				<xs:annotation>
+					<xs:documentation>HTTP status code</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:integer">
+						<xs:enumeration value="200">
+							<xs:annotation>
+								<xs:documentation>OK</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="201">
+							<xs:annotation>
+								<xs:documentation>Created</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="304">
+							<xs:annotation>
+								<xs:documentation>Not modified</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="400">
+							<xs:annotation>
+								<xs:documentation>Bad request</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="401">
+							<xs:annotation>
+								<xs:documentation>Unauthorized due to authentication error</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="403">
+							<xs:annotation>
+								<xs:documentation>Unauthorized</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="404">
+							<xs:annotation>
+								<xs:documentation>Not found</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="409">
+							<xs:annotation>
+								<xs:documentation>Conflict with existing resource</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="422">
+							<xs:annotation>
+								<xs:documentation>Invalid entity.  The request is structured correctly, but the content violates data constraints or workflow rules.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="500">
+							<xs:annotation>
+								<xs:documentation>Internal server error</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="error_code" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Error code relevant to local service</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="developer_message" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Plain text description for app developer with hits about how to fix</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="user_message" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Message passed to the application. if needed</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="more_information" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Link with additional information about this error </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceRequestType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type to call a SOA service</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="request_name" type="xs:anyURI">
+				<xs:annotation>
+					<xs:documentation>Uniform Resource Name (URN) for this request e.g.; urn:openhbx:requests:v1:individual</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="parameters" type="xs:anyType" minOccurs="0"/>
+			<xs:element name="metadata" type="ServiceMetadataType" minOccurs="0"/>
+			<xs:element name="body" type="xs:anyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceResponseType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base type for response body.  If results might return more than one record (i.e. it's a set response type), you MUST provide metadata.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="header" type="ServiceHeaderType"/>
+			<xs:element name="metadata" type="ServiceMetadataType" minOccurs="0"/>
+			<xs:element name="body" type="xs:anyType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ServiceResultSetType">
+		<xs:annotation>
+			<xs:documentation>Base type of service result propoerties for SOA service call</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="count" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Total number of items in the result set</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="limit" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Number of items returned in this payload</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="offset" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Position in the result set of the first record in this payload</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="SimpleDateRangeType">
+		<xs:annotation>
+			<xs:documentation>Time period expressed in SimpleDateType format</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="start" type="SimpleDateType"/>
+			<xs:element name="end" type="SimpleDateType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TpaType">
+		<xs:annotation>
+			<xs:documentation>Third Party Administrator</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="tpa_name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>TPA or GA name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tpa_fein" type="FederalTaxIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>TPA or GA federal tax ID</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="AcaMarketPlaceNameType">
+		<xs:annotation>
+			<xs:documentation>ACA marketplace categories where consumers may enroll in QHPs</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:aca_marketplace#individual"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:aca_marketplace#shop"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:aca_marketplace#coverall"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CalendarYearType">
+		<xs:annotation>
+			<xs:documentation>Year represented in four-digit format: CCYY.  For example: 2015</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="2013"/>
+			<xs:maxInclusive value="2020"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CurrencyType">
+		<xs:annotation>
+			<xs:documentation>Monetary value. Positive and negative values are valid</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="FederalTaxIdType">
+		<xs:annotation>
+			<xs:documentation>IRS-assigned Identifier for an individual or organization. Matches: 01-1234567, 011234567, 123-45-6789</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([0-9]{3}-[0-9]{2}-[0-9]{4})|([0-9]{9})|([0-9]{2}-[0-9]{7})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="GenderNameType">
+		<xs:annotation>
+			<xs:documentation>Identification of an individual as masculine or feminine</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:gender#male"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:gender#female"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:gender#unknown"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HbxCmsNameType">
+		<xs:annotation>
+			<xs:documentation>CMS-assigned Health Benefit Exchange identifier in URN form</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_cms_name#dc0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HbxResourceNameType">
+		<xs:annotation>
+			<xs:documentation>Resources in OpenHBX services model</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#application_group"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#individual"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#employer"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#policy"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#plan"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#carrier"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:resource#broker"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HbxServiceNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#unassisted_qhp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#insurance_assisted_qhp"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#employer_sponsored"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#streamlined_medicaid"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#emergency_medicaid"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:hbx_service#hcr_chip"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="HiosPlanIdType">
+		<xs:annotation>
+			<xs:documentation>Health Insurance Oversight System (HIOS) identifier for QHP</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="LanguageNameType">
+		<xs:annotation>
+			<xs:documentation>Language classification per ISO 639-1 standard</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/aa">
+				<xs:annotation>
+					<xs:documentation>Afar</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ab">
+				<xs:annotation>
+					<xs:documentation>Abkhazian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ae">
+				<xs:annotation>
+					<xs:documentation>Avestan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/af">
+				<xs:annotation>
+					<xs:documentation>Afrikaans</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ak">
+				<xs:annotation>
+					<xs:documentation>Akan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/am">
+				<xs:annotation>
+					<xs:documentation>Amharic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/an">
+				<xs:annotation>
+					<xs:documentation>Aragonese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ar">
+				<xs:annotation>
+					<xs:documentation>Arabic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/as">
+				<xs:annotation>
+					<xs:documentation>Assamese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/av">
+				<xs:annotation>
+					<xs:documentation>Avaric</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ay">
+				<xs:annotation>
+					<xs:documentation>Aymara</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/az">
+				<xs:annotation>
+					<xs:documentation>Azerbaijani</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ba">
+				<xs:annotation>
+					<xs:documentation>Bashkir</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/be">
+				<xs:annotation>
+					<xs:documentation>Belarusian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bg">
+				<xs:annotation>
+					<xs:documentation>Bulgarian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bh">
+				<xs:annotation>
+					<xs:documentation>Bihari languages</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bi">
+				<xs:annotation>
+					<xs:documentation>Bislama</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bm">
+				<xs:annotation>
+					<xs:documentation>Bambara</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bn">
+				<xs:annotation>
+					<xs:documentation>Bengali</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bo">
+				<xs:annotation>
+					<xs:documentation>Tibetan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/br">
+				<xs:annotation>
+					<xs:documentation>Breton</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/bs">
+				<xs:annotation>
+					<xs:documentation>Bosnian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ca">
+				<xs:annotation>
+					<xs:documentation>Catalan | Valencian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ce">
+				<xs:annotation>
+					<xs:documentation>Chechen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ch">
+				<xs:annotation>
+					<xs:documentation>Chamorro</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/co">
+				<xs:annotation>
+					<xs:documentation>Corsican</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/cr">
+				<xs:annotation>
+					<xs:documentation>Cree</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/cs">
+				<xs:annotation>
+					<xs:documentation>Czech</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/cu">
+				<xs:annotation>
+					<xs:documentation>Church Slavic |  Old Slavonic |  Church Slavonic |  Old Bulgarian |  Old Church Slavonic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/cv">
+				<xs:annotation>
+					<xs:documentation>Chuvash</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/cy">
+				<xs:annotation>
+					<xs:documentation>Welsh</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/da">
+				<xs:annotation>
+					<xs:documentation>Danish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/de">
+				<xs:annotation>
+					<xs:documentation>German</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/dv">
+				<xs:annotation>
+					<xs:documentation>Divehi | Dhivehi | Maldivian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/dz">
+				<xs:annotation>
+					<xs:documentation>Dzongkha</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ee">
+				<xs:annotation>
+					<xs:documentation>Ewe</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/el">
+				<xs:annotation>
+					<xs:documentation>Greek, Modern (1453-)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/en">
+				<xs:annotation>
+					<xs:documentation>English</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/eo">
+				<xs:annotation>
+					<xs:documentation>Esperanto</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/es">
+				<xs:annotation>
+					<xs:documentation>Spanish | Castilian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/et">
+				<xs:annotation>
+					<xs:documentation>Estonian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/eu">
+				<xs:annotation>
+					<xs:documentation>Basque</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fa">
+				<xs:annotation>
+					<xs:documentation>Persian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ff">
+				<xs:annotation>
+					<xs:documentation>Fulah</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fi">
+				<xs:annotation>
+					<xs:documentation>Finnish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fj">
+				<xs:annotation>
+					<xs:documentation>Fijian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fo">
+				<xs:annotation>
+					<xs:documentation>Faroese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fr">
+				<xs:annotation>
+					<xs:documentation>French</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/fy">
+				<xs:annotation>
+					<xs:documentation>Western Frisian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ga">
+				<xs:annotation>
+					<xs:documentation>Irish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/gd">
+				<xs:annotation>
+					<xs:documentation>Gaelic | Scottish Gaelic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/gl">
+				<xs:annotation>
+					<xs:documentation>Galician</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/gn">
+				<xs:annotation>
+					<xs:documentation>Guarani</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/gu">
+				<xs:annotation>
+					<xs:documentation>Gujarati</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/gv">
+				<xs:annotation>
+					<xs:documentation>Manx</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ha">
+				<xs:annotation>
+					<xs:documentation>Hausa</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/he">
+				<xs:annotation>
+					<xs:documentation>Hebrew</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/hi">
+				<xs:annotation>
+					<xs:documentation>Hindi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ho">
+				<xs:annotation>
+					<xs:documentation>Hiri Motu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/hr">
+				<xs:annotation>
+					<xs:documentation>Croatian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ht">
+				<xs:annotation>
+					<xs:documentation>Haitian | Haitian Creole</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/hu">
+				<xs:annotation>
+					<xs:documentation>Hungarian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/hy">
+				<xs:annotation>
+					<xs:documentation>Armenian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/hz">
+				<xs:annotation>
+					<xs:documentation>Herero</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ia">
+				<xs:annotation>
+					<xs:documentation>Interlingua (International Auxiliary Language Association)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/id">
+				<xs:annotation>
+					<xs:documentation>Indonesian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ie">
+				<xs:annotation>
+					<xs:documentation>Interlingue | Occidental</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ig">
+				<xs:annotation>
+					<xs:documentation>Igbo</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ii">
+				<xs:annotation>
+					<xs:documentation>Sichuan Yi | Nuosu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ik">
+				<xs:annotation>
+					<xs:documentation>Inupiaq</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/io">
+				<xs:annotation>
+					<xs:documentation>Ido</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/is">
+				<xs:annotation>
+					<xs:documentation>Icelandic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/it">
+				<xs:annotation>
+					<xs:documentation>Italian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/iu">
+				<xs:annotation>
+					<xs:documentation>Inuktitut</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ja">
+				<xs:annotation>
+					<xs:documentation>Japanese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/jv">
+				<xs:annotation>
+					<xs:documentation>Javanese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ka">
+				<xs:annotation>
+					<xs:documentation>Georgian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kg">
+				<xs:annotation>
+					<xs:documentation>Kongo</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ki">
+				<xs:annotation>
+					<xs:documentation>Kikuyu |  Gikuyu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kj">
+				<xs:annotation>
+					<xs:documentation>Kuanyama |  Kwanyama</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kk">
+				<xs:annotation>
+					<xs:documentation>Kazakh</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kl">
+				<xs:annotation>
+					<xs:documentation>Kalaallisut |  Greenlandic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/km">
+				<xs:annotation>
+					<xs:documentation>Central Khmer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kn">
+				<xs:annotation>
+					<xs:documentation>Kannada</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ko">
+				<xs:annotation>
+					<xs:documentation>Korean</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kr">
+				<xs:annotation>
+					<xs:documentation>Kanuri</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ks">
+				<xs:annotation>
+					<xs:documentation>Kashmiri</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ku">
+				<xs:annotation>
+					<xs:documentation>Kurdish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kv">
+				<xs:annotation>
+					<xs:documentation>Komi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/kw">
+				<xs:annotation>
+					<xs:documentation>Cornish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ky">
+				<xs:annotation>
+					<xs:documentation>Kirghiz |  Kyrgyz</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/la">
+				<xs:annotation>
+					<xs:documentation>Latin</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lb">
+				<xs:annotation>
+					<xs:documentation>Luxembourgish |  Letzeburgesch</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lg">
+				<xs:annotation>
+					<xs:documentation>Ganda</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/li">
+				<xs:annotation>
+					<xs:documentation>Limburgan |  Limburger |  Limburgish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ln">
+				<xs:annotation>
+					<xs:documentation>Lingala</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lo">
+				<xs:annotation>
+					<xs:documentation>Lao</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lt">
+				<xs:annotation>
+					<xs:documentation>Lithuanian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lu">
+				<xs:annotation>
+					<xs:documentation>Luba-Katanga</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/lv">
+				<xs:annotation>
+					<xs:documentation>Latvian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mg">
+				<xs:annotation>
+					<xs:documentation>Malagasy</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mh">
+				<xs:annotation>
+					<xs:documentation>Marshallese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mi">
+				<xs:annotation>
+					<xs:documentation>Maori</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mk">
+				<xs:annotation>
+					<xs:documentation>Macedonian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ml">
+				<xs:annotation>
+					<xs:documentation>Malayalam</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mn">
+				<xs:annotation>
+					<xs:documentation>Mongolian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mr">
+				<xs:annotation>
+					<xs:documentation>Marathi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ms">
+				<xs:annotation>
+					<xs:documentation>Malay</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/mt">
+				<xs:annotation>
+					<xs:documentation>Maltese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/my">
+				<xs:annotation>
+					<xs:documentation>Burmese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/na">
+				<xs:annotation>
+					<xs:documentation>Nauru</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nb">
+				<xs:annotation>
+					<xs:documentation>Bokmål, Norwegian |  Norwegian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nd">
+				<xs:annotation>
+					<xs:documentation>Ndebele, North |  North Ndebele</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ne">
+				<xs:annotation>
+					<xs:documentation>Nepali</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ng">
+				<xs:annotation>
+					<xs:documentation>Ndonga</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nl">
+				<xs:annotation>
+					<xs:documentation>Dutch |  Flemish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nn">
+				<xs:annotation>
+					<xs:documentation>Norwegian Nynorsk |  Nynorsk, Norwegian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/no">
+				<xs:annotation>
+					<xs:documentation>Norwegian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nr">
+				<xs:annotation>
+					<xs:documentation>Ndebele, South |  South Ndebele</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/nv">
+				<xs:annotation>
+					<xs:documentation>Navajo |  Navaho</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ny">
+				<xs:annotation>
+					<xs:documentation>Chichewa | Chewa | Nyanja</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/oc">
+				<xs:annotation>
+					<xs:documentation>Occitan (post 1500)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/oj">
+				<xs:annotation>
+					<xs:documentation>Ojibwa</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/om">
+				<xs:annotation>
+					<xs:documentation>Oromo</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/or">
+				<xs:annotation>
+					<xs:documentation>Oriya</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/os">
+				<xs:annotation>
+					<xs:documentation>Ossetian |  Ossetic</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/pa">
+				<xs:annotation>
+					<xs:documentation>Panjabi |  Punjabi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/pi">
+				<xs:annotation>
+					<xs:documentation>Pali</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/pl">
+				<xs:annotation>
+					<xs:documentation>Polish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ps">
+				<xs:annotation>
+					<xs:documentation>Pushto |  Pashto</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/pt">
+				<xs:annotation>
+					<xs:documentation>Portuguese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/qu">
+				<xs:annotation>
+					<xs:documentation>Quechua</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/rm">
+				<xs:annotation>
+					<xs:documentation>Romansh</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/rn">
+				<xs:annotation>
+					<xs:documentation>Rundi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ro">
+				<xs:annotation>
+					<xs:documentation>Romanian |  Moldavian |  Moldovan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ru">
+				<xs:annotation>
+					<xs:documentation>Russian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/rw">
+				<xs:annotation>
+					<xs:documentation>Kinyarwanda	rwanda</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sa">
+				<xs:annotation>
+					<xs:documentation>Sanskrit</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sc">
+				<xs:annotation>
+					<xs:documentation>Sardinian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sd">
+				<xs:annotation>
+					<xs:documentation>Sindhi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/se">
+				<xs:annotation>
+					<xs:documentation>Northern Sami</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sg">
+				<xs:annotation>
+					<xs:documentation>Sango</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/si">
+				<xs:annotation>
+					<xs:documentation>Sinhala |  Sinhalese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sk">
+				<xs:annotation>
+					<xs:documentation>Slovak</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sl">
+				<xs:annotation>
+					<xs:documentation>Slovenian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sm">
+				<xs:annotation>
+					<xs:documentation>Samoan</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sn">
+				<xs:annotation>
+					<xs:documentation>Shona</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/so">
+				<xs:annotation>
+					<xs:documentation>Somali</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sq">
+				<xs:annotation>
+					<xs:documentation>Albanian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sr">
+				<xs:annotation>
+					<xs:documentation>Serbian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ss">
+				<xs:annotation>
+					<xs:documentation>Swati</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/st">
+				<xs:annotation>
+					<xs:documentation>Sotho, Southern</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/su">
+				<xs:annotation>
+					<xs:documentation>Sundanese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sv">
+				<xs:annotation>
+					<xs:documentation>Swedish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/sw">
+				<xs:annotation>
+					<xs:documentation>Swahili</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ta">
+				<xs:annotation>
+					<xs:documentation>Tamil</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/te">
+				<xs:annotation>
+					<xs:documentation>Telugu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tg">
+				<xs:annotation>
+					<xs:documentation>Tajik</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/th">
+				<xs:annotation>
+					<xs:documentation>Thai</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ti">
+				<xs:annotation>
+					<xs:documentation>Tigrinya</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tk">
+				<xs:annotation>
+					<xs:documentation>Turkmen</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tl">
+				<xs:annotation>
+					<xs:documentation>Tagalog</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tn">
+				<xs:annotation>
+					<xs:documentation>Tswana</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/to">
+				<xs:annotation>
+					<xs:documentation>Tonga (Tonga Islands)</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tr">
+				<xs:annotation>
+					<xs:documentation>Turkish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ts">
+				<xs:annotation>
+					<xs:documentation>Tsonga</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tt">
+				<xs:annotation>
+					<xs:documentation>Tatar</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/tw">
+				<xs:annotation>
+					<xs:documentation>Twi</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ty">
+				<xs:annotation>
+					<xs:documentation>Tahitian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ug">
+				<xs:annotation>
+					<xs:documentation>Uighur | Uyghur</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/uk">
+				<xs:annotation>
+					<xs:documentation>Ukrainian</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ur">
+				<xs:annotation>
+					<xs:documentation>Urdu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/uz">
+				<xs:annotation>
+					<xs:documentation>Uzbek</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/ve">
+				<xs:annotation>
+					<xs:documentation>Venda</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/vi">
+				<xs:annotation>
+					<xs:documentation>Vietnamese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/vo">
+				<xs:annotation>
+					<xs:documentation>Volapük</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/wa">
+				<xs:annotation>
+					<xs:documentation>Walloon</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/wo">
+				<xs:annotation>
+					<xs:documentation>Wolof</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/xh">
+				<xs:annotation>
+					<xs:documentation>Xhosa</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/yi">
+				<xs:annotation>
+					<xs:documentation>Yiddish</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/yo">
+				<xs:annotation>
+					<xs:documentation>Yoruba</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/za">
+				<xs:annotation>
+					<xs:documentation>Zhuang | Chuang</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/zh">
+				<xs:annotation>
+					<xs:documentation>Chinese</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="http://id.loc.gov/vocabulary/iso639-1/zu">
+				<xs:annotation>
+					<xs:documentation>Zulu</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="NpnIdType">
+		<xs:annotation>
+			<xs:documentation>Broker National Producer Number (NPN) identifier</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="QhpBenefitCoverageNameType">
+		<xs:annotation>
+			<xs:documentation>Kind of medical insurance provided under QHP</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:qhp_benefit_coverage#health"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:qhp_benefit_coverage#dental"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:qhp_benefit_coverage#health_and_dental"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SicCodeType">
+		<xs:annotation>
+			<xs:documentation>Standard Industrial Code classification</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="SimpleDateType">
+		<xs:annotation>
+			<xs:documentation>A simple date format: CCYYMMDD. Matches: YYYYMMDD (20140601)</xs:documentation>
+			<xs:appinfo>
+				<altova:exampleValues>
+					<altova:example value="20140601"/>
+				</altova:exampleValues>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([1-9][0-9]{3})(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="SocialSecurityNumberType">
+		<xs:annotation>
+			<xs:documentation>US Social Security number. Matches: 314-46-0753, 314460753</xs:documentation>
+			<xs:appinfo>
+				<altova:exampleValues>
+					<altova:example value="314-46-0753"/>
+					<altova:example value="314460753"/>
+				</altova:exampleValues>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{9}"/>
+			<xs:pattern value="\d{3}-\d{2}-\d{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TelephoneNumberType">
+		<xs:annotation>
+			<xs:documentation>US Telephone number format. Matches: 5551212, 5551212, 202-555-1212</xs:documentation>
+			<xs:appinfo>
+				<altova:exampleValues>
+					<altova:example value="5551212"/>
+					<altova:example value="2025551212"/>
+					<altova:example value="202-555-1212"/>
+				</altova:exampleValues>
+			</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\d{7,11}"/>
+			<xs:pattern value="\d{3}-\d{3}-\d{4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="UsStateNameType">
+		<xs:annotation>
+			<xs:documentation>US state names</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#alabama"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#alaska"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#arizona"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#arkansas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#california"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#colorado"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#connecticut"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#delaware"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#district_of_columbia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#florida"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#georgia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#hawaii"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#idaho"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#illinois"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#indiana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#iowa"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#kansas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#kentucky"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#louisiana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#maine"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#maryland"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#massachusetts"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#michigan"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#minnesota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#mississippi"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#missouri"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#montana"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#nebraska"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#nevada"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#new_hampshire"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#new_jersey"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#new_mexico"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#new_york"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#north_carolina"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#north_dakota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#ohio"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#oklahoma"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#oregon"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#pennsylvania"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#rhode_island"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#south_carolina"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#south_dakota"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#tennessee"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#texas"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#utah"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#vermont"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#virginia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#washington"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#west_virginia"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#wisconsin"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:us_state#wyoming"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PlanMetalLevelNameType">
+		<xs:annotation>
+			<xs:documentation>ACA plan category designation</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#bronze"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#silver"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#gold"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#platinum"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#catastrophic"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:plan_metal_level#dental"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="enrollment_group_uri" type="xs:anyURI" substitutionGroup="extended_resource_instance_uri">
+		<xs:annotation>
+			<xs:documentation>Dereferenceable identifier for enrollment group instance, e.g. http://dchealthlink.com/api/services/enrollment_group/_id</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:simpleType name="PlanActiveYearType">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:minInclusive value="2012"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="OfficeLocationType">
+		<xs:annotation>
+			<xs:documentation>An office location of an organization.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType" minOccurs="0"/>
+			<xs:element name="name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>An optional reference for this office location</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="primary" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Is this the home office for the organization?</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="address" type="AddressType" minOccurs="0"/>
+			<xs:element name="phone" type="PhoneType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OfficeLocationListType">
+		<xs:sequence>
+			<xs:element name="office_location" type="OfficeLocationType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="IncomeVerificationType">
+		<xs:sequence>
+			<xs:element name="is_valid" type="xs:boolean"/>
+			<xs:element name="verification_source" type="xs:string" minOccurs="0"/>
+			<xs:element name="verified_at" type="xs:dateTime"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="VerifiedCurrencyAmountPerAnnumType">
+		<xs:annotation>
+			<xs:documentation>Sum of currency amount for a calendar year, includes income verification data if available.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="calendar_year" type="CalendarYearType"/>
+			<xs:element name="total_amount" type="CurrencyType"/>
+			<xs:element name="verification" type="IncomeVerificationType" minOccurs="0" maxOccurs="1"/>
+		</xs:sequence>
+	</xs:complexType>
+
+</xs:schema>

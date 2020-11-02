@@ -1,0 +1,26 @@
+<div class="row no-buffer">
+  <div class="form-group form-group-lg">
+    <p class="sixteen">Please indicate preferred method to receive notices (OPTIONAL)</p>
+  </div>
+  <div class="phone no-pd">
+    <%= f.fields_for role, errors: {}, fieldset: true do |person_role| %>
+      <%= person_role.hidden_field :id if role == :employee_roles %>
+      <% next if role == :employee_roles && !person_role.object&.is_active? %>
+      <div class="row row-form-wrapper no-buffer <%= 'hidden' if @identifier %>">
+        <div class="col-md-6 col-sm-6 form-group-lg no-pd">
+          <label class='personal_landing_page_label'>Contact Method</label>
+          <br>
+          <%= person_role.select :contact_method, options_for_select(["Only Electronic communications", "Only Paper communication", "Paper and Electronic communications"], selected: person_role.object.contact_method), {prompt: 'Select communications preference'} %>
+        </div>
+        <div class="col-md-6 col-sm-6 form-group-lg no-pd">
+          <label class='personal_landing_page_label'>Language Preference</label>
+          <br>
+          <%= person_role.select :language_preference, options_for_select(["English", "Spanish", "Amharic"], selected: person_role.object.language_preference), {prompt: 'Select communications language'} %>
+        </div>
+      </div>
+      <% if role == :employee_roles && @person.active_employee_roles.size > 1 %>
+        <% @identifier = true %>
+      <% end %>
+    <% end %>
+  </div>
+</div>

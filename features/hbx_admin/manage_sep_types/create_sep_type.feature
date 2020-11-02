@@ -29,11 +29,11 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see newly created SEP Type title on Datatable
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |
 
   Scenario Outline: Failure scenario to create <market_kind> market SEP type
     Given Admin can navigate to the Manage SEPs screen
@@ -53,11 +53,11 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see failure for end date
     And Hbx Admin logs out
 
-  Examples:
-    | market_kind | action |
-    | individual  | cannot |
-    | shop        |  can   |
-    | fehb        |  can   |
+    Examples:
+      | market_kind | action |
+      | individual  | cannot |
+      | shop        | can    |
+      | fehb        | can    |
 
 
   Scenario Outline: Admin will create a new <market_kind> SEP type with/without selecting termination on kinds
@@ -83,12 +83,13 @@ Feature: Admin has ability to create a new SEP Type
     And Hbx Admin logs out
 
     Examples:
-      | market_kind | action          |
-      | shop        |  selected       |
-      | fehb        |  selected       |
-      | shop        |  not selected   |
-      | fehb        |  not selected   |
+      | market_kind | action       |
+      | shop        | selected     |
+      | fehb        | selected     |
+      | shop        | not selected |
+      | fehb        | not selected |
 
+  @flaky
   Scenario: Admin should see failure when creating SEP type with past start date
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
@@ -122,6 +123,7 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see failure for invalid eligibility date
     And Hbx Admin logs out
 
+  @flaky
   Scenario: Admin should see failure when creating SEP type withonly eligibility start date
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button
@@ -139,6 +141,7 @@ Feature: Admin has ability to create a new SEP Type
     Then Admin should see failure for eligibility end date
     And Hbx Admin logs out
 
+  @flaky
   Scenario: Admin should see failure when creating SEP type withonly eligibility end date
     Given Admin can navigate to the Manage SEPs screen
     When Admin clicks on the Create SEP Type button

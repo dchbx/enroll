@@ -19,7 +19,7 @@ describe "insured/family_members/index.html.erb" do
 
   it "should have title" do
     render template: "insured/family_members/index.html.erb"
-    expect(rendered).to have_selector("h1", text: 'Family Members')
+    expect(rendered).to have_selector("h2", text: "#{l10n("family_information")}")
   end
 
   it "should have memo to indicate required fields" do
@@ -46,11 +46,6 @@ describe "insured/family_members/index.html.erb" do
       allow(view).to receive(:is_under_open_enrollment?).and_return false
       render template: "insured/family_members/index.html.erb"
     end
-
-    it "should call individual_progress" do
-      expect(rendered).to match /Verify Identity/
-      expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
-    end
   end
 
   context "when resident" do
@@ -59,11 +54,6 @@ describe "insured/family_members/index.html.erb" do
       assign :resident_role, resident_role
       allow(view).to receive(:is_under_open_enrollment?).and_return false
       render template: "insured/family_members/index.html.erb"
-    end
-
-    it "should call individual_progress" do
-      expect(rendered).to match /Verify Identity/
-      expect(rendered).not_to have_selector("label.static_label", text: 'SOCIAL SECURITY')
     end
   end
 end

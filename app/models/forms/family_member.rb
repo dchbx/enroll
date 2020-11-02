@@ -6,7 +6,7 @@ module Forms
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
     attr_accessor :gender, :relationship
-    attr_accessor :addresses, :no_dc_address, :no_dc_address_reason, :same_with_primary, :is_applying_coverage
+    attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
@@ -30,6 +30,7 @@ module Forms
     validates_inclusion_of :relationship, :in => RELATIONSHIPS.uniq, :allow_blank => nil, message: ""
     validate :relationship_validation
     validate :consumer_fields_validation
+    validate :ssn_validation
 
     attr_reader :dob
 
@@ -51,17 +52,23 @@ module Forms
         end
 
         if @indian_tribe_member.nil?
-          self.errors.add(:base, "native american / alaskan native status is required")
+          self.errors.add(:base, "native american / alaska native status is required")
         end
 
         if !tribal_id.present? && @indian_tribe_member
-          self.errors.add(:tribal_id, "is required when native american / alaskan native is selected")
+          self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
 
         if @is_incarcerated.nil?
           self.errors.add(:base, "Incarceration status is required")
         end
       end
+    end
+
+    def ssn_validation
+      return true unless individual_market_is_enabled?
+
+      self.errors.add(:base, "ssn is required") if @ssn.blank? && @no_ssn == '0'
     end
 
     def dob=(val)
@@ -121,7 +128,7 @@ module Forms
     def assign_person_address(person)
       if same_with_primary == 'true'
         primary_person = family.primary_family_member.person
-        person.update(no_dc_address: primary_person.no_dc_address, no_dc_address_reason: primary_person.no_dc_address_reason)
+        person.update(is_homeless: primary_person.is_homeless?, is_temporarily_out_of_state: primary_person.is_temporarily_out_of_state?)
         address = primary_person.home_address
         if address.present?
           person.home_address.try(:destroy)
@@ -147,7 +154,7 @@ module Forms
             next
           end
           if current_address.present?
-            current_address.update(address.permit!)
+            person.addresses.update(address.permit!)
           else
             person.addresses.create(address.permit!)
           end
@@ -183,8 +190,8 @@ module Forms
         :is_incarcerated => is_incarcerated,
         :citizen_status => @citizen_status,
         :tribal_id => tribal_id,
-        :no_dc_address => no_dc_address,
-        :no_dc_address_reason => no_dc_address_reason
+        :is_homeless => is_homeless,
+        :is_temporarily_out_of_state => is_temporarily_out_of_state
       }
     end
 
@@ -227,6 +234,7 @@ module Forms
         :dob => (found_family_member.dob.is_a?(Date) ? found_family_member.dob.try(:strftime, "%Y-%m-%d") : found_family_member.dob),
         :gender => found_family_member.gender,
         :ssn => found_family_member.ssn,
+        :no_ssn => found_family_member.no_ssn,
         :race => found_family_member.race,
         :ethnicity => found_family_member.ethnicity,
         :language_code => found_family_member.language_code,
@@ -237,8 +245,8 @@ module Forms
         :indian_tribe_member => found_family_member.indian_tribe_member,
         :tribal_id => found_family_member.tribal_id,
         :same_with_primary => has_same_address_with_primary.to_s,
-        :no_dc_address => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address),
-        :no_dc_address_reason => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:no_dc_address_reason),
+        :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
+        :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
         :addresses => [home_address, mailing_address]
       })
     end
@@ -248,8 +256,8 @@ module Forms
       primary = family_member.family.primary_family_member.person
 
       compare_keys = ["address_1", "address_2", "city", "state", "zip"]
-      current.no_dc_address == primary.no_dc_address &&
-        current.no_dc_address_reason == primary.no_dc_address_reason &&
+        current.is_homeless? == primary.is_homeless? &&
+        current.is_temporarily_out_of_state? == primary.is_temporarily_out_of_state? &&
         current.home_address.attributes.select{|k,v| compare_keys.include? k} == primary.home_address.attributes.select{|k,v| compare_keys.include? k}
     rescue
       false
@@ -280,6 +288,7 @@ module Forms
       assign_attributes(attr)
       assign_citizen_status
       return false unless valid?
+      assign_person_address(family_member.person)
       return false unless try_update_person(family_member.person)
       if attr["is_consumer_role"] == "true"
         family_member.family.build_consumer_role(family_member, attr["vlp_document_id"])
@@ -287,10 +296,18 @@ module Forms
       elsif attr["is_resident_role"] == "true"
         family_member.family.build_resident_role(family_member)
       end
-      assign_person_address(family_member.person)
       family_member.update_relationship(relationship)
       family_member.save!
       true
+    end
+
+    def age_on(date)
+      age = date.year - dob.year
+      if date.month < dob.month || (date.month == dob.month && date.day < dob.day)
+        age - 1
+      else
+        age
+      end
     end
 
 

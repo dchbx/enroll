@@ -1,0 +1,46 @@
+<% if !heading.nil? %>
+  <h2 class="darkblue"><%= personalize_heading_text(heading) %></h2>
+<% end %>
+
+<% lines.each do |line| %>
+  <div class="row row-form-wrapper radio-align no-buffer row-height yml-row">
+  <% line.cells.each do |cell| %>
+
+  <div class='col-md-<%= cell.gutter %>'>
+    <% case cell.type %>
+    <% when 'radio' %>
+      <%= render 'workflow/radio', cell: cell %>
+    <% when 'checkbox' %>
+      <%= render 'workflow/checkbox', cell: cell %>
+    <% when 'dropdown' %>
+      <%= render 'workflow/dropdown', cell: cell %>
+    <% when 'age_left_foster_care_dropdown' %>
+      <%= render 'workflow/age_left_foster_care_dropdown', cell: cell %>
+    <% when 'claimed_as_dependent_by_dropdown' %>
+      <%= render 'workflow/claimed_as_dependent_by_dropdown', cell: cell %>
+    <% when 'text' %>
+      <%= render 'workflow/text', cell: cell %>
+    <% when 'input' %>
+      <%= render 'workflow/input', cell: cell %>
+    <% when 'input_date' %>
+      <%= render 'workflow/input_date', cell: cell %>
+    <% when 'label' %>
+      <%= render 'workflow/label', cell: cell %>
+    <% when 'raw_html' %>
+      <%= render 'workflow/raw_html', cell: cell %>
+        <% when 'support_text_raw_html' %>
+    <%= render 'workflow/support_text_raw_html', cell: cell %>
+    <% when 'anchor' %>
+      <%= render 'workflow/anchor', cell: cell %>
+    <% when 'label_radio' %>
+      <%= render 'workflow/label_radio', cell: cell %>
+    <% when 'signature_inputs'%>
+      <%= render 'workflow/signature_inputs', cell: cell %>
+    <% end %>
+  </div>
+  <% end %>
+
+  </div>
+<% end %>
+<br><br>
+

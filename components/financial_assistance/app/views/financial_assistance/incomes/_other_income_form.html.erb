@@ -1,0 +1,32 @@
+<%= income_form_for @application, @applicant, other_income do |f| %>
+<div class="focus_effect_module">
+  <div class="row row-form-wrapper no-buffer row-height row-edit-border">
+    <%= f.hidden_field :kind, value: kind %>
+    <div class="col-md-3">
+      <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+      <div class="faa-amount">
+        <%= f.text_field :amount, placeholder: '0.00', value: number_to_currency(other_income.amount), required: true %>
+      </div>
+    </div>
+    <div class="col-md-3 fa-select select-box">
+      <%#= f.select_tag :frequency, placeholder: 'HOW OFTEN *', required: true, class: "floatlabel" %>
+      <%= f.label :frequency_kind, 'HOW OFTEN *', class: "label-color" %>
+      <div class="fa-frequency-kind">
+        <%= f.select(:frequency_kind, options_for_select(frequency_kind_options, selected: other_income.frequency_kind), {include_blank: "Choose"}, {:disabled => false}) %>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{other_income.id}", class: "datepicker-js floatlabel" %>
+    </div>
+    <div class="col-md-3">
+      <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{other_income.id}", class: "datepicker-js floatlabel" %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-3 pull-right">
+      <a class="btn btn-default other-income-cancel">Cancel</a>
+      <%= f.submit 'Save', class: "btn btn-danger #{'disabled' if disabled }" %>
+    </div>
+  </div>
+</div>
+<% end %>

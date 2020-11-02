@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Insured::ConsumerRolesController < ApplicationController
   include ApplicationHelper
   include VlpDoc
@@ -9,10 +11,9 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
 
-  FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id]
+  FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
-  def ssn_taken
-  end
+  def ssn_taken; end
 
   def privacy
     set_current_person(required: false)
@@ -28,7 +29,6 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to bookmark_url || family_account_path
     end
   end
-
 
   def search
     @no_previous_button = true
@@ -65,11 +65,11 @@ class Insured::ConsumerRolesController < ApplicationController
     respond_to do |format|
       if @consumer_candidate.valid?
         idp_search_result = nil
-        if current_user.idp_verified?
-          idp_search_result = :not_found
-        else
-          idp_search_result = IdpAccountManager.check_existing_account(@consumer_candidate)
-        end
+        idp_search_result = if current_user.idp_verified?
+                              :not_found
+                            else
+                              IdpAccountManager.check_existing_account(@consumer_candidate)
+                            end
         case idp_search_result
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
@@ -84,9 +84,7 @@ class Insured::ConsumerRolesController < ApplicationController
             if @employee_candidate.valid?
               found_census_employees = @employee_candidate.match_census_employees
               @employment_relationships = ::Factories::EmploymentRelationshipFactory.build(@employee_candidate, found_census_employees)
-              if @employment_relationships.present?
-                format.html { render 'insured/employee_roles/match' }
-              end
+              format.html { render 'insured/employee_roles/match' } if @employment_relationships.present?
             end
           end
           @resident_candidate = ::Forms::ResidentCandidate.new(@person_params)
@@ -111,9 +109,9 @@ class Insured::ConsumerRolesController < ApplicationController
               end
               create_sso_account(current_user, @person, 15, "resident") do
                 respond_to do |format|
-                  format.html {
+                  format.html do
                     redirect_to family_account_path
-                  }
+                  end
                 end
               end
             end
@@ -163,19 +161,19 @@ class Insured::ConsumerRolesController < ApplicationController
       redirect_to search_insured_consumer_role_index_path
       return
     end
-    @person.primary_family.create_dep_consumer_role if @person
+    @person&.primary_family&.create_dep_consumer_role
     is_assisted = session["individual_assistance_path"]
-    role_for_user = (is_assisted) ? "assisted_individual" : "individual"
+    role_for_user = is_assisted ? "assisted_individual" : "individual"
     create_sso_account(current_user, @person, 15, role_for_user) do
       respond_to do |format|
-        format.html {
+        format.html do
           if is_assisted
-            @person.primary_family.update_attribute(:e_case_id, "curam_landing_for#{@person.id}") if @person.primary_family
+            @person.primary_family&.update_attribute(:e_case_id, "curam_landing_for#{@person.id}")
             redirect_to navigate_to_assistance_saml_index_path
           else
             redirect_to :action => "edit", :id => @consumer_role.id
           end
-        }
+        end
       end
     end
   end
@@ -202,14 +200,18 @@ class Insured::ConsumerRolesController < ApplicationController
     set_consumer_bookmark_url
     @consumer_role.build_nested_models_for_person
     @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
+    respond_to do |format|
+      format.js
+      format.html
+    end
   end
 
   def update
     authorize @consumer_role, :update?
-    save_and_exit =  params['exit_after_method'] == 'true'
+    save_and_exit = params['exit_after_method'] == 'true'
 
     if update_vlp_documents(@consumer_role, 'person') && @consumer_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) if (!params[:person][:is_applying_coverage].nil?)
+      @consumer_role.update_attribute(:is_applying_coverage, params[:person][:is_applying_coverage]) unless params[:person][:is_applying_coverage].nil?
       @person.active_employee_roles.each { |role| role.update_attributes(contact_method: params[:person][:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
       @person.primary_family.update_attributes(application_type: params["person"]["family"]["application_type"]) if current_user.has_hbx_staff_role?
       if save_and_exit
@@ -221,7 +223,11 @@ class Insured::ConsumerRolesController < ApplicationController
           redirect_to upload_ridp_document_insured_consumer_role_index_path
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          redirect_to  @consumer_role.admin_bookmark_url.present? ?  @consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          # rubocop:disable Metrics/BlockNesting
+          consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+          redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          # rubocop:enable Metrics/BlockNesting
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
         end
@@ -246,7 +252,9 @@ class Insured::ConsumerRolesController < ApplicationController
     set_current_person
     consumer = @person.consumer_role
     if @person.completed_identity_verification? || consumer.identity_verified?
-      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      redirect_to consumer.admin_bookmark_url.present? ? consumer.admin_bookmark_url : consumer_redirection_path
     else
       set_consumer_bookmark_url
     end
@@ -264,9 +272,46 @@ class Insured::ConsumerRolesController < ApplicationController
     @person.primary_family.update_attributes(application_type: application_type)
     if @person.primary_family.has_curam_or_mobile_application_type?
       @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-      redirect_to insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+      consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      redirect_to consumer_redirection_path
     else
       redirect_back fallback_location: '/'
+    end
+  end
+
+  def help_paying_coverage
+    if EnrollRegistry.feature_enabled?(:financial_assistance)
+      set_current_person
+      save_faa_bookmark(request.original_url)
+      set_admin_bookmark_url
+      @transaction_id = params[:id]
+    else
+      render(:file => "#{Rails.root}/public/404.html", layout: false, status: :not_found)
+    end
+  end
+
+  def help_paying_coverage_response
+    set_current_person
+    if params["is_applying_for_assistance"].blank?
+      flash[:error] = "Please choose an option before you proceed."
+      redirect_to help_paying_coverage_insured_consumer_role_index_path
+    elsif params["is_applying_for_assistance"] == "true"
+      begin
+        result = Operations::FinancialAssistance::Apply.new.call(family_id: @person.primary_family.id)
+        if result.success?
+          redirect_to financial_assistance.application_checklist_application_path(id: result.success)
+        else
+          flash[:error] = result.errors
+          redirect_back fallback_location: '/'
+        end
+      rescue StandardError => e
+        flash[:error] = "Failed to proceed, " + e.message
+        redirect_back fallback_location: '/'
+      end
+    else
+      @person.update_attributes is_applying_for_assistance: false
+      redirect_to insured_family_members_path(consumer_role_id: @person.consumer_role.id)
     end
   end
 
@@ -332,7 +377,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :tribal_id,
       :no_dc_address,
       :no_dc_address_reason,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :is_homeless,
+      :is_temporarily_out_of_state
     ]
   end
 
@@ -340,7 +387,6 @@ class Insured::ConsumerRolesController < ApplicationController
     @consumer_role = ConsumerRole.find(params.require(:id))
     @person = @consumer_role.person
   end
-
 
   def check_consumer_role
     set_current_person(required: false)
@@ -363,16 +409,16 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def set_error_message(message)
     if message.include? "year too big to marshal"
-      return "Date of birth cannot be more than 110 years ago"
+      "Date of birth cannot be more than 110 years ago"
     else
-      return message
+      message
     end
   end
 
   def build_person_params
-   @person_params = {:ssn =>  Person.decrypt_ssn(@person.encrypted_ssn)}
+    @person_params = {:ssn => Person.decrypt_ssn(@person.encrypted_ssn)}
 
-    %w(first_name middle_name last_name gender).each do |field|
+    %w[first_name middle_name last_name gender].each do |field|
       @person_params[field] = @person.attributes[field]
     end
 

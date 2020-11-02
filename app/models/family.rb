@@ -1135,6 +1135,14 @@ class Family
     ['Curam', 'Mobile'].include? application_type
   end
 
+  def has_in_person_application_type?
+    application_type == 'In Person'
+  end
+
+  def has_paper_paplication_type?
+    application_type == 'Paper'
+  end
+
   def set_due_date_on_verification_types
     family_members.each do |family_member|
       person = family_member.person
@@ -1162,6 +1170,16 @@ class Family
 
   def has_active_sep?(pre_enrollment)
     pre_enrollment.is_ivl_by_kind? && latest_ivl_sep&.start_on&.year == pre_enrollment.effective_on.year
+  end
+
+  def benchmark_product_id
+    bcp = HbxProfile.bcp_by_oe_dates || HbxProfile.bcp_by_effective_period
+    bcp.slcsp_id
+  end
+
+  def application_applicable_year
+    bcp = HbxProfile.bcp_by_oe_dates
+    bcp.present? ? bcp.start_on.year : TimeKeeper.date_of_record.year
   end
 
 private

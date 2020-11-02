@@ -436,7 +436,7 @@ module ApplicationHelper
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image).digest_path}"
+        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image)&.digest_path}"
         carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
@@ -756,7 +756,13 @@ module ApplicationHelper
   end
 
   def is_new_paper_application?(current_user, app_type)
+    app_type = app_type&.downcase
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def is_new_in_person_application?(current_user, app_type)
+    app_type = app_type&.humanize&.downcase
+    current_user.has_hbx_staff_role? && app_type == "in person"
   end
 
   def load_captcha_widget?
@@ -865,6 +871,14 @@ module ApplicationHelper
     EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
       ui_display = csr == '-1' ? 'limited' : csr
       csr_options << [ui_display, csr]
+    end
+  end
+
+  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
+      false
+    else
+      true
     end
   end
 end

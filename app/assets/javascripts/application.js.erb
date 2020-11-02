@@ -842,11 +842,18 @@ $(document).on('click', '#address_info + span.form-action', function(){
   if ($(this).text() == "Add Mailing Address"){
     $(this).text('Remove Mailing Address');
     $('.row-form-wrapper.mailing-div').show();
+    $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip,  #dependent_addresses_1_city").each(function() {
+      $(this).prop('required', true);
+    })
   }else if ($(this).text() == "Remove Mailing Address"){
     $(this).text('Add Mailing Address');
     $('.mailing-div').hide();
     $(".mailing-div input[type='text']").val("");
+    $(".mailing-div #state_id_mailing").val("")
     $('.mailing-div .label-floatlabel').hide();
+    $("#person_addresses_attributes_1_zip, #person_addresses_attributes_1_address_1, #person_addresses_attributes_1_city, #dependent_addresses_1_address_1, #dependent_addresses_1_zip, #dependent_addresses_1_city").each(function() {
+      $(this).prop('required', false);
+    })
     $("#person_addresses_attributes_1__destroy").val(true);
   }
 });
@@ -878,7 +885,7 @@ var submitInvisibleRecaptchaForm = function () {
   $(document).on('ready turbolinks:load', function(){
     $("#person_first_name").change(function() {
       var text = $("#person_first_name").val() == '' ? "this person" : $("#person_first_name").val()
-      $("#is_applying_coverage_value").text("Is "+ text +" applying for coverage? *");
+      $("#is_applying_coverage_value").text("Does "+ text +" need coverage? *");
     });
 
     $('a.interaction-click-control-download-notices').click(function(e) {

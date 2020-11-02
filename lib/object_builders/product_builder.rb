@@ -171,7 +171,7 @@ class ProductBuilder
     if Settings.site.key == :cca
       @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
     else
-      @service_area_map[[get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+      @service_area_map[[get_issuer_profile_id.to_s,"#{Settings.site.key.upcase}S001",@qhp.active_year]]
     end
   end
 

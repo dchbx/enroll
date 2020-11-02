@@ -46,6 +46,7 @@ Feature: Customers go to Curam to view notices and verifications
     When MEDICAID & TAX CREDITS button is visible to the user
     Then there will be text to the left of the MEDICAID & TAX CREDITS button
 
+  @flaky
   Scenario: Consumer can see the Navigation Button
     Given a consumer exists
     And the consumer is logged in

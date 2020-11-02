@@ -248,7 +248,7 @@ QualifyingLifeEventKind.create!(
   ordinal_position: 100,
   reason: "court_order",
   edi_code: " ",
-  effective_on_kinds: ["exact_date"],
+  effective_on_kinds: ["date_of_event"],
   pre_event_sep_in_days: 0,
   post_event_sep_in_days: 60,
   is_self_attested: false,

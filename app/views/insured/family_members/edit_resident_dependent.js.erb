@@ -1,7 +1,17 @@
+<% if @dependent.errors.present? || @address_errors.present?  %>
+var dependent_response = $("<%= escape_javascript(render 'dependent_resident_form', dependent: @dependent, person: @person) %>");
+if($("#dependent_ul").find("form#edit_dependent .alert-error").length){
+  $("#dependent_ul").find("form#edit_dependent .alert-error").replaceWith($(dependent_response).find(".alert-error"));
+}else {
+  $("#dependent_ul").find("form#edit_dependent").prepend($(dependent_response).find(".alert-error"));
+}
+<% else %>
 $("#new_employee_dependent_form").each(function(idx, ele) {
   $(ele).remove();
 });
 $("#add_member_list_<%= @dependent.id %>").replaceWith("<%= escape_javascript(render 'dependent_resident_form', dependent: @dependent,person: @person) %>");
+<% end %>
+
 $("#add_member_list_<%= @dependent.id %>").attr('data-confirm', '');
 $("#dependent_buttons").addClass('hidden');
 semantic_class();

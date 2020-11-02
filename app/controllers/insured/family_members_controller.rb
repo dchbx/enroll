@@ -69,18 +69,26 @@ class Insured::FamilyMembersController < ApplicationController
   def create
     @dependent = ::Forms::FamilyMember.new(params.require(:dependent).permit!)
 
+    @address_errors = validate_address_params(params.require(:dependent).permit![:same_with_primary], params.require(:dependent).permit![:addresses])
+
     if ((Family.find(@dependent.family_id)).primary_applicant.person.resident_role?)
-      if @dependent.save
+      if @address_errors.blank? && @dependent.save
         @created = true
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
         end
+      else
+        init_address_for_dependent
+        respond_to do |format|
+          format.html { render 'new_resident_dependent' }
+          format.js { render 'new_resident_dependent' }
+        end
       end
       return
     end
 
-    if @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.save && update_vlp_documents(@dependent.family_member.try(:person).try(:consumer_role), 'dependent', @dependent)
       @created = true
       respond_to do |format|
         format.html { render 'show' }
@@ -122,20 +130,28 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def update
+    @address_errors = validate_address_params(params.require(:dependent).permit![:same_with_primary], params.require(:dependent).permit![:addresses])
+
     if (@dependent.family_member.try(:person).present? && (@dependent.family_member.try(:person).is_resident_role_active?))
-      if @dependent.update_attributes(params.require(:dependent))
+      if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent))
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
+        end
+      else
+        init_address_for_dependent
+        respond_to do |format|
+          format.html { render 'edit_resident_dependent' }
+          format.js { render 'edit_resident_dependent' }
         end
       end
       return
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
-      consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, no_dc_address: params[:dependent]["no_dc_address"], dc_status: @dc_status) if consumer_role
+      consumer_role.check_for_critical_changes(@dependent.family_member.family, info_changed: @info_changed, is_homeless: params[:dependent]["is_homeless"], is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"], dc_status: @dc_status) if consumer_role
       consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && (!params[:dependent][:is_applying_coverage].nil?)
       respond_to do |format|
         format.html { render 'show' }
@@ -218,6 +234,20 @@ private
       end
       @dependent.addresses = addresses
     end
+  end
+
+  def validate_address_params(same_with_primary, address_params)
+    return [] if same_with_primary == 'true'
+
+    errors_array = []
+    clean_address_params = address_params.reject{|_key, value| value[:address_1].blank? && value[:city].blank? && value[:state].blank? && value[:zip].blank?}
+    clean_address_params.to_h.each do |_key, value|
+      if value.is_a?(Hash)
+        result = Validators::AddressContract.new.call(value)
+        errors_array <<  result.errors.to_h  if result.failure?
+      end
+    end
+    errors_array
   end
 
   def duplicate_sep(sep)

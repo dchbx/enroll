@@ -15,22 +15,22 @@ Feature: Employer terminates borker and hires new broker
     And initial employer ABC Widgets has draft benefit application
     And employer ABC Widgets hired broker Jane Goodall from Browns Inc
 
-    Scenario: Employer terminates broker agency and hires new agency
-      And staff role person logged in
-      And ABC Widgets goes to the brokers tab
-      Then Employer should see broker Jane Goodall and agency Browns Inc active for the employer
-      When Employer terminates broker
-      Then Employer should see broker terminated message
-      When Employer clicks on the Brokers tab
-      Then Employer should see no active broker
-      When Employer clicks on Browse Brokers button
-      Then Employer should see broker agencies index view
-      When Employer searches broker agency District Brokers Inc
-      Then Employer should see broker agency District Brokers Inc
-      When Employer clicks select broker button
-      Then Employer should see confirm modal dialog box
-      When Employer confirms broker selection
-      Then Employer should see broker selected successful message
-      When Employer clicks on the Brokers tab
-      Then Employer should see broker Max Planck and agency District Brokers Inc active for the employer
-      And Employer logs out
+  Scenario: Employer terminates broker agency and hires new agency
+    And staff role person logged in
+    And ABC Widgets goes to the brokers tab
+    Then Employer should see broker Jane Goodall and agency Browns Inc active for the employer
+    When Employer terminates broker
+    Then Employer should see broker terminated message
+    When Employer clicks on the Brokers tab
+    Then Employer should see no active broker
+    When Employer clicks on Browse Brokers button
+    Then Employer should see broker agencies index view
+    When Employer searches broker agency District Brokers Inc
+    Then Employer should see broker agency District Brokers Inc
+    When Employer clicks select broker button
+    Then Employer should see confirm modal dialog box
+    When Employer confirms broker selection
+    Then Employer should see broker selected successful message
+    When Employer clicks on the Brokers tab
+    Then Employer should see broker Max Planck and agency District Brokers Inc active for the employer
+    And Employer logs out

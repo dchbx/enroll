@@ -350,7 +350,7 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|
-  find('.family_members h1', text: 'Household Info: Family Members', wait: 5)
+  find('.family_members h2', text: "#{l10n('family_information')}", wait: 5)
   find('.family_members span', text: name, wait: 5)
 end
 

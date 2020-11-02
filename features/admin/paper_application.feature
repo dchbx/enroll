@@ -11,12 +11,14 @@ Background: Hbx Admin navigates into the new consumer application with paper app
   When Admin clicks CONTINUE button
   Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
-Scenario: Hbx Admin clicks continue after uploading and verifying an Application
+Scenario: FAA is disabled and Hbx Admin clicks continue after uploading and verifying an Application
+  Given the FAA feature configuration is disabled
   Given the Admin will be navigated to the DOCUMENT UPLOAD page
   When the Admin clicks CONTINUE after uploading and verifying an application
   Then the Admin can navigate to the next page and finish the application
 
-Scenario: Hbx Admin clicks continue after uploading and verifying an Identity
+Scenario: FAA is enabled and Hbx Admin clicks continue after uploading and verifying an Identity
+  Given the FAA feature configuration is enabled
   Given the Admin will be navigated to the DOCUMENT UPLOAD page
   When the Admin clicks CONTINUE after uploading and verifying an Identity
-  Then the Admin can navigate to the next page and finish the application
+  Then the Admin should be on the Help Paying for Coverage page

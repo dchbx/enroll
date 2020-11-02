@@ -26,6 +26,7 @@ module Insured
 
       def pay_now_button_timed_out?
         covered_time = @enrollment.workflow_state_transitions.where(to_state: 'coverage_selected').first
+        return true if covered_time.blank?
         covered_time.transition_at + 15.minutes <= Time.now
       end
 

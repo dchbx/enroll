@@ -282,6 +282,11 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       expect(helper.pay_now_button_timed_out?).to eq true
     end
 
+    it 'should return true if transition is not found' do
+      hbx_enrollment.workflow_state_transitions.first.update_attributes(to_state: "renewing_coverage_selected")
+      expect(helper.pay_now_button_timed_out?).to eq true
+    end
+
     it 'should return false if transition time is within 15 minutes' do
       hbx_enrollment.workflow_state_transitions.first.update_attributes(transition_at: TimeKeeper.date_of_record - 10.minutes)
       expect(helper.pay_now_button_timed_out?).to eq true

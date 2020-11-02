@@ -62,10 +62,44 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
                         applied_aptc_amount: 0.0)
     end
 
+    let!(:auto_renewing_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: Date.new(TimeKeeper.date_of_record.year, 1, 1),
+                        household: family.households.first,
+                        kind: "individual",
+                        is_any_enrollment_member_outstanding: true,
+                        aasm_state: "auto_renewing",
+                        applied_aptc_amount: 0.0)
+    end
+
+    let!(:cover_auto_renewing_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: Date.new(TimeKeeper.date_of_record.year, 1, 1),
+                        household: family.households.first,
+                        kind: "coverall",
+                        is_any_enrollment_member_outstanding: true,
+                        aasm_state: "auto_renewing",
+                        applied_aptc_amount: 0.0)
+    end
+
     it "should picks up the renewing_coverage_selected enrollment" do
       subject.begin_coverage_for_ivl_enrollments
       expect(renewing_selected_enrollment.reload.aasm_state).to eq "coverage_selected"
       expect(renewing_selected_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
+    end
+
+    it "should picks up the auto renewing enrollment" do
+      subject.begin_coverage_for_ivl_enrollments
+      expect(auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
+      expect(auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
+    end
+
+    it "should picks up the cover all auto renewing enrollment" do
+      subject.begin_coverage_for_ivl_enrollments
+      expect(cover_auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
+      expect(cover_auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
     end
   end
 end

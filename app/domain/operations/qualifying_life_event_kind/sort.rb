@@ -17,7 +17,7 @@ module Operations
       def persist_data(params)
         sort_data = params['sort_data']
         sort_data.each do |sort|
-          qleks = ::QualifyingLifeEventKind.active.where(market_kind: params['market_kind'], id: sort['id'])
+          qleks = ::QualifyingLifeEventKind.where(market_kind: params['market_kind'], id: sort['id'])
           qleks.update(ordinal_position: sort['position'])
         end
 

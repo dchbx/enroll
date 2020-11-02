@@ -9,7 +9,7 @@ registry:
         is_enabled: true
         settings:
           - key: :effective_period
-            item: <%= Date.new(2020,6,6)..Date.new(2020,10,9) %>
+            item: <%= Date.new(2020,6,6)..Date.new(2020,12,31) %>
       - key: :verification_sensitive_attributes
         item: :consumer_role_hub_call
         is_enabled: true
@@ -23,3 +23,11 @@ registry:
             item: 20
           - key: :fifteenth_of_the_month
             item: 15
+      - key: :aca_individual_assistance_benefits
+        is_enabled: true
+        settings:
+          - key: :default_applied_aptc_percentage
+            item: 0.85
+      - key: :cancel_renewals_for_term
+        item: Operations::Individual::CancelRenewalEnrollment.new
+        is_enabled: true

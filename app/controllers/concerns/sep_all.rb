@@ -7,6 +7,8 @@ module SepAll
       params[:effective_kind] = 'first of month'
     elsif params[:effective_kind] == 'End of Month'
       params[:effective_kind] = 'first of next month'
+    elsif params[:effective_kind] == 'First of month after event'
+      params[:effective_kind] = 'fixed first of next month'
     else
       #Do Nothing
     end
@@ -32,6 +34,7 @@ module SepAll
   def calculate_rule
     fifteen_day_rule = '15th of month'
     end_month_rule = 'End of Month'
+    next_month_event_rule = 'First of month after event'
 
     if @qle.reason == 'covid-19'
       qle_on = TimeKeeper.date_of_record
@@ -48,6 +51,8 @@ module SepAll
           fifteen_day_rule
         elsif t == 'first_of_next_month'
           end_month_rule
+        elsif t == 'fixed_first_of_next_month'
+          next_month_event_rule
         else
           t.humanize
         end
@@ -66,9 +71,10 @@ module SepAll
 
   def getMarket(family)
     consumer_role = family.primary_applicant.person.consumer_role
+    resident_role = family.primary_applicant.person.resident_role
     employee_roles = family.primary_applicant.person.active_employee_roles
 
-    @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role, true)
+    @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role || resident_role, true)
     @qle_shop = QualifyingLifeEventKind.qualifying_life_events_for(employee_roles.first, true)
 
     if employee_roles.present?

@@ -13,11 +13,15 @@ RSpec.describe "insured/consumer_roles/search.html.haml" do
   end
 
   it "should display the title" do
-    expect(rendered).to have_selector('h1', text: 'Personal Information')
+    expect(rendered).to have_selector('h2', text: 'Personal Information')
   end
 
   it "should have memo to indicate required fields" do
     expect(rendered).to have_selector('p.memo', text: '* = required field')
+  end
+
+  it "should have the content enter your information" do
+    expect(rendered).to have_selector('p', text: "Enter your personal information. When you're finished, select CONTINUE.")
   end
 
 end

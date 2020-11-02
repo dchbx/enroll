@@ -6,6 +6,8 @@ When(/^\w+ visits? the Insured portal during open enrollment$/) do
   FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date_and_first_month, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
   screenshot("individual_start")
+  r_id = BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[1].id.to_s
+  BenefitMarkets::Products::Product.all.where(title:  "IVL Test Plan Bronze")[0].update_attributes!(renewal_product_id: r_id)
 end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
@@ -52,6 +54,8 @@ end
 
 And(/user should see your information page$/) do
   expect(page).to have_content("Your Information")
+  expect(page).to have_content("View Privacy Act statement")
+  expect(page).to have_content("By selecting CONTINUE")
   expect(page).to have_content("CONTINUE")
   click_link "CONTINUE"
   sleep 5
@@ -78,6 +82,7 @@ end
 
 Then(/^.+ should see heading labeled personal information/) do
   expect(page).to have_content("Personal Information")
+  expect(page).to have_css("#gender-tooltip")
 end
 
 Then(/Individual should click on Individual market for plan shopping/) do
@@ -99,7 +104,16 @@ Then(/Individual should see a form to enter personal information$/) do
   find(:xpath, '//*[@id="address_info"]/div/div[3]/div[2]/div/div[2]/span').click
   first('li', :text => 'DC', wait: 5).click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
-
+  expect(page).to have_css("#home_address_tooltip")
+  expect(page).to have_content("Enter your personal information and answer the following questions")
+  expect(page).to have_content("Is this person a US citizen or US national")
+  expect(page).to have_content("Is this person a naturalized citizen")
+  expect(page).to have_content("Is this person a member of an American Indian")
+  expect(page).to have_content("Is this person currently incarcerated")
+  expect(page).to have_content("What is your race/ethnicity? (OPTIONAL - check all that apply)")
+  expect(page).to have_content("If Hispanic/Latino/a, ethnicity (OPTIONAL - check all that apply.)")
+  expect(page).to have_css("#us_citizen", visible: false)
+  expect(page).to have_css("#is_incarcerated", visible: false)
   sleep 2
   screenshot("personal_form")
 end
@@ -144,16 +158,16 @@ end
 
 Then(/selects i94 unexpired foreign passport document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => "I-94 (Arrival/Departure Record) in Unexpired Foreign Passport", match: :prefer_exact, wait: 10).click
+  find('li', :text => "I-94 – Arrival/departure record in unexpired foreign passport", match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
-  fill_in 'Visa number', with: 'V1234567'
+  fill_in 'Visa Number', with: 'V1234567'
   step 'should fill in valid sevis, passport expiration_date, tribe_member and incarcerated details'
 end
 
 Then(/selects Other With I-94 Number document and fills required details (.*)$/) do |correct_or_incorrect|
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'Other (With I-94 Number)', match: :prefer_exact, wait: 10).click
+  find('li', :text => 'Other (with I-94 number)', match: :prefer_exact, wait: 10).click
   fill_in 'I 94 Number', with: (correct_or_incorrect == 'correctly' ? '123456789a1' : '@23#5678901')
   fill_in 'Passport Number', with: 'A123456'
   fill_in 'Document Description', with: 'Other With I94 Number'
@@ -179,7 +193,7 @@ end
 
 Then(/select I-551 doc and fill details/) do
   find('.label', :text => 'Select document type', wait: 10).click
-  find('li', :text => 'I-551 (Permanent Resident Card)', wait: 10).click
+  find('li', :text => 'I-551 – Permanent resident card', wait: 10).click
   fill_in 'Alien Number', with: '987654323'
   fill_in 'Card Number', with: 'aaa1231231231'
   fill_in 'I-551 Expiration Date', with: TimeKeeper.date_of_record.to_s
@@ -200,7 +214,7 @@ When(/click eligible immigration status yes/) do
 end
 
 Then(/should find I-551 doc type/) do
-  find('.label', :text => 'I-551 (Permanent Resident Card)', wait: 10)
+  find('.label', :text => 'I-551 – Permanent resident card', wait: 10)
 end
 
 And(/should find alien number/) do
@@ -208,7 +222,7 @@ And(/should find alien number/) do
 end
 
 And(/Individual edits dependent/) do
-  find('.fa-edit').click
+  find(:xpath, './html/body/div[3]/div[2]/div/div/div[2]/div[4]/ul/li/div/div[2]/div[4]/div/div/a').click
   wait_for_ajax
 end
 
@@ -239,6 +253,7 @@ end
 Then(/^\w+ agrees? to the privacy agreeement/) do
   wait_for_ajax
   expect(page).to have_content('Authorization and Consent')
+  expect(page).to have_content('US Department of Health and Human Services (HHS).')
   find(:xpath, '//label[@for="agreement_agree"]').click
   click_link "Continue"
   sleep 2
@@ -252,6 +267,7 @@ end
 
 Then(/^\w+ should see identity verification page and clicks on submit/) do
   expect(page).to have_content('Verify Identity')
+  expect(page).to have_content("When you're finished, select SUBMIT.")
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_0_response_id_a"]', wait: 5).click
   find(:xpath, '//label[@for="interactive_verification_questions_attributes_1_response_id_c"]', wait: 5).click
   screenshot("identify_verification")
@@ -260,8 +276,18 @@ Then(/^\w+ should see identity verification page and clicks on submit/) do
   click_link "Continue Application"
 end
 
+Then(/\w+ should be on the Help Paying for Coverage page/) do
+  expect(page).to have_content("Help Paying for Coverage")
+end
+
+Then(/\w+ does not apply for assistance and clicks continue/) do
+  find(:xpath, '//label[@for="radio2"]').click
+  find('.interaction-click-control-continue').click
+end
+
 Then(/\w+ should see the dependents form/) do
-  expect(page).to have_content('Add Member')
+  #expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents")
 end
 
@@ -274,8 +300,8 @@ And(/Individual clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => @u.adult_dob
   click_link(@u.adult_dob.to_date.day)
   fill_in "dependent[ssn]", :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[3]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -294,8 +320,8 @@ And(/Individual again clicks on add member button/) do
   fill_in "jq_datepicker_ignore_dependent[dob]", :with => '01/15/2013'
   click_link('15')
   fill_in 'dependent[ssn]', :with => @u.ssn
-  find('.label', :text => 'This Person Is', :wait => 10).click
-  find(:xpath, '//*[@id="new_dependent"]/div[1]/div[4]/div[1]/div[1]/div[3]/div/ul/li[4]').click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_female"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
   find(:xpath, '//label[@for="dependent_naturalized_citizen_false"]').click
@@ -348,13 +374,13 @@ And(/I click on log out link$/) do
   find('.interaction-click-control-logout').click
 end
 
-And(/^.+ click on sign in existing account$/) do
+And(/^.+ click on Sign In$/) do
   expect(page).to have_content "Welcome to the District's Health Insurance Marketplace"
 end
 
 And(/I signed in$/) do
   sleep 2
-  find('.btn-link', :text => 'Sign In Existing Account', wait: 5).click
+  find('.btn-link', :text => 'Sign In', wait: 5).click
   sleep 5
   fill_in "user[login]", :with => "testflow@test.com"
   fill_in "user[password]", :with => "aA1!aA1!aA1!"
@@ -372,6 +398,15 @@ Then(/I click on back to my account$/) do
   find('.interaction-click-control-back-to-my-account').click
 end
 
+And(/Aptc user signed in$/) do
+  sleep 2
+  find('.btn-link', :text => 'Sign In', wait: 5).click
+  sleep 5
+  fill_in "user[login]", :with => "aptc@dclink.com"
+  fill_in "user[password]", :with => "aA1!aA1!aA1!"
+  find('.sign-in-btn').click
+end
+
 And(/^I click on continue button on group selection page$/) do
   click_button 'CONTINUE', :wait => 10
 end
@@ -379,6 +414,14 @@ end
 And(/I select a plan on plan shopping page/) do
    screenshot("plan_shopping")
    find_all('.plan-select')[0].click
+end
+
+And(/I select a non silver plan on plan shopping page/) do
+  find(:xpath, '//*[@id="ivl_plans"]/div[1]/div/div[5]/div[3]/a[1]').click
+end
+
+Then(/Should see the modal pop up for eligibility/) do
+  expect(page).to have_css('.modal-title')
 end
 
 And(/I click on purchase button on confirmation page/) do
@@ -408,7 +451,7 @@ And(/I should see the individual home page/) do
 end
 
 Then(/^Individual edits a dependents address$/) do
-  click_link 'Add Member'
+  click_link 'Add New Person'
 end
 
 Then(/^Individual fills in the form$/) do
@@ -416,9 +459,9 @@ Then(/^Individual fills in the form$/) do
   fill_in 'dependent[last_name]', :with => (@u.last_name :last_name)
   fill_in 'jq_datepicker_ignore_dependent[dob]', :with => (@u.adult_dob :dob)
   click_link(@u.adult_dob.to_date.day)
-  click_outside_datepicker('Household Info: Family Members')
+  click_outside_datepicker("#{l10n('family_information')}")
   fill_in 'dependent[ssn]', :with => (@u.ssn :ssn)
-  find('.label', :text => 'This Person Is', :wait => 10).click
+  find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Sibling')]").click
   find(:xpath, '//label[@for="radio_male"]').click
   find(:xpath, '//label[@for="dependent_us_citizen_true"]').click
@@ -472,7 +515,7 @@ end
 
 Then(/Individual asks for help$/) do
   expect(page).to have_content "Help"
-  find('.container .row div div.btn', text: 'Help').click
+  find('.container div.btn', text: 'Help').click
   wait_for_ajax
   expect(page).to have_content "Help"
   find(:id => "CSR", :wait => 10).click
@@ -582,7 +625,7 @@ When(/^\w+ visits the Consumer portal$/i) do
 end
 
 When(/^(\w+) signs in$/) do |person|
-  click_link 'Sign In Existing Account'
+  click_link 'Sign In'
   fill_in 'user[login]', with: (@u.find 'email' + person)
   find('#user_email').set(@u.find 'email' + person)
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
@@ -659,6 +702,7 @@ Then(/^Aptc user goes to register as individual/) do
 end
 
 Then(/^Aptc user should see a form to enter personal information$/) do
+  sleep 1
   step "Individual should see a form to enter personal information"
   screenshot("aptc_personal")
   find('.btn', text: 'CONTINUE').click
@@ -676,6 +720,26 @@ Then(/^Prepare taxhousehold info for aptc user$/) do
   if household.tax_households.blank?
     household.build_thh_and_eligibility(80, 0, start_on, current_product.id, 'Admin')
     household.build_thh_and_eligibility(80, 0, future_start_on, future_product.id, 'Admin')
+    household.save!
+  end
+  benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: current_product.id)
+  benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(future_start_on)}.update_attributes!(slcsp_id: future_product.id)
+  screenshot("aptc_householdinfo")
+end
+
+Then(/^Prepare taxhousehold info for aptc user with selected eligibility$/) do
+  person = User.find_by(email: 'aptc@dclink.com').person
+  household = person.primary_family.latest_household
+
+  start_on = Date.new(TimeKeeper.date_of_record.year, 1,1)
+  future_start_on = Date.new(TimeKeeper.date_of_record.year + 1, 1,1)
+  current_product = BenefitMarkets::Products::Product.all.by_year(start_on.year).where(metal_level_kind: :silver).first
+  future_product = BenefitMarkets::Products::Product.all.by_year(future_start_on.year).where(metal_level_kind: :silver).first
+
+  if household.tax_households.blank?
+    household.build_thh_and_eligibility(80, 73, start_on, current_product.id, 'Admin')
+    household.build_thh_and_eligibility(80, 73, future_start_on, future_product.id, 'Admin')
     household.save!
   end
   benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
@@ -743,4 +807,23 @@ end
 
 When("consumer visits home page") do
   visit "/families/home"
+end
+
+When(/^\w+ checks? the Insured portal open enrollment dates$/) do
+  current_day = TimeKeeper.date_of_record
+  if (Date.new(current_day.year - 1, 11, 1)..Date.new(current_day.year, 1, 31)).include?(current_day)
+    expect(page).to have_content "Confirm Your Plan Selection"
+  else
+    next_year_date = current_day.next_year
+    bcp = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.first
+    bcp.update_attributes!(open_enrollment_start_on: Date.new(current_day.year - 1, 11, 1),
+                           open_enrollment_end_on: Date.new(current_day.year, 1, 31))
+    successor_bcp = bcp.successor
+    successor_bcp.update_attributes!(open_enrollment_start_on: (current_day - 10.days),
+                                     open_enrollment_end_on: Date.new(next_year_date.year, 1, 31))
+  end
+end
+
+Then("I should see a new renewing enrollment title on home page") do
+  expect(page).to have_content "Auto Renewing"
 end

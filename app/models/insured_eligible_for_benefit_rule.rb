@@ -41,6 +41,7 @@ class InsuredEligibleForBenefitRule
   def satisfied?
     if @role.class.name == "ConsumerRole" || @role.class.name == "ResidentRole"
       @errors = []
+      return [false, ["coverage not available"]] if @benefit_package.blank?
       status = @benefit_package.benefit_eligibility_element_group.class.fields.keys.reject{|k| k == "_id"}.reduce(true) do |eligible, element|
         if @market_kind == "shop" && !("#{element}" == "active_consumer")
           if self.public_send("is_#{element}_satisfied?")
@@ -131,6 +132,7 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_residency_status_satisfied?
+    return false if @benefit_package.blank?
     return true if @benefit_package.residency_status.include?("any")
 
     if @benefit_package.residency_status.include?("state_resident") && @role.present?
@@ -148,11 +150,13 @@ class InsuredEligibleForBenefitRule
   end
 
   def is_incarceration_status_satisfied?
+    return false if @benefit_package.blank?
     return true if @benefit_package.incarceration_status.include?("any")
     @benefit_package.incarceration_status.include?("unincarcerated") && (@role.is_incarcerated == false)
   end
 
   def is_age_range_satisfied?
+    return false if @benefit_package.blank?
     return true if @benefit_package.age_range == (0..0)
     age = age_on_next_effective_date(@role.dob)
     @benefit_package.age_range.cover?(age)

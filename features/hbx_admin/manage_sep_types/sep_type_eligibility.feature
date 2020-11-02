@@ -3,6 +3,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
     And Hbx Admin logs on to the Hbx Portal
     And the Admin is on the Main Page
+    And the FAA feature configuration is enabled
 
   Scenario: Consumer qualify for Special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
@@ -22,6 +23,7 @@ Feature: Qualifying life of event kind based on eligibity dates
     Then Individual should not see sucess confirmation text
     And I click on log out link
 
+  @broken
   Scenario: Admin logged to qualify consumer for special enrollment period based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
     And Hbx Admin logs out

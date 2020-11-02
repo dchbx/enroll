@@ -126,6 +126,10 @@ class User
     idp_verified
   end
 
+  def consumer_identity_verified?
+    !identity_verified_date.nil? || person.consumer_role.identity_verified? if person&.consumer_role?
+  end
+
   def permission
     person.hbx_staff_role.permission
   end

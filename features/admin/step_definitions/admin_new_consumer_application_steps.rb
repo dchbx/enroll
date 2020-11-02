@@ -27,7 +27,7 @@ When(/^hbx admin uploads application document and verifies application$/) do
 end
 
 Then(/^Hbx admin visits household info page$/) do
-  expect(page).to have_content('Household Info')
+  expect(page).to have_content('Family Information')
 end
 
 Then(/^Admin continues to families home page$/) do

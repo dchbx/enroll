@@ -11,7 +11,18 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
   let(:person) { FactoryBot.create(:person) }
   let(:employee_role) {FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
   let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
-  let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household)}
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                      household: family.active_household,
+                      family: family,
+                      aasm_state: "coverage_selected",
+                      submitted_at: initial_application.open_enrollment_period.max,
+                      rating_area_id: initial_application.recorded_rating_area_id,
+                      sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                      sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                      benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                      employee_role_id: employee_role.id)
+  end
   let(:individual_family) { FactoryBot.create(:family, :with_primary_family_member)}
   let(:individual_enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: individual_family,  household: individual_family.active_household)}
 
@@ -37,7 +48,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       it "sets the latest date able to terminate an enrollment to be 1 year less 1 day from the enrollment start date" do
         enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
         #latest_date = Date.new(enrollment.effective_on.year, 12, 31)
-        latest_date = enrollment.effective_on + 1.year - 1.day
+        latest_date = enrollment.sponsored_benefit_package.end_on
         expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
       end
     end
@@ -47,7 +58,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
         enrollment.update_attributes(kind: "employer_sponsored_cobra")
         enrollment.effective_on = (TimeKeeper.date_of_record - 7.days)
         #latest_date = Date.new(enrollment.effective_on.year, 12, 31)
-        latest_date = enrollment.effective_on + 1.year - 1.day
+        latest_date = enrollment.sponsored_benefit_package.end_on
         expect(helper.set_date_max_to_plan_end_of_year(enrollment)).to eq(latest_date)
       end
     end
@@ -75,7 +86,7 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
 
     it "sets to last day of enrollment if current_date is outside the plan_year" do
       enrollment.effective_on = (TimeKeeper.date_of_record - 2.year)
-      expect(helper.set_default_termination_date_value(enrollment)).to eq(enrollment.effective_on + 1.year - 1.day)
+      expect(helper.set_default_termination_date_value(enrollment)).to eq(enrollment.effective_on + 2.year)
     end
   end
 

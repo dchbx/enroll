@@ -22,7 +22,7 @@ module Notifier
       builder.event_name = event_name if is_employee? || is_employer? || is_consumer?
       builder.payload = payload
       builder.append_contact_details
-      builder.dependents if is_consumer?
+      builder.append_data if is_consumer?
       template.data_elements.each do |element|
         elements = element.split('.')
         next if is_consumer? && elements.first == 'dependent'
@@ -83,6 +83,7 @@ module Notifier
         # clear_tmp
       else
         ivl_blank_page
+        ivl_appeal_rights
         ivl_non_discrimination
         ivl_taglines
         voter_application
@@ -173,11 +174,15 @@ module Notifier
     end
 
     def ivl_blank_page
-      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'blank.pdf')] if ['projected_eligibility_notice'].include?(event_name)
+      attach_blank_page
     end
 
     def attach_envelope
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', shop_envelope_without_address)]
+    end
+
+    def ivl_appeal_rights
+      join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'ivl_appeal_rights.pdf')] if ['final_eligibility_notice', 'final_eligibility_notice_renewal'].include?(event_name)
     end
 
     def employee_appeal_rights
@@ -188,10 +193,18 @@ module Notifier
       join_pdfs [notice_path, Rails.root.join('lib/pdf_templates', 'taglines.pdf')]
     end
 
-    def join_pdfs(pdfs)
+    def attach_blank_page(template_path = nil)
+      path = template_path.nil? ? notice_path : template_path
+      blank_page = Rails.root.join('lib/pdf_templates', 'blank.pdf')
+      page_count = Prawn::Document.new(:template => path).page_count
+      join_pdfs([path, blank_page], path) if page_count.odd?
+    end
+
+    def join_pdfs(pdfs, path = nil)
       pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
       pdf << CombinePDF.load(pdfs[1])
-      pdf.save notice_path
+      path_to_save = path.nil? ? notice_path : path
+      pdf.save path_to_save
     end
 
     def upload_and_send_secure_message

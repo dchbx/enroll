@@ -116,15 +116,19 @@ class Exchanges::ResidentsController < ApplicationController
   end
 
   def update
-    save_and_exit =  params['exit_after_method'] == 'true'
+    save_and_exit = params['exit_after_method'] == 'true'
     if save_and_exit
       respond_to do |format|
         format.html {redirect_to destroy_user_session_path}
       end
+    elsif @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
+      redirect_to ridp_bypass_exchanges_residents_path
     else
       @resident_role.build_nested_models_for_person
-      @resident_role.update_by_person(params.require(:person).permit(*person_parameters_list))
-      redirect_to ridp_bypass_exchanges_residents_path
+      bubble_address_errors_by_person(@resident_role.person)
+      respond_to do |format|
+        format.html { render "edit" }
+      end
     end
   end
 
@@ -201,7 +205,8 @@ class Exchanges::ResidentsController < ApplicationController
       :indian_tribe_member,
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason
+      :is_homeless,
+      :is_temporarily_out_of_state
     ]
   end
 

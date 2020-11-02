@@ -57,7 +57,7 @@ module BenefitMarkets
         def product_package_entity_for(product_package, application_period, enrollment_eligibility)
           package_kind               = product_package[:package_kind]
           product_package_params     = product_package.as_json.deep_symbolize_keys.except(:products)
-          contribution_models_params = product_package_params.delete(:contribution_models)
+          contribution_models_params = product_package_params.delete(:contribution_models) || []
           contribution_model_params  = product_package_params.delete(:contribution_model)
           pricing_units_params       = product_package_params[:pricing_model].delete(:pricing_units)
           product_package_params[:application_period]            = application_period

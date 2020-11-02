@@ -85,6 +85,7 @@ fixture_dumps
 
 /public/packs
 /public/packs-test
+/public/assets
 /node_modules
 /yarn-error.log
 yarn-debug.log*
@@ -92,8 +93,6 @@ yarn-debug.log*
 
 # Ignore YARD generated doc
 doc
-angular_documentation
-angular_coverage
 rubocop
 coverage
 

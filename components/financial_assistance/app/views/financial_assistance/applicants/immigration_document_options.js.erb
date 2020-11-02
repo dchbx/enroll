@@ -1,0 +1,40 @@
+<% case @vlp_doc_target %>
+<% when "naturalization_cert_container" %>
+  <% partial_target = "financial_assistance/shared/naturalization_cert_fields" %>
+<% when "citizenship_cert_container" %>
+  <% partial_target = "financial_assistance/shared/citizenship_cert_fields" %>
+<% when "immigration_i_327_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_327_fields" %>
+<% when "immigration_i_766_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_766_fields" %>
+<% when "immigration_i_571_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_571_fields" %>
+<% when "immigration_i_94_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_94_fields" %>
+<% when "immigration_i_94_2_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_94_2_fields" %>
+<% when "machine_readable_immigrant_visa_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/machine_readable_immigrant_visa_fields" %>
+<% when "immigration_i_551_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_551_fields" %>
+<% when "immigration_temporary_i_551_stamp_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/temporary_i_551_stamp_fields" %>
+<% when "immigration_temporary_i_20_stamp_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/i_20_fields" %>
+<% when "immigration_other_with_alien_number_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/other_with_alien_number_fields" %>
+<% when "immigration_other_with_i94_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/other_with_i94_fields" %>
+<% when "immigration_unexpired_foreign_passport_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/unexpired_foreign_passport_fields" %>
+<% when "immigration_DS_2019_fields_container" %>
+  <% partial_target = "financial_assistance/applicants/ds_2019_fields" %>
+<%else%>
+  <% partial_target = "financial_assistance/applicants/i_94_fields" %>
+<% end %>
+
+<% if @target.present? %>
+  '<%= form_for @target, immigration_document_options_submission_url(@application, @target) do |f| %>'
+    $(".vlp_doc_area").html("<%= escape_javascript(render partial: partial_target, locals: {c: f}) %>")
+  '<% end %>'
+<% end %>

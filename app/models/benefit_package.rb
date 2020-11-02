@@ -89,6 +89,4 @@ class BenefitPackage
       in: PREMIUM_CREDIT_STRATEGY_KINDS,
       message: "%{value} is not a valid premium credit strategy kind"
     }
-
-
 end

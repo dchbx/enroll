@@ -22,5 +22,8 @@ module Entities
     attribute :termination_on_kinds, Types::Array.of(Types::String).optional
     attribute :date_options_available, Types::Bool
     attribute :qle_event_date_kind, Types::String
+    attribute :updated_by, Types::String.optional
+    attribute :created_by, Types::String.optional
+    attribute :published_by, Types::String.optional
   end
 end

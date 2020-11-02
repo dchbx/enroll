@@ -87,10 +87,6 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         # expect(Family.all.size).to be >= 10
       end
 
-      it ".active_enrollment_from_family" do
-        expect(subject.active_enrollment_from_family(enrollment).first).to eq enrollment
-      end
-
       it "at least one Family with both active Individual Market Health and Dental product Enrollments"
       it "at least one Family with an active 'Individual Market Health product Enrollment only'"
       it "at least one Family with an active 'Assisted Individual Market Health product Enrollment only'"
@@ -192,8 +188,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           it "should not produce a new SHOP health enrollment"
         end
 
-        it ".can_renew_enrollment?" do
-          value = subject.can_renew_enrollment?(enrollment, family, benefit_coverage_period)
+        it "for can_renew_coverage?" do
+          value = enrollment.can_renew_coverage?(benefit_coverage_period.start_on)
           expect(value).to eq false
         end
       end
@@ -243,18 +239,31 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
           end
 
-          it "should generate renewal enrollment for assisted family" do
-            invoke_oe_script
-            family_assisted.active_household.reload
-            enrollments = family_assisted.active_household.hbx_enrollments
-            expect(enrollments.size).to eq 2
-            expect(enrollments[1].applied_aptc_amount.to_f).to eq((BigDecimal.new((enrollments[1].total_premium * enrollments[1].product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN)).round(2))
+          context 'assisted renewal' do
+            before :each do
+              invoke_oe_script
+              family_assisted.active_household.reload
+              @enrollments = family_assisted.active_household.hbx_enrollments
+            end
+
+            it 'should generate renewal enrollment' do
+              expect(@enrollments.count).to eq 2
+            end
+
+            it 'should generate assisted renewal enrollment' do
+              expect(@enrollments[1].applied_aptc_amount.to_f).to eq(BigDecimal((@enrollments[1].total_premium * @enrollments[1].product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN).round(2))
+            end
           end
 
-          it "should generate renewal enrollment for unassisted family" do
-            invoke_oe_script
-            family_unassisted.active_household.reload
-            expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
+          context 'unassisted renewal' do
+            before :each do
+              invoke_oe_script
+              family_unassisted.active_household.reload
+            end
+
+            it 'should generate renewal enrollment for unassisted family' do
+              expect(family_unassisted.active_household.hbx_enrollments.count).to eq 3
+            end
           end
         end
       end
@@ -289,19 +298,6 @@ end
 private
 
 def invoke_oe_script
-  field_names = ["Icnumber", "Ssn", "Subscriber", "Member", "Firstname", "Lastname", "Dob",
-                 "#{renewal_calender_year - 1.year} Applied", "#{renewal_calender_year - 1.year} Max",
-                 "Unadjustedapplied", "Applied Pct", "#{renewal_calender_year} Aptc",
-                 "#{renewal_calender_year} Applied", "#{renewal_calender_year} Csr", "Error Msg"]
-  Dir.mkdir("pids") unless File.exist?("pids")
-  file_name = "#{Rails.root}/pids/#{renewal_calender_year}_FA_Renewals.csv"
-
-  CSV.open(file_name, "w") do |csv|
-    csv << field_names
-    person = family_assisted.primary_family_member.person
-    csv << ["", person.ssn, person.hbx_id, person.hbx_id, person.first_name, person.last_name, person.dob, 100, 200, "", 0, 400, 150, 100]
-  end
-
   oe_begin = Enrollments::IndividualMarket::OpenEnrollmentBegin.new
   oe_begin.process_renewals
 end

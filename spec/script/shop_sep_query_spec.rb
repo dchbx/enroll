@@ -4,6 +4,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 describe '.can_publish_enrollment?', :dbclean => :after_each do
+  before :all do
+    DatabaseCleaner.clean
+  end
+
   let(:plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year - 1, hios_id: "11111111122302-01", csr_variant_id: "01", renewal_plan_id: renewal_plan.id, coverage_kind: 'health') }
   let(:renewal_plan) { FactoryBot.create(:plan, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, hios_id: "11111111122302-01", csr_variant_id: "01", coverage_kind: 'health') }
 

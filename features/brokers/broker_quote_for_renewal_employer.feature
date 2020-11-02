@@ -1,7 +1,7 @@
 Feature: Broker creates a quote for a prospect employer
-  In order for Brokers to create a quote to Employers
-  The Broker should be able to add Employer and Employees
-  And Generate a quote
+    In order for Brokers to create a quote to Employers
+    The Broker should be able to add Employer and Employees
+    And Generate a quote
 
   Background: Set up employer, broker and their relationship
     Given a CCA site exists with a benefit market

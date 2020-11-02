@@ -388,8 +388,8 @@ describe Person, :dbclean => :after_each do
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
-                         native: "American Indian / Alaskan Native status is required.",
-                         tribal_id_presence: "Tribal id is required when native american / alaskan native is selected",
+                         native: "American Indian / Alaska Native status is required.",
+                         tribal_id_presence: "Tribal id is required when native american / alaska native is selected",
                          tribal_id: "Tribal id must be 9 digits",
                          incarceration: "Incarceration status is required." }
 
@@ -967,19 +967,22 @@ describe Person, :dbclean => :after_each do
 
     it "should false" do
       person.no_dc_address = false
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should false" do
       person.no_dc_address = true
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should true" do
       person.no_dc_address = true
-      person.no_dc_address_reason = "I am Homeless"
+      person.is_homeless = true
+      person.is_temporarily_out_of_state = true
       expect(person.residency_eligible?).to be_truthy
     end
   end
@@ -997,17 +1000,17 @@ describe Person, :dbclean => :after_each do
   end
 
   describe "is_dc_resident?" do
-    context "when no_dc_address is true" do
-      let(:person) { Person.new(no_dc_address: true) }
+    context "when person is homeless or temp outside of DC" do
+      let(:person) { Person.new }
 
-      it "return false with no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+      it "return true when person is_homeless" do
+        allow(person).to receive(:is_homeless?).and_return true
         expect(person.is_dc_resident?).to eq true
       end
 
-      it "return true without no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return ""
-        expect(person.is_dc_resident?).to eq false
+      it "return true when person is_temporarily_out_of_state" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        expect(person.is_dc_resident?).to eq true
       end
     end
 
@@ -1087,18 +1090,6 @@ describe Person, :dbclean => :after_each do
 
       it "creates family with households and tax_households" do
         expect(family1.households.first.tax_households).not_to be_empty
-      end
-
-      it "true if person family households present" do
-        expect(@person_aqhp.check_households(family1)).to eq true
-      end
-
-      it "true if person family households tax_households present" do
-        expect(@person_aqhp.check_tax_households(family1)).to eq true
-      end
-
-      it "returns true if persons is AQHP" do
-        expect(@person_aqhp.is_aqhp?).to eq true
       end
     end
   end

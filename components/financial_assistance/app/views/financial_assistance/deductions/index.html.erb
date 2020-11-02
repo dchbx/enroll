@@ -1,0 +1,166 @@
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+    <div class="row">
+      <div class="col-md-10">
+        <div class="title-icon">
+          <span class="fa-rectangle fa-lg deducticon-rectangle">
+            <i class="fa fa-usd"></i>
+            <i class="fa fa-sliders"></i>
+          </span>
+        </div>
+        <h2 class="fa-darkblue">Income Adjustments for <%= @applicant.first_name.titleize %></h2>
+      </div>
+    </div>
+
+    <p>Tell us about income adjustments for this person. When you're finished, select CONTINUE.</p>
+    <br>
+
+    <!--income adjustment driver question-->
+    <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">Does this person expect to have income adjustments in <%= @application.assistance_year %>? *</span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_deductions", true, @applicant.has_deductions, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_deductions_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_deductions", false, @applicant.has_deductions == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="has_deductions_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+           <a href="#has_deductions" data-toggle="modal" data-target="#has_deductions">Not sure?</a>
+           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_deductions"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <!--Deduction Kinds-->
+    <div class='deduction-kinds'>
+      <div class="instruction-row row row-form-wrapper no-buffer row-height">
+        <div class="col-md-9">
+          <h4 class="panel-title">
+              <b> Income adjustments you must report </b>
+          </h4>
+        </div>
+      </div>
+      <div class="instruction-row row row-form-wrapper no-buffer row-height">
+        <div class="col-md-12 lightgray">
+          <span>  Check any boxes that apply to this person and enter details when requested. </span>
+        </div>
+      </div>
+
+      <br />
+
+      <% FinancialAssistance::Deduction::KINDS.each do |deduction_kind| %>
+        <div id="<%= deduction_kind %>"class="deduction-kind">
+          <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
+            <div class="col-md-1 checkbox-mr">
+              <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+            </div>
+
+            <div class="col-md-9 no-pd <%= deduction_kind %> run-glossary">
+              <%= FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym] %>
+            </div>
+          </div>
+
+          <div class="deductions-list">
+            <% @applicant.deductions.of_kind(deduction_kind).each do |deduction| %>
+              <%= render partial: 'deduction', locals: { deduction: deduction } %>
+            <% end %>
+          </div>
+
+          <div class='new-deduction-form hidden <%= deduction_kind %>'>
+            <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind} %>
+          </div>
+          <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+             <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym]}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+          <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Hidden destroy deduction modal -->
+  <div class="modal fade" id="destroyDeduction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy all deductions modal -->
+  <div class="modal fade" id="destroyAllDeductions" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
+          <br />
+          This cannot be undone.
+          </strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden unsaved deduction modal -->
+  <div class="modal fade" id="unsavedDeductionChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+        </div>
+        <div class="modal-body">
+          If you leave without saving, you will lose all your changes.<br />
+          <strong>This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
+          <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right NAV -->
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: other_application_applicant_incomes_path(@application, @applicant),
+      next_url: application_applicant_benefits_path(@application, @applicant)
+    } %>
+  </div>
+</div>
+
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>

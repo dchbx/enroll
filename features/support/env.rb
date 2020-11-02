@@ -10,7 +10,6 @@ require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
-require 'capybara/cucumber'
 require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 

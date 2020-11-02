@@ -31,7 +31,7 @@ When(/^the Admin selects the Curam application option$/) do
 end
 
 Then(/^the Admin should navigate to Household Info Page$/) do
-  expect(page).to have_content("Household Info")
+  expect(page).to have_content("#{l10n('family_information')}")
 end
 
 When(/^the Admin selects the Mobile application option$/) do

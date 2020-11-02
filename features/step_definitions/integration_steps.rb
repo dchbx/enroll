@@ -626,7 +626,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  expect(page).to have_selector('.selectric', text: Settings.aca.shop_market.employee.default_contact_method)
+  expect(page).to have_selector('.selectric', text: 'Only electronic communications')
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
@@ -650,8 +650,7 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
-  find('.interaction-click-control-add-member', wait: 10)
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
 
@@ -675,7 +674,7 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link("Add Member", :visible => true)
+  click_link 'Add New Person'
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -688,8 +687,8 @@ When(/^.+ enters? the dependent info of .+ daughter$/) do
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
+  find(:xpath, "//label[@for='radio_female']").click
   find(:xpath, "//label[@for='radio_female']").click
 end
 
@@ -700,8 +699,8 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
   find('#dependents_info_wrapper').click
   sleep 1
-  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
@@ -712,7 +711,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  expect(page).to have_link('Add New Person')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
@@ -852,8 +851,8 @@ When(/^.+ clicks? a qle event$/) do
   @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
-  @browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  @browser.element(text: "#{l10n('family_information')}").wait_until_present
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   scroll_then_click(@browser.a(id: /btn_household_continue/))
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
@@ -1020,7 +1019,7 @@ end
 
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-continue')[1].click();")
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present

@@ -1,0 +1,10 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    features:
+      - key: :product_selection_effects
+        is_enabled: true
+        settings:
+          - key: :operation
+            item: "::Operations::ProductSelectionEffects::DchbxProductSelectionEffects"

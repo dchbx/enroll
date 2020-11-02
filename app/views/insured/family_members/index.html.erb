@@ -1,81 +1,22 @@
-<% content_for :horizontal_status do %>
-  <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+<% if !@person.has_consumer_role? || (@person.has_active_employee_role? && @person.has_consumer_role?) %>
+  <% content_for :horizontal_status do %>
+    <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
+  <% end %>
 <% end %>
 <div class="container">
   <div id="dependents_info_wrapper">
     <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 bottom-pd">
-
-        <% if @change_plan.present? && @sep.blank?%>
-           <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
-        <% end %>
-
-        <% if @sep.present? %>
-          <h3 class="blue-text"><%= @sep.title %> on: <%= @sep.qle_on %></h3>
-        <% end %>
-
-        <h1><%= l10n("household_info") %>: <%= l10n("family_members") %></h1>
-        <p class="twenty"><%= l10n(".continue_to_get_insurance") %></p>
-        <p class='memo'>* = <%= l10n("required_field") %></p>
-
-        <div class="row no-buffer">
-          <div class="col-md-12 col-sm-12 col-xs-12 no-pd first">
-            <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
-              <label class="static_label label-floatlabel" for="name"><%= l10n("name").to_s.upcase %></label>
-              <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.first_name} #{@person.middle_name} #{@person.last_name}" %></span>
-            </div>
-            <div class="col-md-6 col-sm-6 no-pd form-group-lg no-pd">
-              <label class="static_label label-floatlabel" for="relation"><%= l10n("relation").to_s.upcase %></label>
-              <span class="field_value floatlabel form-control active-floatlabel" id="relation"><%= l10n(".self").to_s.upcase %></span>
-            </div>
-          </div>
-        </div>
-
-        <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
-          <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
-            <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-              <p class="fail"><%= l10n(".add_member_info_html") %></p>
-              <br>
-              <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
-                <%= link_to l10n("add_member"), new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-                  &nbsp; &nbsp;
-                <a class="text-center btn btn-success"><%= l10n(".continue") %></a>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <br>
-        <div class="row no-buffer">
-          <ul class="" id="dependent_ul">
-            <% @family.active_family_members.reject(&:is_primary_applicant).each do |dependent| %>
-              <% if dependent.person.is_consumer_role_active? %>
-                  <%= render "dependent", dependent: dependent, person: @person %>
-              <% else %>
-                  <%= render "dependent_coverall", dependent: dependent, person: @person %>
-              <% end %>
-            <% end %>
-          </ul>
-        </div>
-
-        <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
-            <%= link_to l10n('add_member'), new_insured_family_member_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
-            <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], change_plan_date: @change_plan_date) %>
-            <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
-
-            <% if @change_plan.present? %>
-              <%=
-                link_to "<i class='fa fa-user-plus'></i> #{l10n('continue')}".html_safe, group_selection_url,
-                 class: 'btn btn-primary pull-right' + pundit_class(Family,:updateable?), id: 'btn_household_continue'
-              %>
-            <% end %>
-          </div>
-        </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <%= render :partial => 'shared/left_nav' %>
+      </div>
+      <div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 bottom-pd">
+        <%= render partial: 'family_members' %>
       </div>
 
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan,change_plan_date: @change_plan_date)%>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-12">
+        <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan, market_kind: @market_kind, sep_id: @sep.try(:id), qle_id: @qle.try(:id), effective_on_option_selected: params[:effective_on_option], resident_role_id: @resident_role.try(:id)) %>
+        <% find_sep_url = find_sep_insured_families_path(employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id), change_plan: @change_plan)%>
+
         <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% elsif @type == "employee" %>

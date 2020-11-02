@@ -2,6 +2,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Background:
     Given Individual has not signed up as an HBX user
+    Given the FAA feature configuration is enabled
     When Individual visits the Insured portal during open enrollment
     Then Individual creates a new HBX account
     Then Individual should see a successful sign up message
@@ -10,20 +11,23 @@ Feature: Insured Plan Shopping on Individual market
     When user clicks on continue button
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual again clicks on add member button #TODO re-write this step
@@ -49,20 +53,25 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
+  @flaky
   Scenario: New insured user purchases on individual market and click on 'Make changes' button on enrollment
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
     Then Individual should see a form to enter personal information
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual sees previously saved address
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
+    Then the user clicks on add member button
+    And the user fills the the add member form
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual again clicks on add member button #TODO re-write this step
@@ -80,7 +89,7 @@ Feature: Insured Plan Shopping on Individual market
 
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -92,9 +101,10 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see identity verification page and clicks on submit
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
@@ -104,15 +114,18 @@ Feature: Insured Plan Shopping on Individual market
     Then Individual should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should see document errors when proceeds without uploading document.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
     When Individual clicks on continue
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual edits dependent
@@ -122,15 +135,18 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Dependents should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then Individual should see heading labeled personal information
     Then Individual should see a form to enter personal information
     When Individual clicks on continue
     Then Individual agrees to the privacy agreeement
     Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
     Then Individual should see the dependents form
     And Individual clicks on add member button
     And Individual edits dependent
@@ -140,9 +156,10 @@ Feature: Insured Plan Shopping on Individual market
     Then Dependent should not see error message Document type cannot be blank
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should see immigration details even after changing radio options
     Given Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then user should see heading labeled personal information
     Then Individual should click on Individual market for plan shopping #TODO re-write this step
@@ -151,7 +168,7 @@ Feature: Insured Plan Shopping on Individual market
     Then select I-551 doc and fill details
     When Individual clicks on Save and Exit
     Then Individual resumes enrollment
-    And Individual click on sign in existing account
+    And Individual click on Sign In
     And I signed in
     Then click citizen yes
     Then click citizen no
@@ -159,3 +176,26 @@ Feature: Insured Plan Shopping on Individual market
     Then should find I-551 doc type
     And should find alien number
     Then Individual logs out
+
+  @flaky
+  Scenario: New insured user purchases on individual market during open enrollment and see a renewal enrollment generation with initial enrollment
+    Given Individual resumes enrollment
+    And Individual click on Sign In
+    And I signed in
+    Then user should see heading labeled personal information
+    Then Individual should click on Individual market for plan shopping
+    Then Individual should see a form to enter personal information
+    When Individual click continue button
+    And Individual agrees to the privacy agreeement
+    Then Individual should see identity verification page and clicks on submit
+    Then Individual should be on the Help Paying for Coverage page
+    Then Individual does not apply for assistance and clicks continue
+    And Individual should see the dependents form
+    When I click on continue button on household info form
+    And I click on continue button on group selection page
+    And I select a plan on plan shopping page
+    And I checks the Insured portal open enrollment dates
+    And I click on purchase button on confirmation page
+    And I click on continue button to go to the individual home page
+    Then I should see a new renewing enrollment title on home page
+    And I logs out

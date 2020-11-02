@@ -372,6 +372,46 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         end
       end
 
+      context "non applying family member has no incarceration status" do
+        let!(:person_1) { FactoryBot.create(:person, :with_consumer_role)}
+        let!(:family_1) {FactoryBot.create(:family, :with_primary_family_member, :person => person_1)}
+        let!(:person_2) do
+          FactoryBot.create(:person, :with_consumer_role)
+        end
+
+        before do
+          allow(person_1).to receive(:primary_family).and_return(family_1)
+          person_2.update_attributes!(is_incarcerated: nil)
+          person_2.consumer_role.update_attributes!(is_applying_coverage: false)
+          person_1.update_attributes!(is_incarcerated: false)
+          family = person_1.primary_family
+          expect(family.family_members.count).to eq(1)
+          FactoryBot.create(:family_member, family: family, person: person_2)
+          expect(family.family_members.count).to eq(2)
+        end
+
+        it "should not check incarceration status of non-applying family members" do
+          sign_in user
+          get(
+            :new,
+            params: {
+              person_id: person_1.id,
+              consumer_role_id: person.consumer_role.id,
+              change_plan: "change",
+              hbx_enrollment_id: "123",
+              coverage_kind: hbx_enrollment.coverage_kind
+            }
+          )
+          fm_hash = assigns(:fm_hash)
+          active_family_members = assigns(:active_family_members)
+          expect(fm_hash.values.flatten.detect{|err| err.to_s.match(/incarcerated_not_answered/)}).to eq(nil)
+          nonapplying = family.family_members.where(person_id: person_2).first
+          expect(active_family_members).to_not include(nonapplying)
+          expect(active_family_members.length).to eq(1)
+          expect(response).to have_http_status("200")
+        end
+      end
+
       it "should not redirect to coverage household page if incarceration is unanswered" do
         person.unset(:is_incarcerated)
         HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.last.benefit_packages[0].incarceration_status = ["incarceration_status"]

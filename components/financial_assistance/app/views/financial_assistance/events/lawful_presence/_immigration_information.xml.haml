@@ -1,0 +1,40 @@
+%immigration_information
+  - if applicant.alien_number
+    %alien_number= applicant.alien_number
+  - if applicant.i94_number
+    %i94_number= applicant.i94_number
+  - if applicant.citizenship_number
+    %citizenship_number= applicant.citizenship_number
+  - if applicant.visa_number
+    %visa_number= applicant.visa_number
+  - if applicant.sevis_id
+    %sevis_id= applicant.sevis_id
+  - if applicant.naturalization_number
+    %naturalization_number= applicant.naturalization_number
+  %documents
+    %has_document_I327= applicant.has_i327?
+    %has_document_I571= applicant.has_i571?
+    %has_document_cert_of_citizenship= applicant.has_cert_of_citizenship?
+    %has_document_cert_of_naturalization= applicant.has_cert_of_naturalization?
+    %has_document_temp_I551= applicant.has_temp_i551?
+    %has_document_I94= applicant.has_i94?
+    %has_document_I20= applicant.has_i20?
+    %has_document_DS2019= applicant.has_ds2019?
+    - if applicant.i551
+      %document_I551_receipt_number= applicant.receipt_number
+    - if applicant.i766
+      %document_I766
+      = render :partial => 'financial_assistance/events/lawful_presence/receipt_document', locals: {receipt_number: applicant.receipt_number, expiration_date: applicant.expiration_date}
+    - if applicant.mac_read_i551
+      %document_mac_read_I551
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+    - if applicant.foreign_passport_i94
+      %document_foreign_passport_I94
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+    - if applicant.foreign_passport
+      %document_foreign_passport
+      = render :partial => 'financial_assistance/events/lawful_presence/passport_information', locals: {issuing_country: applicant.issuing_country, passport_number: applicant.passport_numbr, expiration_date: applicant.expiration_date}
+    - if applicant.case1
+      %other_case_1_document_description= applicant.alien_number
+    - if applicant.case2
+      %other_case_2_document_description= applicant.i94_number

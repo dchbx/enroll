@@ -1,10 +1,10 @@
 Feature: Employee with past date of hire
-  In order for the New Employee to purchase insurance
-  Given Employer exists with active plan year
-  Given New Employee is on the Census Employee Roster with past date as DOH and roster entry date as today
-  Given New Employee does not have a pre-existing person
-  Then New Employee should be able to match Employer
-  And Employee should be able to purchase Insurance
+    In order for the New Employee to purchase insurance
+    Given Employer exists with active plan year
+    Given New Employee is on the Census Employee Roster with past date as DOH and roster entry date as today
+    Given New Employee does not have a pre-existing person
+    Then New Employee should be able to match Employer
+    And Employee should be able to purchase Insurance
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a fehb benefit market

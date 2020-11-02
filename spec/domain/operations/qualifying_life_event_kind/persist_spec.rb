@@ -14,7 +14,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
     end
 
     context 'for success case' do
-
+      let(:user) {FactoryBot.create(:user)}
       let(:qlek_create_params) do
         { 'start_on': TimeKeeper.date_of_record.strftime("%Y-%m-%d"),
           'end_on': TimeKeeper.date_of_record.end_of_month.strftime("%Y-%m-%d"),
@@ -29,8 +29,11 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
           'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
           'event_kind_label': 'event kind label',
-          qle_event_date_kind: 'qle_on',
+          'qle_event_date_kind': 'qle_on',
           'is_visible': true,
+          'updated_by': user.id.to_s,
+          'published_by': user.id.to_s,
+          'created_by': user.id.to_s,
           'date_options_available': true }
 
       end
@@ -50,6 +53,13 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
 
         it 'should create QualifyingLifeEventKind object' do
           expect(::QualifyingLifeEventKind.all.count).to eq(1)
+        end
+
+        it 'should set audit attributes on QualifyingLifeEventKind object' do
+          qlek = ::QualifyingLifeEventKind.all.first
+          expect(qlek.created_by).to eq user.id
+          expect(qlek.published_by).to eq nil
+          expect(qlek.updated_by).to eq nil
         end
       end
 
@@ -75,6 +85,13 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           it 'should publish the newly created qlek object' do
             expect(QualifyingLifeEventKind.all.first.active?).to be_truthy
           end
+
+          it 'should set audit attributes on QualifyingLifeEventKind object' do
+            qlek = ::QualifyingLifeEventKind.all.first
+            expect(qlek.created_by).to eq user.id
+            expect(qlek.published_by).to eq user.id
+            expect(qlek.updated_by).to eq nil
+          end
         end
 
         context 'for failure case', :dbclean => :after_each do
@@ -98,6 +115,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
               'is_visible': true,
               qle_event_date_kind: 'qle_on',
               'id': q2.id.to_s,
+              'updated_by': '',
+              'published_by': '',
+              'created_by': '',
               'publish': 'Publish',
               'date_options_available': true }
           end
@@ -139,6 +159,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           event_kind_label: 'event kind label',
           is_visible: true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           date_options_available: true }
       end
 
@@ -161,7 +184,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
   end
 
   context "update QualifyingLifeEventKind" do
-
+    let(:user) {FactoryBot.create(:user)}
     let(:qlek) { FactoryBot.create(:qualifying_life_event_kind, title: 'qlek title') }
 
     it 'should be a container-ready operation' do
@@ -186,6 +209,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': user.id.to_s,
+          'published_by': user.id.to_s,
+          'created_by': user.id.to_s,
           'date_options_available' => true }
       end
 
@@ -204,6 +230,13 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
       it 'should update QualifyingLifeEventKind object' do
         qlek.reload
         expect(qlek.title).to eq(qlek_update_params['title'])
+      end
+
+      it 'should set audit attributes on QualifyingLifeEventKind object' do
+        qlek = ::QualifyingLifeEventKind.all.first
+        expect(qlek.created_by).to eq user.id
+        expect(qlek.published_by).to eq nil
+        expect(qlek.updated_by).to eq nil
       end
     end
 
@@ -226,6 +259,9 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
+          'updated_by': '',
+          'published_by': '',
+          'created_by': '',
           'date_options_available' => true }
       end
 

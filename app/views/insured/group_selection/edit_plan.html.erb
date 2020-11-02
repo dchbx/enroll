@@ -75,7 +75,7 @@
                   <i class="fa fa-phone fa-2x margin-right-15px"></i>
                   <span><%= l10n(".plan_contact_info") %></span>
                 </a>
-                <%= render partial: "shared/carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
+                <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
                 </a>
               </div>
             </div>
