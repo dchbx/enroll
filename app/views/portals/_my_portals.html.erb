@@ -1,6 +1,16 @@
 <div class="container no-pd">
   <h4> Active Portals </h4>
 
+  <% if @person.hbx_staff_role.present? %>
+    <div class="col-12 no-pd">
+      <div class="d-flex flex-row bg-white rounded flex-shadow">
+        <div class="col-6 p-2"><span class="portal-label">Admin</span></div>
+        <div class="col-3 p-2"><label class="personal-info-label">Type:</label> <span class="portal-label"><%= @person.hbx_staff_role.subrole.split('_').join(" ").capitalize %></span></div>
+        <div class="col-3 p-2"><label class="personal-info-label">Start Date:</label><span class="portal-label"><%= @person.hbx_staff_role.created_at.to_date %></span></div>
+      </div>
+    </div>
+  <% end %>
+
   <% if @person.active_employer_staff_roles.present? %>
     <% @person.active_employer_staff_roles.each do |staff_role| %>
       <div class="col-12 no-pd">
@@ -36,6 +46,19 @@
   <% end %>
 
   <div class="col-md-12 mt-1 no-pd">
-    <%= link_to "Add New Portal", portal_path(id: @person.id), class: "col-12 btn btn-outline-primary" %>
+    <%= link_to "Add New Portal", portal_path(id: @person.id), class: "col-12 btn btn-outline-primary" unless current_user.person.hbx_staff_role %>
   </div>
+
+
+  <% if @person.active_employee_roles.present? %>
+    <% @person.active_employee_roles.each do |employee_role| %>
+      <div class="col-12 mt-1 no-pd">
+        <div class="d-flex flex-row bg-white rounded flex-shadow">
+          <div class="col-6 p-2"><span class="portal-label"><%= employee_role.employer_profile.legal_name %></span></div>
+          <div class="col-3 p-2"><label class="personal-info-label">Type:</label><span class="portal-label">Employee</span></div>
+          <div class="col-3 p-2"><label class="personal-info-label">Start Date:</label><span class="portal-label"><%= employee_role.created_at.to_date %></span></div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 </div>
