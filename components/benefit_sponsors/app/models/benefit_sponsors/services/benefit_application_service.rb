@@ -19,11 +19,8 @@ module BenefitSponsors
       end
 
       def filter_start_on_options(form)
-        active_and_terminated_bas = @benefit_sponsorship&.benefit_applications&.active_and_terminated_states || []
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
-
-        options.reject { |option| active_and_terminated_bas.any? { |ba| ba.effective_period.cover?(option) } }
+        schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
       end
 
       def load_form_params_from_resource(form)
@@ -54,8 +51,13 @@ module BenefitSponsors
         bas.active_states_per_dt_action.present? ? false : true
       end
 
+      def has_overlap_application?(model_attributes)
+        active_and_terminated_bas = @benefit_sponsorship&.benefit_applications&.active_and_terminated_states || []
+        active_and_terminated_bas.any? {|ba| ba.effective_period.cover?(model_attributes[:effective_period].min)}
+      end
+
       def create_or_cancel_draft_ba(form, model_attributes)
-        if form.admin_datatable_action && !can_create_draft_ba?
+        if form.admin_datatable_action && !can_create_draft_ba? || has_overlap_application?(model_attributes)
           form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
           [false, nil]
         else
@@ -72,8 +74,8 @@ module BenefitSponsors
       end
 
       def applications_for_cancel
-        applications  = benefit_sponsorship.benefit_applications.draft_and_exception
-        applications += benefit_sponsorship.benefit_applications.enrollment_ineligible.select { |application| !application.is_renewing? }.to_a
+        applications = benefit_sponsorship.benefit_applications.draft_and_exception
+        applications + benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?).to_a
       end
 
       def cancel_draft_and_ineligible_applications(applications)
