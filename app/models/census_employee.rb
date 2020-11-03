@@ -602,7 +602,7 @@ class CensusEmployee < CensusMember
   # Pass in active coverage_date to get the renewal benefit group assignment
   def renewal_benefit_group_assignment(coverage_date = nil)
     active_assignment = coverage_date ? active_benefit_group_assignment(coverage_date) : active_benefit_group_assignment
-    return unless active_assignment
+    return unless active_assignment&.benefit_package.present?
 
     renewal_begin_date = active_assignment.benefit_package.end_on.next_day
     benefit_package_assignment_on(renewal_begin_date)

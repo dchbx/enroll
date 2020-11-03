@@ -74,8 +74,7 @@ module BenefitSponsors
       end
 
       def applications_for_cancel
-        applications = benefit_sponsorship.benefit_applications.draft_and_exception
-        applications + benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?).to_a
+        benefit_sponsorship.benefit_applications.draft_and_exception + benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?)
       end
 
       def cancel_draft_and_ineligible_applications(applications)
