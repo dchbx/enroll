@@ -9,7 +9,15 @@
         <p class="twenty">Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</p>
         <div id="effective_date" style="font-size :24px">
         <%if @effective_on_date.present? || @new_effective_on%>
-          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= format_date(@effective_on_date || @new_effective_on) %></span>
+          <%= l10n("insured.group_selection.new.effective_date") %>: 
+          <span style="color: red;">
+            <% if can_shop_individual_and_shop_not_under_open_enrollment_or_sep?(@person, @employee_role) %>
+              <%= format_date(@ivl_effective_on_date)
+
+            <% else %>
+              <%= format_date(@effective_on_date || @new_effective_on) %>   
+            <% end %> 
+          </span>
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>

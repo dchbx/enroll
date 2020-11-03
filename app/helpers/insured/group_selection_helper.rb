@@ -23,6 +23,12 @@ module Insured
       return false
     end
 
+    def can_shop_individual_and_shop_not_under_open_enrollment_or_sep?(person, employee_role)
+      can_shop_individual_or_resident?(person) &&
+      employee_role.is_under_open_enrollment? &&
+      !(@change_plan == 'change_by_qle' or @enrollment_kind == 'sep')
+    end
+
     def health_relationship_benefits(benefit_group)
       return unless benefit_group.present?
 

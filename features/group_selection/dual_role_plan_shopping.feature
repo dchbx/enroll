@@ -42,3 +42,11 @@ Feature: EE with consumer role plan purchase
     And employee shouldnt see make changes button in individual market
     And employee should see make changes button in shop market
 
+  
+  Scenario: When using a dual role member presses the "shop for plans button" during IVL OE and does not have an open SHOP SEP/OE, the system should default to display the next available IVL start date and the "IVL" coverage on the "market/coverage selection" screen.
+    Given a matched Employee exists with consumer role
+    And Employer is not under open enrollment and employee has no SEP
+    Then Employee sign in to portal
+    When employee clicked on shop for plans
+    And the user is on the Choose Coverage For Your Houshold page
+    Then the user should only see the IVL effective on date
