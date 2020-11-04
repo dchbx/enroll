@@ -97,3 +97,4 @@ rubocop
 coverage
 
 .env
+.vscode

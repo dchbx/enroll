@@ -43,6 +43,18 @@ describe FakesController do
     end
   end
 
+  context 'For fixed_first_of_next_month rule' do
+    let(:qle) { FactoryBot.build(:qualifying_life_event_kind, effective_on_kinds: ['fixed_first_of_next_month']) }
+
+    before do
+      controller.instance_variable_set("@qle", qle)
+    end
+
+    it 'should return alias name of fixed_first_of_next_month' do
+      expect(subject.calculate_rule).to eq ['First of month after event']
+    end
+  end
+
   context 'set qle_ivl for resident role' do
     let!(:qle) {FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")}
     let(:resident_person) {FactoryBot.create(:person, :with_resident_role)}
@@ -54,18 +66,6 @@ describe FakesController do
 
     it 'should return qle_ivl instance variable for resident role' do
       expect(subject.instance_variable_get(:@qle_ivl)).to eq [qle]
-    end
-  end
-
-  context 'For fixed_first_of_next_month rule' do
-    let(:qle) { FactoryBot.build(:qualifying_life_event_kind, effective_on_kinds: ['fixed_first_of_next_month']) }
-
-    before do
-      controller.instance_variable_set("@qle", qle)
-    end
-
-    it 'should return alias name of fixed_first_of_next_month' do
-      expect(subject.calculate_rule).to eq ['First of month after event']
     end
   end
 end

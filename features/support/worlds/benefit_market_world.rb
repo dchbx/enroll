@@ -20,8 +20,10 @@ module BenefitMarketWorld
     end
   end
 
-  def rating_area
-    @rating_area ||= FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year)
+  def rating_area(active_year = nil)
+    active_year ||= current_effective_date.year
+    return @rating_area if @rating_area&.active_year == active_year
+    @rating_area = FactoryBot.create(:benefit_markets_locations_rating_area, active_year: active_year)
   end
 
   def renewal_rating_area

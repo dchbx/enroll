@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery, :type => :model do
+RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery, :type => :model, dbclean: :after_each do
   let(:query) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery.new(benefit_application) }
   let(:benefit_application) do
   	site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)

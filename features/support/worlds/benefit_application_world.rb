@@ -174,6 +174,7 @@ end
 And(/^renewal employer (.*) has (.*) and renewal (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
   @employer_profile = employer_profile(legal_name)
   earlier_application = create_application(new_application_status: earlier_application_status.to_sym)
+  rating_area(earlier_application.start_on.next_year.year)
   @renewal_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(earlier_application).renew_application[1]
   @renewal_application.update_attributes!(aasm_state: new_application_status.to_sym)
 
