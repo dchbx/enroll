@@ -56,6 +56,26 @@ Given (/a matched Employee exists with consumer role/) do
 end
 
 
+And(/Employer is not under open enrollment and employee has no SEP$/) do
+  allow(::Insured::GroupSelectionHelper).to receive(:can_shop_individual_and_shop_not_under_open_enrollment_or_sep?).with(@person, @person.employee_roles.first).and_return(false)
+end
+
+And(/the user is on the Choose Coverage for your Household page$/) do
+  expect(page).to have_content("Choose Coverage for your Household")
+end
+
+Then(/the user should only see the IVL effective on date$/) do
+    ivl_effective_on = HbxEnrollment.calculate_effective_on_from(
+      market_kind: 'individuall',
+      qle: (@change_plan == 'change_by_qle' or @enrollment_kind == 'sep'),
+      family: @family,
+      employee_role: @person.employee_roles.first,
+      benefit_group: @sponsorship.organization.employer_profile.plan_years.last.benefit_groups.last,
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+    )
+    expect(page).to have_content(ivl_effective_on.to_s)
+end
+
 And(/(.*) has a dependent in (.*) relationship with age (.*) than 26/) do |role, kind, var|
   dob = (var == "greater" ? TimeKeeper.date_of_record - 35.years : TimeKeeper.date_of_record - 5.years)
   family = Family.all.first

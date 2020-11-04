@@ -48,5 +48,5 @@ Feature: EE with consumer role plan purchase
     And Employer is not under open enrollment and employee has no SEP
     Then Employee sign in to portal
     When employee clicked on shop for plans
-    And the user is on the Choose Coverage For Your Houshold page
+    And the user is on the Choose Coverage for your Household page
     Then the user should only see the IVL effective on date
