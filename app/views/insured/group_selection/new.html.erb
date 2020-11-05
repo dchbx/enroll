@@ -11,7 +11,7 @@
         <%if @effective_on_date.present? || @new_effective_on%>
           <%= l10n("insured.group_selection.new.effective_date") %>: 
           <span style="color: red;">
-            <% if can_shop_individual_and_shop_not_under_open_enrollment_or_sep?(@person, @employee_role) %>
+            <% if dual_role_not_under_shop_open_enrollment_or_sep?(@person, @employee_role) %>
               <%= format_date(@ivl_effective_on_date)  %>
             <% else %>
               <%= format_date(@effective_on_date || @new_effective_on) %>   
