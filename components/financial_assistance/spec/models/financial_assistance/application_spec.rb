@@ -336,12 +336,11 @@ RSpec.describe ::FinancialAssistance::Application, type: :model, dbclean: :after
   end
 
   describe '.set_assistance_year' do
-    let(:assistance_year) { TimeKeeper.date_of_record + 1.year}
     let(:family_id)       { BSON::ObjectId.new }      
     let!(:application) { FactoryBot.create(:financial_assistance_application, family_id: family_id) }
     it 'updates assistance year' do
       application.send(:set_assistance_year)
-      expect(application.assistance_year).to eq(assistance_year.year - 1)
+      expect(application.assistance_year).to eq(FinancialAssistanceRegistry[:application_year].item.call.value!)
     end
   end
 

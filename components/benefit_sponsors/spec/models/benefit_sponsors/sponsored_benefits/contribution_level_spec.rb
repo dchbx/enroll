@@ -18,8 +18,22 @@ module BenefitSponsors
 
     describe 'set minimum contribution factor' do
       let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month.prev_year + 2.months }
-      let(:initial_sponsor_setting) { EnrollRegistry["initial_sponsor_default_#{current_effective_date.year}".to_sym].feature.settings[0] }
-      let(:renewal_sponsor_setting) { EnrollRegistry["renewal_sponsor_default_#{current_effective_date.next_year.year}".to_sym].feature.settings[0] }
+      let(:initial_sponsor_setting) do
+        key = if current_effective_date.month == 1
+                "initial_sponsor_jan_default_#{current_effective_date.year}"
+              else
+                "initial_sponsor_default_#{current_effective_date.year}"
+              end
+        EnrollRegistry[key.to_sym].feature.settings[0]
+      end
+      let(:renewal_sponsor_setting) do
+        key = if current_effective_date.month == 1
+                "renewal_sponsor_jan_default_#{current_effective_date.year}"
+              else
+                "renewal_sponsor_default_#{current_effective_date.year}"
+              end
+        EnrollRegistry[key.to_sym].feature.settings[0]
+      end
 
       before :each do
         allow(initial_sponsor_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)

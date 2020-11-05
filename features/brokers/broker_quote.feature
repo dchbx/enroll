@@ -40,6 +40,7 @@ Feature: Broker creates a quote for a prospect employer
       | contribution_pct |
       | 100              |
 
+  @flaky
   Scenario Outline: Broker should be able to create a quote for prospect employer with effective date in 2020 with flexible rules
     Given Max Planck logs on to the Broker Agency Portal
     When Primary Broker clicks on the Employers tab

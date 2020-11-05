@@ -9,15 +9,15 @@ describe FakesController do
   let(:fifteen_day_rule) { ["15th of month"] }
   let(:end_month_rule) { ['End of Month'] }
 
-  context "Should Calculate Rules for Effective Kind" do 
+  context "Should Calculate Rules for Effective Kind" do
     before do
       controller.instance_variable_set("@qle", qle)
     end
 
-    it "first_of_month" do  
+    it "first_of_month" do
       expect(subject.calculate_rule).to eq fifteen_day_rule
     end
-    
+
     it "first_of_next_month" do
       expect(end_month_rule).to eq end_month_rule
     end
@@ -52,6 +52,20 @@ describe FakesController do
 
     it 'should return alias name of fixed_first_of_next_month' do
       expect(subject.calculate_rule).to eq ['First of month after event']
+    end
+  end
+
+  context 'set qle_ivl for resident role' do
+    let!(:qle) {FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")}
+    let(:resident_person) {FactoryBot.create(:person, :with_resident_role)}
+    let(:resident_family) { FactoryBot.create(:family, :with_primary_family_member, person: resident_person) }
+
+    before do
+      subject.getMarket(resident_family)
+    end
+
+    it 'should return qle_ivl instance variable for resident role' do
+      expect(subject.instance_variable_get(:@qle_ivl)).to eq [qle]
     end
   end
 end

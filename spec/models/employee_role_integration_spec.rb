@@ -32,10 +32,6 @@ describe EmployeeRole, dbclean: :after_each do
       let(:benefit_group_a)    { plan_year_a.benefit_packages.first }
       let(:benefit_group_b)    { plan_year_b.benefit_packages.first }
 
-      it "the reference plans should not be the same" do
-        expect(benefit_group_a.reference_plan.id).not_to eq benefit_group_b.reference_plan.id
-      end
-
       context "and we have an employee on the roster" do
         let(:census_employee) { FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
 

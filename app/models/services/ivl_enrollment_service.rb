@@ -17,7 +17,7 @@ module Services
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       individual_market_enrollments = HbxEnrollment.where(
         :effective_on.lt => current_benefit_period.start_on,
-        kind: 'individual',
+        :kind.in => ['individual', 'coverall'],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']
       )
       begin

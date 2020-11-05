@@ -259,6 +259,7 @@ RSpec.describe Operations::Individual::CancelRenewalEnrollment, dbclean: :after_
   describe "Should system is not under oe period " do
     before do
       expired_enrollment.update_attributes(aasm_state: :coverage_selected)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 9, 1))
     end
 
     include_context 'family with previous enrollment for termination and passive renewal'

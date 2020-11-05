@@ -71,9 +71,10 @@ module SepAll
 
   def getMarket(family)
     consumer_role = family.primary_applicant.person.consumer_role
+    resident_role = family.primary_applicant.person.resident_role
     employee_roles = family.primary_applicant.person.active_employee_roles
 
-    @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role, true)
+    @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role || resident_role, true)
     @qle_shop = QualifyingLifeEventKind.qualifying_life_events_for(employee_roles.first, true)
 
     if employee_roles.present?
