@@ -23,8 +23,8 @@ module Insured
       return true if can_shop_resident?(person) && person.has_active_consumer_member?
       false
     end
-
-    def can_shop_individual_and_shop_not_under_open_enrollment_or_sep?(person, employee_role)
+    
+    def dual_role_not_under_shop_open_enrollment_or_sep?(person, employee_role)
       can_shop_individual_or_resident?(person) &&
         employee_role.is_under_open_enrollment? &&
         !((@change_plan == 'change_by_qle') || (@enrollment_kind == 'sep'))

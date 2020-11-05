@@ -57,7 +57,7 @@ end
 
 
 And(/Employer is not under open enrollment and employee has no SEP$/) do
-  allow(::Insured::GroupSelectionHelper).to receive(:can_shop_individual_and_shop_not_under_open_enrollment_or_sep?).with(@person, @person.employee_roles.first).and_return(false)
+  allow(::Insured::GroupSelectionHelper).to receive(:dual_role_not_under_shop_open_enrollment_or_sep?).with(@person, @person.employee_roles.first).and_return(false)
 end
 
 And(/the user is on the Choose Coverage for your Household page$/) do
