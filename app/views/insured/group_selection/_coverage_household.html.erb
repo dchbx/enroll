@@ -4,7 +4,7 @@
     <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
       <% current_employee_role = @hbx_enrollment.employee_role %>
     <% end %>
-    <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
+    <% @coverage_household.valid_coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
       <% if @adapter.can_shop_shop?(@person) %>
         <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), (@effective_on_date || @new_effective_on), @qle) %>
