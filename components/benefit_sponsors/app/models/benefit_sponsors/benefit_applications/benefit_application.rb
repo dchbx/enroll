@@ -839,6 +839,7 @@ module BenefitSponsors
 
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
+      state :reinstated # This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
@@ -954,9 +955,9 @@ module BenefitSponsors
         transitions from: [:active, :suspended], to: :termination_pending
       end
 
-      # Coverage reinstated
-      event :reinstate_enrollment do
-        transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
+      # This transition is to indicate that the BenefitApplication is reinstated.
+      event :reinstate do
+        transitions from: :draft, to: :reinstated
       end
 
       event :extend_open_enrollment do

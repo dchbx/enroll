@@ -425,6 +425,22 @@ module BenefitSponsors
             expect(benefit_application.aasm_state).to eq :active
           end
         end
+
+        context 'reinstate' do
+          before do
+            benefit_application.reinstate!
+            @workflow_state_transition = benefit_application.reload.workflow_state_transitions.first
+          end
+
+          it 'should transition from draft to reinstated' do
+            expect(benefit_application.reload.aasm_state).to eq(:reinstated)
+          end
+
+          it 'should record transition' do
+            expect(@workflow_state_transition.from_state).to eq('draft')
+            expect(@workflow_state_transition.to_state).to eq('reinstated')
+          end
+        end
       end
 
       context "Conversion workflow" do
@@ -1280,40 +1296,40 @@ module BenefitSponsors
     end
 
 
-describe '.is_renewing?' do
-  include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup renewal application"
+    describe '.is_renewing?' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
 
-  let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_ineligible',
-    :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
-  )}
+      let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
+        :with_benefit_package,
+        :benefit_sponsorship => benefit_sponsorship,
+        :aasm_state => 'enrollment_ineligible',
+        :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
+      )}
 
-  before do
-    benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
-  end
+      before do
+        benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
+      end
 
-  context "finding if plan year is a renewal or not" do
-    it 'renewing application should return true' do
-      expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+      context "finding if plan year is a renewal or not" do
+        it 'renewing application should return true' do
+          expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+        end
+
+        it 'active application should return false' do
+          expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
+        end
+
+        it 'old ineligible application should return false' do
+          expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
+        end
+
+        it 'renewal application transitions to enrollment ineligible state' do
+          renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
+          expect(renewal_application.is_renewing?).to eq true
+        end
+      end
     end
-
-    it 'active application should return false' do
-      expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
-    end
-
-    it 'old ineligible application should return false' do
-      expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
-    end
-
-    it 'renewal application transitions to enrollment ineligible state' do
-      renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
-      expect(renewal_application.is_renewing?).to eq true
-    end
-  end
-end
 
     describe '.employee_participation_ratio_minimum' do
 
