@@ -425,6 +425,22 @@ module BenefitSponsors
             expect(benefit_application.aasm_state).to eq :active
           end
         end
+
+        context 'reinstate' do
+          before do
+            benefit_application.reinstate!
+            @workflow_state_transition = benefit_application.reload.workflow_state_transitions.first
+          end
+
+          it 'should transition from draft to reinstated' do
+            expect(benefit_application.reload.aasm_state).to eq(:reinstated)
+          end
+
+          it 'should record transition' do
+            expect(@workflow_state_transition.from_state).to eq('draft')
+            expect(@workflow_state_transition.to_state).to eq('reinstated')
+          end
+        end
       end
 
       context "Conversion workflow" do
