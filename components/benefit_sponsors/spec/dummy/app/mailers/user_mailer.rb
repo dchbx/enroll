@@ -8,4 +8,7 @@ class UserMailer < ApplicationMailer
 
   def renewal_invitation_email(email, census_employee, invitation)
   end
+
+  def initial_employee_invitation_email(email, census_employee, invitation)
+  end
 end
