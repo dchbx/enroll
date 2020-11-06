@@ -493,6 +493,10 @@ module BenefitSponsors
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
     end
 
+    def is_off_cycle?
+      effective_period.min != benefit_sponsorship.effective_begin_on
+    end
+
     def open_enrollment_contains?(date)
       open_enrollment_period.cover?(date)
     end
@@ -738,7 +742,11 @@ module BenefitSponsors
 
     def send_employee_renewal_invites
       benefit_sponsorship.census_employees.non_terminated.each do |ce|
-        ::Invitation.invite_renewal_employee!(ce)
+        if is_off_cycle?
+          ::Invitation.invite_initial_employee!(ce)
+        else
+          ::Invitation.invite_renewal_employee!(ce)
+        end
       end
     end
 

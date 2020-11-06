@@ -553,6 +553,7 @@ module BenefitSponsors
           context "same employer, same email" do
             before :each do
               ::Invitation.destroy_all
+              renewal_application.benefit_sponsorship.update_attributes!(effective_begin_on: renewal_application.effective_period.min)
               renewal_application.save!
               renewal_bga
               CensusEmployee.all.each do |ce|
@@ -569,6 +570,13 @@ module BenefitSponsors
               expect(::Invitation.count).to eq(2)
               renewal_application.send_employee_renewal_invites
               expect(::Invitation.count).to eq(2)
+            end
+
+            it "should send initial invitation to off_cycle_renewing" do
+              renewal_application.benefit_sponsorship.update_attributes!(effective_begin_on: Date.new(2020,10,1))
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.last.invitation_email_type).not_to eq("renewal_invitation_email")
+              expect(::Invitation.last.invitation_email_type).to eq(nil)
             end
           end
         end
