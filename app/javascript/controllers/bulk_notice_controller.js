@@ -25,8 +25,9 @@ export default class extends Controller {
     let hiddenInputEl = parentEl.querySelector('input[value="false"]')
     hiddenInputEl.value = true
     parentEl.querySelector('span').remove()
-    event.preventDefault()
+    parentEl.closest('form').querySelector('input[type=file]').classList.remove('d-none')
     parentEl.closest('form').querySelector('input[type="submit"]').setAttribute('value', 'Preview')
+    event.preventDefault()
     return false
   }
 }
