@@ -6,11 +6,15 @@ module Forms
         attr_accessor :is_incarcerated, :is_disabled, :citizen_status
 
         def us_citizen=(val)
+          return  if val.to_s.blank?
+
           @us_citizen = (val.to_s == "true")
           @naturalized_citizen = false if val.to_s == "false"
         end
 
         def naturalized_citizen=(val)
+          return  if val.to_s.blank?
+
           @naturalized_citizen = (val.to_s == "true")
         end
 
@@ -23,6 +27,8 @@ module Forms
         end
 
         def eligible_immigration_status=(val)
+          return if val.to_s.blank?
+
           @eligible_immigration_status = (val.to_s == "true")
         end
 
