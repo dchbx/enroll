@@ -27,9 +27,7 @@ module Admin
     accepts_nested_attributes_for :documents, allow_destroy: true
 
     def send_notices!
-      puts 'being processed'
       audience_ids.map do |audience_id|
-        puts audience_id.inspect
         BulkNoticeWorker.perform_async(audience_id, self.id)
       end
     end

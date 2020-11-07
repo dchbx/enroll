@@ -12,28 +12,31 @@
 
   <div class="row bg-white mt-5 p-3 border-top border-left border-right border-bottom">
     <div class='col-2 p-3'>
-      Subject
-    </div>
-    <div class='col-10 p-3'>
-      <%= @bulk_notice.subject %>
-    </div>
-    <div class='col-2 p-3'>
       Audience Type
     </div>
     <div class='col-10 p-3'>
       <%= @bulk_notice.audience_type.humanize.titleize %>
     </div>
+
+    <div class='col-2 p-3'>
+      Subject
+    </div>
+    <div class='col-10 p-3'>
+      <%= @bulk_notice.subject %>
+    </div>
+
     <div class='col-2 p-3'>
       Message
     </div>
     <div class='col-10 p-3'>
       <%= @bulk_notice.body %>
     </div>
-    <div class='col-2 p-3'>
-      Attachments
-    </div>
 
     <% unless @bulk_notice.documents.empty? %>
+      <div class='col-2 p-3'>
+        Attachments
+      </div>
+
       <div class='col-10 p-3'>
         <% @bulk_notice.documents.each_with_index do |document, i| %>
           <div class='py-1'>
