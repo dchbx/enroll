@@ -45,7 +45,7 @@ class BulkNoticeWorker
         result: "Success"
       )
 
-      html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @org.attributes.symbolize_keys.slice(:id, :fien, :hbx_id, :legal_name) })
+      html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @org.attributes.symbolize_keys.slice(:id, :fein, :hbx_id, :legal_name) })
       cable_ready["bulk-notice-processing"].morph(
         selector: "#bulk-notice-#{@bulk_notice.id}-audience-#{audience_id}",
         html: html
