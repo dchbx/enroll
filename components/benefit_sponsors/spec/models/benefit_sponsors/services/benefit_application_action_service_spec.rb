@@ -12,7 +12,7 @@ module BenefitSponsors
     include_context "setup benefit market with market catalogs and product packages"
 
     include_context "setup initial benefit application" do
-      let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
     end
 
     describe '.terminate_application' do

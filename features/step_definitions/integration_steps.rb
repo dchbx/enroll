@@ -931,6 +931,7 @@ end
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  wait_for_ajax
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|

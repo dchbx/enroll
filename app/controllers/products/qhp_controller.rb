@@ -32,7 +32,7 @@ class Products::QhpController < ApplicationController
 
       @qhps = @qhps.each do |qhp|
         qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.product, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.product_for(@market_kind), @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
       end
     end
 

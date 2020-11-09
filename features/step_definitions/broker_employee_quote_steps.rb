@@ -117,6 +117,7 @@ end
 
 When(/^.+ clicks Actions for that Employer$/) do
   find('.dropdown.pull-right', text: 'Actions').click
+  sleep 5
 end
 
 Then(/^.+ sees Create Quote button$/) do
@@ -140,6 +141,7 @@ end
 Then(/^the broker selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
   wait_for_ajax(3, 2)
   find(:xpath, "//*[@id='pdp-bms']/div/ul/li[2]/label/div").click
+  wait_for_ajax(3, 2)
   expect(page).to have_content("Gold")
   find(:xpath, "//*[@id='metalLevelCarrierList']/div[3]/div[2]/label/h3").click
   wait_for_ajax(3, 2)
@@ -256,21 +258,22 @@ When(/^the broker clicks on quote$/) do
 end
 
 Given(/^the Plans exist$/) do
-  open_enrollment_start_on = TimeKeeper.date_of_record.end_of_month + 1.day
-  open_enrollment_end_on = open_enrollment_start_on + 12.days
-  start_on = open_enrollment_start_on + 2.months
-  previous_start_on = open_enrollment_start_on + 1.months
-  end_on = start_on + 1.year - 1.day
-  plan01 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: previous_start_on.year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
-  plan11 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: previous_start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
-  plan21 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: previous_start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
-  plan31 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: previous_start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan41 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: previous_start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan0 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: start_on.year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
-  plan1 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: start_on.year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
-  plan2 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: start_on.year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
-  plan3 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
-  plan4 = FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: start_on.year, deductible: 4000, coverage_kind: 'dental')
+  sys_year = TimeKeeper.date_of_record.year
+
+  # TODO: create bcps with proper OE dates and check the TimeKeeper against it.
+  previous_year = if (Date.new(sys_year, 11, 1)..Date.new(sys_year, 12, 31)).cover? TimeKeeper.date_of_record
+                    TimeKeeper.date_of_record.year
+                  else
+                    TimeKeeper.date_of_record.year - 1
+                  end
+
+  [previous_year, (previous_year + 1)].each do |year|
+    FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'gold', active_year: year, deductible: 2000, csr_variant_id: "01", coverage_kind: 'health')
+    FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'silver', active_year: year, deductible: 5000, csr_variant_id: "01", coverage_kind: 'health')
+    FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', metal_level: 'bronze', active_year: year, deductible: 3000, csr_variant_id: "01", coverage_kind: 'health')
+    FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'high', active_year: year, deductible: 4000, coverage_kind: 'dental')
+    FactoryBot.create(:plan, :with_rating_factors, :with_premium_tables, market: 'shop', dental_level: 'low', active_year: year, deductible: 4000, coverage_kind: 'dental')
+  end
   Caches::PlanDetails.load_record_cache!
 end
 

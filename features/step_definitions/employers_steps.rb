@@ -614,6 +614,8 @@ Then(/^employer should see form for benefit application and benefit package$/) d
 end
 
 Then(/^employer should see edit plan year button$/) do
+  sleep 5
+  wait_for_ajax
   expect(page).to have_content "Edit Plan Year"
 end
 

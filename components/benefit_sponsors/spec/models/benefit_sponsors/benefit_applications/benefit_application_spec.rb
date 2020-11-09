@@ -21,6 +21,7 @@ module BenefitSponsors
     let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
 
     let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
+    let!(:rating_area2) {FactoryBot.create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.next_year.year)}
     let(:service_area) { create_default(:benefit_markets_locations_service_area) }
     let(:sic_code)      { "001" }
 
@@ -641,13 +642,14 @@ module BenefitSponsors
         context "based on exchange's rules" do
 
           context 'when current benefit application has flex rules and renewals are not allowed to get flex rules' do
-            let(:flex_setting) do
-              renewal_application.start_on.yday == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_application.start_on.year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_application.start_on.year}"]
-            end
+            let(:renewal_year) { initial_application.start_on.next_year.year }
+            let(:flex_setting) { initial_application.start_on.month == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_year}"] }
             let(:flex_contribution_setting) { flex_setting.setting(:contribution_model_key) }
             let(:flex_period) { flex_setting.setting(:effective_period).item }
-            let(:flex_setting_enabled) { EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_application.start_on.year}") }
-            let(:contribution_model1) { renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model }
+            let(:flex_setting_enabled) do
+              initial_application.start_on.month == 1 ? EnrollRegistry.feature_enabled?("renewal_sponsor_jan_default_#{renewal_year}") : EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_year}")
+            end
+            let(:contribution_model1) {renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model}
 
             before :each do
               allow(flex_contribution_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
