@@ -32,22 +32,49 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
   context 'success' do
     let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_year}
+    let(:current_year) {current_effective_date.year}
+    let(:end_of_year) {Date.new(current_year, 12, 31)}
 
     before do
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each {|spon_benefit| create_pd(spon_benefit)}
       end
-      initial_application.terminate_enrollment!
-      initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: TimeKeeper.date_of_record.end_of_month)
-      @result = subject.call({benefit_application: initial_application})
     end
 
-    it 'should return a success with a BenefitApplication' do
-      expect(@result.success).to be_a(BenefitSponsors::BenefitApplications::BenefitApplication)
+    context 'reinstate terminated benefit application' do
+      before do
+        initial_application.terminate_enrollment!
+        initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: TimeKeeper.date_of_record.end_of_month)
+        @new_ba = subject.call({benefit_application: initial_application}).success
+      end
+
+      it 'should return a success with a BenefitApplication' do
+        expect(@new_ba).to be_a(BenefitSponsors::BenefitApplications::BenefitApplication)
+      end
+
+      it 'should return a BenefitApplication with aasm_state being reinstated' do
+        expect(@new_ba.aasm_state).to eq(:reinstated)
+      end
+
+      it 'should return a BenefitApplication with remaining effective_period' do
+        expect(@new_ba.effective_period).to eq(Date.new(current_year, 11, 1)..end_of_year)
+      end
     end
 
-    it 'should return a BenefitApplication with aasm_state being reinstated' do
-      expect(@result.success.aasm_state).to eq(:reinstated)
+    context 'reinstate canceled benefit application' do
+      before do
+        initial_application.cancel!
+        @new_ba = subject.call({benefit_application: initial_application}).success
+      end
+
+      it 'should return a BenefitApplication with aasm_state being reinstated' do
+        expect(@new_ba.aasm_state).to eq(:reinstated)
+      end
+
+      it 'should return a BenefitApplication with matching effective_period' do
+        expect(@new_ba.effective_period).to eq(initial_application.effective_period)
+      end
     end
   end
 end
