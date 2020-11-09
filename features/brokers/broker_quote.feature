@@ -64,6 +64,7 @@ Feature: Broker creates a quote for a prospect employer
       | 50               |
       | 100              |
 
+  @flaky
   Scenario Outline: Broker should be able to create a quote with flexible rules for an existing employer
     Given there is an employer Netflix
     And employer Netflix hired broker Max Planck from District Brokers Inc
