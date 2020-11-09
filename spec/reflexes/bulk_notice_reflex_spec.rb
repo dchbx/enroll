@@ -41,7 +41,7 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
         end
 
         it 'will render a org badge for ACME Inc' do
-          expect(reflex).to have_received(:morph) do |selector, raw|
+          expect(reflex).to have_received(:morph) do |_selector, raw|
             html = Capybara::Node::Simple.new(raw)
             expect(html).to have_css('span.badge-secondary', text: 'ACME Inc')
           end
@@ -52,7 +52,7 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
         before { reflex.run(:new_identifier) }
 
         it 'will render an error org badge' do
-          expect(reflex).to have_received(:morph) do |selector, raw|
+          expect(reflex).to have_received(:morph) do |_selector, raw|
             html = Capybara::Node::Simple.new(raw)
             expect(html).to have_css('span.badge-danger', text: '1234')
           end
