@@ -28,10 +28,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       :active_year => current_benefit_market_catalog.application_period.min.year
     ).first
   end
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_year}
+
   include_context 'setup initial benefit application'
 
   context 'success' do
-    let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_year}
     let(:current_year) {current_effective_date.year}
     let(:end_of_year) {Date.new(current_year, 12, 31)}
 
@@ -45,7 +46,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     context 'reinstate terminated benefit application' do
       before do
         initial_application.terminate_enrollment!
-        initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: TimeKeeper.date_of_record.end_of_month)
+        initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
         @new_ba = subject.call({benefit_application: initial_application}).success
         @first_wfst = @new_ba.workflow_state_transitions.first
         @second_wfst = @new_ba.workflow_state_transitions.second
@@ -60,7 +61,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
 
       it 'should return a BenefitApplication with remaining effective_period' do
-        expect(@new_ba.effective_period).to eq(Date.new(current_year, 11, 1)..end_of_year)
+        expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
       end
 
       context 'workflow_state_transitions' do
@@ -114,6 +115,78 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         it 'should record transition to_state' do
           expect(@second_wfst.to_state).to eq('active')
         end
+      end
+    end
+
+    context 'reinstate termination_pending benefit application' do
+      before do
+        initial_application.schedule_enrollment_termination!
+        initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record + 1.month).end_of_month)
+        @new_ba = subject.call({benefit_application: initial_application}).success
+        @first_wfst = @new_ba.workflow_state_transitions.first
+        @second_wfst = @new_ba.workflow_state_transitions.second
+      end
+
+      it 'should return a success with a BenefitApplication' do
+        expect(@new_ba).to be_a(BenefitSponsors::BenefitApplications::BenefitApplication)
+      end
+
+      it 'should return a BenefitApplication with aasm_state active' do
+        expect(@new_ba.aasm_state).to eq(:active)
+      end
+
+      it 'should return a BenefitApplication with remaining effective_period' do
+        expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
+      end
+
+      context 'workflow_state_transitions' do
+        it 'should record transition from_state' do
+          expect(@first_wfst.from_state).to eq('draft')
+        end
+
+        it 'should record transition to_state' do
+          expect(@first_wfst.to_state).to eq('reinstated')
+        end
+
+        it 'should record transition from_state' do
+          expect(@second_wfst.from_state).to eq('reinstated')
+        end
+
+        it 'should record transition to_state' do
+          expect(@second_wfst.to_state).to eq('active')
+        end
+      end
+    end
+  end
+
+  context 'failure' do
+    context 'no params' do
+      before do
+        @result = subject.call({})
+      end
+
+      it 'should return a failure with a message' do
+        expect(@result.failure).to eq('Missing Key')
+      end
+    end
+
+    context 'invalid params' do
+      before do
+        @result = subject.call({benefit_application: 'benefit_application'})
+      end
+
+      it 'should return a failure with a message' do
+        expect(@result.failure).to eq('Not a valid Benefit Application object')
+      end
+    end
+
+    context "invalid benefit_application's aasm state" do
+      before do
+        @result = subject.call({benefit_application: initial_application})
+      end
+
+      it 'should return a failure with a message' do
+        expect(@result.failure).to eq('Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled] states')
       end
     end
   end
