@@ -47,18 +47,38 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         initial_application.terminate_enrollment!
         initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: TimeKeeper.date_of_record.end_of_month)
         @new_ba = subject.call({benefit_application: initial_application}).success
+        @first_wfst = @new_ba.workflow_state_transitions.first
+        @second_wfst = @new_ba.workflow_state_transitions.second
       end
 
       it 'should return a success with a BenefitApplication' do
         expect(@new_ba).to be_a(BenefitSponsors::BenefitApplications::BenefitApplication)
       end
 
-      it 'should return a BenefitApplication with aasm_state being reinstated' do
-        expect(@new_ba.aasm_state).to eq(:reinstated)
+      it 'should return a BenefitApplication with aasm_state active' do
+        expect(@new_ba.aasm_state).to eq(:active)
       end
 
       it 'should return a BenefitApplication with remaining effective_period' do
         expect(@new_ba.effective_period).to eq(Date.new(current_year, 11, 1)..end_of_year)
+      end
+
+      context 'workflow_state_transitions' do
+        it 'should record transition from_state' do
+          expect(@first_wfst.from_state).to eq('draft')
+        end
+
+        it 'should record transition to_state' do
+          expect(@first_wfst.to_state).to eq('reinstated')
+        end
+
+        it 'should record transition from_state' do
+          expect(@second_wfst.from_state).to eq('reinstated')
+        end
+
+        it 'should record transition to_state' do
+          expect(@second_wfst.to_state).to eq('active')
+        end
       end
     end
 
@@ -66,14 +86,34 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       before do
         initial_application.cancel!
         @new_ba = subject.call({benefit_application: initial_application}).success
+        @first_wfst = @new_ba.workflow_state_transitions.first
+        @second_wfst = @new_ba.workflow_state_transitions.second
       end
 
-      it 'should return a BenefitApplication with aasm_state being reinstated' do
-        expect(@new_ba.aasm_state).to eq(:reinstated)
+      it 'should return a BenefitApplication with aasm_state active' do
+        expect(@new_ba.aasm_state).to eq(:active)
       end
 
       it 'should return a BenefitApplication with matching effective_period' do
         expect(@new_ba.effective_period).to eq(initial_application.effective_period)
+      end
+
+      context 'workflow_state_transitions' do
+        it 'should record transition from_state' do
+          expect(@first_wfst.from_state).to eq('draft')
+        end
+
+        it 'should record transition to_state' do
+          expect(@first_wfst.to_state).to eq('reinstated')
+        end
+
+        it 'should record transition from_state' do
+          expect(@second_wfst.from_state).to eq('reinstated')
+        end
+
+        it 'should record transition to_state' do
+          expect(@second_wfst.to_state).to eq('active')
+        end
       end
     end
   end

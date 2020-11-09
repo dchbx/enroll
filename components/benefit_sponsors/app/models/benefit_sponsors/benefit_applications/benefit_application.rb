@@ -920,7 +920,7 @@ module BenefitSponsors
       end
 
       event :activate_enrollment do
-        transitions from: [:enrollment_eligible, :binder_paid],
+        transitions from: [:enrollment_eligible, :binder_paid, :reinstated],
           to:     :active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled

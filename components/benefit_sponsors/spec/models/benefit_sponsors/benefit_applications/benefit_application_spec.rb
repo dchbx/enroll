@@ -424,6 +424,17 @@ module BenefitSponsors
           it "should transition to state: :active" do
             expect(benefit_application.aasm_state).to eq :active
           end
+
+          context 'from_state reinstated' do
+            before do
+              benefit_application.update_attributes!(aasm_state: :reinstated)
+              benefit_application.activate_enrollment!
+            end
+
+            it 'should transition to state: :active' do
+              expect(benefit_application.aasm_state).to eq :active
+            end
+          end
         end
 
         context 'reinstate' do
