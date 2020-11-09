@@ -29,7 +29,8 @@ module BenefitSponsors
         end
 
         def filter(values)
-          return Failure('Given BenefitApplication is not a canceled or terminated application') unless [:terminated, :canceled].include?(values[:benefit_application].aasm_state)
+          valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled]
+          return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states") unless valid_states_for_reinstatement.include?(values[:benefit_application].aasm_state)
           Success(values)
         end
 
@@ -37,6 +38,8 @@ module BenefitSponsors
           current_ba = params[:benefit_application]
           case current_ba.aasm_state
           when :terminated
+            Success((current_ba.terminated_on + 1.day)..current_ba.effective_period.max)
+          when :termination_pending
             Success((current_ba.terminated_on + 1.day)..current_ba.effective_period.max)
           when :canceled
             Success(current_ba.effective_period)
