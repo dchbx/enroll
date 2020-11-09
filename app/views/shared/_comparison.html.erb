@@ -7,20 +7,20 @@
       <tr>
         <th class="row-title">Plans</th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(Maybe.new(qhp.product), {width: 80}) %></th>
+          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><%= display_carrier_logo(Maybe.new(qhp.product_for(@market_kind)), {width: 80}) %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.product.name %></th>
+          <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.product_for(@market_kind).name %></th>
         <% end %>
       </tr>
       <tr>
         <th></th>
         <% qhps.each do |qhp|%>
-          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product %></span> &nbsp;&#149;&nbsp;
-          <%= qhp.product.product_type.upcase %>
+          <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.product_for(@market_kind).metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.product_for(@market_kind) %></span> &nbsp;&#149;&nbsp;
+          <%= qhp.product_for(@market_kind).product_type.upcase %>
           </th>
         <% end %>
       </tr>
@@ -34,14 +34,14 @@
         <th></th>
         <% qhps.each do |qhp|%>
           <th colspan="2" style="text-align: center; verticle-align: center; border: none; padding: 15px 0 25px;">
-            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product } %>
+            <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product_for(@market_kind) } %>
           </th>
         <% end %>
       </tr>
       <tr>
         <th>Provider Network</th>
         <% qhps.each do |qhp|%>
-            <%= render partial: "shared/network_data", locals: {plan: qhp.product} %>
+            <%= render partial: "shared/network_data", locals: {plan: qhp.product_for(@market_kind)} %>
         <% end %>
       </tr>
 
@@ -51,7 +51,7 @@
             <th></th>
             <% qhps.each do |qhp| %>
               <th colspan="2">
-                <% if qhp.product.nationwide %>
+                <% if qhp.product_for(@market_kind).nationwide %>
                   <%= link_to 'DOCTOR DIRECTORY', qhp.plan.provider_directory_url, target: '_blank' %>
                 <% end %>
               </th>
@@ -67,7 +67,7 @@
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
-              <% if qhp.product.kind.to_s == "health" && qhp.product.rx_formulary_url.present? %>
+              <% if qhp.product_for(@market_kind).kind.to_s == "health" && qhp.product_for(@market_kind).rx_formulary_url.present? %>
                 <%= link_to "DRUG LIST", qhp.plan.rx_formulary_url, target: "_blank" %>
               <% end %>
             </th>
@@ -89,7 +89,7 @@
         <% qhps.each do |qhp|%>
           <th colspan="2">
             <div class="plan_comparison">
-              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.product } %>
+              <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: qhp.product_for(@market_kind) } %>
             </div>
           </th>
         <% end %>
@@ -99,7 +99,7 @@
           <th></th>
           <% qhps.each do |qhp|%>
             <th colspan="2">
-              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product } %>
+              <%= render partial: "shared/plan_shoppings/select_plan_button", locals: { plan: qhp.product_for(@market_kind) } %>
             </th>
           <% end %>
         </tr>
