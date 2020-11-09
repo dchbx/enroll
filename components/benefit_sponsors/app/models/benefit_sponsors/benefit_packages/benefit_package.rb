@@ -277,10 +277,12 @@ module BenefitSponsors
       #        Notice also how it only returns a known result of the form
       #        [boolean, message] when failure happens.  What is it
       #        supposed to return when things go correctly?
-      def renew_member_benefit(census_employee)
+      def renew_member_benefit(census_employee, result_reporter = SilentRenewalReporter.new)
         employee_role = census_employee.employee_role
+        result_reporter.report_renewal_failure(census_employee, self, "no employee_role")
         return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
+        result_reporter.report_renewal_failure(census_employee, self, "family missing for #{census_employee.full_name}")
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
 
         # family.validate_member_eligibility_policy
@@ -300,7 +302,7 @@ module BenefitSponsors
             next if renewing_enrollment.present?
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              renewed_enrollment = hbx_enrollment.renew_benefit(self)       
+              renewed_enrollment = hbx_enrollment.renew_benefit(self)
             end
 
             trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment)
