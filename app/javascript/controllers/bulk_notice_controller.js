@@ -60,6 +60,7 @@ export default class extends Controller {
     this.recipientListTarget.classList.add('collapsed')
     this.moreRecipientsTarget.classList.remove('d-none')
     this.lessRecipientsTarget.classList.add('d-none')
+    this.displayExpandLink()
     event.preventDefault()
     return false
   }
