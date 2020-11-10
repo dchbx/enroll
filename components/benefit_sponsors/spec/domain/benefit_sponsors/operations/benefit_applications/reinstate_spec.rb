@@ -64,6 +64,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
       end
 
+      it 'should populate reinstated_id' do
+        expect(@new_ba.reinstated_id).to eq(initial_application.id)
+      end
+
       context 'workflow_state_transitions' do
         it 'should record transition from_state' do
           expect(@first_wfst.from_state).to eq('draft')
@@ -97,6 +101,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
       it 'should return a BenefitApplication with matching effective_period' do
         expect(@new_ba.effective_period).to eq(initial_application.effective_period)
+      end
+
+      it 'should populate reinstated_id' do
+        expect(@new_ba.reinstated_id).to eq(initial_application.id)
       end
 
       context 'workflow_state_transitions' do
@@ -139,6 +147,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
       end
 
+      it 'should populate reinstated_id' do
+        expect(@new_ba.reinstated_id).to eq(initial_application.id)
+      end
+
       context 'workflow_state_transitions' do
         it 'should record transition from_state' do
           expect(@first_wfst.from_state).to eq('draft')
@@ -166,7 +178,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
 
       it 'should return a failure with a message' do
-        expect(@result.failure).to eq('Missing Key')
+        expect(@result.failure).to eq('Missing Key.')
       end
     end
 
@@ -176,7 +188,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
 
       it 'should return a failure with a message' do
-        expect(@result.failure).to eq('Not a valid Benefit Application object')
+        expect(@result.failure).to eq('Not a valid Benefit Application object.')
       end
     end
 
@@ -186,7 +198,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
 
       it 'should return a failure with a message' do
-        expect(@result.failure).to eq('Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled] states')
+        expect(@result.failure).to eq('Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled] states.')
       end
     end
   end

@@ -117,6 +117,8 @@ module BenefitSponsors
     field :termination_kind,       type: String
     field :termination_reason,     type: String
 
+    field :reinstated_id, type: BSON::ObjectId
+
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,

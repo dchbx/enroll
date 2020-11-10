@@ -31,15 +31,15 @@ module BenefitSponsors
         private
 
         def validate(params)
-          return Failure('Missing Key') unless params.key?(:benefit_application)
-          return Failure('Not a valid Benefit Application object') unless params[:benefit_application].is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
+          return Failure('Missing Key.') unless params.key?(:benefit_application)
+          return Failure('Not a valid Benefit Application object.') unless params[:benefit_application].is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
 
           Success(params)
         end
 
         def filter(values)
           valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled]
-          return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states") unless valid_states_for_reinstatement.include?(values[:benefit_application].aasm_state)
+          return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(values[:benefit_application].aasm_state)
           Success(values)
         end
 
@@ -90,7 +90,7 @@ module BenefitSponsors
 
         def init_benefit_application(current_ba, benefit_sponsorship, effective_period)
           ba_params = current_ba.attributes.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :terminated_on, :termination_reason, :termination_kind, :benefit_packages, :workflow_state_transitions)
-          ba_params.merge!({aasm_state: :draft, effective_period: effective_period})
+          ba_params.merge!({aasm_state: :draft, effective_period: effective_period, reinstated_id: current_ba.id})
           new_ba = benefit_sponsorship.benefit_applications.new
           new_ba.assign_attributes(ba_params)
           new_ba
@@ -141,10 +141,10 @@ module BenefitSponsors
         end
 
         def reinstate(new_ba)
-          return Failure('Cannot transition to state reinstated on event reinstate') unless new_ba.may_reinstate?
+          return Failure('Cannot transition to state reinstated on event reinstate.') unless new_ba.may_reinstate?
 
           new_ba.reinstate!
-          return Failure('Cannot transition to state active on event activate_enrollment') unless new_ba.may_activate_enrollment?
+          return Failure('Cannot transition to state active on event activate_enrollment.') unless new_ba.may_activate_enrollment?
 
           new_ba.activate_enrollment!
           Success(new_ba)
