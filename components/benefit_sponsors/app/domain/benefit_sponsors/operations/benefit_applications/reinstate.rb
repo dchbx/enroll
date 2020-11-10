@@ -6,9 +6,18 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitApplications
+      # This class reinstates a canceled/terminated/termination_pending
+      # benefit_application where end result is a new benefit_application.
+      # The effective_period of the newly created benefit_application depends
+      # on the aasm_state of the input benefit_application. The aasm_state of the
+      # newly created application will be active but there will be a transition
+      # from draft to reinstated before the final state(active) to indicate that
+      # this very application is reinstated.
       class Reinstate
         include Dry::Monads[:result, :do]
 
+        # @param [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
+        # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         def call(params)
           values              = yield validate(params)
           filtered_values     = yield filter(values)
