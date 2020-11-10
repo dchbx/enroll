@@ -1317,7 +1317,6 @@ module BenefitSponsors
                           :benefit_sponsorship => benefit_sponsorship,
                           :aasm_state => 'enrollment_ineligible',
                           :effective_period => (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day))
-
       end
 
       before do
