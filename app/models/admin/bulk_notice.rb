@@ -30,6 +30,9 @@ module Admin
       audience_ids.map do |audience_id|
         BulkNoticeWorker.perform_async(audience_id, self.id)
       end
+      assign_attributes sent_at: TimeKeeper.datetime_of_record
+      complete!
+      save
     end
 
     def on_success(_status, _options)
