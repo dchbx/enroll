@@ -46,13 +46,13 @@ class BulkNoticeReflex < ApplicationReflex
     # this method loops through the given audience_ids and displays a normal badge or error badge if the types are wrong
     audience_ids.reduce('') do |badges, identifier|
       org_attrs = cache_or_fetch_org_attrs(identifier)
-      return badges if badges.include?(identifier)
+      return badges if badges.include?(identifier) # already has a badge for this identifier
       if org_attrs.key?(:error)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], legal_name: org_attrs[:legal_name] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], hbx_id: org_attrs[:hbx_id] })
       elsif org_attrs[:types].include?(audience_type)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], legal_name: org_attrs[:legal_name] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], hbx_id: org_attrs[:hbx_id] })
       else
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', legal_name: org_attrs[:legal_name] })
+        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', hbx_id: org_attrs[:hbx_id] })
       end
     end
   end
