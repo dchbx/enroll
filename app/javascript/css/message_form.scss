@@ -64,3 +64,9 @@ table.table.table-message-wrapper tr th.vtop {
   font-size: 12px;
   line-height: 16px;
 }
+
+#recipient-list.collapsed {
+  max-height: 30px;
+  overflow-y: hidden;
+  max-width: 90%;
+}

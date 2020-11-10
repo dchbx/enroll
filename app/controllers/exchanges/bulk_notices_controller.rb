@@ -8,7 +8,7 @@ module Exchanges
     before_action :set_current_user
 
     def index
-      @bulk_notices = Admin::BulkNotice.all
+      @bulk_notices = Admin::BulkNotice.all.order([:updated_at, :desc])
     end
 
     def show
