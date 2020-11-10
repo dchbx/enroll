@@ -5,7 +5,7 @@
   data-trigger='hover'
   title='<%= error %>'>
   <%= hidden_field_tag 'admin_bulk_notice[audience_ids][]', id %>
-  <%= legal_name || id %>
+  <%= hbx_id || id %>
   <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
     <i class="far fa-times-circle"></i>
   </a>
