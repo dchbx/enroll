@@ -74,7 +74,7 @@ function setGroupSelectionHandlers(){
 
       $('#dental-radio-button').slideDown();
       hideShopErrors();
-      $('.ivl_errors').hide();
+      //$('.ivl_errors').hide();
 
       //disableIvlIneligible();
       //setPrimaryForIvl();
@@ -191,7 +191,18 @@ function disableIvlIneligible() {
 function enableIvlEligibleForCoverall() {
   //debugger;
   $('#coverage-household tr').filter("[class^=ineligible_]").not(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
-  $('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
+    //$('#coverage-household tr').filter(".ineligible_ivl_row").find('input').prop({'checked': true, 'disabled': false});
+
+  $('#coverage-household tr').filter(".ineligible_ivl_row").each(function() {
+    var error_element = $(this).children().filter('td.ivl_errors').find('div')
+    if (error_element.length && error_element.text() === "eligibility failed on active_individual_role") {
+      $(this).find('input').prop({'checked': true, 'disabled': false});
+      error_element.hide();
+
+    }else {
+      $(this).find('input').prop({'checked': false, 'disabled': true});
+    }
+  })
 }
 
 function disableShopDentalIneligible(employer_id) {
