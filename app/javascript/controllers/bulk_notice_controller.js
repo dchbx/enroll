@@ -28,7 +28,10 @@ export default class extends Controller {
     hiddenInputEl.value = true
     parentEl.querySelector('span').remove()
     parentEl.closest('form').querySelector('input[type=file]').classList.remove('d-none')
-    parentEl.closest('form').querySelector('input[type="submit"]').setAttribute('value', 'Preview')
+    let submitButton = parentEl.closest('form').querySelector('input[type="submit"]')
+    submitButton.setAttribute('value', 'Preview')
+    submitButton.dataset.disableWith = 'Preview'
+    submitButton.removeAttribute('data-confirm')
     event.preventDefault()
     return false
   }
