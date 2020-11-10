@@ -9,9 +9,5 @@ Given(/^the Reinstate feature configuration is disabled$/) do
 end
 
 Then(/^the user will (.*) Reinstate button$/) do |action|
-  if action == 'see'
-    page.has_css?('Reinstate') == true
-  else
-    page.has_css?('Reinstate') == false
-  end
+  action == 'see' ? (page.has_css?('Reinstate') == true) : (page.has_css?('Reinstate') == false)
 end
