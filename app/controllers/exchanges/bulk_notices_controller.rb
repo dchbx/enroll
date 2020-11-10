@@ -43,6 +43,7 @@ module Exchanges
       if @bulk_notice.update_attributes(bulk_notice_params)
         @bulk_notice.upload_document(params, current_user) if params[:file].present?
         @bulk_notice.process! unless params[:commit] == "Preview"
+        flash[:notice] = "Success, message sent!"
         redirect_to exchanges_bulk_notice_path(@bulk_notice)
       else
         render 'new'
