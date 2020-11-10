@@ -12,16 +12,23 @@
       <tbody>
         <tr>
           <th style="text-transform: capitalize;">Recipients:</th>
-          <td data-target="bulk-notice.recipientList">
-            <% @bulk_notice.audience_ids.each do |identifier| %>
-              <span class="badge badge-secondary mb-1">
-                <%= f.hidden_field :audience_ids, multiple: true, value: identifier %>
-                <%= BenefitSponsors::Organizations::Organization.find(identifier).legal_name %>&nbsp;
-                <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
-                  <i class="far fa-times-circle"></i>
-                </a>
-              </span>
-            <% end %>
+          <td>
+            <div id='recipient-list' class='collapsed float-left' data-target="bulk-notice.recipientList">
+              <% @bulk_notice.audience_ids.each do |identifier| %>
+                <span class="badge badge-secondary mr-1 mb-1 p-2">
+                  <%= f.hidden_field :audience_ids, multiple: true, value: identifier %>
+                  <%= BenefitSponsors::Organizations::Organization.find(identifier).hbx_id %>&nbsp;
+                  <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
+                    <i class="far fa-times-circle"></i>
+                  </a>
+                </span>
+              <% end %>
+            </div>
+            <div id='more-receipients' class='float-right pr-1'>
+              <a href data-target="bulk-notice.moreRecipients" data-action='bulk-notice#expandRecipients' class='d-none'>0 more...</a>
+              <a href data-target="bulk-notice.lessRecipients" data-action='bulk-notice#collapseRecipients' class='d-none'>Less...</a>
+            </div>
+
             <%= f.text_area :audience_identifiers, rows: 1, data: { reflex: 'blur->BulkNotice#new_identifier' }, placeholder: 'FEINs or HBX IDs, comma separated', value: '' %>
           </td>
         </tr>
