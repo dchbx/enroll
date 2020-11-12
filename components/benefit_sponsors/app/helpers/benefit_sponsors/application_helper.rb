@@ -102,7 +102,7 @@ module BenefitSponsors
     end
 
     def add_plan_year_button_business_rule(benefit_applications)
-      canceled_rule_check = benefit_applications.active.present? && benefit_applications.canceled.select{ |ba| ba.start_on > benefit_applications.active.first.end_on }.present?
+      canceled_rule_check = benefit_applications.active.present? && benefit_applications.where(:aasm_state.in => [:canceled, :retroactive_cancel]).select{ |ba| ba.start_on > benefit_applications.active.first.end_on }.present?
       ineligible_rule_check = benefit_applications.enrollment_ineligible.effective_date_begin_on
       published_and_ineligible_apps = benefit_applications.published + benefit_applications.enrollment_ineligible
       ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check) && benefit_applications.none?(&:is_renewing?)
