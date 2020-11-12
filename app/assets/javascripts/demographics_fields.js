@@ -176,6 +176,11 @@ function validationForIndianTribeMember() {
     if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
+
+    if ($('input[name="dependent[is_applying_coverage]"]').length > 0 && $('input[name="dependent[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
       alert("Please select the option for 'Is this person a member of an American Indian or Alaska Native Tribe?'");
       e.preventDefault && e.preventDefault();

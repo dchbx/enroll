@@ -477,6 +477,73 @@ module BenefitSponsors
         family.reload
         expect(family.active_household.hbx_enrollments.map(&:aasm_state).include?("auto_renewing")).to eq false
       end
+
+      context 'renewing enrollment already present' do
+        let!(:renewing_hbx_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            :shop,
+            family: family,
+            household: family.active_household,
+            product: rbp.sponsored_benefits.first.reference_product,
+            coverage_kind: :health,
+            effective_on: ra.start_on,
+            employee_role_id: census_employee.employee_role.id,
+            sponsored_benefit_package_id: rbp.id,
+            benefit_sponsorship: bs,
+            benefit_group_assignment: renewal_bga
+          )
+        end
+
+        context 'auto renewing enrollment present' do
+          it 'should not generate a duplicate auto renewing enrollment' do
+            renewing_hbx_enrollment.update_attributes(aasm_state: 'auto_renewing')
+            enrolled_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                         .by_benefit_sponsorship(bs).by_effective_period(ra.effective_period)
+            expect(enrolled_enrollments.count).to eq 1
+            rbp.renew_member_benefit(census_employee)
+            family.reload
+            expect(enrolled_enrollments.count).to eq 1
+          end
+        end
+
+        context 'renewing_waived enrollment present' do
+          it 'should not generate a duplicate renewing_waived enrollment' do
+            hbx_enrollment.update_attributes(benefit_sponsorship: bs, aasm_state: 'inactive')
+            renewing_hbx_enrollment.update_attributes(aasm_state: 'renewing_waived')
+            enrolled_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                         .by_benefit_sponsorship(bs).by_effective_period(ra.effective_period)
+            expect(enrolled_enrollments.count).to eq 1
+            rbp.renew_member_benefit(census_employee)
+            family.reload
+            expect(enrolled_enrollments.count).to eq 1
+          end
+        end
+
+        context 'actively selected renewal enrollment present' do
+          it 'should not generate a duplicate coverage_selected enrollment' do
+            renewing_hbx_enrollment.update_attributes(aasm_state: 'coverage_selected')
+            enrolled_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                         .by_benefit_sponsorship(bs).by_effective_period(ra.effective_period)
+            expect(enrolled_enrollments.count).to eq 1
+            rbp.renew_member_benefit(census_employee)
+            family.reload
+            expect(enrolled_enrollments.count).to eq 1
+          end
+        end
+
+        context 'coverage canceled renewal enrollment' do
+          it 'should not generate a duplicate coverage_selected enrollment' do
+            renewing_hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
+            enrolled_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                         .by_benefit_sponsorship(bs).by_effective_period(ra.effective_period)
+            expect(enrolled_enrollments.count).to eq 0
+            rbp.renew_member_benefit(census_employee)
+            family.reload
+            expect(enrolled_enrollments.count).to eq 1
+          end
+        end
+      end
     end
 
     describe '.is_renewal_benefit_available?' do

@@ -258,15 +258,19 @@ module BenefitSponsors
           if Rails.env.test?
             renew_member_benefit(member)
           else
-            notify(
-              "acapi.info.events.benefit_package.renew_employee",
-              {
-                :census_employee_id => member.id.to_s,
-                :benefit_package_id => self.id.to_s
-              }
-            )
+            trigger_renew_employee_event(member)
           end
         end
+      end
+
+      def trigger_renew_employee_event(census_employee)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee",
+          {
+            :census_employee_id => census_employee.id.to_s,
+            :benefit_package_id => self.id.to_s
+          }
+        )
       end
 
       # FIXME: Nowhere do we check the result of this method.
@@ -281,12 +285,19 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-          
+
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
+          renewing_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
+                                       .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(effective_period)
+
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+
+            renewing_enrollment = renewing_enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
+
+            next if renewing_enrollment.present?
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
               renewed_enrollment = hbx_enrollment.renew_benefit(self)       

@@ -2255,6 +2255,35 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       benefit_group_assignment_two.update_attribute(:updated_at, benefit_group_assignment_two.updated_at + 1.day)
       expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
     end
+
+    context 'when multiple renewal assignments present' do
+
+      context 'and latest assignment has enrollment associated' do 
+        let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
+        let(:enrollment) { double }
+
+        before do
+          allow(benefit_group_assignment_three).to receive(:hbx_enrollment).and_return(enrollment)
+        end
+
+        it 'should return assignment with coverage associated' do
+          expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_three
+        end
+      end
+
+      context 'and ealier assignment has enrollment associated' do 
+        let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
+        let(:enrollment) { double }
+
+        before do
+          allow(benefit_group_assignment_two).to receive(:hbx_enrollment).and_return(enrollment)
+        end
+
+        it 'should return assignment with coverage associated' do
+          expect(census_employee.renewal_benefit_group_assignment).to eq benefit_group_assignment_two
+        end
+      end
+    end
   end
 
   context ".is_waived_under?" do
