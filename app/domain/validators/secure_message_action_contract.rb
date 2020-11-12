@@ -9,6 +9,8 @@ module Validators
       required(:actions_id).filled(:string)
       required(:subject).value(:string)
       required(:body).value(:string)
+      optional(:model_id).value(:string)
+      optional(:model_klass).value(:string)
       optional(:file)
       optional(:document)
     end
