@@ -22,8 +22,8 @@ module BenefitSponsors
     ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible, :binder_paid].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
-    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired].freeze
-    CANCELED_STATES               = [:canceled].freeze
+    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired, :retroactive_cancel].freeze
+    CANCELED_STATES               = [:canceled, :retroactive_cancel].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid, :active, :suspended].freeze
