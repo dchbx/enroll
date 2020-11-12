@@ -7,7 +7,11 @@
     <%= org[:legal_name] %>
   </div>
   <div class='col-2 text-right'>
-    <%= result ? result.created_at : 'Not sent' %>
+    <% if result %>
+      <% result.result %> at <%= result.created_at %>
+    <% else %>
+      Not sent
+    <% end %>
   </div>
   <div class='col-3 text-right text-truncate'>
     <%= org[:fein] %>
