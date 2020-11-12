@@ -1668,7 +1668,7 @@ class HbxEnrollment
   def reinstate(edi: false)
     return false unless can_be_reinstated?
     return false if has_active_or_term_exists_for_reinstated_date?
-    reinstate_enrollment = Enrollments::Replicator::Reinstatement.new(self, terminated_on.next_day).build
+    reinstate_enrollment = Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: self}).success
 
     if self.is_shop?
       census_employee = benefit_group_assignment.census_employee
