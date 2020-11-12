@@ -19,7 +19,9 @@ class BulkNoticeWorker
             subject: @bulk_notice.subject,
             body: @bulk_notice.body,
             actions_id: "Bulk Notice",
-            document: @bulk_notice.documents.first
+            document: @bulk_notice.documents.first,
+            model_id: @bulk_notice.id,
+            model_klass: @bulk_notice.class.to_s
           },
           user: User.first
         )
@@ -34,7 +36,9 @@ class BulkNoticeWorker
           subject: @bulk_notice.subject,
           body: @bulk_notice.body,
           actions_id: "Bulk Notice",
-          document: @bulk_notice.documents.first
+          document: @bulk_notice.documents.first,
+          model_instance: @bulk_notice,
+          model_klass: @bulk_notice.class.to_s
         },
         user: User.first
       )
