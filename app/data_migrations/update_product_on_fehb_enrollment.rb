@@ -17,7 +17,7 @@ class UpdateProductOnFehbEnrollment < MongoidMigrationTask
       employer_profile.census_employees.no_timeout.each do |ce|
         if ce.employee_role.present?
           person = ce.employee_role.person
-          enrollments = enrollments_effective_on(person, Date.new(2019,1,1))
+          enrollments = enrollments_effective_on(person, Date.new(2020,1,1))
           enrollments.each do |enrollment|
             next unless enrollment.fehb_profile.present?
 

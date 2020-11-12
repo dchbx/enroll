@@ -44,6 +44,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
   before :each do
     allow(mock_qhp).to receive("[]").with(:total_employee_cost).and_return(30)
+    allow(mock_qhp).to receive(:product_for).with('aca_shop').and_return(product)
     assign(:visit_types, [])
     assign :person, primary_family_member.person
     assign :member_groups, []
@@ -54,7 +55,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "dental"
-      assign :market_kind, 'shop'
+      assign :market_kind, 'aca_shop'
       render "shared/comparison", :qhps => mock_qhps
     end
 
@@ -77,7 +78,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
 
     before :each do
       assign :coverage_kind, "health"
-      assign :market_kind, 'shop'
+      assign :market_kind, 'aca_shop'
       allow(product).to receive(:sbc_document).and_return double("Document", :identifier => "identifier")
       render "shared/comparison", :qhps => mock_qhps
     end
@@ -139,7 +140,7 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
     before do
       assign :plans, [hbx_enrollment.product]
       allow(product).to receive(:rx_formulary_url).and_return plan.rx_formulary_url
-      assign :market_kind, 'shop'
+      assign :market_kind, 'aca_shop'
     end
 
     it "should have rx formulary url coverage_kind = health" do
@@ -155,6 +156,11 @@ describe "shared/_comparison.html.erb", dbclean: :after_each do
         let!(:dental_plan) { FactoryBot.create(:plan, market: 'shop', metal_level: 'dental', hios_id: "91111111122302", coverage_kind: 'dental', dental_level: 'high') }
         let!(:mock_qhp){instance_double("Products::QhpCostShareVariance", :product => dental_product, :plan => dental_plan, :plan_marketing_name => dental_product.title)}
         let(:mock_qhps) {[mock_qhp]}
+
+        before :each do
+          allow(mock_qhp).to receive(:product_for).with('aca_shop').and_return(product)
+        end
+
         it "should not have rx_formulary_url coverage_kind = dental" do
           render "shared/comparison", :qhps => mock_qhps
           expect(rendered).to_not have_selector('a', text: 'DRUG LIST')
