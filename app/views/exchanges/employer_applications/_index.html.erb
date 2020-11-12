@@ -38,11 +38,13 @@
                   Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" style="padding:10px">
-                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="cancel-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.cancel") %></li>
-                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="terminate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.terminate") %></li>
-                    <%if ::EnrollRegistry.feature_enabled?(:benefit_application_reinstate)%>
-                      <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.terminated_on %>', '')" class="reinstate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.reinstate") %></li>
+                  <li onclick="pyAction('cancel','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="cancel-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.cancel") %></li>
+                  <li onclick="pyAction('terminate','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="terminate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.terminate") %></li>
+                  <%if ::EnrollRegistry.feature_enabled?(:benefit_application_reinstate)%>
+                    <%if display_reinstate_benefit_application?(application) %>
+                      <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @benefit_sponsorship.id %>', '<%= application.terminated_on %>', '')" class="reinstate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.reinstate") %></li>
                     <%end%>
+                  <%end%>
                 </ul>
               </div>
               
