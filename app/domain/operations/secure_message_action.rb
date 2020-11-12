@@ -7,7 +7,7 @@ module Operations
   class SecureMessageAction
     send(:include, Dry::Monads[:result, :do, :try])
 
-    def call(params:, user:)
+    def call(params:, user: nil)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
       uploaded_doc = yield upload_document(resource, validate_params, user) if params[:file].present?
