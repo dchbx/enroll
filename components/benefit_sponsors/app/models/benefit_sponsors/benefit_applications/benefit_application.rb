@@ -117,6 +117,7 @@ module BenefitSponsors
     field :termination_kind,       type: String
     field :termination_reason,     type: String
 
+    field :cancellation_reason,     type: String
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
@@ -837,6 +838,7 @@ module BenefitSponsors
       state :expired,    :after_enter => :transition_benefit_package_members  # Non-published plans are expired following their end on date
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
 
+      state :retroactive_cancel,   :after_enter => [:set_cancellation_reason, :transition_benefit_package_members]  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
@@ -936,6 +938,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
+        transitions from: :active, to: :retroactive_cancel  # Enrollment cancelled after it became active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
           to:     :canceled
       end
@@ -1179,6 +1182,10 @@ module BenefitSponsors
 
     def set_expiration_date
       update_attribute(:expiration_date, effective_period.min) unless expiration_date
+    end
+
+    def set_cancellation_reason
+      update_attribute(:cancellation_reason, "retroactive_cancel")
     end
 
     def refresh_recorded_rating_area
