@@ -1,4 +1,6 @@
 require "rails_helper"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each do
   before do
@@ -475,6 +477,65 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         it "when cobra employee has no enrollments" do
           allow(census_employee).to receive(:has_cobra_hbx_enrollment?).and_return false
           expect(helper.employee_state_format(census_employee, census_employee.aasm_state, nil)).to eq "Cobra linked"
+        end
+      end
+    end
+
+    describe "display_reinstate_benefit_application?" do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:effective_period) { start_on..end_on }
+
+      let(:display_reinstate_ba) {helper.display_reinstate_benefit_application?(initial_application)}
+
+      context "benefit application effective period start on with in past 12 months" do
+        let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month - 1.year }
+        let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month }
+        let(:cancel_end_on) { TimeKeeper.date_of_record.end_of_month }
+
+        it 'For terminated benefit_application' do
+          initial_application.update_attributes!(aasm_state: :terminated)
+          expect(initial_application.aasm_state).to eq :terminated
+          expect(display_reinstate_ba).to eq true
+        end
+
+        it 'For termiantion_pending benefit_application' do
+          initial_application.update_attributes!(aasm_state: :termination_pending)
+          expect(initial_application.aasm_state).to eq :termination_pending
+          expect(display_reinstate_ba).to eq true
+        end
+
+        it 'For retroactive cancel benefit_application' do
+          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
+          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          expect(display_reinstate_ba).to eq true
+        end
+      end
+
+      context "benefit application effective period start on not with in past 12 months" do
+        let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 1.year }
+        let(:end_on) { TimeKeeper.date_of_record.end_of_month }
+        let(:cancel_end_on)  { TimeKeeper.date_of_record.prev_month.end_of_month }
+
+        it 'For terminated benefit_application' do
+          initial_application.update_attributes!(aasm_state: :terminated)
+          expect(initial_application.aasm_state).to eq :terminated
+          expect(display_reinstate_ba).to eq false
+        end
+
+        it 'For termiantion_pending benefit_application' do
+          initial_application.update_attributes!(aasm_state: :termination_pending)
+          expect(initial_application.aasm_state).to eq :termination_pending
+          expect(display_reinstate_ba).to eq false
+        end
+
+        it 'For retroactive cancel benefit_application' do
+          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.update_attributes!(aasm_state: :retroactive_cancel)
+          expect(initial_application.aasm_state).to eq :retroactive_cancel
+          expect(display_reinstate_ba).to eq false
         end
       end
     end
