@@ -742,11 +742,7 @@ module BenefitSponsors
 
     def send_employee_renewal_invites
       benefit_sponsorship.census_employees.non_terminated.each do |ce|
-        if is_off_cycle?
-          ::Invitation.invite_initial_employee!(ce)
-        else
           ::Invitation.invite_renewal_employee!(ce)
-        end
       end
     end
 
@@ -764,7 +760,11 @@ module BenefitSponsors
 
     def send_employee_invites
       if is_renewing?
-        notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+        if is_off_cycle?
+          notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+        else
+          notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+        end
       elsif enrollment_open?
         notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
       else
