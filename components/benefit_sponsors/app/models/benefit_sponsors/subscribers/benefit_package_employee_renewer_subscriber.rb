@@ -78,6 +78,32 @@ module BenefitSponsors
         )
       end
 
+      def report_enrollment_renewal_exception(hbx_enrollment, exception)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee.renewal_enrollment_exception", {
+            :return_status => "500",
+            :hbx_enrollment_id => hbx_enrollment.id,
+            :body => JSON.dump(
+              {
+                :error => exception.inspect,
+                :message => exception.message,
+                :backtrace => exception.backtrace
+              }
+            )
+          }.merge(extract_response_params(@renewal_message_properties))
+        )
+      end
+
+      def report_enrollment_save_renewal_failure(hbx_enrollment, model_errors)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee.renewal_enrollment_save_failed", {
+            :return_status => "500",
+            :hbx_enrollment_id => hbx_enrollment.id,
+            :body => JSON.dump(model_errors.to_hash)
+          }.merge(extract_response_params(@renewal_message_properties))
+        )
+      end
+
       private
 
       def run_validations(stringed_payload)

@@ -302,7 +302,7 @@ module BenefitSponsors
             next if renewing_enrollment.present?
 
             if hbx_enrollment && is_renewal_benefit_available?(hbx_enrollment)
-              renewed_enrollment = hbx_enrollment.renew_benefit(self)
+              renewed_enrollment = hbx_enrollment.renew_benefit(self, result_reporter)
             end
 
             trigger_renewal_model_event(sponsored_benefit, census_employee, renewed_enrollment)
