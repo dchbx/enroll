@@ -2,12 +2,17 @@
 
 module Operations
   module HbxEnrollments
+    # This class reinstates a coverage_canceled/coverage_terminated/
+    # coverage_termination_pending hbx_enrollment where end result
+    # is a new hbx_enrollment. The effective_period of the newly
+    # created hbx_enrollment depends on the aasm_state of the input
+    # hbx_enrollment. The aasm_state of the newly created application
+    # will be shopping. Currently, this operation does not account for
+    # APTC related values yet for IVL cases.
     class Reinstate
       include Dry::Monads[:result, :do]
 
       # @param [ HbxEnrollment ] hbx_enrollment
-      # @param [ Date ] new_enrollment_effective_on Hbx Enrollment effective_on
-      # @param [ Float ] new_aptc Hbx Enrollment applied_aptc_amount
       # @return [ HbxEnrollment ] hbx_enrollment
       def call(params)
         values           = yield validate(params)
@@ -117,18 +122,26 @@ module Operations
 
       def additional_attrs
         if @current_enr.is_shop?
-          {employee_role_id: @current_enr.employee_role_id,
-           benefit_group_assignment_id: @reinstate_bga_id,
-           sponsored_benefit_package_id: @reinstate_sbp.id,
-           sponsored_benefit_id: @reinstate_sb.id,
-           benefit_sponsorship_id: @current_enr.benefit_sponsorship_id,
-           product_id: @reinstate_plan.id,
-           rating_area_id: @reinstate_rating_area,
-           issuer_profile_id: @reinstate_plan.issuer_profile_id}
+          shop_attributes
         elsif @current_enr.is_ivl_by_kind?
-          {product_id: @current_enr.product_id,
-           consumer_role_id: @current_enr.consumer_role_id}
+          ivl_attributes
         end
+      end
+
+      def shop_attributes
+        {employee_role_id: @current_enr.employee_role_id,
+         benefit_group_assignment_id: @reinstate_bga_id,
+         sponsored_benefit_package_id: @reinstate_sbp.id,
+         sponsored_benefit_id: @reinstate_sb.id,
+         benefit_sponsorship_id: @current_enr.benefit_sponsorship_id,
+         product_id: @reinstate_plan.id,
+         rating_area_id: @reinstate_rating_area,
+         issuer_profile_id: @reinstate_plan.issuer_profile_id}
+      end
+
+      def ivl_attributes
+        {product_id: @current_enr.product_id,
+         consumer_role_id: @current_enr.consumer_role_id}
       end
     end
   end
