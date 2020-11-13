@@ -187,7 +187,7 @@ function pyAction(action, id, employer_id, term_date, start_on) {
   showPlanYearActions(id);
   showEndDateField();
   if (action == "reinstate") {
-    disableDatePicker();
+    initDatePicker();
     $('input#datepicker').val(<%= Date.today %>);
     hideTerminationRadios();
     enableSubmitButton()
