@@ -2723,18 +2723,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:termination_date) {myc_application.start_on.prev_day}
 
       before do
+        benefit_sponsorship.benefit_applications.each do |ba|
+          next if ba == myc_application
+          updated_dates = benefit_application.effective_period.min.to_date..termination_date.to_date
+          ba.update_attributes!(:effective_period => updated_dates)
+          ba.terminate_enrollment!
+        end
         benefit_sponsorship.benefit_applications << myc_application
         benefit_sponsorship.save
+        census_employee.benefit_group_assignments.first.reload
       end
 
       it "should return mid year benefit_package if given effective_on date is in both imported & mid year benefit application" do
         coverage_date = myc_application.start_on
         mid_year_benefit_group_assignment
-        census_employee.benefit_group_assignments.where(:benefit_package_id.in => benefit_application.benefit_packages.map(&:id)).each do |bga|
-          # when there is both MYC & Imported Plan years, is_active for imported plan year's bga's should be false
-          # to allow plan shop through myc plan years
-          bga.update!(end_on: termination_date)
-        end
         expect(census_employee.benefit_package_for_date(coverage_date)).to eq myc_application.benefit_packages.first
       end
     end
