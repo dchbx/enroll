@@ -279,10 +279,10 @@ module BenefitSponsors
       #        supposed to return when things go correctly?
       def renew_member_benefit(census_employee, result_reporter = SilentRenewalReporter.new)
         employee_role = census_employee.employee_role
-        result_reporter.report_renewal_failure(census_employee, self, "no employee_role")
+        result_reporter.report_renewal_failure(census_employee, self, "no employee_role") unless employee_role
         return [false, "no employee_role"] unless employee_role
         family = employee_role.primary_family
-        result_reporter.report_renewal_failure(census_employee, self, "family missing for #{census_employee.full_name}")
+        result_reporter.report_renewal_failure(census_employee, self, "family missing for #{census_employee.full_name}") if family.blank?
         return [false, "family missing for #{census_employee.full_name}"] if family.blank?
 
         # family.validate_member_eligibility_policy
