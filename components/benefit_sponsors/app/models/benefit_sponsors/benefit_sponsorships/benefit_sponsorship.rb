@@ -434,7 +434,12 @@ module BenefitSponsors
     end
 
     def published_benefit_application
-      benefit_applications.submitted.where(:id.ne => off_cycle_benefit_application&.id).last
+      benefit_applications.submitted.where(:id.ne => off_cycle_benefit_application&.id).last || published_off_cycle_application
+    end
+
+    def published_off_cycle_application
+      approved_states = BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES
+      off_cycle_benefit_application if approved_states.include?(off_cycle_benefit_application&.aasm_state)
     end
 
     def submitted_benefit_application
