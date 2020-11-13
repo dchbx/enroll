@@ -288,6 +288,10 @@ module Employers::EmployerHelper
     Settings.aca.employer_has_sic_field
   end
 
+  def display_referred_by_field_for_employer?
+    Settings.aca.employer_registration_has_referred_by_field
+  end
+
   def check_for_canceled_wst?(application)
     application.workflow_state_transitions.any?{|wst| wst.from_state.to_s == "active" && wst.to_state.to_s == "canceled"}
   end
