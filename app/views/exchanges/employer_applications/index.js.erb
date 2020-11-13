@@ -45,7 +45,7 @@ function populateDropDown(status) {
 
   var cancel_states = ["approved", "pending", "draft", "imported", "enrollment_open", "enrollment_extended", "enrollment_closed", "enrollment_eligible", "binder_paid", "enrollment_ineligible", "active"]
   var term_states = ["active", "suspended", "expired", "termination_pending"]
-  var reinstate_states = []
+  var reinstate_states = ["terminated", "termination_pending", "retroactive_cancel", "canceled"]
 
   if (cancel_states.indexOf(status) > -1) {
     $('li.cancel-py').removeClass('blocking');
