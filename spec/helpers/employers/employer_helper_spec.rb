@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -512,6 +514,14 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           expect(initial_application.aasm_state).to eq :retroactive_cancel
           expect(display_reinstate_ba).to eq true
         end
+
+        it 'For canceled benefit_application' do
+          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.cancel!
+          initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+          expect(initial_application.aasm_state).to eq :canceled
+          expect(display_reinstate_ba).to eq true
+        end
       end
 
       context "benefit application effective period start on not with in past 12 months" do
@@ -535,6 +545,14 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
           initial_application.update_attributes!(aasm_state: :retroactive_cancel)
           expect(initial_application.aasm_state).to eq :retroactive_cancel
+          expect(display_reinstate_ba).to eq false
+        end
+
+        it 'For canceled benefit_application' do
+          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.cancel!
+          initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+          expect(initial_application.aasm_state).to eq :canceled
           expect(display_reinstate_ba).to eq false
         end
       end

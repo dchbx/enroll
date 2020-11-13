@@ -288,12 +288,12 @@ module Employers::EmployerHelper
     Settings.aca.employer_has_sic_field
   end
 
-  def display_referred_by_field_for_employer?
-    Settings.aca.employer_registration_has_referred_by_field
+  def check_for_canceled_wst?(application)
+    application.workflow_state_transitions.any?{|wst| wst.from_state.to_s == "active" && wst.to_state.to_s == "canceled"}
   end
 
   def display_reinstate_benefit_application?(application)
-    return false unless [:terminated, :termination_pending, :retroactive_cancel].include?(application.aasm_state)
+    return false unless [:terminated, :termination_pending, :retroactive_cancel].include?(application.aasm_state) || (application.canceled? && check_for_canceled_wst?(application))
     current_month = TimeKeeper.date_of_record.beginning_of_month
     ((current_month - 11.months)..current_month).cover?(application.effective_period.min.to_date)
   end
