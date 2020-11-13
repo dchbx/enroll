@@ -127,10 +127,12 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
       let(:audience_ids) { ['1234', '1235'] }
       let(:audience_type) { 'employee' }
       let(:session) do
-        { bulk_notice: {
+        {
+          bulk_notice: {
             audience: { '1234' => { id: '1', fein: '1', hbx_id: '1234', types: ['general_agency'] },
-                        '1235' => { id: '2', fein: '2', hbx_id: '1235', types: ['general_agency'] }}
-        } }
+                        '1235' => { id: '2', fein: '2', hbx_id: '1235', types: ['general_agency'] } }
+          }
+        }
       end
 
       before { reflex.run(:audience_select) }
@@ -147,10 +149,12 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
       let(:audience_ids) { ['1234', '1235'] }
       let(:audience_type) { 'employee' }
       let(:session) do
-        { bulk_notice: {
+        {
+          bulk_notice: {
             audience: { '1234' => { id: '1', fein: '1', hbx_id: '1234', types: ['employer'] },
-                        '1235' => { id: '2', fein: '2', hbx_id: '1235', types: ['employer'] }}
-        } }
+                        '1235' => { id: '2', fein: '2', hbx_id: '1235', types: ['employer'] } }
+          }
+        }
       end
 
       before { reflex.run(:audience_select) }
