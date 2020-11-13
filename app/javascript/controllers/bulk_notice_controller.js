@@ -12,12 +12,18 @@ export default class extends Controller {
   newIdentifierSuccess(element) {
     element.value = '';
     this.displayExpandLink()
+    this.identifierErrorCheck()
+  }
+
+  audienceSelectSuccess() {
+    this.identifierErrorCheck()
   }
 
   deleteIdentifier(event) {
     let identifierEl = event.currentTarget.closest('span.badge')
     identifierEl.remove()
     this.displayExpandLink()
+    this.identifierErrorCheck()
     event.preventDefault()
     return false
   }
@@ -38,14 +44,31 @@ export default class extends Controller {
 
   displayExpandLink() {
     let filter = Array.prototype.filter,
-        result = this.recipientListTarget.querySelectorAll('span.badge'),
-        hidden = filter.call(result, (badge) => { return badge.offsetTop > this.recipientListTarget.offsetHeight });
+        badges = this.recipientListTarget.querySelectorAll('span.badge'),
+        hidden = filter.call(badges, (badge) => { return badge.offsetTop > this.recipientListTarget.offsetHeight });
 
     if (hidden.length) {
       this.moreRecipientsTarget.classList.remove('d-none')
       this.moreRecipientsTarget.innerText = this.moreRecipientsTarget.innerText.replace(/\d+/, hidden.length)
     } else
       this.moreRecipientsTarget.classList.add('d-none')
+  }
+
+  identifierErrorCheck() {
+    let filter = Array.prototype.filter,
+        badges = this.recipientListTarget.querySelectorAll('span.badge'),
+        wrong_type = filter.call(badges, (badge) => { return badge.getAttribute('title') == "Wrong audience type" }),
+        not_found = filter.call(badges, (badge) => { return badge.getAttribute('title') == "Not found" })
+
+    let textarea = document.querySelector('#bulk-notice-audience-identifiers')
+    if (wrong_type.length && not_found.length)
+      textarea.setCustomValidity('Wrong audience type and IDs are not found')
+    else if (wrong_type.length)
+      textarea.setCustomValidity('Wrong audience type')
+    else if (not_found.length)
+      textarea.setCustomValidity('IDs not found')
+    else
+      textarea.setCustomValidity('')
   }
 
   expandRecipients(event) {
