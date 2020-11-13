@@ -500,6 +500,10 @@ module BenefitSponsors
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
     end
 
+    def is_enrolling?
+      ENROLLING_STATES.include?(aasm_state)
+    end
+
     def open_enrollment_contains?(date)
       open_enrollment_period.cover?(date)
     end

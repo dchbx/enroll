@@ -605,13 +605,16 @@ class CensusEmployee < CensusMember
     return unless active_assignment&.benefit_package.present?
 
     renewal_begin_date = active_assignment.benefit_package.end_on.next_day
-    benefit_package_assignment_on(renewal_begin_date)
+    renewal_assignment = benefit_package_assignment_on(renewal_begin_date)
+    return nil if renewal_assignment&.benefit_package&.benefit_application == benefit_sponsorship.off_cycle_benefit_application
+
+    renewal_assignment
   end
 
   def off_cycle_benefit_group_assignment
-    return if active_benefit_group_assignment.nil? || benefit_sponsorship.nil?
-
     off_cycle_app = benefit_sponsorship.off_cycle_benefit_application
+    return if active_benefit_group_assignment.nil? || benefit_sponsorship.nil? || off_cycle_app.nil?
+
     benefit_package_ids = off_cycle_app.benefit_packages.map(&:id)
     benefit_group_assignments.detect { |benefit_group_assignment| benefit_package_ids.include?(benefit_group_assignment.benefit_package.id) && benefit_group_assignment.is_active?(off_cycle_app.start_on) }
   end
@@ -1543,9 +1546,10 @@ class CensusEmployee < CensusMember
   end
 
   def benefit_package_for_date(coverage_date)
-    benefit_assignment = benefit_group_assignment_for_date(coverage_date)
+    # benefit_assignment = benefit_group_assignment_for_date(coverage_date)
+    benefit_assignment = benefit_package_assignment_on(coverage_date)
     benefit_package = benefit_assignment.benefit_package if benefit_assignment.present?
-    (benefit_package.present? && benefit_package.is_conversion?) ? nil : benefit_package
+    benefit_package&.is_conversion? ? nil : benefit_package
   end
 
   # Retrieves the benefit_group_assignment that covers the passed +coverage_date+
