@@ -16,7 +16,9 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
-  mount Sidekiq::Web => '/sidekiq'
+  authenticate :user, lambda { |u| u.has_hbx_staff_role? } do
+    mount Sidekiq::Web => '/sidekiq'
+  end
 
   namespace :uis do
     resources :bootstrap3_examples do
