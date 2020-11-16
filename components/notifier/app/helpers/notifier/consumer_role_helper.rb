@@ -79,13 +79,13 @@ module Notifier
     end
 
     def ivl_oe_start_date_value
-      Settings.aca.individual_market.upcoming_open_enrollment.start_on.strftime('%B %d, %Y')
+      Settings.aca.individual_market.open_enrollment.start_on.strftime('%B %d, %Y')
     end
 
     def ivl_oe_end_date_value
       Settings.aca
               .individual_market
-              .upcoming_open_enrollment
+              .open_enrollment
               .end_on.strftime('%B %d, %Y')
     end
 
