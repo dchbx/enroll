@@ -53,6 +53,8 @@ class Insured::GroupSelectionController < ApplicationController
       @new_effective_on = new_effective_date
     end
 
+    @ivl_effective_on_date = @adapter.calculate_ivl_effective_on
+
     @waivable = @adapter.can_waive?(@hbx_enrollment, params)
     @fm_hash = {}
     # Only check eligibility for *active* family members because
