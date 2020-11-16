@@ -1,5 +1,5 @@
 <div class=" container personal-info-container no-pd">
-  <%= form_for @person, url: update_personal_info_person_path, method: :put, html: { class: "personal_information_form" } do |f|%>
+  <%= form_for @person, url: update_personal_info_person_path(id: @person.id), method: :put, html: { class: "personal_information_form" } do |f|%>
     <h4 class="personal-info-heading"> <%= l10n("personal")%> </h4>
     <div class="col-md-12 no-pd">
       <div class="row">
@@ -40,7 +40,7 @@
 
         <div class="col-md-3">
           <label for="inputGender" class="personal-info-label"><%= l10n("gender")%></label>
-          <%= f.select :gender, [ 'Male', 'Female' ], { :prompt => 'Choose one...' }, { :class => 'form-control'} %>
+          <%= f.select :gender, [ 'Choose *','Male', 'Female' ], { :prompt => 'Choose one...' }, { :class => 'form-control'} %>
         </div>
       </div>
     </div>
