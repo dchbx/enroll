@@ -279,21 +279,20 @@ class PeopleController < ApplicationController
   end
 
   def manage_account
-    @person = Person.find(params[:id])
-    respond_to do |format|
-      format.html
-    end
+    @person = find_person(params[:id])
+    render :manage_account
   end
 
   def personal_info
-    @person = Person.find(params[:id])
+    @person = find_person(params[:id])
+    render :personal_info
   end
 
   def update_personal_info
-    @person = Person.find(params[:id])
+    @person = find_person(params[:id])
     respond_to do |format|
       if @person.update_attributes(person_params)
-        format.html {  redirect_back fallback_location: '/', notice: 'Person was successfully updated.' }
+        format.html {  redirect_back fallback_location: '/', notice: 'Person successfully updated.' }
       else
         person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
         format.html { redirect_back fallback_location: '/',  alert: "Person update failed. #{person_error_megs}" }
