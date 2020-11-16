@@ -742,7 +742,7 @@ module BenefitSponsors
 
     def send_employee_renewal_invites
       benefit_sponsorship.census_employees.non_terminated.each do |ce|
-          ::Invitation.invite_renewal_employee!(ce)
+        ::Invitation.invite_renewal_employee!(ce)
       end
     end
 
