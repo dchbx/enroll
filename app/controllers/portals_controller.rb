@@ -8,10 +8,12 @@ class PortalsController < ApplicationController
   before_action :find_person
 
   def index
-    @person = Person.find(params[:id])
+    render :index
   end
 
-  def show; end
+  def show
+    render :show
+  end
 
   def new
     @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
