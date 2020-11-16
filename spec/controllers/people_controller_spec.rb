@@ -202,14 +202,14 @@ RSpec.describe PeopleController, dbclean: :after_each do
       person_params[:phones_attributes] = invalid_phones_attributes
       put :update_personal_info, params: {person: person_params, id: person.id}
       expect(response).to have_http_status(:redirect)
-      expect(flash[:alert]).to match(/Person update failed /)
+      expect(flash[:alert]).to match('Person update failed. Phones is invalid')
     end
 
     it 'should update existing person with valid phone numbe' do
       person_params[:phones_attributes] = valid_phones_attributes
       put :update_personal_info, params: {person: person_params, id: person.id}
       expect(response).to have_http_status(:redirect)
-      expect(flash[:notice]).to match(/Person successfully updated /)
+      expect(flash[:notice]).to match('Person successfully updated.')
     end
   end
 end
