@@ -67,7 +67,7 @@ module SponsoredBenefits
         }
       end
 
-      let(:flexible_rules_enabled) { AcaHelperModStubber.flexible_contribution_model_enabled_for_bqt_for_period.cover?(benefit_application.effective_period.min.to_date) }
+      let(:flexible_rules_enabled) { AcaHelperModStubber.flexible_contribution_model_enabled_for_bqt_for_initial_period.cover?(benefit_application.effective_period.min.to_date) }
 
       before do
         benefit_application.benefit_groups.delete_all
