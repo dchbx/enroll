@@ -3724,3 +3724,49 @@ describe ".parent enrollments", dbclean: :around_each do
     end
   end
 end
+
+describe 'calculate effective_on' do
+
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:service) {BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application)}
+  let(:start_on) {TimeKeeper.date_of_record.next_month.beginning_of_month}
+  let(:open_enrollment_start_on) {TimeKeeper.date_of_record.beginning_of_month}
+  let!(:off_cycle_application) do
+    application = FactoryBot.create(
+      :benefit_sponsors_benefit_application,
+      :with_benefit_sponsor_catalog,
+      :with_benefit_package,
+      benefit_sponsorship: benefit_sponsorship,
+      fte_count: 8,
+      aasm_state: "enrollment_open",
+      effective_period: start_on..start_on.next_year.prev_day,
+      open_enrollment_period: open_enrollment_start_on..(open_enrollment_start_on + 9.days)
+    )
+    application.benefit_sponsor_catalog.save!
+    application
+  end
+  let(:person)       { FactoryBot.create(:person, :with_family) }
+  let(:family)       { person.primary_family }
+  let(:census_employee) { create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
+  let(:employee_role) { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, person: person, census_employee_id: census_employee.id) }
+  let(:calculated_effective_on) do
+    HbxEnrollment.calculate_effective_on_from(
+      market_kind: 'shop',
+      qle: false,
+      family: family,
+      employee_role: employee_role,
+      benefit_group: nil,
+      benefit_sponsorship: HbxProfile.current_hbx.try(:benefit_sponsorship)
+    )
+  end
+
+  before do
+    service.schedule_termination(TimeKeeper.date_of_record.end_of_month, TimeKeeper.date_of_record, "voluntary", "test", false)
+  end
+
+  it 'effective date on CCHH page should return off_cycle_application effective date' do
+    expect(calculated_effective_on).to eq off_cycle_application.effective_period.min
+  end
+end
