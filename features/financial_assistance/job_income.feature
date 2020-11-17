@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 Feature: Start a new Financial Assistance Application and fills out the job and self employed income forms
+  @flaky
 
   Background: User logs in and visits applicant's Job income page
     Given a consumer, with a family, exists
