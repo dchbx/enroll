@@ -254,7 +254,7 @@ module BenefitSponsors
         #        as I am not sure what tests rely on renewal.
         #        Correct and updates specs IMMEDIATELY.
 
-        census_employees_assigned_on(effective_period.min, false).each do |member| 
+        census_employees_assigned_on(effective_period.min, false).each do |member|
           if Rails.env.test?
             renew_member_benefit(member)
           else
@@ -289,7 +289,7 @@ module BenefitSponsors
         if true #family.is_valid?
 
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
-          .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
+                              .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
           renewing_enrollments = family.active_household.hbx_enrollments.enrolled_waived_and_renewing
                                        .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(effective_period)
@@ -361,7 +361,7 @@ module BenefitSponsors
           end
         end
       end
- 
+
       def terminate_member_benefits(term_date: nil, enroll_term_reason: nil, enroll_notify: false)
         terminate_benefit_group_assignments
         enrolled_and_terminated_families.each do |family|
