@@ -6,6 +6,7 @@ module Exchanges
 
     before_action :unread_messages
     before_action :set_current_user
+    before_action :perform_authorization
 
     def index
       @bulk_notices = Admin::BulkNotice.all.order([:updated_at, :desc])
@@ -59,6 +60,10 @@ module Exchanges
     def unread_messages
       profile = current_user.person.try(:hbx_staff_role).try(:hbx_profile)
       @unread_messages = profile.inbox.unread_messages.try(:count) || 0
+    end
+
+    def perform_authorization
+      authorize HbxProfile, :can_send_secure_message?
     end
   end
 end
