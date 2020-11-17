@@ -12,6 +12,8 @@ module BenefitSponsors
       attribute :reference_product,           ::BenefitMarkets::Entities::Product
       attribute :sponsor_contribution,        BenefitSponsors::Entities::SponsorContribution
       attribute :pricing_determinations,      Types::Array.of(BenefitSponsors::Entities::PricingDetermination)
+
+      attribute :_type,                       Types::Strict::String.optional.meta(omittable: true)
     end
   end
 end
