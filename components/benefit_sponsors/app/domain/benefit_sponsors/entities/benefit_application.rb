@@ -20,6 +20,8 @@ module BenefitSponsors
       attribute :benefit_sponsor_catalog_id,  Types::Bson
       attribute :termination_kind,            Types::String.optional
       attribute :termination_reason,          Types::String.optional
+      attribute :reinstated_id,               Types::Bson.optional.meta(omittable: true)
+
       attribute :benefit_packages,            Types::Array.of(::BenefitSponsors::Entities::BenefitPackage).optional.meta(omittable: true)
 
       def is_termed_or_ineligible?
