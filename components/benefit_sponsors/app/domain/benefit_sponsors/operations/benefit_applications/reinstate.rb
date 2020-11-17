@@ -20,8 +20,7 @@ module BenefitSponsors
         # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         def call(params)
           values              = yield validate(params)
-          effective_period    = yield effective_period_range(values)
-          new_ba              = yield new_benefit_application(values, effective_period)
+          new_ba              = yield new_benefit_application(values)
           benefit_application = yield reinstate(new_ba)
 
           Success(benefit_application)
@@ -34,28 +33,40 @@ module BenefitSponsors
           return Failure('Not a valid Benefit Application object.') unless params[:benefit_application].is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
           valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled]
           return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(params[:benefit_application].aasm_state)
+          return Failure('Overlapping BenefitApplication exists for this Employer.') if overlapping_ba_exists?(params)
 
           Success(params)
+        end
+
+        def overlapping_ba_exists?(params)
+          @effective_period = effective_period_range(params)
+          # benefit_sponsorship = params[:benefit_application].benefit_sponsorship
+          # benefit_sponsorship.benefit_applications.non_canceled.any?{|ba| ba.effective_period.cover?(@effective_period.min)}
+
+          # TODO: Refactor this code while working on ticket 90968.
+          false
         end
 
         def effective_period_range(params)
           current_ba = params[:benefit_application]
           case current_ba.aasm_state
           when :terminated
-            Success((current_ba.terminated_on + 1.day)..current_ba.effective_period.max)
+            (current_ba.terminated_on + 1.day)..current_ba.effective_period.max
           when :termination_pending
-            Success((current_ba.terminated_on + 1.day)..current_ba.effective_period.max)
+            (current_ba.terminated_on + 1.day)..current_ba.effective_period.max
           when :canceled
-            Success(current_ba.effective_period)
-          else
-            Failure("Cannot determine effective_period because of the aasm_state: #{current_ba.aasm_state}")
+            current_ba.effective_period
           end
         end
 
-        def new_benefit_application(params, effective_period)
-          clone_result = Clone.new.call({benefit_application: params[:benefit_application], effective_period: effective_period})
+        def new_benefit_application(params)
+          clone_result = Clone.new.call({benefit_application: params[:benefit_application], effective_period: @effective_period})
           return clone_result if clone_result.failure?
           new_ba = clone_result.success
+
+          # TODO: Create a new benefit_sponsor_catalog and assign this to the benefit_application
+          # current_ba = params[:benefit_application]
+          # current_ba.benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)
           new_ba.assign_attributes({reinstated_id: params[:benefit_application].id})
           new_ba.save!
           Success(new_ba)
