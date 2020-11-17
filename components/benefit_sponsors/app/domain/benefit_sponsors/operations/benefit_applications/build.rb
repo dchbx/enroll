@@ -6,6 +6,8 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitApplications
+      # This class initializes a benefit_application entity after
+      # validating the incoming benefit_application params.
       class Build
         include Dry::Monads[:result, :do]
 

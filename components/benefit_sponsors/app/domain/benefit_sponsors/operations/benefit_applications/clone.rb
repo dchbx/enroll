@@ -41,11 +41,10 @@ module BenefitSponsors
           ba_params = current_ba.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_packages, :workflow_state_transitions)
           ba_params.merge!({aasm_state: :draft,
                             effective_period: values[:effective_period],
-                            reinstated_id: current_ba.id,
+                            reinstated_id: nil,
                             termination_on: nil,
                             termination_kind: '',
                             termination_reason: ''})
-          ba_params.merge!({expiration_date: ba_params[:expiration_date].to_datetime}) if ba_params[:expiration_date].present?
           ba_params[:benefit_packages] = benefit_packages_params(current_ba)
           Success(ba_params)
         end
