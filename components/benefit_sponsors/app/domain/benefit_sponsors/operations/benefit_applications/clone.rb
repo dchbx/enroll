@@ -38,13 +38,8 @@ module BenefitSponsors
 
         def construct_params(values)
           current_ba = values[:benefit_application]
-          ba_params = current_ba.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_packages, :workflow_state_transitions)
-          ba_params.merge!({aasm_state: :draft,
-                            effective_period: values[:effective_period],
-                            reinstated_id: nil,
-                            termination_on: nil,
-                            termination_kind: '',
-                            termination_reason: ''})
+          ba_params = current_ba.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :reinstated_id, :terminated_on, :termination_kind, :termination_reason, :benefit_packages, :workflow_state_transitions)
+          ba_params.merge!({aasm_state: :draft, effective_period: values[:effective_period]})
           ba_params[:benefit_packages] = benefit_packages_params(current_ba)
           Success(ba_params)
         end
