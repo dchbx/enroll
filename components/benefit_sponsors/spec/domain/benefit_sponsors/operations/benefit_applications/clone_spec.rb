@@ -47,7 +47,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
       end
     end
 
-    context 'reinstate terminated benefit application' do
+    context 'clone terminated benefit application' do
       before do
         initial_application.terminate_enrollment!
         initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
@@ -69,9 +69,13 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
       it 'should return a non persisted BenefitApplication' do
         expect(@new_ba.persisted?).to be_falsy
       end
+
+      it 'should not copy reinstated_id' do
+        expect(@new_ba.reinstated_id).to be_nil
+      end
     end
 
-    context 'reinstate canceled benefit application' do
+    context 'clone canceled benefit application' do
       before do
         initial_application.cancel!
         @new_ba = subject.call({benefit_application: initial_application, effective_period: initial_application.effective_period}).success
@@ -88,9 +92,13 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
       it 'should return a non persisted BenefitApplication' do
         expect(@new_ba.persisted?).to be_falsy
       end
+
+      it 'should not copy reinstated_id' do
+        expect(@new_ba.reinstated_id).to be_nil
+      end
     end
 
-    context 'reinstate termination_pending benefit application' do
+    context 'clone termination_pending benefit application' do
       before do
         initial_application.schedule_enrollment_termination!
         initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record + 1.month).end_of_month)
@@ -111,6 +119,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
 
       it 'should return a non persisted BenefitApplication' do
         expect(@new_ba.persisted?).to be_falsy
+      end
+
+      it 'should not copy reinstated_id' do
+        expect(@new_ba.reinstated_id).to be_nil
       end
     end
   end
