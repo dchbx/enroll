@@ -263,14 +263,14 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       it "should have open enrollment start date" do
         expect(subject.ivl_oe_start_date). to eq(Settings.aca
                                                 .individual_market
-                                                .upcoming_open_enrollment
+                                                .open_enrollment
                                                 .start_on.strftime('%B %d, %Y'))
       end
 
       it "should have open enrollment end date" do
         expect(subject.ivl_oe_end_date). to eq(Settings.aca
                                               .individual_market
-                                              .upcoming_open_enrollment
+                                              .open_enrollment
                                               .end_on.strftime('%B %d, %Y'))
       end
     end

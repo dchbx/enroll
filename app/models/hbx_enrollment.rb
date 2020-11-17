@@ -55,6 +55,8 @@ class HbxEnrollment
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
+  ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
+
 
   WAIVER_REASONS = [
       "I have coverage through spouse’s employer health plan",
@@ -469,15 +471,18 @@ class HbxEnrollment
     )
   end
 
-  def renew_benefit(new_benefit_package)
+  def renew_benefit(new_benefit_package, result_reporter = ::BenefitSponsors::BenefitPackages::SilentRenewalReporter.new)
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
         assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+      else
+        result_reporter.report_enrollment_save_renewal_failure(self, self.errors)
       end
       enrollment
     rescue Exception => e
+      result_reporter.report_enrollment_renewal_exception(self, e)
     end
   end
 
@@ -738,7 +743,7 @@ class HbxEnrollment
   end
 
   def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
+    self.terminated_on = term_date
     if benefit_group_assignment
       benefit_group_assignment.end_benefit(terminated_on)
       benefit_group_assignment.save
@@ -1235,6 +1240,44 @@ class HbxEnrollment
     family.is_under_special_enrollment_period?
   end
 
+  def can_make_changes?
+    return false if coverage_canceled?
+    if is_shop?
+      can_make_changes_for_shop_enrollment?
+    else
+      can_make_changes_for_ivl_enrollment?
+    end
+  end
+
+  def can_make_changes_for_shop_enrollment?
+    return false if sponsored_benefit_package.blank?
+    return true if open_enrollment_period_available?
+    return true if special_enrollment_period_available?
+    return true if new_hire_enrollment_period_available?
+    false
+  end
+
+  def can_make_changes_for_ivl_enrollment?
+    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    false
+  end
+
+  def open_enrollment_period_available?
+    return false if coverage_expired?
+    sponsored_benefit_package.open_enrollment_period.cover?(TimeKeeper.date_of_record)
+  end
+
+  def special_enrollment_period_available?
+    shop_sep = family.earliest_effective_shop_sep
+    return false unless shop_sep
+    sponsored_benefit_package.effective_period.cover?(shop_sep.effective_on)
+  end
+
+  def new_hire_enrollment_period_available?
+    return false if employee_role.blank?
+    sponsored_benefit_package.effective_on_for(employee_role.hired_on) > sponsored_benefit_package.start_on
+  end
+
   def can_complete_shopping?(options = {})
     household.family.is_eligible_to_enroll?(qle: options[:qle])
   end
@@ -1419,7 +1462,7 @@ class HbxEnrollment
           # we always have benefit group unless QLE gives an effective date before plan year start on
           # return employee_role.census_employee.coverage_effective_on if benefit_group.blank?
           # benefit_group.effective_on_for(employee_role.hired_on)
-          employee_role.census_employee.coverage_effective_on(benefit_group).to_date
+          employee_role.census_employee.coverage_effective_on
         end
       when 'individual'
         if qle && family.is_under_special_enrollment_period?

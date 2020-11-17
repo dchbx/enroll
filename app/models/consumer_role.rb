@@ -226,6 +226,10 @@ class ConsumerRole
     errors.add(:base, 'Provide SSN or check No SSN') unless ssn.present? || no_ssn == '1'
   end
 
+  def update_is_applying_coverage_status(is_applying_coverage)
+    update_attribute(:is_applying_coverage, is_applying_coverage) if is_applying_coverage == "false"
+  end
+
   def start_residency_verification_process
     notify(RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME, {:person => self.person})
   end
@@ -864,7 +868,7 @@ class ConsumerRole
 
   def check_native_status(family, native_status_changed)
     return unless native_status_changed
-    return unless family.person_has_an_active_enrollment?(person)
+    return unless family&.person_has_an_active_enrollment?(person)
 
     if person.tribal_id.present?
       fail_indian_tribe

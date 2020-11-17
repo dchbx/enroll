@@ -135,7 +135,7 @@ module Notifier
       def tax_households
         tax_households = []
         primary_member = payload['notice_params']['primary_member']
-        return [] unless primary_member['aqhp_eligible']&.upcase == "YES"
+        return [] unless aqhp_event
 
         thh = ::Notifier::Services::TaxHouseholdService.new(primary_member)
         tax_households << tax_households_hash(thh)
@@ -264,7 +264,7 @@ module Notifier
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         members = primary_member + dependent_members
-        members.compact.each do |member|
+        members.compact.uniq { |dependent| dependent['member_id'] }.each do |member|
           next if member["magi_medicaid"] != "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
@@ -279,7 +279,7 @@ module Notifier
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         members = primary_member + dependent_members
-        members.compact.each do |member|
+        members.compact.uniq { |dependent| dependent['member_id'] }.each do |member|
           next unless member["aqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)
@@ -294,7 +294,7 @@ module Notifier
         primary_member << primary_member_object
         dependent_members = payload['notice_params']['dependents']
         members = primary_member + dependent_members
-        members.compact.each do |member|
+        members.compact.uniq { |dependent| dependent['member_id'] }.each do |member|
           next unless member["uqhp_eligible"] == "Yes" || member["non_magi_medicaid"] == "Yes"
 
           fam_member = ::Notifier::Services::DependentService.new(uqhp_notice?, member, renewing_enrollments)

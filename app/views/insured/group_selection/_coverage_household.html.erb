@@ -4,7 +4,7 @@
     <% if benefit_type.present? && @hbx_enrollment.is_shop? %>
       <% current_employee_role = @hbx_enrollment.employee_role %>
     <% end %>
-    <% @coverage_household.coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
+    <% @coverage_household.valid_coverage_household_members.map(&:family_member).each_with_index do |family_member, index| %>
 
       <% if @adapter.can_shop_shop?(@person) %>
         <% is_health_coverage, is_dental_coverage = @adapter.shop_health_and_dental_attributes(family_member, (current_employee_role || @employee_role), (@effective_on_date || @new_effective_on), @qle) %>
@@ -32,8 +32,12 @@
             <td class='<%= "dental_errors_#{employee_role.id}" %>'><%= l10n("insured.group_selection.coverage_household_ineligible_coverage", coverage_kind: @coverage_kind)  if !is_dental_coverage && !is_dental_coverage.nil? %></td>
           <% end %>
 
-          <td class="ivl_errors"><%= raw(errors.join(', ')) if errors.present? %></td>
-        </tr>
+          <td class="ivl_errors">
+           <% if errors.present? %>
+             <div><%= raw(errors.join(', '))%></div>
+           <% end%>
+         </td>
+       </tr>
     <% end %>
   </tbody>
 </table>

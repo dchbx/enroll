@@ -668,6 +668,17 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   end
 
   context 'POST edit_aptc', dbclean: :after_each do
+
+    before do
+      current_year = TimeKeeper.date_of_record.year
+      is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+    end
+
+    after do
+      allow(TimeKeeper).to receive(:date_of_record).and_call_original
+    end
+
     let!(:silver_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -683,7 +694,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:tax_household_member1) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[0].id, tax_household: tax_household)}
     let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household)}
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
-    let(:effective_on) {TimeKeeper.date_of_record.beginning_of_month.next_month}
+    let(:current_year) { TimeKeeper.date_of_record.year }
+    let(:effective_on) { Date.new(current_year, 11, 1) }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -797,6 +809,22 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should redirect successfully' do
       expect(response).to redirect_to(family_account_path)
+    end
+
+    context 'Overlapping plan year enrollments' do
+      before do
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 17))
+        sign_in user
+        post :edit_aptc, params: params
+      end
+
+      after do
+        allow(TimeKeeper).to receive(:date_of_record).and_call_original
+      end
+
+      it 'should return flash error message' do
+        expect(flash[:notice]).to eq 'Action cannot be performed because of the overlapping plan years.'
+      end
     end
   end
 

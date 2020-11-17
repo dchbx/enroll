@@ -208,7 +208,7 @@ module BenefitSponsors
         )
         allow(benefit_package).to receive(
           :renew_member_benefit
-        ).with(census_employee)
+        ).with(census_employee, subscriber)
         allow(
           BenefitSponsors::BenefitPackages::BenefitPackage
         ).to receive(
@@ -239,7 +239,7 @@ module BenefitSponsors
       it "executed the renewal" do
         expect(benefit_package).to receive(
           :renew_member_benefit
-        ).with(census_employee)
+        ).with(census_employee, subscriber)
         subscriber.work_with_params("", nil, payload)
       end
 
