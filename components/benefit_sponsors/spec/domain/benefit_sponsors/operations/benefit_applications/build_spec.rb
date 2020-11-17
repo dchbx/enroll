@@ -5,6 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe BenefitSponsors::Operations::BenefitApplications::Build, dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
+
   let!(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_year }
   let!(:effective_period_end_on)   { TimeKeeper.date_of_record.end_of_year }
   let!(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
