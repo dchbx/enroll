@@ -21,6 +21,8 @@ module BenefitSponsors
           required(:benefit_sponsor_catalog_id).filled(Types::Bson)
           optional(:termination_kind).maybe(:string)
           optional(:termination_reason).maybe(:string)
+          optional(:reinstated_id).maybe(Types::Bson)
+
           optional(:benefit_packages).array(:hash)
 
           before(:value_coercer) do |result|

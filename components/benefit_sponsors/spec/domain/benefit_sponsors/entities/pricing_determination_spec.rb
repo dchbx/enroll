@@ -8,7 +8,7 @@ RSpec.describe BenefitSponsors::Entities::PricingDetermination do
 
     let(:contract)      { BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminationContract.new }
 
-    let(:pricing_determination_tiers) { [{pricing_unit_id: 'pricing_unit_id', price: 227.07}] }
+    let(:pricing_determination_tiers) { [{pricing_unit_id: BSON::ObjectId.new, price: 227.07}] }
     let(:required_params) do
       {
         group_size: 4, participation_rate: 0.75, pricing_determination_tiers: pricing_determination_tiers

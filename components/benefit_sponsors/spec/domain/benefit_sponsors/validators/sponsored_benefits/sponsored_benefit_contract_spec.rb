@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
 
   let(:contribution_level) do
     {
-      display_name: 'Employee Only', order: 1, contribution_unit_id: 'contribution_unit_id',
+      display_name: 'Employee Only', order: 1, contribution_unit_id: BSON::ObjectId.new,
       is_offered: true, contribution_factor: 0.75, min_contribution_factor: 0.5,
       contribution_cap: 0.75, flat_contribution_amount: 227.07
     }
@@ -18,7 +18,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitC
   let(:contribution_levels)        { [contribution_level] }
   let(:sponsor_contribution)       { {contribution_levels: contribution_levels} }
 
-  let(:pricing_determination)     { {group_size: 4, participation_rate: 75, pricing_determination_tiers: [{pricing_unit_id: 'pricing_unit_id', price: 227.07}]} }
+  let(:pricing_determination)     { {group_size: 4, participation_rate: 75, pricing_determination_tiers: [{pricing_unit_id: BSON::ObjectId.new, price: 227.07}]} }
   let(:pricing_determinations)     { [pricing_determination] }
 
   let(:missing_params)   { {product_package_kind: product_package_kind, product_option_choice: product_option_choice, source_kind: source_kind, pricing_determinations: pricing_determinations} }
