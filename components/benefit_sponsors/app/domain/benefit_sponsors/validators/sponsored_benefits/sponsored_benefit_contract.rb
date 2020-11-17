@@ -12,8 +12,8 @@ module BenefitSponsors
           required(:reference_product).filled(:hash)
           required(:sponsor_contribution).filled(:hash)
           required(:pricing_determinations).array(:hash)
+          optional(:_type).maybe(:string)
         end
-
 
         rule(:reference_product) do
           if key? && value
