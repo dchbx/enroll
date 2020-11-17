@@ -16,5 +16,9 @@ Feature: As an admin user I should have the ability to click reinstate button on
 
   Scenario: Admin clicks reinstate button under planyear dropdown
     When Admin clicks on Reinstate button
-    Then Admin will see transmit to carrier checkbox
+    Then Admin will fill Reinstate date
+    And Admin will see transmit to carrier checkbox
+    When Admin clicks on Submit button
+    Then Admin will see confirmation pop modal
+    And Admin will click on Cancel button
     And user logs out

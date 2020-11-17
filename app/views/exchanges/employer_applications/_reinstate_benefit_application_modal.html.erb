@@ -1,0 +1,17 @@
+<div class="modal" id="reinstateBenefitApplication_<%= application.id %>" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <!-- <h4 class="modal-title">Confirm Reinstate Plan Year</h4> -->
+      </div>
+      <div class="modal-body">
+        <h4>Plan Year will be Reinstated</h4>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Continue", exchanges_employer_application_reinstate_path(application.benefit_sponsorship, application), method: :put, remote: true, class: "btn btn-primary mtz  btn-small"%>
+        <span class="btn btn-default btn-small" data-dismiss="modal">Cancel</span>
+      </div>
+    </div>
+  </div>
+</div>

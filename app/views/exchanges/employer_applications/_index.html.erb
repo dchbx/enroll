@@ -23,6 +23,9 @@
       </thead>
       <tbody>
         <% benefit_applications.order('start_on DESC').each do |application| %>
+          <div>
+            <%= render "exchanges/employer_applications/reinstate_benefit_application_modal", application: application %>
+          </div>
           <tr>
             <td class="py-status"><%= radio_button_tag 'plan_year_radio', application.id, false, status: application.aasm_state.to_s  %></td>
             <td><%= (application.start_on.to_date) %></td>
@@ -68,16 +71,21 @@
             <td colspan="2">
               <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on.next_day) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
-            <td colspan="2">
-              <%if display_reinstate_benefit_application?(application)%>
+            <%if display_reinstate_benefit_application?(application)%>
+              <td colspan="2">
                 <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, enabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
-              <%else%>
+              </td>
+              <td colspan="1">
+                <span class="btn btn-primary btn-sm plan-year-submit" data-target="#reinstateBenefitApplication_<%= application.id %>" data-toggle="modal"><%= l10n("exchange.employer_applications.submit") %></span>
+              </td>
+            <%else%>
+              <td colspan="2">
                 <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, disabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
-              <%end%>
-            </td>
-            <td colspan="1">
-              <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>
-            </td>
+              </td>
+              <td colspan="1">
+                <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>
+              </td>
+            <%end%>
           </tr>
         <% end %>
       </tbody>
@@ -86,7 +94,6 @@
     <h2><%= l10n("exchange.employer_applications.no_valid_pys") %> <%= @benefit_sponsorship.profile.legal_name.titleize %></h2>
   <% end %>
 </div>
-
 <div class="attestation_form"></div>
 </div>
 
