@@ -6,7 +6,7 @@ RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminat
 
   let(:group_size)          { 4 }
   let(:participation_rate)  { 75 }
-  let(:pricing_determination_tiers) { [{pricing_unit_id: 'pricing_unit_id', price: 227.07}] }
+  let(:pricing_determination_tiers) { [{pricing_unit_id: BSON::ObjectId.new, price: 227.07}] }
 
   let(:missing_params)   { {group_size: group_size, participation_rate: participation_rate} }
   let(:invalid_params)   { missing_params.merge({ pricing_determination_tiers: {}}) }
