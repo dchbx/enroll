@@ -53,8 +53,8 @@ module BenefitSponsors
           end
         end
 
-        def sponsored_benefits_params(bp)
-          bp.sponsored_benefits.inject([]) do |sbs_array, sb|
+        def sponsored_benefits_params(current_bp)
+          current_bp.sponsored_benefits.inject([]) do |sbs_array, sb|
             sb_params = sb.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :sponsor_contribution, :pricing_determinations, :reference_product)
             sb_params[:_type] = sb._type
             sb_params[:sponsor_contribution] = sponsor_contribution_params(sb.sponsor_contribution)
@@ -64,28 +64,28 @@ module BenefitSponsors
           end
         end
 
-        def sponsor_contribution_params(sc)
-          sb_params = sc.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :contribution_levels)
-          sb_params[:contribution_levels] = contribution_levels_params(sc)
+        def sponsor_contribution_params(current_sc)
+          sb_params = current_sc.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :contribution_levels)
+          sb_params[:contribution_levels] = contribution_levels_params(current_sc)
           sb_params
         end
 
-        def contribution_levels_params(sc)
-          sc.contribution_levels.inject([]) do |cls_array, cl|
+        def contribution_levels_params(current_sc)
+          current_sc.contribution_levels.inject([]) do |cls_array, cl|
             cls_array << cl.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at)
           end
         end
 
-        def pricing_determinations_params(sb)
-          sb.pricing_determinations.inject([]) do |pds_array, pd|
+        def pricing_determinations_params(current_sb)
+          current_sb.pricing_determinations.inject([]) do |pds_array, pd|
             pd_params = pd.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :pricing_determination_tiers)
             pd_params[:pricing_determination_tiers] = pricing_determination_tiers_params(pd)
             pds_array << pd_params
           end
         end
 
-        def pricing_determination_tiers_params(pd)
-          pd.pricing_determination_tiers.inject([]) do |pdts_array, pdt|
+        def pricing_determination_tiers_params(current_pd)
+          current_pd.pricing_determination_tiers.inject([]) do |pdts_array, pdt|
             pdts_array << pdt.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at)
           end
         end

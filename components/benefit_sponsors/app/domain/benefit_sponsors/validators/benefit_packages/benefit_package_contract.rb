@@ -18,20 +18,20 @@ module BenefitSponsors
         rule(:sponsored_benefits) do
           if key? && value
             sponsored_benefits_array = value.inject([]) do |hash_array, sb_hash|
-                                       if sb_hash.is_a?(Hash)
-                                         result = BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitContract.new.call(sb_hash)
-                                         if result&.failure?
-                                           key.failure(text: 'invalid sponsored_benefit', error: result.errors.to_h)
-                                         else
-                                           hash_array << result.to_h
-                                         end
-                                       else
-                                         key.failure(text: 'invalid sponsored_benefit. Expected a hash.')
-                                       end
-                                       hash_array
-                                     end
-            values.merge!(sponsored_benefits: sponsored_benefits_array) 
-          end 
+              if sb_hash.is_a?(Hash)
+                result = BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitContract.new.call(sb_hash)
+                if result&.failure?
+                  key.failure(text: 'invalid sponsored_benefit', error: result.errors.to_h)
+                else
+                  hash_array << result.to_h
+                end
+              else
+                key.failure(text: 'invalid sponsored_benefit. Expected a hash.')
+              end
+              hash_array
+            end
+            values.merge!(sponsored_benefits: sponsored_benefits_array)
+          end
         end
       end
     end
