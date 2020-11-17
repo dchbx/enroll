@@ -39,7 +39,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
       initial_application.benefit_packages.each do |bp|
-        bp.sponsored_benefits.each {|spon_benefit| create_pd(spon_benefit)}
+        bp.sponsored_benefits.each do |spon_benefit|
+          spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
+          create_pd(spon_benefit)
+          update_contribution_levels(spon_benefit)
+        end
       end
     end
 
@@ -211,4 +215,10 @@ def create_pd(spon_benefit)
   pricing_determination_tier = BenefitSponsors::SponsoredBenefits::PricingDeterminationTier.new({pricing_unit_id: pricing_unit_id, price: 320.00})
   pricing_determination.pricing_determination_tiers << pricing_determination_tier
   spon_benefit.save!
+end
+
+def update_contribution_levels(spon_benefit)
+  spon_benefit.sponsor_contribution.contribution_levels.each do |cl|
+    cl.update_attributes!({contribution_cap: 0.5, flat_contribution_amount: 100.00})
+  end
 end
