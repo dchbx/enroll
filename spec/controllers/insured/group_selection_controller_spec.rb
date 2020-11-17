@@ -668,6 +668,13 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   end
 
   context 'POST edit_aptc', dbclean: :after_each do
+
+    before do
+      current_year = TimeKeeper.date_of_record.year
+      is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+    end
+
     let!(:silver_product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -797,6 +804,19 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     it 'should redirect successfully' do
       expect(response).to redirect_to(family_account_path)
+    end
+
+    context 'Overlapping plan year enrollments' do
+      before do
+        current_year = TimeKeeper.date_of_record.year
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 17))
+        sign_in user
+        post :edit_aptc, params: params
+      end
+
+      it 'should return flash error message' do
+        expect(flash[:notice]).to eq 'Action cannot be performed because of the overlapping plan years.'
+      end
     end
   end
 
