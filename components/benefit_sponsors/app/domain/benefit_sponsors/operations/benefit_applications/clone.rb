@@ -6,6 +6,11 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitApplications
+      # This class clones a benefit_application where end
+      # result is a new benefit_application. The aasm_state
+      # of the newly created application will be draft irrespective
+      # of the aasm_state of the input benefit_application.
+      # Also, the result benefit_application is a non-persisted object.
       class Clone
         include Dry::Monads[:result, :do]
 
@@ -24,7 +29,7 @@ module BenefitSponsors
         private
 
         def validate(params)
-          return Failure('Missing Key.') unless params.key?(:benefit_application) || params.key?(:effective_period)
+          return Failure('Missing Keys.') unless params.key?(:benefit_application) && params.key?(:effective_period)
           return Failure('Not a valid Benefit Application object.') unless params[:benefit_application].is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
           return Failure('Invalid effective_period') if params[:effective_period].min > params[:effective_period].max
 
