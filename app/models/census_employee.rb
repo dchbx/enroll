@@ -486,7 +486,9 @@ class CensusEmployee < CensusMember
 
   def renewal_benefit_group_assignment
     return benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.plan_year &. is_renewing? } if is_case_old?
-    benefit_group_assignments.order_by(:created_at.desc).detect{ |assignment| assignment.benefit_application &. is_renewing? }
+    renewal_assignments = benefit_group_assignments.order_by(:created_at.desc).select{ |assignment| assignment.benefit_application &. is_renewing? }
+    assignment_with_coverage = renewal_assignments.detect{|assignment| assignment.hbx_enrollment.present?} if renewal_assignments.count > 1
+    assignment_with_coverage || renewal_assignments.first
   end
 
   def inactive_benefit_group_assignments

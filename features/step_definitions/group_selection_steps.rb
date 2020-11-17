@@ -512,6 +512,7 @@ end
 # end
 
 When(/(.*) clicks on the make changes button/) do |_role|
+  enable_change_tax_credit_button
   click_link('Make Changes')
   wait_for_ajax
 end
