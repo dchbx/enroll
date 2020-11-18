@@ -76,6 +76,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         expect(@new_ba.reinstated_id).to eq(initial_application.id)
       end
 
+      it 'should create new benefit_sponsor_catalog' do
+        expect(@new_ba.benefit_sponsor_catalog_id).not_to eq(initial_application.benefit_sponsor_catalog_id)
+      end
+
       context 'workflow_state_transitions' do
         it 'should record transition from_state' do
           expect(@first_wfst.from_state).to eq('draft')
@@ -113,6 +117,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
       it 'should populate reinstated_id' do
         expect(@new_ba.reinstated_id).to eq(initial_application.id)
+      end
+
+      it 'should create new benefit_sponsor_catalog' do
+        expect(@new_ba.benefit_sponsor_catalog_id).not_to eq(initial_application.benefit_sponsor_catalog_id)
       end
 
       context 'workflow_state_transitions' do
@@ -157,6 +165,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
       it 'should populate reinstated_id' do
         expect(@new_ba.reinstated_id).to eq(initial_application.id)
+      end
+
+      it 'should create new benefit_sponsor_catalog' do
+        expect(@new_ba.benefit_sponsor_catalog_id).not_to eq(initial_application.benefit_sponsor_catalog_id)
       end
 
       context 'workflow_state_transitions' do
