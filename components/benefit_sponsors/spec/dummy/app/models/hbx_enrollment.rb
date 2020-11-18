@@ -94,7 +94,6 @@ class HbxEnrollment
   field :effective_on, type: Date
   field :terminated_on, type: Date
   field :terminate_reason, type: String
-  field :cancel_reason, type: String
 
   field :broker_agency_profile_id, type: BSON::ObjectId
   field :writing_agent_id, type: BSON::ObjectId

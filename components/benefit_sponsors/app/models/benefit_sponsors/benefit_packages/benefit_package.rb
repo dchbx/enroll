@@ -406,14 +406,14 @@ module BenefitSponsors
         end
       end
 
-      def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false, enroll_cancel_reason: nil)
+      def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false)
         deactivate_benefit_group_assignments
 
         enrolled_families.no_timeout.each do |family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
-              hbx_enrollment.update_attribute(:cancel_reason, enrollment_cancel_reason(enroll_cancel_reason))
+              hbx_enrollment.update_attribute(:terminate_reason, "retroactive_canceled") if benefit_application.retroactive_canceled?
               if hbx_enrollment.inactive?
                 hbx_enrollment.cancel_coverage!
               else
@@ -433,11 +433,6 @@ module BenefitSponsors
 
       def canceled_as_ineligible?(transition)
         transition.from_state == 'enrollment_ineligible' && transition.to_state == 'canceled'
-      end
-
-      def enrollment_cancel_reason(cancel_reason)
-        return cancel_reason if cancel_reason
-        benefit_application.cancellation_reason
       end
 
       def enrollment_term_reason(term_reason)
