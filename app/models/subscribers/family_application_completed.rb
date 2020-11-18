@@ -53,7 +53,7 @@ module Subscribers
       #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       family.e_case_id = verified_family.integrated_case_id
       begin
-        active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+        newly_created_thh = active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
@@ -70,12 +70,12 @@ module Subscribers
             active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
             if active_verified_tax_household.present?
               new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member, newly_created_thh)
             end
           end
         end
-        if active_household.latest_active_tax_household.present?
-          unless active_household.latest_active_tax_household.eligibility_determinations.present?
+        if newly_created_thh.present?
+          unless newly_created_thh.eligibility_determinations.present?
             log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
           end
         end
