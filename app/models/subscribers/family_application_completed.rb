@@ -74,11 +74,7 @@ module Subscribers
             end
           end
         end
-        if newly_created_thh.present?
-          unless newly_created_thh.eligibility_determinations.present?
-            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-          end
-        end
+        log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => 'error'}) if newly_created_thh.present? && !newly_created_thh.eligibility_determinations.present?
       rescue
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
