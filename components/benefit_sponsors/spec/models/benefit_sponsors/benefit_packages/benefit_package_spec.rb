@@ -783,7 +783,7 @@ module BenefitSponsors
         end
 
         it "should not persist retro cancel reason for canceled applications" do
-          expect(hbx_enrollment.reload.cancel_reason).to eq nil
+          expect(hbx_enrollment.reload.termination_reason).to eq nil
         end
       end
 
@@ -802,7 +802,7 @@ module BenefitSponsors
 
         it "should persist retro cancel reason for retroactive_canceled applications" do
           benefit_package.cancel_member_benefits
-          expect(hbx_enrollment.reload.cancel_reason).to eq "retroactive_canceled"
+          expect(hbx_enrollment.reload.termination_reason).to eq "retroactive_canceled"
         end
       end
     end
