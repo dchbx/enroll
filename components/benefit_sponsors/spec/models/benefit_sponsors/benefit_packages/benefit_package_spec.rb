@@ -773,7 +773,7 @@ module BenefitSponsors
         let(:enr_state) {"auto_renewing"}
 
         before do
-          renewal_application.update_attributes(cancellation_reason: "", aasm_state: :canceled)
+          renewal_application.update_attributes(aasm_state: :canceled)
         end
 
         it "should move auto renewing enrollment to coverage enrolled state" do
@@ -791,7 +791,7 @@ module BenefitSponsors
         let(:enr_state) {"coverage_selected"}
 
         before :each do
-          renewal_application.update_attributes(cancellation_reason: "retroactive_cancel", aasm_state: :retroactive_cancel)
+          renewal_application.update_attributes(aasm_state: :retroactive_canceled)
         end
 
         it "should move auto renewing enrollment to coverage enrolled state" do
@@ -800,9 +800,9 @@ module BenefitSponsors
           expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
         end
 
-        it "should persist retro cancel reason for retroactive_cancel applications" do
+        it "should persist retro cancel reason for retroactive_canceled applications" do
           benefit_package.cancel_member_benefits
-          expect(hbx_enrollment.reload.cancel_reason).to eq "retroactive_cancel"
+          expect(hbx_enrollment.reload.cancel_reason).to eq "retroactive_canceled"
         end
       end
     end

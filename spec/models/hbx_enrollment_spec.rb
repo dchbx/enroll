@@ -5,11 +5,6 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
-  describe "A new model instance" do
-    it { is_expected.to be_mongoid_document }
-    it { is_expected.to have_fields(:cancel_reason).of_type(String)}
-  end
-
   describe HbxEnrollment, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
