@@ -58,11 +58,10 @@ module Forms
         if !tribal_id.present? && @indian_tribe_member
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
-
-        if @is_incarcerated.nil?
-          self.errors.add(:base, "Incarceration status is required")
-        end
       end
+
+      return unless (@is_resident_role.to_s == "true" || @is_consumer_role.to_s == "true") && is_applying_coverage.to_s == "true" && @is_incarcerated.nil?
+      self.errors.add(:base, "Incarceration status is required")
     end
 
     def ssn_validation
