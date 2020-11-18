@@ -145,7 +145,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
     let(:past_date) { Date.new(oe_start_year, 10, 10) }
     let(:future_date) { Date.new(oe_start_year + 1 , 10, 10) }
     let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
-    let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.households.first, effective_starting_on: past_date) }
+    let!(:tax_household10) { FactoryBot.create(:tax_household, household: family10.households.first, effective_starting_on: past_date, effective_ending_on: nil) }
     let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
     let!(:current_hbx_under_open_enrollment) {double("current hbx", under_open_enrollment?: true)}
     let(:oe_start_year) { Settings.aca.individual_market.open_enrollment.start_on.year }
