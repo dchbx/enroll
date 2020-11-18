@@ -49,7 +49,10 @@
   "scripts": {
     "test": "jest",
     "test-watch": "jest --watch",
-    "start:angular": "ANGULAR_ADMIN_APPLICATION_URL=http://localhost:4200 bundle exec rails s"
+    "start:angular": "ANGULAR_ADMIN_APPLICATION_URL=http://localhost:4200 bundle exec rails s",
+    "hugo:dev": "cd hugo && hugo server --disableFastRender",
+    "build:hugo": "cd hugo && hugo --minify",
+    "build:hugo:local": "rm -rf hugo/public && npm run build:hugo"
   },
   "jest": {
     "testURL": "http://localhost",
