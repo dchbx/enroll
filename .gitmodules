@@ -1,0 +1,3 @@
+[submodule "hugo/themes/fuji"]
+	path = hugo/themes/fuji
+	url = https://github.com/amzrk2/hugo-theme-fuji.git

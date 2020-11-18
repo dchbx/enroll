@@ -1,0 +1,6 @@
+baseURL = "http://example.org/"
+languageCode = "en-us"
+title = "Enroll Documentation"
+theme = "fuji"
+showLicense = true
+showToc = true
