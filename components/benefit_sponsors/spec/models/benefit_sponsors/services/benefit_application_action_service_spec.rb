@@ -71,11 +71,7 @@ module BenefitSponsors
         end
 
         it "should cancel benefit application" do
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
-        end
-
-        it "should persit cancel reason to  benefit application" do
-          expect(initial_application.cancellation_reason).to eq "retroactive_cancel"
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
         end
       end
 
@@ -88,10 +84,6 @@ module BenefitSponsors
 
         it "should cancel benefit application" do
           expect(initial_application.aasm_state).to eq :canceled
-        end
-
-        it "should persit cancel reason to  benefit application" do
-          expect(initial_application.cancellation_reason).to eq nil
         end
       end
     end

@@ -61,7 +61,6 @@ module BenefitSponsors
     describe "A new model instance" do
       it { is_expected.to be_mongoid_document }
       it { is_expected.to have_fields(:effective_period, :open_enrollment_period, :terminated_on)}
-      it { is_expected.to have_fields(:cancellation_reason).of_type(String)}
       it { is_expected.to have_field(:expiration_date).of_type(Date)}
       it { is_expected.to have_field(:aasm_state).of_type(Symbol).with_default_value_of(:draft)}
       it { is_expected.to have_field(:fte_count).of_type(Integer).with_default_value_of(0)}
@@ -1477,11 +1476,7 @@ module BenefitSponsors
         end
 
         it "should cancel benefit application" do
-          expect(initial_application.aasm_state).to eq :retroactive_cancel
-        end
-
-        it "should persit cancel reason to benefit application" do
-          expect(initial_application.cancellation_reason).to eq "retroactive_cancel"
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
         end
 
         it "should cancel associated enrollments" do
@@ -1491,7 +1486,7 @@ module BenefitSponsors
 
         it "should persit cancel reason to enrollment" do
           hbx_enrollment.reload
-          expect(hbx_enrollment.cancel_reason).to eq "retroactive_cancel"
+          expect(hbx_enrollment.cancel_reason).to eq "retroactive_canceled"
         end
       end
 
