@@ -126,9 +126,11 @@ RSpec.describe Operations::Individual::CancelRenewalEnrollment, dbclean: :after_
                           :ivl_product,
                           :gold,
                           renewal_product_id: renewal_product.id,
+                          issuer_profile_id: '1',
                           application_period: start_of_year..end_of_year)
       end
       before do
+        product.update_attributes(issuer_profile_id: '2')
         renewal_enrollment.update_attributes(product_id: gold_renewal_product.id, aasm_state: "renewing_coverage_selected")
         expired_enrollment.update_attributes(aasm_state: :coverage_selected)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
