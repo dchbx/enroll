@@ -40,11 +40,9 @@ module BenefitSponsors
 
         def overlapping_ba_exists?(params)
           @effective_period = effective_period_range(params)
-          # benefit_sponsorship = params[:benefit_application].benefit_sponsorship
-          # benefit_sponsorship.benefit_applications.non_canceled.any?{|ba| ba.effective_period.cover?(@effective_period.min)}
-
-          # TODO: Refactor this code while working on ticket 90968.
-          false
+          current_ba = params[:benefit_application]
+          valid_bas = current_ba.benefit_sponsorship.benefit_applications.non_canceled.where(:id.ne => current_ba.id)
+          valid_bas.any?{|ba| ba.effective_period.cover?(@effective_period.min)}
         end
 
         def effective_period_range(params)
