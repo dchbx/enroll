@@ -8,12 +8,10 @@ module BenefitSponsors
       def update(employer_profile, options={})
         address_or_phone_changed = employer_profile.office_locations.any? do |office_location|
           office_location.address.changes.present? && office_location.address.changes.keys.any?{ |key| ["address_1", "address_2", "city", "state", "zip"].include?(key)} ||
-              office_location.phone.changes.present? && office_location.phone.changes.keys.any?{ |key| ["area_code", "number", "kind"].include?(key)}
+            office_location.phone.changes.present? && office_location.phone.changes.keys.any?{ |key| ["area_code", "number", "kind"].include?(key)}
         end
-
-        if address_or_phone_changed
-          notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"})
-        end
+        return unless address_or_phone_changed
+        notify("acapi.info.events.employer.address_changed", {employer_id: employer_profile.hbx_id, event_name: "address_changed"})
       end
 
       # def notifications_send(model_instance, new_model_event)
