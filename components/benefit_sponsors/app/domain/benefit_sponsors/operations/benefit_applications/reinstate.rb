@@ -64,12 +64,16 @@ module BenefitSponsors
           return clone_result if clone_result.failure?
           new_ba = clone_result.success
 
-          # TODO: Create a new benefit_sponsor_catalog and assign this to the benefit_application
-          # current_ba = params[:benefit_application]
-          # current_ba.benefit_sponsorship.benefit_sponsor_catalog_for(effective_date)
-          new_ba.assign_attributes({reinstated_id: params[:benefit_application].id})
+          bsc = new_benefit_sponsor_catalog(params[:benefit_application])
+          new_ba.assign_attributes({reinstated_id: params[:benefit_application].id, benefit_sponsor_catalog_id: bsc.id})
           new_ba.save!
           Success(new_ba)
+        end
+
+        def new_benefit_sponsor_catalog(current_ba)
+          bsc = current_ba.benefit_sponsorship.benefit_sponsor_catalog_for(current_ba.effective_period.min)
+          bsc.save!
+          bsc
         end
 
         def reinstate(new_ba)
