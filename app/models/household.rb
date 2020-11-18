@@ -133,17 +133,17 @@ class Household
         determined_at: latest_eligibility_determination.determination_date
       )
       th.save!
+      th
     end
   end
 
-  def add_tax_household_family_member(family_member, verified_tax_household_member)
-    th = latest_active_tax_household
-    th.tax_household_members.build(
+  def add_tax_household_family_member(family_member, verified_tax_household_member, newly_created_thh)
+    newly_created_thh.tax_household_members.build(
       family_member: family_member,
       is_subscriber: false,
       is_ia_eligible: verified_tax_household_member.is_insurance_assistance_eligible
     )
-    th.save!
+    newly_created_thh.save!
   end
 
   def create_tax_households_and_members(verified_family, _primary_person, active_verified_household)
