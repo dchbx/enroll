@@ -4,7 +4,7 @@ development:
   channel_prefix: enroll_development
 
 test:
-  adapter: redis
+  adapter: async
   url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
   channel_prefix: enroll_test
 
