@@ -10,6 +10,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       Given Qualifying life events are present
       And initial employer ABC Widgets has active benefit application
       And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
+      And census employee Patrick Doe has a past DOH
       And employees for employer ABC Widgets have selected a coverage
       Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
@@ -67,6 +68,7 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       Given Qualifying life events are present
       And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
       And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
+      And census employee Patrick Doe has a past DOH
       And employees for employer ABC Widgets have selected a coverage
       Given that a user with a HBX staff role with HBX staff subrole exists and is logged in
       And the user is on the Employer Index of the Admin Dashboard
