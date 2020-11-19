@@ -5,7 +5,7 @@ module PermissionsWorld
     Permission.create!(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                        send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                        can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
-                       view_admin_tabs: true, view_the_configuration_tab: true, can_submit_time_travel_request: false, can_send_secure_message: true)
+                       view_admin_tabs: true, view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create!(name: 'hbx_read_only', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
                        send_broker_agency_message: false, approve_broker: false, approve_ga: false,
                        modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
@@ -23,7 +23,7 @@ module PermissionsWorld
                        modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create!(name: 'hbx_tier3', modify_family: true, modify_employer: false, revert_application: false, list_enrollments: true,
                        send_broker_agency_message: false, approve_broker: false, approve_ga: false,
-                       modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, can_send_secure_message: true)
+                       modify_admin_tabs: false, view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false)
     Permission.create!(name: 'super_admin', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                        send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                        can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
