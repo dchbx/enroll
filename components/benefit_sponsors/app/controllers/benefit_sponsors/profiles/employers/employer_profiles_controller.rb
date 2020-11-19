@@ -66,7 +66,7 @@ module BenefitSponsors
 
               if @benefit_sponsorship.present?
                 @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application
+                @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
               end
 
               collect_and_sort_invoices(params[:sort_order])

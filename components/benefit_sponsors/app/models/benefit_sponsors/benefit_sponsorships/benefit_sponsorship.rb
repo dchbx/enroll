@@ -433,8 +433,9 @@ module BenefitSponsors
       benefit_market_catalog.open_enrollment_period_on(effective_date)
     end
 
-    def published_benefit_application
-      benefit_applications.submitted.where(:id.ne => off_cycle_benefit_application&.id).last || published_off_cycle_application
+    def published_benefit_application(include_term_pending: true)
+      submitted_applications = include_term_pending ? benefit_applications.submitted + benefit_applications.termination_pending : benefit_applications.submitted
+      submitted_applications.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
     end
 
     def published_off_cycle_application
@@ -442,9 +443,9 @@ module BenefitSponsors
       off_cycle_benefit_application if approved_states.include?(off_cycle_benefit_application&.aasm_state)
     end
 
-    def submitted_benefit_application
+    def submitted_benefit_application(include_term_pending: true)
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application || active_imported_benefit_application
+      published_benefit_application(include_term_pending: include_term_pending) || active_imported_benefit_application
     end
 
     def active_imported_benefit_application

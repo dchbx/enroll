@@ -612,8 +612,8 @@ class CensusEmployee < CensusMember
   end
 
   def off_cycle_benefit_group_assignment
-    off_cycle_app = benefit_sponsorship.off_cycle_benefit_application
-    return if active_benefit_group_assignment.nil? || benefit_sponsorship.nil? || off_cycle_app.nil?
+    off_cycle_app = benefit_sponsorship&.off_cycle_benefit_application
+    return if active_benefit_group_assignment.nil? || off_cycle_app.nil?
 
     benefit_package_ids = off_cycle_app.benefit_packages.map(&:id)
     benefit_group_assignments.detect { |benefit_group_assignment| benefit_package_ids.include?(benefit_group_assignment.benefit_package.id) && benefit_group_assignment.is_active?(off_cycle_app.start_on) }
