@@ -7,10 +7,10 @@ describe Entities::People::Roles::Role, "creating a role" do
   describe 'with valid arguments' do
     let(:input_params) do
       { name: "test",
-      kind: "test2",
-      link: "http://test.com",
-      status: :active,
-      date: Date.today}
+        kind: "test2",
+        link: "http://test.com",
+        status: :active,
+        date: Date.today}
     end
 
     it 'should initialize' do
