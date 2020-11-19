@@ -59,4 +59,10 @@ class EmployerStaffRole
       @profile = EmployerProfile.find(employer_profile_id)
     end
   end
+
+  def fetch_redirection_link
+    return nil if aasm_state.to_sym != :is_active
+
+    BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(profile, tab: 'home').to_s
+  end
 end
