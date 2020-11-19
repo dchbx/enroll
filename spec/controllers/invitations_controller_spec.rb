@@ -39,7 +39,9 @@ RSpec.describe InvitationsController do
       context "broker invitation" do
         let(:user) { FactoryBot.create(:user) }
         let(:person) { FactoryBot.create(:person, user: user) }
-        let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+        let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+        let!(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+        let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
         let!(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, aasm_state: 'active', person: person)}
         let(:invitation) { FactoryBot.create(:invitation, :broker_role, :source_id => broker_agency_profile.id)}
         let(:params) { {id: invitation.id, person_id: person.id }}
