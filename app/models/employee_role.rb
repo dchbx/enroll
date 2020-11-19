@@ -157,7 +157,7 @@ class EmployeeRole
     off_cycle_application = census_employee.benefit_sponsorship.off_cycle_benefit_application
     return false if package.nil? || off_cycle_application.nil?
 
-    off_cycle_application != package.application
+    off_cycle_application != package.benefit_application
   end
 
   # Use this method to pull earliest effective on for new hire when there is no sep
