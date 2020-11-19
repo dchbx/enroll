@@ -9,6 +9,7 @@ RSpec.describe "people/manage_account.html.erb", :type => :view, dbclean: :after
 
   before do
     sign_in(user)
+    assign(:person, person)
     render template: 'people/manage_account.html.erb'
   end
 
