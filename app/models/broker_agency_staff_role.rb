@@ -66,15 +66,6 @@ class BrokerAgencyStaffRole
     end
   end
 
-  def broker_agency_profile
-    return @broker_agency_profile if defined? @broker_agency_profile
-    if self.benefit_sponsors_broker_agency_profile_id.nil?
-      @broker_agency_profile = ::BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
-    elsif has_broker_agency_profile?
-      @broker_agency_profile = ::BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile
-    end
-  end
-
   def has_broker_agency_profile?
     self.benefit_sponsors_broker_agency_profile_id.present? || self.broker_agency_profile_id.present?
   end
@@ -122,9 +113,11 @@ class BrokerAgencyStaffRole
   def fetch_redirection_link
     return nil if aasm_state.to_sym != :active
 
-    if broker_agency_profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+    if benefit_sponsors_broker_agency_profile_id.present?
+      broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(benefit_sponsors_broker_agency_profile_id)
       BenefitSponsors::Engine.routes.url_helpers.profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile, tab: 'home').to_s
     else
+      broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id)
       Rails.application.routes.url_helpers.broker_agencies_profile_path(broker_agency_profile).to_s
     end
   end
