@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Entities::HbxEnrollment, dbclean: :after_each do
+RSpec.describe Entities::HbxEnrollments::HbxEnrollment, dbclean: :after_each do
 
   let(:hbx_enrollment_member) do
     { applicant_id: BSON::ObjectId.new,
@@ -20,7 +20,7 @@ RSpec.describe Entities::HbxEnrollment, dbclean: :after_each do
       hbx_enrollment_members: [hbx_enrollment_member]}
   end
 
-  let(:contract) { Validators::HbxEnrollmentContract.new }
+  let(:contract) { Validators::HbxEnrollments::HbxEnrollmentContract.new }
 
   it 'contract validation should pass' do
     expect(contract.call(valid_params).to_h).to eq valid_params
@@ -32,7 +32,7 @@ RSpec.describe Entities::HbxEnrollment, dbclean: :after_each do
     end
 
     it 'should return an object' do
-      expect(@result).to be_a(Entities::HbxEnrollment)
+      expect(@result).to be_a(Entities::HbxEnrollments::HbxEnrollment)
     end
   end
 
