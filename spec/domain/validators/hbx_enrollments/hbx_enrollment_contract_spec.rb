@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Validators::HbxEnrollmentMemberContract, type: :model, dbclean: :after_each do
+RSpec.describe Validators::HbxEnrollments::HbxEnrollmentContract, type: :model, dbclean: :after_each do
 
   before :all do
     DatabaseCleaner.clean
@@ -12,16 +12,21 @@ RSpec.describe Validators::HbxEnrollmentMemberContract, type: :model, dbclean: :
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  let(:enrollment_member_params) do
-    { applicant_id: BSON::ObjectId.new,
-      is_subscriber: true,
-      eligibility_date: TimeKeeper.date_of_record,
-      coverage_start_on: TimeKeeper.date_of_record}
+  let(:enrollment_params) do
+    { kind: 'individual',
+      consumer_role_id: BSON::ObjectId.new,
+      enrollment_kind: 'open_enrollment',
+      coverage_kind: 'health',
+      effective_on: TimeKeeper.date_of_record,
+      hbx_enrollment_members: [{applicant_id: BSON::ObjectId.new,
+                                is_subscriber: true,
+                                eligibility_date: TimeKeeper.date_of_record,
+                                coverage_start_on: TimeKeeper.date_of_record}]}
   end
 
   context 'success case' do
     before do
-      @result = subject.call(enrollment_member_params)
+      @result = subject.call(enrollment_params)
     end
 
     it 'should return success' do
@@ -36,7 +41,7 @@ RSpec.describe Validators::HbxEnrollmentMemberContract, type: :model, dbclean: :
   context 'failure case' do
     context 'missing a mandatory attribute' do
       before do
-        @result = subject.call(enrollment_member_params.except(:applicant_id))
+        @result = subject.call(enrollment_params.except(:kind))
       end
 
       it 'should return failure' do
