@@ -113,7 +113,7 @@
                 <% end %>
               <% end %>
 
-              <% if @employee_role.can_enroll_as_new_hire? && @employee_role.is_under_off_cycle_open_enrollment? && @employee_role.can_get_coverage_under_current_py? %>
+              <% if @employee_role&.can_enroll_as_new_hire? && @employee_role.is_under_off_cycle_open_enrollment? && @employee_role.can_get_coverage_under_current_py? %>
                 <p>If you <%= link_to 'enroll as new hire', new_insured_group_selection_path(options) %> coverage will begin <%= format_date @employee_role.earliest_effective_on_for_new_hire %>.</p>
               <% end %>
 

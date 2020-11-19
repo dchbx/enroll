@@ -606,7 +606,7 @@ class CensusEmployee < CensusMember
 
     renewal_begin_date = active_assignment.benefit_package.end_on.next_day
     renewal_assignment = benefit_package_assignment_on(renewal_begin_date)
-    return nil if renewal_assignment&.benefit_package&.benefit_application == benefit_sponsorship.off_cycle_benefit_application
+    return nil if renewal_assignment&.benefit_package&.benefit_application == benefit_sponsorship&.off_cycle_benefit_application
 
     renewal_assignment
   end
