@@ -6,7 +6,7 @@ module Operations
     # coverage_termination_pending hbx_enrollment where end result
     # is a new hbx_enrollment. The effective_period of the newly
     # created hbx_enrollment depends on the aasm_state of the input
-    # hbx_enrollment. The aasm_state of the newly created application
+    # hbx_enrollment. The aasm_state of the newly created hbx_enrollment
     # will be shopping. Currently, this operation supports SHOP
     # enrollments only does not account for IVL cases.
     class Reinstate
