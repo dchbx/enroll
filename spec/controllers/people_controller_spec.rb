@@ -143,6 +143,28 @@ RSpec.describe PeopleController, dbclean: :after_each do
     end
   end
 
+  describe 'show_roles' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+      get :show_roles, params: {id: person.id}
+    end
+
+    it 'should return success status' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'should assign instance variable' do
+      expect(assigns(:person)).to eq person
+    end
+
+    it 'should render manage_account template' do
+      expect(response).to render_template("people/show_roles")
+    end
+  end
+
   describe 'Manage Account' do
     let(:user) { FactoryBot.build(:user) }
     let(:person) {FactoryBot.create(:person, user: user)}
