@@ -94,10 +94,12 @@ describe Person, :dbclean => :after_each do
       context "with broker role" do
         let(:params) {valid_params}
         let(:person) {Person.new(**params)}
-        let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+        let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+        let!(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+        let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
 
         before do
-          FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+          FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person, aasm_state: 'active')
         end
 
         it "has correct welcome message for broker role" do
@@ -1389,12 +1391,14 @@ describe Person, :dbclean => :after_each do
 
   describe '.brokers_matching_search_criteria' do
     let(:person) { FactoryBot.create(:person, :with_broker_role)}
-    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
     let(:name) { person.full_name}
 
     before do
       Person.create_indexes
-      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person, aasm_state: 'active')
       person.broker_role.update_attributes!(aasm_state: "active")
       person.broker_role.update_attributes!(npn: "11111111")
       person.save!
@@ -1488,17 +1492,19 @@ describe Person, :dbclean => :after_each do
   end
 
   describe 'get staff for broker' do
-    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:broker_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_agency_profile) { broker_agency_organization.broker_agency_profile }
     let(:broker_staff_people) { FactoryBot.create_list(:person, 5)}
     let(:terminated_staff_member) { FactoryBot.create(:person)}
     let(:pending_staff_member) { FactoryBot.create(:person)}
 
     before do
       broker_staff_people.each do |person|
-        FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+        FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: person, aasm_state: 'active')
       end
-      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: terminated_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_terminated')
-      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: pending_staff_member, broker_agency_profile: broker_agency_profile, aasm_state: 'broker_agency_pending')
+      FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: terminated_staff_member, aasm_state: 'broker_agency_terminated')
+      FactoryBot.create(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id, person: pending_staff_member, aasm_state: 'broker_agency_pending')
     end
 
     context 'finds all active staff for broker with same broker agency profile id' do
