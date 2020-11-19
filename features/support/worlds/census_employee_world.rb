@@ -410,7 +410,6 @@ end
 And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the off cycle benefit application$/) do |named_person, _legal_name|
   person = people[named_person]
   person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
-
   census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
   off_cycle_benefit_application = census_employee.benefit_sponsorship.off_cycle_benefit_application
   benefit_package = off_cycle_benefit_application.benefit_packages[0]

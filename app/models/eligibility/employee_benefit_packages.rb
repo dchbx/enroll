@@ -101,6 +101,10 @@ module Eligibility
       end
     end
 
+    def off_cycle_published_benefit_group
+      off_cycle_benefit_group_assignment.benefit_package if off_cycle_benefit_group_assignment&.benefit_package&.benefit_application&.is_submitted?
+    end
+
     def possible_benefit_package
       if under_new_hire_enrollment_period?
         benefit_package = benefit_package_for_date(earliest_eligible_date)

@@ -49,6 +49,9 @@ Feature: Ability for employer to create an off-cycle benefit application and all
       And staff role person clicks on employee Patrick Doe
       Then the user should see a dropdown for Off Plan Year benefit package
       And census employee Patrick Doe has benefit group assignment of the off cycle benefit application
+      And staff role person clicked on benefits tab
+      When Employer clicks on publish plan year
+      And user logs out
       And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
       When Patrick Doe clicks "Shop for Plans" on my account page
       Then Employee should see the group selection page
