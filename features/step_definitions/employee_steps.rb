@@ -186,6 +186,12 @@ And(/staff role person clicks on employee (.*?)$/) do |named_person|
   expect(page.current_path).to include("census_employee")
 end
 
+Given(/census employee (.*?) has a past DOH$/) do |named_person|
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  ce.update_attributes!(created_at: TimeKeeper.date_of_record.prev_year, updated_at: TimeKeeper.date_of_record.prev_year)
+end
+
 Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
   # Selectric is weird
   Capybara.ignore_hidden_elements = false
