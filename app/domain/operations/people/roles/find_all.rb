@@ -90,7 +90,7 @@ module Operations
 
           link = person.resident_role.bookmark_url
 
-          role_params(person.full_name, link, "resident", person.resident.created_at.to_date, :active)
+          role_params(person.full_name, link, "resident", person.resident_role.created_at.to_date, :active)
         end
 
         def fetch_employee_details(ee_role)
@@ -115,7 +115,7 @@ module Operations
           link = broker_staff_role.fetch_redirection_link
           created_at = broker_staff_role.created_at.present? ? broker_staff_role.created_at.to_date : nil
           name = profile.legal_name
-          role_params(name, link, "Broker", created_at, status)
+          role_params(name, link, "Broker Staff", created_at, status)
         end
 
         def fetch_ga_staff_details(ga_staff_role)
