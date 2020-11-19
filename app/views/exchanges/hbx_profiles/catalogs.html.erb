@@ -1,0 +1,47 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<% content_for :head do %>
+  <%= javascript_include_tag 'standalone_effective_datatables' %>
+  <%= stylesheet_link_tag 'standalone_effective_datatables' %>
+<% end %>
+
+
+<div class="container">
+  <div class="bottom-pd">
+      <h1 class="heading-text">Enroll Configurations</h1>
+
+	  <div class="row mt-4" id="configurations">
+	  	<div class="col-md-3">
+	  		<%#= list_registry_menu(EnrollRegistry) %>
+
+	  		<%= render 'catalog_nav' %>
+	  	</div>
+
+	  	<div class="col-md-9">
+	  		<div id="data_container"></div>
+<!-- 		  <div class="tab-content" id="nav-tabContent">  
+		      <div class="tab-pane fade" id="find_all_shop" role="tabpanel" aria-labelledby="list-find_all_shop-list">
+		      	 <%#= EnrollRegistry[:find_all_shop]{{market_kind: :aca_shop}}.value!.html_safe %>
+		      </div>
+		      <div class="tab-pane fade" id="find_all_fehb" role="tabpanel" aria-labelledby="list-find_all_fehb-list">
+		      	 <%#= EnrollRegistry[:find_all_fehb]{{market_kind: :fehb}}.value!.html_safe %>
+		      </div>
+		    </div> -->
+	  	</div>
+	  </div>
+  </div>
+</div>
+
+<!-- <script>
+  (function() {
+    applyJQDatePickers();
+  })();
+</script> -->
+
+
+<style>
+   #configurations .list-group {
+   	  color: black;
+   	  background-color: #fff;
+   }
+</style>
