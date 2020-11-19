@@ -4,7 +4,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean: :around_each do
+RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: :around_each do
   describe 'initial employer',  dbclean: :around_each do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
@@ -53,6 +53,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
                         sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                         employee_role_id: employee_role.id,
                         product: sponsored_benefit.reference_product,
+                        rating_area_id: BSON::ObjectId.new,
                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
     end
 
@@ -73,11 +74,11 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         expect(reinstated_enrollment.product_id).to eq enrollment.product_id
       end
 
-      it 'should build a continuous coverage' do
+      it 'should have continuous coverage' do
         expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
       end
 
-      it 'should give same member coverage begin date as base enrollment to calculate premious correctly' do
+      it 'should give same member coverage begin date as base enrollment' do
         enrollment_member = reinstated_enrollment.hbx_enrollment_members.first
         expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
         expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
@@ -148,12 +149,15 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
                           sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
                           employee_role_id: employee_role.id,
                           product: sponsored_benefit.reference_product,
+                          rating_area_id: BSON::ObjectId.new,
                           benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
       end
 
       context 'prior to renewing plan year begin date' do
         let(:reinstate_effective_date) { renewal_effective_date.prev_month }
-        let(:reinstated_enrollment) {enrollment.reinstate(edi: false)}
+        let(:reinstated_enrollment) do
+          Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
+        end
 
         before do
           census_employee.terminate_employment(reinstate_effective_date.prev_day)
@@ -167,26 +171,15 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
           expect(reinstated_enrollment.product_id).to eq enrollment.product_id
         end
 
-        it 'should build a continuous coverage' do
+        it 'should have continuous coverage' do
           expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
         end
 
-        it 'should give same member coverage begin date as base enrollment to calculate premious correctly' do
+        it 'should give same member coverage begin date as base enrollment' do
           enrollment_member = reinstated_enrollment.hbx_enrollment_members.first
           expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
           expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
           expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
-        end
-
-        it 'should generate passive renewal' do
-          initial_benefit_package = renewal_application.predecessor.benefit_packages.first
-          renewal_application.benefit_packages.first.update_attributes(title: initial_benefit_package.title + renewal_application.effective_period.min.year.to_s)
-          reinstated_enrollment
-          enrollment = HbxEnrollment.where({family_id: family.id,
-                                            effective_on: renewal_effective_date,
-                                            :aasm_state.ne => 'coverage_canceled'}).first
-          expect(enrollment.present?).to be_truthy
-          expect(enrollment.sponsored_benefit_package.benefit_application).to eq benefit_sponsorship.renewal_benefit_application
         end
       end
 
@@ -194,7 +187,9 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
         let(:reinstate_effective_date) { renewal_effective_date }
 
         context 'when plan year is renewing' do
-          let(:reinstated_enrollment) { enrollment.reinstate(edi: false) }
+          let(:reinstated_enrollment) do
+            Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
+          end
 
           before do
             enrollment.terminate_coverage!(reinstate_effective_date.prev_day)
@@ -213,28 +208,22 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
             expect(reinstated_enrollment.product_id).to eq renewal_benefit_package.health_sponsored_benefit.reference_product.id
           end
 
-          it 'should build a continuous coverage' do
+          it 'should have continuous coverage' do
             expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
           end
 
-          it 'should give same member coverage begin date as base enrollment to calculate premious correctly' do
+          it 'should give same member coverage begin date as base enrollment' do
             enrollment_member = reinstated_enrollment.hbx_enrollment_members.first
             expect(enrollment_member.coverage_start_on).to eq reinstated_enrollment.effective_on
             expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
             expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
           end
-
-          it 'should not generate any other passive renewal' do
-            reinstated_enrollment
-            enrollment = HbxEnrollment.where({family_id: family.id,
-                                              effective_on: renewal_effective_date,
-                                              :aasm_state.ne => 'coverage_canceled'}).detect{|en| en != reinstated_enrollment}
-            expect(enrollment).to be_nil
-          end
         end
 
         context 'when renewal plan year is already active' do
-          let(:reinstated_enrollment) { enrollment.reinstate(edi: false) }
+          let(:reinstated_enrollment) do
+            Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
+          end
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(renewal_effective_date + 5.days)
@@ -261,23 +250,15 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
             expect(reinstated_enrollment.product_id).to eq renewal_benefit_package.health_sponsored_benefit.reference_product.id
           end
 
-          it 'should build a continuous coverage' do
+          it 'should have continuous coverage' do
             expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
           end
 
-          it 'should give same member coverage begin date as base enrollment to calculate premious correctly' do
+          it 'should give same member coverage begin date as base enrollment' do
             enrollment_member = reinstated_enrollment.hbx_enrollment_members.first
             expect(enrollment_member.coverage_start_on).to eq reinstated_enrollment.effective_on
             expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
             expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
-          end
-
-          it 'should not generate any other passive renewal' do
-            reinstated_enrollment
-            enrollment = HbxEnrollment.where({family_id: family.id,
-                                              effective_on: renewal_effective_date,
-                                              :aasm_state.ne => 'coverage_canceled'}).detect{|en| en != reinstated_enrollment}
-            expect(enrollment).to be_nil
           end
         end
       end
