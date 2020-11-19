@@ -4,8 +4,8 @@ module Operations
   module HbxEnrollments
     # This class clones a hbx_enrollment where end
     # result is a new hbx_enrollment. The aasm_state
-    # of the newly created application will be shopping irrespective
-    # of the aasm_state of the input hbx_enrollment.
+    # of the newly created hbx_enrollment will be shopping
+    # irrespective of the aasm_state of the input hbx_enrollment.
     # Also, the result hbx_enrollment is a non-persisted object.
     class Clone
       include Dry::Monads[:result, :do]
