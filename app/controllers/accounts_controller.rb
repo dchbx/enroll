@@ -1,18 +1,14 @@
 # frozen_string_literal: true
 
-class PortalsController < ApplicationController
+class AccountsController < ApplicationController
 
 
   layout 'bootstrap_4_two_column'
 
   before_action :find_person
 
-  def index
-    render :index
-  end
-
-  def show
-    render :show
+  def available_accounts
+    render :available_accounts
   end
 
   def new
