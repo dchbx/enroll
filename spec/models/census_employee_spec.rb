@@ -2411,7 +2411,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     context 'when multiple renewal assignments present' do
 
       context 'and latest assignment has enrollment associated' do
-        let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
+        let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee, end_on: renewal_benefit_group.end_on)}
         let(:enrollment) { double }
 
         before do
@@ -2849,8 +2849,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
   end
 
-  describe "#terminate_employee_enrollments" do
-
+  describe "#terminate_employee_enrollments", dbclean: :around_each do
+    let(:aasm_state) { :imported }
     include_context "setup renewal application"
 
     let(:renewal_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 2.months }
