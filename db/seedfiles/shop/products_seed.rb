@@ -31,7 +31,7 @@ namespace :shop do
           pt[:rating_area_id] = rating_area_id
         end
 
-        BenefitMarkets::Products::Product.create(product_hash)
+        product_hash[:kind].to_s == 'health' ? BenefitMarkets::Products::HealthProducts::HealthProduct.create(product_hash) :BenefitMarkets::Products::DentalProducts::DentalProduct.create(product_hash)
       end
       puts ":::: Created #{data.length} products for #{year} benefit year ::::" unless Rails.env.test?
     end

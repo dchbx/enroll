@@ -26,7 +26,7 @@ namespace :system do
     HbxStaffRole.create!(person: super_admin.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile_id)
 
     puts "::: Created Admin Roles. ::::"
-    puts "::: Super Admin Credentials ::::"
+    puts "::: Admin Credentials ::::"
     puts "username - admin@dc.gov"
     puts 'password - aA1!aA1!aA1!'
   end
