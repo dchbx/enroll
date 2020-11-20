@@ -86,13 +86,45 @@ RSpec.describe Operations::HbxEnrollments::Clone, :type => :model, dbclean: :aro
   end
 
   context 'failure' do
-    context 'no params' do
-      before do
-        @result = subject.call({})
+    context 'missing params' do
+      context 'no params' do
+        before do
+          @result = subject.call({})
+        end
+
+        it 'should return a failure with a message' do
+          expect(@result.failure).to eq('Missing Keys.')
+        end
       end
 
-      it 'should return a failure with a message' do
-        expect(@result.failure).to eq('Missing Keys.')
+      context 'missing hbx_enrollment key' do
+        before do
+          @result = subject.call({effective_on: TimeKeeper.date_of_record, options: {}})
+        end
+
+        it 'should return a failure with a message' do
+          expect(@result.failure).to eq('Missing Keys.')
+        end
+      end
+
+      context 'missing effective_on key' do
+        before do
+          @result = subject.call({hbx_enrollment: 'hbx_enrollment', options: {}})
+        end
+
+        it 'should return a failure with a message' do
+          expect(@result.failure).to eq('Missing Keys.')
+        end
+      end
+
+      context 'missing options key' do
+        before do
+          @result = subject.call({hbx_enrollment: 'hbx_enrollment', effective_on: TimeKeeper.date_of_record})
+        end
+
+        it 'should return a failure with a message' do
+          expect(@result.failure).to eq('Missing Keys.')
+        end
       end
     end
 
