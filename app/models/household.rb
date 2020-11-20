@@ -264,7 +264,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households.tax_household_with_year(year).active_tax_household.order_by(:'created_at'.desc).first
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:created_at.desc).first
   end
 
   def latest_tax_household_with_year(year)
