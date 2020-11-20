@@ -468,7 +468,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
         let(:thh_year) {2015}
         let(:family_db) { Family.where(e_case_id: parser.integrated_case_id).first }
-        let(:tax_household_db) { family_db.active_household.latest_active_tax_household_with_year(thh_year) }
+        let(:tax_household_db) { family_db.active_household.latest_tax_households_with_year(thh_year).first }
         let(:person_db) { family_db.primary_applicant.person }
         let(:consumer_role_db) { person_db.consumer_role }
         let(:new_dep_consumer_role_db) { family_db.dependents.first.person.consumer_role }
@@ -486,7 +486,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
         it "updates the tax household with aptc from the payload on the primary persons family" do
           expect(tax_household_db).to be_truthy
-          expect(tax_household_db).to eq person.primary_family.active_household.latest_active_tax_household_with_year(tax_household_db.effective_starting_on.year)
+          expect(tax_household_db).to eq person.primary_family.active_household.latest_tax_households_with_year(tax_household_db.effective_starting_on.year).first
           expect(tax_household_db.primary_applicant.family_member.person).to eq person
           expect(tax_household_db.allocated_aptc).to eq 0
           expect(tax_household_db.is_eligibility_determined).to be_truthy
