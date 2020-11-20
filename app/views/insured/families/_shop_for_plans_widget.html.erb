@@ -52,7 +52,7 @@
             </div>
             <strong><%= l10n("insured.shop_for_health_and_dental_plans")%></strong>
           </div>
-          <% if (@family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)) || (@employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending?) || (@employee_role.can_enroll_as_new_hire? && @employee_role.is_under_off_cycle_open_enrollment?)%>
+          <% if (@family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)) || (@employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending?) || (@employee_role.can_enroll_as_new_hire? && @employee_role.is_under_off_cycle_open_enrollment? && @employee_role.can_get_coverage_under_current_py?)%>
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
               <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
                 <%= l10n("insured.shop_for_plans")%>
