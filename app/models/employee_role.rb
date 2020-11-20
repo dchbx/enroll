@@ -132,11 +132,11 @@ class EmployeeRole
     census_employee.benefit_package_for_date(possible_effective_date)
   end
 
-  def benefit_package(qle: false, new_hire_with_off_cycle_oe: false)
+  def benefit_package(qle: false, dual_oe: false)
     if qle.present?
       qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
-    elsif new_hire_with_off_cycle_oe
-      census_employee.off_cycle_published_benefit_group
+    elsif dual_oe
+      census_employee.published_benefit_group
     else
       new_hire_or_possible_benefit_package
     end
@@ -151,18 +151,18 @@ class EmployeeRole
     census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
   end
 
-  # Check if a new hire can get immediate coverage under active application if employee is in off cycle open enrollment
+  # Check if a new hire can get immediate coverage under active application if employee is in off cycle/renewal open enrollment
   def can_get_coverage_under_current_py?
-    package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
-    off_cycle_application = census_employee.benefit_sponsorship.off_cycle_benefit_application
-    return false if package.nil? || off_cycle_application.nil?
+    package = census_employee.active_benefit_group_assignment.benefit_package
+    application = census_employee.benefit_sponsorship.off_cycle_benefit_application || census_employee.benefit_sponsorship.renewal_benefit_application
+    return false if package.nil? || application.nil?
 
-    off_cycle_application != package.benefit_application
+    application != package.benefit_application
   end
 
   # Use this method to pull earliest effective on for new hire when there is no sep
-  def earliest_effective_on_for_new_hire
-    package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
+  def earliest_effective_on_for_new_hire_in_current_py
+    package = census_employee.active_benefit_group_assignment.benefit_package
     census_employee.coverage_effective_on(package)&.to_date
   end
 

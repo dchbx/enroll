@@ -8,7 +8,7 @@ class GroupSelectionPrevaricationAdapter
   attr_accessor :enrollment_kind
   attr_accessor :shop_for_plans
   attr_accessor :optional_effective_on
-  attr_accessor :new_hire_with_off_cycle_oe
+  attr_accessor :dual_oe
 
   include ActiveModel::Model
 
@@ -18,7 +18,7 @@ class GroupSelectionPrevaricationAdapter
     family = person.primary_family
     coverage_household = family.active_household.immediate_family_coverage_household
     change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    new_hire_with_off_cycle_oe = params[:new_hire_with_off_cycle_oe] || false
+    dual_oe = params[:dual_oe] || false
     coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     shop_for_plans = params[:shop_for_plans].present? ? params[:shop_for_plans] : ''
@@ -32,7 +32,7 @@ class GroupSelectionPrevaricationAdapter
       enrollment_kind: enrollment_kind,
       shop_for_plans: shop_for_plans,
       optional_effective_on: optional_effective_on,
-      new_hire_with_off_cycle_oe: new_hire_with_off_cycle_oe
+      dual_oe: dual_oe
     )
     if params[:hbx_enrollment_id].present?
       enrollment = ::HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -242,7 +242,7 @@ class GroupSelectionPrevaricationAdapter
     return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
     if possible_employee_role.present?
-      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?, new_hire_with_off_cycle_oe: new_hire_with_off_cycle_oe)
+      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?, dual_oe: dual_oe)
     end
 
     if @change_plan.present? && @previous_hbx_enrollment.present?
