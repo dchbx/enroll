@@ -18,7 +18,8 @@ Feature: As an admin user I should have the ability to click reinstate button on
     And Admin will see transmit to carrier checkbox
     When Admin clicks on Submit button
     Then Admin will see confirmation pop modal
-    And Admin will click on Cancel button
+    When Admin clicks on continue button for reinstating benefit_application
+    Then Admin will see a Successfull message
     And user logs out
 
   Examples:

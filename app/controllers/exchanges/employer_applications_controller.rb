@@ -55,7 +55,11 @@ module Exchanges
       render json: @reasons
     end
 
-    def reinstate; end
+    def reinstate
+      @application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
+      flash[:notice] = "Plan Year Reinstated Successfully"
+      render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
+    end
 
     private
 
