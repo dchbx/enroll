@@ -42,7 +42,7 @@ module BenefitSponsors
           @effective_period = effective_period_range(params)
           current_ba = params[:benefit_application]
           valid_bas = current_ba.benefit_sponsorship.benefit_applications.non_canceled.where(:id.ne => current_ba.id)
-          valid_bas.any?{|ba| ba.effective_period.cover?(@effective_period.min)}
+          valid_bas.any?{|ba| ba.effective_period.cover?(@effective_period.min) || ba.effective_period.min >= @effective_period.min}
         end
 
         def effective_period_range(params)

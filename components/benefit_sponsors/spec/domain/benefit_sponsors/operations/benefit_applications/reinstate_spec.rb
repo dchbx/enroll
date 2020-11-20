@@ -38,7 +38,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
   context 'with valid benefit_application' do
     let(:current_year) {current_effective_date.year}
-    let(:end_of_year) {Date.new(current_year, 12, 31)}
+    let(:end_of_the_year) {Date.new(current_year, 12, 31)}
 
     before do
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
@@ -70,7 +70,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         it 'should return a BenefitApplication with remaining effective_period' do
-          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
+          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_the_year)
         end
 
         it 'should populate reinstated_id' do
@@ -146,7 +146,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       context 'reinstate termination_pending benefit application' do
         before do
           initial_application.schedule_enrollment_termination!
-          initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record + 1.month).end_of_month)
+          initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: TimeKeeper.date_of_record.end_of_month)
           @new_ba = subject.call({benefit_application: initial_application}).success
           @first_wfst = @new_ba.workflow_state_transitions.first
           @second_wfst = @new_ba.workflow_state_transitions.second
@@ -161,7 +161,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         it 'should return a BenefitApplication with remaining effective_period' do
-          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_year)
+          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_the_year)
         end
 
         it 'should populate reinstated_id' do
@@ -193,18 +193,38 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     end
 
     context 'with overlapping benefit_application' do
-      before do
-        overlapping_ba = initial_application.benefit_sponsorship.benefit_applications.new
-        initial_app_params = initial_application.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_packages, :workflow_state_transitions)
-        overlapping_ba.assign_attributes(initial_app_params)
-        overlapping_ba.save!
-        initial_application.terminate_enrollment!
-        initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
-        @result = subject.call({benefit_application: initial_application})
+      context "new effective_on lies within a benefit_application's effective_period" do
+        before do
+          overlapping_ba = initial_application.benefit_sponsorship.benefit_applications.new
+          initial_app_params = initial_application.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_packages, :workflow_state_transitions)
+          overlapping_ba.assign_attributes(initial_app_params)
+          overlapping_ba.save!
+          initial_application.terminate_enrollment!
+          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+          @result = subject.call({benefit_application: initial_application})
+        end
+
+        it 'should return failure with a message' do
+          expect(@result.failure).to eq('Overlapping BenefitApplication exists for this Employer.')
+        end
       end
 
-      it 'should return failure with a message' do
-        expect(@result.failure).to eq('Overlapping BenefitApplication exists for this Employer.')
+      context 'a valid benefit_application will be effective after the new effective_on' do
+        before do
+          overlapping_ba = initial_application.benefit_sponsorship.benefit_applications.new
+          initial_app_params = initial_application.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_packages, :workflow_state_transitions)
+          overlapping_ba.assign_attributes(initial_app_params)
+          ba_effective_period = (Date.new(current_year, 12, 1)..end_of_the_year)
+          overlapping_ba.assign_attributes(effective_period: ba_effective_period)
+          overlapping_ba.save!
+          initial_application.terminate_enrollment!
+          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+          @result = subject.call({benefit_application: initial_application})
+        end
+
+        it 'should return failure with a message' do
+          expect(@result.failure).to eq('Overlapping BenefitApplication exists for this Employer.')
+        end
       end
     end
   end
