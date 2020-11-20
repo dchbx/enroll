@@ -64,6 +64,16 @@ module Validators
         optional(:hbx_enrollment_members).array(:hash)
       end
 
+      rule(:terminated_on, :effective_on) do
+        if key? && value
+          if !value.is_a?(Date)
+            key.failure('must be a date')
+          elsif values[:terminated_on] < values[:effective_on]
+            key.failure('must be on or after effective_on.')
+          end
+        end
+      end
+
       rule(:hbx_enrollment_members) do
         if key? && value
           hbx_enrollment_members_array = value.inject([]) do |hash_array, member_hash|
