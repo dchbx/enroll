@@ -264,16 +264,7 @@ class Household
   end
 
   def latest_active_tax_household_with_year(year)
-    tax_households = self.tax_households.tax_household_with_year(year)
-    if TimeKeeper.date_of_record.year == year
-      tax_households = self.tax_households.tax_household_with_year(year).active_tax_household
-    end
-
-    if tax_households.empty?
-      nil
-    else
-      tax_households.entries.last
-    end
+    tax_households.tax_household_with_year(year).active_tax_household.order_by(:'created_at'.desc).first
   end
 
   def latest_tax_household_with_year(year)
