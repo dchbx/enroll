@@ -6,7 +6,7 @@ namespace :system do
     
     Rake::Task['permissions:assign_current_permissions'].invoke
 
-    super_admin = FactoryBot.create(:user, :with_person, first_name: 'admin', last_name: 'system', oim_id: 'admin@dc.gov', password: 'aA1!aA1!aA1!')
+    super_admin = FactoryBot.create(:user, :with_person, oim_id: 'admin@dc.gov', password: 'aA1!aA1!aA1!', password_confirmation: 'aA1!aA1!aA1!')
     hbx_read_only = FactoryBot.create(:user, :with_person)
     hbx_csr_supervisor = FactoryBot.create(:user, :with_person)
     hbx_csr_tier1 = FactoryBot.create(:user, :with_person)

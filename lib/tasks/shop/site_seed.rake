@@ -50,9 +50,6 @@ namespace :shop do
   end
 end
 
-
-require 'rails_helper'
-
 RSpec.describe "site seed", dbclean: :after_each do
   require 'rake'
 

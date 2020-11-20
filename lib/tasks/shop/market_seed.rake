@@ -4,6 +4,7 @@ namespace :shop do
 
     puts ":::: Creating markets, pricing models, contribution units ::::"
 
+    site = BenefitSponsors::Site.all.first
     site_key = Settings.site.key
     state = site_key.upcase.to_s
     current_year = TimeKeeper.date_of_record.year

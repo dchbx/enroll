@@ -15,7 +15,7 @@ namespace :shop do
     data = JSON.load(contents)
 
     JSON.parse(data).each do |organization_params|
-      organization_params = organization_params.deep_symbolize_keys!
+      organization_params.deep_symbolize_keys!
       issuer = BenefitSponsors::Organizations::ExemptOrganization.new(organization_params.except(:profiles))
       issuer.profiles = organization_params[:profiles].inject([]) do |result, profile_hash|
         result << BenefitSponsors::Organizations::IssuerProfile.new(profile_hash)

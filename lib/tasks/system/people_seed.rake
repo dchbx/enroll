@@ -1,6 +1,6 @@
 namespace :system do
-  desc "Load Roles, permissions"
-  task :admin_seed => :environment do
+  desc "Load people"
+  task :people_seed => :environment do
 
     FactoryBot.create_list(:person, 5, :with_family, :with_consumer_role)
     FactoryBot.create_list(:person, 5, :with_family, :with_employee_role)
