@@ -7,6 +7,6 @@ namespace :system do
     FactoryBot.create_list(:person, 5, :with_broker_role)
     FactoryBot.create_list(:person, 5, :with_family, :with_resident_role)
 
-    puts "::: Created consumers, employees, brokers and resident roles - :::"
+    puts "::: Created consumers, employees, brokers and resident roles :::"
   end
 end
