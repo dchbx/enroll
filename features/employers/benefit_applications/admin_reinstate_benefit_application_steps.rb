@@ -36,9 +36,13 @@ When("Admin clicks on Submit button") do
 end
 
 Then("Admin will see confirmation pop modal") do
-  expect(page).to have_content('Plan Year will be Reinstated')
+  expect(page).to have_content('Would you like to reinstate the plan year?')
 end
 
-Then("Admin will click on Cancel button") do
-  find("span", :text => "Cancel").click
+When("Admin clicks on continue button for reinstating benefit_application") do
+  find('.btn', text: 'CONTINUE').click
+end
+
+Then("Admin will see a Successfull message") do
+  expect(page).to have_content("Plan Year Reinstated Successfully")
 end
