@@ -56,5 +56,25 @@ RSpec.describe Validators::HbxEnrollments::HbxEnrollmentContract, type: :model, 
         expect(@result.errors.messages.first.text).to eq('is missing')
       end
     end
+
+    context 'terminated_on falls before effective_on' do
+      before do
+        @result = subject.call(enrollment_params.merge!({terminated_on: TimeKeeper.date_of_record - 10.days}))
+      end
+
+      it 'should return failure with an error message' do
+        expect(@result.errors.messages.first.text).to eq('must be on or after effective_on.')
+      end
+    end
+
+    context 'bad object for terminated_on' do
+      before do
+        @result = subject.call(enrollment_params.merge!({terminated_on: 'test'}))
+      end
+
+      it 'should return failure with an error message' do
+        expect(@result.errors.messages.first.text).to eq('must be a date')
+      end
+    end
   end
 end
