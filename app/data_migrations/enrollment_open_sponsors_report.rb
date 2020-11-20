@@ -41,7 +41,7 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
     BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications => {
                                                                      :$elemMatch => {
                                                                        :predecessor_id => { :$exists => true, :$ne => nil },
-                                                                       :aasm_state.in => [:enrollment_open],
+                                                                       :aasm_state.in => [:enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_extended, :active],
                                                                        :workflow_state_transitions => {
                                                                          "$elemMatch" => {
                                                                            "to_state" => :enrollment_open,
@@ -52,7 +52,7 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
     })
   end
 
-  def find_failure_reason(enrollment_prev_year, enrollment_current_year)
+  def enrollment_reason(enrollment_prev_year, enrollment_current_year)
     current_year_state = enrollment_current_year.try(:aasm_state)
     prev_year_state = enrollment_prev_year.try(:aasm_state)
     rp_id = enrollment_prev_year.try(:product).try(:renewal_product_id)
@@ -82,7 +82,11 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
         puts "Processing...#{ben_spon.legal_name}"
 
         ben_app_prev_year = ben_spon.benefit_applications.where(:"effective_period.min".lt => from_date, aasm_state: :active).first
-        ben_app_curr_year = ben_spon.benefit_applications.where(:"effective_period.min".gte => from_date, aasm_state: :enrollment_open).first
+        ben_app_curr_year = ben_spon.benefit_applications.where({
+          :"effective_period.min".gte => from_date,
+          :predecessor_id => { :$exists => true, :$ne => nil },
+          :aasm_state.in => [:enrollment_open, :enrollment_closed, :enrollment_eligible, :enrollment_extended, :active]
+        }).first
 
         ben_spon.census_employees.non_term_and_pending.no_timeout.each do |census|
           if census.employee_role.present?
@@ -95,7 +99,10 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
           renewal_enrollments = []
           if family.present?
             benefit_package_ids = ben_app_curr_year.present? ? ben_app_curr_year.benefit_packages.map(&:id) : []
-            renewal_enrollments = family.active_household.hbx_enrollments.where(:sponsored_benefit_package_id.in => benefit_package_ids, :aasm_state.nin => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES))
+            renewal_enrollments = family.active_household.hbx_enrollments.where({
+              :sponsored_benefit_package_id.in => benefit_package_ids,
+              :aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES)
+            })
           end
 
           next if renewal_enrollments.size > 0
@@ -139,7 +146,7 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
                     enrollment_current_year&.product&.hios_id,
                     enrollment_current_year&.effective_on,
                     enrollment_current_year&.aasm_state]
-            data += [find_failure_reason(enrollment_prev_year, enrollment_current_year)]
+            data += [enrollment_reason(enrollment_prev_year, enrollment_current_year)]
             csv << data
           end
         end
