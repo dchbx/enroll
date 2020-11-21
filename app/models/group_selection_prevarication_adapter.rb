@@ -18,7 +18,7 @@ class GroupSelectionPrevaricationAdapter
     family = person.primary_family
     coverage_household = family.active_household.immediate_family_coverage_household
     change_plan = params[:change_plan].present? ? params[:change_plan] : ''
-    dual_oe = params[:dual_oe] || false
+    dual_oe = params[:dual_oe] == "true"
     coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     shop_for_plans = params[:shop_for_plans].present? ? params[:shop_for_plans] : ''
@@ -311,7 +311,7 @@ class GroupSelectionPrevaricationAdapter
 
   def build_new_shop_waiver_enrollment(controller_employee_role, params)
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
+    e_builder.build_new_waiver_enrollment(is_qle: is_qle?, is_dual_oe: dual_oe, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
 
   def build_change_shop_waiver_enrollment(
@@ -442,7 +442,7 @@ class GroupSelectionPrevaricationAdapter
   )
 
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: optional_effective_on)
+    e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, is_dual_oe: dual_oe,  optional_effective_on: optional_effective_on)
   end
 
   def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)

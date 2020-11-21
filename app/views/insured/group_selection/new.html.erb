@@ -19,6 +19,7 @@
         <%= hidden_field_tag(:coverage_household_id, @coverage_household_id) %>
         <%= hidden_field_tag(:enrollment_kind, @enrollment_kind) %>
         <%= hidden_field_tag(:hbx_enrollment_id, @hbx_enrollment.id) if @hbx_enrollment.present? %>
+        <%= hidden_field_tag(:dual_oe, @dual_oe) if @dual_oe %>
 
           <% if @adapter.can_shop_shop?(@person) || @adapter.can_shop_individual?(@person) || @adapter.can_shop_resident?(@person) && @coverage_household.coverage_household_members %>
             <div id="coverage-household" class='row no-buffer'>

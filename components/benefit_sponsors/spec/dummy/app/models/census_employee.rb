@@ -331,7 +331,7 @@ class CensusEmployee < CensusMember
     if benefit_packages.present?
       if assignment.present?
         end_date, new_start_on =
-          if assignment.start_on > TimeKeeper.date_of_record
+          if assignment.start_on >= TimeKeeper.date_of_record
             [assignment.start_on, benefit_packages.first.start_on]
           else
             [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
@@ -346,7 +346,7 @@ class CensusEmployee < CensusMember
     if renewal_benefit_packages.present?
       if renewal_benefit_group_assignment.present?
         end_date, new_start_on =
-          if renewal_benefit_group_assignment.start_on > TimeKeeper.date_of_record
+          if renewal_benefit_group_assignment.start_on >= TimeKeeper.date_of_record
             [renewal_benefit_group_assignment.start_on, renewal_benefit_packages.first.start_on]
           else
             [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
