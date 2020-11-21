@@ -25,7 +25,7 @@ module Eligibility
       if benefit_packages.present?
         if assignment.present?
           end_date, new_start_on =
-            if assignment.start_on > TimeKeeper.date_of_record
+            if assignment.start_on >= TimeKeeper.date_of_record
               [assignment.start_on, benefit_packages.first.start_on]
             else
               [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
@@ -40,7 +40,7 @@ module Eligibility
       if renewal_benefit_packages.present?
         if renewal_benefit_group_assignment.present?
           end_date, new_start_on =
-            if renewal_benefit_group_assignment.start_on > TimeKeeper.date_of_record
+            if renewal_benefit_group_assignment.start_on >= TimeKeeper.date_of_record
               [renewal_benefit_group_assignment.start_on, renewal_benefit_packages.first.start_on]
             else
               [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
@@ -105,12 +105,18 @@ module Eligibility
       off_cycle_benefit_group_assignment.benefit_package if off_cycle_benefit_group_assignment&.benefit_package&.benefit_application&.is_submitted?
     end
 
-    def possible_benefit_package
+    def possible_benefit_package(is_dual_oe: false)
       if under_new_hire_enrollment_period?
+        return active_benefit_group_assignment.benefit_package if is_dual_oe && active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+
         benefit_package = benefit_package_for_date(earliest_eligible_date)
         return benefit_package if benefit_package.present?
       end
 
+      benefit_package_based_on_assignment
+    end
+
+    def benefit_package_based_on_assignment
       if renewal_benefit_group_assignment.present? && (renewal_benefit_group_assignment.benefit_application.is_renewal_enrolling? || renewal_benefit_group_assignment.benefit_application.enrollment_eligible?)
         renewal_benefit_group_assignment.benefit_package
       elsif off_cycle_benefit_group_assignment.present? && (off_cycle_benefit_group_assignment.benefit_application.is_enrolling? || off_cycle_benefit_group_assignment.benefit_application.enrollment_eligible?)

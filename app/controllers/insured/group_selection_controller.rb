@@ -39,6 +39,7 @@ class Insured::GroupSelectionController < ApplicationController
 
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
+    @dual_oe = @adapter.dual_oe
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|

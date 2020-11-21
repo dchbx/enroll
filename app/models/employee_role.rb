@@ -153,16 +153,16 @@ class EmployeeRole
 
   # Check if a new hire can get immediate coverage under active application if employee is in off cycle/renewal open enrollment
   def can_get_coverage_under_current_py?
-    package = census_employee.active_benefit_group_assignment.benefit_package
-    application = census_employee.benefit_sponsorship.off_cycle_benefit_application || census_employee.benefit_sponsorship.renewal_benefit_application
-    return false if package.nil? || application.nil?
+    active_package = census_employee.active_benefit_group_assignment&.benefit_package
+    future_package = census_employee.off_cycle_benefit_group_assignment&.benefit_package || census_employee.renewal_benefit_group_assignment&.benefit_package
+    return false if active_package.nil? || future_package.nil?
 
-    application != package.benefit_application
+    census_employee.coverage_effective_on(future_package) != census_employee.coverage_effective_on(active_package)
   end
 
   # Use this method to pull earliest effective on for new hire when there is no sep
   def earliest_effective_on_for_new_hire_in_current_py
-    package = census_employee.active_benefit_group_assignment.benefit_package
+    package = census_employee.active_benefit_group_assignment&.benefit_package
     census_employee.coverage_effective_on(package)&.to_date
   end
 

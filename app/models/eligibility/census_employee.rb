@@ -1,8 +1,8 @@
 module Eligibility
   module CensusEmployee
 
-    def coverage_effective_on(package = nil)
-      package = possible_benefit_package if (package.blank? || package.is_conversion?) # cautious
+    def coverage_effective_on(package = nil, is_dual_oe: false)
+      package = possible_benefit_package(is_dual_oe: is_dual_oe) if package.blank? || package.is_conversion? # cautious
       if package.present?
         effective_on_date = package.effective_on_for(hired_on)
         effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max if newly_designated?
@@ -18,15 +18,15 @@ module Eligibility
 
     # TODO: eligibility rule different for active and renewal plan years
     def earliest_eligible_date
-      possible_benefit_group_assignment&.benefit_group&.eligible_on(hired_on)
+      possible_benefit_group_assignment&.benefit_package&.eligible_on(hired_on)
     end
 
     def newly_eligible_earlist_eligible_date
-      possible_benefit_group_assignment&.benefit_group&.start_on
+      possible_benefit_group_assignment&.benefit_package&.start_on
     end
 
     def earliest_effective_date
-      possible_benefit_group_assignment&.benefit_group&.effective_on_for(hired_on)
+      possible_benefit_group_assignment&.benefit_package&.effective_on_for(hired_on)
     end
 
     def under_new_hire_enrollment_period?
