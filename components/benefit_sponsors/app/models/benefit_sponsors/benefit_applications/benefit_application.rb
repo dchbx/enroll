@@ -493,6 +493,10 @@ module BenefitSponsors
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
     end
 
+    def is_off_cycle?
+      effective_period.min != benefit_sponsorship.effective_begin_on
+    end
+
     def open_enrollment_contains?(date)
       open_enrollment_period.cover?(date)
     end
@@ -756,7 +760,11 @@ module BenefitSponsors
 
     def send_employee_invites
       if is_renewing?
-        notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+        if is_off_cycle?
+          notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
+        else
+          notify("acapi.info.events.plan_year.employee_renewal_invitations_requested", {:benefit_application_id => self.id.to_s})
+        end
       elsif enrollment_open?
         notify("acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested", {:benefit_application_id => self.id.to_s})
       else
