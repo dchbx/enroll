@@ -23,6 +23,7 @@ namespace :reports do
         csv << field_names
         benefit_sponsorships.no_timeout.each do |sponsorship|
           employer_profile = sponsorship.organization.employer_profile
+          next if employer_profile.is_fehb?
           benefit_application = employer_profile.benefit_applications.detect do |benefit_application|
             (benefit_application.open_enrollment_period.include?(window_date)) && (valid_states.include?(benefit_application.aasm_state))
           end
