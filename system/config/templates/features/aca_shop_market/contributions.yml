@@ -314,9 +314,11 @@ registry:
         is_enabled: true
         settings:
         - key: :initial_application_period
-          item: <%= Date.new(2020,03,01)..Date.new(2020,12,31) %>
+          item: <%= Date.new(2020,03,01)..Date.new(2021,12,31) %>
+        - key: :renewal_application_period
+          item: <%= Date.new(2021,01,01)..Date.new(2021,12,31) %>
         - key: :enabled_for_renewal_applications
-          item: false
+          item: true
         - key: :employer_contribution_percent_minimum
           item: 0
         - key: :employer_family_contribution_percent_minimum

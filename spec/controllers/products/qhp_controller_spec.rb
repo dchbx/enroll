@@ -86,6 +86,8 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
     let(:qhp_cost_share_variance){ double("QhpCostShareVariance", :hios_plan_and_variant_id => "id") }
     let(:product) { double("Product") }
     let(:qhp_cost_share_variances) { [qhp_cost_share_variance] }
+    let(:enrollment_plan_id) { shop_health_enrollment.plan_id }
+    let(:dental_plan_id) { shop_dental_enrollment.plan_id }
 
     before do
       allow(Products::QhpCostShareVariance).to receive(:find_qhp_cost_share_variances).and_return(qhp_cost_share_variances)
@@ -94,7 +96,8 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
     it "should return summary of a plan for shop and coverage_kind as health" do
       allow(qhp_cost_share_variance).to receive(:product_for).with("aca_shop").and_return(product)
       sign_in(user)
-      get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_health_enrollment.id, active_year: shop_health_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "health"}
+      get :summary, params: {enrollment_plan_id: enrollment_plan_id, standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_health_enrollment.id,
+                             active_year: shop_health_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "health"}
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "aca_shop"
       expect(assigns(:coverage_kind)).to eq "health"
@@ -113,7 +116,8 @@ RSpec.describe Products::QhpController, :type => :controller, dbclean: :around_e
       allow(qhp_cost_share_variance).to receive(:product_for).with("aca_shop").and_return(product)
       allow(qhp_cost_share_variance).to receive(:hios_plan_and_variant_id=)
       sign_in(user)
-      get :summary, params: {standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_dental_enrollment.id, active_year: shop_dental_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "dental"}
+      get :summary, params: {dental_plan_id: dental_plan_id, standard_component_id: "11111100001111-01", hbx_enrollment_id: shop_dental_enrollment.id,
+                             active_year: shop_dental_enrollment.effective_on.year, market_kind: "shop", coverage_kind: "dental"}
       expect(response).to have_http_status(:success)
       expect(assigns(:market_kind)).to eq "aca_shop"
       expect(assigns(:coverage_kind)).to eq "dental"

@@ -87,6 +87,7 @@ Feature: Insured Plan Shopping on Individual market
     Then I should not see any plan which premium is 0
     Then Individual logs out
 
+  @flaky
   Scenario: Individual should not see document errors when not applying for coverage.
     Given Individual resumes enrollment
     And Individual click on Sign In
