@@ -131,9 +131,9 @@ module BenefitSponsors
       private
 
       def execute_sponsor_event(benefit_sponsorships, event)
-        notify_logger("Event: #{event}. Process started at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}")
+        notify_logger("Event: #{event}. Process started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}")
         BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorships, event)
-        notify_logger("Event: #{event}. Process ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}")
+        notify_logger("Event: #{event}. Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M')}")
       end
 
       def process_events_for(&block)
