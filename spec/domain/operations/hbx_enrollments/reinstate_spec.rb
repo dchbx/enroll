@@ -64,14 +64,16 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
 
     context 'when enrollment reinstated', dbclean: :around_each do
-      let(:reinstated_enrollment) do
-        Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
-      end
+      let(:reinstated_enrollment) { subject.call({hbx_enrollment: enrollment}).success }
 
       it 'should build reinstated enrollment' do
         expect(reinstated_enrollment.kind).to eq enrollment.kind
         expect(reinstated_enrollment.coverage_kind).to eq enrollment.coverage_kind
         expect(reinstated_enrollment.product_id).to eq enrollment.product_id
+      end
+
+      it 'should return enrollment in coverage_selected state' do
+        expect(reinstated_enrollment.aasm_state).to eq 'coverage_selected'
       end
 
       it 'should have continuous coverage' do
@@ -83,6 +85,19 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
         expect(enrollment_member.eligibility_date).to eq reinstated_enrollment.effective_on
         expect(reinstated_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
+      end
+    end
+
+    context 'overlapping enrollment exists' do
+      before do
+        new_enr = enrollment.dup
+        new_enr.assign_attributes({effective_on: enrollment.terminated_on.next_day})
+        new_enr.save!
+        @result = subject.call({hbx_enrollment: enrollment})
+      end
+
+      it 'should return a failure with a message' do
+        expect(@result.failure).to eq('Overlapping coverage exists for this family in current year.')
       end
     end
   end
@@ -155,9 +170,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
 
       context 'prior to renewing plan year begin date' do
         let(:reinstate_effective_date) { renewal_effective_date.prev_month }
-        let(:reinstated_enrollment) do
-          Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
-        end
+        let(:reinstated_enrollment) { subject.call({hbx_enrollment: enrollment}).success }
 
         before do
           census_employee.terminate_employment(reinstate_effective_date.prev_day)
@@ -169,6 +182,10 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
           expect(reinstated_enrollment.kind).to eq enrollment.kind
           expect(reinstated_enrollment.coverage_kind).to eq enrollment.coverage_kind
           expect(reinstated_enrollment.product_id).to eq enrollment.product_id
+        end
+
+        it 'should return enrollment in coverage_selected state' do
+          expect(reinstated_enrollment.aasm_state).to eq 'coverage_selected'
         end
 
         it 'should have continuous coverage' do
@@ -187,9 +204,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         let(:reinstate_effective_date) { renewal_effective_date }
 
         context 'when plan year is renewing' do
-          let(:reinstated_enrollment) do
-            Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
-          end
+          let(:reinstated_enrollment) { subject.call({hbx_enrollment: enrollment}).success }
 
           before do
             enrollment.terminate_coverage!(reinstate_effective_date.prev_day)
@@ -208,6 +223,10 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
             expect(reinstated_enrollment.product_id).to eq renewal_benefit_package.health_sponsored_benefit.reference_product.id
           end
 
+          it 'should return enrollment in coverage_selected state' do
+            expect(reinstated_enrollment.aasm_state).to eq 'coverage_selected'
+          end
+
           it 'should have continuous coverage' do
             expect(reinstated_enrollment.effective_on).to eq enrollment.terminated_on.next_day
           end
@@ -221,9 +240,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         end
 
         context 'when renewal plan year is already active' do
-          let(:reinstated_enrollment) do
-            Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: enrollment}).success
-          end
+          let(:reinstated_enrollment) { subject.call({hbx_enrollment: enrollment}).success }
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(renewal_effective_date + 5.days)
@@ -235,9 +252,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
             benefit_sponsorship.reload
           end
 
-          after do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
-          end
+          after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
           it 'should build reinstated enrollment' do
             expect(reinstated_enrollment.kind).to eq enrollment.kind
@@ -248,6 +263,10 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
             expect(reinstated_enrollment.effective_on).to eq reinstate_effective_date
             expect(reinstated_enrollment.sponsored_benefit_package.benefit_application).to eq benefit_sponsorship.active_benefit_application
             expect(reinstated_enrollment.product_id).to eq renewal_benefit_package.health_sponsored_benefit.reference_product.id
+          end
+
+          it 'should return enrollment in coverage_selected state' do
+            expect(reinstated_enrollment.aasm_state).to eq 'coverage_selected'
           end
 
           it 'should have continuous coverage' do
