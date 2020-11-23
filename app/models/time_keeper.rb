@@ -98,6 +98,7 @@ class TimeKeeper
   end
 
   def push_date_of_record
+    notify_logger("TimeKeeper advance day started at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}")
     BenefitSponsorship.advance_day(self.date_of_record)
     BenefitSponsors::ScheduledEvents::AcaShopScheduledEvents.advance_day(self.date_of_record)
     # EmployerProfile.advance_day(self.date_of_record)
@@ -106,6 +107,7 @@ class TimeKeeper
     CensusEmployee.advance_day(self.date_of_record)
     ConsumerRole.advance_day(self.date_of_record)
     QualifyingLifeEventKind.advance_day(self.date_of_record)
+    notify_logger("TimeKeeper advance day ended at #{Time.now.in_time_zone("Eastern Time (US & Canada)").strftime("%m-%d-%Y %H:%M")}")
   end
 
   def push_date_change_event
@@ -114,6 +116,11 @@ class TimeKeeper
     rescue Exception => e
       Rails.logger.error { "Couldn't trigger benefit application date change events due to #{e.inspect}" }
     end
+  end
+
+  def notify_logger(message)
+    Rails.logger.info(message)
+    log(message)
   end
 
   def self.with_cache
