@@ -7,7 +7,7 @@ module Operations
     # is a new hbx_enrollment. The effective_period of the newly
     # created hbx_enrollment depends on the aasm_state of the input
     # hbx_enrollment. The aasm_state of the newly created hbx_enrollment
-    # will be shopping. Currently, this operation supports SHOP
+    # will be coverage_selected. Currently, this operation supports SHOP
     # enrollments only does not account for IVL cases.
     class Reinstate
       include Dry::Monads[:result, :do]
@@ -27,17 +27,26 @@ module Operations
       def validate(params)
         return Failure('Missing Key.') unless params.key?(:hbx_enrollment)
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
+        return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
         valid_states_for_reinstatement = ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled']
         return Failure("Given HbxEnrollment is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(params[:hbx_enrollment].aasm_state)
+        return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?(params)
         init_instance_variables(params)
         return Failure("HbxEnrollment cannot be reinstated. Employer Sponsored Benefits no longer offers the plan/product: #{@reinstate_plan.name}.") unless can_be_reinstated?
 
         Success(params)
       end
 
+      def overlapping_enrollment_exists?(params)
+        @effective_on = fetch_effective_on(params)
+        current_enr = params[:hbx_enrollment]
+        query_criteria = {:aasm_state.nin => ['shopping', 'coverage_canceled'], :_id.ne => current_enr.id, kind: current_enr.kind, coverage_kind: current_enr.coverage_kind}
+        valid_enrs = current_enr.family.hbx_enrollments.where(query_criteria)
+        valid_enrs.any?{|ba| ba.effective_on >= @effective_on && ba.effective_on.year == @effective_on.year}
+      end
+
       def init_instance_variables(values)
         @current_enr = values[:hbx_enrollment]
-        @effective_on = fetch_effective_on(values)
         return unless @current_enr.is_shop?
 
         benefit_application = @current_enr.sponsored_benefit_package.benefit_application
@@ -94,7 +103,12 @@ module Operations
       end
 
       def reinstate_hbx_enrollment(new_enrollment)
-        # TODO: State transitions as needed.
+        return Failure('Cannot transition to state coverage_reinstated on event reinstate_coverage.') unless new_enrollment.may_reinstate_coverage?
+
+        new_enrollment.reinstate_coverage!
+        return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
+
+        new_enrollment.begin_coverage!
         Success(new_enrollment)
       end
 
