@@ -151,7 +151,7 @@ module BenefitSponsors
 
       def notify_logger(message)
         @logger.info(message)
-        log(message)
+        log(message) unless Rails.env.test?
       end
     end
   end
