@@ -46,3 +46,12 @@ end
 Then("Admin will see a Successfull message") do
   expect(page).to have_content("Plan Year Reinstated Successfully")
 end
+
+And(/^initial employer ABC Widgets has updated (.*) effective period for reinstate$/) do |aasm_state|
+  if aasm_state == 'canceled'
+    employer_profile.benefit_applications.first.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+    current_effective_month = TimeKeeper.date_of_record.beginning_of_month
+    effective_period = current_effective_month.next_month.prev_year..(current_effective_month + 10.months)
+    employer_profile.benefit_applications.first.update_attributes!(effective_period: effective_period)
+  end
+end

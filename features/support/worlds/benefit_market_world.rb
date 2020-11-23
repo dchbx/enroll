@@ -81,7 +81,7 @@ module BenefitMarketWorld
       current_effective_date((TimeKeeper.date_of_record + 2.months).beginning_of_month)
     when :enrollment_closed, :enrollment_eligible, :enrollment_extended
       current_effective_date((TimeKeeper.date_of_record + 1.months).beginning_of_month)
-    when :active, :terminated, :termination_pending, :expired, :canceled, :retroactive_cancel
+    when :active, :terminated, :termination_pending, :expired, :retroactive_cancel
       current_effective_date((TimeKeeper.date_of_record - 2.months).beginning_of_month)
     end
   end
@@ -92,7 +92,7 @@ module BenefitMarketWorld
       current_effective_date((TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year)
     when :enrollment_closed, :enrollment_eligible, :enrollment_extended
       current_effective_date((TimeKeeper.date_of_record + 1.months).beginning_of_month.prev_year)
-    when :active, :terminated, :termination_pending, :expired, :canceled, :retroactive_cancel
+    when :active, :terminated, :termination_pending, :expired, :retroactive_cancel
       current_effective_date((TimeKeeper.date_of_record - 1.months).beginning_of_month.prev_year)
     end
   end
