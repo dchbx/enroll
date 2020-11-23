@@ -8,21 +8,21 @@ namespace :reports do
 
       window_date = Date.today
       valid_states = (BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES - [:enrollment_closed])
-      benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:"benefit_applications.aasm_state".in => valid_states)
-
-      employer_profiles = benefit_sponsorships.flat_map(&:benefit_applications).inject([]) do |array, benefit_application|
-        array << benefit_application if benefit_application.open_enrollment_period.include?(window_date)
-        array.flatten
-      end.map(&:sponsor_profile).uniq
-
+      benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications =>
+                                                                                              { :$elemMatch =>
+                                                                                                  {
+                                                                                                    :aasm_state.in => valid_states,
+                                                                                                    :'open_enrollment_period.min'.lte => window_date,
+                                                                                                    :'open_enrollment_period.max'.gte => window_date,
+                                                                                                  }})
       file_name = fetch_file_format('employers_failing_minimum_participation', 'EMPLOYERSFAILINGMINIMUMPARTICIPATION')
 
       field_names  = [ "FEIN", "Legal Name", "DBA Name", "Plan Year Effective Date", "OE Close Date", "Type of Failure", "Type of Group", "Conversion ?" ]
 
       CSV.open(file_name, "w") do |csv|
         csv << field_names
-
-        employer_profiles.each do |employer_profile|
+        benefit_sponsorships.no_timeout.each do |sponsorship|
+          employer_profile = sponsorship.organization.employer_profile
           benefit_application = employer_profile.benefit_applications.detect do |benefit_application|
             (benefit_application.open_enrollment_period.include?(window_date)) && (valid_states.include?(benefit_application.aasm_state))
           end
