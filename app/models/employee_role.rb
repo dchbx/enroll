@@ -132,11 +132,13 @@ class EmployeeRole
     census_employee.benefit_package_for_date(possible_effective_date)
   end
 
-  def benefit_package(qle: false, dual_oe: false)
+  def benefit_package(qle: false, shop_under_current: false, shop_under_future: false)
     if qle.present?
       qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
-    elsif dual_oe
+    elsif shop_under_current
       census_employee.published_benefit_group
+    elsif shop_under_future
+      census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
     else
       new_hire_or_possible_benefit_package
     end
@@ -149,6 +151,10 @@ class EmployeeRole
     end
 
     census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
+  end
+
+  def has_multiple_shop_oe_periods?
+    can_enroll_as_new_hire? && (is_under_open_enrollment? || is_under_off_cycle_open_enrollment?) && can_get_coverage_under_current_py?
   end
 
   # Check if a new hire can get immediate coverage under active application if employee is in off cycle/renewal open enrollment

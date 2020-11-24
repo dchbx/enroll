@@ -105,9 +105,10 @@ module Eligibility
       off_cycle_benefit_group_assignment.benefit_package if off_cycle_benefit_group_assignment&.benefit_package&.benefit_application&.is_submitted?
     end
 
-    def possible_benefit_package(is_dual_oe: false)
+    def possible_benefit_package(shop_under_current: false, shop_under_future: false)
       if under_new_hire_enrollment_period?
-        return active_benefit_group_assignment.benefit_package if is_dual_oe && active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+        return active_benefit_group_assignment.benefit_package if shop_under_current && active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
+        return benefit_package_based_on_assignment if shop_under_future
 
         benefit_package = benefit_package_for_date(earliest_eligible_date)
         return benefit_package if benefit_package.present?
