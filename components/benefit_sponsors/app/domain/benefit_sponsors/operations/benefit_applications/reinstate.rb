@@ -20,7 +20,9 @@ module BenefitSponsors
         # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         def call(params)
           values              = yield validate(params)
-          new_ba              = yield new_benefit_application(values)
+          cloned_ba           = yield clone_benefit_application(values)
+          cloned_bsc          = yield clone_benefit_sponsor_catalog(values)
+          new_ba              = yield new_benefit_application(values, cloned_ba, cloned_bsc)
           benefit_application = yield reinstate(new_ba)
 
           Success(benefit_application)
@@ -57,21 +59,19 @@ module BenefitSponsors
           end
         end
 
-        def new_benefit_application(params)
-          clone_result = Clone.new.call({benefit_application: params[:benefit_application], effective_period: @effective_period})
-          return clone_result if clone_result.failure?
-          new_ba = clone_result.success
-
-          bsc = new_benefit_sponsor_catalog(params[:benefit_application])
-          new_ba.assign_attributes({reinstated_id: params[:benefit_application].id, benefit_sponsor_catalog_id: bsc.id})
-          new_ba.save!
-          Success(new_ba)
+        def clone_benefit_application(values)
+          Clone.new.call({benefit_application: values[:benefit_application], effective_period: @effective_period})
         end
 
-        def new_benefit_sponsor_catalog(current_ba)
-          bsc = current_ba.benefit_sponsorship.benefit_sponsor_catalog_for(current_ba.effective_period.min)
-          bsc.save!
-          bsc
+        def clone_benefit_sponsor_catalog(values)
+          ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: values[:benefit_application].benefit_sponsor_catalog)
+        end
+
+        def new_benefit_application(values, cloned_ba, cloned_bsc)
+          cloned_bsc.save!
+          cloned_ba.assign_attributes({reinstated_id: values[:benefit_application].id, benefit_sponsor_catalog_id: cloned_bsc.id})
+          cloned_ba.save!
+          Success(cloned_ba)
         end
 
         def reinstate(new_ba)
