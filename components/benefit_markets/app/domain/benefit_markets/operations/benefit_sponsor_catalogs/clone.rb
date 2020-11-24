@@ -8,7 +8,8 @@ module BenefitMarkets
     module BenefitSponsorCatalogs
       # This class clones a benefit_sponsor_catalog where end
       # result is a new benefit_sponsor_catalog. Also, the result
-      # benefit_sponsor_catalog is a non-persisted object.
+      # benefit_sponsor_catalog is a non-persisted object
+      # without benefit_application.
       class Clone
         include Dry::Monads[:result, :do]
 
@@ -33,7 +34,7 @@ module BenefitMarkets
         def init_benefit_sponsor_catalog(values)
           current_bsc = values[:benefit_sponsor_catalog]
           new_bsc = ::BenefitMarkets::BenefitSponsorCatalog.new
-          bsc_attributes = current_bsc.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :service_areas, :sponsor_market_policy, :member_market_policy, :product_packages)
+          bsc_attributes = current_bsc.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :benefit_application_id, :service_areas, :sponsor_market_policy, :member_market_policy, :product_packages)
           new_bsc.assign_attributes(bsc_attributes)
           assign_child_objects_for_bsc(new_bsc, current_bsc)
           Success(new_bsc)
