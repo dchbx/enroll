@@ -1656,6 +1656,11 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       expect(census_employee.can_elect_cobra?).to be_truthy
     end
 
+    it "should return true when aasm_state is employee_termination_pending status" do
+      census_employee.aasm_state = 'employee_termination_pending'
+      expect(census_employee.can_elect_cobra?).to be_truthy
+    end
+
     it "should return true when aasm_state is cobra_terminated" do
       census_employee.aasm_state = 'cobra_terminated'
       expect(census_employee.can_elect_cobra?).to be_falsey
@@ -2258,7 +2263,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context 'when multiple renewal assignments present' do
 
-      context 'and latest assignment has enrollment associated' do 
+      context 'and latest assignment has enrollment associated' do
         let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
         let(:enrollment) { double }
 
@@ -2271,7 +2276,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         end
       end
 
-      context 'and ealier assignment has enrollment associated' do 
+      context 'and ealier assignment has enrollment associated' do
         let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
         let(:enrollment) { double }
 
@@ -2672,6 +2677,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
       it "should return false" do
         expect(census_employee.is_terminate_possible?).to eq false
+      end
+    end
+
+    context 'if censue employee is cobra linked and cobra begin date is in future' do
+      let(:aasm_state) {"cobra_linked"}
+
+      it 'should return true' do
+        census_employee.cobra_begin_date = TimeKeeper.date_of_record.next_month
+        expect(census_employee.is_terminate_possible?).to eq true
       end
     end
 

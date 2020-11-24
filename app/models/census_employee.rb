@@ -699,6 +699,7 @@ class CensusEmployee < CensusMember
   end
 
   def is_terminate_possible?
+    return true if cobra_linked? && cobra_begin_date.present? && cobra_begin_date > TimeKeeper.date_of_record
     return true if employment_terminated? || cobra_terminated?
     return false if cobra_linked?
 
@@ -1163,8 +1164,8 @@ class CensusEmployee < CensusMember
     end
 
     event :elect_cobra, :guard => :have_valid_date_for_cobra?, :after => :record_transition do
-      transitions from: :employment_terminated, to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
-      transitions from: :employment_terminated, to: :cobra_eligible
+      transitions from: [:employment_terminated, :employee_termination_pending], to: :cobra_linked, :guard => :has_employee_role_linked?, after: :build_hbx_enrollment_for_cobra
+      transitions from: [:employment_terminated, :employee_termination_pending], to: :cobra_eligible
     end
 
     event :link_employee_role, :after => :record_transition do
@@ -1229,7 +1230,7 @@ class CensusEmployee < CensusMember
   end
 
   def can_elect_cobra?
-    ['employment_terminated'].include?(aasm_state)
+    ['employment_terminated', 'employee_termination_pending'].include?(aasm_state)
   end
 
   def have_valid_date_for_cobra?(current_user = nil)
