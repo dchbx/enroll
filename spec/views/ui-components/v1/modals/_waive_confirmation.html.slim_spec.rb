@@ -2,12 +2,16 @@
 
 require 'rails_helper'
 
-RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
+RSpec.describe "ui-components/v1/modals/_waive_confirmation.html.slim" do
   context "when not waivable" do
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, coverage_kind: 'dental', kind: 'individual') }
+
     before :each do
       assign(:waivable, false)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
-      render "insured/plan_shoppings/waive_confirmation"
+      render "ui-components/v1/modals/waive_confirmation", enrollment: enrollment
     end
 
     it "should not display the waive button" do
@@ -20,10 +24,14 @@ RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
   end
 
   context "when waivable" do
+    let(:person) { FactoryBot.create(:person) }
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+    let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
+
     before :each do
       assign(:waivable, true)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
-      render "insured/plan_shoppings/waive_confirmation", enrollment: instance_double("HbxEnrollment", id: "enrollment_id")
+      render "ui-components/v1/modals/waive_confirmation", enrollment: enrollment
     end
 
     it "should prompt for the waiver reason" do
@@ -42,10 +50,14 @@ RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
     end
 
     context "when coverage_kind is dental" do
+      let(:person) { FactoryBot.create(:person) }
+      let(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
+      let(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family, coverage_kind: 'dental') }
+
       before :each do
         assign(:mc_coverage_kind, 'dental')
         allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
-        render "insured/plan_shoppings/waive_confirmation", enrollment: instance_double("HbxEnrollment", id: "enrollment_id")
+        render "ui-components/v1/modals/waive_confirmation", enrollment: enrollment
       end
 
       it "should display confirm waive" do
