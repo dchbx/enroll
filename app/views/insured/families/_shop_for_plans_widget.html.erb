@@ -97,17 +97,16 @@
                 <% if @employee_role.present? && @employee_role.census_employee.is_employee_in_term_pending? %>
                 <% else %>
                   <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?) %>
-                    <% options.merge!(new_hire_with_off_cycle_oe: true) if @employee_role.can_enroll_as_new_hire? && @employee_role.is_under_off_cycle_open_enrollment? %>
-                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
+                    <% new_options = @employee_role.has_multiple_shop_oe_periods? ? options.merge(shop_under_future: true) : options %>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(new_options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
                   <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
                     <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date ivl_enrollment_effective_date %>.</p>
                   <% end %>
                 <% end %>
               <% end %>
 
-              <% if @employee_role&.can_enroll_as_new_hire? && (@employee_role.is_under_open_enrollment? || @employee_role.is_under_off_cycle_open_enrollment?) && @employee_role.can_get_coverage_under_current_py? %>
-                <% options.merge!(dual_oe: true) %>
-                <p>If you <%= link_to 'enroll as new hire', new_insured_group_selection_path(options) %> coverage will begin <%= format_date @employee_role.earliest_effective_on_for_new_hire_in_current_py %>.</p>
+              <% if @employee_role.has_multiple_shop_oe_periods? %>
+                <p>If you <%= link_to 'enroll as new hire', new_insured_group_selection_path(options.merge(shop_under_current: true)) %> coverage will begin <%= format_date @employee_role.earliest_effective_on_for_new_hire_in_current_py %>.</p>
               <% end %>
 
               <% if @family.latest_active_sep %>

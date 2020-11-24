@@ -1,8 +1,8 @@
 module Eligibility
   module CensusEmployee
 
-    def coverage_effective_on(package = nil, is_dual_oe: false)
-      package = possible_benefit_package(is_dual_oe: is_dual_oe) if package.blank? || package.is_conversion? # cautious
+    def coverage_effective_on(package = nil, shop_under_current: false, shop_under_future: false)
+      package = possible_benefit_package(shop_under_current: shop_under_current, shop_under_future: shop_under_future) if package.blank? || package.is_conversion? # cautious
       if package.present?
         effective_on_date = package.effective_on_for(hired_on)
         effective_on_date = [effective_on_date, newly_eligible_earlist_eligible_date].max if newly_designated?
