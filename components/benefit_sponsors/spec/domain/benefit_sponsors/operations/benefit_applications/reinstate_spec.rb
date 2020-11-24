@@ -79,6 +79,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
         it 'should create new benefit_sponsor_catalog' do
           expect(@new_ba.benefit_sponsor_catalog_id).not_to eq(initial_application.benefit_sponsor_catalog_id)
+          expect(@new_ba.benefit_sponsor_catalog.benefit_application).to eq(@new_ba)
+          expect(@new_ba.benefit_sponsor_catalog.benefit_application.persisted?).to be_truthy
         end
 
         context 'workflow_state_transitions' do

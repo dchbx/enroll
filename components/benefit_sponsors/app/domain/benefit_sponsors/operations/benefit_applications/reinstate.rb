@@ -68,6 +68,7 @@ module BenefitSponsors
         end
 
         def new_benefit_application(values, cloned_ba, cloned_bsc)
+          cloned_bsc.benefit_application = cloned_ba
           cloned_bsc.save!
           cloned_ba.assign_attributes({reinstated_id: values[:benefit_application].id, benefit_sponsor_catalog_id: cloned_bsc.id})
           cloned_ba.save!
