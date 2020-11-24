@@ -289,7 +289,7 @@ Then(/(.*) should see both dependent and primary/) do |role|
   expect(page).to have_content "Coverage For:   #{primary.full_name} + 1 Dependent"
 end
 
-And(/(.*) selects high for metal level plan and metal level box appears selected/) do |role|
+And(/(.*) selects high for metal level plan and metal level box appears selected/) do |_role|
   Capybara.ignore_hidden_elements = false
   page.all('label').detect { |input| input[:for] == 'plan-metal-level-high' }.click
   sleep 5
@@ -373,7 +373,7 @@ When(/(.*) (.*) the primary person/) do |role, checked|
   end
 end
 
-And(/(.*) selects (.*) for coverage kind/) do |role, coverage_kind|
+And(/(.*) selects (.*) for coverage kind/) do |_role, coverage_kind|
   find("##{coverage_kind}-radio-button").click
 end
 
