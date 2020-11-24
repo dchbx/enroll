@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 
 RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone, dbclean: :after_each do
   before do
