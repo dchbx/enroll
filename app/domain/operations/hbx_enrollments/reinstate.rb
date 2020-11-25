@@ -112,9 +112,14 @@ module Operations
         return Failure('Cannot transition to state coverage_reinstated on event reinstate_coverage.') unless new_enrollment.may_reinstate_coverage?
 
         new_enrollment.reinstate_coverage!
-        return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
+        if @current_enr.is_waived?
+          return Failure('Cannot transition to state inactive on event waive_coverage.') unless new_enrollment.may_waive_coverage?
+          new_enrollment.waive_coverage!
+        else
+          return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
+          new_enrollment.begin_coverage!
+        end
 
-        new_enrollment.begin_coverage!
         Success(new_enrollment)
       end
 
