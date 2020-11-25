@@ -24,7 +24,8 @@ module BenefitSponsors
       EMPLOYER_EDI_EVENTS_ON_SAVE = [
         :benefit_coverage_period_terminated_nonpayment,
         :benefit_coverage_period_terminated_voluntary,
-        :benefit_coverage_renewal_carrier_dropped
+        :benefit_coverage_renewal_carrier_dropped,
+        :benefit_coverage_period_reinstated
       ].freeze
 
       DATE_CHANGE_EVENTS = [
@@ -70,7 +71,8 @@ module BenefitSponsors
           end
 
           is_benefit_coverage_renewal_carrier_dropped = true if is_transition_matching?(to: [:canceled, :retroactive_canceled], from: [:enrollment_eligible, :active, :binder_paid], event: :cancel)
-
+          is_benefit_coverage_period_reinstated = true if is_transition_matching?(to: :active, from: :reinstated, event: :activate_enrollment)
+          
           if is_transition_matching?(to: :approved, from: [:draft, :imported] + BenefitSponsors::BenefitApplications::BenefitApplication::APPLICATION_EXCEPTION_STATES, event: :auto_approve_application)
             is_renewal_application_autosubmitted = true
           end

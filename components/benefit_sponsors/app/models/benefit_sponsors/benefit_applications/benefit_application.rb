@@ -53,6 +53,9 @@ module BenefitSponsors
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped".freeze
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped".freeze
 
+    REINSTATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_reinstated".freeze
+    REINSTATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_reinstated".freeze
+
     VOLUNTARY_TERM_REASONS =
       [
         "Company went out of business/bankrupt",
@@ -118,7 +121,7 @@ module BenefitSponsors
     field :termination_kind,       type: String
     field :termination_reason,     type: String
     field :reinstated_id, type: BSON::ObjectId
-    
+
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
