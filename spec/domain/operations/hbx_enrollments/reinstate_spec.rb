@@ -58,7 +58,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
 
     before do
-      census_employee.terminate_employment(effective_on + 1.days)
+      census_employee.terminate_employment(effective_on.next_day)
       enrollment.reload
       census_employee.reload
     end

@@ -40,7 +40,13 @@ module Operations
       def overlapping_enrollment_exists?(params)
         @effective_on = fetch_effective_on(params)
         current_enr = params[:hbx_enrollment]
-        query_criteria = {:aasm_state.nin => ['shopping', 'coverage_canceled'], :_id.ne => current_enr.id, kind: current_enr.kind, coverage_kind: current_enr.coverage_kind}
+        # Same Employer, same Kind, same Coverage Kind and same benefit_sponsorship_id.
+        query_criteria = {:aasm_state.nin => ['shopping', 'coverage_canceled'],
+                          :_id.ne => current_enr.id,
+                          kind: current_enr.kind,
+                          coverage_kind: current_enr.coverage_kind,
+                          benefit_sponsorship_id: current_enr.benefit_sponsorship_id,
+                          employee_role_id: current_enr.employee_role_id}
         valid_enrs = current_enr.family.hbx_enrollments.where(query_criteria)
         valid_enrs.any?{|ba| ba.effective_on >= @effective_on && ba.effective_on.year == @effective_on.year}
       end
