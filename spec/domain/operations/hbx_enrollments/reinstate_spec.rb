@@ -100,6 +100,19 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
         expect(@result.failure).to eq('Overlapping coverage exists for this family in current year.')
       end
     end
+
+    context 'for a waived enrollment' do
+      before do
+        enrollment.update_attributes!(aasm_state: 'shopping')
+        enrollment.waive_coverage!
+        enrollment.cancel_coverage!
+        @result = subject.call({hbx_enrollment: enrollment}).success
+      end
+
+      it 'should transition to inactive' do
+        expect(@result.aasm_state).to eq('inactive')
+      end
+    end
   end
 
   describe 'renewing employer',  dbclean: :around_each do
