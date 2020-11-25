@@ -968,6 +968,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(enrollment.coverage_expired?).to be_truthy
       end
     end
+
+    context 'for event waive_coverage' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'coverage_reinstated')
+        enrollment.waive_coverage!
+      end
+
+      it 'should transition the enrollment to inactive' do
+        expect(enrollment.inactive?).to be_truthy
+      end
+    end
   end
 
   context "can_terminate_coverage?" do
@@ -3811,6 +3822,33 @@ describe ".parent enrollments", dbclean: :around_each do
 
       it 'should create the workflow_state_transition object' do
         expect(hbx_enrollment12.workflow_state_transitions.count).to eq(1)
+      end
+    end
+  end
+
+  context 'is_waived?' do
+    context 'non-waived enrollment' do
+      it 'should return false if the enrollment is non-waived' do
+        expect(active_enrollment.is_waived?).to be_falsy
+      end
+    end
+
+    context 'waived enrollment' do
+      before {active_enrollment.update_attributes!(aasm_state: 'shopping')}
+      context 'with event waive_coverage!' do
+        before {active_enrollment.waive_coverage!}
+
+        it 'should return true if the enrollment is waived' do
+          expect(active_enrollment.is_waived?).to be_truthy
+        end
+      end
+
+      context 'with event waive_coverage' do
+        before {active_enrollment.waive_coverage}
+
+        it 'should return true if the enrollment is waived' do
+          expect(active_enrollment.is_waived?).to be_truthy
+        end
       end
     end
   end
