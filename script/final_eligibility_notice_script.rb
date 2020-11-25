@@ -110,7 +110,7 @@ if InitialEvents.include?(event_name) && eligibility_kind.upcase == 'UQHP'
   raise 'Please provide file path to exclude individuals from notice generation' unless excluded_list_file_path.present?
 
   CSV.foreach(excluded_list_file_path, :headers => true).each do |d|
-    @excluded_list << d["subscriber_id"]
+    @excluded_list << d["hbx_id"]
   end
 end
 

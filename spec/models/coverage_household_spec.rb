@@ -19,6 +19,25 @@ describe CoverageHousehold, type: :model do
       expect(coverage_household.family_members).to eq [family_member1]
     end
   end
+
+  context "valid_coverage_household_members" do
+    let(:person) {FactoryBot.create(:person)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+    let(:family_member) {FactoryBot.create(:family_member, family: family, is_active: true)}
+    let(:coverage_household) { family.latest_household.coverage_households.first }
+    let(:coverage_household_member1) { CoverageHouseholdMember.new(:family_member_id => family_member.id) }
+    let(:coverage_household_member2) { CoverageHouseholdMember.new(:family_member_id => nil) }
+
+    before do
+      coverage_household.coverage_household_members << [coverage_household_member1, coverage_household_member2]
+      coverage_household.save
+    end
+
+    it "should include valid_coverage_household_members " do
+      expect(coverage_household.valid_coverage_household_members).to include(coverage_household_member1)
+      expect(coverage_household.valid_coverage_household_members).not_to include(coverage_household_member2)
+    end
+  end
 end
 
 describe CoverageHousehold, "when informed that eligiblity has changed for an individual" do
