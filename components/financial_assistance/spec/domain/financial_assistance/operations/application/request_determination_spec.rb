@@ -96,9 +96,9 @@ RSpec.describe FinancialAssistance::Operations::Application::RequestDeterminatio
 
   describe "when some applicants not applying coverage" do
 
-    let(:conditional_elements) {
+    let(:conditional_elements) do
       %w[immigration_information is_incarcerated has_insurance is_self_attested_blind is_veteran has_daily_living_help has_bill_pay_3_month_help]
-    }
+    end
     before do
       allow(application).to receive(:relationships_complete?).and_return(true)
       allow(subject).to receive(:notify).and_return(true)

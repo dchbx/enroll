@@ -54,10 +54,10 @@ module FinancialAssistance
         def validate_payload(payload)
           payload_xml = Nokogiri::XML.parse(payload)
           schema_path = if payload_xml.xpath("//xmlns:is_coverage_applicant").collect(&:text).include?('false')
-            FAA_FLEXIBLE_SCHEMA_FILE_PATH
-          else
-            FAA_SCHEMA_FILE_PATH
-          end
+                          FAA_FLEXIBLE_SCHEMA_FILE_PATH
+                        else
+                          FAA_SCHEMA_FILE_PATH
+                        end
 
           xml_schema = Nokogiri::XML::Schema(File.open(schema_path))
           if xml_schema.valid?(payload_xml)

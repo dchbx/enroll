@@ -638,10 +638,10 @@ module FinancialAssistance
         deductions.all? {|deduction| deduction.valid? :submission} &&
         other_questions_complete?
       else
-      valid?(:submission) &&
-        incomes.all? {|income| income.valid? :submission} &&
-        deductions.all? {|deduction| deduction.valid? :submission} &&
-        other_questions_complete?
+        valid?(:submission) &&
+          incomes.all? {|income| income.valid? :submission} &&
+          deductions.all? {|deduction| deduction.valid? :submission} &&
+          other_questions_complete?
       end
     end
 
