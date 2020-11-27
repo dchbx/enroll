@@ -10,7 +10,7 @@
       <% if dependent.errors.any? %>
         <div class="alert alert-error">
           <h4>
-            <%= "#{pluralize(@dependent.errors.size, "error")} prohibited this family member from being saved:" %>
+            <%= "Correct the following to add this family member:" %>
           </h4>
           <ul>
             <% dependent.errors.full_messages.each do |msg| %>

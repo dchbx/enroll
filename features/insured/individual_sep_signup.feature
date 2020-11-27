@@ -39,6 +39,7 @@ Feature: Insured Plan Shopping on Individual market
     And I should see the individual home page
     Then Individual logs out
 
+  @flaky
   Scenario: Consumer work flow if he did not selects any sep & also not in open enrollment period
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal outside of open enrollment
