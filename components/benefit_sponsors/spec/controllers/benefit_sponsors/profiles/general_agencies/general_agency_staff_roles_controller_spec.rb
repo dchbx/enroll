@@ -24,6 +24,10 @@ module BenefitSponsors
 
     let(:staff_class) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm }
 
+    before do
+      Person.create_indexes
+    end
+
     describe "GET new" do
 
       before do

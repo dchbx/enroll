@@ -61,6 +61,11 @@ class Products::QhpController < ApplicationController
       @member_group = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.product)
     end
 
+    if params[:plan_id].present?
+      plan = BenefitMarkets::Products::Product.find(params[:plan_id])
+      @plan ||= UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
+    end
+
     respond_to do |format|
       format.html
       format.js

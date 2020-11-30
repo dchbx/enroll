@@ -130,6 +130,7 @@ describe FakesController do
         let(:invalid_params) do
           {
             'person' => {
+              "naturalized_citizen" => 'true',
               'consumer_role' => {
                 'vlp_documents_attributes' => {
                   '0' => {
@@ -162,6 +163,7 @@ describe FakesController do
         let(:valid_params) do
           {
             'person' => {
+
               'consumer_role' => {
                 'vlp_documents_attributes' => {
                   '0' => {
@@ -190,15 +192,77 @@ describe FakesController do
           expect(person.errors.full_messages).to be_empty
         end
       end
+
+      context "already verified case" do
+        context "naturalized citizen" do
+          let(:naturalized_params) do
+            {
+              'person' => {
+                'naturalized_citizen' => "true",
+                'consumer_role' => {
+                  'vlp_documents_attributes' => {
+                    '0' => {
+                      'subject' => 'Other (With Alien Number)',
+                      'alien_number' => '123456789',
+                      'passport_number' => 'Jsdhf73',
+                      'sevis_id' => '1234567891',
+                      'expiration_date' => '02/29/2020',
+                      'country_of_citizenship' => 'Algeria',
+                      'description' => 'Some type of document',
+                      'card_number' => ''
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let(:params) { ActionController::Parameters.new(naturalized_params)}
+          it "should return true" do
+            expect(subject.validate_vlp_params(params, 'person', double, double)).to eq(true)
+          end
+        end
+
+        context "eligible immigration status" do
+          let(:eligible_immigration_params) do
+            {
+              'person' => {
+                'eligible_immigration_status' => "true",
+                'consumer_role' => {
+                  'vlp_documents_attributes' => {
+                    '0' => {
+                      'subject' => 'Other (With Alien Number)',
+                      'alien_number' => '123456789',
+                      'passport_number' => 'Jsdhf73',
+                      'sevis_id' => '1234567891',
+                      'expiration_date' => '02/29/2020',
+                      'country_of_citizenship' => 'Algeria',
+                      'description' => 'Some type of document',
+                      'card_number' => ''
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let(:params) { ActionController::Parameters.new(eligible_immigration_params)}
+          it "should return true" do
+            expect(subject.validate_vlp_params(params, 'person', double, double)).to eq(true)
+
+          end
+        end
+      end
     end
 
-    context 'for dependet' do
+    context 'for dependent' do
       let(:dependent) { ::Forms::FamilyMember.new }
 
       context 'invalid case' do
         let(:invalid_params) do
           {
             'dependent' => {
+              'naturalized_citizen' => 'true',
               'consumer_role' => {
                 'vlp_documents_attributes' => {
                   '0' => {

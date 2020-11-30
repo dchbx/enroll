@@ -706,7 +706,7 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
         it "should fail validation when less than HBX minimum" do
           benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = invalid_minimum_contribution
-          if AcaHelperModStubber.flexible_contribution_model_enabled_for_bqt_for_period.cover?(plan_year.start_on)
+          if AcaHelperModStubber.flexible_contribution_model_enabled_for_bqt_for_initial_period.cover?(plan_year.start_on)
             expect(benefit_group.valid?).to be_truthy
             expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
           else

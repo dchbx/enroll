@@ -12,7 +12,7 @@ class CoverageHousehold
   # all coverage_household members are immediate relations
   field :is_immediate_family, type: Boolean
 
-  # coverage household includes immediate relations with non-QHP eligibility determination 
+  # coverage household includes immediate relations with non-QHP eligibility determination
   field :is_determination_split_household, type: Boolean, default: false
 
   # Agency representing this coverage household
@@ -174,6 +174,12 @@ class CoverageHousehold
       (he.coverage_household_id == self.id.to_s) &&
          (!he.benefit_sponsored?) &&
          he.currently_active?
+    end
+  end
+
+  def valid_coverage_household_members
+    coverage_household_members.select do |chm|
+      chm.family_member_id.present? && family.family_members.map(&:id).flatten.map(&:to_s).include?(chm.family_member_id.to_s)
     end
   end
 
