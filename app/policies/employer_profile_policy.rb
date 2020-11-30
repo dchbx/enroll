@@ -11,6 +11,12 @@ class EmployerProfilePolicy < ApplicationPolicy
     role.permission.modify_employer
   end
 
+  def can_access_pay_now?
+    role = user&.person&.hbx_staff_role
+    return true unless role
+    role.permission.can_access_pay_now
+  end
+
   def can_modify_employer?
     return false if (user.blank? || user.person.blank? )
     return true if (user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer)
