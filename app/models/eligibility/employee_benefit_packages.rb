@@ -30,7 +30,8 @@ module Eligibility
             else
               [TimeKeeper.date_of_record.prev_day, TimeKeeper.date_of_record]
             end
-          assignment.end_benefit(end_date)
+          verified_end_date = assignment.benefit_package.effective_period.cover?(end_date) ? end_date : assignment.benefit_package.effective_period.max
+          assignment.end_benefit(verified_end_date)
         end
         add_benefit_group_assignment(benefit_packages.first, new_start_on || benefit_packages.first.start_on, benefit_packages.first.end_on)
       end
