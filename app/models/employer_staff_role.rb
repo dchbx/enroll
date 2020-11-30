@@ -10,6 +10,7 @@ class EmployerStaffRole
   after_update :notify_observers
 
   embedded_in :person
+  embeds_one :employee_coverage
 
   field :is_owner, type: Boolean, default: true
   field :employer_profile_id, type: BSON::ObjectId
@@ -40,7 +41,7 @@ class EmployerStaffRole
     state :is_closed    #Person employer staff role is not active
 
     event :approve do
-      transitions from: [:is_applicant, :is_active], to: :is_active
+      transitions from: [:is_applicant, :is_active], to: :is_active , :guard => :has_employee_coverage?, :after => [:create_census_employee]
     end
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
@@ -64,5 +65,14 @@ class EmployerStaffRole
     return nil if aasm_state.to_sym != :is_active
 
     BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(profile, tab: 'home').to_s
+  end
+
+  def create_census_employee
+  end
+
+  private
+
+  def has_employee_coverage?
+    self.employee_coverage.present?
   end
 end
