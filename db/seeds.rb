@@ -142,7 +142,7 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   # system "bundle exec rake load:dc_benefit_market_catalog[2020]"
   # system "bundle exec rake load:dc_benefit_market_catalog[2021]"
 
-  # toDo - Add Fehb market, load old plans related data for BQT
+  # TODO - Add Fehb market, load old plans related data for BQT
   system "bundle exec rake shop:site_seed"
   system "bundle exec rake shop:issuer_and_locations_seed"
   system "bundle exec rake shop:products_seed"
