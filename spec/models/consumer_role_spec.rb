@@ -112,6 +112,23 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
     end
   end
 
+  describe "update_is_applying_coverage_status" do
+    let(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    let(:consumer_role) { person.consumer_role }
+
+    it 'should update is_applying_coverage field to false' do
+      consumer_role.update_attributes(is_applying_coverage: true)
+      consumer_role.update_is_applying_coverage_status("false")
+      expect(consumer_role.is_applying_coverage). to eq false
+    end
+
+    it 'should not update is_applying_coverage field to false' do
+      consumer_role.update_attributes(is_applying_coverage: true)
+      consumer_role.update_is_applying_coverage_status("true")
+      expect(consumer_role.is_applying_coverage). to eq true
+    end
+  end
+
   describe "#find_vlp_document_by_key" do
     let(:person) {FactoryBot.create(:person, :with_consumer_role)}
     let(:consumer_role) { person.consumer_role }
