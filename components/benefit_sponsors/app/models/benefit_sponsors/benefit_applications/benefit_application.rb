@@ -1180,6 +1180,11 @@ module BenefitSponsors
       CensusEmployee.employees_for_benefit_application_sponsorship(self).count > CensusEmployee.benefit_application_assigned(self).count
     end
 
+    def parent_reinstate_application
+      return unless reinstated_id
+      self.class.find(reinstated_id)
+    end
+
     private
 
     def set_expiration_date
