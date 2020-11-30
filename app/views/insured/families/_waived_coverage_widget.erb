@@ -26,12 +26,14 @@
       <%= format_policy_waived_date(hbx_enrollment) %>
       (<%= format_policy_waived_time(hbx_enrollment) %>)
     </div>
-    <div class="enrollment-reason-waived info">
-      <strong>
-        <%= l10n("reason_waived") %>:
-      </strong>
-      <%= hbx_enrollment.waiver_reason || hbx_enrollment.terminate_reason %>
-    </div>
+    <% if hbx_enrollment.coverage_kind != 'dental' %>
+      <div class="enrollment-reason-waived info">
+        <strong>
+          <%= l10n("reason_waived") %>:
+        </strong>
+        <%= hbx_enrollment.waiver_reason || hbx_enrollment.terminate_reason %>
+      </div>
+    <% end %>
   </div>
   <% if read_only != true %>
   <div class="panel-footer">
