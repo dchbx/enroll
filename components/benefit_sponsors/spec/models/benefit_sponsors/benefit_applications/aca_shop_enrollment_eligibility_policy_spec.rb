@@ -4,6 +4,11 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
+    before(:all) do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
     include_context "setup employees with benefits"
@@ -157,7 +162,7 @@ module BenefitSponsors
         end
       end
 
-      context "When less then minimum participation of the census employees are emrolled" do
+      context "When less than minimum participation of the census employees are emrolled" do
 
         let!(:load_enrollments) do
           benefit_sponsorship.census_employees.limit(3).each do |ce|
@@ -186,6 +191,13 @@ module BenefitSponsors
 
         # For 1/1 effective date minimum participation rule does not apply
         # 1+ non-owner rule does apply
+
+        before do
+          if benefit_application.start_on.yday != 1
+            allow(benefit_application).to receive(:employee_participation_ratio_minimum).and_return(0.75)
+          end
+        end
+
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
           # Making the system to default to amnesty rules for release 1.
