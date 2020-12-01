@@ -19,11 +19,12 @@ module BenefitSponsors
         # @param [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         # @return [ BenefitSponsors::BenefitApplications::BenefitApplication ] benefit_application
         def call(params)
-          values              = yield validate(params)
-          cloned_ba           = yield clone_benefit_application(values)
-          cloned_bsc          = yield clone_benefit_sponsor_catalog(values)
-          new_ba              = yield new_benefit_application(values, cloned_ba, cloned_bsc)
-          benefit_application = yield reinstate(new_ba)
+          values               = yield validate(params)
+          cloned_ba            = yield clone_benefit_application(values)
+          cloned_bsc           = yield clone_benefit_sponsor_catalog(values)
+          new_ba               = yield new_benefit_application(values, cloned_ba, cloned_bsc)
+          benefit_application  = yield reinstate(new_ba)
+          _benefit_sponsorship = yield reinstate_after_effects(benefit_application)
 
           Success(benefit_application)
         end
@@ -96,6 +97,17 @@ module BenefitSponsors
 
           new_ba.activate_enrollment!
           Success(new_ba)
+        end
+
+        def reinstate_after_effects(reinstated_ba)
+          months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
+          renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
+          renewal_application_begin = (TimeKeeper.date_of_record + months_prior_to_effective.months - renewal_offset_days)
+          return Success(reinstated_ba.benefit_sponsorship) unless renewal_application_begin.mday == 1
+
+          service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: reinstated_ba.benefit_sponsorship)
+          service.renew_sponsor_benefit
+          Success(reinstated_ba.benefit_sponsorship)
         end
       end
     end

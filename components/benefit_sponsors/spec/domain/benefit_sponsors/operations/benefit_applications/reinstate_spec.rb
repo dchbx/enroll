@@ -41,7 +41,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     let(:end_of_the_year) {Date.new(current_year, 12, 31)}
 
     before do
-      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 15))
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 1))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each do |spon_benefit|
           spon_benefit.update_attributes!(_type: 'BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit')
@@ -81,6 +81,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           expect(@new_ba.benefit_sponsor_catalog_id).not_to eq(initial_application.benefit_sponsor_catalog_id)
           expect(@new_ba.benefit_sponsor_catalog.benefit_application).to eq(@new_ba)
           expect(@new_ba.benefit_sponsor_catalog.benefit_application.persisted?).to be_truthy
+        end
+
+        it 'should create a renewal draft for the reinstated benefit_application' do
+          expect(@new_ba.benefit_sponsorship.benefit_applications.count).to eq(3)
+          expect(@new_ba.benefit_sponsorship.benefit_applications.last.aasm_state).to eq(:draft)
         end
 
         context 'workflow_state_transitions' do
