@@ -1,5 +1,4 @@
 require "json"
-include FactoryBot::Syntax::Methods
 
 namespace :hbxinternal do
   desc "build hbx internals team db"
