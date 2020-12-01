@@ -1,6 +1,6 @@
-<% can_display =  (HbxEnrollment::ENROLLED_RENEWAL_WAIVED_STATUSES).include?(hbx_enrollment.aasm_state) ? disable_make_changes_button?(hbx_enrollment) : false %>
+<% make_changes_button_status =  (HbxEnrollment::ENROLLED_RENEWAL_WAIVED_STATUSES).include?(hbx_enrollment.aasm_state) ? disable_make_changes_button?(hbx_enrollment) : false %>
 <% if hbx_enrollment.is_coverage_waived? %>
-  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || can_display, hbx_enrollment: hbx_enrollment } %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || make_changes_button_status, hbx_enrollment: hbx_enrollment } %>
 <% else %>
 <% product = hbx_enrollment.product %>
 <% # This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
@@ -192,11 +192,11 @@
     </div>
     <% if !read_only == true %>
       <div class="col-lg-3">
-        <div class="row <%if can_display %>cna<%end%>">
-         <% if is_family_eligible_to_enroll &&  can_display && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop?%>
+        <div class="row <%if make_changes_button_status %>cna<%end%>">
+         <% if is_family_eligible_to_enroll &&  make_changes_button_status && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop?%>
             <%= pundit_span Family, :updateable? %>
                <!-- Use turbolinks: false, to avoid calling controller action twice-->
-              <%= link_to l10n('make_changes'), new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, coverage_kind: hbx_enrollment.coverage_kind), class: 'btn btn-default btn-block ee-make-changes', disabled: can_display,  data: { turbolinks: false } %>
+              <%= link_to l10n('make_changes'), new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, coverage_kind: hbx_enrollment.coverage_kind), class: 'btn btn-default btn-block ee-make-changes', disabled: make_changes_button_status,  data: { turbolinks: false } %>
             </span>
           <!-- This potentially allows certain shop users to view Make Changes -->
           <% elsif enable_make_changes_button?(hbx_enrollment) %>
