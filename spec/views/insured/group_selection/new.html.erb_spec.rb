@@ -83,6 +83,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:employee_role_id] = employee_role.id
 
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
       census_employee.benefit_group_assignments.first.benefit_group.plan_year.aasm_state = "enrolling"
     end
 
@@ -193,6 +194,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         controller.request.path_parameters[:consumer_role_id] = consumer_role.id
         allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+        allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
         allow(view).to receive(:can_employee_shop?).and_return(false)
         allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
         allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
@@ -689,6 +691,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
@@ -725,6 +728,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)

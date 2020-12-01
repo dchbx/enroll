@@ -14,6 +14,7 @@ RSpec.describe "insured/employee_roles/match.html.haml" do
     @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees.first)
     sign_in user
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", can_access_pay_now?: true))
   end
 
   it "should display the employee search page with no match info" do
