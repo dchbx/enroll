@@ -85,6 +85,40 @@ RSpec.describe BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone, dbclea
     it 'should return a benefit_sponsor_catalog with same effective_period' do
       expect(@new_bsc.effective_period).to eq(benefit_sponsor_catalog.effective_period)
     end
+
+    context 'check to verify creation of contribution_units' do
+      before do
+        @new_cus = @new_bsc.product_packages.first.contribution_model.contribution_units.to_a
+      end
+
+      it 'should create contribution_units with proper classes' do
+        expect([::BenefitMarkets::ContributionModels::FixedDollarContributionUnit,
+                ::BenefitMarkets::ContributionModels::FixedPercentContributionUnit,
+                ::BenefitMarkets::ContributionModels::PercentWithCapContributionUnit]).to include(@new_cus.sample.class)
+      end
+    end
+
+    context 'check to verify creation of pricing_units' do
+      before do
+        @new_pus = @new_bsc.product_packages.first.pricing_model.pricing_units.to_a
+      end
+
+      it 'should create pricing_units with proper classes' do
+        expect([::BenefitMarkets::PricingModels::RelationshipPricingUnit,
+                ::BenefitMarkets::PricingModels::TieredPricingUnit]).to include(@new_pus.sample.class)
+      end
+    end
+
+    context 'check to verify creation of products' do
+      before do
+        @new_products = @new_bsc.product_packages.first.products.to_a
+      end
+
+      it 'should create products with proper classes' do
+        expect([::BenefitMarkets::Products::HealthProducts::HealthProduct,
+                ::BenefitMarkets::Products::DentalProducts::DentalProduct]).to include(@new_products.sample.class)
+      end
+    end
   end
 
   context 'failure' do
