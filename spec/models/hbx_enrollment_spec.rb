@@ -3715,7 +3715,7 @@ describe 'calculate effective_on' do
   end
   let(:person)       { FactoryBot.create(:person, :with_family) }
   let(:family)       { person.primary_family }
-  let(:census_employee) { create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
+  let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package, hired_on: start_on.prev_day) }
   let(:employee_role) { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, person: person, census_employee_id: census_employee.id) }
   let(:calculated_effective_on) do
     HbxEnrollment.calculate_effective_on_from(
