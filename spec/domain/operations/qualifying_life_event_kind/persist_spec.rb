@@ -7,10 +7,6 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
     DatabaseCleaner.clean
   end
 
-  # before do
-  #   allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 10, 12))
-  # end
-
   context "create QualifyingLifeEventKind" do
 
     it 'should be a container-ready operation' do
