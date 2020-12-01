@@ -185,7 +185,7 @@ module BenefitSponsors
         return false, 'Person count too high, please contact HBX Admin' if person.count > 1
         return false, 'Person already has a staff role for this General Agency' if Person.staff_for_ga_including_pending(general_agency_profile).include?(person.first)
 
-        terminated_agencies_with_same_profile =  person.first.general_agency_staff_roles.detect{|role| role if role.benefit_sponsors_general_agency_profile_id == general_agency_profile.id && role.aasm_state == "general_agency_terminated"}
+        terminated_agencies_with_same_profile =  person.first.general_agency_staff_roles.detect{ |role| role.benefit_sponsors_general_agency_profile_id == general_agency_profile.id && role.aasm_state == "general_agency_terminated" }
         if terminated_agencies_with_same_profile.present?
           terminated_agencies_with_same_profile.general_agency_active!
         else
