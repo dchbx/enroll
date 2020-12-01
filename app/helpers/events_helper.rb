@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module EventsHelper
   def xml_iso8601_for(date_time)
     return nil if date_time.blank?
@@ -74,8 +76,13 @@ module EventsHelper
   def employer_plan_years(employer, benefit_application_id)
     employer.benefit_applications.select{|benefit_app| (benefit_app.eligible_for_export? || benefit_app.id.to_s == benefit_application_id) }
   end
-  
+
   def plan_years_for_manual_export(employer)
-    employer.benefit_applications.select {|benefit_application|  benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?}
+    employer.benefit_applications.select {|benefit_application|  (benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?) && benefit_application.reinstated_id.nil?}
+  end
+
+  def reinstated_application(benefit_application)
+    ba = benefit_application.benefit_sponsorship.benefit_applications.where(reinstated_id: benefit_application.id).first
+    ba.present? ? reinstated_application(ba) : benefit_application
   end
 end

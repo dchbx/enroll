@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -29,7 +31,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
   end
 
   describe "employer_plan_years" do
-    
+
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup renewal application"
 
@@ -68,7 +70,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         before do
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
         end
 
         it "should return active and renewal plan year" do
@@ -93,7 +95,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
     context "conversion employer with no external plan year" do
 
       before do
-        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
         predecessor_application.update_attributes({:aasm_state => "enrollment_eligible"})
       end
 
@@ -125,7 +127,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
       context "day is after open enrollment this month" do
         before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
         end
@@ -157,7 +159,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
       context "day is after open enrollment this month" do
 
         before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
         end
@@ -210,8 +212,8 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
   describe "is_office_location_phone_valid?" do
 
-    let(:phone) { FactoryBot.build(:phone, kind:'home') }
-    let(:phone1) { FactoryBot.build(:phone, kind:'phone main main') }
+    let(:phone) { FactoryBot.build(:phone, kind: 'home') }
+    let(:phone1) { FactoryBot.build(:phone, kind: 'phone main main') }
     let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
@@ -248,7 +250,7 @@ describe EventsHelper, "transforming a qualifying event kind for external xml", 
     "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
     "divorce" => "divorce",
     "unknown_sep" => "exceptional_circumstances"
-  }
+  }.freeze
 
   subject { EventsHelperSlug.new }
 
@@ -291,8 +293,7 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
     context "terminated plan year with future date of termination" do
       before do
-        predecessor_application.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
-                                     :aasm_state => "terminated"})
+        predecessor_application.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month, :aasm_state => "terminated"})
       end
 
       it "should return the plan year" do
@@ -381,6 +382,60 @@ describe EventsHelper, "employer_plan_years", dbclean: :after_each do
 
       it "should return the terminated pending plan year" do
         expect(subject.employer_plan_years(abc_profile, nil)).to eq [predecessor_application]
+      end
+    end
+  end
+end
+
+describe EventsHelper, "finding a reinstated plan year", dbclean: :after_each do
+  subject { EventsHelperSlug.new }
+
+  describe "reinstated_application" do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    context "when plan year is not reinstated" do
+      it "should return initial_application" do
+        expect(subject.reinstated_application(initial_application)).to eq initial_application
+      end
+    end
+
+    context "when plan year is reinstated" do
+      let(:start_date) {TimeKeeper.date_of_record.beginning_of_month - 11.months}
+      let(:end_date) {(start_date + 6.months).end_of_month}
+      let(:effective_period) {start_date..end_date}
+      let(:start_date1) {end_date.next_day}
+      let(:end_date1) {TimeKeeper.date_of_record.end_of_month}
+      let(:effective_period1) {start_date1..end_date1}
+      let(:open_enrollment_start_on) { start_date - 1.month }
+      let(:open_enrollment_start_on1) { end_date.beginning_of_month }
+      let(:open_enrollment_period) {open_enrollment_start_on..(open_enrollment_start_on + 5.days)}
+      let(:open_enrollment_period) {open_enrollment_start_on1..(open_enrollment_start_on1 + 5.days)}
+      let(:reinstated_application1) do
+        create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+               :with_benefit_package,
+               passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
+               benefit_sponsorship: benefit_sponsorship,
+               effective_period: effective_period1,
+               aasm_state: aasm_state,
+               open_enrollment_period: open_enrollment_period,
+               recorded_rating_area: rating_area,
+               recorded_service_areas: service_areas,
+               package_kind: package_kind,
+               dental_package_kind: dental_package_kind,
+               dental_sponsored_benefit: dental_sponsored_benefit,
+               fte_count: 5,
+               pte_count: 0,
+               msp_count: 0,
+               reinstated_id: initial_application.id)
+      end
+
+      before do
+        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+      end
+
+      it "should return reinstated_application" do
+        expect(subject.reinstated_application(initial_application)).to eq reinstated_application1
       end
     end
   end
