@@ -193,9 +193,7 @@ module BenefitSponsors
         # 1+ non-owner rule does apply
 
         before do
-          if benefit_application.start_on.yday != 1
-            allow(benefit_application).to receive(:employee_participation_ratio_minimum).and_return(0.75)
-          end
+          allow(benefit_application).to receive(:employee_participation_ratio_minimum).and_return(0.75) unless benefit_application.start_on.yday == 1
         end
 
         it "should fail the policy" do
