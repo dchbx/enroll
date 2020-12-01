@@ -102,7 +102,7 @@ registry:
               {employer_sponsored_coverage_termination: "employer unpaid premium"}, {enrollment_error_or_misconduct_hbx: "enrollment error HBX"}, {enrollment_error_or_misconduct_issuer: "enrollment error carrier"},
               {enrollment_error_or_misconduct_non_hbx: "enrollment error assister broker"}, {exceptional_circumstances: "exceptional circumstances"}, {exceptional_circumstances_civic_service: "americorps"},
               {exceptional_circumstances_domestic_abuse: "domestic abuse"}, {exceptional_circumstances_medical_emergency: "medical emergency"}, {exceptional_circumstances_natural_disaster: "natural disaster"},
-              {exceptional_circumstances_system_outage: "system outage"}, {lost_access_to_mec: "lost other mec"}, {lost_hardship_exemption: "lost hardship exemption"},
+              {exceptional_circumstances_system_outage: "system outage"}, {hra: "hra" }, {hra_ii: "hra II"}, {individual_responsibility: "individual responsibility"}, {lost_access_to_mec: "lost other mec"}, {lost_hardship_exemption: "lost hardship exemption"},
               {marriage: "marriage"}, {new_eligibility_family: "drop new eligibility"}, {new_eligibility_member: "drop family new eligibility"}, {new_employment: "new employment"}, {qualified_native_american: "native american"},
               {relocate: "moved"}]
               default: ''
