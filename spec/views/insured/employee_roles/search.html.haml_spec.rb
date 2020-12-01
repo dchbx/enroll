@@ -6,6 +6,7 @@ RSpec.describe "insured/employee_roles/search.html.haml" do
   before :each do
     assign(:person, person)
     allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", updateable?: true))
+    allow(view).to receive(:policy_helper).and_return(double("EmployerProfilePolicy", can_access_pay_now?: true))
     render template: "insured/employee_roles/search.html.slim"
   end
 

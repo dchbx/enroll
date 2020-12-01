@@ -78,6 +78,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
 
     allow(@plan).to receive(:sole_source?).and_return(true)
     allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+    allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', can_access_pay_now?: true))
     allow(view).to receive(:show_pay_now?).and_return false
     render file: "insured/plan_shoppings/receipt.en.html.erb"
   end
