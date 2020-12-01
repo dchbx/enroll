@@ -126,7 +126,12 @@ module BenefitSponsors
         end
 
         def init_sponsored_benefit(sb_params, new_bp)
-          new_sb = new_bp.sponsored_benefits.new
+          new_sb = if sb_params[:_type].present?
+                     sb_params[:_type].constantize.new
+                   else
+                     new_bp.sponsored_benefits.new
+                   end
+          new_sb.benefit_package = new_bp
           new_sb.assign_attributes(sb_params.except(:sponsor_contribution, :pricing_determinations, :reference_product))
           new_sb.reference_product = ::BenefitMarkets::Products::Product.find(sb_params[:reference_product][:_id])
           new_sb
