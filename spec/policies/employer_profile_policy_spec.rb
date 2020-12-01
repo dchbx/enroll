@@ -13,7 +13,6 @@ describe EmployerProfilePolicy, dbclean: :after_each do
       expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be true
-      expect(policy.can_access_pay_now?).to be true
     end
 
     it 'hbx_read_only' do 
@@ -29,7 +28,6 @@ describe EmployerProfilePolicy, dbclean: :after_each do
       expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be true
-      expect(policy.can_access_pay_now?).to be true
     end
 
     it 'hbx_csr_tier2' do 
@@ -37,7 +35,6 @@ describe EmployerProfilePolicy, dbclean: :after_each do
       expect(policy.list_enrollments?).to be false
       expect(policy.updateable?).to be true
       expect(policy.revert_application?).to be false
-      expect(policy.can_access_pay_now?).to be true
     end
 
     it 'csr_tier1' do 
