@@ -7,6 +7,10 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
     DatabaseCleaner.clean
   end
 
+  # before do
+  #   allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 10, 12))
+  # end
+
   context "create QualifyingLifeEventKind" do
 
     it 'should be a container-ready operation' do
@@ -27,7 +31,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'market_kind': 'individual',
           'effective_on_kinds': ['date_of_event'],
           'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
+          'coverage_end_on': "#{TimeKeeper.date_of_record.year}-08-01",
           'event_kind_label': 'event kind label',
           'qle_event_date_kind': 'qle_on',
           'is_visible': true,
@@ -110,7 +114,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
               'market_kind': 'individual',
               'effective_on_kinds': ['date_of_event'],
               'coverage_start_on': "#{TimeKeeper.date_of_record.year}-07-01",
-              'coverage_end_on': "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
+              'coverage_end_on': "#{TimeKeeper.date_of_record.year}-09-01",
               'event_kind_label': 'event kind label',
               'is_visible': true,
               qle_event_date_kind: 'qle_on',
@@ -155,7 +159,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           market_kind: 'individual',
           effective_on_kinds: ['date_of_event'],
           coverage_start_on: "#{TimeKeeper.date_of_record.year}-07-19",
-          coverage_end_on: "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
+          coverage_end_on: "#{TimeKeeper.date_of_record.year}-08-01",
           event_kind_label: 'event kind label',
           is_visible: true,
           qle_event_date_kind: 'qle_on',
@@ -205,7 +209,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'effective_on_kinds' => ['date_of_event'],
           '_id' => qlek.id.to_s,
           'coverage_start_on' => "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
+          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-08-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
@@ -255,7 +259,7 @@ RSpec.describe Operations::QualifyingLifeEventKind::Persist, type: :model, dbcle
           'effective_on_kinds' => ['date_of_event'],
           '_id' => qlek.id.to_s,
           'coverage_start_on' => "#{TimeKeeper.date_of_record.year}-07-01",
-          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-#{TimeKeeper.date_of_record.next_month.month}-01",
+          'coverage_end_on' => "#{TimeKeeper.date_of_record.year}-09-01",
           'event_kind_label' => 'event kind label',
           'is_visible' => true,
           qle_event_date_kind: 'qle_on',
