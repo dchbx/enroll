@@ -56,6 +56,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
         initial_application.terminate_enrollment!
         initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
         @new_ba = subject.call({benefit_application: initial_application, effective_period: initial_application.effective_period}).success
+        @new_sponsored_benefit = @new_ba.benefit_packages.first.sponsored_benefits.first
       end
 
       it 'should return a success with a BenefitApplication' do
@@ -76,6 +77,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
 
       it 'should not copy reinstated_id' do
         expect(@new_ba.reinstated_id).to be_nil
+      end
+
+      it 'should create sponsored_benefit with correct classes' do
+        expect(@new_sponsored_benefit.class).to eq(initial_application.benefit_packages.first.sponsored_benefits.first.class)
+        expect([::BenefitSponsors::SponsoredBenefits::HealthSponsoredBenefit, ::BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit]).to include(@new_sponsored_benefit.class)
       end
     end
 

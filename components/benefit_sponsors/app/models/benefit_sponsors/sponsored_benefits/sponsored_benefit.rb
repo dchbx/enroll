@@ -46,8 +46,7 @@ module BenefitSponsors
       end
 
       def product_kind
-        name_of_class = self&._type || self.class.name
-        name_of_class.demodulize.split('SponsoredBenefit')[0].downcase.to_sym
+        self.class.name.demodulize.split('SponsoredBenefit')[0].downcase.to_sym
       end
 
       # Don't remove this. Added it to get around mass assignment
