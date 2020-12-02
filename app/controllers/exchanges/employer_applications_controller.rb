@@ -57,7 +57,12 @@ module Exchanges
 
     def reinstate
       @application = @benefit_sponsorship.benefit_applications.find(params[:employer_application_id])
-      flash[:notice] = "Plan Year Reinstated Successfully"
+      effective_date = if [:terminated, :termination_pending].include?(@application.aasm_state)
+                         @application.effective_period.max + 1.day
+                       else
+                         @application.effective_period.min
+                       end
+      flash[:notice] = "#{@benefit_sponsorship.legal_name} - Plan Year Reinstated Successfully Effective #{effective_date}"
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
 
