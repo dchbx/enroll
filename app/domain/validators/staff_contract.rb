@@ -10,6 +10,7 @@ module Validators
       optional(:area_code).filled(:string)
       optional(:number).filled(:string)
       optional(:email).filled(:string)
+      # toDo - Add is appyling coverage attributes by adding new contract
     end
   end
 end
