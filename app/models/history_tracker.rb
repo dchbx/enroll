@@ -5,6 +5,7 @@ class HistoryTracker
 
   TRACK_HISTORY_ON = %w- consumer_role -
 
+  index({"association_chain.0.id" => 1, "association_chain.0.name" => 1, "scope" => 1})
 
   def check_history_trackers
     TRACK_HISTORY_ON.each do |collection|
