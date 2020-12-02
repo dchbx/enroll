@@ -20,7 +20,7 @@ describe EmployerProfilePolicy, dbclean: :after_each do
       expect(policy.list_enrollments?).to be true
       expect(policy.updateable?).to be false
       expect(policy.revert_application?).to be false
-      expect(policy.can_access_pay_now?).to be true
+      expect(policy.can_access_progress?).to be true
     end
 
     it 'hbx_csr_supervisor' do
@@ -42,7 +42,7 @@ describe EmployerProfilePolicy, dbclean: :after_each do
       expect(policy.list_enrollments?).to be false
       expect(policy.updateable?).to be false
       expect(policy.revert_application?).to be false
-      expect(policy.can_access_pay_now?).to be true
+      expect(policy.can_access_progress?).to be true
     end
 
   end
