@@ -8,9 +8,9 @@ RSpec.describe ::Entities::Staff, dbclean: :after_each do
 
   describe 'initialize instance' do
     let(:params) do
-      { 
+      {
         first_name: 'jhon',
-        last_name: 'doe' 
+        last_name: 'doe'
       }
     end
 
