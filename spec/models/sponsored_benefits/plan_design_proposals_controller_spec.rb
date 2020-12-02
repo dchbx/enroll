@@ -33,7 +33,8 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
         :with_benefit_market,
         :with_benefit_market_catalog_and_product_packages,
         :as_hbx_profile,
-        Settings.site.key
+        Settings.site.key,
+        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
       )
     end
 
