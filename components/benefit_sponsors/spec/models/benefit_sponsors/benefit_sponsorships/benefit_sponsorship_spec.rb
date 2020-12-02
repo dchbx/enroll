@@ -1308,6 +1308,12 @@ module BenefitSponsors
         expired_application
       end
 
+      before do
+        benefit_sponsorship.benefit_applications.each do |ba|
+          ba.update_attributes(updated_at: ba.start_on)
+        end
+      end
+
       context "when renewal application is ineligible" do
         it 'should return nil' do
           expect(benefit_sponsorship.late_renewal_benefit_application).to eq nil
