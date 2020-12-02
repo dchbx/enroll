@@ -47,7 +47,11 @@ FactoryBot.define do
 
     trait :with_benefit_market_catalog_and_product_packages do
       after :create do |site, evaluator|
-        create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: site.benefit_markets[0], application_period: evaluator.application_period, issuer_profile: FactoryBot.create(:benefit_sponsors_organizations_issuer_profile))
+        create(:benefit_markets_benefit_market_catalog,
+               :with_product_packages,
+               benefit_market: site.benefit_markets[0],
+               application_period: evaluator.application_period,
+               issuer_profile: FactoryBot.create(:benefit_sponsors_organizations_issuer_profile))
       end
     end
 
