@@ -37,6 +37,7 @@ RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, 
         application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
       )
     end
+    let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
 
     let(:owner_profile) { broker_agency_profile }
 

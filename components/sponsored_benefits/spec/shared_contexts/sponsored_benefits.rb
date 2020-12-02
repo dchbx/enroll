@@ -90,6 +90,7 @@ RSpec.shared_context "set up broker agency profile for BQT, by using configurati
 
   let(:health_reference_product) { health_product }
   let(:dental_reference_product) { dental_product }
+  let!(:rating_area) { FactoryBot.create(:benefit_markets_locations_rating_area, active_year: current_effective_date.year) }
 
   def health_plan
     if Settings.aca.state_abbreviation == "DC"
