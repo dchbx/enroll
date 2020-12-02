@@ -371,7 +371,7 @@ class HbxEnrollment
     )
   end
 
-  def renew_benefit(new_benefit_package)
+  def renew_benefit(new_benefit_package, result_reporter = ::BenefitSponsors::BenefitPackages::SilentRenewalReporter.new)
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
