@@ -101,12 +101,9 @@ module BenefitSponsors
 
         def reinstate_after_effects(reinstated_ba)
           months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
-          renewal_offset_days = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.day_of_month.days
-          renewal_application_begin = (TimeKeeper.date_of_record + months_prior_to_effective.months - renewal_offset_days)
-          return Success(reinstated_ba.benefit_sponsorship) unless renewal_application_begin.mday == 1
+          renewal_ba_generation_date = reinstated_ba.end_on.next_day.to_date - months_prior_to_effective.months
+          reinstated_ba.renew.save! if TimeKeeper.date_of_record >= renewal_ba_generation_date
 
-          service = BenefitSponsors::BenefitSponsorships::AcaShopBenefitSponsorshipService.new(benefit_sponsorship: reinstated_ba.benefit_sponsorship)
-          service.renew_sponsor_benefit
           Success(reinstated_ba.benefit_sponsorship)
         end
       end
