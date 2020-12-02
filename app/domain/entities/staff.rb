@@ -10,7 +10,7 @@ module Entities
     attribute :email,                Types::String.optional.meta(omittable: true)
     attribute :area_code,            Types::String.optional.meta(omittable: true)
     attribute :number,               Types::String.optional.meta(omittable: true)
-    # toDo - Add is appyling coverage attributes
+    # TODO: Add is appyling coverage attributes
     # attribute :employee_coverage     Entities::EmployeeCoverage
   end
 end
