@@ -10,7 +10,7 @@ RSpec.describe Validators::StaffContract, type: :model, dbclean: :after_each do
 
   let(:params) do
     {
-      first_name: 'test', last_name: 'test',
+      first_name: 'test', last_name: 'test'
     }
   end
 
