@@ -6,12 +6,22 @@
           .modal-header
             button.close type="button" data-dismiss="modal" aria-label="Close"
               | &times;
-            h4.modal-title = l10n("select_waive_reason")
-          .modal-body
-            = select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason"), id: "waiver_reason_selection_dropdown"
+            - if enrollment.coverage_kind == 'dental'
+              h4.modal-title = l10n("confirm_waive")
+            - else
+              h4.modal-title = l10n("select_waive_reason")
+
+          - if enrollment.coverage_kind == 'dental'
+            = hidden_field_tag "waiver_reason", ""
+          - else
+            .modal-body
+              = select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason"), id: "waiver_reason_selection_dropdown"
           .modal-footer class="#{pundit_class Family, :updateable?}"
             button.btn.btn-default type="button" data-dismiss="modal" = l10n("close")
-            = submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true
+            - if enrollment.coverage_kind == 'dental'
+              = submit_tag l10n("confirm"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: false
+            - else
+              = submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true
       - else
         .modal-header
           button.close type="button" data-dismiss="modal" aria-label="Close"
