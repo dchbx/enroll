@@ -47,6 +47,7 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
     #  allow(@enrollment).to receive(:employee_role).and_return(true)
     #  allow(@enrollment).to receive(:is_shop?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, can_access_progress?: true))
     end
 
     it 'should display the correct plan selection text' do

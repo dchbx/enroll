@@ -15,6 +15,7 @@ describe "insured/family_members/index.html.erb" do
     assign :person, person
     assign :family, family
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, can_access_progress?: true))
   end
 
   it "should have title" do

@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe "shared/_signup_progress.html.haml" do
   before :each do
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateble?: true))
-    allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
   end
   context "step 1" do
     before :each do

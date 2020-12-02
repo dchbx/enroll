@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "shared/_signup_progress.html.erb" do
   before :each do
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
-    allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_pay_now?: true))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
     render 'shared/signup_progress', locals: {step: '1'}
   end
 
