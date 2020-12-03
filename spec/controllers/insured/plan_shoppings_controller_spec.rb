@@ -97,6 +97,25 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
         expect(flash[:error]).to include("You can not keep an existing plan which belongs to previous plan year")
       end
     end
+
+    context "off-cycle OE" do
+      let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+
+      before :each do
+        request.env["HTTP_REFERER"] = "/home"
+        next_period_start = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on + 1.year
+        hbx_enrollment.update_attributes!(aasm_state: 'shopping')
+        allow(hbx_enrollment).to receive(:employee_role).and_return(nil)
+        allow(hbx_enrollment).to receive(:effective_on).and_return(next_period_start + 1.month)
+        allow(hbx_enrollment).to receive(:is_active_renewal_purchase?).and_return(true)
+      end
+
+      it "should set enrollment to coverage_selected if effective date on 2/1 or 3/1" do
+        post :checkout, params: {id: "hbx_id", plan_id: "plan_id"}
+        expect(response).to have_http_status(:redirect)
+        expect(hbx_enrollment.aasm_state).to eq('coverage_selected')
+      end
+    end
   end
 
   context "GET receipt", :dbclean => :around_each do
@@ -482,8 +501,8 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       expect(flash[:notice]).to eq "Waive Coverage Successful"
       expect(response).to be_redirect
     end
-    
-    it "#post enrollment termination" do 
+
+    it "#post enrollment termination" do
       allow(hbx_enrollment).to receive(:coverage_termination_pending?).and_return(true)
       allow(hbx_enrollment).to receive(:waiver_reason=).with("Because").and_return(true)
       allow(hbx_enrollment).to receive(:valid?).and_return(true)

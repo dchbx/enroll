@@ -35,7 +35,10 @@ class PlanSelection
       hbx_enrollment.special_enrollment_period_id = hbx_enrollment.earlier_effective_sep_by_market_kind.try(:id)
     end
 
-    hbx_enrollment.aasm_state = 'actively_renewing' if hbx_enrollment.is_active_renewal_purchase?
+    current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+    next_period_start = current_benefit_period.start_on + 1.year
+
+    hbx_enrollment.aasm_state = 'actively_renewing' if hbx_enrollment.is_active_renewal_purchase? && ![next_period_start + 1.month, next_period_start + 2.months].include?(hbx_enrollment.effective_on)
 
     hbx_enrollment.update_attributes!(is_any_enrollment_member_outstanding: true) if enrollment_members_verification_status(market_kind)
 
