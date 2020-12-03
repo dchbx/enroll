@@ -413,7 +413,7 @@ module BenefitSponsors
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
           enrollments.each do |hbx_enrollment|
             if hbx_enrollment.may_cancel_coverage?
-              hbx_enrollment.update_attribute(:terminate_reason, "retroactive_canceled") if benefit_application.retroactive_canceled?
+              hbx_enrollment.terminate_reason = "retroactive_canceled" if benefit_application.retroactive_canceled?
               if hbx_enrollment.inactive?
                 hbx_enrollment.cancel_coverage!
               else
