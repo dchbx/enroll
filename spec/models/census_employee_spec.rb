@@ -2258,7 +2258,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context 'when multiple renewal assignments present' do
 
-      context 'and latest assignment has enrollment associated' do 
+      context 'and latest assignment has enrollment associated' do
         let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
         let(:enrollment) { double }
 
@@ -2271,7 +2271,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         end
       end
 
-      context 'and ealier assignment has enrollment associated' do 
+      context 'and ealier assignment has enrollment associated' do
         let(:benefit_group_assignment_three) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_benefit_group, census_employee: census_employee)}
         let(:enrollment) { double }
 
