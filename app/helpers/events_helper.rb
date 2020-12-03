@@ -74,15 +74,17 @@ module EventsHelper
   end
 
   def employer_plan_years(employer, benefit_application_id)
-    employer.benefit_applications.select{|benefit_app| (benefit_app.eligible_for_export? || benefit_app.id.to_s == benefit_application_id) }
+    employer.benefit_applications.select{|benefit_app| (benefit_app.eligible_for_export? || benefit_app.id.to_s == benefit_application_id) && benefit_app.reinstated_id.present? }
   end
 
   def plan_years_for_manual_export(employer)
-    employer.benefit_applications.select {|benefit_application|  (benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?) && benefit_application.reinstated_id.nil?}
+    employer.benefit_applications.select {|benefit_application|  (benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?) && benefit_application.reinstated_id.present?}
   end
 
   def reinstated_application(benefit_application)
-    ba = benefit_application.benefit_sponsorship.benefit_applications.where(reinstated_id: benefit_application.id).first
+    return benefit_application if benefit_application.reinstated_id.nil?
+    ba_id = benefit_application.reinstated_id
+    ba = benefit_application.benefit_sponsorship.benefit_applications.where(id: ba_id).first
     ba.present? ? reinstated_application(ba) : benefit_application
   end
 end

@@ -434,8 +434,8 @@ describe EventsHelper, "finding a reinstated plan year", dbclean: :after_each do
         initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
       end
 
-      it "should return reinstated_application" do
-        expect(subject.reinstated_application(initial_application)).to eq reinstated_application1
+      it "should return initial_application" do
+        expect(subject.reinstated_application(reinstated_application1)).to eq initial_application
       end
     end
   end
