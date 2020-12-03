@@ -135,7 +135,7 @@ module Notifier
       def tax_households
         tax_households = []
         primary_member = payload['notice_params']['primary_member']
-        return [] unless primary_member['aqhp_eligible']&.upcase == "YES"
+        return [] unless aqhp_event
 
         thh = ::Notifier::Services::TaxHouseholdService.new(primary_member)
         tax_households << tax_households_hash(thh)

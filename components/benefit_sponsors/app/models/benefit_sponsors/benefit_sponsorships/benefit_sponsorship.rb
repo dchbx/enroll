@@ -511,8 +511,9 @@ module BenefitSponsors
 
     # use this only for EDI
     def late_renewal_benefit_application
-      benefit_applications.order_by(:created_at.desc).detect do |application|
-        application.predecessor.present? && application.start_on.year == TimeKeeper.date_of_record.year && [:active, :enrollment_eligible].include?(application.aasm_state)
+      benefit_applications.order(updated_at: :desc).detect do |application|
+        application.predecessor.present? && application.start_on == application.predecessor.end_on + 1.day &&
+          [:active, :enrollment_eligible].include?(application.aasm_state) && application.start_on >= TimeKeeper.date_of_record - 1.month # grace period of one month for late renewal
       end
     end
 
@@ -581,8 +582,11 @@ module BenefitSponsors
     end
 
     def carriers_dropped_for(product_kind)
-      renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind) if renewal_benefit_application.present?
-      late_renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - late_renewal_benefit_application.issuers_offered_for(product_kind) if late_renewal_benefit_application.present?
+      if renewal_benefit_application.present?
+        renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - renewal_benefit_application.issuers_offered_for(product_kind)
+      elsif late_renewal_benefit_application.present?
+        late_renewal_benefit_application.predecessor.issuers_offered_for(product_kind) - late_renewal_benefit_application.issuers_offered_for(product_kind)
+      end
     end
 
     ####

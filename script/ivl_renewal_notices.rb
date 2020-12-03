@@ -132,7 +132,8 @@ CSV.open(report_name, "w", force_quotes: true) do |csv|
 
       consumer_role = primary_person.consumer_role
       if consumer_role.present?
-        if ((InitialEvents.include? event) || event == 'ivl_backlog_verification_notice_uqhp')
+        # resets document due date on family
+        if event == 'final_eligibility_notice_renewal_uqhp' || event == 'ivl_backlog_verification_notice_uqhp'
           family = primary_person.primary_family
           family.set_due_date_on_verification_types
           family.update_attributes(min_verification_due_date: (family.min_verification_due_date_on_family || (TimeKeeper.date_of_record + 95.days)))

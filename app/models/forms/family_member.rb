@@ -66,9 +66,15 @@ module Forms
     end
 
     def ssn_validation
+      return unless is_applying_coverage?
+      return true if is_applying_coverage == "false"
       return true unless individual_market_is_enabled?
 
       self.errors.add(:base, "ssn is required") if @ssn.blank? && @no_ssn == '0'
+    end
+
+    def is_applying_coverage?
+      is_applying_coverage.to_s == "true"
     end
 
     def dob=(val)
