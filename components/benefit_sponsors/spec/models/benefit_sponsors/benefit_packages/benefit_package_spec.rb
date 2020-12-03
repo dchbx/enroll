@@ -771,10 +771,7 @@ module BenefitSponsors
 
       context "when enrollment is in auto renewing state" do
         let(:enr_state) {"auto_renewing"}
-
-        before do
-          renewal_application.update_attributes(aasm_state: :canceled)
-        end
+        let(:renewal_state) { :canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "auto_renewing"
@@ -789,10 +786,7 @@ module BenefitSponsors
 
       context "when enrollment is in coverage selected state state" do
         let(:enr_state) {"coverage_selected"}
-
-        before :each do
-          renewal_application.update_attributes(aasm_state: :retroactive_canceled)
-        end
+        let(:renewal_state) { :retroactive_canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
