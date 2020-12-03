@@ -63,6 +63,10 @@ module Forms
       self.new(default_keys_hash.merge(qlek_params.symbolize_keys))
     end
 
+    def qle_kind_reason_options
+      (QualifyingLifeEventKind::REASON_KINDS + QualifyingLifeEventKind.non_draft.map(&:reason).uniq)
+    end
+
     class << self
       def fetch_qlek_data(id, update_params = nil)
         qle = ::QualifyingLifeEventKind.find(id)
