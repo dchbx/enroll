@@ -1,6 +1,7 @@
 Feature: Employee while terminating active enrollment should able to see and pick termination on kinds dates to terminate
 
   Background: Setup site, employer, and benefit application
+    Given HbxProfile exists
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present
