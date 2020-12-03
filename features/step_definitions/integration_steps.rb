@@ -801,7 +801,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effective date/) do |_named_person, screen, status|
-  hbx_profile = FactoryBot.create(:hbx_profile)
+  FactoryBot.create(:hbx_profile)
   @applications_by_state ||= {}
   @applications_by_state[status] ||= benefit_sponsorship.benefit_applications.where(aasm_state: status).first
   start_on = @applications_by_state[status].start_on
