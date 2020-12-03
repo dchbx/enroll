@@ -73,7 +73,7 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
     if prev_year_state.in?(HbxEnrollment::WAIVED_STATUSES + HbxEnrollment::TERMINATED_STATUSES)
       "Previous plan has waived or terminated and did not generate renewal"
     elsif ["coverage_selected", "coverage_enrolled"].include?(prev_year_state)
-      "Enrollment plan was changed either for current year or previous year" unless rp_id == cp_id
+      "Employer plan offerings might have changed for current year"
     end
   end
 
@@ -109,7 +109,7 @@ class EnrollmentOpenSponsorsReport < MongoidMigrationTask
                                                                                 })
           end
 
-          next if renewal_enrollments.size > 0
+          next unless renewal_enrollments.empty?
 
           enrollments = []
           if family.present?
