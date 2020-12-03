@@ -131,7 +131,9 @@ module BenefitSponsors
       private
 
       def execute_sponsor_event(benefit_sponsorships, event)
+        notify_logger("Event: #{event}. Process started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
         BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorships, event)
+        notify_logger("Event: #{event}. Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
       end
 
       def process_events_for(&block)
@@ -145,6 +147,11 @@ module BenefitSponsors
 
       def initialize_logger
         @logger = Logger.new("#{Rails.root}/log/aca_shop_scheduled_events.log") unless defined? @logger
+      end
+
+      def notify_logger(message)
+        @logger.info(message)
+        log(message) unless Rails.env.test?
       end
     end
   end
