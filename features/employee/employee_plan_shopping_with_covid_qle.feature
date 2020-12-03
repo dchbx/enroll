@@ -3,6 +3,7 @@ Feature: Shop Employees can purchase coverage through covid QLE
   they can choose First of Next month as coverage begin date
 
   Background: Setup site, employer, and benefit application
+    Given HbxProfile exists
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active initial employer with health benefits
     Given Qualifying life events are present
@@ -49,4 +50,3 @@ Feature: Shop Employees can purchase coverage through covid QLE
     Then Employee should see coverage summary page with "fixed_first_of_next_month" as coverage effective date
     Then Employee should see receipt page with "fixed_first_of_next_month" as coverage effective date
     Then Patrick Doe should see "my account" page with enrollment
-

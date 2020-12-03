@@ -223,6 +223,10 @@ Given(/^User has existing security questions/) do
 
 end
 
+Given(/^HbxProfile exists/) do
+  FactoryBot.create :hbx_profile
+end
+
 Given(/^Hbx Admin Tier 3 exists$/) do
   p_staff = Permission.create(name: 'hbx_tier3',
                               modify_family: true,
