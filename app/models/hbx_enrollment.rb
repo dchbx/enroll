@@ -469,15 +469,18 @@ class HbxEnrollment
     )
   end
 
-  def renew_benefit(new_benefit_package)
+  def renew_benefit(new_benefit_package, result_reporter = ::BenefitSponsors::BenefitPackages::SilentRenewalReporter.new)
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
         assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
+      else
+        result_reporter.report_enrollment_save_renewal_failure(self, self.errors)
       end
       enrollment
     rescue Exception => e
+      result_reporter.report_enrollment_renewal_exception(self, e)
     end
   end
 

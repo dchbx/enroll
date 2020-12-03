@@ -37,7 +37,8 @@ module BenefitSponsors
           census_employee_id = validation.output[:census_employee_id]
           bp = BenefitSponsors::BenefitPackages::BenefitPackage.find(benefit_package_id)
           ce = CensusEmployee.find(census_employee_id)
-          bp.renew_member_benefit(ce)
+          @renewal_message_properties = properties
+          bp.renew_member_benefit(ce, self)
         rescue Exception => e
           notify(
             "acapi.error.events.benefit_package.renew_employee.exception", {
@@ -52,6 +53,8 @@ module BenefitSponsors
             }.merge(extract_response_params(properties))
           )
           return :reject
+        ensure
+          @renewal_message_properties = nil
         end
 
         notify(
@@ -62,6 +65,43 @@ module BenefitSponsors
           }.merge(extract_response_params(properties))
         )
         return :ack
+      end
+
+      def report_renewal_failure(census_employee, benefit_package, issue_string)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee.renewal_failed", {
+            :return_status => "500",
+            :benefit_package_id => benefit_package.id.to_s,
+            :census_employee_id => census_employee.id.to_s,
+            :body => issue_string
+          }.merge(extract_response_params(@renewal_message_properties))
+        )
+      end
+
+      def report_enrollment_renewal_exception(hbx_enrollment, exception)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee.renewal_enrollment_exception", {
+            :return_status => "500",
+            :hbx_enrollment_id => hbx_enrollment.id,
+            :body => JSON.dump(
+              {
+                :error => exception.inspect,
+                :message => exception.message,
+                :backtrace => exception.backtrace
+              }
+            )
+          }.merge(extract_response_params(@renewal_message_properties))
+        )
+      end
+
+      def report_enrollment_save_renewal_failure(hbx_enrollment, model_errors)
+        notify(
+          "acapi.info.events.benefit_package.renew_employee.renewal_enrollment_save_failed", {
+            :return_status => "500",
+            :hbx_enrollment_id => hbx_enrollment.id,
+            :body => JSON.dump(model_errors.to_hash)
+          }.merge(extract_response_params(@renewal_message_properties))
+        )
       end
 
       private
