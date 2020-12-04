@@ -10,7 +10,7 @@ class EmployerStaffRole
   after_update :notify_observers
 
   embedded_in :person
-  embeds_one :employee_coverage
+  embeds_one :coverage_record
 
   field :is_owner, type: Boolean, default: true
   field :employer_profile_id, type: BSON::ObjectId
@@ -73,6 +73,6 @@ class EmployerStaffRole
   private
 
   def has_employee_coverage?
-    self.employee_coverage.present?
+    self.coverage_record.present?
   end
 end
