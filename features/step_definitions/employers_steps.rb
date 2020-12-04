@@ -623,8 +623,9 @@ And /^employer should see form for benefit package$/ do
   expect(page).to have_content "Benefit Package - Set Up"
 end
 
-And /^employer filled all the fields on benefit package form$/ do
-  fill_in 'benefit_package[title]', with: "Benefit Package"
+And(/^employer filled all the fields on benefit package form for (.*) application$/) do |sponsor_type|
+  title = sponsor_type == 'off-cycle' ? 'Off-Cycle BP' : 'Benefit Package'
+  fill_in 'benefit_package[title]', with: title
   fill_in 'benefit_package[description]', with: "Benefit Package"
 end
 
@@ -1070,6 +1071,11 @@ And(/^employer should see that the create plan year is (.*)$/) do |plan_year_btn
     expect(find("#submitBenefitPackage")[:class].include?('disabled')).to eql true
   end
 end
+
+And(/^employer clicks Create Plan Year$/) do
+  click_button 'Create Plan Year'
+end
+
 
 And(/^employer should see default cobra start date$/) do
   terminated_on = @census_employees.first.employment_terminated_on.next_month.beginning_of_month.to_s

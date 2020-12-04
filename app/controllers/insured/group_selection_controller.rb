@@ -39,6 +39,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
+    @shop_under_current = @adapter.shop_under_current
+    @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|

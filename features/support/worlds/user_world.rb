@@ -133,6 +133,10 @@ Then(/^the user will see the Extend Open Enrollment button$/) do
   expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
 end
 
+And(/^the user clicks the Plan Years button$/) do
+  find('.btn.btn-xs', text: 'Plan Years').click
+end
+
 Then(/^the user will see the Plan Years button$/) do
   find('.btn.btn-xs', text: 'Plan Years').click
 end

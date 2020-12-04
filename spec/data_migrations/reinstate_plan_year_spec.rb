@@ -58,8 +58,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(enrollment_terminated.termination_submitted_on).to eq nil
 
         expect(ce_benefit_group_assignment.end_on).to eq nil
-        expect(ce_benefit_group_assignment.aasm_state).to eq "coverage_selected"
-        expect(ce_benefit_group_assignment.is_active).to eq true
       end
 
       it "should not reinstate cancelled plan year" do
@@ -82,8 +80,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(plan_year.aasm_state).to eq 'expired'
         expect(plan_year.terminated_on).to eq terminated_on
       end
-
-
     end
 
     context "on reinstate of plan year with end date passed and has renewing plan year cancelled" do
@@ -103,8 +99,8 @@ describe ReinstatePlanYear, dbclean: :after_each do
       let!(:terminated_enrollment) { FactoryBot.create(:hbx_enrollment, :terminated, effective_on:plan_year.start_on, terminated_on: plan_year.end_on, benefit_group_id:benefit_group.id, household: family.active_household, terminate_reason: "")}
       let!(:canceled_enrollment) { FactoryBot.create(:hbx_enrollment, effective_on:renewing_plan_year.start_on, benefit_group_id:renew_benefit_group.id, household: family.active_household, aasm_state:'coverage_canceled')}
 
-      let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, aasm_state:'coverage_selected',hbx_enrollment_id:terminated_enrollment.id,benefit_group_id:benefit_group.id,start_on:start_on,end_on:end_on) }
-      let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id:canceled_enrollment.id, benefit_group_id:renew_benefit_group.id, is_active:false) }
+      let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id: terminated_enrollment.id, benefit_group_id: benefit_group.id, start_on: start_on, end_on: end_on) }
+      let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, hbx_enrollment_id: canceled_enrollment.id, benefit_group_id: renew_benefit_group.id) }
 
 
       let!(:emp_plan_years) {  employer_profile.plan_years << [renewing_plan_year,plan_year] }
@@ -131,8 +127,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(terminated_enrollment.termination_submitted_on).to eq nil
 
         expect(benefit_group_assignment.end_on).to eq plan_year.end_on
-        expect(benefit_group_assignment.aasm_state).to eq "coverage_expired"
-        expect(benefit_group_assignment.is_active).to eq false
 
       end
 
@@ -156,8 +150,6 @@ describe ReinstatePlanYear, dbclean: :after_each do
         expect(canceled_enrollment.termination_submitted_on).to eq nil
 
         expect(renewal_benefit_group_assignment.end_on).to eq nil
-        expect(renewal_benefit_group_assignment.aasm_state).to eq "coverage_selected"
-        expect(renewal_benefit_group_assignment.is_active).to eq true
       end
 
       it "renewing plan year not force published, plan year should be moved to renewing draft state " do

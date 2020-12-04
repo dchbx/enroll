@@ -1,12 +1,17 @@
 require 'rails_helper'
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :around_each do
-  let(:person) { FactoryBot.build(:person) }
-  let(:family) { FactoryBot.build(:family, :with_primary_family_member) }
-  let(:employee_role) { FactoryBot.build(:employee_role) }
-  let(:employer_profile) {employee_role.employer_profile}
-  let(:plan_year) {FactoryBot.create(:plan_year, employer_profile: employer_profile, aasm_state: "published")}
-  let(:census_employee) { FactoryBot.build(:census_employee) }
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:person)  { FactoryBot.create(:person, :with_family)}
+  let(:family)  { person.primary_family }
+  let(:employer_profile) { abc_profile }
+  let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
+  let(:plan_year) { initial_application }
+  let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
   let(:hbx_enrollments) {double}
   let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:current_user) { FactoryBot.create(:user)}
@@ -54,6 +59,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
       assign :person, person
       assign :employee_role, employee_role
       assign :hbx_enrollments, []
+      assign :family, family
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       sign_in(current_user)
 

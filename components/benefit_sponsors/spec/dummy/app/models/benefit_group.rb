@@ -488,11 +488,11 @@ class BenefitGroup
       else
         Plan.valid_shop_health_plans("carrier", carrier_for_elected_plan, start_on.year).to_a
       end
-      
+
     when "metal_level"
       if carrier_for_elected_plan.blank?
         carrier_for_elected_plan = reference_plan.carrier_profile_id if reference_plan.present?
-      end    
+      end
       if constrain_service_areas?
         Plan.valid_shop_health_plans_for_service_area("carrier", carrier_for_elected_plan, start_on.year, @profile_and_service_area_pairs).select { |pair| pair.metal_level == reference_plan.metal_level }.to_a
       else
@@ -531,7 +531,7 @@ class BenefitGroup
           bga.hbx_enrollments.each do |enrollment|
             enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
           end
-          bga.update(is_active: false) unless self.plan_year.is_renewing?
+          bga.update(end_on: bga.start_on) unless self.plan_year.is_renewing?
         end
 
         other_benefit_group = self.plan_year.benefit_groups.detect{ |bg| bg.id != self.id}
@@ -540,7 +540,7 @@ class BenefitGroup
           # ce.add_renew_benefit_group_assignment(other_benefit_group)
           ce.add_renew_benefit_group_assignment([other_benefit_group])
         else
-          ce.find_or_create_benefit_group_assignment([other_benefit_group])
+          ce.create_benefit_group_assignment([other_benefit_group])
         end
       end
     end

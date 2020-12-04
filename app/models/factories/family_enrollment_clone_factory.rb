@@ -51,12 +51,12 @@ module Factories
       clone_enrollment.coverage_kind = enrollment.coverage_kind
       clone_enrollment.kind = 'employer_sponsored_cobra'
       clone_enrollment.external_enrollment = enrollment.external_enrollment
-
       clone_enrollment.benefit_sponsorship_id = enrollment.benefit_sponsorship_id
       clone_enrollment.sponsored_benefit_id = sponsored_benefit_package.sponsored_benefit_for(enrollment.coverage_kind).id
       clone_enrollment.rating_area_id = sponsored_benefit_package.recorded_rating_area.id
       clone_enrollment.issuer_profile_id = product.issuer_profile_id
-      assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
+      assignment = census_employee.create_benefit_package_assignment(sponsored_benefit_package, effective_on)
+      # assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
       clone_enrollment.benefit_group_assignment_id = assignment.id
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 
@@ -107,7 +107,7 @@ module Factories
     end
 
     def assign_enrollment_to_benefit_package_assignment(enrollment)
-      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
       assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       enrollment.update_attributes(benefit_group_assignment_id: assignment.id)
     end

@@ -15,11 +15,11 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
   let(:enrollment) { FactoryBot.build(:hbx_enrollment, family: family, household: family.active_household, employee_role: census_employee.employee_role)}
   let(:enrollment2) { FactoryBot.build(:hbx_enrollment,family: family, household: family.active_household, employee_role: census_employee.employee_role,aasm_state:'auto_renewing')}
   let!(:active_benefit_group_assignment) do
-    bga = FactoryBot.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, is_active: true, census_employee: census_employee, hbx_enrollment_id: enrollment.id, aasm_state: 'coverage_selected')
+    bga = FactoryBot.build(:benefit_group_assignment, benefit_group_id: benefit_group.id, census_employee: census_employee, hbx_enrollment_id: enrollment.id)
     bga.save(:validate => false)
     bga
   end
-  let!(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: benefit_group1.id, is_active: false, census_employee: census_employee, hbx_enrollment_id: enrollment2.id) }
+  let!(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: benefit_group1.id, census_employee: census_employee, hbx_enrollment_id: enrollment2.id) }
 
   describe 'migrations:cancel_employer_incorrect_renewal' do
 
@@ -38,8 +38,6 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
       active_benefit_group_assignment.reload
       expect(active_plan_year.aasm_state).to eq "canceled"
       expect(enrollment.aasm_state).to eq "coverage_canceled"
-      expect(active_benefit_group_assignment.aasm_state).to eq "initialized"
-      expect(active_benefit_group_assignment.is_active).to eq false
     end
 
     it 'should not cancel incorrect plan year and enrollments' do
@@ -47,8 +45,6 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
       active_plan_year.reload
       expect(active_plan_year.aasm_state).to eq "published"
       expect(enrollment.aasm_state).to eq "coverage_selected"
-      expect(active_benefit_group_assignment.aasm_state).to eq "coverage_selected"
-      expect(active_benefit_group_assignment.is_active).to eq true
     end
   end
 
@@ -56,7 +52,7 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
 
     before do
       enrollment2.update_attributes!(benefit_group_id: benefit_group1.id, aasm_state:'auto_renewing')
-      renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id:enrollment2.id, is_active:true, aasm_state:'coverage_renewing')
+      renewal_benefit_group_assignment.update_attributes(hbx_enrollment_id: enrollment2.id)
       load File.expand_path("#{Rails.root}/lib/tasks/migrations/cancel_employer_renewal.rake", __FILE__)
       Rake::Task.define_task(:environment)
       fein = organization.fein
@@ -69,8 +65,6 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
       renewal_benefit_group_assignment.reload
       expect(renewal_plan_year.aasm_state).to eq "renewing_canceled"
       expect(enrollment2.aasm_state).to eq "coverage_canceled"
-      expect(renewal_benefit_group_assignment.aasm_state).to eq "initialized"
-      expect(renewal_benefit_group_assignment.is_active).to eq false
     end
 
     it 'should not cancel plan year and enrollments' do
@@ -78,8 +72,6 @@ describe 'Cancel employer plan year & enrollments', :dbclean => :around_each do
       renewal_plan_year.reload
       expect(renewal_plan_year.aasm_state).to eq "published"
       expect(enrollment2.aasm_state).to eq "auto_renewing"
-      expect(renewal_benefit_group_assignment.aasm_state).to eq "coverage_renewing"
-      expect(renewal_benefit_group_assignment.is_active).to eq true
     end
   end
 

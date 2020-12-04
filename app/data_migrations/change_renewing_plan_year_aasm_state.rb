@@ -26,11 +26,6 @@ class ChangeRenewingPlanYearAasmState< MongoidMigrationTask
               expiring_plan_year = organization.employer_profile.plan_years.where(start_on:plan_year_start_on - 1.year).first
               expiring_plan_year.hbx_enrollments.each do |enrollment|
                 enrollment.expire_coverage! if enrollment.may_expire_coverage?
-                if !enrollment.benefit_group_assignment_id.blank?
-                  assignment = enrollment.benefit_group_assignment
-                  assignment.expire_coverage! if assignment.may_expire_coverage?
-                  assignment.update_attributes(is_active: false) if assignment.is_active?
-                end
                 expiring_plan_year.expire! if expiring_plan_year.may_expire?
               end
             end

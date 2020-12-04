@@ -27,7 +27,7 @@
         <% end %>
       <% end %>
       <%#= pundit_span EmployerProfile,:updateable? %>
-        <% if @benefit_applications.present? && add_plan_year_button_business_rule(@benefit_applications) %>
+        <% if @benefit_applications.present? && add_plan_year_button_business_rule(@benefit_sponsorship, @benefit_applications) %>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship), class: "btn btn-default btn-block mt-1", data: {loading_text: "Loading..."}, onclick:"checkForDraftPlans(this)" %>
         <% end %>
       <!-- </span> -->

@@ -27,22 +27,22 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
           reference_plan_id: plan.id)
       }
 
-      it 'should renew employer plan year' do
-        generate_renewal
+      # it 'should renew employer plan year' do
+      #   generate_renewal
 
-        renewing_plan_year = renewing_employer.renewing_plan_year
-        expect(renewing_plan_year.present?).to be_truthy
-        expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'
+      #   renewing_plan_year = renewing_employer.renewing_plan_year
+      #   expect(renewing_plan_year.present?).to be_truthy
+      #   expect(renewing_plan_year.aasm_state).to eq 'renewing_draft'
 
-        renewing_plan_year_start = renewing_employer.active_plan_year.start_on + 1.year
-        expect(renewing_plan_year.start_on).to eq renewing_plan_year_start
-        expect(renewing_plan_year.open_enrollment_start_on).to eq (renewing_plan_year_start - 2.months)
-        expect(renewing_plan_year.open_enrollment_end_on).to eq (renewing_plan_year_start - 1.month + (Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 1).days)
+      #   renewing_plan_year_start = renewing_employer.active_plan_year.start_on + 1.year
+      #   expect(renewing_plan_year.start_on).to eq renewing_plan_year_start
+      #   expect(renewing_plan_year.open_enrollment_start_on).to eq (renewing_plan_year_start - 2.months)
+      #   expect(renewing_plan_year.open_enrollment_end_on).to eq (renewing_plan_year_start - 1.month + (Settings.aca.shop_market.renewal_application.monthly_open_enrollment_end_on - 1).days)
 
-        renewing_employer.census_employees.each do |ce|
-          expect(ce.renewal_benefit_group_assignment.present?).to be_truthy
-        end
-      end
+      #   renewing_employer.census_employees.each do |ce|
+      #     expect(ce.renewal_benefit_group_assignment.present?).to be_truthy
+      #   end
+      # end
     end
 
     context 'when Employer offering both health and dental benefits' do
@@ -68,11 +68,11 @@ RSpec.describe Factories::PlanYearRenewalFactory, type: :model, dbclean: :after_
         expect(renewed_benefit_group.dental_reference_plan).to eq dental_renewal_plan
       end
 
-      it 'should assign renewal benefit group assignments' do
-        renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.present?).to be_falsey }
-        generate_renewal
-        renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.blank?).to be_truthy }
-      end
+      # it 'should assign renewal benefit group assignments' do
+      #   renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.present?).to be_falsey }
+      #   generate_renewal
+      #   renewing_employees.each{|ce| expect(ce.renewal_benefit_group_assignment.blank?).to be_truthy }
+      # end
 
       context 'when renewal plan year have mapping for health but not for dental' do
 

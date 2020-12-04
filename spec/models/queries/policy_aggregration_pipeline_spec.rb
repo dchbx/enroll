@@ -23,7 +23,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_
   let(:open_enrollment_period)   { (effective_period.min.prev_month - 2.days)..(effective_period.min - 10.days) }
   let!(:effective_on) {effective_period.min}
   let!(:organization) {abc_organization}
-  let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id:nil, benefit_package: current_benefit_package, is_active:false)}
+  let!(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: current_benefit_package.start_on, benefit_group_id: nil, benefit_package: current_benefit_package)}
   let(:reference_product) {current_benefit_package.sponsored_benefits.first.reference_product}
   let!(:ce)  { census_employees[0]}
   let!(:person) {FactoryBot.create(:person, first_name: ce.first_name, last_name: ce.last_name, ssn:ce.ssn)}

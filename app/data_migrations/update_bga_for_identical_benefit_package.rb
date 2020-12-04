@@ -19,14 +19,13 @@ class UpdateBgaForIdenticalBenefitPackage < MongoidMigrationTask
           if ce.benefit_group_assignments.any?{|a| !a.valid?}
             new_assignment = ce.benefit_group_assignments.where(benefit_package_id: new_benefit_package).first
             if new_assignment.blank?
-              ce.benefit_group_assignments.each{|a| a.is_active = false}
-              ce.benefit_group_assignments.build(benefit_group: new_benefit_package, start_on: new_benefit_package.start_on, is_active: true)
+              ce.benefit_group_assignments.build(benefit_group: new_benefit_package, start_on: new_benefit_package.start_on)
               ce.save(:validate => false)
               count += 1
               puts "New benefit_group_assignment assigned to census_employee #{ce.full_name} of ER: #{benefit_sponsorship.legal_name}" unless Rails.env.test?
             end
           else
-            ce.find_or_create_benefit_group_assignment([new_benefit_package])
+            ce.create_benefit_group_assignment([new_benefit_package])
           end
         end
 
@@ -39,7 +38,6 @@ class UpdateBgaForIdenticalBenefitPackage < MongoidMigrationTask
             hbx_enrollment = invalid_assignment.hbx_enrollment
             hbx_enrollment.update(benefit_group_assignment_id: new_assignment.id)
             invalid_assignment.hbx_enrollment_id = nil
-            invalid_assignment.aasm_state = 'initialized'
           end
           ce.save(:validate => false)
         end
@@ -58,7 +56,6 @@ class UpdateBgaForIdenticalBenefitPackage < MongoidMigrationTask
                                                  sponsored_benefit_id: new_benefit_package.sponsored_benefit_for(hbx_enrollment.coverage_kind).id
                                                })
               assignment.hbx_enrollment_id = nil
-              assignment.aasm_state = 'initialized'
             end
           end
           ce.save(validate: false)
