@@ -15,7 +15,6 @@ class AccountsController < ApplicationController
     @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
   end
 
-
   private
 
   def find_person
