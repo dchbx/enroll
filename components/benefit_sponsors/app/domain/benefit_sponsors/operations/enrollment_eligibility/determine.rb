@@ -74,7 +74,7 @@ module BenefitSponsors
         def is_initial_sponsor?(benefit_applications, effective_date)
           recent_benefit_application = benefit_applications.sort { |a, b|  a.effective_period.min <=> b.effective_period.min }.last
           return true unless recent_benefit_application
-          return true if (recent_benefit_application.is_termed_or_ineligible? || recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date))
+          return true if recent_benefit_application.is_termed_or_ineligible? || recent_benefit_application.aasm_state == :active && recent_benefit_application.effective_period.cover?(effective_date)
 
           ba_states = BenefitSponsors::BenefitApplications::BenefitApplication::RENEWAL_TRANSMISSION_STATES +
                       BenefitSponsors::BenefitApplications::BenefitApplication::CANCELED_STATES +
