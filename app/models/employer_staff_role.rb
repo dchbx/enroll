@@ -41,7 +41,7 @@ class EmployerStaffRole
     state :is_closed    #Person employer staff role is not active
 
     event :approve do
-      transitions from: [:is_applicant, :is_active], to: :is_active , :guard => :has_employee_coverage?, :after => [:create_census_employee]
+      transitions from: [:is_applicant, :is_active], to: :is_active , :guard => :has_coverage?, :after => [:create_census_employee]
     end
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
@@ -67,12 +67,11 @@ class EmployerStaffRole
     BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(profile, tab: 'home').to_s
   end
 
-  def create_census_employee
-  end
+  def create_census_employee; end
 
   private
 
-  def has_employee_coverage?
+  def has_coverage?
     self.coverage_record.present?
   end
 end
