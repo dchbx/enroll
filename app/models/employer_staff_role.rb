@@ -41,7 +41,7 @@ class EmployerStaffRole
     state :is_closed    #Person employer staff role is not active
 
     event :approve do
-      transitions from: [:is_applicant, :is_active], to: :is_active , :guard => :has_coverage?, :after => [:create_census_employee]
+      transitions from: [:is_applicant, :is_active], to: :is_active, :guard => :has_coverage?, :after => [:create_census_employee]
     end
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
