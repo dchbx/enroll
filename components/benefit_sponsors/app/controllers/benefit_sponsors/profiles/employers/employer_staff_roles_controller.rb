@@ -63,9 +63,7 @@ module BenefitSponsors
           @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
         end
 
-        def create_staff_member
-
-        end
+        def create_staff_member; end
 
         def employer_search
           @search_value = params.permit!.to_h["q"]

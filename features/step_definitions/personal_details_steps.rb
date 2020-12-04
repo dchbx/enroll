@@ -57,7 +57,6 @@ And(/that a person with (.*) exists in EA/) do |role|
     create_broker_staff(role, "Test", user)
   when 'GA Staff'
     create_ga_staff(role, "Test", user)
-  else
   end
 end
 
