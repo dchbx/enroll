@@ -1,0 +1,7 @@
+<span class="badge badge-alt-blue mr-1 mb-1 p-2" data-target="bulk-notice.recipientBadge">
+  <%= hidden_field_tag 'admin_bulk_notice[audience_ids][]', id %>
+  <%= hbx_id %>
+  <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
+    <i class="far fa-times-circle"></i>
+  </a>
+</span>
