@@ -2729,7 +2729,7 @@ describe '#can_make_changes?', :dbclean => :after_each do
     end
 
     it 'should return false if enr is individual market and is active' do
-      %w(shopping coverage_canceled coverage_terminated inactive coverage_expired).each do |aasm_state|
+      %w[shopping coverage_canceled coverage_terminated inactive coverage_expired].each do |aasm_state|
         hbx_enrollment.update_attributes(kind: 'individual', aasm_state: aasm_state)
         expect(hbx_enrollment.can_make_changes?). to eq false
       end
