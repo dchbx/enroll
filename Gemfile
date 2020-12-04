@@ -5,6 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
 gem 'rails', '~> 5.2.3'
+gem 'sidekiq'
 
 #######################################################
 # FIXME
@@ -116,7 +117,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
-
+gem 'stimulus_reflex', '~> 3.3'
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -134,11 +135,12 @@ group :development do
   gem 'listen',                 '>= 3.0.5', '< 3.2'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'              
+  gem 'spring'
   gem 'spring-watcher-listen'
 end
 
 group :development, :test do
+  gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
@@ -152,12 +154,9 @@ group :development, :test do
   gem 'railroady',              '~> 1.5.3'
   gem 'rspec-rails'
   gem 'rspec_junit_formatter'
+  gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-
-  gem 'pry-rails'
-  gem 'pry-byebug'
-  gem 'pry-stack_explorer'
 end
 
 group :test do

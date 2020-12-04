@@ -1,0 +1,12 @@
+<span class="badge badge-danger mr-1 mb-1 p-2"
+  data-target="bulk-notice.recipientBadge"
+  data-toggle='tooltip'
+  data-placement='bottom'
+  data-trigger='hover'
+  title='<%= error %>'>
+  <%= hidden_field_tag 'admin_bulk_notice[audience_ids][]', id %>
+  <%= hbx_id || id %>
+  <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
+    <i class="far fa-times-circle"></i>
+  </a>
+</span>

@@ -70,6 +70,8 @@
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'staff', link_path: main_app.staff_index_exchanges_hbx_profiles_path, display_name: 'Staff', active_tab: 'staff', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'users-orphans', link_path: main_app.users_orphans_path, display_name: 'Orphan Accounts', active_tab: 'users-orphans', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'bulk-notices', link_path: main_app.exchanges_bulk_notices_path, display_name: 'Bulk Notices', active_tab: 'bulk_notices', remote: false, pundit_object: HbxProfile, pundit_method: :can_send_secure_message? }
               - if EnrollRegistry.feature_enabled?(:sep_types)
                 li
                   = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'manage-sep-types', link_path: main_app.sep_types_dt_exchanges_manage_sep_types_path, data: { turbolinks: false }, display_name: l10n("exchange.manage_sep_types.manage_seps"), active_tab: "manage-sep-types", remote: false, pundit_object: QualifyingLifeEventKind, pundit_method: :can_manage_qles?}
