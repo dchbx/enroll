@@ -23,11 +23,10 @@
       <% else %>
         <% enrollments = @hbx_enrollments %>
       <% end %>
-      <% is_family_eligible_to_enroll = @family.is_eligible_to_enroll? %>
       <%= render partial: "enrollment",
                  :collection => enrollments,
                  :as => :hbx_enrollment,
-                 locals: { read_only: false, is_family_eligible_to_enroll: is_family_eligible_to_enroll } %>
+                 locals: { read_only: false } %>
       <%= render partial: 'shop_for_plans_widget' %>
       <% if individual_market_is_enabled? %>
       <%= render partial: 'apply_for_medicaid_widget' %>
