@@ -192,7 +192,7 @@
     </div>
     <% if !read_only == true %>
       <div class="col-lg-3">
-        <div class="row <%if can_make_changes_for_enrollment %>cna<%end%>">
+        <div class="row <%if hbx_enrollment.is_shop? && can_make_changes_for_enrollment %>cna<%end%>">
          <% if can_make_changes_for_enrollment && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop?%>
             <%= pundit_span Family, :updateable? %>
                <!-- Use turbolinks: false, to avoid calling controller action twice-->
