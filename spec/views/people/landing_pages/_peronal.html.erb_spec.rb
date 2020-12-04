@@ -4,10 +4,12 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
   let(:person) { FactoryBot.build(:person) }
   let(:person1) { FactoryBot.build(:invalid_person) }
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:current_user) { FactoryBot.create(:user, person: person) }
 
   before(:each) do
     stub_template 'devise/passwords/_edit.html.erb' => ''
     stub_template 'users/security_question_responses/_edit_modal.html.erb' => ''
+    sign_in(current_user)
   end
 
   context 'family is updateable' do
@@ -48,6 +50,11 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
         expect(rendered).to have_selector('div#address_info')
         expect(rendered).to match /homeless DC resident/
         expect(rendered).to match /living outside of DC temporarily and intend to return/
+      end
+
+      it "should have age off exclusion checbox" do
+        expect(rendered).to match "Ageoff Exclusion"
+        expect(rendered).to have_field('age_off_excluded', checked: false)
       end
     end
 
@@ -130,6 +137,27 @@ RSpec.describe "people/landing_pages/_personal.html.erb", dbclean: :around_each 
 
     it "should display the affirmative message" do
       expect(rendered).to match /Your answer to this question does not apply to coverage offered by an employer./
+    end
+  end
+
+  context "without both employee_role and consumer_role" do
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+    let!(:broker_role1) { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+
+    before :each do
+      current_user.person.broker_agency_staff_roles << broker_agency_staff_role
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      allow(person).to receive(:broker_role).and_return(broker_role1)
+      assign(:person, person)
+      sign_in(current_user)
+      render :template => "people/landing_pages/_personal.html.erb"
+    end
+
+    it "should have age off exclusion checbox" do
+      expect(rendered).not_to match "Ageoff Exclusion"
+      expect(rendered).not_to have_field('age_off_excluded', checked: false)
     end
   end
 

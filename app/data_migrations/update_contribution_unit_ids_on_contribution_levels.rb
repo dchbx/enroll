@@ -4,6 +4,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateContributionUnitIdsOnContributionLevels < MongoidMigrationTask
 
+  # rubocop:disable Style/Next
   def migrate
     date = Date.new(2020,7,23)
     BenefitMarkets::BenefitSponsorCatalog.where(:created_at.gte => date).each do |catalog|
@@ -28,4 +29,5 @@ class UpdateContributionUnitIdsOnContributionLevels < MongoidMigrationTask
       end
     end
   end
+  # rubocop:enable Style/Next
 end

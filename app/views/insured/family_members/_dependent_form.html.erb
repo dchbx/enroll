@@ -39,7 +39,7 @@
             </div>
             <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
               <label class="static_label label-floatlabel" for="name">AGE</label>
-              <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(Date.today)}" %></span>
+              <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@dependent.age_on(TimeKeeper.date_of_record)}" %></span>
             </div>
             <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
               <label class="static_label label-floatlabel" for="name">GENDER</label>
@@ -172,7 +172,13 @@
             <span class="position-full-name"> <%= @person.full_name %> </span>
           </div>
         </div>
-
+        <% if !current_user.has_insured_role? %>
+          <% if current_user.does_not_have_any_staff_role? %>
+            <div class="row row-form-wrapper no-buffer">
+              <%= render 'shared/age_off_excluded', f: f %>
+            </div>
+          <% end %>
+        <% end %>
         <% if has_active_consumer_dependent?(@person,@dependent) %>
           <%= render 'shared/ssn_coverage_msg' %>
         <% end %>

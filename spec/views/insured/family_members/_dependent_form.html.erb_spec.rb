@@ -85,6 +85,11 @@ describe "insured/family_members/_dependent_form.html.erb" do
       end
       expect(rendered).to have_selector("option", text: "choose")
     end
+
+    it "should have not have age off exclusion field for consumer role only" do
+      expect(rendered).not_to match "Ageoff Exclusion"
+      expect(rendered).not_to have_field('age_off_excluded', checked: false)
+    end
   end
 
   context "without consumer_role" do
@@ -133,6 +138,37 @@ describe "insured/family_members/_dependent_form.html.erb" do
     it "should have address info area" do
       expect(rendered).to have_selector('#address_info')
       expect(rendered).to match(/Home Address/)
+    end
+
+    it "should have age off exclusion field for employee role only" do
+      expect(rendered).to match "Ageoff Exclusion"
+      expect(rendered).to have_field('age_off_excluded', checked: false)
+    end
+  end
+
+  context "user login with broker role" do
+
+    let(:current_user) { FactoryBot.create(:user, person: person) }
+    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:broker_agency_profile) { FactoryBot.create(:broker_agency_profile) }
+    let!(:broker_role1) { FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile.id, person: person) }
+    let(:broker_agency_staff_role) { FactoryBot.create(:broker_agency_staff_role, aasm_state: "active", benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+
+    before :each do
+      current_user.person.broker_agency_staff_roles << broker_agency_staff_role
+      sign_in(current_user)
+      @request.env['HTTP_REFERER'] = ''
+      allow(person).to receive(:is_consumer_role_active?).and_return false
+      allow(person).to receive(:has_active_employee_role?).and_return false
+      allow(person).to receive(:broker_role).and_return(broker_role1)
+      assign :person, person
+      assign :dependent, dependent
+      allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      render "insured/family_members/dependent_form", dependent: dependent, person: person
+    end
+
+    it "should not have age off exclusion checbox when current user has broker role" do
+      expect(rendered).not_to match "Ageoff Exclusion"
     end
   end
 end

@@ -381,7 +381,8 @@ private
       :is_temporarily_out_of_state,
       :id,
       :consumer_role,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :age_off_excluded
     ]
   end
 
