@@ -3,7 +3,6 @@
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
-
 RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbclean: :after_each do
   before do
     DatabaseCleaner.clean
@@ -41,6 +40,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
     let(:end_of_the_year) {Date.new(current_year, 12, 31)}
 
     before do
+      setup_contribution_models(benefit_sponsor_catalog)
       allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 1))
       initial_application.benefit_packages.each do |bp|
         bp.sponsored_benefits.each do |spon_benefit|
@@ -89,10 +89,6 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         context 'workflow_state_transitions' do
-          it 'should record transition from_state' do
-            expect(@first_wfst.from_state).to eq('draft')
-          end
-
           it 'should record transition to_state' do
             expect(@first_wfst.to_state).to eq('reinstated')
           end
@@ -132,10 +128,6 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         context 'workflow_state_transitions' do
-          it 'should record transition from_state' do
-            expect(@first_wfst.from_state).to eq('draft')
-          end
-
           it 'should record transition to_state' do
             expect(@first_wfst.to_state).to eq('reinstated')
           end
@@ -180,10 +172,6 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         context 'workflow_state_transitions' do
-          it 'should record transition from_state' do
-            expect(@first_wfst.from_state).to eq('draft')
-          end
-
           it 'should record transition to_state' do
             expect(@first_wfst.to_state).to eq('reinstated')
           end
@@ -294,5 +282,18 @@ end
 def update_contribution_levels(spon_benefit)
   spon_benefit.sponsor_contribution.contribution_levels.each do |cl|
     cl.update_attributes!({contribution_cap: 0.5, flat_contribution_amount: 100.00})
+  end
+end
+
+def setup_contribution_models(benefit_sponsor_catalog)
+  benefit_sponsor_catalog.product_packages.each do |pp|
+    if pp.assigned_contribution_model.nil?
+      pp.assigned_contribution_model = pp.contribution_model
+      pp.save!
+    end
+    if pp.contribution_models.blank?
+      pp.contribution_models = [pp.contribution_model]
+      pp.save!
+    end
   end
 end
