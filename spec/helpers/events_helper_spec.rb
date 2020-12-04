@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -29,7 +31,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
   end
 
   describe "employer_plan_years" do
-    
+
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup renewal application"
 
@@ -68,7 +70,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
         before do
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
         end
 
         it "should return active and renewal plan year" do
@@ -93,7 +95,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
     context "conversion employer with no external plan year" do
 
       before do
-        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
         predecessor_application.update_attributes({:aasm_state => "enrollment_eligible"})
       end
 
@@ -125,7 +127,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
       context "day is after open enrollment this month" do
         before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
         end
@@ -157,7 +159,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
       context "day is after open enrollment this month" do
 
         before do
-          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month+ 21.days)
+          allow(TimeKeeper).to receive(:date_of_record).and_return(TimeKeeper.date_of_record.at_beginning_of_month + 21.days)
           predecessor_application.update_attributes({:aasm_state => "active"})
           renewal_application.update_attributes({:aasm_state => "enrollment_eligible"})
         end
@@ -210,8 +212,8 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
   describe "is_office_location_phone_valid?" do
 
-    let(:phone) { FactoryBot.build(:phone, kind:'home') }
-    let(:phone1) { FactoryBot.build(:phone, kind:'phone main main') }
+    let(:phone) { FactoryBot.build(:phone, kind: 'home') }
+    let(:phone1) { FactoryBot.build(:phone, kind: 'phone main main') }
     let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
@@ -248,7 +250,7 @@ describe EventsHelper, "transforming a qualifying event kind for external xml", 
     "employer_sponsored_coverage_termination" => "eligibility_change_employer_ineligible",
     "divorce" => "divorce",
     "unknown_sep" => "exceptional_circumstances"
-  }
+  }.freeze
 
   subject { EventsHelperSlug.new }
 
@@ -291,8 +293,7 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
     context "terminated plan year with future date of termination" do
       before do
-        predecessor_application.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month,
-                                     :aasm_state => "terminated"})
+        predecessor_application.update_attributes({:terminated_on => TimeKeeper.date_of_record + 1.month, :aasm_state => "terminated"})
       end
 
       it "should return the plan year" do
