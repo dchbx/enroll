@@ -1241,10 +1241,24 @@ class HbxEnrollment
   end
 
   def can_make_changes?
-    return false if !is_shop? || coverage_canceled? || sponsored_benefit_package.blank?
+    return false if coverage_canceled?
+    if is_shop?
+      can_make_changes_for_shop_enrollment?
+    else
+      can_make_changes_for_ivl_enrollment?
+    end
+  end
+
+  def can_make_changes_for_shop_enrollment?
+    return false if sponsored_benefit_package.blank?
     return true if open_enrollment_period_available?
     return true if special_enrollment_period_available?
     return true if new_hire_enrollment_period_available?
+    false
+  end
+
+  def can_make_changes_for_ivl_enrollment?
+    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
     false
   end
 

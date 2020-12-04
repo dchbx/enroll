@@ -2721,9 +2721,18 @@ describe '#can_make_changes?', :dbclean => :after_each do
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household) }
 
   context 'Individual can_make_changes?' do
-    it 'should return false if enr is individual market' do
-      hbx_enrollment.update_attributes(kind: 'individual')
-      expect(hbx_enrollment.can_make_changes?). to eq false
+    it 'should return true if enr is individual market and is active or renewal enrollment' do
+      HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES.each do |aasm_state|
+        hbx_enrollment.update_attributes(kind: 'individual', aasm_state: aasm_state)
+        expect(hbx_enrollment.can_make_changes?). to eq true
+      end
+    end
+
+    it 'should return false if enr is individual market and is active' do
+      %w(shopping coverage_canceled coverage_terminated inactive coverage_expired).each do |aasm_state|
+        hbx_enrollment.update_attributes(kind: 'individual', aasm_state: aasm_state)
+        expect(hbx_enrollment.can_make_changes?). to eq false
+      end
     end
   end
 
