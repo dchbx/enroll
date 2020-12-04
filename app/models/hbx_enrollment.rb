@@ -1240,6 +1240,30 @@ class HbxEnrollment
     family.is_under_special_enrollment_period?
   end
 
+  def can_make_changes?
+    return false if !is_shop? || coverage_canceled? || sponsored_benefit_package.blank?
+    return true if open_enrollment_period_available?
+    return true if special_enrollment_period_available?
+    return true if new_hire_enrollment_period_available?
+    false
+  end
+
+  def open_enrollment_period_available?
+    return false if coverage_expired?
+    sponsored_benefit_package.open_enrollment_period.cover?(TimeKeeper.date_of_record)
+  end
+
+  def special_enrollment_period_available?
+    shop_sep = family.earliest_effective_shop_sep
+    return false unless shop_sep
+    sponsored_benefit_package.effective_period.cover?(shop_sep.effective_on)
+  end
+
+  def new_hire_enrollment_period_available?
+    return false if employee_role.blank?
+    sponsored_benefit_package.effective_on_for(employee_role.hired_on) > sponsored_benefit_package.start_on
+  end
+
   def can_complete_shopping?(options = {})
     household.family.is_eligible_to_enroll?(qle: options[:qle])
   end
