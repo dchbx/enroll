@@ -5,6 +5,8 @@ module BenefitSponsors
 
         include Pundit
 
+        layout 'bootstrap_4_two_column', :only => :new_staff_member
+
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           respond_to do |format|
@@ -54,6 +56,23 @@ module BenefitSponsors
             flash[:notice] = 'Staff role was deleted'
           end
           redirect_to edit_profiles_registration_path(id: staff_params[:profile_id])
+        end
+
+        def new_staff_member
+          @person = Person.find(params["id"])
+          @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
+        end
+
+        def create_staff_member
+
+        end
+
+        def employer_search
+          @search_value = params.permit!.to_h["q"]
+
+          return [] if @search_value.blank?
+
+          @employer_profiles = BenefitSponsors::Organizations::Organization.employer_profiles.datatable_search(@search_value)
         end
 
         private
