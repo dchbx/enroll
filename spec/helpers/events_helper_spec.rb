@@ -30,7 +30,7 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
     end
   end
 
-  describe "employer_plan_years" do
+  describe "employer_plan_years", dbclean: :after_each do
 
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup renewal application"
@@ -187,6 +187,109 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
     end
   end
 
+  describe "employer_plan_years when plan year is reinstated", dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    let(:start_date) {TimeKeeper.date_of_record.beginning_of_month - 11.months}
+    let(:end_date) {(start_date + 6.months).end_of_month}
+    let(:effective_period) {start_date..end_date}
+    let(:start_date1) {end_date.next_day}
+    let(:end_date1) {TimeKeeper.date_of_record.end_of_month}
+    let(:effective_period1) {start_date1..end_date1}
+    let(:open_enrollment_start_on) { start_date - 1.month }
+    let(:open_enrollment_start_on1) { end_date.beginning_of_month }
+    let(:open_enrollment_period) {open_enrollment_start_on..(open_enrollment_start_on + 5.days)}
+    let(:open_enrollment_period) {open_enrollment_start_on1..(open_enrollment_start_on1 + 5.days)}
+    let(:reinstated_application) do
+      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+             :with_benefit_package,
+             passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
+             benefit_sponsorship: benefit_sponsorship,
+             effective_period: effective_period1,
+             aasm_state: aasm_state,
+             open_enrollment_period: open_enrollment_period,
+             recorded_rating_area: rating_area,
+             recorded_service_areas: service_areas,
+             package_kind: package_kind,
+             dental_package_kind: dental_package_kind,
+             dental_sponsored_benefit: dental_sponsored_benefit,
+             fte_count: 5,
+             pte_count: 0,
+             msp_count: 0,
+             reinstated_id: initial_application.id)
+    end
+
+    context 'when terminated benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:terminated, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.employer_plan_years(abc_profile, reinstated_application.id)).to eq [reinstated_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [reinstated_application]
+      end
+
+      it 'should not return terminated application' do
+        expect(subject.employer_plan_years(abc_profile, initial_application.id)).not_to eq [initial_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).not_to eq [initial_application]
+      end
+    end
+
+    context 'when termination_pending benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :termination_pending, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:termination_pending, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.employer_plan_years(abc_profile, reinstated_application.id)).to eq [reinstated_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [reinstated_application]
+      end
+
+      it 'should not return termination_pending application' do
+        expect(subject.employer_plan_years(abc_profile, initial_application.id)).not_to eq [initial_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).not_to eq [initial_application]
+      end
+    end
+
+    context 'when retroactive_cancel benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :retroactive_cancel, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:retroactive_cancel, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.employer_plan_years(abc_profile, reinstated_application.id)).to eq [reinstated_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).to eq [reinstated_application]
+      end
+
+      it 'should not return retroactive_cancel application' do
+        expect(subject.employer_plan_years(abc_profile, initial_application.id)).not_to eq [initial_application]
+        expect(subject.employer_plan_years(abc_profile, nil)).not_to eq [initial_application]
+      end
+    end
+  end
+
   describe "is_office_location_address_valid?" do
 
     let(:phone) { FactoryBot.build(:phone) }
@@ -265,10 +368,9 @@ end
 
 describe EventsHelper, "selecting plan years to be exported", dbclean: :after_each do
   subject { EventsHelperSlug.new }
+  include_context "setup benefit market with market catalogs and product packages"
 
-  describe "plan_years_for_manual_export" do
-
-    include_context "setup benefit market with market catalogs and product packages"
+  context "plan_years_for_manual_export" do
     include_context "setup renewal application"
 
     context "draft plan year" do
@@ -318,6 +420,102 @@ describe EventsHelper, "selecting plan years to be exported", dbclean: :after_ea
 
       it "should not return the plan year" do
         expect(subject.plan_years_for_manual_export(abc_profile)).to eq [predecessor_application]
+      end
+    end
+  end
+
+  context "plan_years_for_manual_export when plan year is reinstated" do
+    include_context "setup initial benefit application"
+
+    let(:start_date) {TimeKeeper.date_of_record.beginning_of_month - 11.months}
+    let(:end_date) {(start_date + 6.months).end_of_month}
+    let(:effective_period) {start_date..end_date}
+    let(:start_date1) {end_date.next_day}
+    let(:end_date1) {TimeKeeper.date_of_record.end_of_month}
+    let(:effective_period1) {start_date1..end_date1}
+    let(:open_enrollment_start_on) { start_date - 1.month }
+    let(:open_enrollment_start_on1) { end_date.beginning_of_month }
+    let(:open_enrollment_period) {open_enrollment_start_on..(open_enrollment_start_on + 5.days)}
+    let(:open_enrollment_period) {open_enrollment_start_on1..(open_enrollment_start_on1 + 5.days)}
+    let(:reinstated_application) do
+      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+             :with_benefit_package,
+             passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
+             benefit_sponsorship: benefit_sponsorship,
+             effective_period: effective_period1,
+             aasm_state: aasm_state,
+             open_enrollment_period: open_enrollment_period,
+             recorded_rating_area: rating_area,
+             recorded_service_areas: service_areas,
+             package_kind: package_kind,
+             dental_package_kind: dental_package_kind,
+             dental_sponsored_benefit: dental_sponsored_benefit,
+             fte_count: 5,
+             pte_count: 0,
+             msp_count: 0,
+             reinstated_id: initial_application.id)
+    end
+
+    context 'when terminated benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :terminated, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:terminated, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).to eq [reinstated_application]
+      end
+
+      it 'should not return terminated application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).not_to eq [initial_application]
+      end
+    end
+
+    context 'when termination_pending benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :termination_pending, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:termination_pending, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).to eq [reinstated_application]
+      end
+
+      it 'should not return termination_pending application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).not_to eq [initial_application]
+      end
+    end
+
+    context 'when retroactive_cancel benefit_application reinstated' do
+      before do
+        initial_application.update_attributes!(:aasm_state => :retroactive_cancel, effective_period: effective_period)
+        abc_profile.benefit_applications << [reinstated_application]
+        abc_profile.save!
+      end
+
+      it 'should have two benefit_applications' do
+        expect(abc_profile.benefit_applications.count).to eq 2
+        expect(abc_profile.benefit_applications.pluck(:aasm_state)).to eq [:retroactive_cancel, :active]
+      end
+
+      it 'should return only reinstated_application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).to eq [reinstated_application]
+      end
+
+      it 'should not return retroactive_cancel application' do
+        expect(subject.plan_years_for_manual_export(abc_profile)).not_to eq [initial_application]
       end
     end
   end
