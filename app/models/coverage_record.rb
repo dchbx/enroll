@@ -10,5 +10,4 @@ class CoverageRecord
   field :dob, type: Date
   field :hired_on, type: Date
   field :is_applying_coverage, type: Boolean, default: false
-
 end
