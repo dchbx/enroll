@@ -55,7 +55,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       context 'reinstate terminated benefit application' do
         before do
           initial_application.terminate_enrollment!
-          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+          period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
+          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @new_ba = subject.call({benefit_application: initial_application}).success
           @first_wfst = @new_ba.workflow_state_transitions.first
           @second_wfst = @new_ba.workflow_state_transitions.second
@@ -70,7 +71,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         it 'should return a BenefitApplication with remaining effective_period' do
-          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_the_year)
+          expect(@new_ba.effective_period).to eq((initial_application.effective_period.max.next_day)..end_of_the_year)
         end
 
         it 'should populate reinstated_id' do
@@ -145,10 +146,9 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       context 'reinstate termination_pending benefit application' do
         before do
           initial_application.schedule_enrollment_termination!
-          initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: TimeKeeper.date_of_record.end_of_month)
+          period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
+          initial_application.update_attributes!(termination_reason: 'Testing, future termination', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @new_ba = subject.call({benefit_application: initial_application}).success
-          @first_wfst = @new_ba.workflow_state_transitions.first
-          @second_wfst = @new_ba.workflow_state_transitions.second
         end
 
         it 'should return a success with a BenefitApplication' do
@@ -160,7 +160,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         end
 
         it 'should return a BenefitApplication with remaining effective_period' do
-          expect(@new_ba.effective_period).to eq((initial_application.terminated_on + 1.day)..end_of_the_year)
+          expect(@new_ba.effective_period).to eq((initial_application.effective_period.max.next_day)..end_of_the_year)
         end
 
         it 'should populate reinstated_id' do
@@ -173,15 +173,11 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
         context 'workflow_state_transitions' do
           it 'should record transition to_state' do
-            expect(@first_wfst.to_state).to eq('reinstated')
-          end
-
-          it 'should record transition from_state' do
-            expect(@second_wfst.from_state).to eq('reinstated')
+            expect(@new_ba.workflow_state_transitions.first.to_state).to eq('reinstated')
           end
 
           it 'should record transition to_state' do
-            expect(@second_wfst.to_state).to eq('active')
+            expect(@new_ba.workflow_state_transitions.second.to_state).to eq('active')
           end
         end
       end
@@ -195,7 +191,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           overlapping_ba.assign_attributes(initial_app_params)
           overlapping_ba.save!
           initial_application.terminate_enrollment!
-          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+          period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
+          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @result = subject.call({benefit_application: initial_application})
         end
 
@@ -213,7 +210,8 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
           overlapping_ba.assign_attributes(effective_period: ba_effective_period)
           overlapping_ba.save!
           initial_application.terminate_enrollment!
-          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month)
+          period = initial_application.effective_period.min..(initial_application.effective_period.min.next_month.next_month.next_month.prev_day)
+          initial_application.update_attributes!(termination_reason: 'Testing', terminated_on: (TimeKeeper.date_of_record - 1.month).end_of_month, effective_period: period)
           @result = subject.call({benefit_application: initial_application})
         end
 
@@ -228,6 +226,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
         timeframe_months = EnrollRegistry[:reinstate_timeframe].setting(:timeframe_months).item
         min = (TimeKeeper.date_of_record - timeframe_months.months).beginning_of_month
         initial_application.update_attributes!(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
+        initial_application.benefit_sponsor_catalog.update_attributes!(effective_period: min..(min.next_year.prev_day))
         @result = subject.call({benefit_application: initial_application})
       end
 

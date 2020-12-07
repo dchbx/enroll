@@ -44,11 +44,10 @@ module BenefitSponsors
         end
 
         def initial_ba_within_valid_timeframe?
-          application = parent_ba_by_reinstate_id(@current_ba)
+          start_on = @current_ba.benefit_sponsor_catalog.effective_period.min
           start_of_month = TimeKeeper.date_of_record.beginning_of_month
           timeframe_months = EnrollRegistry[:reinstate_timeframe].setting(:timeframe_months).item
-          # Example: In the month of November(2020), I should be able to reinstate the BAs that have min date on or after 12/1/2019.
-          ((start_of_month.next_month - timeframe_months.months)..start_of_month.end_of_month).cover?(application.effective_period.min)
+          ((start_of_month.next_month - timeframe_months.months)..start_of_month.end_of_month).cover?(start_on)
         end
 
         def parent_ba_by_reinstate_id(benefit_application)
@@ -63,11 +62,10 @@ module BenefitSponsors
         end
 
         def effective_period_range
+          @parent_application = parent_ba_by_reinstate_id(@current_ba)
           case @current_ba.aasm_state
-          when :terminated
-            (@current_ba.terminated_on + 1.day)..@current_ba.effective_period.max
-          when :termination_pending
-            (@current_ba.terminated_on + 1.day)..@current_ba.effective_period.max
+          when :terminated, :termination_pending
+            (@current_ba.effective_period.max.next_day)..(@parent_application.effective_period.min.next_year.prev_day)
           when :canceled
             @current_ba.effective_period
           end
@@ -102,8 +100,10 @@ module BenefitSponsors
         def reinstate_after_effects(reinstated_ba)
           months_prior_to_effective = Settings.aca.shop_market.renewal_application.earliest_start_prior_to_effective_on.months.abs
           renewal_ba_generation_date = reinstated_ba.end_on.next_day.to_date - months_prior_to_effective.months
-          reinstated_ba.renew.save! if TimeKeeper.date_of_record >= renewal_ba_generation_date
+          return Success(reinstated_ba.benefit_sponsorship) unless TimeKeeper.date_of_record >= renewal_ba_generation_date
 
+          ba_enrollment_service = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(reinstated_ba)
+          ba_enrollment_service.renew_application
           Success(reinstated_ba.benefit_sponsorship)
         end
       end
