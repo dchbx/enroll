@@ -21,7 +21,22 @@ module Operations
           person = Person.where(id: id).first
 
           if person
-            Success({first_name: person.first_name, last_name: person.last_name, dob: person.dob})
+            Success(
+              {
+                first_name: person.first_name,
+                last_name: person.last_name,
+                dob: person.dob,
+                email: person.work_email_or_best&.address,
+                area_code: person.work_phone_or_best&.area_code,
+                number: person.work_phone_or_best&.number,
+                coverage_record: {
+                  encrypted_ssn: person.ssn,
+                  dob: person.dob,
+                  hired_on: nil,
+                  is_applying_coverage: false
+                }
+              }
+            )
           else
             Failure({:message => ['Person not found']})
           end
