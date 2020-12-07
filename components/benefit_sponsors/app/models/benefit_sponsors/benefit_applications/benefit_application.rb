@@ -161,7 +161,7 @@ module BenefitSponsors
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
 
     # Used for specific DataTable Action only
-    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending]) }
+    scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :termination_pending]) }
 
     # scope :is_renewing,                     ->{ where(:predecessor => {:$exists => true},
     #                                                   :aasm_state.in => APPLICATION_DRAFT_STATES + ENROLLING_STATES).order_by(:'created_at'.desc)
