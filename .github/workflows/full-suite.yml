@@ -51,6 +51,7 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
+          gem update --system
           bundle config path vendor/bundle
           bundle install
       - name: Restore Node Modules
@@ -211,6 +212,7 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: Install project gems
         run: |
+          gem update --system
           bundle config path vendor/bundle
           bundle install
           gem install treye-semaphore_test_boosters --version '2.5.2'
