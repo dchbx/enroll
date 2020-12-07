@@ -22,8 +22,8 @@ jobs:
             v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
       - name: bundle install
         run: |
-          bundle config path vendor/bundle
           gem update --system
+          bundle config path vendor/bundle
           bundle install
       - name: Run rubocop
         run: |
