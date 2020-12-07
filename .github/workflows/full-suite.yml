@@ -1,8 +1,5 @@
-name: full check suite
-on:
-  push:
-  schedule:
-    - cron: '0 6 * * *'
+name: full check suite troubleshoot
+on: push
 
 env:
   RSPEC_SPLIT_CONFIGURATION_PATH: 'ci/rspec-split-config.json'
