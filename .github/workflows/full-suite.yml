@@ -24,6 +24,7 @@ jobs:
         run: |
           bundle config path vendor/bundle
           bundle install
+          gem update --system
       - name: Run rubocop
         run: |
           git config diff.renameLimit 800
