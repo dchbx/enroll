@@ -552,7 +552,8 @@ module BenefitSponsors
     end
 
     def is_potential_off_cycle_employer?
-      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?)
+      latest_application = benefit_applications.order_by(:created_at.asc).to_a.last
+      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
     end
 
     def most_recent_benefit_application
