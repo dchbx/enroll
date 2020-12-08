@@ -4,7 +4,7 @@ module BenefitSponsors
       include Virtus.model
       include ActiveModel::Validations
 
-      attribute :encrypted_ssn, String
+      attribute :ssn, String
       attribute :dob, String
       attribute :hired_on, String
       attribute :is_applying_coverage, Boolean

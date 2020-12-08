@@ -1064,7 +1064,7 @@ class Person
     # Adds employer staff role to person
     # Returns status and message if failed
     # Returns status and person if successful
-    def add_employer_staff_role(first_name, last_name, dob, email, employer_profile, coverage_record: nil)
+    def add_employer_staff_role(first_name, last_name, dob, email, employer_profile)
       person = Person.where(first_name: /^#{first_name}$/i, last_name: /^#{last_name}$/i, dob: dob)
 
       return false, 'Person count too high, please contact HBX Admin' if person.count > 1
@@ -1077,17 +1077,6 @@ class Person
       end
 
       employer_staff_role.save
-
-      if coverage_record.present?
-        employer_staff_role.is_owner = true
-        employer_staff_role.coverage_record = CoverageRecord.new(
-          ssn: coverage_record[:encrypted_ssn],
-          dob: coverage_record[:dob],
-          hired_on: coverage_record[:hired_on],
-          is_applying_coverage: coverage_record[:is_applying_coverage]
-        )
-        employer_staff_role.save
-      end
 
       return true, person.first
     end
