@@ -41,7 +41,7 @@ class EmployerStaffRole
     state :is_closed    #Person employer staff role is not active
 
     event :approve do
-      transitions from: [:is_applicant, :is_active], to: :is_active, :guard => :has_coverage?, :after => [:create_census_employee]
+      transitions from: [:is_applicant, :is_active], to: :is_active, :after => [:create_census_employee]
     end
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
@@ -68,12 +68,13 @@ class EmployerStaffRole
   end
 
   def create_census_employee
+    return unless has_coverage?
     census_employee = CensusEmployee.new(census_employee_params.merge!(benefit_sponsorship_id: profile.benefit_sponsorship.id,
                                                                        benefit_sponsors_employer_profile_id: benefit_sponsor_employer_profile_id,
                                                                        # active_benefit_group_assignment: ,
                                                                        # renewal_benefit_group_assignment: ,
                                                                        hired_on: coverage_record.hired_on,
-                                                                       encrypted_ssn: coverage_record.encrypted_ssn))
+                                                                       ssn: coverage_record.ssn))
     census_employee.save
   end
 
