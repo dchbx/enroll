@@ -60,7 +60,8 @@ module Operations
                 ssn: params[:encrypted_ssn],
                 dob: params[:dob],
                 hired_on: params[:hired_on],
-                is_applying_coverage: params[:is_applying_coverage]
+                is_applying_coverage: params[:is_applying_coverage],
+                gender: params[:gender]
               )
             )
             person.save!
