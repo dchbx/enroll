@@ -34,23 +34,29 @@
 javascript:
   validateForm();
 
-  // function isApplyingCoverage(element) {
-  //   if (element.value === "true") {
-  //     document.getElementById("labelSsn").classList.remove('hidden')
-  //     //$("#labelSsn").removeClass("hidden");
-  //     // $("#labelGender").removeClass("hidden");
-  //     document.getElementById("inputSsn").classList.remove('hidden')
-  //     document.getElementById("inputSsn").setAttribute("required", "true");
-  //     //$("#inputSsn").removeClass("hidden");
-  //     // $("#inputGender").removeClass("hidden");
-  //   } else {
-  //     document.getElementById("labelSsn").classList.add('hidden')
-  //     //$("#labelSsn").addClass("hidden");
-  //     // $("#labelGender").addClass("hidden");
-  //     document.getElementById("inputSsn").classList.add('hidden')
-  //     //$("#inputSsn").addClass("hidden");
-  //     // $("#inputGender").addClass("hidden");
-  //   }
+  function isApplyingCoverage(element) {
+    var result = document.querySelectorAll('.optional');
+   var ssn =  document.getElementById("inputSsn")
+    var gender =  document.getElementById("inputGender")
+    var hiredOn =  document.getElementById("inputHiredOn")
+    if (element.value === "true") {
+      result.forEach(function (ele) {
+      ele.classList.remove("hidden");
+      });
+
+      ssn.setAttribute("required", "true");
+      gender.setAttribute("required", "true");
+      hiredOn.setAttribute("required", "true");
+
+    } else {
+      result.forEach(function (ele) {
+        ele.classList.add("hidden");
+      });
+
+      ssn.setAttribute("required", "false");
+      gender.setAttribute("required", "false");
+      hiredOn.setAttribute("required", "false");
+    }
   }
 
   function employerSearch() {

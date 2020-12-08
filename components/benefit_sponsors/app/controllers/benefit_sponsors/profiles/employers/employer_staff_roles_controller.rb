@@ -72,9 +72,10 @@ module BenefitSponsors
           # add redirects
           if result.success?
             redirect_to main_app.show_roles_person_path(id: staff_params["person_id"])
-            flash[:notice] = 'Successfully added employer staff role'
+            flash[:notice] = result.value![:message]
           else
             redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params["person_id"])
+            flash[:error] = "Unable to create Staff role"
           end
         end
 
