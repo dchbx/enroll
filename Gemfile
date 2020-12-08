@@ -37,8 +37,7 @@ gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
-# gem 'resource_registry',  git: '../resource_registry'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'branch_0.8.1'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
@@ -74,7 +73,7 @@ gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
 gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "~> 0.5.9"
+gem 'devise-jwt', "~> 0.6.0"
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
@@ -156,7 +155,7 @@ group :development, :test do
   gem 'yard-mongoid',           '~> 0.1',     require: false
 
   gem 'pry-rails'
-  gem 'pry-byebug'
+  gem 'pry-byebug', '~> 3.9'
   gem 'pry-stack_explorer'
 end
 
