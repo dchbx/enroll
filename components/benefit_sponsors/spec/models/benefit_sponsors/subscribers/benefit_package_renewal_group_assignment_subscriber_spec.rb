@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper.date_of_record
+
 module BenefitSponsors
   RSpec.describe Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber do
 
@@ -9,7 +11,7 @@ module BenefitSponsors
     let(:correlation_id) { "a correlation id" }
     let(:benefit_package_id) { "a benefit package id" }
     let(:census_employee_id) { "a census employee id" }
-    let(:effective_on_date) { Date.today }
+    let(:effective_on_date) { TimeKeeper.date_of_record }
     let(:effective_on_date_string) { effective_on_date.strftime("%Y-%m-%d") }
     let(:syntax_validator) { double }
     let(:domain_validator) { double }

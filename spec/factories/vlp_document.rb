@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :vlp_document do
     alien_number { "123456789" }
     receipt_number { "abc4567890123" }
-    expiration_date { Date.today }
+    expiration_date { TimeKeeper.date_of_record }
     issuing_country { "USA" }
     identifier { "identifier" }
     country_of_citizenship { "Ukraine" }

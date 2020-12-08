@@ -1,10 +1,12 @@
 require "rails_helper"
 
+# Date.today converted to TimeKeeper.date_of_record
+
 RSpec.describe BenefitSponsors::BenefitPackages::RenewalGroupAssignments::ParameterValidator do
   let(:validator) { BenefitSponsors::BenefitPackages::RenewalGroupAssignments::ParameterValidator.new }
   let(:benefit_package_id) { BSON::ObjectId.new }
   let(:census_employee_id) { BSON::ObjectId.new }
-  let(:effective_on_date) { Date.today }
+  let(:effective_on_date) { TimeKeeper.date_of_record }
 
   let(:base_valid_params) do
     {

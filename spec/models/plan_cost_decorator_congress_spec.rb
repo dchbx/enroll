@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe PlanCostDecoratorCongress, dbclean: :after_each do
-  let!(:plan_year)          { double("PlanYear", start_on: Date.today.beginning_of_year) }
+  let!(:plan_year)          { double("PlanYear", start_on: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:benefit_group)      { double("BenefitGroupCongress", plan_year: plan_year, over_one_dependents_max_amt: Money.new('97190'), employee_max_amt: Money.new("43769"), first_dependent_max_amt: Money.new("97190"), contribution_pct_as_int: 75) }
   let(:hbx_enrollment)      { HbxEnrollment.new }
   let!(:hem_employee)       { double("HbxEnrollmentMember_Employee", class: HbxEnrollmentMember, _id: "a", age_on_effective_date: 19, age_on_eligibility_date: 19, is_subscriber?: true , primary_relationship: "self") }

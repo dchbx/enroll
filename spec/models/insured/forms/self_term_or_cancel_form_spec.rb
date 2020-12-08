@@ -118,8 +118,9 @@ module Insured
       let(:sep) {FactoryBot.create(:special_enrollment_period, family: family) }
       let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#124") }
       let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
-      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month) }
-      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month) }
+      # Date.today converted to TimeKeeper
+      let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record + 1.month) }
+      let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record - 1.month) }
 
       it "should cancel an enrollment if it is not yet effective" do
         attrs = {enrollment_id: enrollment_to_cancel.id, term_date: TimeKeeper.date_of_record.to_s}

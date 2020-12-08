@@ -106,7 +106,8 @@ module BenefitSponsors
     end
 
     before do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      # Date.today converted to TimeKeeper.date_of_record
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       benefit_sponsorship.benefit_market.site_urn = site.site_key
       benefit_sponsorship.save
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id, permission_id: permission.id)

@@ -20,7 +20,7 @@ describe Family, "with 2 policies", :dbclean => :around_each do
   end
 
   after do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   describe "when the start dates on the second policy are changed" do

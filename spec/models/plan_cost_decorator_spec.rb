@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe PlanCostDecorator, dbclean: :after_each do
-  let!(:plan_year)               { double("PlanYear", start_on: Date.today.beginning_of_year) }
+  let!(:plan_year)               { double("PlanYear", start_on: TimeKeeper.date_of_record.beginning_of_year) }
   let!(:default_benefit_group)   { instance_double(BenefitGroup, plan_year: plan_year) }  
   let!(:benefit_group)   {default_benefit_group}
   let!(:member_provider) {double("member_provider", class: HbxEnrollment, hbx_enrollment_members: [father, mother, one, two, three, four, five])}

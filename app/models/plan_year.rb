@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+# rubocop:disable Style/NumericLiteralPrefix
+
+# rubocop:disable Layout/LineLength
+
 class PlanYear
   include Mongoid::Document
   include SetCurrentUser
@@ -1443,3 +1449,9 @@ class PlanYear
     update_attributes!({terminated_on: nil, end_on: start_on.next_year.prev_day})
   end
 end
+
+# rubocop:enable Style/NumericLiteralPrefix
+
+# rubocop:enable Layout/LineLength
+
+

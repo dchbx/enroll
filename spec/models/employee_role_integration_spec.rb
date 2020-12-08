@@ -2,6 +2,8 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper
+
 describe EmployeeRole, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application" do
@@ -11,11 +13,11 @@ describe EmployeeRole, dbclean: :after_each do
   let(:person) {FactoryBot.create(:person, :with_family)}
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 20))
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 20))
   end
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   context "employer with two draft plan years exist" do

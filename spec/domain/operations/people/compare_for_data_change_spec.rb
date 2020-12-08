@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper
+
 require 'rails_helper'
 RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each do
 
   describe 'valid params' do
     let!(:person) do
       per = FactoryBot.create(:person, :with_consumer_role, hbx_id: '13cce9fe14b04209b2443330900108d8',
-                              dob: (Date.today - 1.years).strftime('%d/%m/%Y'), first_name: 'childfirst',
-                              last_name: 'childlast', gender: 'male')
+                                                            dob: (TimeKeeper.date_of_record - 1.years).strftime('%d/%m/%Y'), first_name: 'childfirst',
+                                                            last_name: 'childlast', gender: 'male')
       per.addresses = [FactoryBot.build(:address, :mailing_kind, address_1: '1 Awesome Street', address_2: '#1', state: 'DC')]
       per.addresses << FactoryBot.build(:address, address_1: '2 Awesome Street', address_2: '#2', state: 'DC')
       per.emails = [FactoryBot.build(:email, kind: 'work'), FactoryBot.build(:email, kind: 'home')]
@@ -18,9 +20,9 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
 
     context 'for incoming payload and existing attributes are different' do
       let(:person_params) do
-        {:hbx_id=>'13cce9fe14b04209b2443330900108d8',
-         :ssn=>person.ssn,
-         :dob=>(Date.today - 1.years),
+        {:hbx_id => '13cce9fe14b04209b2443330900108d8',
+         :ssn => person.ssn,
+         :dob => (TimeKeeper.date_of_record - 1.years),
          first_name: 'childfirst10',
          last_name: 'childlast',
          gender: 'male'}
@@ -41,9 +43,9 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
 
     context 'for incoming payload and existing attributes are same' do
       let(:person_params) do
-        {:hbx_id=>'13cce9fe14b04209b2443330900108d8',
-         :ssn=>person.ssn,
-         :dob=>(Date.today - 1.years),
+        {:hbx_id => '13cce9fe14b04209b2443330900108d8',
+         :ssn => person.ssn,
+         :dob => (TimeKeeper.date_of_record - 1.years),
          first_name: 'childfirst',
          last_name: 'childlast',
          gender: 'male'}
@@ -81,14 +83,14 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
 
     context 'for incoming payload and existing attributes are same but attributes order changed' do
       let(:person_params) do
-        {:hbx_id=>'13cce9fe14b04209b2443330900108d8',
-         :ssn=>person.ssn,
-         :dob=>(Date.today - 1.years),
+        {:hbx_id => '13cce9fe14b04209b2443330900108d8',
+         :ssn => person.ssn,
+         :dob => (TimeKeeper.date_of_record - 1.years),
          first_name: 'childfirst',
          last_name: 'childlast',
          gender: 'male',
-         :addresses=>[person.mailing_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary),
-                      person.home_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)]}
+         :addresses => [person.mailing_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary),
+                        person.home_address.serializable_hash.symbolize_keys.except(:_id, :created_at, :updated_at, :tracking_version, :full_text, :location_state_code, :modifier_id, :primary)]}
       end
 
       before :each do

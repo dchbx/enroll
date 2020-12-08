@@ -4,6 +4,7 @@ require "#{SponsoredBenefits::Engine.root}/spec/shared_contexts/sponsored_benefi
 module SponsoredBenefits
   RSpec.describe SponsoredBenefits::Organizations::PlanDesignProposalsController, type: :controller, dbclean: :around_each do
     routes { SponsoredBenefits::Engine.routes }
+    # Date.today converted to TimeKeeper.date_of_record
     include_context "set up broker agency profile for BQT, by using configuration settings"
     let(:broker_double) { double(id: '12345') }
     let(:current_person) { double(:current_person) }
@@ -12,8 +13,8 @@ module SponsoredBenefits
     let(:sponsor) { double(:sponsor, id: '5ac4cb58be0a6c3ef400009a', sic_code: '1111') }
     let(:active_user) { double(:has_hbx_staff_role? => false) }
     let(:open_enrollment_start_on) { (beginning_of_next_month - 15.days).prev_month }
-    let(:beginning_of_next_month) { Date.today.next_month.beginning_of_month }
-    let(:end_of_month) { Date.today.end_of_month }
+    let(:beginning_of_next_month) { TimeKeeper.date_of_record.next_month.beginning_of_month }
+    let(:end_of_month) { TimeKeeper.date_of_record.end_of_month }
     let(:initial_enrollment_period) { (beginning_of_next_month..(beginning_of_next_month + 1.year - 1.day)) }
 
     let(:valid_attributes) {
@@ -26,7 +27,7 @@ module SponsoredBenefits
             annual_enrollment_period_begin_month_of_year: beginning_of_next_month.month,
             benefit_application: {
               effective_period: initial_enrollment_period,
-              open_enrollment_period: (Date.today..end_of_month)
+              open_enrollment_period: (TimeKeeper.date_of_record..end_of_month)
             }
           }
         }

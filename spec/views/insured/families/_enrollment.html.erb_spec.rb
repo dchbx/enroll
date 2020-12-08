@@ -252,7 +252,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     context "coverage_termination_pending" do
       let(:terminated_on) { TimeKeeper.date_of_record.end_of_month }
       let(:enrollment_aasm_state) { "coverage_termination_pending" }
-      let(:future_enrollment_termination_date) { Date.today }
+      let(:future_enrollment_termination_date) { TimeKeeper.date_of_record }
 
       before :each do
         allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)

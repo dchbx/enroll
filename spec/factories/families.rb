@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :family do
     association :person
@@ -11,8 +13,10 @@ FactoryBot.define do
     end
 
     trait :with_primary_family_member do
-      family_members { [FactoryBot.build(:family_member, family: self,
-          is_primary_applicant: true, is_active: true, person: person)] }
+      family_members do
+        [FactoryBot.build(:family_member, family: self,
+                                          is_primary_applicant: true, is_active: true, person: person)]
+      end
     end
 
     trait :with_family_members do
@@ -37,20 +41,20 @@ FactoryBot.define do
       end
     end
 
-    after(:create) do |f, evaluator|
+    after(:create) do |f, _evaluator|
       f.households.first.add_household_coverage_member(f.family_members.first)
       f.save
     end
 
     trait :with_primary_family_member_and_dependent do
-      family_members {
+      family_members do
         [
           FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true, person: person),
           FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person: FactoryBot.create(:person, first_name: "John", last_name: "Doe")),
           FactoryBot.build(:family_member, family: self, is_primary_applicant: false, is_active: true, person:  FactoryBot.create(:person, first_name: "Alex", last_name: "Doe"))
         ]
-      }
-      before(:create)  do |family, evaluator|
+      end
+      before(:create)  do |family, _evaluator|
         family.dependents.each do |dependent|
           family.relate_new_member(dependent.person, "child")
         end
@@ -65,21 +69,27 @@ FactoryBot.define do
     transient do
       primary_person    { FactoryBot.create(:person, :with_consumer_role) }
       significant_other { FactoryBot.create(:person, :with_consumer_role, gender: "female") }
-      disabled_child    { FactoryBot.create(:person, :with_consumer_role,
-                                              is_disabled: true,
-                                              dob: (Date.today - 27.years)) }
-      second_disabled_child    { FactoryBot.create(:person, :with_consumer_role,
-                                              first_name: "Tony",
-                                              is_disabled: true,
-                                              dob: (Date.today - 30.years)) }
+      disabled_child    do
+        FactoryBot.create(:person, :with_consumer_role,
+                          is_disabled: true,
+                          dob: (TimeKeeper.date_of_record - 27.years))
+      end
+      second_disabled_child    do
+        FactoryBot.create(:person, :with_consumer_role,
+                          first_name: "Tony",
+                          is_disabled: true,
+                          dob: (TimeKeeper.date_of_record - 30.years))
+      end
     end
 
-    family_members { [
+    family_members do
+      [
         FactoryBot.build(:family_member, family: self, is_primary_applicant: true, is_active: true,
-            person: primary_person)
-      ] }
+                                         person: primary_person)
+      ]
+    end
 
-    after(:create) do |f, evaluator|
+    after(:create) do |f, _evaluator|
       f.households.first.add_household_coverage_member(f.family_members.first)
     end
 
@@ -87,7 +97,7 @@ FactoryBot.define do
 
       after(:create) do |f, evaluator|
         spouse = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
-                  is_active: true, person: evaluator.significant_other)
+                                                   is_active: true, person: evaluator.significant_other)
         f.active_household.add_household_coverage_member(spouse)
       end
 
@@ -97,7 +107,7 @@ FactoryBot.define do
 
       after(:create) do |f, evaluator|
         child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
-                  is_active: true, person: evaluator.disabled_child)
+                                                  is_active: true, person: evaluator.disabled_child)
         f.active_household.add_household_coverage_member(child)
       end
 
@@ -106,15 +116,15 @@ FactoryBot.define do
     factory :individual_market_family_with_spouse_and_two_disabled_children do
       after(:create) do |f, evaluator|
         spouse = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
-                  is_active: true, person: evaluator.significant_other)
+                                                   is_active: true, person: evaluator.significant_other)
         f.active_household.add_household_coverage_member(spouse)
         f.relate_new_member(spouse.person, "spouse")
         child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
-                  is_active: true, person: evaluator.disabled_child)
+                                                  is_active: true, person: evaluator.disabled_child)
         f.active_household.add_household_coverage_member(child)
         f.relate_new_member(child.person, "child")
         second_child = FactoryBot.create(:family_member, family: f, is_primary_applicant: false,
-                  is_active: true, person: evaluator.second_disabled_child)
+                                                         is_active: true, person: evaluator.second_disabled_child)
         f.active_household.add_household_coverage_member(second_child)
         f.relate_new_member(second_child.person, "child")
       end

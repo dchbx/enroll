@@ -41,7 +41,8 @@ javascript:
             success: function (data) {
               $("#broker_agency_staff").html(data);
               setTimeout(function() {
-              initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+              // Date.today converted to TimeKeeper.date_of_record
+              initDatepicker('inputStaffDOB', new Date("#{TimeKeeper.date_of_record.beginning_of_month-90.years}"), new Date("#{TimeKeeper.date_of_record.end_of_month-18.years}"));
 
               var cleave = new Cleave('#inputStaffDOB', {
             	    date: true,
@@ -66,7 +67,7 @@ javascript:
             data: {profile_type: "general_agency_staff"},
             success: function (data) {
               $("#general_agency_staff").html(data)
-                initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+                initDatepicker('inputStaffDOB', new Date("#{TimeKeeper.date_of_record.beginning_of_month-90.years}"), new Date("#{TimeKeeper.date_of_record.end_of_month-18.years}"));
             }
           })
         }

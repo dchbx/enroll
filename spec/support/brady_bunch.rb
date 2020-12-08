@@ -1,7 +1,7 @@
 module BradyBunch
   shared_context "BradyBunch" do
     def dob(num_years)
-      Date.today - num_years.years
+      TimeKeeper.date_of_record - num_years.years
     end
 
     def build_brady_address

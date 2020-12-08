@@ -48,7 +48,7 @@ describe EmployerProfile, dbclean: :after_each do
   let!(:rating_area) { create(:rating_area, county_name: address.county, zip_code: address.zip)}
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   it { should validate_presence_of :entity_kind }

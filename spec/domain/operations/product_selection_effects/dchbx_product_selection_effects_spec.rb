@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper
+
 require "rails_helper"
 require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
@@ -10,7 +12,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 - it is not open enrollment prior to plan year start
 ", dbclean: :after_each do
 
-  let(:coverage_year) { Date.today.year + 1}
+  let(:coverage_year) { TimeKeeper.date_of_record.year + 1}
 
   let(:consumer_role) { FactoryBot.create(:consumer_role) }
   let(:hbx_profile) do
@@ -61,7 +63,7 @@ describe Operations::ProductSelectionEffects::DchbxProductSelectionEffects, "whe
 - it is open enrollment prior to plan year start
 ", dbclean: :after_each do
 
-  let(:coverage_year) { Date.today.year + 1}
+  let(:coverage_year) { TimeKeeper.date_of_record.year + 1}
 
   let(:consumer_role) { FactoryBot.create(:consumer_role) }
   let(:hbx_profile) do

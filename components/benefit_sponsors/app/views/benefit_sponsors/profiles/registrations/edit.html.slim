@@ -24,7 +24,8 @@
 
 javascript:
   (function() {
-    initDatepicker('inputDOB',new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month-16.years %>'))
+    // Date.today converted to TimeKeeper.date_of_record
+    initDatepicker('inputDOB',new Date('<%= TimeKeeper.date_of_record.beginning_of_month-100.years %>'),new Date('<%= TimeKeeper.date_of_record.beginning_of_month-16.years %>'))
     var cleave = new Cleave('#inputDOB', {
         date: true,
         datePattern: ['m', 'd', 'Y']

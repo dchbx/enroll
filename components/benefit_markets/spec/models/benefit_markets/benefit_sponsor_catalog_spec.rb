@@ -1,10 +1,13 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 module BenefitMarkets
   RSpec.describe BenefitSponsorCatalog, type: :model, dbclean: :after_each do
     let(:subject) { described_class.new }
 
-    let(:this_year)               { Date.today.year }
+    # Date.today converted to TimeKeeper.date_of_record
+    let(:this_year)               { TimeKeeper.date_of_record.year }
     let(:application_period)      { Date.new(this_year,1,1)..Date.new(this_year,12,31) }
     let(:effective_date)          { Date.new(this_year, 6,1) }
     let(:effective_period)        { effective_date..(effective_date + 1.year - 1.day) }
@@ -17,14 +20,14 @@ module BenefitMarkets
 
     let(:params) do
       {
-        effective_date:         effective_date,
-        effective_period:       effective_period,
+        effective_date: effective_date,
+        effective_period: effective_period,
         open_enrollment_period: open_enrollment_period,
         probation_period_kinds: probation_period_kinds,
-        service_areas:          service_areas,
-        sponsor_market_policy:  sponsor_market_policy,
-        member_market_policy:   member_market_policy,
-        product_packages:       product_packages,
+        service_areas: service_areas,
+        sponsor_market_policy: sponsor_market_policy,
+        member_market_policy: member_market_policy,
+        product_packages: product_packages
       }
     end
 
@@ -90,7 +93,7 @@ module BenefitMarkets
       end
 
 
- # TODO Fix -- re-enable when seed file supports these
+ # TODO: Fix -- re-enable when seed file supports these
       # context "with no sponsor_market_policy" do
       #   subject { described_class.new(params.except(:sponsor_market_policy)) }
 

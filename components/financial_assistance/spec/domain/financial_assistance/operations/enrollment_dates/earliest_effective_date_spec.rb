@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate do
@@ -11,7 +13,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffec
 
     context 'when passed date outside open enrollment' do
       context 'and before enrollment monthly due date' do
-        let(:application_date) { Date.new(Date.today.year, 5, 5)}
+        let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 5, 5)}
 
 
         it 'should return next month begin as effective date' do
@@ -21,7 +23,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffec
       end
 
       context 'and after enrollment monthly due date' do
-        let(:application_date) { Date.new(Date.today.year, 5, 16)}
+        let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 5, 16)}
 
         it 'should return month after next month effective date' do
           expect(result).to be_a(Dry::Monads::Result::Success)
@@ -32,7 +34,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffec
 
     context 'when passed date with in open enrollment' do
       context 'and before enrollment monthly due date' do
-        let(:application_date) { Date.new(Date.today.year, 12, 15)}
+        let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 12, 15)}
 
         it 'should return next year begin date' do
           expect(result).to be_a(Dry::Monads::Result::Success)
@@ -41,7 +43,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::EarliestEffec
       end
 
       context 'and after enrollment monthly due date' do
-        let(:application_date) { Date.new(Date.today.year, 12, 16)}
+        let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 12, 16)}
 
         it 'should return next year begin date' do
           expect(result).to be_a(Dry::Monads::Result::Success)

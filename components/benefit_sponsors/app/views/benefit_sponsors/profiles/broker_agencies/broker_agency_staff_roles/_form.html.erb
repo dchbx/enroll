@@ -21,6 +21,7 @@
 
 <script type="text/javascript">
     function showDatepicker(element) {
-      initDatepicker(element.id,new Date('<%= Date.today.beginning_of_month-100.years %>'),new Date('<%= Date.today.beginning_of_month-16.years %>'))
+      // Date.etoday converted to TimeKeeper.date_of_record
+      initDatepicker(element.id,new Date('<%= TimeKeeper.date_of_record.beginning_of_month-100.years %>'),new Date('<%= TimeKeeper.date_of_record.beginning_of_month-16.years %>'))
     }
 </script>

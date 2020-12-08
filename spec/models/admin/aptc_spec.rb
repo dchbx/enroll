@@ -60,7 +60,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
     end
 
     after(:all) do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     # MAX APTC

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(Rails.root, 'app', 'data_migrations', 'change_enrollment_termination_date')
 
@@ -5,11 +7,11 @@ describe ChangeEnrollmentTerminationDate, dbclean: :after_each do
 
   let(:given_task_name) { 'change_enrollment_effective_on_date' }
   subject { ChangeEnrollmentTerminationDate.new(given_task_name, double(:current_scope => nil)) }
-   let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-   let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on:Date.today,household: family.active_household, family: family)}
-   let!(:py_params) {{hbx_id: hbx_enrollment.hbx_id, new_termination_date: (hbx_enrollment.terminated_on + 1.month).to_s }}
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+  let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,terminated_on: TimeKeeper.date_of_record, household: family.active_household, family: family)}
+  let!(:py_params) {{hbx_id: hbx_enrollment.hbx_id, new_termination_date: (hbx_enrollment.terminated_on + 1.month).to_s }}
 
-  describe 'given a task name'do
+  describe 'given a task name' do
     it 'has the given task name' do
       expect(subject.name).to eql given_task_name
     end
@@ -31,7 +33,7 @@ describe ChangeEnrollmentTerminationDate, dbclean: :after_each do
   end
 
   describe 'changing enrollment member termiantion date' do
-    let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment:hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date:Date.today )}
+    let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment,applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record)}
 
     it 'should change effective on date' do
       terminated_on = hbx_enrollment.terminated_on

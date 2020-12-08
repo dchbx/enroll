@@ -419,9 +419,10 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     let(:favorite_general_agency) { FactoryBot.create(:favorite_general_agency, general_agency_profile_id: general_agency_profile.id, broker_role: broker_role) }
     let(:person) { broker_role.person }
     let(:user) { FactoryBot.create(:user, person: person, roles: ['broker']) }
+    # Date.today replaced by TimeKeeper
     let(:employer_profile) do
       FactoryBot.create(:employer_profile, general_agency_profile: general_agency_profile, general_agency_accounts: [
-        GeneralAgencyAccount.new(general_agency_profile_id: general_agency_profile.id, broker_role_id: broker_role.id, start_on: (Date.today - 1.month))
+        GeneralAgencyAccount.new(general_agency_profile_id: general_agency_profile.id, broker_role_id: broker_role.id, start_on: (TimeKeeper.date_of_record - 1.month))
       ])
     end
 

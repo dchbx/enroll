@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Date.today converted to TimeKeeper
+
 FactoryBot.define do
   factory :scheduled_event do
     type { 'holiday' }
@@ -15,15 +19,15 @@ FactoryBot.define do
     end
 
     trait :start_on_friday do
-      start_time { Date.today.sunday + 5.day }
+      start_time { TimeKeeper.date_of_record.sunday + 5.day }
     end
 
     trait :start_on_saturday do
-      start_time { Date.today.sunday + 6.day }
+      start_time { TimeKeeper.date_of_record.sunday + 6.day }
     end
 
     trait :start_on_sunday do
-      start_time { Date.today.sunday }
+      start_time { TimeKeeper.date_of_record.sunday }
     end
   end
 end

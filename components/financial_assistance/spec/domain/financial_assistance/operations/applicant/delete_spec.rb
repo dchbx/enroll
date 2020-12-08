@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :after_each do
@@ -96,7 +98,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
   let!(:applicant2) do
     FactoryBot.create(:financial_assistance_applicant,
                       ssn: '889984400',
-                      dob: (Date.today - 10.years),
+                      dob: (TimeKeeper.date_of_record - 10.years),
                       first_name: 'test',
                       last_name: 'person1')
   end

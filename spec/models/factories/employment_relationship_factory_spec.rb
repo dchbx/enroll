@@ -9,13 +9,13 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
   end
 
   after :each do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:organization) {
     org = abc_organization
-    TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.end_of_year)
     employer_profile = abc_profile
     active_plan_year = predecessor_application
     renewing_plan_year = renewal_application
@@ -44,6 +44,6 @@ RSpec.describe Factories::EmploymentRelationshipFactory, type: :model, dbclean: 
     employment_relationship = Factories::EmploymentRelationshipFactory.new
     employmentrelationship = employment_relationship.build(employee_candidate, census_employee)    
     expect(employmentrelationship.eligible_for_coverage_on).to eq census_employee.hired_on
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 end

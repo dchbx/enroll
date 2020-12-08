@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe Exchanges::ScheduledEventsController do
 
   let(:user){ double(:save => double("user")) }
@@ -9,7 +11,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
       event_name: 'Christmas',
       offset_rule: 3,
       recurring_rules: {},
-      :start_time => Date.today
+      :start_time => TimeKeeper.date_of_record
     }}
   after do
     ScheduledEvent.delete_all

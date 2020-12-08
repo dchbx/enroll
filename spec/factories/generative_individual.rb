@@ -3,7 +3,7 @@ FactoryBot.define do
     first_name { Forgery(:name).first_name }
     last_name { Forgery(:name).first_name }
     gender { Forgery(:personal).gender }
-    dob { Date.today }
+    dob { TimeKeeper.date_of_record }
     addresses {
       address_count = Random.rand(4)
       if address_count == 0

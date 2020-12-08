@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe EnrollmentPeriod::Base, :type => :model do
   let(:title)     { "Spec special enrollment period" }
-  let(:start_on)  { Date.current }
-  let(:end_on)    { Date.current + 30.days }
+  let(:start_on)  { TimeKeeper.date_of_record }
+  let(:end_on)    { TimeKeeper.date_of_record + 30.days }
 
   let(:valid_params){
     {

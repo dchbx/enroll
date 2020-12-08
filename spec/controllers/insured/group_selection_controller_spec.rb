@@ -645,8 +645,8 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: 'AAA', sbc_document: sbc_document)}
-    let(:enrollment_to_cancel) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month)}
-    let(:enrollment_to_term) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month)}
+    let(:enrollment_to_cancel) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record + 1.month)}
+    let(:enrollment_to_term) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: TimeKeeper.date_of_record - 1.month)}
 
     it 'should cancel enrollment with no term date given' do
       family.family_members.first.person.consumer_role.update_attributes(:aasm_state => :fully_verified)

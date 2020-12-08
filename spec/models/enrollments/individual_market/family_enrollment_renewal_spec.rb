@@ -83,7 +83,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         household: family.active_household,
                         coverage_kind: coverage_kind,
                         resident_role_id: family.primary_person.consumer_role.id,
-                        effective_on: Date.new(Date.current.year,1,1),
+                        effective_on: Date.new(TimeKeeper.date_of_record.year,1,1),
                         kind: "coverall",
                         product_id: current_cat_product.id,
                         aasm_state: 'coverage_selected')
@@ -235,7 +235,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment_renewal.enrollment = catastrophic_enrollment
             enrollment_renewal.assisted = assisted
             enrollment_renewal.aptc_values = aptc_values
-            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
+            enrollment_renewal.renewal_coverage_start = Date.new(TimeKeeper.date_of_record.year + 1,1,1)
             enrollment_renewal
           end
           let(:child1_dob) { current_date.next_month - 30.years }

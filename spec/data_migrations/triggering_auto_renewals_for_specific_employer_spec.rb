@@ -1,6 +1,8 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "triggering_auto_renewals_for_specific_employer")
 
+# Date.today converted to TimeKeeper
+
 describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
   skip "ToDo rake was never updated to new model, check if we can remove it" do
 
@@ -41,7 +43,7 @@ describe TriggeringAutoRenewalsForSpecificEmployer, dbclean: :after_each do
       around gT
 
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       context "triggering a new enrollment", dbclean: :after_each do

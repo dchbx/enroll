@@ -5,7 +5,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 describe 'recurring:employee_dependent_age_off_termination', :dbclean => :around_each do
   before :each do
-    TimeKeeper.set_date_of_record_unprotected!(Date.current)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   include_context "setup benefit market with market catalogs and product packages"

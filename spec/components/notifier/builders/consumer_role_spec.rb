@@ -69,7 +69,8 @@ RSpec.describe 'Components::Notifier::Builders::ConsumerRole', :dbclean => :afte
       end
 
       it "should return notice date" do
-        expect(subject.notice_date).to include(Date.today.year.to_s)
+        # Date.today replaced by TimeKeeper
+        expect(subject.notice_date).to include(TimeKeeper.date_of_record.year.to_s)
       end
 
       it "should return citizenship" do

@@ -1,4 +1,8 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
+
+# Date.today convereted to TimeKeeper.date_of_record
 
 module SponsoredBenefits
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
@@ -10,18 +14,18 @@ module SponsoredBenefits
     let(:open_enrollment_period)                { Date.new(2018,4,1)..Date.new(2019,4,10) }
     let(:annual_enrollment_period_begin_month)  { initial_enrollment_period.min.month }
 
-    let(:required_params) do 
+    let(:required_params) do
       {
         benefit_market: benefit_market,
         contact_method: contact_method,
-        enrollment_frequency: enrollment_frequency,
+        enrollment_frequency: enrollment_frequency
       }
     end
 
     let(:optional_params) do
       {
         initial_enrollment_period: initial_enrollment_period,
-        annual_enrollment_period_begin_month: annual_enrollment_period_begin_month,
+        annual_enrollment_period_begin_month: annual_enrollment_period_begin_month
       }
     end
 
@@ -29,9 +33,9 @@ module SponsoredBenefits
     context "with required parameters" do
       let(:invalid_enrollment_frequency)  { :weekly }
 
-      subject {
-          described_class.new(required_params)
-        }
+      subject do
+        described_class.new(required_params)
+      end
 
       it "is valid with required valid attributes" do
         expect(subject).to be_valid
@@ -60,13 +64,13 @@ module SponsoredBenefits
       let(:month_value_over)              { 13 }
       let(:enrollment_dates_reversed)     { initial_enrollment_period.end..initial_enrollment_period.begin  }
 
-      let(:first_of_next_month)           { Date.today.end_of_month + 1.day }
+      let(:first_of_next_month)           { TimeKeeper.date_of_record.end_of_month + 1.day }
       let(:enrollment_dates_as_time)      { (first_of_next_month.to_time)..(first_of_next_month + 1.year - 1.day).to_time  }
 
 
-     subject {
-          described_class.new(all_params)
-        }
+      subject do
+        described_class.new(all_params)
+      end
 
       it "is valid with all valid attributes" do
         expect(subject).to be_valid
@@ -146,6 +150,6 @@ module SponsoredBenefits
       # end
 
     end
- 
+
   end
 end

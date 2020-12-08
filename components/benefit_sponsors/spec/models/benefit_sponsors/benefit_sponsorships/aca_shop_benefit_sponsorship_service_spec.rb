@@ -3,8 +3,8 @@ require 'rails_helper'
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::AcaShopBenefitSponsorshipService, dbclean: :after_each do
 
-    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
-    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
+    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year - 1) }
+    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.year - 1) }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
 
@@ -96,6 +96,7 @@ module BenefitSponsors
 
       after do
         # Does this do what we think it does?
+        # Date.today converted to TimeKeeper.date_of_record
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
       end
 

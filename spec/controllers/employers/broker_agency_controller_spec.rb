@@ -216,7 +216,7 @@ RSpec.describe Employers::BrokerAgencyController do
           allow(SponsoredBenefits::Organizations::BrokerAgencyProfile).to receive(:assign_employer).and_return(true)
           sign_in(@user)
           @employer_profile.plan_years=[]
-          invalid_plan=FactoryBot.build(:plan_year, open_enrollment_end_on: Date.today)
+          invalid_plan = FactoryBot.build(:plan_year, open_enrollment_end_on: TimeKeeper.date_of_record)
           @employer_profile.plan_years << invalid_plan
           @employer_profile.save!(validate:false)
     end

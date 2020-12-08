@@ -73,10 +73,10 @@ FactoryBot.define do
   end
 
   factory(:generative_plan_year, {class: PlanYear}) do
-    open_enrollment_start_on { Date.today }
-    open_enrollment_end_on { Date.today }
-    start_on { Date.today }
-    end_on { Date.today }
+    open_enrollment_start_on { TimeKeeper.date_of_record }
+    open_enrollment_end_on { TimeKeeper.date_of_record }
+    start_on { TimeKeeper.date_of_record }
+    end_on { TimeKeeper.date_of_record }
     benefit_groups {
       example_count = Random.rand(4)
       (0..example_count).to_a.map do |e|

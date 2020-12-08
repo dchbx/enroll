@@ -1,6 +1,8 @@
 require "rails_helper"
 require File.join(Rails.root, "app", "data_migrations", "group_conversion_employers_migration")
 
+# Date.today converted ot TimeKeeper
+
 describe GroupConversionEmployersMigration, dbclean: :after_each do
 
   let(:given_task_name) { "group_conversion_employers_migration" }
@@ -22,7 +24,7 @@ describe GroupConversionEmployersMigration, dbclean: :after_each do
     let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, effective_on: Date.new(2016,10,1))}
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     before do

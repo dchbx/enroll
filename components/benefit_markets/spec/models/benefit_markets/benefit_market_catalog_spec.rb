@@ -4,7 +4,8 @@ module BenefitMarkets
   RSpec.describe BenefitMarketCatalog, type: :model, dbclean: :after_each do
 
     let(:benefit_market_kind)       { :aca_shop }
-    let(:today)                     { Date.today }
+    # Date.today converted to TimeKeeper.date_of_record
+    let(:today)                     { TimeKeeper.date_of_record }
 
     let(:title)                     { "Benefit Buddy's SHOP Employer Benefit Market" }
     let(:description)               { "As an eligible employer, you may shop, select, and elect contribution amounts on \

@@ -1,4 +1,7 @@
 require 'rails_helper'
+
+# Date.today converted to TimeKeeper.date_of_record
+
 RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_broker.html.erb", :type => :view, dbclean: :after_each do
 
   let!(:site)  { FactoryBot.create(:benefit_sponsors_site, :with_owner_exempt_organization, :cca, :with_benefit_market) }
@@ -13,7 +16,7 @@ RSpec.describe "views/benefit_sponsors/profiles/employers/broker_agency/_active_
 
   let!(:person) { FactoryBot.create(:person) }
   let!(:date) { TimeKeeper.date_of_record - 1.day }
-  let!(:user) {   FactoryBot.create(:user, person: person) }
+  let!(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
     view.extend BenefitSponsors::Engine.routes.url_helpers

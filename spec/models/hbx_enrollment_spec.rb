@@ -3,6 +3,8 @@ require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
   describe HbxEnrollment, dbclean: :around_each do
@@ -1308,7 +1310,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     describe "and given a special enrollment period, with a reason of 'birth'", dbclean: :after_each do
-      let(:qle_on) { Date.today }
+      let(:qle_on) { TimeKeeper.date_of_record }
       let(:spl_enr_period) { SpecialEnrollmentPeriod.new(:qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "birth"), :qle_on => qle_on) }
 
       before :each do
@@ -1330,7 +1332,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     describe "and given a special enrollment period, with a reason of 'covid-19'", dbclean: :after_each do
-      let(:qle_on) { Date.today }
+      let(:qle_on) { TimeKeeper.date_of_record }
       let(:spl_enr_period1) { SpecialEnrollmentPeriod.new(:qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "covid-19"), :qle_on => qle_on) }
 
       before :each do
@@ -1352,7 +1354,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     end
 
     describe "and given a special enrollment period, with a new reason of 'test_reason'", dbclean: :after_each do
-      let(:qle_on) {Date.today}
+      let(:qle_on) {TimeKeeper.date_of_record}
 
       before :each do
         allow(subject).to receive(:special_enrollment_period).and_return(SpecialEnrollmentPeriod.new(:qualifying_life_event_kind => QualifyingLifeEventKind.new(:reason => "test_reason", is_active: true),
@@ -2853,7 +2855,7 @@ describe HbxEnrollment,"reinstate and change end date", type: :model, :dbclean =
     end
 
     after do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     context "for Individual market" do

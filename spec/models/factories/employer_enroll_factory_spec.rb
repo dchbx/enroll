@@ -1,12 +1,14 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe Factories::EmployerEnrollFactory, type: :model, dbclean: :after_each do
 
   let(:calendar_year) { TimeKeeper.date_of_record.year }
   let(:date_of_record_to_use) { Date.new(calendar_year, 5, 1) }
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   xcontext 'New Employer' do

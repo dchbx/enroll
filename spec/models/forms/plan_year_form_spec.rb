@@ -9,7 +9,7 @@ describe ::Forms::PlanYearForm, "when newly created" do
   end
 
   after do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   context "validation" do

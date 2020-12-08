@@ -92,7 +92,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
                                         )
                                         }
 
-  let(:qle_on)         { Date.current }
+  let(:qle_on)         { TimeKeeper.date_of_record }
 
   let(:valid_params){
     {
@@ -297,7 +297,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     end
 
     after :all do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     context "and QLE is reported before end of SEP" do
@@ -385,7 +385,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       let(:shop_lost_insurance_qle_sep) { FactoryBot.create(:special_enrollment_period, family: family,
                                                             qualifying_life_event_kind_id: shop_lost_insurance_qle.id, qle_on: lapsed_qle_on_date) }
 
-      let(:reporting_date)        { Date.current }
+      let(:reporting_date)        { TimeKeeper.date_of_record }
       let(:lapsed_effective_date) { ivl_qle_sep.end_on.end_of_month + 1.day }
 
       before do
@@ -393,7 +393,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
       end
 
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       it "the effective date should be in the past: first of month following the lapsed date" do
@@ -806,7 +806,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
     context 'when first_of_month is selected' do
 
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       let(:effective_on_kind) { 'first_of_month' }
@@ -1058,7 +1058,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     context 'when first_of_next_month_coinciding is selected' do
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
       let(:effective_on_kind) { 'first_of_next_month_coinciding' }
       let(:new_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: effective_on_kind) }
@@ -1169,7 +1169,7 @@ RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each
 
     context 'when first_of_next_month_plan_selection is selected' do
       after :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
       let(:effective_on_kind) { 'first_of_next_month_plan_selection' }
       let(:new_sep) { family.special_enrollment_periods.build(qualifying_life_event_kind: ivl_qle, qle_on: qle_on, effective_on_kind: effective_on_kind) }

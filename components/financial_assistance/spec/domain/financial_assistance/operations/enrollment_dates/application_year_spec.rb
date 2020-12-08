@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converteed to TimeKeeper.date_of_record
+
 require 'rails_helper'
 
 RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::ApplicationYear do
@@ -10,7 +12,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::ApplicationYe
   describe 'Application Date Operation' do
 
     context 'when passed date outside open enrollment' do
-      let(:application_date) { Date.new(Date.today.year, 5, 1)}
+      let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 5, 1)}
 
       it 'return current calender year' do
         expect(result).to be_a(Dry::Monads::Result::Success)
@@ -19,7 +21,7 @@ RSpec.describe ::FinancialAssistance::Operations::EnrollmentDates::ApplicationYe
     end
 
     context 'when passed date with in open enrollment' do
-      let(:application_date) { Date.new(Date.today.year, 12, 1)}
+      let(:application_date) { Date.new(TimeKeeper.date_of_record.year, 12, 1)}
 
       it 'should return next calender year' do
         expect(result).to be_a(Dry::Monads::Result::Success)

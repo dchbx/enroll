@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Application::RelationshipHandler, dbclean: :after_each do
@@ -12,7 +14,7 @@ RSpec.describe FinancialAssistance::Operations::Application::RelationshipHandler
                       :with_home_address,
                       application: application,
                       ssn: '889984400',
-                      dob: (Date.today - 10.years),
+                      dob: (TimeKeeper.date_of_record - 10.years),
                       first_name: 'james',
                       last_name: 'bond',
                       :gender => "male",
@@ -36,7 +38,7 @@ RSpec.describe FinancialAssistance::Operations::Application::RelationshipHandler
                       application: application,
                       :gender => "male",
                       ssn: '889984401',
-                      dob: (Date.today - 10.years),
+                      dob: (TimeKeeper.date_of_record - 10.years),
                       first_name: 'child1',
                       last_name: 'bond',
                       :is_applying_coverage => true,

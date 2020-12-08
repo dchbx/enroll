@@ -9,8 +9,8 @@ module BenefitSponsors
   RSpec.describe "initial employer monthly transmission",dbclean: :after_each do
 
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
-    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area,active_year: Date.current.year - 1) }
-    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area,active_year: Date.current.year - 1) }
+    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area,active_year: TimeKeeper.date_of_record.year - 1) }
+    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area,active_year: TimeKeeper.date_of_record.year - 1) }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 require 'rails_helper'
 
 RSpec.describe FinancialAssistance::Operations::Applicant::Build, dbclean: :after_each do
@@ -9,7 +11,7 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Build, dbclean: :afte
       :last_name => "test",
       :ssn => "889984400",
       :gender => "female",
-      :dob => Date.today - 10.years,
+      :dob => TimeKeeper.date_of_record - 10.years,
       :is_incarcerated => false,
       :ethnicity => [],
       :indian_tribe_member => true,

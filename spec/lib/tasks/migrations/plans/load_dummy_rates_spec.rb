@@ -14,8 +14,8 @@ describe "load_dummy_rates", dbclean: :after_each do
   before :all do
     DatabaseCleaner.clean
 
-    @start_date = Date.new(Date.current.year, 7, 1)
-    @end_date = Date.new(Date.current.year, 9, 30)
+    @start_date = Date.new(TimeKeeper.date_of_record.year, 7, 1)
+    @end_date = Date.new(TimeKeeper.date_of_record.year, 9, 30)
     @application_period = Time.utc(@start_date.year, @start_date.month, @start_date.day)..Time.utc(@end_date.year, @end_date.month, @end_date.day)
 
     Rake.application.rake_require 'tasks/migrations/plans/load_dummy_rates'

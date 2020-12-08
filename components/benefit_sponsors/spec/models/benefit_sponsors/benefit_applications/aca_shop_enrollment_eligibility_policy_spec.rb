@@ -2,6 +2,8 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper.date_of_record
+
 module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
     before(:all) do
@@ -15,9 +17,12 @@ module BenefitSponsors
 
     let!(:subject) {BenefitApplications::AcaShopEnrollmentEligibilityPolicy.new}
     let!(:benefit_application) {initial_application}
-    let!(:benefit_application_update) {benefit_application.update_attributes(:fte_count => 5,
-                                                                             :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
-    }
+    let!(:benefit_application_update) do
+      benefit_application.update_attributes(
+        :fte_count => 5,
+        :open_enrollment_period => Range.new(TimeKeeper.date_of_record, TimeKeeper.date_of_record + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+      )
+    end
 
     describe "New model instance" do
       it "should have businese_policy" do
@@ -86,10 +91,13 @@ module BenefitSponsors
 
     describe "For business_policies_for 1/1 effective date" do
 
-      let!(:benefit_application_update) {benefit_application.update_attributes(:fte_count => 5,
-                                                                               :effective_period => Range.new(TimeKeeper.date_of_record.beginning_of_year-1.year, TimeKeeper.date_of_record.end_of_year-1.year),
-                                                                               :open_enrollment_period => Range.new(Date.today, Date.today + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN))
-      }
+      let!(:benefit_application_update) do
+        benefit_application.update_attributes(
+          :fte_count => 5,
+          :effective_period => Range.new(TimeKeeper.date_of_record.beginning_of_year - 1.year, TimeKeeper.date_of_record.end_of_year - 1.year),
+          :open_enrollment_period => Range.new(TimeKeeper.date_of_record, TimeKeeper.date_of_record + BenefitApplications::AcaShopApplicationEligibilityPolicy::OPEN_ENROLLMENT_DAYS_MIN)
+        )
+      end
 
       context "When all the census employees are emrolled" do
 

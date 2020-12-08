@@ -7,8 +7,8 @@ c_model_attributes = {
     contribution_calculator_kind: "::BenefitSponsors::ContributionCalculators::TieredPercentWithCapContributionCalculator",
     title: "DC Congress Contribution Model",
     many_simultaneous_contribution_units: false,
-    updated_at: Date.today,
-    created_at: Date.today,
+    updated_at: TimeKeeper.date_of_record,
+    created_at: TimeKeeper.date_of_record,
     contribution_units: [
         {
             "_id"=>BSON::ObjectId.new,

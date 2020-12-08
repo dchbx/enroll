@@ -1,10 +1,11 @@
 FactoryBot.define do
   factory :benefit_markets_benefit_market_catalog, class: 'BenefitMarkets::BenefitMarketCatalog' do
 
+    # Date.today converted to TimeKeeper.date_of_record
     title                     { "Benefit Buddy's SHOP Employer Benefit Market" }
     description               { "Some awesome description text here" }
     application_interval_kind { :monthly }
-    application_period        { Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31) }
+    application_period        { Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31) }
     probation_period_kinds    { [:first_of_month, :first_of_month_after_30_days, :first_of_month_after_60_days] }
     sponsor_market_policy     { build(:benefit_markets_market_policies_sponsor_market_policy) }
     member_market_policy      { build(:benefit_markets_market_policies_member_market_policy) }

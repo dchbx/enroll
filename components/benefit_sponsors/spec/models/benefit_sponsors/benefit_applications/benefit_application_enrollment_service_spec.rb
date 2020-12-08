@@ -13,6 +13,7 @@ module BenefitSponsors
     include_context "setup benefit market with market catalogs and product packages"
 
     before do
+      # Date.today converted to TimeKeeper.date_of_record
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
@@ -23,7 +24,7 @@ module BenefitSponsors
       include_context "setup initial benefit application"
 
       before(:each) do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 6, 10))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 6, 10))
       end
 
       after(:each) do
@@ -67,7 +68,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 4))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 4))
         end
 
         after(:each) do
@@ -557,7 +558,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
         after(:each) do
@@ -569,7 +570,7 @@ module BenefitSponsors
         context "open enrollment close date passed" do
           before :each do
             initial_application.benefit_sponsorship.update_attributes(aasm_state: :applicant)
-            allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(Date.today.year, 7, 24))
+            allow(::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator).to receive(:call).with(initial_application, Date.new(TimeKeeper.date_of_record.year, 7, 24))
           end
 
           context "and the benefit_application enrollment passes eligibility policy validation" do
@@ -616,7 +617,7 @@ module BenefitSponsors
 
 
           it "invokes pricing determination calculation" do
-            expect{::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(initial_application, Date.new(Date.today.year, 7, 24))}.not_to raise_error
+            expect{::BenefitSponsors::SponsoredBenefits::EnrollmentClosePricingDeterminationCalculator.call(initial_application, Date.new(TimeKeeper.date_of_record.year, 7, 24))}.not_to raise_error
             subject.end_open_enrollment
           end
         end
@@ -646,7 +647,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
         end
 
         after(:each) do
@@ -690,7 +691,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 7, 24))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 7, 24))
         end
 
         after(:each) do
@@ -740,7 +741,7 @@ module BenefitSponsors
         end
 
         before(:each) do
-          TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year, 8, 1))
+          TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 8, 1))
         end
 
         after(:each) do
@@ -902,7 +903,7 @@ module BenefitSponsors
 
     describe '.extend_open_enrollment' do
       include_context "setup initial benefit application"
-      let(:current_effective_date) { Date.new(Date.today.year, 8, 1) }
+      let(:current_effective_date) { Date.new(TimeKeeper.date_of_record.year, 8, 1) }
       let(:today) { current_effective_date - 7.days }
 
       subject { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application) }

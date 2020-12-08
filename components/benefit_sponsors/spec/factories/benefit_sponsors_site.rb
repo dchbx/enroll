@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Date.today converted to TimeKeeper.date_of_record
+
 FactoryBot.define do
   factory :benefit_sponsors_site, class: 'BenefitSponsors::Site' do
     byline      { "ACME Healthcare" }
@@ -8,7 +12,7 @@ FactoryBot.define do
     transient do
       kind { :aca_shop }
       site_owner_organization_legal_name { "Site Owner" }
-      application_period {Date.new(Date.today.year, 1, 1)..Date.new(Date.today.year, 12, 31)}
+      application_period {Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31)}
     end
 
     # trait :with_owner_general_organization do
@@ -18,13 +22,13 @@ FactoryBot.define do
     # end
 
     trait :with_owner_exempt_organization do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
 
     trait :as_hbx_profile do
-      after :build do |site, evaluator|
+      after :build do |site, _evaluator|
         site.owner_organization = build(:benefit_sponsors_organizations_exempt_organization, :with_hbx_profile, site: site)
       end
     end
@@ -40,7 +44,7 @@ FactoryBot.define do
     end
 
     trait :with_benefit_market_catalog do
-      after :create do |site, evaluator|
+      after :create do |site, _evaluator|
         create(:benefit_markets_benefit_market_catalog, benefit_market: site.benefit_markets[0])
       end
     end

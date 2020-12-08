@@ -154,7 +154,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       after :each do
-        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+        TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
       end
 
       context "when carrier mappings not present" do
@@ -387,7 +387,7 @@ RSpec.describe Plan, dbclean: :after_each do
       end
 
       it "should raise exception" do
-        expect { plan.premium_for(Date.today.at_beginning_of_month, params[:premium_tables][0][:age] + 1) }.to raise_error(NameError)
+        expect { plan.premium_for(TimeKeeper.date_of_record.at_beginning_of_month, params[:premium_tables][0][:age] + 1) }.to raise_error(NameError)
       end
     end
 

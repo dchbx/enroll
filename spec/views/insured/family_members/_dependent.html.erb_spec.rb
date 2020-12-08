@@ -11,7 +11,7 @@ describe "insured/family_members/_dependent.html.erb", dbclean: :after_each do
   before :each do
     sign_in user
     allow(view).to receive(:edit_insured_family_member_path).and_return "#"
-    allow(dependent).to receive(:age_on).with(Date.today).and_return 10
+    allow(dependent).to receive(:age_on).with(TimeKeeper.date_of_record).and_return 10
   end
 
   it "should have name age gender relationship for dependent" do

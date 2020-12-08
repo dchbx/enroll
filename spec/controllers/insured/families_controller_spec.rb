@@ -41,7 +41,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: Date.today) }
+  let(:hbx_enrollments) { double("HbxEnrollment", order: nil, waived: nil, any?: nil, non_external: nil, effective_on: TimeKeeper.date_of_record) }
   let(:user) { FactoryBot.create(:user) }
   let(:person) do
     double(
@@ -659,7 +659,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     context 'when its initial enrollment' do
       before :each do
-        post :record_sep, params: {qle_id: @qle.id, qle_date: Date.today}
+        post :record_sep, params: {qle_id: @qle.id, qle_date: TimeKeeper.date_of_record}
       end
 
       it "should redirect" do
@@ -673,7 +673,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       before :each do
         allow(@family).to receive(:enrolled_hbx_enrollments).and_return([double])
-        post :record_sep, params: {qle_id: @qle.id, qle_date: Date.today}
+        post :record_sep, params: {qle_id: @qle.id, qle_date: TimeKeeper.date_of_record}
       end
 
       it "should redirect with change_plan parameter" do

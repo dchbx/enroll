@@ -181,8 +181,8 @@ describe EmployeeRole, dbclean: :around_each do
   it 'properly intantiates the class using an existing person' # do
 =begin
     ssn = "987654321"
-    date_of_hire = Date.today - 10.days
-    dob = Date.today - 36.years
+    date_of_hire = TimeKeeper.date_of_record - 10.days
+    dob = TimeKeeper.date_of_record - 36.years
     gender = "female"
 
     employer_profile = EmployerProfile.create(
@@ -235,8 +235,8 @@ describe EmployeeRole, dbclean: :around_each do
   it 'properly intantiates the class using a new person' # do
 =begin
     ssn = "987654320"
-    date_of_hire = Date.today - 10.days
-    dob = Date.today - 26.years
+    date_of_hire = TimeKeeper.date_of_record - 10.days
+    dob = TimeKeeper.date_of_record - 26.years
     gender = "female"
 
     employer_profile = employer_profile.create(
@@ -565,7 +565,7 @@ describe EmployeeRole, dbclean: :around_each do
   let(:open_enrollment_end_on) {benefit_application.open_enrollment_end_on}
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   # let!(:plan_year) {

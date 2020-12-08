@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -6,48 +8,50 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
   let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
-  let(:shop_qle)      { QualifyingLifeEventKind.create(
-                              title: "Entered into a legal domestic partnership",
-                              action_kind: "add_benefit",
-                              reason: "domestic_partnership",
-                              edi_code: "33-ENTERING DOMESTIC PARTNERSHIP",
-                              market_kind: "shop",
-                              effective_on_kinds: ["first_of_month"],
-                              pre_event_sep_in_days: 0,
-                              post_event_sep_in_days: 30,
-                              is_self_attested: true,
-                              is_visible: true,
-                              ordinal_position: 20,
-                              event_kind_label: 'Date of domestic partnership',
-                              tool_tip: "Enroll or add a family member due to a new domestic partnership"
-                            )
-                          }
-  let(:ivl_qle)       { QualifyingLifeEventKind.create(
-                              title: "Had a baby",
-                              tool_tip: "Household adds a member due to birth",
-                              action_kind: "add_member",
-                              market_kind: "individual",
-                              event_kind_label: "Date of birth",
-                              reason: "birth",
-                              edi_code: "02-BIRTH",
-                              ordinal_position: 10,
-                              effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
-                              pre_event_sep_in_days: 0,
-                              post_event_sep_in_days: 30,
-                              is_self_attested: true,
-                              is_visible: true,
-                              is_active: true
-                            )
-                          }
-  let(:qle_on)         { Date.current }
+  let(:shop_qle)      do
+    QualifyingLifeEventKind.create(
+      title: "Entered into a legal domestic partnership",
+      action_kind: "add_benefit",
+      reason: "domestic_partnership",
+      edi_code: "33-ENTERING DOMESTIC PARTNERSHIP",
+      market_kind: "shop",
+      effective_on_kinds: ["first_of_month"],
+      pre_event_sep_in_days: 0,
+      post_event_sep_in_days: 30,
+      is_self_attested: true,
+      is_visible: true,
+      ordinal_position: 20,
+      event_kind_label: 'Date of domestic partnership',
+      tool_tip: "Enroll or add a family member due to a new domestic partnership"
+    )
+  end
+  let(:ivl_qle)       do
+    QualifyingLifeEventKind.create(
+      title: "Had a baby",
+      tool_tip: "Household adds a member due to birth",
+      action_kind: "add_member",
+      market_kind: "individual",
+      event_kind_label: "Date of birth",
+      reason: "birth",
+      edi_code: "02-BIRTH",
+      ordinal_position: 10,
+      effective_on_kinds: ["date_of_event", "fixed_first_of_next_month"],
+      pre_event_sep_in_days: 0,
+      post_event_sep_in_days: 30,
+      is_self_attested: true,
+      is_visible: true,
+      is_active: true
+    )
+  end
+  let(:qle_on)         { TimeKeeper.date_of_record }
 
-  let(:valid_params){
+  let(:valid_params) do
     {
       family: family,
       qualifying_life_event_kind: ivl_qle,
-      qle_on: qle_on,
+      qle_on: qle_on
     }
-  }
+  end
 
   context "a new instance" do
     context "with no family" do
@@ -113,7 +117,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     end
 
     context "and this is retro QLE that has lapsed" do
-      let(:lapsed_qle_on_date)  { (TimeKeeper.date_of_record.beginning_of_month + 16.days) - 1.year }
+      let(:lapsed_qle_on_date)  { (qle_on + 16.days) - 1.year }
       let(:qle_start_on_date)   { lapsed_qle_on_date }
       let(:qle_end_on_date)     { lapsed_qle_on_date + ivl_qle_sep.qualifying_life_event_kind.post_event_sep_in_days }
 
@@ -210,7 +214,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
           ivl_qle_sep.qle_on = qle_on_date
         end
         after do
-          TimeKeeper.set_date_of_record_unprotected!(Date.today)
+          TimeKeeper.set_date_of_record_unprotected!(today)
         end
 
         it "the effective date is first of next month following QLE date" do
@@ -238,8 +242,8 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
 
 
   let(:event_date) { TimeKeeper.date_of_record }
-  let(:expired_event_date) { TimeKeeper.date_of_record - 1.year }
-  let(:first_of_following_month) { TimeKeeper.date_of_record.end_of_month + 1 }
+  let(:expired_event_date) { event_date - 1.year }
+  let(:first_of_following_month) { event_date.end_of_month + 1 }
   let(:qle_effective_date) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
   let(:qle_first_of_month) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_first_of_month) }
 
@@ -272,9 +276,9 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
           sep.effective_on_kind = "first_of_next_month"
           sep.qualifying_life_event_kind = qle
           allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return true
-          allow(qle).to receive(:employee_gaining_medicare).and_return (TimeKeeper.date_of_record - 1.day)
-          sep.qle_on = TimeKeeper.date_of_record + 40.days
-          expect(sep.effective_on).to eq (TimeKeeper.date_of_record - 1.day)
+          allow(qle).to receive(:employee_gaining_medicare).and_return(event_date - 1.day)
+          sep.qle_on = event_date + 40.days
+          expect(sep.effective_on).to eq(event_date - 1.day)
         end
 
         context "when is_moved_to_dc" do
@@ -282,25 +286,25 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
             sep.effective_on_kind = "first_of_next_month"
             sep.qualifying_life_event_kind = qle
             allow(qle).to receive(:is_moved_to_dc?).and_return true
-            sep.qle_on = TimeKeeper.date_of_record - 40.days
-            expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month + 1.day)
+            sep.qle_on = event_date - 40.days
+            expect(sep.effective_on).to eq(event_date.end_of_month + 1.day)
           end
 
           context "when current_date < qle on" do
             it "qle on is not beginning_of_month" do
               sep.effective_on_kind = "first_of_next_month"
               sep.qualifying_life_event_kind = qle
-              allow(qle).to receive(:is_moved_to_dc?).and_return true
-              sep.qle_on = TimeKeeper.date_of_record.end_of_month + 2.days
-              expect(sep.effective_on).to eq ((TimeKeeper.date_of_record.end_of_month+2.days).end_of_month + 1.day)
+              allow(qle).to receive(:is_moved_to_dc?).and_return(true)
+              sep.qle_on = event_date.end_of_month + 2.days
+              expect(sep.effective_on).to eq((event_date.end_of_month + 2.days).end_of_month + 1.day)
             end
 
             it "qle on is beginning_of_month" do
               sep.effective_on_kind = "first_of_next_month"
               sep.qualifying_life_event_kind = qle
               allow(qle).to receive(:is_moved_to_dc?).and_return true
-              sep.qle_on = TimeKeeper.date_of_record.end_of_month + 1.days
-              expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month+1.days)
+              sep.qle_on = event_date.end_of_month + 1.days
+              expect(sep.effective_on).to eq(event_date.end_of_month + 1.days)
             end
           end
         end
@@ -308,15 +312,15 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
         it "should set effective date to date of event" do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
-          sep.qle_on = TimeKeeper.date_of_record + 40.days
-          expect(sep.effective_on).to eq ((TimeKeeper.date_of_record+40.days).end_of_month + 1.day)
+          sep.qle_on = event_date + 40.days
+          expect(sep.effective_on).to eq((event_date + 40.days).end_of_month + 1.day)
         end
 
         it "should set effective date to current date" do
           sep.qualifying_life_event_kind = qle
           sep.effective_on_kind = "first_of_next_month"
-          sep.qle_on = TimeKeeper.date_of_record - 4.days
-          expect(sep.effective_on).to eq (TimeKeeper.date_of_record.end_of_month + 1.day)
+          sep.qle_on = event_date - 4.days
+          expect(sep.effective_on).to eq(event_date.end_of_month + 1.day)
         end
       end
 
@@ -324,7 +328,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
         sep.qualifying_life_event_kind = qle
         sep.effective_on_kind = "fixed_first_of_next_month"
         sep.qle_on = event_date
-        expect(sep.effective_on).to eq first_of_following_month
+        expect(sep.effective_on).to eq(first_of_following_month)
       end
 
       it "and qle is exact_date" do
@@ -353,7 +357,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
           it "should the first of month following current date" do
             event_date = TimeKeeper.date_of_record - 8.days
             sep.qle_on = event_date
-            expect(sep.effective_on).to eq TimeKeeper.date_of_record.end_of_month + 1.day
+            expect(sep.effective_on).to eq(TimeKeeper.date_of_record.end_of_month + 1.day)
           end
         end
 
@@ -394,7 +398,7 @@ RSpec.describe EnrollmentPeriod::SpecialEnrollment, :type => :model do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
-    let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package ) }
+    let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
     let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: abc_profile) }
     let(:person) {FactoryBot.create(:person)}
     let(:family){ FactoryBot.create(:family, :with_primary_family_member, person: person) }

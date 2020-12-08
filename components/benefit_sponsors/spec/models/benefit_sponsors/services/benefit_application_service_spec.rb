@@ -3,6 +3,8 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_product_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper.date_of_record
+
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::BenefitApplicationService, type: :model, :dbclean => :after_each do
     subject { ::BenefitSponsors::Services::BenefitApplicationService.new }

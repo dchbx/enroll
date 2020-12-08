@@ -254,7 +254,7 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
           end
 
           after do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
+            TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
           end
 
           it "should build reinstated enrollment" do

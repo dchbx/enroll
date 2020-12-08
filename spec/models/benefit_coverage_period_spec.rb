@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
   let(:hbx_profile)               { FactoryBot.create(:hbx_profile) }
@@ -196,7 +198,7 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
   end
 
   context "elected_plans_by_enrollment_members", dbclean: :before_each do
-    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(Time.current.year,1,1)) }
+    let(:benefit_coverage_period) { BenefitCoveragePeriod.new(start_on: Date.new(TimeKeeper.date_of_record.year,1,1)) }
     let(:c1) {FactoryBot.create(:consumer_role)}
     let(:c2) {FactoryBot.create(:consumer_role)}
     let(:r1) {FactoryBot.create(:resident_role)}

@@ -1385,7 +1385,7 @@ describe Family, "#check_dep_consumer_role", dbclean: :after_each do
 end
 
 describe "min_verification_due_date", dbclean: :after_each do
-  let!(:today) { Date.today }
+  let!(:today) { TimeKeeper.date_of_record }
   let!(:family) { create(:family, :with_primary_family_member, min_verification_due_date: 5.days.ago) }
 
   context "::min_verification_due_date_range" do

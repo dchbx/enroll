@@ -2401,8 +2401,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
         # before do
         #   benefit_application.update_attributes(aasm_state: :enrollment_closed)
-        #   TimeKeeper.set_date_of_record_unprotected!(Date.today.end_of_year)
-        #   TimeKeeper.set_date_of_record(Date.today.end_of_year + 1.day)
+        #   TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.end_of_year)
+        #   TimeKeeper.set_date_of_record(TimeKeeper.date_of_record.end_of_year + 1.day)
         # end
 
         xit "should transition 'newly designated eligible' status to initial state" do

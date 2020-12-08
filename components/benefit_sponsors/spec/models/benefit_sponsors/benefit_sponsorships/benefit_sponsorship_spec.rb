@@ -3,12 +3,12 @@ require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_spo
 
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
-    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year - 1) }
-    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year - 1) }
+    let!(:previous_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year - 1) }
+    let!(:previous_service_area) { create_default(:benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.year - 1) }
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let!(:service_area) { create_default(:benefit_markets_locations_service_area) }
-    let!(:next_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: Date.current.year + 1) }
-    let!(:next_service_area) { create_default(:benefit_markets_locations_service_area, active_year: Date.current.year + 1) }
+    let!(:next_rating_area) { create_default(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.year + 1) }
+    let!(:next_service_area) { create_default(:benefit_markets_locations_service_area, active_year: TimeKeeper.date_of_record.year + 1) }
   
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)  { site.benefit_markets.first }
@@ -49,7 +49,7 @@ module BenefitSponsors
       end
 
       context "instantiated using .new" do
-        let(:today)               { Date.today }
+        let(:today)               { TimeKeeper.date_of_record }
         let(:effective_begin_on)  { today.next_month.beginning_of_month }
 
         let(:params) do
@@ -190,7 +190,7 @@ module BenefitSponsors
         sponsorship.save
         sponsorship
       end
-      let(:next_year)                           { Date.today.year + 1 }
+      let(:next_year)                           { TimeKeeper.date_of_record.year + 1 }
       let(:application_period_next_year)        { (Date.new(next_year,1,1))..(Date.new(next_year,12,31)) }
       let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
       let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
@@ -289,7 +289,7 @@ module BenefitSponsors
 
     describe "Transitioning a BenefitSponsorship through Initial Application Workflow States" do
       let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
-      let(:this_year)                           { Date.today.year }
+      let(:this_year)                           { TimeKeeper.date_of_record.year }
       let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
       let(:service_area) { create_default(:benefit_markets_locations_service_area) }
       let(:benefit_application) do
@@ -670,7 +670,7 @@ module BenefitSponsors
         )
       end
 
-      let(:current_date)                    { Date.today }
+      let(:current_date)                    { TimeKeeper.date_of_record }
 
       before { TimeKeeper.set_date_of_record_unprotected!(current_date) }
 

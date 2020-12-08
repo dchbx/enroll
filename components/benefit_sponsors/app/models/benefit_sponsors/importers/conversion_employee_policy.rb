@@ -36,8 +36,9 @@ module BenefitSponsors
                                                        # hired_on: {"$lte" => start_date},
                                                        encrypted_ssn: CensusMember.encrypt_ssn(subscriber_ssn)
                                                    })
+        # Date.today converted to TimeKeeper.date_of_record
         non_terminated_employees = candidate_employees.reject do |ce|
-          (!ce.employment_terminated_on.blank?) && ce.employment_terminated_on <= Date.today
+          !ce.employment_terminated_on.blank? && ce.employment_terminated_on <= TimeKeeper.date_of_record
         end
 
         @found_employee = non_terminated_employees.sort_by(&:hired_on).last

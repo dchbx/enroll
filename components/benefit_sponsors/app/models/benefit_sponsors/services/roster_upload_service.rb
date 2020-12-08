@@ -302,7 +302,8 @@ module BenefitSponsors
 
       def parse_relationship(cell, dob)
         return nil if cell.blank?
-        age = Date.today.year - dob.year
+        # Date.today converted to TimeKeeper.date_of_record
+        age = TimeKeeper.date_of_record.year - dob.year
         case parse_text(cell).downcase
           when "employee"
             "self"

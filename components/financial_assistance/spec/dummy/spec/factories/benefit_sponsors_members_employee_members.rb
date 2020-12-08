@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 FactoryBot.define do
   factory :benefit_sponsors_members_employee_member, class: 'BenefitSponsors::Members::EmployeeMember' do
     last_name     { "Jetson" }
-    dob           { Date.today - 45.years }
-    date_of_hire  { Date.today - 3.years }
+    dob           { TimeKeeper.date_of_record - 45.years }
+    date_of_hire  { TimeKeeper.date_of_record - 3.years }
 
     ssn do
       Forgery('basic').text(

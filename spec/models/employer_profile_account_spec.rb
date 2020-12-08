@@ -29,11 +29,11 @@ describe EmployerProfileAccount, type: :model, dbclean: :after_each do
   end
 
   before do
-    TimeKeeper.set_date_of_record_unprotected!(Date.current.next_month.beginning_of_month)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record.next_month.beginning_of_month)
   end
 
   after :all do
-    TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
   end
 
   context ".new" do

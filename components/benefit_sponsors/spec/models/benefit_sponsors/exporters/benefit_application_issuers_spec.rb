@@ -2,6 +2,8 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
+# Date.today converted to TimeKeeper.date_of_record
+
 module BenefitSponsors
   module Exporters
     RSpec.describe BenefitApplicationIssuers, :dbclean => :after_each do
@@ -41,7 +43,7 @@ module BenefitSponsors
           let(:renewal_state)             { :enrollment_eligible }
 
           before do
-            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month + 1))
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, aca_shop_market_employer_transmission_day_of_month + 1))
           end
 
           it 'finds benefit applications' do
@@ -55,7 +57,7 @@ module BenefitSponsors
           let(:renewal_state)             { :enrollment_eligible }
 
           before do
-            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month - 1))
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, aca_shop_market_employer_transmission_day_of_month - 1))
           end
 
           it 'finds benefit applications' do
@@ -69,7 +71,7 @@ module BenefitSponsors
           let(:renewal_state)             { :enrollment_closed }
 
           before do
-            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(Date.today.year, Date.today.month, aca_shop_market_employer_transmission_day_of_month + 1))
+            allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, TimeKeeper.date_of_record.month, aca_shop_market_employer_transmission_day_of_month + 1))
           end
 
           it 'finds benefit applications' do

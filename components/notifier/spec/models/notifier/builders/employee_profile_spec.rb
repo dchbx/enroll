@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+# Date.today converted to TimeKeeper.date_of_record
+
 RSpec.describe Notifier::Builders::EmployeeProfile, dbclean: :around_each do
   let(:employee_profile) { ::Notifier::Builders::EmployeeProfile.new }
   let(:payload) do
-    { 'notice_params' => { 'qle_title' => 'test test', 'qle_event_on' => (Date.today + 1.day).to_s} }
+    { 'notice_params' => { 'qle_title' => 'test test', 'qle_event_on' => (TimeKeeper.date_of_record + 1.day).to_s} }
   end
   let(:sep) { double('SpecialEnrollmentPeriod', title: 'sep_title') }
 
@@ -14,7 +16,7 @@ RSpec.describe Notifier::Builders::EmployeeProfile, dbclean: :around_each do
 
   context 'special_enrollment_period_event_on' do
     it 'should return qle event_on date that is sent in the payload' do
-      expect(employee_profile.special_enrollment_period_event_on).to eq((Date.today + 1.day).to_s)
+      expect(employee_profile.special_enrollment_period_event_on).to eq((TimeKeeper.date_of_record + 1.day).to_s)
     end
 
     it 'should not raise error when there is an existing sep' do

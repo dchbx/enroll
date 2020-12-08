@@ -31,7 +31,7 @@ describe Forms::BulkActionsForAdmin do
 
   context 'enrollment market' do
     context "SHOP" do
-      let(:termination_date) { Date.today + 1.month }
+      let(:termination_date) { TimeKeeper.date_of_record + 1.month }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
       let(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment, :shop, family: family, aasm_state: 'coverage_enrolled')
@@ -63,7 +63,7 @@ describe Forms::BulkActionsForAdmin do
     end
 
     context "IVL" do
-      let(:termination_date) { Date.today + 1.month }
+      let(:termination_date) { TimeKeeper.date_of_record + 1.month }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
       let(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: 'coverage_enrolled')

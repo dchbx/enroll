@@ -7,7 +7,7 @@ RSpec.describe CensusDependent, :type => :model do
   let(:middle_name) { "R" }   
   let(:last_name) { "Skynyrd" }   
   let(:name_sfx) { "PhD" }   
-  let(:dob) { Date.today }
+  let(:dob) { TimeKeeper.date_of_record }
   let(:ssn) { "230987654" }
   let(:gender) { "male" }
   let(:employee_relationship) { "spouse" }
@@ -59,7 +59,7 @@ RSpec.describe CensusDependent, :type => :model do
   end
 
   context 'dependent' do
-    let(:dob) { Date.today - 15.years }
+    let(:dob) { TimeKeeper.date_of_record - 15.years }
     let!(:census_employee) { FactoryBot.create(:census_employee) }
 
     before do

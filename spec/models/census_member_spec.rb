@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe CensusMember, :dbclean => :after_each do
   it { should validate_presence_of :first_name }
   it { should validate_presence_of :last_name }
@@ -45,7 +47,7 @@ RSpec.describe CensusMember, :dbclean => :after_each do
 
   context "validate of date_of_birth_is_past" do
     it "should invalid" do
-      dob = (Date.today + 10.days)
+      dob = (TimeKeeper.date_of_record + 10.days)
       census_employee.date_of_birth = dob.strftime("%Y-%m-%d")
       expect(census_employee.save).to be_falsey
       expect(census_employee.errors[:dob].any?).to be_truthy

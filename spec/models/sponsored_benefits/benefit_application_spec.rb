@@ -6,7 +6,7 @@ module SponsoredBenefits
 
     # let(:date_range) { (Date.today..1.year.from_now) }
 
-    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+    let(:effective_period_start_on) { Date.today.end_of_month + 1.day + 1.month }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
 
@@ -39,7 +39,7 @@ module SponsoredBenefits
       let(:benefit_group)             { FactoryBot.create :benefit_group, title: 'new' }
 
       let(:benefit_market)      { site.benefit_markets.first }
-      let(:current_effective_date)  { TimeKeeper.date_of_record }
+      let(:current_effective_date)  { Date.today }
       let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
       let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                              benefit_market: benefit_market,

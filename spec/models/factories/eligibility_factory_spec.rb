@@ -3,6 +3,8 @@
 require 'rails_helper'
 require File.join(Rails.root, 'spec/shared_contexts/ivl_eligibility')
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe Factories::EligibilityFactory, type: :model do
 
   before :all do
@@ -174,7 +176,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
 
-      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
+      let!(:enrollment1) { FactoryBot.create(:hbx_enrollment, :individual_shopping, household: family.active_household, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :all do
@@ -303,7 +305,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
         context 'with an existing enrollment' do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
-          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family, effective_on: Date.today.beginning_of_year) }
+          let!(:enrollment2) { FactoryBot.create(:hbx_enrollment, :individual_assisted, applied_aptc_amount: 50.00, household: family.active_household, family: family, effective_on: TimeKeeper.date_of_record.beginning_of_year) }
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           context 'with valid tax household for all the shopping members' do

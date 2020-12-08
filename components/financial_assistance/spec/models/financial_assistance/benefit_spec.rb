@@ -19,7 +19,8 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
       title: 'Financial Benefit',
       kind: 'is_eligible',
       insurance_kind: 'medicare_part_b',
-      start_on: Date.today
+      # Date,today converted to TimeKeeper.date_of_record
+      start_on: TimeKeeper.date_of_record
     }
   end
 
@@ -234,7 +235,7 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
       end
 
       it 'should be valid' do
-        benefit.start_on = Date.today
+        benefit.start_on = TimeKeeper.date_of_record
         benefit.valid?(:step_1)
         expect(benefit.errors['start_on']).to be_empty
         benefit.valid?(:submission)
@@ -244,7 +245,7 @@ RSpec.describe FinancialAssistance::Benefit, type: :model, dbclean: :after_each 
 
     context 'if step_1 and submit end on date occur before start on date' do
       it "end on date can't occur before start on date" do
-        now = Date.today
+        now = TimeKeeper.date_of_record
         benefit.start_on = now
         benefit.end_on = now - 90
         benefit.kind = 'is_enrolled'

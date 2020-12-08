@@ -46,10 +46,10 @@ RSpec.describe TimeKeeper, type: :model do
   end
 
   context "a message is received with a new date_of_record", dbclean: :after_each do
-    let(:base_date)   { Date.current }
-    let(:past_date)   { Date.current - 5.days }
-    let(:next_day)    { Date.current + 1.day  }
-    let(:future_date) { Date.current + 5.days }
+    let(:base_date)   { TimeKeeper.date_of_record }
+    let(:past_date)   { TimeKeeper.date_of_record - 5.days }
+    let(:next_day)    { TimeKeeper.date_of_record + 1.day  }
+    let(:future_date) { TimeKeeper.date_of_record + 5.days }
 
     let(:date_of_record) { TimeKeeper.set_date_of_record(base_date) }
 
@@ -94,7 +94,7 @@ RSpec.describe TimeKeeper, type: :model do
 
   context "which can avoid local cache hits" do
     before :each do
-      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
     end
 
     it "should return identical values for the life of the cache" do

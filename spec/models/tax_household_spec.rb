@@ -23,10 +23,10 @@ RSpec.describe TaxHousehold, type: :model do
   it "max_aptc and csr values returned are from the most recent eligibility record" do
     hh = Household.new(
         eligibilities: [
-          Eligibility.new({date_determined: Date.today - 100, max_aptc: 101.05, csr_percent: 1.0}),
-          Eligibility.new({date_determined: Date.today - 80, max_aptc: 181.05, csr_percent: 0.80}),
-          Eligibility.new({date_determined: Date.today, max_aptc: 287.95, csr_percent: 0.73}),
-          Eligibility.new({date_determined: Date.today - 50, max_aptc: 101.05, csr_percent: 0.50})
+          Eligibility.new({date_determined: TimeKeeper.date_of_record - 100, max_aptc: 101.05, csr_percent: 1.0}),
+          Eligibility.new({date_determined: TimeKeeper.date_of_record - 80, max_aptc: 181.05, csr_percent: 0.80}),
+          Eligibility.new({date_determined: TimeKeeper.date_of_record, max_aptc: 287.95, csr_percent: 0.73}),
+          Eligibility.new({date_determined: TimeKeeper.date_of_record - 50, max_aptc: 101.05, csr_percent: 0.50})
         ]
       )
 
@@ -36,24 +36,24 @@ RSpec.describe TaxHousehold, type: :model do
   it "returns list of SEPs for specified day and single 'current_sep'" do
     hh = Household.new(
         special_enrollment_periods: [
-          SpecialEnrollmentPeriod.new({reason: "marriage", start_date: Date.today - 120, end_date: Date.today - 90}),
-          SpecialEnrollmentPeriod.new({reason: "retirement", start_date: Date.today - 10, end_date: Date.today + 20}),
-          SpecialEnrollmentPeriod.new({reason: "birth", start_date: Date.today - 90, end_date: Date.today - 60}),
-          SpecialEnrollmentPeriod.new({reason: "location_change", start_date: Date.today - 260, end_date: Date.today - 230}),
-          SpecialEnrollmentPeriod.new({reason: "employment_termination", start_date: Date.today - 180, end_date: Date.today - 150})
+          SpecialEnrollmentPeriod.new({reason: "marriage", start_date: TimeKeeper.date_of_record - 120, end_date: TimeKeeper.date_of_record - 90}),
+          SpecialEnrollmentPeriod.new({reason: "retirement", start_date: TimeKeeper.date_of_record - 10, end_date: TimeKeeper.date_of_record + 20}),
+          SpecialEnrollmentPeriod.new({reason: "birth", start_date: TimeKeeper.date_of_record - 90, end_date: TimeKeeper.date_of_record - 60}),
+          SpecialEnrollmentPeriod.new({reason: "location_change", start_date: TimeKeeper.date_of_record - 260, end_date: TimeKeeper.date_of_record - 230}),
+          SpecialEnrollmentPeriod.new({reason: "employment_termination", start_date: TimeKeeper.date_of_record - 180, end_date: TimeKeeper.date_of_record - 150})
         ]
       )
 
-    past_day = hh.active_seps(Date.today - 500)
+    past_day = hh.active_seps(TimeKeeper.date_of_record - 500)
     expect(past_day.count).to eq(0)
 
-    wedding_day = hh.active_seps(Date.today - 120)
+    wedding_day = hh.active_seps(TimeKeeper.date_of_record - 120)
     expect(wedding_day.count).to eq(1)
     expect(wedding_day.first.reason).to eq("marriage")
-    expect(wedding_day.first.start_date).to eq(Date.today - 120)
+    expect(wedding_day.first.start_date).to eq(TimeKeeper.date_of_record - 120)
 
     expect(hh.current_sep.reason).to eq("retirement")
-    expect(hh.current_sep.start_date).to eq(Date.today - 10)
+    expect(hh.current_sep.start_date).to eq(TimeKeeper.date_of_record - 10)
   end
 
   describe "new SEP effects on enrollment state:" do
@@ -78,17 +78,17 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "not affect state when system date is outside new SEP date range" do
       hh = Household.new
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "marriage", start_date: Date.today - 120, end_date: Date.today - 90})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "marriage", start_date: TimeKeeper.date_of_record - 120, end_date: TimeKeeper.date_of_record - 90})
       expect(hh.closed_enrollment?).to eq(true)
 
       hh.special_enrollment
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "location_change", start_date: Date.today - 90, end_date: Date.today - 60})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "location_change", start_date: TimeKeeper.date_of_record - 90, end_date: TimeKeeper.date_of_record - 60})
       expect(hh.special_enrollment_period?).to eq(true)
     end
 
     it "set state to special_enrollment_period when system date is within SEP date range" do
       hh = Household.new(rel: "subscriber")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "birth", start_date: Date.today - 5, end_date: Date.today + 25})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "birth", start_date: TimeKeeper.date_of_record - 5, end_date: TimeKeeper.date_of_record + 25})
       hh.save!
 
       expect(hh.special_enrollment_period?).to eq(true)
@@ -97,21 +97,21 @@ RSpec.describe TaxHousehold, type: :model do
 
     it "change state from open_enrollment_period to special_enrollment_period when end_date is later" do
       hh = Household.new(rel: "spouse")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: Date.today - 30, end_date: Date.today + 5})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: TimeKeeper.date_of_record - 30, end_date: TimeKeeper.date_of_record + 5})
       hh.save!
       expect(hh.open_enrollment_period?).to eq(true)
 
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: Date.today - 15, end_date: Date.today + 15})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: TimeKeeper.date_of_record - 15, end_date: TimeKeeper.date_of_record + 15})
       expect(hh.special_enrollment_period?).to eq(true)
     end
 
     it "do not change state from open_enrollment_period to special_enrollment_period when end_date is prior" do
       hh = Household.new(rel: "spouse")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: Date.today - 30, end_date: Date.today + 5})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: TimeKeeper.date_of_record - 30, end_date: TimeKeeper.date_of_record + 5})
       hh.save!
       expect(hh.open_enrollment_period?).to eq(true)
 
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: Date.today - 29, end_date: Date.today + 1})
+      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: TimeKeeper.date_of_record - 29, end_date: TimeKeeper.date_of_record + 1})
       expect(hh.open_enrollment_period?).to eq(true)
     end
 

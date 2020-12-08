@@ -1,5 +1,7 @@
 require 'rails_helper'
 
+# Date.today converted to TimeKeeper
+
 RSpec.describe BenefitSponsorship, :type => :model do
 
   context "when an Employer is instantiated as the benefit sponsor" do
@@ -95,7 +97,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
                 open_enrollment_end_on:   ((TimeKeeper.date_of_record + 1.year).beginning_of_year + 1.month),
               )
             }
-          let(:enroll_date) {Date.today}
+          let(:enroll_date) {TimeKeeper.date_of_record}
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(enroll_date)
@@ -103,7 +105,7 @@ RSpec.describe BenefitSponsorship, :type => :model do
           end
 
           after do
-            TimeKeeper.set_date_of_record_unprotected!(Date.today)
+            TimeKeeper.set_date_of_record_unprotected!(TimeKeeper.date_of_record)
           end
 
           it 'should return this year as the current benefit coverage period' do

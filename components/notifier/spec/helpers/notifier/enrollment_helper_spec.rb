@@ -8,7 +8,7 @@ RSpec.describe Notifier::EnrollmentHelper, :type => :helper, dbclean: :after_eac
       coverage_start_on: "",
       premium_amount: "",
       product: double(
-        application_period: (Date.today..(Date.today + 1.week)),
+        application_period: (TimeKeeper.date_of_record..(TimeKeeper.date_of_record + 1.week)),
         title: "Product Title",
         metal_level_kind: "bronze",
         kind: "health",
@@ -26,7 +26,7 @@ RSpec.describe Notifier::EnrollmentHelper, :type => :helper, dbclean: :after_eac
       aptc_amount: "",
       is_receiving_assistance: "",
       responsible_amount: "",
-      effective_on: Date.today.beginning_of_month,
+      effective_on: TimeKeeper.date_of_record.beginning_of_month,
       total_premium: 10,
       hbx_enrollment_members: [],
       applied_aptc_amount: 1

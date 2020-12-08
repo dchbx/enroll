@@ -91,8 +91,8 @@ module BenefitMarkets
 
     context "with benefit_market_catalogs" do
       let(:benefit_market)                  { BenefitMarkets::BenefitMarket.new(kind: kind, title: title, description: description) }
-
-      let(:today)                           { Date.today }
+      # Date.today converted to TimeKeeper.date_of_record
+      let(:today)                           { TimeKeeper.date_of_record }
       let(:this_year_range)                 { Date.new(today.year,1,1,)..Date.new(today.year,12,31) }
       let(:last_year_range)                 { (this_year_range.begin - 1.year)..(this_year_range.end - 1.year)}
       let(:next_year_range)                 { (this_year_range.begin + 1.year)..(this_year_range.end + 1.year)}

@@ -1,6 +1,5 @@
 FactoryBot.define do
   factory :benefit_markets_benefit_sponsor_catalog, class: 'BenefitMarkets::BenefitSponsorCatalog' do
-
     effective_date          {
                                 this_year = Date.today.year
                                 Date.new(this_year,6,1)
