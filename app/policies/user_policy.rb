@@ -22,4 +22,10 @@ class UserPolicy < ApplicationPolicy
     return false unless role.permission
     role.permission.view_login_history
   end
+
+  def add_roles?
+    # No admin level permissions at this phase
+    return false if current_user.blank?
+    true
+  end
 end
