@@ -221,17 +221,16 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
     end
 
-    context "benefit_application's effective starting on not in past 12 months" do
+    context "benefit_application's effective starting" do
       before do
-        timeframe_months = EnrollRegistry[:reinstate_timeframe].setting(:timeframe_months).item
-        min = (TimeKeeper.date_of_record - timeframe_months.months).beginning_of_month
+        min = (TimeKeeper.date_of_record.prev_year).beginning_of_month
         initial_application.update_attributes!(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
         initial_application.benefit_sponsor_catalog.update_attributes!(effective_period: min..(min.next_year.prev_day))
         @result = subject.call({benefit_application: initial_application})
       end
 
       it 'should return a failure with message' do
-        expect(@result.failure).to eq("Given BenefitApplication's effective starting date is not in the past 12 months.")
+        expect(@result.failure).to eq("System date is not within the given BenefitApplication's effective period timeframe.")
       end
     end
   end
