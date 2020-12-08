@@ -51,26 +51,31 @@ module Operations
 
         def persist(person, profile, params)
           Try do
-            person.employer_staff_roles << EmployerStaffRole.new(
-              person: person,
-              :benefit_sponsor_employer_profile_id => profile.id,
-              is_owner: false,
-              aasm_state: 'is_applicant',
-              coverage_record: CoverageRecord.new(
-                ssn: params[:encrypted_ssn],
-                dob: params[:dob],
-                hired_on: params[:hired_on],
-                is_applying_coverage: params[:is_applying_coverage],
-                gender: params[:gender]
+            employer_ids = person.employer_staff_roles.map(&:benefit_sponsor_employer_profile_id)
+            if employer_ids.include? profile.id.to_s
+              Failure({:message => ['Already exists a staff role for the selected organization']})
+            else
+              person.employer_staff_roles << EmployerStaffRole.new(
+                person: person,
+                :benefit_sponsor_employer_profile_id => profile.id,
+                is_owner: false,
+                aasm_state: 'is_applicant',
+                coverage_record: CoverageRecord.new(
+                  ssn: params[:encrypted_ssn],
+                  dob: params[:dob],
+                  hired_on: params[:hired_on],
+                  is_applying_coverage: params[:is_applying_coverage],
+                  gender: params[:gender]
+                )
               )
-            )
-            person.save!
-            user = person.user
-            if user && !user.roles.include?("employer_staff")
-              user.roles << "employer_staff"
-              user.save!
+              person.save!
+              user = person.user
+              if user && !user.roles.include?("employer_staff")
+                user.roles << "employer_staff"
+                user.save!
+              end
+              Success({:message => ['Successfully added employer staff role']})
             end
-            Success({:message => ['Successfully added employer staff role']})
           end.or(Failure({:message => ['Failed while saving person/user']}))
         end
       end
