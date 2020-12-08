@@ -27,12 +27,12 @@ module Operations
                 first_name: person.first_name,
                 last_name: person.last_name,
                 dob: person.dob,
-                gender: person.gender,
                 email: person.work_email_or_best,
                 area_code: person.work_phone&.area_code,
                 number: person.work_phone&.number,
                 coverage_record: {
                   encrypted_ssn: person.ssn,
+                  gender: person.gender,
                   dob: person.dob,
                   hired_on: nil,
                   is_applying_coverage: false
