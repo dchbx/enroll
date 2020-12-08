@@ -75,6 +75,10 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Clone, dbclean:
         expect(@new_ba.persisted?).to be_falsy
       end
 
+      it 'should return a persistable BenefitApplication' do
+        expect(@new_ba.save!).to be_truthy
+      end
+
       it 'should not copy reinstated_id' do
         expect(@new_ba.reinstated_id).to be_nil
       end

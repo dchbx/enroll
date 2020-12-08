@@ -594,7 +594,11 @@ module BenefitSponsors
 
       def sponsored_benefits=(sponsored_benefits_attrs)
         sponsored_benefits_attrs.each do |sponsored_benefit_attrs|
-          sponsored_benefit = sponsored_benefits.build
+          sponsored_benefit = if sponsored_benefit_attrs[:product_kind].present?
+                                init_sb(sponsored_benefit_attrs)
+                              else
+                                sponsored_benefits.build
+                              end
           sponsored_benefit.assign_attributes(sponsored_benefit_attrs)
         end
       end
@@ -604,6 +608,15 @@ module BenefitSponsors
       def plan_year
         warn "[Deprecated] Instead use benefit_application" unless Rails.env.test?
         benefit_application
+      end
+
+      private
+
+      def init_sb(sb_attrs)
+        sub_class_prefix = sb_attrs.delete(:product_kind).to_s.camelize
+        sb_obj = "::BenefitSponsors::SponsoredBenefits::#{sub_class_prefix}SponsoredBenefit".constantize.new
+        sb_obj.benefit_package = self
+        sb_obj
       end
     end
   end
