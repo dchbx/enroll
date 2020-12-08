@@ -82,7 +82,8 @@ class EmployerStaffRole
 
   def census_employee_params
     person.attributes.slice(:first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender).merge(
-      person.addresses[0].attributes.except(:_id, :created_at, :updated_at,:tracking_version))
+      person.addresses[0].attributes.except(:_id, :created_at, :updated_at,:tracking_version)
+    )
   end
 
   def has_coverage?

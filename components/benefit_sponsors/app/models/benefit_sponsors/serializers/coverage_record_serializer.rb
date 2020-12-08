@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module Serializers
     class CoverageRecordSerializer < ActiveModel::Serializer
@@ -7,7 +9,6 @@ module BenefitSponsors
       def attributes(*args)
         hash = super
         unless object.persisted?
-          
         end
         hash
       end

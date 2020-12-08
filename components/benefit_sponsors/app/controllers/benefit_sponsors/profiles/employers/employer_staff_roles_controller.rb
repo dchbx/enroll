@@ -61,17 +61,20 @@ module BenefitSponsors
         def new_staff_member
           # Add pundit policy
           authorize User, :add_roles?
-          @person = Person.find(params["id"])
           @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
         end
 
         def create_staff_member
           # Add pundit policy
           authorize User, :add_roles?
-          result = ::Operations::People::Roles::PersistStaff.new.call(params)
+          staff_params = params.permit!["staff_member"].to_h
+          result = ::Operations::People::Roles::PersistStaff.new.call(params.permit!["staff_member"].to_h)
           # add redirects
           if result.success?
+            redirect_to main_app.show_roles_person_path(id: staff_params["person_id"])
+            flash[:notice] = 'Successfully added employer staff role'
           else
+            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params["person_id"])
           end
         end
 
@@ -80,7 +83,7 @@ module BenefitSponsors
 
           return [] if @search_value.blank?
 
-          @employer_profiles = BenefitSponsors::Organizations::Organization.employer_profiles.datatable_search(@search_value)
+          @employer_profile_organizations = BenefitSponsors::Organizations::Organization.employer_profiles.datatable_search(@search_value)
         end
 
         private
