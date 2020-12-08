@@ -4,13 +4,18 @@ module Entities
   class Staff < Dry::Struct
     transform_keys(&:to_sym)
 
+    attribute :person_id,            Types::String
     attribute :first_name,           Types::String
     attribute :last_name,            Types::String
     attribute :dob,                  Types::Date.meta(omittable: true)
     attribute :email,                Types::String.optional.meta(omittable: true)
     attribute :area_code,            Types::String.optional.meta(omittable: true)
     attribute :number,               Types::String.optional.meta(omittable: true)
-    # TODO: Add is appyling coverage attributes
-    # attribute :employee_coverage     Entities::EmployeeCoverage
+    attribute :coverage_record,      Dry::Struct.meta(omittable: true) do
+      attribute :encrypted_ssn,          Types::String.optional.meta(omittable: true)
+      attribute :dob,                    Types::Date.optional.meta(omittable: true)
+      attribute :hired_on,               Types::Date.optional.meta(omittable: true)
+      attribute :is_applying_coverage,   Types::Bool.optional.meta(omittable: true)
+    end
   end
 end

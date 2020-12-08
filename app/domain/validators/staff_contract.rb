@@ -4,19 +4,20 @@ module Validators
   class StaffContract < Dry::Validation::Contract
 
     params do
-      required(:first_name).filled(:string)
-      required(:last_name).filled(:string)
-      optional(:dob).filled(:date)
-      optional(:area_code).filled(:string)
-      optional(:number).filled(:string)
-      optional(:email).filled(:string)
-      optional(:coverage_record).schema do
-        optional(:encrypted_ssn).filled(:string)
-        optional(:dob).filled(:date)
-        optional(:hired_on).filled(:date)
-        required(:is_applying_coverage).filled(:bool)
+      required(:person_id).value(:string)
+      required(:first_name).value(:string)
+      required(:last_name).value(:string)
+      optional(:profile_id).value(:string)
+      optional(:dob).maybe(:date)
+      optional(:area_code).maybe(:string)
+      optional(:number).maybe(:string)
+      optional(:email).maybe(:string)
+      required(:coverage_record).schema do
+        optional(:encrypted_ssn).maybe(:string)
+        optional(:dob).maybe(:date)
+        optional(:hired_on).maybe(:date)
+        required(:is_applying_coverage).value(:bool)
       end
-      # TODO: Add is appyling coverage attributes by adding new contract
     end
   end
 end
