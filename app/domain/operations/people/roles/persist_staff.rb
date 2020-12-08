@@ -34,9 +34,9 @@ module Operations
             if profile
               Success(profile)
             else
-              Failure({:message => ['Profile not found']})
+              Failure({:message => 'Profile not found'})
             end
-          end.or(Failure({:message => ['Profile not found']}))
+          end.or(Failure({:message => 'Profile not found'}))
         end
 
         def fetch_person(id)
@@ -45,15 +45,15 @@ module Operations
           if person
             Success(person)
           else
-            Failure({:message => ['Person not found']})
+            Failure({:message => 'Person not found'})
           end
         end
 
         def persist(person, profile, params)
           Try do
-            employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id)
+            employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id).map(&:to_s)
             if employer_ids.include? profile.id.to_s
-              Failure({:message => ['Already exists a staff role for the selected organization']})
+              Failure({:message => 'Already exists a staff role for the selected organization'})
             else
               person.employer_staff_roles << EmployerStaffRole.new(
                 person: person,
@@ -74,9 +74,9 @@ module Operations
                 user.roles << "employer_staff"
                 user.save!
               end
-              Success({:message => ['Successfully added employer staff role']})
+              Success({:message => 'Successfully added employer staff role'})
             end
-          end.or(Failure({:message => ['Failed while saving person/user']}))
+          end.or(Failure({:message => 'Failed while saving person/user'}))
         end
       end
     end

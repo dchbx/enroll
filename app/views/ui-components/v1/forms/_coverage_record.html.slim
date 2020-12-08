@@ -1,5 +1,24 @@
 .col-md-3.mb-3
-  label for="inputApplying"  #{l10n('date_of_birth')} *
-  = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying'
+  label for="inputApplying"  #{l10n('is_applying_coverage')} *
+  = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying', :onchange => 'isApplyingCoverage(this)'
   .invalid-feedback
     | Please select an applying coverage option.
+
+.col-md-3.mb-3.optional.hidden
+  label for="inputSsn"  #{l10n('ssn')} *
+  - ssn_present = f.object.encrypted_ssn.present? ? true : false
+  = f.text_field :encrypted_ssn, class: "form-control",  value: f.object.encrypted_ssn, readonly: ssn_present, placeholder: 'SSN *', id: 'inputSsn', minlength: '9',maxlength:'9', onkeypress:'return isNumberKey(event)'
+  .invalid-feedback
+    | Please enter SSN.
+
+.col-md-3.mb-3.optional.hidden
+  label for="inputGender"  #{l10n('gender')} *
+  = f.select :gender, options_for_select(['Male', 'Female'], selected: f.object.gender), {}, class: "form-control", id: 'inputGender'
+  .invalid-feedback
+    | Please select an gender option.
+
+.col-md-3.mb-3.optional.hidden
+  label for="inputHired"  Hired On *
+  = f.date_field :hired_on, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputHiredOn', maxlength:10, minlength:10}
+  .invalid-feedback
+    | Please provide a Hired on date.
