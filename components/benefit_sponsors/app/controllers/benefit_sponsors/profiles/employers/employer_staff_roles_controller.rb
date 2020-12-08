@@ -59,11 +59,19 @@ module BenefitSponsors
         end
 
         def new_staff_member
+          # Add pundit policy
           @person = Person.find(params["id"])
           @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
         end
 
-        def create_staff_member; end
+        def create_staff_member
+          # Add pundit policy
+          result = ::Operations::People::Roles::PersistStaff.new.call(params)
+          # add redirects
+          if result.success?
+          else
+          end
+        end
 
         def employer_search
           @search_value = params.permit!.to_h["q"]
