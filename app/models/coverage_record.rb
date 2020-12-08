@@ -10,6 +10,7 @@ class CoverageRecord
   field :encrypted_ssn, type: String
   field :dob, type: Date
   field :hired_on, type: Date
+  field :gender, type: String
   field :is_applying_coverage, type: Boolean, default: false
 
   def ssn=(val)
