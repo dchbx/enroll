@@ -51,7 +51,7 @@ module Operations
 
         def persist(person, profile, params)
           Try do
-            employer_ids = person.employer_staff_roles.map(&:benefit_sponsor_employer_profile_id)
+            employer_ids = person.employer_staff_roles.where(:'aasm_state'.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id)
             if employer_ids.include? profile.id.to_s
               Failure({:message => ['Already exists a staff role for the selected organization']})
             else
