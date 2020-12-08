@@ -7,7 +7,7 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending
+        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :coverage_record
         attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind
         attr_accessor :area_code, :number, :extension
         attr_accessor :handler
@@ -94,6 +94,7 @@ module BenefitSponsors
             else
               initialize_staff_role_from_person(attrs[:person_id])
             end
+            self.coverage_record = attrs[:coverage_record] if attrs[:coverage_record].present?
           end
         end
 
@@ -291,7 +292,23 @@ module BenefitSponsors
             else
               pending = organization && Person.staff_for_employer(profile).detect{|person|person.user_id}
               role_state = pending ? 'is_applicant' : 'is_active'
-              person.employer_staff_roles << EmployerStaffRole.new(person: person, :benefit_sponsor_employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+              attrs = {
+                person: person,
+                :benefit_sponsor_employer_profile_id => profile.id,
+                is_owner: true,
+                aasm_state: role_state
+              }
+              attrs.merge!(
+                coverage_record: {
+                  ssn: coverage_record[:ssn],
+                  dob: coverage_record[:dob],
+                  hired_on: coverage_record[:hired_on],
+                  is_applying_coverage: coverage_record[:is_applying_coverage]
+                }
+              ) if coverage_record.present?
+              person.employer_staff_roles << EmployerStaffRole.new(attrs)
+            end
+
             end
             factory.pending = pending
             current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
