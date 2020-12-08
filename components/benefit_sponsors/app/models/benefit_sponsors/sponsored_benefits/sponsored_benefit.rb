@@ -155,6 +155,16 @@ module BenefitSponsors
       def sponsor_contribution_attributes=(sponsor_contribution_attrs)
         # build_sponsor_contribution(sponsor_contribution_attrs)
       end
+
+      def pricing_determinations=(pds_values)
+        pds_values.each do |pd_value|
+          if pd_value.is_a?(Hash)
+            self.pricing_determinations.build(pd_value)
+          else
+            self.pricing_determinations.push(pd_value)
+          end
+        end
+      end
     end
   end
 end

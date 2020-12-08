@@ -19,7 +19,12 @@ module BenefitSponsors
           if key? && value
             sponsored_benefits_array = value.inject([]) do |hash_array, sb_hash|
               if sb_hash.is_a?(Hash)
-                result = BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitContract.new.call(sb_hash)
+                contract_class = if sb_hash[:product_kind].present?
+                                   "::BenefitSponsors::Validators::SponsoredBenefits::#{sb_hash[:product_kind].to_s.camelize}SponsoredBenefitContract".constantize
+                                 else
+                                   ::BenefitSponsors::Validators::SponsoredBenefits::SponsoredBenefitContract
+                                 end
+                result = contract_class.new.call(sb_hash)
                 if result&.failure?
                   key.failure(text: 'invalid sponsored_benefit', error: result.errors.to_h)
                 else
