@@ -298,15 +298,17 @@ module BenefitSponsors
                 is_owner: true,
                 aasm_state: role_state
               }
-              attrs.merge!({
-                coverage_record: {
-                  ssn: coverage_record[:ssn],
-                  gender: coverage_record[:gender],
-                  dob: coverage_record[:dob],
-                  hired_on: coverage_record[:hired_on],
-                  is_applying_coverage: coverage_record[:is_applying_coverage]
-                }
-              }) if coverage_record.present?
+              if coverage_record.present?
+                attrs.merge!({
+                               coverage_record: {
+                                 ssn: coverage_record[:ssn],
+                                 gender: coverage_record[:gender],
+                                 dob: coverage_record[:dob],
+                                 hired_on: coverage_record[:hired_on],
+                                 is_applying_coverage: coverage_record[:is_applying_coverage]
+                               }
+                             })
+              end
               person.employer_staff_roles << EmployerStaffRole.new(attrs)
             end
 
