@@ -35,7 +35,7 @@ module BenefitSponsors
         elsif form[:is_general_agency_staff_profile?]
           add_general_agency_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
         else
-          Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile)
+          Person.add_employer_staff_role(form[:first_name], form[:last_name], form[:dob], form[:email], profile, form[:coverage_record])
         end
       end
 

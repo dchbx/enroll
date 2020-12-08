@@ -23,6 +23,7 @@ module BenefitSponsors
       attribute :filter_criteria, Hash
       attribute :is_broker_registration_page, Boolean, default: false
       attribute :is_general_agency_registration_page, Boolean, default: false
+      attribute :coverage_record, OrganizationForms::CoverageRecordForm
 
       validates_presence_of :dob, :if => Proc.new { |m| m.person_id.blank? }
       validates_presence_of :first_name, :if => Proc.new { |m| m.person_id.blank? }
