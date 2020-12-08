@@ -223,7 +223,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
 
     context "benefit_application's effective starting" do
       before do
-        min = (TimeKeeper.date_of_record.prev_year).beginning_of_month
+        min = TimeKeeper.date_of_record.prev_year.beginning_of_month
         initial_application.update_attributes!(aasm_state: :terminated, effective_period: min..(min.next_year.prev_day))
         initial_application.benefit_sponsor_catalog.update_attributes!(effective_period: min..(min.next_year.prev_day))
         @result = subject.call({benefit_application: initial_application})
