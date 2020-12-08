@@ -33,8 +33,8 @@ module Operations
         context 'for failure case' do
 
           it 'should fail if profile not found with given id' do
-            result = subject.call(params.merge!({profile_id: 'test' }))
-            expect(result.failure).to eq({:message => ['Profile not found']})
+            result = subject.call(params.merge!({ }))
+            expect(result.failure).to eq({:message => 'Profile not found'})
           end
         end
 
@@ -42,7 +42,7 @@ module Operations
 
           it 'should return new staff entity' do
             result = subject.call(params)
-            expect(result.value![:message]).to eq ["Successfully added employer staff role"]
+            expect(result.value![:message]).to eq "Successfully added employer staff role"
           end
         end
       end
