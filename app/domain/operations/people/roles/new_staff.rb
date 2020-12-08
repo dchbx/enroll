@@ -23,12 +23,13 @@ module Operations
           if person
             Success(
               {
+                person_id: person.id.to_s,
                 first_name: person.first_name,
                 last_name: person.last_name,
                 dob: person.dob,
-                email: person.work_email_or_best&.address,
-                area_code: person.work_phone_or_best&.area_code,
-                number: person.work_phone_or_best&.number,
+                email: person.work_email_or_best,
+                area_code: person.work_phone&.area_code,
+                number: person.work_phone&.number,
                 coverage_record: {
                   encrypted_ssn: person.ssn,
                   dob: person.dob,

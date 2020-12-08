@@ -8,14 +8,24 @@ module Operations
 
 
         def call(params)
-          profile = yield fetch_profile(params[:profile_id])
-          person = yield fetch_person(params[:person_id])
-          result = yield persist(person, profile.value!)
+          params   =    yield validate_params(params)
+          profile  =    yield fetch_profile(params[:profile_id])
+          person   =    yield fetch_person(params[:person_id])
+          result   =    yield persist(person, profile.value!, params)
 
           Success(result.value!)
         end
 
         private
+
+        def validate_params(params)
+          result = Validators::StaffContract.new.call(params)
+          if result.success?
+            Success(result.to_h)
+          else
+            Failure(result.errors.to_h)
+          end
+        end
 
         def fetch_profile(id)
           Try do
@@ -39,13 +49,19 @@ module Operations
           end
         end
 
-        def persist(person, profile)
+        def persist(person, profile, params)
           Try do
             person.employer_staff_roles << EmployerStaffRole.new(
               person: person,
               :benefit_sponsor_employer_profile_id => profile.id,
               is_owner: false,
-              aasm_state: 'is_applicant'
+              aasm_state: 'is_applicant',
+              coverage_record: CoverageRecord.new(
+                ssn: params[:encrypted_ssn],
+                dob: params[:dob],
+                hired_on: params[:hired_on],
+                is_applying_coverage: params[:is_applying_coverage]
+              )
             )
             person.save!
             user = person.user
