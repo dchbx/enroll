@@ -298,7 +298,7 @@ module BenefitSponsors
                 is_owner: true,
                 aasm_state: role_state
               }
-              attrs.merge!(
+              attrs.merge!({
                 coverage_record: {
                   ssn: coverage_record[:ssn],
                   gender: coverage_record[:gender],
@@ -306,11 +306,10 @@ module BenefitSponsors
                   hired_on: coverage_record[:hired_on],
                   is_applying_coverage: coverage_record[:is_applying_coverage]
                 }
-              ) if coverage_record.present?
+              }) if coverage_record.present?
               person.employer_staff_roles << EmployerStaffRole.new(attrs)
             end
 
-            end
             factory.pending = pending
             current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
             current_user.save!
