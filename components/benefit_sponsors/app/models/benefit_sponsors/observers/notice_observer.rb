@@ -237,7 +237,7 @@ module BenefitSponsors
         benefit_sponsorship.census_employees.non_terminated.each do |ce|
           enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
           enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.max_by(&:updated_at)
-          deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation") if enrollment.employee_role.present?
+          deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation") if enrollment&.employee_role.present?
         end
       end
 
