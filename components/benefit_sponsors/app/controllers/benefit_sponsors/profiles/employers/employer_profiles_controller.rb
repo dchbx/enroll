@@ -57,7 +57,7 @@ module BenefitSponsors
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
             when 'inbox'
 
             else
@@ -293,7 +293,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [
+                csv << [  
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,
