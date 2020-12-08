@@ -301,6 +301,7 @@ module BenefitSponsors
               attrs.merge!(
                 coverage_record: {
                   ssn: coverage_record[:ssn],
+                  gender: coverage_record[:gender],
                   dob: coverage_record[:dob],
                   hired_on: coverage_record[:hired_on],
                   is_applying_coverage: coverage_record[:is_applying_coverage]
