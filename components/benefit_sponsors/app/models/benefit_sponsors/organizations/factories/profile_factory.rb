@@ -298,7 +298,8 @@ module BenefitSponsors
                 is_owner: true,
                 aasm_state: role_state
               }
-              if coverage_record.present?
+              if factory.coverage_record.present?
+                coverage_record = factory.coverage_record
                 attrs.merge!({
                                coverage_record: {
                                  ssn: coverage_record[:ssn],
