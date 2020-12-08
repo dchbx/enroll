@@ -4,7 +4,6 @@ module BenefitSponsors
       attributes :first_name, :last_name, :email, :dob, :status, :phone, :person_id
       attribute :npn, if: :non_sponsor_profile? # For both Broker Agency and General Agency
       attribute :status, if: :is_employer_profile?
-      attribute :coverage_record, serializer: ::BenefitSponsors::Serializers::InboxSerializer, if: :is_employer_profile?
 
       def email
         object.work_email_or_best
