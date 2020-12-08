@@ -16,11 +16,8 @@ module PortalHeaderHelper
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
       elsif controller_path.include?('general_agencies')
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id), class: "portal"
-      elsif controller == 'employer_profiles' || controller_path.include?('employers')
-        employer_profile_path = benefit_sponsors.profiles_employers_employer_profile_path(id: current_user.person.active_employer_staff_roles.first.benefit_sponsor_employer_profile_id, :tab => 'home')
-        link_to "#{image_tag 'icons/icon-business-owner.png'} &nbsp; I'm an Employer".html_safe, employer_profile_path, class: "portal"
       else
-        link_to "#{image_tag exchange_icon_path('icon-individual.png')} &nbsp; I'm an Employee".html_safe, main_app.family_account_path, class: "portal"
+        link_to "#{image_tag exchange_icon_path('icon-individual.png')} &nbsp; I'm an #{controller == 'employer_profiles' ? 'Employer' : 'Employee'}".html_safe, main_app.family_account_path, class: "portal"
       end
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?)) ||
       (EnrollRegistry.feature_enabled?(:financial_assistance) && controller_path.include?("financial_assistance") && current_user.try(:has_consumer_role?))
