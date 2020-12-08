@@ -60,12 +60,14 @@ module BenefitSponsors
 
         def new_staff_member
           # Add pundit policy
+          authorize User, :add_roles?
           @person = Person.find(params["id"])
           @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
         end
 
         def create_staff_member
           # Add pundit policy
+          authorize User, :add_roles?
           result = ::Operations::People::Roles::PersistStaff.new.call(params)
           # add redirects
           if result.success?
