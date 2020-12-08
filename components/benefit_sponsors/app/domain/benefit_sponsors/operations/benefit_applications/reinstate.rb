@@ -37,17 +37,17 @@ module BenefitSponsors
           return Failure('Not a valid Benefit Application object.') unless @current_ba.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
           valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled]
           return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(@current_ba.aasm_state)
-          return Failure("Given BenefitApplication's effective starting date is not in the past 12 months.") unless initial_ba_within_valid_timeframe?
+          return Failure("System date is not within the given BenefitApplication's effective period timeframe.") unless initial_ba_within_valid_timeframe?
           return Failure('Overlapping BenefitApplication exists for this Employer.') if overlapping_ba_exists?
 
           Success(params)
         end
 
         def initial_ba_within_valid_timeframe?
+          offset_months = EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).item
           start_on = @current_ba.benefit_sponsor_catalog.effective_period.min
-          start_of_month = TimeKeeper.date_of_record.beginning_of_month
-          timeframe_months = EnrollRegistry[:reinstate_timeframe].setting(:timeframe_months).item
-          ((start_of_month.next_month - timeframe_months.months)..start_of_month.end_of_month).cover?(start_on)
+          end_on = @current_ba.benefit_sponsor_catalog.effective_period.max + offset_months.months
+          (start_on..end_on).cover?(TimeKeeper.date_of_record)
         end
 
         def parent_ba_by_reinstate_id(benefit_application)
