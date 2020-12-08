@@ -782,7 +782,7 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find('.selectric-interaction-choice-control-carrier').click
-  carrier_option = find('li.interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", wait: 5).click
