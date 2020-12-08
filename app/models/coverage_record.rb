@@ -10,4 +10,12 @@ class CoverageRecord
   field :dob, type: Date
   field :hired_on, type: Date
   field :is_applying_coverage, type: Boolean, default: false
+
+  def ssn=(val)
+    if val.blank?
+      return nil
+    end
+    ssn_val = val.to_s.gsub(/\D/, '')
+    self.encrypted_ssn = SymmetricEncryption.encrypt(ssn_val)
+  end
 end

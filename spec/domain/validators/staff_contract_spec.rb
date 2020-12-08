@@ -10,15 +10,17 @@ RSpec.describe Validators::StaffContract, type: :model, dbclean: :after_each do
 
   let(:params) do
     {
-      first_name: 'test', last_name: 'test'
+      person_id: 'id', first_name: 'test', last_name: 'test'
     }
   end
 
   context 'success case' do
+    context 'with coverage record' do
 
-    it 'should return success' do
-      result = subject.call(params)
-      expect(result.success?).to be_truthy
+      it 'should success with is applying for coverage' do
+        result = subject.call(params.merge!({coverage_record: {is_applying_coverage: false}}))
+        expect(result.success?).to be_truthy
+      end
     end
   end
 
@@ -32,9 +34,16 @@ RSpec.describe Validators::StaffContract, type: :model, dbclean: :after_each do
       end
     end
 
-    context 'with dob key as nil value' do
+    context 'with last name key as nil value' do
       it 'should return failure' do
-        result = subject.call(params.merge!({dob: nil}))
+        result = subject.call(params.merge!({last_name: nil}))
+        expect(result.failure?).to be_truthy
+      end
+    end
+
+    context 'with is coverage record' do
+      it 'should fail without is applying for coverage' do
+        result = subject.call(params.merge!({coverage_record: {}}))
         expect(result.failure?).to be_truthy
       end
     end
