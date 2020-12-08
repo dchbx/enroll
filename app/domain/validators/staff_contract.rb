@@ -8,6 +8,7 @@ module Validators
       required(:first_name).value(:string)
       required(:last_name).value(:string)
       optional(:profile_id).value(:string)
+      optional(:gender).maybe(:string)
       optional(:dob).maybe(:date)
       optional(:area_code).maybe(:string)
       optional(:number).maybe(:string)

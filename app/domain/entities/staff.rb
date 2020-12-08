@@ -8,6 +8,7 @@ module Entities
     attribute :first_name,           Types::String
     attribute :last_name,            Types::String
     attribute :dob,                  Types::Date.meta(omittable: true)
+    attribute :gender,               Types::String.optional.meta(omittable: true)
     attribute :email,                Types::String.optional.meta(omittable: true)
     attribute :area_code,            Types::String.optional.meta(omittable: true)
     attribute :number,               Types::String.optional.meta(omittable: true)
