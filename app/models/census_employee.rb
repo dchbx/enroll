@@ -699,7 +699,6 @@ class CensusEmployee < CensusMember
   end
 
   def is_terminate_possible?
-    return true if cobra_linked? && cobra_begin_date.present? && cobra_begin_date > TimeKeeper.date_of_record
     return true if employment_terminated? || cobra_terminated?
     return false if cobra_linked?
 

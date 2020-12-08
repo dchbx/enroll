@@ -2680,15 +2680,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       end
     end
 
-    context 'if censue employee is cobra linked and cobra begin date is in future' do
-      let(:aasm_state) {"cobra_linked"}
-
-      it 'should return true' do
-        census_employee.cobra_begin_date = TimeKeeper.date_of_record.next_month
-        expect(census_employee.is_terminate_possible?).to eq true
-      end
-    end
-
     context "if censue employee is newly designatede linked" do
       let(:aasm_state) {"newly_designated_linked"}
 
