@@ -45,9 +45,15 @@ namespace :hbxinternal do
   end
 
   task :remove_person_ssn => :environment do
+    endpoint = Settings.hbxit.api.uri + '/rakeTaskTriggerHistories'
     if ENV['hbx_id']
       begin
         person = Person.where(hbx_id:ENV['hbx_id']).first
+        close_broker_connection_with_error(ENV['task'], "Unable to locate a person with HBXID: #{ENV['hbx_id']}") if person.nil?
+        HTTParty.put(endpoint,
+              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => "Completed-Failure: Unable to locate person with HBXID: #{ENV['hbx_id']}"}.to_json,
+              :headers => {'Content-Type' => 'application/json'} 
+              ) if person.nil?
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
         notify_broker ENV['task']
@@ -57,9 +63,18 @@ namespace :hbxinternal do
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
         person.unset(:encrypted_ssn)
         ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
+        HTTParty.put(endpoint,
+              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => 'Completed-Success'}.to_json,
+              :headers => {'Content-Type' => 'application/json'}
+              )
         close_broker_connection ENV['task']
       end
     else
+      close_broker_connection_with_error(ENV['task'], "Missing fields to perform remove person ssn task")
+      HTTParty.put(endpoint,
+              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => 'Completed-Failure: Missing Fields'}.to_json,
+              :headers => {'Content-Type' => 'application/json'} 
+              ) 
       raise StandardError.new "Missing fields to perform remove person ssn task."
     end
   end
@@ -223,6 +238,21 @@ namespace :hbxinternal do
     queue = chan.queue('dev')
     chan.confirm_select
     chan.default_exchange.publish("Ending rake task: #{task} successfully by Admin Client at #{Time.now}",routing_key: queue.name)
+    chan.wait_for_confirms
+    conn.close
+  end
+
+  def close_broker_connection_with_error(task, error)
+    puts "ending #{task} rake task with error: #{error}"
+    hbxit_broker_uri = Settings.hbxit.rabbit.uri
+    target_queue = 'mafia'
+    conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
+    conn.start
+    chan = conn.create_channel
+    queue = chan.queue('dev')
+    chan.confirm_select
+    chan.default_exchange.publish("Ending rake task: #{task} unsuccessfully at #{Time.now}.\n
+      Error: #{error}",routing_key: queue.name)
     chan.wait_for_confirms
     conn.close
   end

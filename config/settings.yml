@@ -413,3 +413,5 @@ external_applications:
 hbxit:
   rabbit:
     uri: 'amqp://mafia:password@qa-dchbx-it.priv.dchbx.org:5672/hbxit'
+  api:
+    uri: 'http://localhost:4000/api/v1'
