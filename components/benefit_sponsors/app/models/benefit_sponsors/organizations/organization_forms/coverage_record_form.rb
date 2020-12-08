@@ -9,6 +9,7 @@ module BenefitSponsors
 
         attribute :ssn, String
         attribute :dob, String
+        attribute :gender, String
         attribute :hired_on, String
         attribute :is_applying_coverage, Boolean
 
