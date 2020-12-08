@@ -25,7 +25,7 @@ class UserPolicy < ApplicationPolicy
 
   def add_roles?
     # No admin level permissions at this phase
-    return false if current_user.blank?
+    return false if user.blank?
     true
   end
 end
