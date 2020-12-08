@@ -33,9 +33,9 @@ module Operations
         context 'for failure case' do
 
           it 'should fail if profile not found with given id' do
-            result = subject.call(params.merge!({ }))
+            result = subject.call(params.merge!({profile_id: 'test' }))
             expect(result.failure).to eq({:message => 'Profile not found'})
-          end
+          end 
         end
 
         context 'for success case' do
