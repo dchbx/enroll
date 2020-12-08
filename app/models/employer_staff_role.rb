@@ -67,11 +67,24 @@ class EmployerStaffRole
     BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(profile, tab: 'home').to_s
   end
 
-  def create_census_employee; end
+  def create_census_employee
+    census_employee = CensusEmployee.new(census_employee_params.merge!(benefit_sponsorship_id: profile.benefit_sponsorship.id,
+                                                                       benefit_sponsors_employer_profile_id: benefit_sponsor_employer_profile_id,
+                                                                       # active_benefit_group_assignment: ,
+                                                                       # renewal_benefit_group_assignment: ,
+                                                                       hired_on: coverage_record.hired_on,
+                                                                       encrypted_ssn: coverage_record.encrypted_ssn))
+    census_employee.save
+  end
 
   private
 
+  def census_employee_params
+    person.attributes.slice(:first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender).merge(
+      person.addresses[0].attributes.except(:_id, :created_at, :updated_at,:tracking_version))
+  end
+
   def has_coverage?
-    self.coverage_record.present?
+    coverage_record.present?
   end
 end

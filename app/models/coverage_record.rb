@@ -3,6 +3,7 @@
 class CoverageRecord
   include Mongoid::Document
   include Mongoid::Timestamps
+  include Ssn
 
   embedded_in :employer_staff_role
 
