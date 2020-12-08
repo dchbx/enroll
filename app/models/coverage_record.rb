@@ -14,9 +14,8 @@ class CoverageRecord
   field :is_applying_coverage, type: Boolean, default: false
 
   def ssn=(val)
-    if val.blank?
-      return nil
-    end
+    return if val.blank?
+
     ssn_val = val.to_s.gsub(/\D/, '')
     self.encrypted_ssn = SymmetricEncryption.encrypt(ssn_val)
   end

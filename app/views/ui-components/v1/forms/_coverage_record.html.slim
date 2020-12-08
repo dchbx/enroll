@@ -1,0 +1,5 @@
+.col-md-3.mb-3
+  label for="inputApplying"  #{l10n('date_of_birth')} *
+  = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying'
+  .invalid-feedback
+    | Please select an applying coverage option.

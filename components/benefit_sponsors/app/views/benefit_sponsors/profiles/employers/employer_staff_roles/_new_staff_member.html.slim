@@ -10,12 +10,11 @@
         =
   = form_for @staff_member, as: :staff_member, url: {action: "create_staff_member"},  html: { class: "needs-validation s508", novalidate:true } do |f|
     div#employer_staff
-    = render partial: './ui-components/v1/forms/employer_staff_information', locals: { f: f }
+    = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
 
     .row.mt-3.employer-search
       .input-group
         h5.col-md-3 Select your Employer
-        = hidden_field_tag :profile_id
         input.col-md-3#example-search-input.form-control.py-2 type="search" placeholder="Legal Name/Fein/HBX ID" /
         span.input-group-append
           button.btn.btn-primary.search type="button" onclick="employerSearch(); return false" data-loading-text="Loading..."
@@ -33,7 +32,26 @@
               = l10n("submit_application")
 
 javascript:
-  validateAjaxForm();
+  validateForm();
+
+  // function isApplyingCoverage(element) {
+  //   if (element.value === "true") {
+  //     document.getElementById("labelSsn").classList.remove('hidden')
+  //     //$("#labelSsn").removeClass("hidden");
+  //     // $("#labelGender").removeClass("hidden");
+  //     document.getElementById("inputSsn").classList.remove('hidden')
+  //     document.getElementById("inputSsn").setAttribute("required", "true");
+  //     //$("#inputSsn").removeClass("hidden");
+  //     // $("#inputGender").removeClass("hidden");
+  //   } else {
+  //     document.getElementById("labelSsn").classList.add('hidden')
+  //     //$("#labelSsn").addClass("hidden");
+  //     // $("#labelGender").addClass("hidden");
+  //     document.getElementById("inputSsn").classList.add('hidden')
+  //     //$("#inputSsn").addClass("hidden");
+  //     // $("#inputGender").addClass("hidden");
+  //   }
+  }
 
   function employerSearch() {
     var employer_search = document.getElementById('example-search-input').value
@@ -46,7 +64,6 @@ javascript:
       });
     }
     ;
-
   }
 
   function selectEmployer(element) {
@@ -57,7 +74,7 @@ javascript:
         ele.classList.remove("agency-selected");
       })
     });
-    document.getElementById('profile_id').value = element.dataset.employer_profile_id;
+    document.getElementById('staff_member_profile_id').value = element.dataset.employer_profile_id;
     element.closest(".select-employer").classList.add('agency-selected')
     document.getElementById('employer-staff-btn').disabled = false;
   }
