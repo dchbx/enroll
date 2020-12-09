@@ -239,9 +239,7 @@ module BenefitSponsors
                 off_cycle: true
               }
             )
-            data_table_params.merge!(
-              current_py_terminated: true
-            ) if @employer_profile.current_benefit_application&.terminated?
+            data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
           end
 
           data_table_params.merge!({

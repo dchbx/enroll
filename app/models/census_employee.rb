@@ -839,9 +839,9 @@ class CensusEmployee < CensusMember
       benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
     end
 
-    if benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
-      create_benefit_group_assignment(benefit_packages)
-    end
+    return unless benefit_packages.present? && (active_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(active_benefit_group_assignment.benefit_package.id))
+
+    create_benefit_group_assignment(benefit_packages)
   end
 
   def off_cycle_benefit_group_assignment=(benefit_package_id)

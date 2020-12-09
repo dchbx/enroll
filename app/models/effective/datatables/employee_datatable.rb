@@ -41,7 +41,7 @@ module Effective
         }, :sortable => false, :filter => false
 
         unless attributes['current_py_terminated']
-          table_column :benefit_package, :proc => Proc.new { |row|
+          table_column :benefit_package, :proc => proc { |row|
             row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
           }, :sortable => false, :filter => false
         end
@@ -59,8 +59,8 @@ module Effective
         end
 
         unless attributes['current_py_terminated']
-          table_column :enrollment_status, :proc => Proc.new { |row|
-              enrollment_state(row)
+          table_column :enrollment_status, :proc => proc { |row|
+            enrollment_state(row)
           }, :sortable => false, :filter => false
         end
 
