@@ -76,12 +76,20 @@ module EventsHelper
   def employer_plan_years(employer, benefit_application_id)
     employer.benefit_applications.select{|benefit_app| (benefit_app.eligible_for_export? || benefit_app.id.to_s == benefit_application_id) && reinstated_ids(employer).exclude?(benefit_app.id) }
   end
-  
+
   def plan_years_for_manual_export(employer)
     employer.benefit_applications.select {|benefit_application| (benefit_application.enrollment_open? || benefit_application.enrollment_closed? || benefit_application.eligible_for_export?) && reinstated_ids(employer).exclude?(benefit_application.id)}
   end
 
   def reinstated_ids(employer)
     employer.benefit_applications.map(&:reinstated_id)
+  end
+
+  def plan_year_start_date(benefit_application)
+    if benefit_application.reinstated_id?
+      simple_date_for(benefit_application.benefit_sponsor_catalog.effective_period.min)
+    else
+      simple_date_for(benefit_application.effective_period.min)
+    end
   end
 end

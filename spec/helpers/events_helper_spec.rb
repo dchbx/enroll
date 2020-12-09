@@ -583,4 +583,55 @@ describe EventsHelper, "employer_plan_years", dbclean: :after_each do
       end
     end
   end
+
+  describe "plan_year_start_date" do
+    subject { EventsHelperSlug.new }
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
+    context "when plan year reinstated id is not present" do
+      it "should return initial benefit_application effective_period min" do
+        date = subject.plan_year_start_date(initial_application)
+        start_date = Date.strptime(date, '%Y%m%d')
+        expect(start_date).to eq initial_application.effective_period.min
+      end
+    end
+
+    context "when plan year reinstated id is present" do
+      let(:start_date) {TimeKeeper.date_of_record.beginning_of_month - 11.months}
+      let(:end_date) {(start_date + 6.months).end_of_month}
+      let(:effective_period) {start_date..end_date}
+      let(:start_date1) {end_date.next_day}
+      let(:end_date1) {TimeKeeper.date_of_record.end_of_month}
+      let(:effective_period1) {start_date1..end_date1}
+      let(:open_enrollment_start_on) { start_date - 1.month }
+      let(:open_enrollment_start_on1) { end_date.beginning_of_month }
+      let(:open_enrollment_period) {open_enrollment_start_on..(open_enrollment_start_on + 5.days)}
+      let(:open_enrollment_period) {open_enrollment_start_on1..(open_enrollment_start_on1 + 5.days)}
+      let(:reinstated_application) do
+        create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
+               :with_benefit_package,
+               passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
+               benefit_sponsorship: benefit_sponsorship,
+               effective_period: effective_period1,
+               aasm_state: aasm_state,
+               open_enrollment_period: open_enrollment_period,
+               recorded_rating_area: rating_area,
+               recorded_service_areas: service_areas,
+               package_kind: package_kind,
+               dental_package_kind: dental_package_kind,
+               dental_sponsored_benefit: dental_sponsored_benefit,
+               fte_count: 5,
+               pte_count: 0,
+               msp_count: 0,
+               reinstated_id: initial_application.id)
+      end
+
+      it "should return reinstated benefit_application effective_period min" do
+        date = subject.plan_year_start_date(reinstated_application)
+        start_date = Date.strptime(date, '%Y%m%d')
+        expect(start_date).to eq initial_application.effective_period.min
+      end
+    end
+  end
 end
