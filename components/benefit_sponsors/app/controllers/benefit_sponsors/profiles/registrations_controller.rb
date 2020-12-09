@@ -8,8 +8,7 @@ module BenefitSponsors
 
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
-      layout 'two_column', :only => :edit
-      layout 'bootstrap_4_two_column', :only => :new_employer_profile_form
+      layout :resolve_layout
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -89,6 +88,15 @@ module BenefitSponsors
 
       def profile_type
         @profile_type = params[:profile_type] || params[:agency][:profile_type] || @agency.profile_type
+      end
+
+      def resolve_layout
+        case action_name
+        when "new_employer_profile_form"
+          "bootstrap_4_two_column"
+        when "edit"
+          "two_column"
+        end
       end
 
       def default_template
