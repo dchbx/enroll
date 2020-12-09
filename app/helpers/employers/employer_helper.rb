@@ -296,9 +296,15 @@ module Employers::EmployerHelper
     application.workflow_state_transitions.any?{|wst| wst.from_state.to_s == "active" && wst.to_state.to_s == "canceled"}
   end
 
+  def is_ben_app_within_reinstate_period?(application)
+    offset_months = EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).item
+    start_on = application.benefit_sponsor_catalog.effective_period.min
+    end_on = application.benefit_sponsor_catalog.effective_period.max + offset_months.months
+    (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+
   def display_reinstate_benefit_application?(application)
     return false unless [:terminated, :termination_pending, :retroactive_cancel].include?(application.aasm_state) || (application.canceled? && check_for_canceled_wst?(application))
-    current_month = TimeKeeper.date_of_record.beginning_of_month
-    ((current_month - 11.months)..current_month).cover?(application.effective_period.min.to_date)
+    is_ben_app_within_reinstate_period?(application)
   end
 end
