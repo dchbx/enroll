@@ -61,7 +61,7 @@ module Operations
                 is_owner: false,
                 aasm_state: 'is_applicant',
                 coverage_record: CoverageRecord.new(
-                  ssn: params[:encrypted_ssn],
+                  ssn: params[:ssn],
                   dob: params[:dob],
                   hired_on: params[:hired_on],
                   is_applying_coverage: params[:is_applying_coverage],
