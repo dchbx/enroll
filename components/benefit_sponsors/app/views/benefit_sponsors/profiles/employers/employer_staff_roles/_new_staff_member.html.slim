@@ -1,13 +1,6 @@
 .broker-agency-staff-registration-container
   h1.mb-4.heading-text#loaded = l10n("Employer_staff")
-  - flash.each do |key, value|
-    div class="alert alert-#{key} alert-dismissible" role="alert"
-      button.close type="button" data-dismiss="alert" aria-label="Close"
-        span aria-hidden="true" &times
-      - value.to_a.flatten.each do |v|
-        = raw v
-
-        =
+  
   = form_for @staff_member, as: :staff_member, url: {action: "create_staff_member"},  html: { class: "needs-validation s508", novalidate:true } do |f|
     div#employer_staff
     = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
