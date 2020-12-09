@@ -40,31 +40,12 @@ legend Personal Information
     .invalid-feedback
       |
             Please provide a valid number.
-  .col-md-3.col-sm-3
-    label  coverage *
-    = select_tag "people", options_for_select(['Yes', 'No']), include_blank: '', required: 'true', id: 'inputCoverage' , class: 'form-control', :onchange => 'isApplyingCoverage(this)'
-    .invalid-feedback
-      |
-            Please provide a valid number.
+
 .row.mt-1
-  .col-md-3.col-sm-3
-    label#labelSsn.hidden for="inputSsn"  SSN *
-    = f.text_field :number, placeholder:'111-11-1111', required:'true', id:'inputSsn', class:'form-control hidden', minlength: '7',maxlength:'7'
-    .invalid-feedback
-      |
-            Please provide a valid number.
-  .col-md-3.col-sm-3
-    label#labelGender.hidden for="inputGender"  Gender *
-    = f.text_field :number, placeholder: 'male/female', required: 'true', id: 'inputGender', class: 'form-control hidden', minlength: '7', maxlength: '7'
-    .invalid-feedback
-      |
-            Please provide a valid number.
-  /.col-md-3.col-sm-3
-  /  label for="inputAddress"  address *
-  /  = render 'ui-components/v1/forms/portals/portal_address.html.erb', f: personF
-  /  .invalid-feedback
-  /    |
-  /          Please provide a valid number.
+  - if f.object.coverage_record.present?
+
+    = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
+      = render partial: './ui-components/v1/forms/coverage_record', locals: { f: f }
 
 javascript:
 

@@ -9,6 +9,7 @@ module BenefitSponsors
       rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
       layout 'two_column', :only => :edit
+      layout 'bootstrap_4_two_column', :only => :new_employer_profile_form
 
       def new
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, portal: params[:portal])
@@ -74,6 +75,14 @@ module BenefitSponsors
         @counties = BenefitMarkets::Locations::CountyZip.where(zip: params[:zip_code]).pluck(:county_name).uniq
 
         render json: @counties
+      end
+
+      def new_employer_profile_form
+        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, person_id: params[:person_id])
+        set_ie_flash_by_announcement unless is_employer_profile?
+        respond_to do |format|
+          format.html
+        end
       end
 
       private

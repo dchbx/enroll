@@ -607,6 +607,7 @@ Rails.application.routes.draw do
       get 'manage_account'
       get 'personal_info'
       get 'show_roles'
+      get 'available_accounts'
       put 'update_personal_info'
     end
 
