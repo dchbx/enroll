@@ -62,10 +62,29 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
                         applied_aptc_amount: 0.0)
     end
 
+    let!(:cover_coverage_enrolled_enrollment1) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        effective_on: Date.new(TimeKeeper.date_of_record.year - 1, 1, 1),
+                        household: family.households.first,
+                        kind: "coverall",
+                        is_any_enrollment_member_outstanding: true,
+                        aasm_state: "coverage_selected",
+                        applied_aptc_amount: 0.0)
+    end
+
     it "should expire the cover all coverage_selected enrollment" do
       subject.expire_individual_market_enrollments
       expect(cover_coverage_enrolled_enrollment.reload.aasm_state).to eq "coverage_expired"
       expect(cover_coverage_enrolled_enrollment.workflow_state_transitions.first.event).to eq "expire_coverage!"
+    end
+
+    it "should not break when there is an error with one of the enrollments." do
+      cover_coverage_enrolled_enrollment.unset(:family_id)
+      cover_coverage_enrolled_enrollment.reload
+      subject.expire_individual_market_enrollments
+      expect(cover_coverage_enrolled_enrollment1.reload.aasm_state).to eq "coverage_expired"
+      expect(cover_coverage_enrolled_enrollment1.workflow_state_transitions.first.event).to eq "expire_coverage!"
     end
   end
 
@@ -118,6 +137,16 @@ RSpec.describe Services::IvlEnrollmentService, type: :model, :dbclean => :after_
 
     it "should picks up the cover all auto renewing enrollment" do
       subject.begin_coverage_for_ivl_enrollments
+      expect(cover_auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
+      expect(cover_auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
+    end
+
+    it "should not break when there is an error with one of the enrollments." do
+      renewing_selected_enrollment.unset(:family_id)
+      renewing_selected_enrollment.reload
+      subject.begin_coverage_for_ivl_enrollments
+      expect(auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
+      expect(auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
       expect(cover_auto_renewing_enrollment.reload.aasm_state).to eq "coverage_selected"
       expect(cover_auto_renewing_enrollment.workflow_state_transitions.first.event).to eq "begin_coverage!"
     end
