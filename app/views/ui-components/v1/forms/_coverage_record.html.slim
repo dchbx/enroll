@@ -6,8 +6,8 @@
 
 .col-md-3.mb-3.optional.hidden
   label for="inputSsn"  #{l10n('ssn')} *
-  - ssn_present = f.object.encrypted_ssn.present? ? true : false
-  = f.text_field :encrypted_ssn, class: "form-control",  value: f.object.encrypted_ssn, readonly: ssn_present, placeholder: 'SSN *', id: 'inputSsn', minlength: '9',maxlength:'9', onkeypress:'return isNumberKey(event)'
+  - ssn_present = f.object.ssn.present? ? true : false
+  = f.text_field :ssn, class: "form-control",  value: f.object.ssn, readonly: ssn_present, placeholder: 'SSN *', id: 'inputSsn', minlength: '9',maxlength:'9', onkeypress:'return isNumberKey(event)'
   .invalid-feedback
     | Please enter SSN.
 

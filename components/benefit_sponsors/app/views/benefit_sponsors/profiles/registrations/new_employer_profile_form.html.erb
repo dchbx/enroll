@@ -1,11 +1,11 @@
 <% content_for :navigation do %>
-  <%= render partial: 'ui-components/v1/navs/manage_account' %>
+  <%= render partial: 'ui-components/v1/navs/manage_account', locals: {person_id: @agency.staff_roles.first.person_id} %>
 <% end %>
 
 <div class="documents-tab" style="padding-top: 0px !important;">
   <div class=" container personal-info-container no-pd">
     <%= form_for @agency, as: :agency, url: {action: "create"},  html: { class: "needs-ajax-validation s508", novalidate:true } do |f| %>
-      <%= render partial: 'accounts/profile_form', locals: {f: f} %>
+      <%= render partial: 'employer_profile_form', locals: {f: f} %>
     <% end %>
   </div>
 
