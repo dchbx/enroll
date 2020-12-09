@@ -31,7 +31,7 @@ module Operations
                 area_code: person.work_phone&.area_code,
                 number: person.work_phone&.number,
                 coverage_record: {
-                  encrypted_ssn: person.ssn,
+                  ssn: person.ssn,
                   gender: person.gender,
                   dob: person.dob,
                   hired_on: nil,
