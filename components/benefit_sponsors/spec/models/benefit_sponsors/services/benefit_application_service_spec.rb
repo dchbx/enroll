@@ -188,7 +188,7 @@ module BenefitSponsors
       end
 
       #for existing active states in as per active_states_per_dt_action
-      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :termination_pending].each do |active_state|
         context 'with dt active state' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
@@ -255,7 +255,7 @@ module BenefitSponsors
           end
         end
 
-        [:pending, :enrollment_open, :enrollment_closed, :binder_paid, :enrollment_ineligible, :termination_pending].each do |active_state|
+        [:pending, :enrollment_open, :enrollment_closed, :binder_paid, :termination_pending].each do |active_state|
           context 'with dt not in active states' do
 
             before do
@@ -274,6 +274,25 @@ module BenefitSponsors
             it 'should return a combination of false and nil' do
               expect(@result).to eq [false, nil]
             end
+          end
+        end
+
+        context 'with ba in enrollment_ineligible state' do
+          before do
+            ba.destroy!
+            ba2.update_attribute(:aasm_state, :enrollment_ineligible)
+            set_bs_for_service(@form)
+            @model_attrs = subject.form_params_to_attributes(@form)
+            @result = subject.create_or_cancel_draft_ba(@form, @model_attrs)
+            benefit_sponsorship.reload
+          end
+
+          it 'should return true and instance as ba succesfully created' do
+            expect(@result).to eq [true, benefit_sponsorship.benefit_applications.last]
+          end
+
+          it "should not move ineligible applications into canceled state" do
+            expect(ba2.aasm_state).to eq(:enrollment_ineligible)
           end
         end
       end
@@ -316,7 +335,7 @@ module BenefitSponsors
         }
       end
 
-      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :enrollment_ineligible, :termination_pending].each do |active_state|
+      [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :termination_pending].each do |active_state|
         context 'for benefit applications in active states' do
           let!(:ba) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship: benefit_sponsorship, aasm_state: active_state) }
 
