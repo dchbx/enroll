@@ -27,7 +27,7 @@ module BenefitSponsors
                                                 ssn: person.ssn,
                                                 dob: person.dob,
                                                 gender: person.gender,
-                                                is_applying_for_coverage: false
+                                                is_applying_coverage: false
                                               }
                                             })
         end
