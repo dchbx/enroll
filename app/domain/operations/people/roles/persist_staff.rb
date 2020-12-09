@@ -11,7 +11,7 @@ module Operations
           params   =    yield validate_params(params)
           profile  =    yield fetch_profile(params[:profile_id])
           person   =    yield fetch_person(params[:person_id])
-          result   =    yield persist(person, profile, params)
+          result   =    yield persist(person, profile, params[:coverage_record])
 
           Success(result)
         end
@@ -51,7 +51,6 @@ module Operations
         end
 
         def persist(person, profile, params)
-          params.deep_symbolize_keys!
           result = Try do
             employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id).map(&:to_s)
             if employer_ids.include? profile.id.to_s
