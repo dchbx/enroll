@@ -1,4 +1,6 @@
 fieldset.mt-2
+
+  = f.hidden_field :profile_type, value: params[:profile_type]
   = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
     = render partial: './ui-components/v1/forms/portals/person_staff_role_information', locals: {f: f}
 
@@ -63,6 +65,31 @@ fieldset.mt-2
       input type="hidden" name="employer_id" id="employer_id"
 
 javascript:
+
+  function isApplyingCoverage(element) {
+    var result = document.querySelectorAll('.optional');
+    var ssn = document.getElementById("inputSsn")
+    var gender = document.getElementById("inputGender")
+    var hiredOn = document.getElementById("inputHiredOn")
+    if (element.value === "true") {
+      result.forEach(function (ele) {
+        ele.classList.remove("hidden");
+      });
+
+      ssn.setAttribute("required", "true");
+      gender.setAttribute("required", "true");
+      hiredOn.setAttribute("required", "true");
+
+    } else {
+      result.forEach(function (ele) {
+        ele.classList.add("hidden");
+      });
+
+      ssn.setAttribute("required", "false");
+      gender.setAttribute("required", "false");
+      hiredOn.setAttribute("required", "false");
+    }
+  }
 
   $("#referred-by-select").on("change", function() {
     var select_val = $(this).val();

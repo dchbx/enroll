@@ -3,7 +3,7 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
-  layout 'bootstrap_4_two_column', :only => [:manage_account, :personal_info, :show_roles]
+  layout 'bootstrap_4_two_column', :only => [:manage_account, :personal_info, :show_roles, :available_accounts]
 
   def new
     @person = Person.new
@@ -267,6 +267,11 @@ class PeopleController < ApplicationController
     @person = find_person(params[:id])
     @available_roles = Operations::People::Roles::FindAll.new.call(params).value!
     render :show_roles
+  end
+
+  def available_accounts
+    @person = find_person(params[:id])
+    render :available_accounts
   end
 
   def select_plan

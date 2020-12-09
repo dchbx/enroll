@@ -12,7 +12,7 @@
         </div>
       <% end %>
       <div class="col-md-12 mt-1 no-pd">
-        <%= link_to "Add New Portal", available_accounts_account_path(id: @person.id), class: "col-12 btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
+        <%= link_to "Add New Portal", available_accounts_person_path(id: @person.id), class: "col-12 btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
       </div>
     <% end %>
   </div>
