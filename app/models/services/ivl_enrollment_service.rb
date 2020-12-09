@@ -26,7 +26,7 @@ module Services
       rescue Exception => e
         begin
           family = enrollment.family
-          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+          Rails.logger.error "Unable to expire enrollments for family #{family.id}"
           @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
         rescue StandardError => e
           @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
