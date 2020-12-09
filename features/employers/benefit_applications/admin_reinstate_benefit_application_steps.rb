@@ -50,8 +50,11 @@ end
 And(/^initial employer ABC Widgets has updated (.*) effective period for reinstate$/) do |aasm_state|
   if aasm_state == 'canceled'
     employer_profile.benefit_applications.first.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
-    current_effective_month = TimeKeeper.date_of_record.beginning_of_month
-    effective_period = current_effective_month.next_month.prev_year..(current_effective_month + 10.months)
+    cancel_ba = employer_profile.benefit_applications.first
+    start_on = cancel_ba.benefit_sponsor_catalog.effective_period.min.prev_year
+    end_on = cancel_ba.benefit_sponsor_catalog.effective_period.max.prev_year
+    effective_period = start_on..end_on
+    cancel_ba.benefit_sponsor_catalog.update_attributes!(effective_period: effective_period)
     employer_profile.benefit_applications.first.update_attributes!(effective_period: effective_period)
   end
 end

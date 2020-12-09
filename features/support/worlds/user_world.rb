@@ -134,7 +134,7 @@ Then(/^the user will see the Extend Open Enrollment button$/) do
 end
 
 Then(/^the user will see the Plan Years button$/) do
-  find('.btn.btn-xs', text: 'Plan Years').click
+  find('.btn.btn-xs', text: 'Plan Years', wait: 5).click
 end
 
 Then(/^the user will not see the Extend Open Enrollment button$/) do
