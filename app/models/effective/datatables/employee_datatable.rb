@@ -40,9 +40,11 @@ module Effective
           employee_state_format(row, row.aasm_state, row.employment_terminated_on)
         }, :sortable => false, :filter => false
 
-        table_column :benefit_package, :proc => Proc.new { |row|
-          row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
-        }, :sortable => false, :filter => false
+        unless attributes['current_py_terminated']
+          table_column :benefit_package, :proc => Proc.new { |row|
+            row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
+          }, :sortable => false, :filter => false
+        end
 
         if attributes["renewal"]
           table_column :renewal_benefit_package, :label => 'Renewal Benefit Package', :proc => Proc.new { |row|
@@ -56,9 +58,11 @@ module Effective
           }, :filter => false, :sortable => false
         end
 
-        table_column :enrollment_status, :proc => Proc.new { |row|
-            enrollment_state(row)
-        }, :sortable => false, :filter => false
+        unless attributes['current_py_terminated']
+          table_column :enrollment_status, :proc => Proc.new { |row|
+              enrollment_state(row)
+          }, :sortable => false, :filter => false
+        end
 
         # Do not show column unless renewal_benefit_application aasm state is in PUBLISHED_STATES
         if attributes["renewal"] && attributes["is_submitted"]
