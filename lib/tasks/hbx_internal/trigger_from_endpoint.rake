@@ -30,34 +30,31 @@ namespace :hbxinternal do
         dob = person.dob
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
+        notify_admin_client(ENV['newRakeTaskId'], 'Missing fields to perform change person dob task.', dob, nil, ENV['task'])
         notify_broker ENV['task']
       rescue => error
         ActionCable.server.broadcast 'notifications_channel', message: error.message
-        notify_admin_client(ENV['newRakeTaskId'], error.message, dob, nil, 'change_person_dob')
       else
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Updated DOB for person record"
         new_dob = Date.strptime(ENV['dob'],'%m/%d/%Y')
         person.update_attributes(dob:new_dob)
         ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
         close_broker_connection ENV['task']
-        notify_admin_client(ENV['newRakeTaskId'], 'complete', dob, new_dob, 'change_person_dob')
+        notify_admin_client(ENV['newRakeTaskId'], 'Completed-Success', dob, new_dob, ENV['task'])
       end
     else
       raise StandardError.new "Missing fields to perform change person dob task."
-      notify_admin_client(ENV['newRakeTaskId'], "Missing fields to perform change person dob task.", dob, nil, 'change_person_dob')
+      notify_admin_client(ENV['newRakeTaskId'], 'Missing fields to perform change person dob task.', nil, nil, ENV['task'])
     end
   end
 
   task :remove_person_ssn => :environment do
-    endpoint = Settings.hbxit.api.uri + '/rakeTaskTriggerHistories'
     if ENV['hbx_id']
       begin
         person = Person.where(hbx_id:ENV['hbx_id']).first
+        current_ssn = person.ssn
         close_broker_connection_with_error(ENV['task'], "Unable to locate a person with HBXID: #{ENV['hbx_id']}") if person.nil?
-        HTTParty.put(endpoint,
-              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => "Completed-Failure: Unable to locate person with HBXID: #{ENV['hbx_id']}"}.to_json,
-              :headers => {'Content-Type' => 'application/json'}
-              ) if person.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "Completed-Failure: Unable to locate person with HBXID: #{ENV['hbx_id']}}".to_json, nil, nil, ENV['task']) if person.nil?
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
         notify_broker ENV['task']
@@ -67,19 +64,13 @@ namespace :hbxinternal do
         ActionCable.server.broadcast 'notifications_channel', message: "2/3 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
         person.unset(:encrypted_ssn)
         ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
-        HTTParty.put(endpoint,
-              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => 'Completed-Success'}.to_json,
-              :headers => {'Content-Type' => 'application/json'}
-              )
+        notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", current_ssn.to_s.last(4), person.try(:ssn), ENV['task'])
         close_broker_connection ENV['task']
       end
     else
       close_broker_connection_with_error(ENV['task'], "Missing fields to perform remove person ssn task")
-      HTTParty.put(endpoint,
-              :body => {:rakeTaskResultId => ENV['newRakeTaskId'], :taskStatus => 'Completed-Failure: Missing Fields'}.to_json,
-              :headers => {'Content-Type' => 'application/json'}
-              )
       raise StandardError.new "Missing fields to perform remove person ssn task."
+      notify_admin_client(ENV['newRakeTaskId'], "Missing fields to perform remove person ssn task.", nil, nil, ENV['task'])
     end
   end
 
@@ -90,6 +81,8 @@ namespace :hbxinternal do
         person2 = Person.where(hbx_id: ENV['hbx_id_2']).first
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}" if person1.nil?
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}".to_json, nil, nil, ENV['task']) if person1.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}".to_json, nil, nil, ENV['task']) if person2.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
         notify_broker ENV['task']
       rescue => error
@@ -106,9 +99,11 @@ namespace :hbxinternal do
         person2.update_attributes(ssn: ssn1)
         ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
         close_broker_connection ENV['task']
+        notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Person 1 SSN: #{ssn1.to_s.last(4)} Person 2 SSN: #{ssn2.to_s.last(4)}", "Person 1 SSN: #{person1.ssn.to_s.last(4)} Person 2 SSN: #{person2.ssn.to_s.last(4)}", ENV['task'])
       end
     else
       raise StandardError.new "Missing fields to perform exchange ssn between two accounts task."
+      notify_admin_client(ENV['newRakeTaskId'], "Missing fields to perform exchange ssn between two accounts task.", nil, nil, ENV['task'])
     end
   end
 
@@ -117,8 +112,12 @@ namespace :hbxinternal do
       begin
         person1 = Person.where(hbx_id: ENV['hbx_id_1']).first
         person2 = Person.where(hbx_id: ENV['hbx_id_2']).first
+        person1_user_id = person1.try(:user).id
+        person2_user_id = person2.try(:user).id
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}" if person1.nil?
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}".to_json, nil, nil, ENV['task']) if person1.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}".to_json, nil, nil, ENV['task']) if person2.nil?
         ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
         notify_broker ENV['task']
       rescue => error
@@ -132,9 +131,11 @@ namespace :hbxinternal do
         sleep 1
         ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
         close_broker_connection ENV['task']
+        notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Person 1 User ID: #{person1_user_id} Person 2 SSN: #{person2_user_id}", "Person 1 User ID: #{person1.try(:user).id} Person 2 SSN: #{person2.try(:user).id}", ENV['task'])
       end
     else
       raise StandardError.new "Missing fields to perform move user account between two people task."
+      notify_admin_client(ENV['newRakeTaskId'], "Missing fields to perform move user account between two people task.", nil, nil, ENV['task'])
     end
   end
 
@@ -142,9 +143,12 @@ namespace :hbxinternal do
     if ENV['ssn'] && ENV['date_of_terminate']
       begin
         census_employee = CensusEmployee.by_ssn(ENV['ssn']).first
+        original_terminated_on = Date.strptime(census_employee&.employment_terminated_on).to_date
         new_termination_date = Date.strptime(ENV['date_of_terminate'],'%m/%d/%Y').to_date
         raise StandardError.new "No census employee was found with ssn provided" if census_employee.nil?
+        notify_admin_client(ENV['newRakeTaskId'], "No census employee was found with ssn provided".to_json, nil, nil, ENV['task']) if census_employee.nil?
         raise StandardError.new "The census employee is not in employment terminated state" if census_employee.aasm_state != "employment_terminated"
+        notify_admin_client(ENV['newRakeTaskId'], "The census employee is not in employment terminated state".to_json, nil, nil, ENV['task']) if census_employee.aasm_state != "employment_terminated"
         ActionCable.server.broadcast 'notifications_channel', message: "1/4 Located census employee record"
         notify_broker ENV['task']
       rescue => error
@@ -156,9 +160,11 @@ namespace :hbxinternal do
         sleep 1
         ActionCable.server.broadcast 'notifications_channel', message: "4/4 Task complete you may close console"
         close_broker_connection ENV['task']
+        notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Census Employee ID: #{census_employee.id}, Terminated On: #{original_terminated_on}", "Census Employee ID: #{census_employee.id}, Terminated On: #{new_termination_date}", ENV['task'])
       end
     else
       raise StandardError.new "Missing fields to perform change census employee date of termination task."
+      notify_admin_client(ENV['newRakeTaskId'], "Missing fields to perform change census employee date of termination task.", nil, nil, ENV['task'])
     end
   end
 
