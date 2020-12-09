@@ -556,6 +556,32 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
           expect(display_reinstate_ba).to eq false
         end
       end
+
+      context "is_ben_app_within_reinstate_period?" do
+        let(:validate_ba_reinstate_period) {helper.is_ben_app_within_reinstate_period?(initial_application)}
+
+        context "benefit application with in reinstate period" do
+          let(:start_on) { TimeKeeper.date_of_record.next_month.next_month.beginning_of_month - 1.year }
+          let(:end_on) { TimeKeeper.date_of_record.next_month.end_of_month }
+
+          it 'should return true' do
+            initial_application.update_attributes!(aasm_state: :terminated)
+            expect(initial_application.aasm_state).to eq :terminated
+            expect(validate_ba_reinstate_period).to eq true
+          end
+        end
+
+        context "benefit application not with in reinstate period" do
+          let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 1.year }
+          let(:end_on) { TimeKeeper.date_of_record.end_of_month }
+
+          it 'For terminated benefit_application' do
+            initial_application.update_attributes!(aasm_state: :terminated)
+            expect(initial_application.aasm_state).to eq :terminated
+            expect(validate_ba_reinstate_period).to eq false
+          end
+        end
+      end
     end
   end
 end
