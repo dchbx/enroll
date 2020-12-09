@@ -14,7 +14,7 @@ module Validators
       optional(:number).maybe(:string)
       optional(:email).maybe(:string)
       required(:coverage_record).schema do
-        optional(:encrypted_ssn).maybe(:string)
+        optional(:ssn).maybe(:string)
         optional(:dob).maybe(:date)
         optional(:hired_on).maybe(:date)
         required(:is_applying_coverage).value(:bool)
