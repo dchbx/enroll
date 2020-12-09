@@ -69,20 +69,27 @@ class EmployerStaffRole
 
   def create_census_employee
     return unless has_coverage?
-    census_employee = CensusEmployee.new(census_employee_params.merge!(benefit_sponsorship_id: profile.benefit_sponsorship.id,
+
+    benefit_sponsorship = profile.benefit_sponsorships.first
+    initial_benefit_packages = benefit_sponsorship.current_benefit_application.benefit_packages if benefit_sponsorship.current_benefit_application.present?
+    renewing_benefit_packages = benefit_sponsorship.renewal_benefit_application.benefit_packages if benefit_sponsorship.renewal_benefit_application.present?
+    initial_benefit_group = initial_benefit_packages&.count == 1 ? initial_benefit_packages.first : nil
+    renewal_benefit_group = renewing_benefit_packages&.count == 1 ? renewing_benefit_packages.first : nil
+    census_employee = CensusEmployee.new(census_employee_params.merge!(benefit_sponsorship_id: benefit_sponsorship.id,
                                                                        benefit_sponsors_employer_profile_id: benefit_sponsor_employer_profile_id,
-                                                                       # active_benefit_group_assignment: ,
-                                                                       # renewal_benefit_group_assignment: ,
+                                                                       active_benefit_group_assignment: initial_benefit_group&.id,
+                                                                       renewal_benefit_group_assignment: renewal_benefit_group&.id,
                                                                        hired_on: coverage_record.hired_on,
-                                                                       ssn: coverage_record.ssn))
+                                                                       ssn: coverage_record.ssn,
+                                                                       gender: coverage_record.gender))
     census_employee.save
   end
 
   private
 
   def census_employee_params
-    person.attributes.slice(:first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender).merge(
-      person.addresses[0].attributes.except(:_id, :created_at, :updated_at,:tracking_version)
+    person.attributes.slice('first_name', 'middle_name', 'last_name', 'name_sfx', 'dob', 'ssn', 'gender').merge({'address_attributes' =>
+      person.addresses[0].attributes.except('_id', 'created_at', 'updated_at','tracking_version')}
     )
   end
 
