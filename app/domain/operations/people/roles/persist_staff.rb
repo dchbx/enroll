@@ -11,9 +11,9 @@ module Operations
           params   =    yield validate_params(params)
           profile  =    yield fetch_profile(params[:profile_id])
           person   =    yield fetch_person(params[:person_id])
-          result   =    yield persist(person, profile.value!, params)
+          result   =    yield persist(person, profile, params)
 
-          Success(result.value!)
+          Success(result)
         end
 
         private
@@ -28,7 +28,7 @@ module Operations
         end
 
         def fetch_profile(id)
-          Try do
+          result = Try do
             profile = BenefitSponsors::Organizations::Profile.find(id)
 
             if profile
@@ -36,7 +36,8 @@ module Operations
             else
               Failure({:message => 'Profile not found'})
             end
-          end.or(Failure({:message => 'Profile not found'}))
+          end
+          result.to_result.failure? ? Failure({:message => 'Profile not found'}) : result.to_result.value!
         end
 
         def fetch_person(id)
@@ -50,7 +51,7 @@ module Operations
         end
 
         def persist(person, profile, params)
-          Try do
+          result = Try do
             employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id).map(&:to_s)
             if employer_ids.include? profile.id.to_s
               Failure({:message => 'Already exists a staff role for the selected organization'})
@@ -76,7 +77,8 @@ module Operations
               end
               Success({:message => 'Successfully added employer staff role'})
             end
-          end.or(Failure({:message => 'Failed while saving person/user'}))
+          end
+          result.to_result.failure? ? Failure({:message => 'Failed while saving records'}) : result.to_result.value!
         end
       end
     end
