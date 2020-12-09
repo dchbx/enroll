@@ -20,17 +20,19 @@ module Services
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']
       )
-      begin
-        individual_market_enrollments.each do |enrollment|
-          enrollment.expire_coverage! if enrollment.may_expire_coverage?
-          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-        end
+      individual_market_enrollments.each do |enrollment|
+        enrollment.expire_coverage! if enrollment.may_expire_coverage?
+        @logger.info "Processed enrollment: #{enrollment.hbx_id}"
       rescue Exception => e
-        family = Family.find(individual_market_enrollments.family_id)
-        Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
-        @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
+        begin
+          family = enrollment.family
+          Rails.logger.error "Unable to expire enrollments for family #{family.e_case_id}"
+          @logger.info "Unable to expire enrollments for family #{family.id}, error: #{e.backtrace}"
+        rescue StandardError => e
+          @logger.info "Unable to find family for enrollment#{enrollment.id}, error: #{e.backtrace}"
+        end
       end
-      @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
+      @logger.info "Ended expire_individual_market_enrollments process at #{TimeKeeper.datetime_of_record}"
     end
 
     def begin_coverage_for_ivl_enrollments
@@ -41,20 +43,22 @@ module Services
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )
-      begin
-        @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
-        count = 0
-        ivl_enrollments.no_timeout.each do |enrollment|
-          if enrollment.may_begin_coverage?
-            enrollment.begin_coverage!
-            count += 1
-            @logger.info "Processed enrollment: #{enrollment.hbx_id}"
-          end
+      @logger.info "Total IVL auto renewing enrollment count: #{ivl_enrollments.count}"
+      count = 0
+      ivl_enrollments.no_timeout.each do |enrollment|
+        if enrollment.may_begin_coverage?
+          enrollment.begin_coverage!
+          count += 1
+          @logger.info "Processed enrollment: #{enrollment.hbx_id}"
         end
       rescue Exception => e
-        family = Family.find(individual_market_enrollments.family_id)
-        Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
-        @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+        begin
+          family = enrollment.family
+          Rails.logger.error "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+          @logger.info "Unable to begin coverage(enrollments) for family #{family.id}, error: #{e.backtrace}"
+        rescue StandardError => e
+          @logger.info "Unable to find family for enrollment #{enrollment.id}, error: #{e.backtrace}"
+        end
       end
       @logger.info "Total IVL auto renewing enrollment processed count: #{count}"
       @logger.info "Ended begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
