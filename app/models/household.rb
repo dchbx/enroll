@@ -275,6 +275,10 @@ class Household
     tax_households.tax_household_with_year(year)
   end
 
+  def hbx_enrollments_with_consumed_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_terminated.with_aptc.by_year(year)
+  end
+
   def end_multiple_thh(options = {})
     all_active_thh = tax_households.active_tax_household
     all_active_thh.group_by(&:group_by_year).select {|k, v| v.size > 1}.each_pair do |k, v|
