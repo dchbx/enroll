@@ -22,6 +22,7 @@ module BenefitSponsors
         if attrs[:person_id].present?
           person = Person.where(id: attrs[:person_id]).first
           params[:staff_roles].first.merge!({
+                                              person_id: attrs[:person_id],
                                               coverage_record: {
                                                 ssn: person.ssn,
                                                 dob: person.dob,
