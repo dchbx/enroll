@@ -75,7 +75,7 @@ module BenefitSponsors
             flash[:notice] = result.value![:message]
           else
             redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params["person_id"])
-            flash[:error] = "Unable to create Staff role"
+            flash[:error] = result.failure[:message]
           end
         end
 

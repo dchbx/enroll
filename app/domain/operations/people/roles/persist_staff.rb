@@ -54,7 +54,7 @@ module Operations
           result = Try do
             employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id).map(&:to_s)
             if employer_ids.include? profile.id.to_s
-              Failure({:message => 'Already exists a staff role for the selected organization'})
+              Failure({:message => 'Already staff role exists for the selected organization'})
             else
               person.employer_staff_roles << EmployerStaffRole.new(
                 person: person,
@@ -78,7 +78,7 @@ module Operations
               Success({:message => 'Successfully added employer staff role'})
             end
           end
-          result.to_result.failure? ? Failure({:message => 'Failed while saving records'}) : result.to_result.value!
+          result.to_result.failure? ? Failure({:message => 'Failed to create records, contact HBX Admin'}) : result.to_result.value!
         end
       end
     end
