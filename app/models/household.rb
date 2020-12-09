@@ -471,6 +471,10 @@ class Household
     hbx_enrollments.enrolled_and_renewing.with_aptc.by_year(year)
   end
 
+  def hbx_enrollments_with_consumed_aptc_by_year(year)
+    hbx_enrollments.enrolled_and_terminated.with_aptc.by_year(year)
+  end
+
   def eligibility_determinations_for_year(year)
     eds = []
     tax_households.tax_household_with_year(year).each do |th|
