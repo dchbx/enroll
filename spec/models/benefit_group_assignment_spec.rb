@@ -230,19 +230,24 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
         end
 
         context "and coverage is terminated" do
+
           let(:employee_role)   { FactoryBot.build(:employee_role, employer_profile: employer_profile)}
           let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role, effective_on: TimeKeeper.date_of_record, aasm_state: :coverage_selected) }
 
-          before do
+          it "should update the end_on date to terminated date only if CE is termed/pending" do
+            census_employee.update_attributes!(aasm_state: 'employee_termination_pending', coverage_terminated_on: TimeKeeper.date_of_record + 2.days)
             hbx_enrollment.benefit_group_assignment = benefit_group_assignment
             benefit_group_assignment.hbx_enrollment = hbx_enrollment
             hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record + 2.days)
-          end
-
-          it "should update the end_on date to terminated date" do
             expect(benefit_group_assignment.end_on).to eq(TimeKeeper.date_of_record + 2.days)
           end
 
+          it "should NOT update the end_on date to terminated date when CE is active" do
+            hbx_enrollment.benefit_group_assignment = benefit_group_assignment
+            benefit_group_assignment.hbx_enrollment = hbx_enrollment
+            hbx_enrollment.term_or_cancel_enrollment(hbx_enrollment, TimeKeeper.date_of_record + 2.days)
+            expect(benefit_group_assignment.end_on).not_to eq(TimeKeeper.date_of_record + 2.days)
+          end
         end
 
         context "and benefit application is terminated" do

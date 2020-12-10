@@ -838,7 +838,7 @@ class CensusEmployee < CensusMember
   end
 
   def active_benefit_group_assignment=(benefit_package_id)
-    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || employer_profile.active_benefit_sponsorship.current_benefit_application
+    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.current_benefit_application
 
     if benefit_application.present? && !benefit_application.terminated?
       benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
