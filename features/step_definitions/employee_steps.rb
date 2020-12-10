@@ -3,9 +3,12 @@
 Given("a matched Employee exists with only employee role") do
   FactoryBot.create(:user)
   person = FactoryBot.create(:person, :with_employee_role, :with_family, first_name: "Employee", last_name: "E", user: user)
-  org = FactoryBot.create :organization, :with_active_plan_year
-  @benefit_group = org.employer_profile.plan_years[0].benefit_groups[0]
-  bga = FactoryBot.build :benefit_group_assignment, benefit_group: @benefit_group
+  site = FactoryBot.build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
+  benefit_sponsor = FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_initial_application, site: site)
+  benefit_sponsorship = benefit_sponsor.active_benefit_sponsorship
+  employer_profile = benefit_sponsorship.profile
+  benefit_package = benefit_sponsorship.benefit_applications.first.benefit_packages.first
+  bga = FactoryBot.build :benefit_group_assignment, benefit_package: benefit_package
   @employee_role = person.employee_roles[0]
   ce = FactoryBot.build(:census_employee,
                         first_name: person.first_name,
@@ -13,12 +16,12 @@ Given("a matched Employee exists with only employee role") do
                         dob: person.dob,
                         ssn: person.ssn,
                         employee_role_id: @employee_role.id,
-                        employer_profile: org.employer_profile)
+                        employer_profile: employer_profile)
 
   ce.benefit_group_assignments << bga
   ce.link_employee_role!
   ce.save!
-  @employee_role.update_attributes(census_employee_id: ce.id, employer_profile_id: org.employer_profile.id)
+  @employee_role.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: employer_profile.id)
 end
 
 Given(/(.*) has a matched employee role/) do |_name|

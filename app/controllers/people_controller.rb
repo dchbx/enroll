@@ -199,11 +199,12 @@ class PeopleController < ApplicationController
     else
       redirect_path = family_account_path
     end
+    @person.consumer_role.update_is_applying_coverage_status(person_params[:is_applying_coverage]) if @person.is_consumer_role_active?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
     @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
       if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
-        if @person.is_consumer_role_active?
+        if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, is_homeless: person_params["is_homeless"], is_temporarily_out_of_state: person_params["is_temporarily_out_of_state"], dc_status: @dc_status)
         end
