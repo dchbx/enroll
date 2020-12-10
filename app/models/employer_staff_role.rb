@@ -76,12 +76,12 @@ class EmployerStaffRole
     initial_benefit_group_id = initial_benefit_packages.present? && initial_benefit_packages.size > 1 ? initial_benefit_packages.first.id : nil
     renewal_benefit_group_id = renewing_benefit_packages.present? && initial_benefit_packages.size > 1 ? renewing_benefit_packages.first.id : nil
     census_employee = CensusEmployee.create!(census_employee_params.merge!(benefit_sponsorship_id: benefit_sponsorship.id,
-                                                                       benefit_sponsors_employer_profile_id: benefit_sponsor_employer_profile_id,
-                                                                       active_benefit_group_assignment: initial_benefit_group_id,
-                                                                       renewal_benefit_group_assignment: renewal_benefit_group_id,
-                                                                       hired_on: coverage_record.hired_on,
-                                                                       ssn: coverage_record.ssn,
-                                                                       gender: coverage_record.gender))
+                                                                           benefit_sponsors_employer_profile_id: benefit_sponsor_employer_profile_id,
+                                                                           active_benefit_group_assignment: initial_benefit_group_id,
+                                                                           renewal_benefit_group_assignment: renewal_benefit_group_id,
+                                                                           hired_on: coverage_record.hired_on,
+                                                                           ssn: coverage_record.ssn,
+                                                                           gender: coverage_record.gender))
     census_employee.save
   end
 
@@ -89,8 +89,8 @@ class EmployerStaffRole
 
   def census_employee_params
     person.attributes.slice('first_name', 'middle_name', 'last_name', 'name_sfx', 'dob', 'ssn', 'gender').merge(
-      {'address_attributes' => person.addresses[0].attributes.except('_id', 'created_at', 'updated_at', 'tracking_version'),
-       'email_attributes' => person.emails[0].attributes.except('_id', 'created_at', 'updated_at')}
+      'address_attributes' => person.addresses[0].attributes.except('_id', 'created_at', 'updated_at', 'tracking_version'),
+      'email_attributes' => person.emails[0].attributes.except('_id', 'created_at', 'updated_at')
     )
   end
 
