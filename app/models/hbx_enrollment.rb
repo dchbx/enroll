@@ -55,6 +55,8 @@ class HbxEnrollment
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
 
+  ENROLLED_RENEWAL_WAIVED_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES + WAIVED_STATUSES
+
 
   WAIVER_REASONS = [
       "I have coverage through spouse’s employer health plan",
@@ -1236,6 +1238,44 @@ class HbxEnrollment
     # TODO: Get a method for is_under_special enrollment period that will
     # check based on a given time.
     family.is_under_special_enrollment_period?
+  end
+
+  def can_make_changes?
+    return false if coverage_canceled?
+    if is_shop?
+      can_make_changes_for_shop_enrollment?
+    else
+      can_make_changes_for_ivl_enrollment?
+    end
+  end
+
+  def can_make_changes_for_shop_enrollment?
+    return false if sponsored_benefit_package.blank?
+    return true if open_enrollment_period_available?
+    return true if special_enrollment_period_available?
+    return true if new_hire_enrollment_period_available?
+    false
+  end
+
+  def can_make_changes_for_ivl_enrollment?
+    return true if ENROLLED_AND_RENEWAL_STATUSES.include?(aasm_state)
+    false
+  end
+
+  def open_enrollment_period_available?
+    return false if coverage_expired?
+    sponsored_benefit_package.open_enrollment_period.cover?(TimeKeeper.date_of_record)
+  end
+
+  def special_enrollment_period_available?
+    shop_sep = family.earliest_effective_shop_sep
+    return false unless shop_sep
+    sponsored_benefit_package.effective_period.cover?(shop_sep.effective_on)
+  end
+
+  def new_hire_enrollment_period_available?
+    return false if employee_role.blank?
+    sponsored_benefit_package.effective_on_for(employee_role.hired_on) > sponsored_benefit_package.start_on
   end
 
   def can_complete_shopping?(options = {})

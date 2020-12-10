@@ -78,6 +78,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       sign_in(current_user)

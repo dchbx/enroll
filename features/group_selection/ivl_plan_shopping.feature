@@ -51,3 +51,19 @@ Feature: IVL plan purchase
     When consumer checks the primary person
     And consumer clicked on shop for new plan
     Then consumer should see primary person
+
+  Scenario: when individual purchases dental plan for self & dependent and tries to filter by Low/High
+    Given a consumer exists
+    And the consumer is logged in
+    And consumer has a dependent in child relationship with age less than 26
+    And consumer has successful ridp
+    When consumer visits home page
+    And consumer clicked on "Married" qle
+    And I select a past qle date
+    Then I should see confirmation and continue
+    When ivl clicked continue on household info page
+    Then consumer should see all the family members names
+    And individual selects dental for coverage kind
+    And consumer clicked on shop for new plan
+    Then consumer should see both dependent and primary
+    And individual selects high for metal level plan and metal level box appears selected
