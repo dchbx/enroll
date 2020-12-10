@@ -2119,7 +2119,15 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
         initial_application
       end
       let(:off_cycle_benefit_package) { off_cycle_application.benefit_packages[0] }
-      let(:off_cycle_benefit_group_assignment) { FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: off_cycle_benefit_package, census_employee: census_employee, start_on: off_cycle_benefit_package.start_on, end_on: off_cycle_benefit_package.end_on) }
+      let(:off_cycle_benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: off_cycle_benefit_package,
+          census_employee: census_employee,
+          start_on: off_cycle_benefit_package.start_on,
+          end_on: off_cycle_benefit_package.end_on
+        )
+      end
 
       let!(:off_cycle_health_enrollment) do
         FactoryBot.create(
