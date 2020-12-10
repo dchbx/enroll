@@ -435,7 +435,7 @@ module BenefitSponsors
 
     def published_benefit_application(include_term_pending: true)
       submitted_applications = include_term_pending ? benefit_applications.submitted + benefit_applications.terminated_or_termination_pending : benefit_applications.submitted
-      submitted_applications.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
+      submitted_applications.sort_by(&:created_at).reverse.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
     end
 
     def published_off_cycle_application

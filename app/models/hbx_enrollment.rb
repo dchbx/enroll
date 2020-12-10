@@ -744,8 +744,14 @@ class HbxEnrollment
 
   def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
     self.terminated_on = term_date
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
+    term_or_cancel_benefit_group_assignment
+  end
+
+  def term_or_cancel_benefit_group_assignment
+    if benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
+      termed_date = census_employee.coverage_terminated_on
+      end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
+      benefit_group_assignment.end_benefit(end_date)
       benefit_group_assignment.save
     end
   end
@@ -757,10 +763,7 @@ class HbxEnrollment
       self.terminated_on ||= term_date
     end
 
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
+    term_or_cancel_benefit_group_assignment
 
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
