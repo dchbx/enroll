@@ -1,14 +1,14 @@
 ---
-title: "Benefit_sponsors"
-date: 2020-11-18T12:11:29-05:00
+title: "Benefit Sponsors Engine"
+date: 2020-12-10T12:11:29-05:00
 draft: true
 ---
 
-"Benefit Sponsors" is a [Rails Engine](https://guides.rubyonrails.org/engines.html) that grouped in the components/ folder of Enroll. The data models within the Benefit Sponsors engine deal primarily with enrolling employees of DC based employers into employer sponsored coverage. The following will give a high level technical overview to help both technical and non technical users gain a basic understanding of the Benefit Sponsors engine.
+"Benefit Sponsors" is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. The Benefit Sponsors engine deals primarily with enrolling employees of DC based employers into employer sponsored (SHOP) coverage. The will provide a high level technical overview to help both technical and non technical users gain a basic understanding of the Benefit Sponsors engine.
 
 Cucumbers will be linked to each section. Non technical users can read more detailed steps for each feature and developers can boot an instance of Enroll locally to "watch" the Cucumbers by enabling the browser in the Cucumber configuration to get a better visualization and technical overview of each steps.
 
-## Basic User Interface Walkthrough and Essential Data Model Overview
+## Basic User Interface Walkthrough and Essential Models Overview
 
 # Employer
 Assuming an environment is loaded with the proper backend data, the primary prerequisite for enrolling an employee is an employer representative creating an Employer account. This is achieved through the following steps:
@@ -21,7 +21,7 @@ Assuming an environment is loaded with the proper backend data, the primary prer
 _Developer Note: The resulting employer instantiated can vary based on the type of business created, but a typical business could be searched with a backend query such as: `BenefitSponsors::Organizations::Organization.where(legal_name: "Legal Name").first`._
 
 *Relevant Cucumbers*
--[Create Employer Feature](https://github.com/dchbx/enroll/blob/master/features/employers/create_employer.feature.wip)
+-[All Employer Related Cucumbers](https://github.com/dchbx/enroll/tree/master/features/employers) - look at all files ending with .feature
 
 # Benefit Sponsorships
 Attached to the instantiated Oragnization/Employer record will be "many" Benefit Sponsorships.
@@ -39,7 +39,7 @@ Benefit Applications contain information such as when the coverage starts, ends,
 _Developer Note: Benefit Applications can be accessed with a query such as `BenefitSponsors::Organizations::Organization.where(legal_name: "Legal Name").first.benefit_sponsorships.last.benefit_applications`_
 
 *Relevant Cucumbers*
--[All Benefit Application Related Cucumbers](https://github.com/dchbx/enroll/tree/master/features/employers/benefit_applications)
+-[All Benefit Application Related Cucumbers](https://github.com/dchbx/enroll/tree/master/features/employers/benefit_applications) - look at all files ending with .feature
 
 # Benefit Packages
 
@@ -52,7 +52,7 @@ Benefit packages contain the information for the employer's choice of benefits b
 _Developer Note: Benefit Packages can be accessed with a query such as `BenefitSponsors::Organizations::Organization.where(legal_name: "Legal Name").first.benefit_sponsorships.last.benefit_applications.last.benefit_packages`_
 
 
-## Advanced Technical Overview
+## Other Models Overview
 
 # Business Policies
 
@@ -73,7 +73,7 @@ Most of these rules can be configured in the application wide [Settings](https:/
 
 # Subscribers
 
-## Technical Best Practices Overview
+## Technical Best Practices
 
 # Resource Registry
 
