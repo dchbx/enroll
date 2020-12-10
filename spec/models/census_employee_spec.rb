@@ -942,14 +942,9 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:census_employee_for_scope_testing)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
       let(:household) { FactoryBot.create(:household, family: family)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+      let!(:benefit_group_assignment) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee_for_scope_testing, start_on: benefit_package.start_on, end_on: benefit_package.end_on, hbx_enrollment_id: enrollment.id)}
       let!(:enrollment) do
-        FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: census_employee_for_scope_testing.active_benefit_group_assignment.benefit_package.id)
-      end
-
-      before do
-        census_employee_for_scope_testing.active_benefit_group_assignment.hbx_enrollment_id = enrollment.id
-        census_employee_for_scope_testing.active_benefit_group_assignment.start_on = TimeKeeper.date_of_record
-        census_employee_for_scope_testing.active_benefit_group_assignment.save(:validate => false)
+        FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id)
       end
 
       it "should return covered employees" do
@@ -2717,7 +2712,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it "should return nil if given effective_on date is in imported benefit application" do
         initial_application.update_attributes(aasm_state: :imported)
         coverage_date = initial_application.end_on - 1.month
-        expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
+        expect(census_employee.reload.benefit_package_for_date(coverage_date)).to eq nil
       end
 
       it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
