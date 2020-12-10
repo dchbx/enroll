@@ -863,20 +863,6 @@ class CensusEmployee < CensusMember
     create_benefit_group_assignment(benefit_packages, true)
   end
 
-  def off_cycle_benefit_group_assignment=(benefit_package_id)
-    benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
-      :"benefit_packages._id" => benefit_package_id
-    ).first || employer_profile.active_benefit_sponsorship.off_cycle_benefit_application
-
-    if benefit_application.present?
-      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
-    end
-
-    return unless benefit_packages.present? && (off_cycle_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(off_cycle_benefit_group_assignment.benefit_package.id))
-
-    create_benefit_group_assignment(benefit_packages, true)
-  end
-
   def renewal_benefit_group_assignment=(renewal_package_id)
     benefit_application = BenefitSponsors::BenefitApplications::BenefitApplication.where(
       :"benefit_packages._id" => renewal_package_id
