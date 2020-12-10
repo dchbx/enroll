@@ -569,10 +569,10 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
       before :each do
         allow(TimeKeeper).to receive(:date_of_record).and_return(todays_date)
-        allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).
-          with(todays_date).and_return(open_enrollment_contains)
-        allow(hbx_enrollment).to receive(:active_during?).
-          with(active_during_date).and_return(active_during)
+        allow(sponsored_benefit_package).to receive(:open_enrollment_contains?)
+          .with(todays_date).and_return(open_enrollment_contains)
+        allow(hbx_enrollment).to receive(:active_during?)
+          .with(active_during_date).and_return(active_during)
       end
 
       context "given a non-census employee enrollment" do

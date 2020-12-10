@@ -119,7 +119,7 @@ module Insured::FamiliesHelper
     end
 
     qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
-    
+
     link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
@@ -153,13 +153,16 @@ module Insured::FamiliesHelper
   end
 
   def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
+    employee_role.employer_profile.active_broker_agency_account.writing_agent
+    rescue StandardError
+      false
+    end
   end
 
   def disable_make_changes_button?(hbx_enrollment)
     # return false if IVL
     return false if hbx_enrollment.census_employee.blank?
-    return false if !hbx_enrollment.is_shop?
+    return false unless hbx_enrollment.is_shop?
     # Enable the button under these conditions
       # 1) plan year under open enrollment period
       # 2) new hire covered under enrolment period
