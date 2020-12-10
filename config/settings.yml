@@ -173,7 +173,7 @@ aca:
     with_in_sixty_days: 60
   #
   individual_market:
-    monthly_enrollment_due_on: 15
+    monthly_enrollment_due_on: 18
     verification_outstanding_window:
       days: 0
     verification_due:
