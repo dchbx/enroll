@@ -119,7 +119,7 @@ module Insured::FamiliesHelper
     end
 
     qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
-    
+
     link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
