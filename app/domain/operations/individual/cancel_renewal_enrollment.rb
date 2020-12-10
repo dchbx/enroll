@@ -29,7 +29,8 @@ module Operations
 
       def product_matched(enr, enrollment)
         return false unless enr.product.present?
-        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id
+        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id ||
+          enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
       end
 
       def cancel_renewals(enrollment)
