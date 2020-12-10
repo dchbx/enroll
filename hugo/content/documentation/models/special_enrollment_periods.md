@@ -40,9 +40,9 @@ _Developer Notes:
 - Check the method `init_qualifying_life_events` in the `families_controller.rb` file to view the initializing process for QLE Kinds_
 
 
-# Create/Manage SEPS
+# Create/Manage Qualifying Life Event Kinds (QLEK)
 
-Admin users have the capability of managing/creating QLE Kinds via the website UI with teh following steps:
+Admin users have the capability of managing/creating QLE Kinds via the website UI with the following steps:
 
 1. Login as an HBX Admin and click "I'm an Admin."
 2. Click the Admin dropdown and click Manage SEP's
@@ -53,9 +53,9 @@ When creating or modifying a new SEP, users must be sure to *publish* the SEP (a
 [Manage SEPs](https://github.com/dchbx/enroll/tree/master/features/hbx_admin/manage_sep_types) - all files ending with .feature
 
 
-# Creating SEPs as Admin
+# Adding SEPs to Families as Admin
 
-Admin users can also manually create a special enerollment period for a family with the following steps:
+Admin users can also manually create a special enrollment period for a family with the following steps:
 
 1. Login as an HBX Admin and click "I'm an Admin."
 2. Click the Families dropdown and go to the Families Index

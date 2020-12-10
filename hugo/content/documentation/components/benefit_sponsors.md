@@ -4,11 +4,9 @@ date: 2020-12-10T12:11:29-05:00
 draft: true
 ---
 
-"Benefit Sponsors" is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. The Benefit Sponsors engine deals primarily with enrolling employees of DC based employers into employer sponsored (SHOP) coverage. The will provide a high level technical overview to help both technical and non technical users gain a basic understanding of the Benefit Sponsors engine.
+"Benefit Sponsors" is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. The Benefit Sponsors engine deals primarily with enrolling employees of DC based employers into employer sponsored (SHOP) coverage. 
 
-Cucumbers will be linked to each section. Non technical users can read more detailed steps for each feature and developers can boot an instance of Enroll locally to "watch" the Cucumbers by enabling the browser in the Cucumber configuration to get a better visualization and technical overview of each steps.
-
-## Basic User Interface Walkthrough and Essential Models Overview
+## Basic User Interface Walkthrough and Models Overview
 
 # Employer
 Assuming an environment is loaded with the proper backend data, the primary prerequisite for enrolling an employee is an employer representative creating an Employer account. This is achieved through the following steps:
