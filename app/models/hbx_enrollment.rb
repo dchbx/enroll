@@ -748,12 +748,12 @@ class HbxEnrollment
   end
 
   def term_or_cancel_benefit_group_assignment
-    if benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
-      termed_date = census_employee.coverage_terminated_on
-      end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
-      benefit_group_assignment.end_benefit(end_date)
-      benefit_group_assignment.save
-    end
+    return unless benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
+
+    termed_date = census_employee.coverage_terminated_on
+    end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
+    benefit_group_assignment.end_benefit(end_date)
+    benefit_group_assignment.save
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
