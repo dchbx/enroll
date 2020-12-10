@@ -434,8 +434,8 @@ module BenefitSponsors
     end
 
     def published_benefit_application(include_term_pending: true)
-      submitted_applications = include_term_pending ? benefit_applications.submitted + benefit_applications.termination_pending : benefit_applications.submitted
-      submitted_applications.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
+      submitted_applications = include_term_pending ? benefit_applications.submitted + benefit_applications.terminated_or_termination_pending : benefit_applications.submitted
+      submitted_applications.sort_by(&:created_at).reverse.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
     end
 
     def published_off_cycle_application
@@ -489,6 +489,8 @@ module BenefitSponsors
     end
 
     def benefit_package_by(id)
+      return unless id.present?
+
       benefit_application = benefit_applications.where(:"benefit_packages._id" => BSON::ObjectId.from_string(id)).first
       if benefit_application
         benefit_application.benefit_packages.unscoped.find(id)
@@ -552,7 +554,8 @@ module BenefitSponsors
     end
 
     def is_potential_off_cycle_employer?
-      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?)
+      latest_application = benefit_applications.order_by(:created_at.asc).to_a.last
+      benefit_applications.order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
     end
 
     def most_recent_benefit_application

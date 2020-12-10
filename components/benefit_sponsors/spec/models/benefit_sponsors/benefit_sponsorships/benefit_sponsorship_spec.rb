@@ -1366,6 +1366,15 @@ module BenefitSponsors
       it_behaves_like "for an employer on the exchange", "active", "terminated", true
       it_behaves_like "for an employer on the exchange", "active", "termination_pending", true
       it_behaves_like "for an employer on the exchange", "active", "pending", false
+      it_behaves_like "for an employer on the exchange", "termination_pending", "canceled", true
+      it_behaves_like "for an employer on the exchange", "termination_pending", "draft", true
+      it_behaves_like "for an employer on the exchange", "termination_pending", "enrollment_open", false
+      it_behaves_like "for an employer on the exchange", "termination_pending", "enrollment_closed", false
+      it_behaves_like "for an employer on the exchange", "terminated", "canceled", true
+      it_behaves_like "for an employer on the exchange", "terminated", "draft", true
+      it_behaves_like "for an employer on the exchange", "terminated", "enrollment_open", false
+      it_behaves_like "for an employer on the exchange", "terminated", "enrollment_closed", false
+      it_behaves_like "for an employer on the exchange", "terminated", "active", false
     end
 
     describe '.off_cycle_benefit_application' do

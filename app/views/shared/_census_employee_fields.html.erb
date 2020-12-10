@@ -41,7 +41,7 @@
           <% end %>
         </div>
       </div>
-    <% elsif off_cycle_benefit_packages.present? %>
+    <% elsif current_benefit_packages.present? && off_cycle_benefit_packages.present? %>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <div class="selectric-labeled">
           <span>
@@ -60,6 +60,19 @@
           <%= f.fields_for :off_cycle_benefit_group_assignments, @census_employee.off_cycle_benefit_group_assignment, errors: {}, fieldset: false do |off_cycle_benefit_group_assignment| %>
             <%= render 'shared/benefit_group_assignment_fields', f: off_cycle_benefit_group_assignment, benefit_groups: off_cycle_benefit_packages, current_option: current_option_for_off_cycle_benefit_package, prompt: "SELECT OFF CYCLE BENEFIT PACKAGE" %>
           <% end %>
+        </div>
+      </div>
+    <% elsif off_cycle_benefit_packages.present? %>
+      <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
+        <div class="selectric-labeled">
+          <span>
+            <strong>Off Cycle Benefit Package</strong>
+          </span>
+          <%= f.fields_for :off_cycle_benefit_group_assignments, @census_employee.off_cycle_benefit_group_assignment, errors: {}, fieldset: false do |off_cycle_benefit_group_assignment| %>
+            <%= render 'shared/benefit_group_assignment_fields', f: off_cycle_benefit_group_assignment, benefit_groups: off_cycle_benefit_packages, current_option: current_option_for_off_cycle_benefit_package, prompt: "SELECT OFF CYCLE BENEFIT PACKAGE" %>
+          <% end %>
+        </div>
+      </div>
     <% else %>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <div class="selectric-labeled">

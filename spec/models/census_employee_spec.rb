@@ -942,14 +942,18 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       let(:census_employee_for_scope_testing)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
       let(:household) { FactoryBot.create(:household, family: family)}
       let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-      let!(:enrollment) do
-        FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: census_employee_for_scope_testing.active_benefit_group_assignment.benefit_package.id)
+      let!(:benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: benefit_package,
+          census_employee: census_employee_for_scope_testing,
+          start_on: benefit_package.start_on,
+          end_on: benefit_package.end_on,
+          hbx_enrollment_id: enrollment.id
+        )
       end
-
-      before do
-        census_employee_for_scope_testing.active_benefit_group_assignment.hbx_enrollment_id = enrollment.id
-        census_employee_for_scope_testing.active_benefit_group_assignment.start_on = TimeKeeper.date_of_record
-        census_employee_for_scope_testing.active_benefit_group_assignment.save(:validate => false)
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id)
       end
 
       it "should return covered employees" do
@@ -2061,9 +2065,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       )
     end
 
-
     shared_examples_for "enrollments for display" do |state, status, result|
-
       let!(:health_enrollment) do
         FactoryBot.create(
           :hbx_enrollment,
@@ -2109,6 +2111,54 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     it_behaves_like "enrollments for display", "coverage_terminated", "not ", false
     it_behaves_like "enrollments for display", "coverage_expired", "not ", false
     it_behaves_like "enrollments for display", "shopping", "not ", false
+
+    context 'when employer has off-cycle benefit application' do
+      let(:terminated_on) { TimeKeeper.date_of_record.end_of_month }
+      let(:current_effective_date) { terminated_on.next_day }
+
+      include_context 'setup initial benefit application'
+
+      let(:off_cycle_application) do
+        initial_application.update_attributes!(aasm_state: :enrollment_open)
+        initial_application
+      end
+      let(:off_cycle_benefit_package) { off_cycle_application.benefit_packages[0] }
+      let(:off_cycle_benefit_group_assignment) do
+        FactoryBot.create(
+          :benefit_sponsors_benefit_group_assignment,
+          benefit_group: off_cycle_benefit_package,
+          census_employee: census_employee,
+          start_on: off_cycle_benefit_package.start_on,
+          end_on: off_cycle_benefit_package.end_on
+        )
+      end
+
+      let!(:off_cycle_health_enrollment) do
+        FactoryBot.create(
+          :hbx_enrollment,
+          household: census_employee.employee_role.person.primary_family.active_household,
+          coverage_kind: "health",
+          kind: "employer_sponsored",
+          family: census_employee.employee_role.person.primary_family,
+          benefit_sponsorship_id: benefit_sponsorship.id,
+          sponsored_benefit_package_id: off_cycle_benefit_package.id,
+          employee_role_id: census_employee.employee_role.id,
+          benefit_group_assignment_id: off_cycle_benefit_group_assignment.id,
+          aasm_state: 'coverage_selected'
+        )
+      end
+
+      before do
+        updated_dates = predecessor_application.effective_period.min.to_date..terminated_on
+        predecessor_application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_kind: 'voluntary', termination_reason: 'voluntary')
+        predecessor_application.terminate_enrollment!
+        renewal_application.cancel!
+      end
+
+      it 'should return off cycle enrollment' do
+        expect(census_employee.enrollments_for_display[0]).to eq off_cycle_health_enrollment
+      end
+    end
 
     it 'should return auto renewing health enrollment' do
       renewal_application.approve_application! if renewal_application.may_approve_application?
@@ -2671,7 +2721,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       it "should return nil if given effective_on date is in imported benefit application" do
         initial_application.update_attributes(aasm_state: :imported)
         coverage_date = initial_application.end_on - 1.month
-        expect(census_employee.benefit_package_for_date(coverage_date)).to eq nil
+        expect(census_employee.reload.benefit_package_for_date(coverage_date)).to eq nil
       end
 
       it "should return nil if given coverage_date is not between the bga start_on and end_on dates" do
