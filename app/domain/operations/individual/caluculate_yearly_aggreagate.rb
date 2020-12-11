@@ -5,6 +5,7 @@ module Operations
     class CalculateYearlyAggregate
       include Dry::Monads[:result, :do]
       include FloatHelper
+
       def call(params)
         validated_enrollment = yield validate(params)
         amount_consumed      = yield consumed_aptc_amount(validated_enrollment)
