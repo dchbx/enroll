@@ -96,13 +96,11 @@
               <% else %>
                 <% if @employee_role.present? && @employee_role.census_employee.is_employee_in_term_pending? %>
                 <% else %>
-                  <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
-                  <% if @employee_role.try(:is_under_open_enrollment?)  %>
-                    <%= format_date @employee_role.benefit_begin_date %>.
-                  <%elsif is_under_open_enrollment? %>
-                    <%= format_date ivl_enrollment_effective_date %>.
+                  <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?) %>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
+                  <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date ivl_enrollment_effective_date %>.</p>
                   <% end %>
-                  </p>
                 <% end %>
               <% end %>
 

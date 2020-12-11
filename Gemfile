@@ -83,7 +83,7 @@ gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'           
+gem 'kaminari'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
 gem 'language_list',            '~> 1'
@@ -134,7 +134,7 @@ group :development do
   gem 'listen',                 '>= 3.0.5', '< 3.2'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'              
+  gem 'spring'
   gem 'spring-watcher-listen'
 end
 
@@ -154,10 +154,6 @@ group :development, :test do
   gem 'rspec_junit_formatter'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
-
-  gem 'pry-rails'
-  gem 'pry-byebug'
-  gem 'pry-stack_explorer'
 end
 
 group :test do
@@ -184,4 +180,3 @@ group :production do
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end
-

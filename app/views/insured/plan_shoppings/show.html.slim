@@ -90,6 +90,28 @@
 javascript:
   var marketKind = "#{@hbx_enrollment.is_shop? ? 'shop' : @hbx_enrollment.kind}";
 
+  // Needs to be defined outside of conditional for marketKind
+  // because will try to render on plan_filters.html.slim even on individual market
+  var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+  function resetAllFilters() {
+    clearAll()
+    clearSelections()
+    resetComparePlan()
+    total_plans = $('#plans .plan-row').length
+    $("#plans-count").text(total_plans);
+  }
+
+  function clearSelections() {
+    Array.from(selectedPlans).forEach(function (plan) {
+      if (plan) {
+        plan.remove()
+      }
+    })
+    if (document.getElementById('plans').length) {
+      document.getElementById('plans').classList.remove('hidden');
+    }
+  }
+
   if (marketKind === "shop") {
     var availableEnrollments = [];
     var availableCarriers = [];
@@ -99,7 +121,8 @@ javascript:
     var enrollments = document.getElementById('filteredPlans').dataset.enrollments;
     var carriers = document.getElementById('filteredPlans').dataset.carriers;
     var filterType = String;
-    var selectedPlans = document.getElementsByClassName("myfilteredPlans");
+    // Needs to be used for IVL too
+    // var selectedPlans = document.getElementsByClassName("myfilteredPlans");
     var carrierLogos = JSON.parse('#{raw(digest_logos.to_json)}');
     // Grabs available products as JSON for filtering onload
     (function () {
@@ -108,26 +131,12 @@ javascript:
     })();
 
     var coverageKind = "#{@hbx_enrollment.coverage_kind}";
-
+    
+    // Allow filtering from high to low
     if (coverageKind == "dental") {
-      $(".plan-metal-level-selection-filter").attr("disabled", true);
-    }
-
-    function resetAllFilters() {
-      clearAll()
-      clearSelections()
-      resetComparePlan()
-      total_plans = $('#plans .plan-row').length
-      $("#plans-count").text(total_plans);
-    }
-
-    function clearSelections() {
-      Array.from(selectedPlans).forEach(function (plan) {
-        if (plan) {
-          plan.remove()
-        }
-      })
-      document.getElementById('plans').classList.remove('hidden')
+      $(".plan-metal-level-selection-filter").filter(
+        plan_filter => plan_filter.id != 'plan-metal-level-high' && plan_filter.id != 'plan-metal-level-low'
+      ).attr("disabled", true);
     }
 
     function filterBy(element) {
@@ -518,10 +527,6 @@ javascript:
   if (marketKind === 'individual' || marketKind === 'coverall') {
     $(document).ready(function () {
       var coverageKind = "#{@hbx_enrollment.coverage_kind}";
-      if (coverageKind === "dental") {
-        $(".plan-metal-level-selection-filter").attr("disabled", true);
-      }
-
       $.ajax({
         url: "#{plans_insured_plan_shopping_path(id: @hbx_enrollment.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind) if @hbx_enrollment.present?}",
         type: "GET"
