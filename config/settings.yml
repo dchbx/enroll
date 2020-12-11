@@ -412,6 +412,6 @@ external_applications:
 
 hbxit:
   rabbit:
-    uri: <%= ENV['HBXIT_PREPROD_RABBIT_URL'] %>
+    uri: <%= ENV['HBXIT_RABBIT_URL'] %>
   api:
-    uri: <%= ENV['HBXIT_PREPROD_ADMIN_API_URL'] %>
+    uri: <%= ENV['HBXIT_ADMIN_API_URL'] %>
