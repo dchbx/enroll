@@ -60,6 +60,9 @@ module Entities
       attribute :applied_premium_credit,               Types::Float.optional.meta(omittable: true)
 
       attribute :hbx_enrollment_members,               Types::Array.of(Entities::HbxEnrollments::HbxEnrollmentMember)
+
+      attribute :family_id,                            Types::Bson.optional.meta(omittable: true)
+      attribute :household_id,                         Types::Bson.optional.meta(omittable: true)
     end
   end
 end
