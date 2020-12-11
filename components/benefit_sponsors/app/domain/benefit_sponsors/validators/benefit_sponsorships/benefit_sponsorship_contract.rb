@@ -15,7 +15,7 @@ module BenefitSponsors
           optional(:termination_reason).maybe(:string)
           optional(:predecessor_id).maybe(Types::Bson)
           required(:source_kind).filled(:symbol)
-          required(:registered_on).filled(:date)
+          optional(:registered_on).maybe(:date)
           optional(:is_no_ssn_enabled).maybe(:bool)
           optional(:ssn_enabled_on).maybe(:date)
           optional(:ssn_disabled_on).maybe(:date)
