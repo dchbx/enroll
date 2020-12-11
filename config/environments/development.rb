@@ -77,7 +77,7 @@ Rails.application.configure do
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
-  config.action_cable.url = "ws://localhost:3000/cable" 
+  config.action_cable.url = "/cable" 
 
 
   Mongoid.logger.level = Logger::ERROR

@@ -96,7 +96,7 @@ Rails.application.configure do
   #Queue adapter
   config.active_job.queue_adapter = :resque
 
-  config.action_cable.url = "ws://pvt-6-enroll.priv.dchbx.org/cable"
+  config.action_cable.url = "/cable"
 
   Mongoid.logger.level = Logger::ERROR
   Mongo::Logger.logger.level = Logger::ERROR
