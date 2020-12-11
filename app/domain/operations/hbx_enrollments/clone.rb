@@ -35,7 +35,7 @@ module Operations
 
       def construct_params(values)
         @current_enrollment = values[:hbx_enrollment]
-        enr_params = @current_enrollment.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :elected_aptc_pct, :applied_aptc_amount, :terminated_on, :terminate_reason, :hbx_enrollment_members, :workflow_state_transitions)
+        enr_params = @current_enrollment.serializable_hash.deep_symbolize_keys.except(:_id, :created_at, :updated_at, :terminated_on, :terminate_reason, :hbx_enrollment_members, :workflow_state_transitions)
         enr_params.merge!({aasm_state: 'shopping', effective_on: values[:effective_on]})
         enr_params.merge!(values[:options])
         enr_params[:hbx_enrollment_members] = hbx_enrollment_members_params
@@ -54,22 +54,7 @@ module Operations
       end
 
       def clone_hbx_enrollment(enr_entity)
-        enr_params = enr_entity.to_h
-        enrollment = ::HbxEnrollment.new
-        enrollment.assign_attributes(enr_params.except(:hbx_enrollment_members, :workflow_state_transitions))
-        enrollment.family = @current_enrollment.family
-        enrollment.household = @current_enrollment.household
-
-        enr_params[:hbx_enrollment_members].each do |member_params|
-          init_hbx_enrollment_member(member_params, enrollment)
-        end
-        Success(enrollment)
-      end
-
-      def init_hbx_enrollment_member(member_params, enrollment)
-        new_enrollment_member = enrollment.hbx_enrollment_members.new
-        new_enrollment_member.assign_attributes(member_params)
-        new_enrollment_member
+        Success(::HbxEnrollment.new(enr_entity.to_h))
       end
     end
   end

@@ -63,25 +63,34 @@ RSpec.describe Operations::HbxEnrollments::Clone, :type => :model, dbclean: :aro
   end
 
   context 'when enrollment reinstated', dbclean: :around_each do
-    let(:cloned_enrollment) do
-      subject.call({hbx_enrollment: enrollment, effective_on: enrollment.terminated_on.next_day, options: {}}).success
+    before do
+      params = {hbx_enrollment: enrollment, effective_on: enrollment.terminated_on.next_day, options: {}}
+      @cloned_enrollment = subject.call(params).success
     end
 
     it 'should build reinstated enrollment' do
-      expect(cloned_enrollment.kind).to eq enrollment.kind
-      expect(cloned_enrollment.coverage_kind).to eq enrollment.coverage_kind
-      expect(cloned_enrollment.product_id).to eq enrollment.product_id
+      expect(@cloned_enrollment.kind).to eq enrollment.kind
+      expect(@cloned_enrollment.coverage_kind).to eq enrollment.coverage_kind
+      expect(@cloned_enrollment.product_id).to eq enrollment.product_id
     end
 
     it 'should build a continuous coverage' do
-      expect(cloned_enrollment.effective_on).to eq enrollment.terminated_on.next_day
+      expect(@cloned_enrollment.effective_on).to eq enrollment.terminated_on.next_day
     end
 
     it 'should give same member coverage begin date as input enrollment' do
-      enrollment_member = cloned_enrollment.hbx_enrollment_members.first
+      enrollment_member = @cloned_enrollment.hbx_enrollment_members.first
       expect(enrollment_member.coverage_start_on).to eq enrollment.effective_on
       expect(enrollment_member.eligibility_date).to eq enrollment.effective_on
-      expect(cloned_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
+      expect(@cloned_enrollment.hbx_enrollment_members.size).to eq enrollment.hbx_enrollment_members.size
+    end
+
+    it 'should assign family_id' do
+      expect(@cloned_enrollment.family_id).to eq(family.id)
+    end
+
+    it 'should assign household_id' do
+      expect(@cloned_enrollment.household_id).to eq(family.latest_household.id)
     end
   end
 
