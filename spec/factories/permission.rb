@@ -44,6 +44,7 @@ FactoryBot.define do
       view_the_configuration_tab { false }
       can_submit_time_travel_request { false }
       can_access_outstanding_verification_sub_tab { true }
+      can_access_pay_now { true }
     end
 
     trait :hbx_csr_supervisor do
@@ -95,6 +96,7 @@ FactoryBot.define do
       can_submit_time_travel_request { false }
       can_access_new_consumer_application_sub_tab { true }
       can_access_age_off_excluded {true}
+      can_access_pay_now { true }
     end
 
     trait :developer do

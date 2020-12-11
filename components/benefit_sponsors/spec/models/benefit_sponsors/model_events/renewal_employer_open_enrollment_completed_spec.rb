@@ -6,6 +6,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompleted', dbclean: :after_each do
+  before do
+    DatabaseCleaner.clean
+  end
+
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
 
