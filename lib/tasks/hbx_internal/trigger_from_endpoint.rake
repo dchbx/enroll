@@ -7,20 +7,22 @@ namespace :hbxinternal do
   desc "testing triggering rake execution from endpoint"
   task :trigger_from_endpoint => :environment do
     puts "running hbxinternal rake task at #{Time.now}"
-    hbxit_broker_uri = Settings.hbxit.rabbit.uri
+    hbxit_broker_uri = Settings.hbxit.rabbit.url
     target_queue = 'mafia'
-
+    notify_broker "Initiating rake task: trigger_from_endpoint"
     conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
     conn.start
     chan = conn.create_channel
     queue = chan.queue('dev')
     chan.confirm_select
     chan.default_exchange.publish("Initiating rake task: trigger_from_endpoint by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
+    #chan.wait_for_confirms
     sleep 4
     puts "ending hbxinternal rake task"
     chan.default_exchange.publish("Ending rake task: trigger_from_endpoint successfully by Andrej Rasevic at #{Time.now}",routing_key: queue.name)
     chan.wait_for_confirms
     conn.close
+    #close_broker_connection "Initiating rake task: trigger_from_endpoint"
   end
 
   task :change_person_dob => :environment do
@@ -228,7 +230,7 @@ namespace :hbxinternal do
   end
 
   def notify_broker(task)
-    hbxit_broker_uri = Settings.hbxit.rabbit.uri
+    hbxit_broker_uri = Settings.hbxit.rabbit.url
     target_queue = 'mafia'
     conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
     conn.start
@@ -240,7 +242,7 @@ namespace :hbxinternal do
 
   def close_broker_connection(task)
     puts "ending #{task} rake task"
-    hbxit_broker_uri = Settings.hbxit.rabbit.uri
+    hbxit_broker_uri = Settings.hbxit.rabbit.url
     target_queue = 'mafia'
     conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
     conn.start
@@ -254,7 +256,7 @@ namespace :hbxinternal do
 
   def close_broker_connection_with_error(task, error)
     puts "ending #{task} rake task with error: #{error}"
-    hbxit_broker_uri = Settings.hbxit.rabbit.uri
+    hbxit_broker_uri = Settings.hbxit.rabbit.url
     target_queue = 'mafia'
     conn = Bunny.new(hbxit_broker_uri, :heartbeat => 15)
     conn.start
@@ -268,7 +270,7 @@ namespace :hbxinternal do
   end
 
   def notify_admin_client(rakeTaskResultId, taskStatus = nil, initialValue = nil, updatedValue = nil, taskAction = nil)
-    endpoint = Settings.hbxit.api.uri + '/rakeTaskTriggerHistories'
+    endpoint = Settings.hbxit.api.url + '/rakeTaskTriggerHistories'
     HTTParty.put(endpoint,
           :body => {:rakeTaskResultId => rakeTaskResultId, :taskStatus => taskStatus, :taskAction => taskAction, :initialDataValues => initialValue, :finalDataValues => updatedValue}.to_json,
           :headers => {'Content-Type' => 'application/json'}

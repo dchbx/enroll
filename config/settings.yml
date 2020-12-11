@@ -412,6 +412,6 @@ external_applications:
 
 hbxit:
   rabbit:
-    uri: 'amqp://mafia:password@qa-dchbx-it.priv.dchbx.org:5672/hbxit'
+    uri: <%= ENV['HBXIT_PREPROD_RABBIT_URL'] %>
   api:
-    uri: 'http://localhost:4000/api/v1'
+    uri: <%= ENV['HBXIT_PREPROD_ADMIN_API_URL'] %>
