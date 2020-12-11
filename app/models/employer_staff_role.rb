@@ -89,12 +89,12 @@ class EmployerStaffRole
 
   def census_employee_params
     person.attributes.slice('first_name', 'middle_name', 'last_name', 'name_sfx', 'dob', 'ssn', 'gender').merge(
-      'address_attributes' => person.addresses[0].attributes.except('_id', 'created_at', 'updated_at', 'tracking_version'),
-      'email_attributes' => person.emails[0].attributes.except('_id', 'created_at', 'updated_at')
+      'address_attributes' => coverage_record.addresses[0].attributes.except('_id', 'created_at', 'updated_at', 'tracking_version'),
+      'email_attributes' => coverage_record.emails[0].attributes.except('_id', 'created_at', 'updated_at')
     )
   end
 
   def has_coverage?
-    coverage_record.present?
+    coverage_record.present? && coverage_record.is_applying_coverage
   end
 end
