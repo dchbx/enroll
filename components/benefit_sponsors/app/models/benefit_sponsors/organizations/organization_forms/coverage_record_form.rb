@@ -13,6 +13,9 @@ module BenefitSponsors
         attribute :hired_on, String
         attribute :is_applying_coverage, Boolean
 
+        attribute :address, ::BenefitSponsors::Organizations::OrganizationForms::AddressForm
+        attribute :email, ::BenefitSponsors::Forms::EmailForm
+
         validates_presence_of :is_applying_coverage
       end
     end
