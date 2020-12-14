@@ -83,7 +83,7 @@ module Operations
                                         country_name: address[:country_name]
                                       }),
                   email: Email.new({
-                                    kind: email[:kind]
+                                    kind: email[:kind],
                                     address: email[:address]
                                   })
                 )
