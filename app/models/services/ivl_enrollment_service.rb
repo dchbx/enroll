@@ -40,7 +40,7 @@ module Services
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       cbp_start = current_benefit_period.start_on
       ivl_enrollments = HbxEnrollment.where(
-        :effective_on.in => [cbp_start, cbp_start + 1.month, cbp_start + 2.months],
+        :effective_on.gte => cbp_start,
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )

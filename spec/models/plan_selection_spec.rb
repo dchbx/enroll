@@ -168,6 +168,23 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
       end
     end
 
+    context "off-cycle OE" do
+      let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
+
+      before :each do
+        next_period_start = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period.start_on + 1.year
+        allow(subject.hbx_enrollment).to receive(:effective_on).and_return(next_period_start + 1.month)
+        allow(subject.hbx_enrollment).to receive(:is_active_renewal_purchase?).and_return(true)
+      end
+
+      it 'should set 2/1 enrollment aasm_state to coverage_selected instead of renewing_coverage_selected' do
+        subject.hbx_enrollment.hbx_enrollment_members.flat_map(&:person).flat_map(&:consumer_role).first.update_attribute("aasm_state","shopping")
+        subject.hbx_enrollment.update_attributes(aasm_state: 'shopping')
+        subject.select_plan_and_deactivate_other_enrollments(nil, 'individual')
+        expect(subject.hbx_enrollment.aasm_state).to eq('coverage_selected')
+      end
+    end
+
     context "IVL user auto_renewed renewal enrollment plan shopping" do
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
 
