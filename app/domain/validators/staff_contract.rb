@@ -18,6 +18,28 @@ module Validators
         optional(:dob).maybe(:date)
         optional(:hired_on).maybe(:date)
         required(:is_applying_coverage).value(:bool)
+        required(:address).maybe(:hash)
+        required(:email).maybe(:hash)
+      end
+    end
+
+    rule(:coverage_record) do
+      if value[:is_applying_coverage]
+        address = value[:address]
+        email = value[:email]
+        if address&.is_a?(Hash)
+          result = Validators::AddressContract.new.call(address)
+          key.failure(text: "invalid address", error: result.errors.to_h) if result&.failure?
+        else
+          key.failure(text: "invalid addresses. Expected a hash.")
+        end
+
+        if email&.is_a?(Hash)
+          result = Validators::EmailContract.new.call(email)
+          key.failure(text: "invalid email", error: result.errors.to_h) if result&.failure?
+        else
+          key.failure(text: "invalid emails. Expected a hash.")
+        end
       end
     end
   end
