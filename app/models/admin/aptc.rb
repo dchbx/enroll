@@ -428,6 +428,7 @@ class Admin::Aptc < ApplicationController
           applied_aptc = hbx[1]["aptc_applied"].to_f
           aptc_errors["ENROLLMENT_MAX_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.enrollment_max_smaller_than_applied + "[NEW_MAX_FOR_ENROLLMENT (#{'%.2f' % max_for_hbx.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > max_for_hbx
           hbx_enrollment = hbxs.select{|h| h.id.to_s == hbx[1]["hbx_id"].gsub("aptc_applied_","") }.first
+          aptc_errors["CATASTROHPHIC_PLAN_ERROR"] = Settings.aptc_errors.cat_plan_error unless hbx_enrollment.product.can_use_aptc?
           plan_premium = hbx_enrollment.total_premium
           aptc_errors["PREMIUM_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.plan_premium_smaller_than_applied + "[PLAN_PREMIUM (#{'%.2f' % plan_premium.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > plan_premium
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f

@@ -431,6 +431,37 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             end
           end
 
+          context 'available aptc for catastrophic product' do
+            before do
+              @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :catastrophic, benefit_market_kind: :aca_individual)
+              @product_id = @product.id.to_s
+              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+              @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
+            end
+
+            context '.fetch_applicable_aptcs' do
+              it 'should return a Hash' do
+                expect(@applicable_aptc.class).to eq Hash
+              end
+
+              it 'should return zero aptc' do
+                expect(@applicable_aptc[@product_id]).to eq 0.0
+              end
+            end
+
+            context '.fetch_aptc_per_member' do
+              it 'should return a Hash' do
+                expect(@aptc_per_member.class).to eq Hash
+              end
+
+              it 'should return zero aptc' do
+                fm1_id = enrollment1.hbx_enrollment_members.first.applicant_id.to_s
+                expect(@aptc_per_member[@product_id][fm1_id]).to eq 0.0
+              end
+            end
+          end
+
           context 'where available_aptc less than ehb_premium and selected_aptc' do
             before do
               family.active_household.tax_households.first.destroy
