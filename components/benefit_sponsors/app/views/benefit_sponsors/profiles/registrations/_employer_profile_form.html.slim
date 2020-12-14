@@ -71,6 +71,12 @@ javascript:
     var ssn = document.getElementById("inputSsn")
     var gender = document.getElementById("inputGender")
     var hiredOn = document.getElementById("inputHiredOn")
+    var address1 = document.getElementById("inputAddress1")
+    var city = document.getElementById("inputCity")
+    var state = document.getElementById("inputState")
+    var zip = document.getElementById("inputZip")
+    var kind = document.getElementById("inputKind")
+    var emailAddress = document.getElementById("inputEmailAddress")
     if (element.value === "true") {
       result.forEach(function (ele) {
         ele.classList.remove("hidden");
@@ -79,6 +85,12 @@ javascript:
       ssn.setAttribute("required", "true");
       gender.setAttribute("required", "true");
       hiredOn.setAttribute("required", "true");
+      address1.setAttribute("required", "true");
+      city.setAttribute("required", "true");
+      state.setAttribute("required", "true");
+      zip.setAttribute("required", "true");
+      kind.setAttribute("required", "true");
+      emailAddress.setAttribute("required", "true");
 
     } else {
       result.forEach(function (ele) {
@@ -88,6 +100,12 @@ javascript:
       ssn.setAttribute("required", "false");
       gender.setAttribute("required", "false");
       hiredOn.setAttribute("required", "false");
+      address1.setAttribute("required", "false");
+      city.setAttribute("required", "false");
+      state.setAttribute("required", "false");
+      zip.setAttribute("required", "false");
+      kind.setAttribute("required", "false");
+      emailAddress.setAttribute("required", "false");
     }
   }
 
