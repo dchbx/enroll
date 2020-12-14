@@ -29,14 +29,14 @@ module Operations
           termination_date = enrollment.terminated_on || (base_enrollment.effective_on - 1.day)
           months_consumed = termination_date.next_month.month - enrollment.effective_on.month
           amount_consumed = enrollment.applied_aptc_amount.to_f * months_consumed
-          @consumed_aptc = consumed_aptc + amount_consumed
+          consumed_aptc += amount_consumed
         end
         Success(consumed_aptc)
       end
 
       #logic to calculate the yearly Aggregate
       def calculate_yearly_aggregate(base_enrollment, consumed_aptc)
-        latest_max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(base_enrollment).latest_eligibility_determination.max_aptc.to_f
+        latest_max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(base_enrollment.effective_on.year).latest_eligibility_determination.max_aptc.to_f
         available_annual_aggregate = (latest_max_aptc * 12) - consumed_aptc
         available_monthly_aggregate = available_annual_aggregate / (12 - (base_enrollment.effective_on - 1.day).month)
         available_monthly_aggregate = (available_monthly_aggregate < 0) ? 0 : available_monthly_aggregate
