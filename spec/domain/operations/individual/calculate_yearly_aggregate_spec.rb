@@ -7,9 +7,8 @@ module Operations
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:household) {FactoryBot.create(:household, family: family)}
       let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
-      let(:household) {FactoryBot.create(:household, family: family)}
       let(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
-      let(:sample_max_aptc_1) {1000.00}
+      let(:sample_max_aptc_1) {1200.00}
       let(:sample_csr_percent_1) {87}
       let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: start_on + 8.months, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
       let!(:hbx1) do
@@ -82,7 +81,7 @@ module Operations
         let(:params) { hbx1 }
 
         it "fails" do
-          expect(subject.success).to eq 3000.0
+          expect(subject.success).to eq 3100.0
         end
       end
     end
