@@ -22,3 +22,55 @@
   = f.date_field :hired_on, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputHiredOn', maxlength:10, minlength:10}
   .invalid-feedback
     | Please provide a Hired on date.
+hr
+
+= f.fields_for :address, f.object.address, errors: {}, fieldset: false do |f|
+  = f.hidden_field :kind, value: 'home'
+  .div.optional.hidden.ml-2.row
+    strong Address
+    .row
+      .col-md-6.col-sm-6.col-xs-12.mb-3
+        label for="inputAddress1" Address 1
+        = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
+        .invalid-feedback
+          | Please provide a valid address.
+      .col-md-6.col-sm-6.col-xs-12.mb-3
+        label for="inputAddress2" Address 2
+        = f.text_field :address_2, class:"form-control mb-1",  placeholder: "Address 2", id: 'inputAddress2'
+
+    .row[data-controller='zip-check']
+      .col-md-6.col-sm-12.col-xs-12.mb-3
+        label for="inputCity" City
+        = f.text_field :city, class: "form-control mb-1", required: true, placeholder: 'CITY', id: 'inputCity'
+        .invalid-feedback
+          | Please provide a valid city.
+      .col-md-6.col-sm-12.col-xs-12.mb-3
+        label for="inputState" State
+        = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
+        .invalid-feedback
+          | Please select a state.
+      .col-md-6.col-sm-12.col-xs-12.mb-3
+        label for="inputZip" Zip
+        = f.text_field :zip, id:'inputZip', class:'form-control mb-1', minlength:'5', maxlength:'5'
+        .invalid-feedback
+          | Please provide a valid zipcode.
+
+      - if (aca_address_query_county && @agency.profile_type != "broker_agency" && @agency.profile_type != "general_agency")
+        .col-md-3.col-sm-12.col-xs-12.mb-3
+          label for="inputCounty" County
+          = f.select :county, options_for_select([]), {include_blank: "SELECT COUNTY"}, class:'form-control mb-1', id:'inputCounty', data: { options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq }
+          .invalid-feedback
+            | Please provide a valid county.
+
+= f.fields_for :email, f.object.email, errors: {}, fieldset: false do |f|
+  .div.optional.hidden.ml-2.row
+    strong Email
+    .row
+      .col-md-6.col-sm-6.col-xs-12.mb-3
+        label for="inputAddress1" Kind
+        = f.select(:kind, options_for_select(Email::KINDS, selected: f.object.try(:kind)), {include_blank: "SELECT KIND"}, class:'form-control mb-1', id:'inputKind', required: true)
+        .invalid-feedback
+          | Please select a valid kind.
+      .col-md-6.col-sm-6.col-xs-12.mb-3
+        label for="inputAddress2" Address
+        = f.text_field :address, class:"form-control mb-1",  placeholder: "Email", id: 'inputEmailAddress'
