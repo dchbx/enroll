@@ -34,6 +34,10 @@ module FinancialAssistance
 
     def create_plan
       hbx_profile = FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+      product = BenefitMarkets::Products::Product.all.first
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+        bcp.update_attributes!(slcsp_id: product.id, slcsp: product.id)
+      end
       hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.benefit_packages.first
     end
 
