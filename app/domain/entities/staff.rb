@@ -17,6 +17,8 @@ module Entities
       attribute :dob,                    Types::Date.optional.meta(omittable: true)
       attribute :hired_on,               Types::Date.optional.meta(omittable: true)
       attribute :is_applying_coverage,   Types::Bool.optional.meta(omittable: true)
+      attribute :address,                Entities::Address.optional
+      attribute :email,                  Entities::Email.optional
     end
   end
 end
