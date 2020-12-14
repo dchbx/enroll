@@ -300,15 +300,26 @@ module BenefitSponsors
               }
               if factory.coverage_record.present?
                 coverage_record = factory.coverage_record
-                attrs.merge!({
-                               coverage_record: {
-                                 ssn: coverage_record[:ssn],
-                                 gender: coverage_record[:gender],
-                                 dob: coverage_record[:dob],
-                                 hired_on: coverage_record[:hired_on],
-                                 is_applying_coverage: coverage_record[:is_applying_coverage]
-                               }
-                             })
+                address = coverage_record[:address]
+                email = coverage_record[:email]
+                attrs.merge!({coverage_record: {ssn: coverage_record[:ssn],
+                                                gender: coverage_record[:gender],
+                                                dob: coverage_record[:dob],
+                                                hired_on: coverage_record[:hired_on],
+                                                is_applying_coverage: coverage_record[:is_applying_coverage],
+                                                address: Address.new({kind: address[:kind],
+                                                                      address_1: address[:kind],
+                                                                      address_2: address[:address_2],
+                                                                      address_3: address[:address_3],
+                                                                      city: address[:city],
+                                                                      county: address[:county],
+                                                                      state: address[:state],
+                                                                      location_state_code: address[:location_state_code],
+                                                                      full_text: address[:full_text],
+                                                                      zip: address[:zip],
+                                                                      country_name: address[:country_name]}),
+                                                email: Email.new({kind: email[:kind],
+                                                                  address: email[:address]})}})
               end
               person.employer_staff_roles << EmployerStaffRole.new(attrs)
             end
