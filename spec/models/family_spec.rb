@@ -974,14 +974,23 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one ivl open enrollment period" do
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
 
     it "should be in open enrollment" do
-      expect(family.is_under_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 1
+      end
     end
 
     it "should not be in shop open enrollment" do
@@ -993,11 +1002,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 
@@ -1005,7 +1022,8 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
     let(:person) {FactoryBot.create(:person)}
     let!(:benefit_group) { current_benefit_package }
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
@@ -1017,7 +1035,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should have two current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 2
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 1
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 2
+      end
     end
 
     it "should be in shop open enrollment" do
@@ -1029,11 +1051,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 
@@ -1041,7 +1071,8 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
     let(:person) {FactoryBot.create(:person)}
     let!(:benefit_group) { current_benefit_package }
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
@@ -1058,7 +1089,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should have three current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 3
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 2
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 3
+      end
     end
 
     it "should be in shop open enrollment" do
@@ -1070,11 +1105,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 end
