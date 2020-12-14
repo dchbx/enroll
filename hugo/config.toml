@@ -1,6 +1,6 @@
 baseURL = "http://example.org/"
 languageCode = "en-us"
 title = "Enroll Documentation"
-theme = "fuji"
+theme = "docsy"
 showLicense = true
 showToc = true

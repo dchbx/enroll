@@ -1,7 +1,8 @@
 ---
 title: "Financial Assistance Engine"
+section: "Components'"
 date: 2020-11-18T12:11:47-05:00
-draft: true
+draft: false
 ---
 
 Financial Assistance (FA) is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. FA is designed to provide an application intake process for Medicaid and APTC through the Assisted/Consumer Family portal accessed through the root page of Enroll. Like all engines, the Financial Assistance engine can be toggled through the EnrollRegistry.

@@ -1,7 +1,8 @@
 ---
 title: "Notifier Engine"
+section: "Components"
 date: 2020-11-18T12:11:55-05:00
-draft: true
+draft: false
 ---
 
 The Notifier(FA) engine is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. The Notifier provides an interface for non developer users to change the font/format/layout/etc. of notices to be sent to users, and even include some conditional logic.

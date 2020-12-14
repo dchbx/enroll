@@ -4,8 +4,6 @@ date: 2020-11-18T12:12:25-05:00
 draft: true
 ---
 
-
-
 # SHOP Brokers
 Brokers can apply on DCHealthLink.com to become a registered broker. Brokers can apply on DCHealthLink.com to become a registered broker. When brokers apply on DCHealthLink.com their application is reviewed by the DCHBX business team and is either approved or put into a pending status. When an application is pending, a notification is automatically generated to the broker with pre-populated check boxes identifying the outstanding criteria the broker must fulfill to become a registered broker.
 

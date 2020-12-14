@@ -1,7 +1,8 @@
 ---
 title: "Benefit Sponsors Engine"
+section: "Components"
 date: 2020-12-10T12:11:29-05:00
-draft: true
+draft: false
 ---
 
 "Benefit Sponsors" is a [Rails Engine](https://guides.rubyonrails.org/engines.html) found in the components/ folder of Enroll. The Benefit Sponsors engine deals primarily with enrolling employees of DC based employers into employer sponsored (SHOP) coverage. 
