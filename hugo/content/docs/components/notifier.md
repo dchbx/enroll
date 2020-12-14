@@ -34,14 +34,11 @@ After creating a notice, clicking the notice name on the main notices index page
 
 Because Notifier is an engine, it does not directly internally reference root Enroll specific models such as consumer roles which are referenced in the Notifiers. To get around this and allow previews of notices, the Notifiers uses a "builder" and "merge model" pattern. For example:
 
-`
-module Notifier
+```module Notifier
   module MergeDataModels
     class ConsumerRole
       include Virtus.model
       include ActiveModel::Model
-
-
       attribute :dependents, Array[MergeDataModels::Dependent]
       attribute :magi_medicaid_members, Array[MergeDataModels::Dependent]
       attribute :aqhp_or_non_magi_medicaid_members, Array[MergeDataModels::Dependent]
@@ -50,9 +47,9 @@ module Notifier
       attribute :aqhp_eligible, Boolean
       attribute :totally_ineligible, Boolean
       # All other attributes listed here
- `
- That same MergeModel class also contains a stubbed object for previews:
- `
+      
+      # That same MergeModel class also contains a stubbed object for previews:
+      
       def self.stubbed_object
         notice = Notifier::MergeDataModels::ConsumerRole.new(
           {
@@ -70,7 +67,6 @@ module Notifier
                                  .strftime('%B %d, %Y')
           }
         )
-
         notice.mailing_address = Notifier::MergeDataModels::Address.stubbed_object
         notice.addresses = [notice.mailing_address]
         notice.dependents = [Notifier::MergeDataModels::Dependent.stubbed_object]
@@ -78,9 +74,10 @@ module Notifier
         notice.magi_medicaid_members = [Notifier::MergeDataModels::Dependent.stubbed_object]
         notice
       end
-The merge model class will also contain the collections (I.E. specific queries) and conditions defined in an array:
-
-```
+      
+      # The merge model class will also contain the collections
+      # (I.E. specific queries) and conditions defined in an array:
+      
       def collections
         %w[addresses dependents magi_medicaid_members aqhp_or_non_magi_medicaid_members uqhp_or_non_magi_medicaid_members]
       end
