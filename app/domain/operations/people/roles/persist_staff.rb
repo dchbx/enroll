@@ -56,6 +56,8 @@ module Operations
             if employer_ids.include? profile.id.to_s
               Failure({:message => 'Already staff role exists for the selected organization'})
             else
+              address = params[:address]
+              email = params[:email]
               person.employer_staff_roles << EmployerStaffRole.new(
                 person: person,
                 :benefit_sponsor_employer_profile_id => profile.id,
@@ -66,7 +68,24 @@ module Operations
                   dob: params[:dob],
                   hired_on: params[:hired_on],
                   is_applying_coverage: params[:is_applying_coverage],
-                  gender: params[:gender]
+                  gender: params[:gender],
+                  address: Address.new({
+                                        kind: address[:kind],
+                                        address_1: address[:kind],
+                                        address_2: address[:address_2],
+                                        address_3: address[:address_3],
+                                        city: address[:city],
+                                        county: address[:county],
+                                        state: address[:state],
+                                        location_state_code: address[:location_state_code],
+                                        full_text: address[:full_text],
+                                        zip: address[:zip],
+                                        country_name: address[:country_name]
+                                      }),
+                  email: Email.new({
+                                    kind: email[:kind]
+                                    address: email[:address]
+                                  })
                 )
               )
               person.save!
