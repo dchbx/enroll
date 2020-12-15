@@ -187,7 +187,7 @@ describe PlanSelection, dbclean: :after_each, :if => ExchangeTestingConfiguratio
 
     context "IVL user auto_renewed renewal enrollment plan shopping" do
       let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
-      
+
       before :each do
         hbx_enrollment.update_attributes(aasm_state: "auto_renewing")
         allow(hbx_enrollment).to receive(:is_active_renewal_purchase?).and_return true
