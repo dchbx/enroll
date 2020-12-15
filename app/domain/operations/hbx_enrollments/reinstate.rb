@@ -29,8 +29,8 @@ module Operations
         return Failure('Not a valid HbxEnrollment object.') unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure('Not a SHOP enrollment.') unless params[:hbx_enrollment].is_shop?
         return Failure('Given HbxEnrollment is not in any of the valid states for reinstatement states.') unless valid_by_states?(params[:hbx_enrollment])
-        return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?(params)
-        return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?
+        return Failure("Active Benefit Group Assignment does not exist for the effective_on: #{@effective_on}") unless active_bga_exists?(params)
+        return Failure('Overlapping coverage exists for this family in current year.') if overlapping_enrollment_exists?
 
         Success(params)
       end
@@ -41,23 +41,22 @@ module Operations
         aasm_state == 'coverage_canceled' && enrollment.terminate_reason == 'retroactive_canceled'
       end
 
-      def active_bga_exists?
+      def active_bga_exists?(params)
+        @effective_on = fetch_effective_on(params)
         @bga = @current_enr.census_employee.benefit_group_assignments.where(:'$or' => [{:start_on.gte => @effective_on, :end_on.lte => @effective_on},
                                                                                        {:start_on.gte => @effective_on, end_on: nil}]).first
       end
 
-      def overlapping_enrollment_exists?(params)
-        @effective_on = fetch_effective_on(params)
-        current_enr = params[:hbx_enrollment]
+      def overlapping_enrollment_exists?
         # Same Employer, same Kind, same Coverage Kind and same sponsored_benefit_package_id.
         query_criteria = {:aasm_state.nin => ['shopping', 'coverage_canceled'],
-                          :_id.ne => current_enr.id,
-                          kind: current_enr.kind,
-                          coverage_kind: current_enr.coverage_kind,
-                          sponsored_benefit_package_id: current_enr.sponsored_benefit_package_id,
-                          employee_role_id: current_enr.employee_role_id}
-        valid_enrs = current_enr.family.hbx_enrollments.where(query_criteria)
-        valid_enrs.any?{|ba| ba.effective_on >= @effective_on && ba.effective_on.year == @effective_on.year}
+                          :_id.ne => @current_enr.id,
+                          kind: @current_enr.kind,
+                          coverage_kind: @current_enr.coverage_kind,
+                          sponsored_benefit_package_id: @bga.benefit_package_id,
+                          employee_role_id: @current_enr.employee_role_id,
+                          effective_on: {"$gte": @bga.benefit_package.start_on.to_date, "$lte": @bga.benefit_package.end_on.to_date}}
+        @current_enr.family.hbx_enrollments.where(query_criteria).any?
       end
 
       def fetch_effective_on(params)
