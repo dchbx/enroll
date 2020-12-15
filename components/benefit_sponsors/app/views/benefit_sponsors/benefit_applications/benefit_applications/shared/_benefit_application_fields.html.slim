@@ -163,7 +163,6 @@ javascript:
     var targetDate = document.getElementById("baStartDate").value
     var minDate = document.querySelector("input#benefit_application_open_enrollment_start_on").dataset.dateMin;
     var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.oeEndDate;
-    // var maxDate = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
 
     if (minDate) {
       initDatepicker(id,new Date(minDate),new Date(maxDate));
