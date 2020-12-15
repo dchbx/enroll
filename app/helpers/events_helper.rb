@@ -86,7 +86,7 @@ module EventsHelper
   end
 
   def plan_year_start_date(benefit_application)
-    if benefit_application.reinstated_id?
+    if benefit_application.reinstated_id.present?
       simple_date_for(benefit_application.benefit_sponsor_catalog.effective_period.min)
     else
       simple_date_for(benefit_application.effective_period.min)
