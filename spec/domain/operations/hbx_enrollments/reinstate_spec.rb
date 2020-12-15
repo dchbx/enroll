@@ -113,7 +113,28 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
       end
     end
 
+    context 'when benefit group assignment not found' do
+      before do
+        new_enr = enrollment.dup
+        new_enr.assign_attributes({effective_on: enrollment.terminated_on.next_day})
+        new_enr.save!
+        @result = subject.call({hbx_enrollment: enrollment})
+      end
+
+      it 'should return a failure with a message' do
+        expect(@result.failure).to eq("Active Benefit Group Assignment does not exist for the effective_on: #{enrollment.terminated_on.next_day}")
+      end
+    end
+
     context 'overlapping enrollment exists' do
+      let!(:new_bga) do
+        current_bga = enrollment.census_employee.benefit_group_assignments.first
+        bga_params = current_bga.serializable_hash.deep_symbolize_keys.except(:_id, :workflow_state_transitions)
+        bga_params.merge!({start_on: enrollment.terminated_on.next_day})
+        enrollment.census_employee.benefit_group_assignments << ::BenefitGroupAssignment.new(bga_params)
+        enrollment.census_employee.save!
+      end
+
       before do
         new_enr = enrollment.dup
         new_enr.assign_attributes({effective_on: enrollment.terminated_on.next_day})
