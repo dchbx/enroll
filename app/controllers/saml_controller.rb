@@ -7,7 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
-    relay_state = URI.parse(params'RelayState').to_s
+    relay_state = URI.parse(params['RelayState']).to_s
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
