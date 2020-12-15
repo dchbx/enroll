@@ -6,11 +6,11 @@ module Operations
     RSpec.describe CalculateYearlyAggregate do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:household) {FactoryBot.create(:household, family: family)}
+      let!(:eligibility_determination_1) {FactoryBot.create(:eligibility_determination, max_aptc: sample_max_aptc_1, determined_at: start_on + 8.months, tax_household: tax_household, csr_percent_as_integer: sample_csr_percent_1)}
       let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
       let(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
       let(:sample_max_aptc_1) {1200.00}
       let(:sample_csr_percent_1) {87}
-      let(:eligibility_determination_1) {EligibilityDetermination.new(determined_at: start_on + 8.months, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
       let!(:hbx1) do
         FactoryBot.create(:hbx_enrollment,
                           family: family,
@@ -44,11 +44,6 @@ module Operations
 
       before(:each) do
         allow(family).to receive(:active_household).and_return household
-        allow(household).to receive(:latest_active_tax_household_with_year).and_return tax_household
-        allow(eligibility_determination_1).to receive(:tax_household).and_return tax_household
-        allow(tax_household).to receive(:eligibility_determinations).and_return [eligibility_determination_1]
-        allow(household).to receive(:hbx_enrollments).and_return [hbx1, hbx2, hbx3]
-        allow(household).to receive(:hbx_enrollments_with_consumed_aptc_by_year).and_return [hbx2, hbx3]
       end
 
       subject do
@@ -80,7 +75,7 @@ module Operations
       describe "calculated aggregate" do
         let(:params) { hbx1 }
 
-        it "fails" do
+        it "returns yearly aggregate amount" do
           expect(subject.success).to eq 3100.0
         end
       end
