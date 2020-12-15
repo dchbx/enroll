@@ -66,11 +66,15 @@ class Exchanges::ResidentsController < ApplicationController
     @resident_candidate = Forms::ResidentCandidate.new(@person_params)
     @person = @resident_candidate
     respond_to do |format|
-      if found_person = @resident_candidate.match_person
-        session[:person_id] = found_person.id
-        format.html { render 'match' }
+      if @person.valid?
+        if (found_person = @resident_candidate.match_person)
+          session[:person_id] = found_person.id
+          format.html { render 'match' }
+        else
+          format.html { render 'no_match' }
+        end
       else
-        format.html { render 'no_match' }
+        format.html { render 'search' }
       end
     end
   end
