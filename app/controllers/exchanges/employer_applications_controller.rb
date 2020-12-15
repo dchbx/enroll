@@ -4,6 +4,7 @@ module Exchanges
   class EmployerApplicationsController < ApplicationController
     include Pundit
     include Config::AcaHelper
+    include ::L10nHelper
 
     before_action :can_modify_plan_year?, only: [:terminate, :cancel]
     before_action :check_hbx_staff_role, except: :term_reasons
@@ -62,7 +63,8 @@ module Exchanges
                        else
                          @application.effective_period.min
                        end
-      flash[:notice] = "#{@benefit_sponsorship.legal_name} - Plan Year Reinstated Successfully Effective #{effective_date}"
+
+      flash[:notice] = "#{@benefit_sponsorship.legal_name} - #{l10n("exchange.employer_applications.success_message")} #{effective_date}"
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
 
