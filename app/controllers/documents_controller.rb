@@ -19,17 +19,17 @@ class DocumentsController < ApplicationController
 
   def authorized_download
     begin
-      model = params[:model].camelize
+      model = params[:model].camelize.safe_constantize
       model_id = params[:model_id]
       relation = params[:relation]
       relation_id = params[:relation_id]
 
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
-        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
+        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"safe_constantize
       end
 
-      model_object = Object.const_get(model).find(model_id)
+      model_object = model.find(model_id)
       documents = model_object.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
         uri = documents.find(relation_id).identifier

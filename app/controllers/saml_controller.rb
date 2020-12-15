@@ -7,7 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
-    relay_state = params["RelayState"]
+    relay_state = URI.parse(SamlInformation.kp_pay_now_relay_state).to_s
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
@@ -32,7 +32,7 @@ class SamlController < ApplicationController
           oim_user.update_attributes!(last_portal_visited: relay_state)
           redirect_to relay_state, flash: {notice: "Signed in Successfully."}
         elsif !oim_user.last_portal_visited.blank?
-          redirect_to oim_user.last_portal_visited, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
           oim_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
