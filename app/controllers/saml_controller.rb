@@ -7,7 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
-    relay_state = URI.parse(params['RelayState']).to_s
+    relay_state = params['RelayState']
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
@@ -30,7 +30,7 @@ class SamlController < ApplicationController
         sign_in(:user, oim_user)
         if !relay_state.blank?
           oim_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         elsif !oim_user.last_portal_visited.blank?
           redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
@@ -55,7 +55,7 @@ class SamlController < ApplicationController
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         else
           new_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         end
       end
     elsif !response.name_id.present?
@@ -80,15 +80,15 @@ class SamlController < ApplicationController
         ::IdpAccountManager::CURAM_NAVIGATION_FLAG
       )
       # redirect_to destroy_user_session_path
-      redirect_to SamlInformation.curam_landing_page_url
+      redirect_to URI.parse(SamlInformation.curam_landing_page_url).to_s
     else
-      redirect_to SamlInformation.iam_login_url
+      redirect_to URI.parse(SamlInformation.iam_login_url).to_s
     end
 
   end
 
   def logout
-    redirect_to SamlInformation.saml_logout_url
+    redirect_to URI.parse(SamlInformation.saml_logout_url).to_s
   end
 
   def redirection_test
