@@ -49,7 +49,11 @@ describe EmployerStaffRole, dbclean: :after_each do
     end
 
     context 'with coverage record and benefit packages' do
-      let!(:coverage) {staff_role.coverage_record = CoverageRecord.new(encrypted_ssn: SymmetricEncryption.encrypt('123123453'), dob: Date.new(2000,1,1), gender: 'male', hired_on: Date.new(2020,11,1), is_applying_coverage: true)}
+      let!(:coverage) do
+        staff_role.coverage_record = CoverageRecord.new(encrypted_ssn: SymmetricEncryption.encrypt('123123453'), dob: TimeKeeper.date_of_record - 25.years, gender: 'male', hired_on: TimeKeeper.date_of_record - 1.years, is_applying_coverage: true)
+        staff_role.coverage_record.email = FactoryBot.build(:email)
+        staff_role.coverage_record.address = Address.new(kind: 'primary', address_1: '123 test', city: 'test', state: 'DC', zip: '20002')
+      end
 
       before do
         staff_role.approve!
