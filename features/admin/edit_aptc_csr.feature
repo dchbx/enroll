@@ -13,5 +13,5 @@ Feature: Update APTC and CSR
         Then Hbx Admin should see an Edit APTC / CSR link
 
     Scenario: Admin tries to Apply APTC/CSR for Catastrophic plan
-        And Hbx Admin clicks on the Update APTC / CSR button
+        And Hbx Admin clicks on the Update APTC CSR button
         Then Hbx Admin should see cat plan error message
