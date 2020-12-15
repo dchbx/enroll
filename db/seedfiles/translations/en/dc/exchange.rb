@@ -13,6 +13,7 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.cancel" => "Cancel",
   "en.exchange.employer_applications.continue" => "Continue",
   "en.exchange.employer_applications.confirmation_message" => "Would you like to reinstate the plan year?",
+  "en.exchange.employer_applications.success_message" => "Plan Year Reinstated Successfully Effective",
   "en.exchange.employer_applications.reinstate" => "Reinstate",
   "en.exchange.employer_applications.voluntary_term" => "Voluntary Termination",
   "en.exchange.employer_applications.non_payment_term" => "Non-Pay Termination",
