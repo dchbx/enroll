@@ -26,7 +26,7 @@ class DocumentsController < ApplicationController
 
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
-        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"safe_constantize
+        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile".safe_constantize
       end
 
       model_object = model.find(model_id)
