@@ -59,7 +59,7 @@ class CensusEmployee < CensusMember
   EMPLOYEE_COBRA_TERMINATED_EVENT_NAME = "acapi.info.events.census_employee.cobra_terminated"
   # @!endgroup
 
-  CONFIRMATION_EFFECTIVE_DATE_TYPES = ['cobra', 'rehire', 'terminate']
+  CONFIRMATION_EFFECTIVE_DATE_TYPES = ['cobra', 'rehire', 'terminate'].freeze
 
   field :is_business_owner, type: Boolean, default: false
   field :hired_on, type: Date
