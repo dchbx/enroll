@@ -59,9 +59,7 @@ module Forms
           self.errors.add(:tribal_id, "is required when native american / alaska native is selected")
         end
 
-        if @is_incarcerated.nil?
-          self.errors.add(:base, "Incarceration status is required")
-        end
+        self.errors.add(:base, "Incarceration status is required") if @is_incarcerated.nil?
       end
     end
 
