@@ -11,4 +11,8 @@ class UserMailer < ApplicationMailer
 
   def initial_employee_invitation_email(email, census_employee, invitation)
   end
+
+  def off_cycle_renewal_invitation_email(email, census_employee, invitation)
+  end
+
 end
