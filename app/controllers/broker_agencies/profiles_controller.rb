@@ -4,6 +4,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   include ::DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
+  before_action :permit_organization_params, only: [:create, :update]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
   before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
@@ -30,7 +31,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def create
-    params.permit!
     @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
 
     if @organization.save(current_user)
@@ -57,7 +57,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def update
     sanitize_broker_profile_params
-    params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
     broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
@@ -442,6 +441,10 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   private
+
+  def permit_organization_params
+    params.permit(:organization)
+  end
 
   def broker_profile_params
     params.require(:organization).permit(
