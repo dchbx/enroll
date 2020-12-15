@@ -199,6 +199,10 @@ class Invitation
     UserMailer.renewal_invitation_email(invitation_email, census_employee, self).deliver_now
   end
 
+  def send_off_cycle_renewal_invitation!(census_employee)
+    UserMailer.off_cycle_renewal_invitation_email(invitation_email, census_employee, self).deliver_now
+  end
+
   def send_agent_invitation!(invitee_name, person_id=nil)
     UserMailer.agent_invitation_email(invitation_email, invitee_name, self, person_id).deliver_now
   end
@@ -272,6 +276,28 @@ class Invitation
         :benefit_sponsors_employer_profile_id => census_employee.benefit_sponsors_employer_profile_id.to_s
       )
       invitation.send_renewal_invitation!(census_employee)
+      invitation
+    end
+  end
+
+  def self.invite_off_cycle_renewal_employee!(census_employee)
+    if !census_employee.email_address.blank?
+      created_at_range = Date.today.all_day
+      return if self.invitation_already_sent?(
+        census_employee,
+        'employee_role',
+        created_at_range,
+        "off_cycle_renewal_invitation_email"
+      )
+      invitation = self.create(
+        :role => "employee_role",
+        :source_kind => "census_employee",
+        :source_id => census_employee.id,
+        :invitation_email => census_employee.email_address,
+        :invitation_email_type => "off_cycle_renewal_invitation_email",
+        :benefit_sponsors_employer_profile_id => census_employee.benefit_sponsors_employer_profile_id.to_s
+      )
+      invitation.send_off_cycle_renewal_invitation!(census_employee)
       invitation
     end
   end

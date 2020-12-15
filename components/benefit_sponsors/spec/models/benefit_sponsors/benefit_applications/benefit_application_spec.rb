@@ -572,14 +572,14 @@ module BenefitSponsors
               expect(::Invitation.count).to eq(2)
             end
 
-            it "should send initial invitation to off_cycle_renewing" do
+            it "should send off cycle renewal invitation to off_cycle_renewing" do
               renewal_application.benefit_sponsorship.update_attributes!(effective_begin_on: Date.new(2020,10,1))
               expect(renewal_application.is_off_cycle?).to eq(true)
 
-              ::Subscribers::EmployeeInitialEnrollmentInvitationsSubscriber.new.call('acapi.info.events.plan_year.employee_initial_enrollment_invitations_requested','e','e','e',{:benefit_application_id => renewal_application.id.to_s})
+              ::Subscribers::OffCycleRenewalEnrollmentInvitationsSubscriber.new.call('acapi.info.events.plan_year.off_cycle_renewal_enrollment_invitations_requested','e','e','e',{:benefit_application_id => renewal_application.id.to_s})
 
               expect(::Invitation.last.invitation_email_type).not_to eq("renewal_invitation_email")
-              expect(::Invitation.last.invitation_email_type).to eq(nil)
+              expect(::Invitation.last.invitation_email_type).to eq("off_cycle_renewal_invitation_email")
             end
           end
         end
