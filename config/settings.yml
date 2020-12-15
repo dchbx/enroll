@@ -409,3 +409,9 @@ external_applications:
   admin:
     url: <%= ENV['ANGULAR_ADMIN_APPLICATION_URL'] %>
     pundit_policy: AngularAdminApplicationPolicy
+
+hbxit:
+  rabbit:
+    url: <%= ENV['HBXIT_RABBIT_URL'] %>
+  api:
+    url: <%= ENV['HBXIT_ADMIN_API_URL'] %>

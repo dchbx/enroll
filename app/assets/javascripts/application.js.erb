@@ -180,7 +180,7 @@ function applyMultiLanguageSelectForGA() {
 };
 
 function dchbx_enroll_date_of_record() {
-  return new Date($('#dchbx_enroll_date_of_record').text());
+  return new Date($('#dchbx_enroll_date_of_record').text() +"00:00");
 };
 
 function getCarrierPlans(ep, ci) {

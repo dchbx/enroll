@@ -83,7 +83,7 @@ gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
 gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'           
+gem 'kaminari'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
 gem 'language_list',            '~> 1'
@@ -95,6 +95,7 @@ gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
+gem 'rack-cors',                '~> 0.4.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
@@ -105,6 +106,7 @@ gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 1.12'
 gem 'sass-rails',               '~> 5'
+gem 'sidekiq',                  '~> 6.0.2'
 gem 'slim',                     '~> 3.0'
 gem 'slim-rails',               '~> 3.2'
 gem 'symmetric-encryption',     '~> 3.9.1'
@@ -134,7 +136,7 @@ group :development do
   gem 'listen',                 '>= 3.0.5', '< 3.2'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'              
+  gem 'spring'
   gem 'spring-watcher-listen'
 end
 
@@ -180,4 +182,3 @@ group :production do
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end
-

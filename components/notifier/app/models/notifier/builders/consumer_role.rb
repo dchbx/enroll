@@ -544,6 +544,14 @@ module Notifier
         primary_member_present
       end
 
+      def primary_member_present
+        merge_model.primary_member_present = payload['notice_params']['primary_member'].present?
+      end
+
+      def primary_member_present?
+        primary_member_present
+      end
+
       def magi_medicaid_members_present
         magi_medicaid_members
         merge_model.magi_medicaid_members_present = merge_model.magi_medicaid_members.present?
@@ -701,6 +709,10 @@ module Notifier
 
       def uqhp_notice?
         payload['notice_params']['uqhp_event'].upcase == 'UQHP'
+      end
+
+      def primary_nil?
+        payload['notice_params']['primary_member'].nil?
       end
 
       def primary_nil?

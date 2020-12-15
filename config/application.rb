@@ -5,6 +5,7 @@ require "action_controller/railtie"
 require "action_mailer/railtie"
 require "rails/test_unit/railtie"
 require "sprockets/railtie" # Uncomment this line for Rails 3.1+
+require "action_cable/engine"
 
 # Configure fallbacks for mongoid errors:
 require "i18n/backend/fallbacks"
@@ -20,7 +21,7 @@ module Enroll
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
-    config.autoload_paths += ["#{config.root}/lib", "#{config.root}/app/notices", "#{config}/app/jobs"]
+    config.autoload_paths += ["#{config.root}/lib", "#{config.root}/app/notices", "#{config}/app/jobs", "#{config.root}/app/channels"]
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
