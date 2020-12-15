@@ -2,9 +2,11 @@
 
 Given(/^a consumer, with a family, exists$/) do
   consumer :with_nuclear_family
-  bcp = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship.current_benefit_coverage_period
-  ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
-  bcp.update_attributes!(slcsp_id: ivl_product.id)
+  hbx_profile = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)
+  hbx_profile.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+    ivl_product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product, application_period: (bcp.start_on..bcp.end_on))
+    bcp.update_attributes!(slcsp_id: ivl_product.id)
+  end
 end
 
 Given(/^is logged in$/) do
