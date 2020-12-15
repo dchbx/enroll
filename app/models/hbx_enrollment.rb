@@ -384,6 +384,13 @@ class HbxEnrollment
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
   }
+
+  scope :enrollments_for_yearly_aggregate, lambda { |family_id, year|
+    where(:family_id => family_id,
+          :effective_on => Date.new(year)..Date.new(year).end_of_year,
+          :aasm_state.in => (ENROLLED_STATUSES + TERMINATED_STATUSES),
+          :"applied_aptc_amount.cents".gt => 0)
+  }
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
   scope :by_writing_agent_id, ->(broker_id) { where(writing_agent_id: broker_id)}
