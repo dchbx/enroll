@@ -74,9 +74,9 @@ class Insured::ConsumerRolesController < ApplicationController
         when :service_unavailable
           format.html { render 'shared/account_lookup_service_unavailable' }
         when :too_many_matches
-          format.html { redirect_to SamlInformation.account_conflict_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_conflict_url).to_s }
         when :existing_account
-          format.html { redirect_to SamlInformation.account_recovery_url }
+          format.html { redirect_to URI.parse(SamlInformation.account_recovery_url).to_s }
         else
           unless params[:persisted] == "true"
             @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
@@ -223,10 +223,10 @@ class Insured::ConsumerRolesController < ApplicationController
           redirect_to upload_ridp_document_insured_consumer_role_index_path
         elsif is_new_paper_application?(current_user, session[:original_application_type]) || @person.primary_family.has_curam_or_mobile_application_type?
           @person.consumer_role.move_identity_documents_to_verified(@person.primary_family.application_type)
-          consumer_redirection_path = insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
           # rubocop:disable Metrics/BlockNesting
-          consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
-          redirect_to @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          consumer_redirection_path = EnrollRegistry.feature_enabled?(:financial_assistance) ? help_paying_coverage_insured_consumer_role_index_path : insured_family_members_path(:consumer_role_id => @person.consumer_role.id)
+          redirect_path = @consumer_role.admin_bookmark_url.present? ? @consumer_role.admin_bookmark_url : consumer_redirection_path
+          redirect_to URI.parse(redirect_path).to_s
           # rubocop:enable Metrics/BlockNesting
         else
           redirect_to ridp_agreement_insured_consumer_role_index_path
