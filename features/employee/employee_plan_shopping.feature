@@ -3,6 +3,7 @@ Feature: Employees can purchase coverage from both active and renewing plan year
   and allowing them to complete plan shopping if they are eligible
 
   Background: Setup site, employer, and benefit application
+    Given HbxProfile exists
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for active renewal employer with health benefits
     Given Qualifying life events are present

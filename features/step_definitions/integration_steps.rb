@@ -223,6 +223,10 @@ Given(/^User has existing security questions/) do
 
 end
 
+Given(/^HbxProfile exists/) do
+  FactoryBot.create :hbx_profile
+end
+
 Given(/^Hbx Admin Tier 3 exists$/) do
   p_staff = Permission.create(name: 'hbx_tier3',
                               modify_family: true,
@@ -801,6 +805,7 @@ And (/(.*) should see the plans from the (.*) plan year$/) do |named_person, pla
 end
 
 Then(/(.*?) should see (.*?) page with (.*?) plan year start as coverage effective date/) do |_named_person, screen, status|
+  FactoryBot.create(:hbx_profile)
   @applications_by_state ||= {}
   @applications_by_state[status] ||= benefit_sponsorship.benefit_applications.where(aasm_state: status).first
   start_on = @applications_by_state[status].start_on

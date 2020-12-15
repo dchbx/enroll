@@ -3,11 +3,12 @@ Feature: Newly designated employees can purchase coverage only through renewing 
   Employee should be blocked from buying coverage under previous year plan year
 
 Background: Setup site, employer, and benefit application
+    Given HbxProfile exists
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     And there is an employer Acme Inc.
     And renewal employer Acme Inc. has active and renewal enrollment_open benefit applications
-    And Acme Inc. employer has a staff role 
+    And Acme Inc. employer has a staff role
     And there is a census employee record for Patrick Doe for employer Acme Inc.
     And census employee Patric Doe is a newly_designated_eligible employee
     And this employer Acme Inc. has first_of_month rule

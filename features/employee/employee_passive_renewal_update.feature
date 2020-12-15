@@ -1,6 +1,7 @@
 Feature: Passive renewal should be updated when EE updates his current coverage
 
   Background: Setup site, employer, and benefit application
+    Given HbxProfile exists
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
     Given Qualifying life events are present

@@ -2,6 +2,9 @@ Feature: Conversion employees can purchase coverage only through renewing plan y
   In order to make employees purchase coverage only using renewal plan year
   Employee should be blocked from buying coverage under off-exchange plan year
 
+  Background: Set up HbxProfile
+    Given HbxProfile exists
+
   Scenario: New Hire should not get effective date before renewing plan year start date
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits

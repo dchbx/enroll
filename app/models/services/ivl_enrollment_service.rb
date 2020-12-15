@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Services
   class IvlEnrollmentService
 
@@ -38,8 +40,9 @@ module Services
     def begin_coverage_for_ivl_enrollments
       @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
+      cbp_start = current_benefit_period.start_on
       ivl_enrollments = HbxEnrollment.where(
-        :effective_on => current_benefit_period.start_on,
+        :effective_on.gte => cbp_start,
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )
