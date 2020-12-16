@@ -516,7 +516,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         end
 
         it 'For canceled benefit_application' do
-          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.update_attributes!(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
           initial_application.cancel!
           initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
           expect(initial_application.aasm_state).to eq :canceled
@@ -549,7 +549,7 @@ RSpec.describe Employers::EmployerHelper, :type => :helper, dbclean: :after_each
         end
 
         it 'For canceled benefit_application' do
-          initial_application.update_attributes!(effective_period: start_on..cancel_end_on)
+          initial_application.update_attributes!(effective_period: TimeKeeper.date_of_record.next_month.beginning_of_month..TimeKeeper.date_of_record.end_of_month.next_year, aasm_state: :enrollment_eligible)
           initial_application.cancel!
           initial_application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
           expect(initial_application.aasm_state).to eq :canceled
