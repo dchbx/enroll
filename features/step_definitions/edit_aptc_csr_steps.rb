@@ -27,24 +27,7 @@ Then(/^Hbx Admin should see an Edit APTC \/ CSR link$/) do
 end
 
 Given(/^User with tax household exists$/) do
-  person = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)
-  @person_name = person.full_name
-  person.consumer_role.update_attributes!(aasm_state: "verification_outstanding")
-  @family = FactoryBot.create(:family, :with_primary_family_member, person: person)
-  tax_household = FactoryBot.create(:tax_household, household: @family.active_household, effective_ending_on: nil)
-  FactoryBot.create(:eligibility_determination, tax_household: tax_household, max_aptc: Money.new(1000, 'USD'), csr_eligibility_kind: 'csr_100')
-  issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)
-  product = FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: 'aca_individual', issuer_profile: issuer_profile, metal_level_kind: :catastrophic)
-  @enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
-                                  :family => @family,
-                                  :household => @family.active_household,
-                                  :aasm_state => 'coverage_selected',
-                                  :is_any_enrollment_member_outstanding => true,
-                                  :kind => 'individual',
-                                  :product => product,
-                                  :effective_on => TimeKeeper.date_of_record.beginning_of_year)
-  FactoryBot.create(:hbx_enrollment_member, applicant_id: @family.primary_applicant.id, eligibility_date: (TimeKeeper.date_of_record - 2.months), hbx_enrollment: @enrollment)
-  @enrollment.save!
+  create_thh_for_family
 end
 
 
