@@ -59,12 +59,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).to_unsafe_hash.except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).to_unsafe_hash.except(:id))
       broker_role.approve!
       broker_role.reload
 
@@ -88,18 +88,18 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   def broker_role_update_params
     # Only assign if nil
     params[:person][:broker_role_attributes][:carrier_appointments] ||= {}
-    params[:person][:broker_role_attributes].permit(:license, :training, :carrier_appointments => {})
+    params.require(:person).require(:broker_role_attributes).permit(:license, :training, :carrier_appointments => {})
   end
 
   def broker_carrier_appointments
-    all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+    all_carrier_appointments = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
     unless broker_carrier_appointments_enabled
-      permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].permit!
-      all_carrier_appointment.merge!(permitted_params) if permitted_params
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+      permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].to_unsafe_hash
+      all_carrier_appointments.merge!(permitted_params) if permitted_params
+      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments
     else
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment.each{ |key,str| all_carrier_appointment[key] = "true" }
+      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each { |key,str| all_carrier_appointments[key] = "true" }
     end
   end
 
