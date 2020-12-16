@@ -11,7 +11,7 @@ module Operations
           params   = yield validate_params(params)
           profile  = yield fetch_profile(params[:profile_id])
           person   = yield fetch_person(params[:person_id])
-          yield check_existing_staff(params[:profile_id])
+          yield check_existing_staff(person, params[:profile_id])
           result   = yield persist(person, profile, params[:coverage_record])
 
           Success(result)
@@ -51,7 +51,7 @@ module Operations
           end
         end
 
-        def check_existing_staff(profile_id)
+        def check_existing_staff(person, profile_id)
           if person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id).map(&:to_s).include? profile_id.to_s
             Failure({:message => 'Already staff role exists for the selected organization'})
           else

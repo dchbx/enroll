@@ -6,8 +6,8 @@ class CoverageRecord
   include Ssn
 
   embedded_in :employer_staff_role
-  embeds_one :address, cascade_callbacks: true, validate: true
-  embeds_one :email, cascade_callbacks: true, validate: true
+  embeds_one :address, cascade_callbacks: true, validate: false
+  embeds_one :email, cascade_callbacks: true, validate: false
 
   field :encrypted_ssn, type: String
   field :dob, type: Date
