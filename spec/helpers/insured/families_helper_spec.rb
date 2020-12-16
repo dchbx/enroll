@@ -25,6 +25,16 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  
 
   end
 
+  describe "#display_change_tax_credits_button?" do
+    context "enrollment has a catastrophic plan" do
+      let(:catastrophic_product) { double(metal_level_kind: :catastrophic) }
+      let(:catastrophic_enrollment) { double(product: catastrophic_product) }
+      it "should return false" do
+        expect(helper.display_change_tax_credits_button?(catastrophic_enrollment)).to eq(false)
+      end
+    end
+  end
+
   describe "#generate_options_for_effective_on_kinds", dbclean: :after_each  do
     let(:qle) {FactoryBot.create(:qualifying_life_event_kind, effective_on_kinds: ['date_of_event', 'fixed_first_of_next_month'])}
     let(:person) {FactoryBot.create(:person, :with_family)}

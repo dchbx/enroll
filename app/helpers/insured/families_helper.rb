@@ -1,6 +1,7 @@
 module Insured::FamiliesHelper
 
   def display_change_tax_credits_button?(hbx_enrollment)
+    return false if hbx_enrollment&.product&.metal_level_kind == :catastrophic
     hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
     hbx_enrollment.product.can_use_aptc? &&
     !hbx_enrollment.is_coverall? &&
