@@ -233,11 +233,24 @@ module BenefitSponsors
 
         return unless benefit_application.is_renewing?
 
+        census_employees = benefit_sponsorship.census_employees.non_terminated
+        batch_size = 500
+        offset = 0
+        total_count = census_employees.count
         benefit_sponsorship = benefit_application.benefit_sponsorship
-        benefit_sponsorship.census_employees.non_terminated.each do |ce|
-          enrollments = ce.renewal_benefit_group_assignment.hbx_enrollments
-          enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.max_by(&:updated_at)
-          deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation") if enrollment&.employee_role.present?
+        while offset <= total_count
+          census_employees.offset(offset).limit(batch_size).no_timeout.each do |ce|
+            enrollments = ce.renewal_benefit_group_assignment&.hbx_enrollments || []
+            enrollment = enrollments.select{ |enr| (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES).include?(enr.aasm_state) }.max_by(&:updated_at)
+            if enrollment&.employee_role.present?
+              deliver(recipient: enrollment.employee_role, event_object: enrollment, notice_event: "renewal_employee_enrollment_confirmation")
+            else
+              Rails.logger.error { "Unable to trigger renewal_employee_enrollment_confirmation notice to #{ce.full_name} - ce.id - #{ce.id} - employer hbx_id - #{benefit_sponsorship.organization.hbx_id} due to no employee role on enrollment" }
+            end
+          rescue StandardError => e
+            Rails.logger.error { "Unable to trigger renewal_employee_enrollment_confirmation notice to #{ce.full_name} - ce.id - #{ce.id} - employer hbx_id - #{benefit_sponsorship.organization.hbx_id} due to #{e.inspect}" }
+          end
+          offset += batch_size
         end
       end
 
