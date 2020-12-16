@@ -14,6 +14,8 @@ var pyEndDate = "";
 var termKind = "";
 var termReason = "";
 var pyEndOn = "";
+var pyStartDate = "";
+var pyStatus = "";
 var pyStartOn = ""
 
 if ( $parent_row.next().hasClass('child-row') ) {
@@ -45,7 +47,7 @@ function populateDropDown(status) {
 
   var cancel_states = ["approved", "pending", "draft", "imported", "enrollment_open", "enrollment_extended", "enrollment_closed", "enrollment_eligible", "binder_paid", "enrollment_ineligible", "active"]
   var term_states = ["active", "suspended", "expired", "termination_pending"]
-  var reinstate_states = []
+  var reinstate_states = ["terminated", "termination_pending", "retroactive_cancel", "canceled"]
 
   if (cancel_states.indexOf(status) > -1) {
     $('li.cancel-py').removeClass('blocking');
@@ -179,16 +181,31 @@ function validTerminatePy() {
   }
 }
 
-function pyAction(action, id, employer_id, term_date, start_on) {
+function populateReinstateStartDate(pyStatus, pyStartDate, pyEndDate, applicationId) {
+
+  var canceled_states = ["retroactive_cancel", "canceled"]
+  var terminated_states = ["terminated", "termination_pending"]
+
+  if (canceled_states.indexOf(pyStatus) > -1) {
+    hideEndDateField(pyStartDate, applicationId);
+  }
+
+  if (terminated_states.indexOf(pyStatus) > -1) {
+    hideEndDateField(pyEndDate, applicationId);
+  }
+}
+
+function pyAction(action, id, status, employer_id, end_on, start_on) {
   applicationId = id;
   employerId = employer_id
   actionSelected = action;
+  pyStatus = status;
   pyStartDate = start_on
+  pyEndDate = end_on
   showPlanYearActions(id);
   showEndDateField();
   if (action == "reinstate") {
-    disableDatePicker();
-    $('input#datepicker').val(<%= Date.today %>);
+    populateReinstateStartDate(pyStatus, pyStartDate, pyEndDate, applicationId)
     hideTerminationRadios();
     enableSubmitButton()
   }
