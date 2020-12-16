@@ -64,7 +64,7 @@ module Exchanges
                          @application.effective_period.min
                        end
 
-      flash[:notice] = "#{@benefit_sponsorship.legal_name} - #{l10n("exchange.employer_applications.success_message")} #{effective_date}"
+      flash[:notice] = "#{@benefit_sponsorship.legal_name} - #{l10n('exchange.employer_applications.success_message')} #{effective_date}"
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
 
