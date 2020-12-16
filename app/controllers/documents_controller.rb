@@ -20,7 +20,7 @@ class DocumentsController < ApplicationController
 
   def authorized_download
     begin
-      model = params[:model].camelize.safe_constantize
+      model = params[:model].camelize
       model_id = params[:model_id]
       relation = params[:relation]
       relation_id = params[:relation_id]
