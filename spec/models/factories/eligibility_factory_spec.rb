@@ -462,6 +462,25 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             end
           end
 
+          context 'available aptc for dental product' do
+            before do
+              @product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, benefit_market_kind: :aca_individual)
+              @product_id = @product.id.to_s
+              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
+            end
+
+            context '.fetch_applicable_aptcs' do
+              it 'should return a Hash' do
+                expect(@applicable_aptc.class).to eq Hash
+              end
+
+              it 'should not apply aptc for dental product' do
+                expect(@applicable_aptc[@product_id]).to eq 0.0
+              end
+            end
+          end
+
           context 'where available_aptc less than ehb_premium and selected_aptc' do
             before do
               family.active_household.tax_households.first.destroy
