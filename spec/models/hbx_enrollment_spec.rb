@@ -873,16 +873,23 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
             expect(hbx_enrollment1_from_db.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
           end
 
+          # If enrollment 2 falls in the next year, enrollment 1 remains in coverage selected
           it "terminates previous enrollments if both effective on in the future" do
             hbx_enrollment1.update_attributes!(effective_on: date + 1.days)
-            hbx_enrollment2.update_attributes!(effective_on: date + 20.days)
+            hbx_enrollment2_effec_date = date + 20.days
+            hbx_enrollment2.update_attributes!(effective_on: hbx_enrollment2_effec_date)
             eff_date = hbx_enrollment1.effective_on
             product1.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
-            product2.update_attributes(application_period: eff_date.beginning_of_year..eff_date.end_of_year)
-            hbx_enrollment2.select_coverage!
-            expect(hbx_enrollment1.reload.coverage_terminated?).to be_truthy
-            expect(hbx_enrollment2.coverage_selected?).to be_truthy
-            expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
+            product2.update_attributes(application_period: hbx_enrollment2_effec_date.beginning_of_year..hbx_enrollment2_effec_date.end_of_year)
+            hbx_enrollment1.reload
+            hbx_enrollment2.reload.select_coverage!
+            if hbx_enrollment1.effective_on.year == hbx_enrollment2.effective_on.year
+              expect(hbx_enrollment1.reload.coverage_terminated?).to be_truthy
+              expect(hbx_enrollment1.terminated_on).to eq hbx_enrollment2.effective_on - 1.day
+            else
+              expect(hbx_enrollment1.reload.coverage_selected?).to be_truthy
+            end
+            expect(hbx_enrollment2.reload.coverage_selected?).to be_truthy
           end
         end
     end
