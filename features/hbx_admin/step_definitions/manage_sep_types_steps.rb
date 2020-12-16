@@ -58,6 +58,7 @@ When("Admin clicks on List SEP Types link") do
 end
 
 Then("Admin navigates to SEP Type List page") do
+  sleep 2
   step "Admin can navigate to the Manage SEPs screen"
 end
 
@@ -213,6 +214,7 @@ Then("listed Congress SEP Types ordinal postions should change") do
 end
 
 Then(/^Admin should see successful message after sorting$/) do
+  sleep(2)
   expect(page).to have_content('Successfully sorted')
   sleep(2)
 end
