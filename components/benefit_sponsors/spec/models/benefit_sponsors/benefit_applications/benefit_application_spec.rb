@@ -1280,40 +1280,41 @@ module BenefitSponsors
     end
 
 
-describe '.is_renewing?' do
-  include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup renewal application"
+    describe '.is_renewing?' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
 
-  let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_ineligible',
-    :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
-  )}
+      let!(:ineligible_application) do
+        FactoryBot.create(:benefit_sponsors_benefit_application,
+                          :with_benefit_package,
+                          :benefit_sponsorship => benefit_sponsorship,
+                          :aasm_state => 'enrollment_ineligible',
+                          :effective_period => (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day))
+      end
 
-  before do
-    benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
-  end
+      before do
+        benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
+      end
 
-  context "finding if plan year is a renewal or not" do
-    it 'renewing application should return true' do
-      expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+      context "finding if plan year is a renewal or not" do
+        it 'renewing application should return true' do
+          expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+        end
+
+        it 'active application should return false' do
+          expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
+        end
+
+        it 'old ineligible application should return false' do
+          expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
+        end
+
+        it 'renewal application transitions to enrollment ineligible state' do
+          renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
+          expect(renewal_application.is_renewing?).to eq true
+        end
+      end
     end
-
-    it 'active application should return false' do
-      expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
-    end
-
-    it 'old ineligible application should return false' do
-      expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
-    end
-
-    it 'renewal application transitions to enrollment ineligible state' do
-      renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
-      expect(renewal_application.is_renewing?).to eq true
-    end
-  end
-end
 
     describe '.employee_participation_ratio_minimum' do
 
@@ -1431,6 +1432,82 @@ end
           it 'should return minimum participation ratio using system default' do
             expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
           end
+        end
+      end
+    end
+
+    describe 'aasm_state#cancel' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application" do
+        let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+      end
+      let(:benefit_package)  { initial_application.benefit_packages.first }
+      let(:benefit_group_assignment) {FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_package)}
+      let(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: benefit_sponsorship.profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id) }
+      let(:census_employee) do
+        FactoryBot.create(:census_employee,
+                          employer_profile: benefit_sponsorship.profile,
+                          benefit_sponsorship: benefit_sponsorship,
+                          benefit_group_assignments: [benefit_group_assignment])
+      end
+      let(:person)       { FactoryBot.create(:person, :with_family) }
+      let!(:family)       { person.primary_family }
+      let!(:hbx_enrollment) do
+        hbx_enrollment = FactoryBot.create(:hbx_enrollment,
+                                           :with_enrollment_members,
+                                           :with_product,
+                                           family: family,
+                                           household: family.active_household,
+                                           aasm_state: "coverage_selected",
+                                           effective_on: initial_application.start_on,
+                                           rating_area_id: initial_application.recorded_rating_area_id,
+                                           sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
+                                           sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                           benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                                           employee_role_id: employee_role.id)
+        hbx_enrollment.benefit_sponsorship = benefit_sponsorship
+        hbx_enrollment.save!
+        hbx_enrollment
+      end
+
+      context "cancelling effectuated application" do
+        before do
+          initial_application.cancel!
+        end
+
+        it "should cancel benefit application" do
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
+        end
+
+        it "should cancel associated enrollments" do
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
+
+        it "should persit cancel reason to enrollment" do
+          hbx_enrollment.reload
+          expect(hbx_enrollment.terminate_reason).to eq "retroactive_canceled"
+        end
+      end
+
+      context "cancelling non effectuated application" do
+        before do
+          initial_application.update_attributes(aasm_state: :enrollment_ineligible)
+          initial_application.cancel!
+        end
+
+        it "should cancel benefit application" do
+          expect(initial_application.aasm_state).to eq :canceled
+        end
+
+        it "should cancel associated enrollments" do
+          hbx_enrollment.reload
+          expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+        end
+
+        it "should not persit cancel reason to enrollment" do
+          hbx_enrollment.reload
+          expect(hbx_enrollment.terminate_reason).to eq nil
         end
       end
     end

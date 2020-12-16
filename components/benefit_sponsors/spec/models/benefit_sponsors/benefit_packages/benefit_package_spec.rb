@@ -771,21 +771,32 @@ module BenefitSponsors
 
       context "when enrollment is in auto renewing state" do
         let(:enr_state) {"auto_renewing"}
+        let(:renewal_state) { :canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "auto_renewing"
           benefit_package.cancel_member_benefits
           expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
         end
+
+        it "should not persist retro cancel reason for canceled applications" do
+          expect(hbx_enrollment.reload.terminate_reason).to eq nil
+        end
       end
 
       context "when enrollment is in coverage selected state state" do
         let(:enr_state) {"coverage_selected"}
+        let(:renewal_state) { :retroactive_canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
           benefit_package.cancel_member_benefits
           expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
+        end
+
+        it "should persist retro cancel reason for retroactive_canceled applications" do
+          benefit_package.cancel_member_benefits
+          expect(hbx_enrollment.reload.terminate_reason).to eq "retroactive_canceled"
         end
       end
     end

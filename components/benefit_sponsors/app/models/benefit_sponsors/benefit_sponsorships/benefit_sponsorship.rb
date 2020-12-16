@@ -506,7 +506,7 @@ module BenefitSponsors
     end
 
     def dt_display_benefit_application
-      benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
+      benefit_applications.where(:aasm_state.nin => [:canceled,:retroactive_canceled]).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
 
     # use this only for EDI

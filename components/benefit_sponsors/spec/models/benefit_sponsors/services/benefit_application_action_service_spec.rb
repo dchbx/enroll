@@ -64,13 +64,27 @@ module BenefitSponsors
 
     describe 'cancel_application' do
 
-      before do
-        subject.new(initial_application, {transmit_to_carrier: false}).cancel_application
-        initial_application.reload
+      context "cancelling effectuated application" do
+        before do
+          subject.new(initial_application, {transmit_to_carrier: false}).cancel_application
+          initial_application.reload
+        end
+
+        it "should cancel benefit application" do
+          expect(initial_application.aasm_state).to eq :retroactive_canceled
+        end
       end
 
-      it "should cancel benefit application" do
-        expect(initial_application.aasm_state).to eq :canceled
+      context "cancelling non effectuated application" do
+        before do
+          initial_application.update_attributes(aasm_state: :enrollment_ineligible)
+          subject.new(initial_application, {transmit_to_carrier: false}).cancel_application
+          initial_application.reload
+        end
+
+        it "should cancel benefit application" do
+          expect(initial_application.aasm_state).to eq :canceled
+        end
       end
     end
   end

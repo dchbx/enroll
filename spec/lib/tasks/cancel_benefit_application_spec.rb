@@ -44,7 +44,7 @@ describe 'cancel employer benefit application & enrollments', :dbclean => :aroun
       end
      
       it "should update application aasm_state" do
-        expect(initial_application.aasm_state).to eq :canceled
+        expect(initial_application.aasm_state).to eq :retroactive_canceled
       end
 
       it "should update enrollment aasm_state" do

@@ -29,7 +29,8 @@ module BenefitSponsors
         scope :benefit_sponsorship_applicant, lambda {
           where({"$or":
             [
-              {:aasm_state => :applicant, :"benefit_applications.aasm_state".in => [:draft, :expired, :terminated, :canceled, :enrollment_ineligible, :approved, :pending], :"benefit_applications.predecessor_id" => {:$exists => false}},
+              {:aasm_state => :applicant, :"benefit_applications.aasm_state".in => [:draft, :expired, :terminated, :canceled, :retroactive_canceled, :enrollment_ineligible, :approved, :pending],
+               :"benefit_applications.predecessor_id" => {:$exists => false}},
               {:benefit_applications => {:$exists => false}}
             ]
           })

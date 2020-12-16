@@ -22,8 +22,8 @@ module BenefitSponsors
     ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible, :binder_paid].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
-    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired].freeze
-    CANCELED_STATES               = [:canceled].freeze
+    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired, :retroactive_canceled].freeze
+    CANCELED_STATES               = [:canceled, :retroactive_canceled].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid, :active, :suspended].freeze
@@ -40,7 +40,8 @@ module BenefitSponsors
                                                   expired:    :expire,
                                                   terminated: :terminate,
                                                   termination_pending: :termination_pending,
-                                                  canceled:   :cancel
+                                                  canceled: :cancel,
+                                                  retroactive_canceled: :cancel
                                                 }
 
     VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
@@ -116,7 +117,6 @@ module BenefitSponsors
 
     field :termination_kind,       type: String
     field :termination_reason,     type: String
-
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
@@ -837,6 +837,7 @@ module BenefitSponsors
       state :expired,    :after_enter => :transition_benefit_package_members  # Non-published plans are expired following their end on date
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
 
+      state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
 
@@ -936,6 +937,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
+        transitions from: :active, to: :retroactive_canceled  # Enrollment cancelled after it became active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
           to:     :canceled
       end
