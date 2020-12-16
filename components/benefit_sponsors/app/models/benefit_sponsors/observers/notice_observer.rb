@@ -233,11 +233,11 @@ module BenefitSponsors
 
         return unless benefit_application.is_renewing?
 
+        benefit_sponsorship = benefit_application.benefit_sponsorship
         census_employees = benefit_sponsorship.census_employees.non_terminated
         batch_size = 500
         offset = 0
         total_count = census_employees.count
-        benefit_sponsorship = benefit_application.benefit_sponsorship
         while offset <= total_count
           census_employees.offset(offset).limit(batch_size).no_timeout.each do |ce|
             enrollments = ce.renewal_benefit_group_assignment&.hbx_enrollments || []
