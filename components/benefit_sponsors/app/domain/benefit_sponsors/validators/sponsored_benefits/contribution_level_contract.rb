@@ -7,7 +7,7 @@ module BenefitSponsors
 
         params do
           required(:display_name).filled(:string)
-          required(:contribution_unit_id).filled(:string)
+          required(:contribution_unit_id).filled(Types::Bson)
           required(:is_offered).filled(:bool)
           required(:order).filled(:integer)
           required(:contribution_factor).filled(:float)

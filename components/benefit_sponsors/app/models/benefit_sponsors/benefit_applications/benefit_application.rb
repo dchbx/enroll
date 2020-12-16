@@ -117,6 +117,8 @@ module BenefitSponsors
 
     field :termination_kind,       type: String
     field :termination_reason,     type: String
+    field :reinstated_id, type: BSON::ObjectId
+    
     delegate :benefit_market, to: :benefit_sponsorship
 
     embeds_many :benefit_packages,
@@ -840,6 +842,7 @@ module BenefitSponsors
       state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
+      state :reinstated # This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
@@ -920,7 +923,7 @@ module BenefitSponsors
       end
 
       event :activate_enrollment do
-        transitions from: [:enrollment_eligible, :binder_paid],
+        transitions from: [:enrollment_eligible, :binder_paid, :reinstated],
           to:     :active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled
@@ -956,9 +959,9 @@ module BenefitSponsors
         transitions from: [:active, :suspended], to: :termination_pending
       end
 
-      # Coverage reinstated
-      event :reinstate_enrollment do
-        transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
+      # This transition is to indicate that the BenefitApplication is reinstated.
+      event :reinstate do
+        transitions from: :draft, to: :reinstated
       end
 
       event :extend_open_enrollment do
@@ -1175,6 +1178,11 @@ module BenefitSponsors
 
     def has_unassigned_census_employees?
       CensusEmployee.employees_for_benefit_application_sponsorship(self).count > CensusEmployee.benefit_application_assigned(self).count
+    end
+
+    def parent_reinstate_application
+      return unless reinstated_id
+      self.class.find(reinstated_id)
     end
 
     private

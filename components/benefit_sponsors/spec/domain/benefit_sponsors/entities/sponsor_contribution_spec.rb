@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Entities::SponsorContribution do
 
     let(:contribution_level) do
       {
-        display_name: 'Employee Only', order: 1, contribution_unit_id: 'contribution_unit_id',
+        display_name: 'Employee Only', order: 1, contribution_unit_id: BSON::ObjectId.new,
         is_offered: true, contribution_factor: 0.75, min_contribution_factor: 0.5,
         contribution_cap: 0.75, flat_contribution_amount: 227.07
       }
