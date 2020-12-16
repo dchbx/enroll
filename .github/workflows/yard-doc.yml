@@ -3,31 +3,35 @@ on: push
 
 jobs:
   hugo_deployment:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: nelonoel/branch-name@v1
-      - uses: ruby/setup-ruby@v1
-      - name: Restore project gems
-        uses: actions/cache@v2
-      - uses: jakejarvis/s3-sync-action@master
         with:
-          path: vendor/bundle
-          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-          restore-keys: |
-            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
-      - name: Compile Hugo
+          submodules: recursive
+      - uses: nelonoel/branch-name@v1.0.1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - name: Install global packages
         run: |
+          yarn install
           npm install -g postcss postcss-cli
           npm install -g autoprefixer
-          sudo snap install hugo --channel=extended
-          cd hugo && hugo --minify
+      - run: sudo snap install hugo --channel=extended
+      - run: cd hugo && hugo --minify
+      - uses: jakejarvis/s3-sync-action@master
+        env:
+          AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
+          SOURCE_DIR: hugo/public
+          DEST_DIR: ${{ env.BRANCH_NAME }}
   yard:
     needs: [hugo_deployment]
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: nelonoel/branch-name@v1
+      - uses: nelonoel/branch-name@v1.0.1
       - uses: ruby/setup-ruby@v1
       - name: Restore project gems
         uses: actions/cache@v2
@@ -42,13 +46,11 @@ jobs:
           bundle install
       - name: Run yard
         run: bundle exec yard doc
-      - name: Copy Yard to Hugo
-        run: cp -r doc hugo/public/yard 
       - name: Deploy to S3
         uses: jakejarvis/s3-sync-action@master
         env:
           AWS_S3_BUCKET: ${{ secrets.YARD_S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.YARD_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.YARD_SECRET_ACCESS_KEY }}
-          SOURCE_DIR: hugo/public
-          DEST_DIR: ${{ env.BRANCH_NAME }}
+          SOURCE_DIR: doc
+          DEST_DIR: ${{ env.BRANCH_NAME }}/yard

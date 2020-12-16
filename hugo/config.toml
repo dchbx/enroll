@@ -4,3 +4,4 @@ title = "Enroll Documentation"
 theme = "docsy"
 showLicense = true
 showToc = true
+relativeURLs = true
