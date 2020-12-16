@@ -141,7 +141,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def update
     sanitize_employer_profile_params
-    @organization = Organization.find(params.permit([:id])
+    @organization = Organization.find(params.permit(:id))
 
     #save duplicate office locations as json in case we need to refresh
     @organization_dup = @organization.office_locations.as_json
