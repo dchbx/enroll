@@ -25,7 +25,9 @@ module Operations
             profile_id: profile.id.to_s,
             person_id: person.id.to_s,
             coverage_record: {
-              is_applying_coverage: false
+              is_applying_coverage: false,
+              address: {},
+              email: {}
             }
           }
         end
