@@ -268,19 +268,19 @@ module Employers::EmployerHelper
     return [links, content]
   end
 
-  def is_rehired(ce)
-    (ce.coverage_terminated_on.present?  && (ce.is_eligible? || ce.employee_role_linked?))
+  def is_rehired(census_employee)
+    (census_employee.coverage_terminated_on.present? && (census_employee.is_eligible? || census_employee.employee_role_linked?))
   end
 
-  def is_terminated(ce)
-    (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
+  def is_terminated(census_employee)
+    (census_employee.coverage_terminated_on.present? && !(census_employee.is_eligible? || census_employee.employee_role_linked?))
   end
 
   def selected_benefit_plan(plan)
     case plan
-      when :single_issuer then 'One Carrier'
-      when :metal_level then 'One Level'
-      when :single_product then 'A Single Plan'
+    when :single_issuer then 'One Carrier'
+    when :metal_level then 'One Level'
+    when :single_product then 'A Single Plan'
     end
   end
 
@@ -290,5 +290,21 @@ module Employers::EmployerHelper
 
   def display_referred_by_field_for_employer?
     Settings.aca.employer_registration_has_referred_by_field
+  end
+
+  def check_for_canceled_wst?(application)
+    application.workflow_state_transitions.any?{|wst| wst.from_state.to_s == "active" && wst.to_state.to_s == "canceled"}
+  end
+
+  def is_ben_app_within_reinstate_period?(application)
+    offset_months = EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).item
+    start_on = application.benefit_sponsor_catalog.effective_period.min
+    end_on = application.benefit_sponsor_catalog.effective_period.max + offset_months.months
+    (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+
+  def display_reinstate_benefit_application?(application)
+    return false unless [:terminated, :termination_pending, :retroactive_cancel].include?(application.aasm_state) || (application.canceled? && check_for_canceled_wst?(application))
+    is_ben_app_within_reinstate_period?(application)
   end
 end
