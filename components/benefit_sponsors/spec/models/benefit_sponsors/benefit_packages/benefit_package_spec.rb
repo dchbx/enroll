@@ -868,7 +868,7 @@ module BenefitSponsors
       context "when coverage_selected enrollments are present", :dbclean => :after_each do
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
           benefit_package.terminate_member_benefits
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -885,6 +885,12 @@ module BenefitSponsors
         it 'should move future enrollments to canceled state' do
           expect(hbx_enrollment_1.aasm_state).to eq "coverage_canceled"
         end
+
+        context "benefit application with termination_kind and NO termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment.terminate_reason).to eq "non_payment"
+          end
+        end
       end
 
       context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
@@ -892,10 +898,10 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
           hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
           hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
-          benefit_package.terminate_member_benefits
+          benefit_package.terminate_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
         end
@@ -907,6 +913,12 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+
+        context "benefit application with termination_kind and termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment_1.terminate_reason).to eq "nonpayment"
+          end
         end
       end
 
@@ -1021,7 +1033,7 @@ module BenefitSponsors
       let(:end_on) { TimeKeeper.date_of_record.next_month }
 
       before do
-        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
         benefit_package.termination_pending_member_benefits
         hbx_enrollment.reload
       end
@@ -1034,15 +1046,21 @@ module BenefitSponsors
         expect(hbx_enrollment.terminated_on).to eq initial_application.end_on
       end
 
+      context "benefit application with termination_kind and NO termination_reason" do
+        it 'should persist terminate reason to enrollment' do
+          expect(hbx_enrollment.terminate_reason).to eq "non_payment"
+        end
+      end
+
       context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
 
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
           hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
           hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
-          benefit_package.termination_pending_member_benefits
+          benefit_package.termination_pending_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
         end
@@ -1054,6 +1072,12 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+
+        context "benefit application with termination_kind and termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment_1.terminate_reason).to eq "nonpayment"
+          end
         end
 
         context "pending terminate_benefit_group_assignments", :dbclean => :after_each do
