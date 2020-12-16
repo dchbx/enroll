@@ -412,6 +412,6 @@ external_applications:
 
 hbxit:
   rabbit:
-    url: <%= ENV['HBXIT_RABBIT_URL'] %>
+    url: "amqp://mafia:password@preprod-dchbx-it.priv.dchbx.org:5672/hbxit"
   api:
-    url: <%= ENV['HBXIT_ADMIN_API_URL'] %>
+    url: "http://preprod-dchbx-it.priv.dchbx.org/api/v1"
