@@ -74,7 +74,8 @@ module BenefitSponsors
       end
 
       def applications_for_cancel
-        benefit_sponsorship.benefit_applications.draft_and_exception + benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?)
+        applications = benefit_sponsorship.benefit_applications.draft_and_exception
+        applications += benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?) if Settings.aca.shop_market.auto_cancel_ineligible
       end
 
       def cancel_draft_and_ineligible_applications(applications)

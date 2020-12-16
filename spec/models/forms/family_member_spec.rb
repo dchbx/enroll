@@ -558,6 +558,50 @@ describe Forms::FamilyMember, "which describes an existing family member" do
   end
 end
 
+describe "checking validations on family member object with resident role" do
+  let(:family_id) { double }
+  let(:family) { double("family", :family_members => []) }
+  let(:member_attributes) do
+    { "first_name" => "test",
+      "middle_name" => "",
+      "last_name" => "fm",
+      "dob" => "1982-11-11",
+      "ssn" => "",
+      "no_ssn" => "1",
+      "gender" => "male",
+      "relationship" => "child",
+      "tribal_id" => "",
+      "ethnicity" => ["", "", "", "", "", "", ""],
+      "is_consumer_role" => "false",
+      "is_resident_role" => "true",
+      "same_with_primary" => "true",
+      "is_homeless" => "false",
+      "is_temporarily_out_of_state" => "false",
+      "addresses" =>
+      { "0" => {"kind" => "home", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""},
+        "1" => {"kind" => "mailing", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""}}}
+  end
+
+  subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
+
+  before do
+    allow(subject.class).to receive(:individual_market_is_enabled?).and_return(true)
+    allow(subject).to receive(:family).and_return family
+  end
+
+  it "should return invalid if no answers found for required questions" do
+    expect(subject.valid?).to eq false
+  end
+
+  context "when user with resident not answered for incarceration status" do
+    subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id, "us_citizen" => "true", "naturalized_citizen" => "false", "indian_tribe_member" => "false"})) }
+    it "should return errors with incarceration status" do
+      subject.save
+      expect(subject.errors.full_messages).to eq ["Incarceration status is required"]
+    end
+  end
+end
+
 describe Forms::FamilyMember, "relationship validation" do
   let(:family) { FactoryBot.build(:family) }
   let(:family_member) { FactoryBot.build(:family_member, family: family) }

@@ -19,8 +19,9 @@ RSpec.describe Operations::FinancialAssistance::Apply, type: :model, dbclean: :a
   let(:product)        { FactoryBot.create(:benefit_markets_products_health_products_health_product, :ivl_product) }
 
   before :each do
-    bcp = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
-    bcp.update_attributes!(slcsp_id: product.id)
+    HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.each do |bcp|
+      bcp.update_attributes!(slcsp_id: product.id)
+    end
   end
 
   it 'should be a container-ready operation' do
