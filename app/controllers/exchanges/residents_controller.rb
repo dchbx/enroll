@@ -96,7 +96,7 @@ class Exchanges::ResidentsController < ApplicationController
         :gender, :consumer, :no_ssn,
         :is_applying_coverage
       )
-      @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+      @resident_role = Factories::EnrollmentFactory.construct_resident_role(params[:person], actual_user)
       if @resident_role.present?
         @person = @resident_role.person
         session[:person_id] = @person.id
