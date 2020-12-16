@@ -92,7 +92,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should update person main phone" do
-      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes(kind: "work")
+      broker_agency_profile.primary_broker_role.person.phones[0].update_attributes!(kind: "work")
       post :update, params: {id: broker_agency_profile.id, organization: organization_params}
        broker_agency_profile.primary_broker_role.person.reload
        expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"

@@ -59,7 +59,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     sanitize_broker_profile_params
 
     # lookup by the origanization and not BrokerAgencyProfile
-    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -71,10 +71,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
-
     person.update_attributes(person_profile_params)
     @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
-
 
     if @organization.update_attributes(broker_profile_params)
       office_location = @organization.primary_office_location
@@ -443,10 +441,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
   private
 
   def permit_organization_params
-    params.permit(:organization)
+    broker_profile_params
   end
 
   def broker_profile_params
+    return unless params[:organization]
     params.require(:organization).permit(
       :legal_name,
       :dba,
