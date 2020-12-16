@@ -87,11 +87,15 @@ class Exchanges::ResidentsController < ApplicationController
     render 'match'
   end
 
-
-
   def create
     begin
-      binding.pry
+      params.require(:person).permit(
+        :name_pfx, :first_name,
+        :middle_name, :last_name,
+        :name_sfx, :ssn, :dob,
+        :gender, :consumer, :no_ssn,
+        :is_applying_coverage
+      )
       @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
       if @resident_role.present?
         @person = @resident_role.person
