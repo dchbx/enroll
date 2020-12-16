@@ -14,7 +14,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
   let(:termination_reason)             { "non_payment_termination_reason"}  
   let(:missing_params)                 { {_id: BSON::ObjectId.new, hbx_id: '1234567', aasm_state: :draft, profile_id: BSON::ObjectId.new, source_kind: :self_serve  } }
   let(:invalid_params)                 { missing_params.merge({is_no_ssn_enabled: 1, market_kind: :aca_shop, registered_on: 'today' })}
-  let(:error_message1)                 { {:market_kind => ["is missing"], :organization_id => ["is missing"], :registered_on => ["is missing"]} }
+  let(:error_message1)                 { {:market_kind => ["is missing"], :organization_id => ["is missing"]} }
   let(:error_message2)                 { {:organization_id => ["is missing"], :registered_on => ["must be a date"]} }
 
   describe "Given invalid required parameters" do
@@ -31,7 +31,7 @@ RSpec.describe BenefitSponsors::Validators::BenefitSponsorships::BenefitSponsors
 
   describe "Given valid parameters" do
     let(:valid_params_1) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on})}
-    let(:valid_params_2) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on})}
+    let(:valid_params_2) { missing_params.merge({is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: nil})}
 
     context "with required params" do
       it "should pass validation" do
