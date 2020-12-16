@@ -35,7 +35,7 @@ module BenefitSponsors
           return Failure('Missing Key.') unless params.key?(:benefit_application)
           @current_ba = params[:benefit_application]
           return Failure('Not a valid Benefit Application object.') unless @current_ba.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-          valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled]
+          valid_states_for_reinstatement = [:terminated, :termination_pending, :canceled, :retroactive_canceled]
           return Failure("Given BenefitApplication is not in any of the #{valid_states_for_reinstatement} states.") unless valid_states_for_reinstatement.include?(@current_ba.aasm_state)
           return Failure("System date is not within the given BenefitApplication's effective period timeframe.") unless initial_ba_within_valid_timeframe?
           return Failure('Overlapping BenefitApplication exists for this Employer.') if overlapping_ba_exists?
@@ -66,7 +66,7 @@ module BenefitSponsors
           case @current_ba.aasm_state
           when :terminated, :termination_pending
             (@current_ba.effective_period.max.next_day)..(@parent_application.effective_period.min.next_year.prev_day)
-          when :canceled
+          when :canceled, :retroactive_canceled
             @current_ba.effective_period
           end
         end

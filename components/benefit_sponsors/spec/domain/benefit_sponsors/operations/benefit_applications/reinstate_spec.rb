@@ -262,7 +262,7 @@ RSpec.describe BenefitSponsors::Operations::BenefitApplications::Reinstate, dbcl
       end
 
       it 'should return a failure with a message' do
-        expect(@result.failure).to eq('Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled] states.')
+        expect(@result.failure).to eq('Given BenefitApplication is not in any of the [:terminated, :termination_pending, :canceled, :retroactive_canceled] states.')
       end
     end
   end
