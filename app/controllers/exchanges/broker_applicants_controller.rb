@@ -95,11 +95,11 @@ class Exchanges::BrokerApplicantsController < ApplicationController
     all_carrier_appointments = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
     unless broker_carrier_appointments_enabled
-      permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].to_unsafe_hash
+      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].to_unsafe_hash
       all_carrier_appointments.merge!(permitted_params) if permitted_params
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments
     else
-      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each { |key,str| all_carrier_appointments[key] = "true" }
+      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each { |key, _str| all_carrier_appointments[key] = "true" }
     end
   end
 
