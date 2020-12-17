@@ -449,6 +449,7 @@ end
 
 When(/^.+ clicks? on publish plan year$/) do
   find('.interaction-click-control-publish-plan-year').click
+  sleep 2
 end
 
 Then(/^.+ should see Action Needed button/) do
