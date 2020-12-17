@@ -2,6 +2,7 @@
 $dc-primary-blue: #005EB8;
 $dc-red: #D22630;
 $white: #ffffff;
+$mhc-href:#337ab7;
 // Secondary Colors
 $dc-organge: #EAA000;
 $dc-dark-blue: #003260;
@@ -15,8 +16,6 @@ $dc-alt-blue: #007BC4;
 $dc-alt-gray: #d7d7d7;
 $dc-alt-gray-2: #b7b7b7;
 $medium-gray: #f2f2f2;
-
-$mhc-dark-blue:#007bc4;
 $mhc-blue: #007bc4;
 $mhc-darker-blue: #007bc4;
 $mhc-dark-gray: #706f6d;
@@ -58,3 +57,8 @@ $primary-border-radius: .5rem;
 $primary-input-border: 1px solid #b7b7b7;
 $primary-botton-border-bottom:#003260;
 $new-style-gray-border: 1px solid #ddd;
+$mhc-dark-blue:#003260;
+$secondary-button-text: $primary-blue;
+$secondary-button-background: transparent;
+$secondary-button-border: $primary-blue;
+$secondary-button-text-casing: capitalize;

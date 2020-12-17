@@ -59,6 +59,18 @@ module BrokerAgencyWorld
     person_rec = FactoryBot.create(:person, first_name: person[:first_name], last_name: person[:last_name], dob: Date.strptime(person[:dob], "%m/%d/%Y"))
     FactoryBot.create(:user, person: person_rec, email: person[:email])
   end
+
+  def create_broker_staff(broker_name, legal_name, user)
+    @brokers ||= {}
+    return @brokers[broker_name] if @brokers[broker_name]
+
+    broker_agency_profile = broker_agency_profile(legal_name)
+    person = FactoryBot.create(:person, first_name: broker_name.split(/\s/)[0], last_name: broker_name.split(/\s/)[1], user: user)
+    primary_broker_agency_staff_role = create(:broker_agency_staff_role, aasm_state: :active, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)
+    person.broker_agency_staff_roles << primary_broker_agency_staff_role
+    user.roles = ['broker_agency_staff']
+    user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/#{broker_agency_profile.id}")
+  end
 end
 
 World(BrokerAgencyWorld)

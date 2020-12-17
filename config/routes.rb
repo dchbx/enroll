@@ -614,8 +614,19 @@ Rails.application.routes.draw do
 
     member do
       get 'get_member'
+      get 'manage_account'
+      get 'personal_info'
+      get 'show_roles'
+      get 'available_accounts'
+      put 'update_personal_info'
     end
 
+  end
+
+  resources :accounts do
+    member do
+      get 'available_accounts'
+    end
   end
 
   match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"

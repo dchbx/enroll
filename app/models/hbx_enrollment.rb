@@ -749,7 +749,7 @@ class HbxEnrollment
   end
 
   def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on = term_date
+    self.terminated_on ||= term_date
     term_or_cancel_benefit_group_assignment
   end
 

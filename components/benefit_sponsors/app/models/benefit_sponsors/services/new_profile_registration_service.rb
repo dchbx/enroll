@@ -18,7 +18,20 @@ module BenefitSponsors
 
       def build(attrs)
         organization = factory_class.build(attrs)
-        attributes_to_form_params(organization)
+        params = attributes_to_form_params(organization)
+        if attrs[:person_id].present?
+          person = Person.where(id: attrs[:person_id]).first
+          params[:staff_roles].first.merge!({
+                                              person_id: attrs[:person_id],
+                                              coverage_record: {
+                                                ssn: person.ssn,
+                                                dob: person.dob,
+                                                gender: person.gender,
+                                                is_applying_coverage: false
+                                              }
+                                            })
+        end
+        params
       end
 
       def find

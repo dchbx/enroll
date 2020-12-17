@@ -82,3 +82,7 @@ registry:
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
+
+      - key: :manage_account_functionality
+        item: "manage_account"
+        is_enabled: true

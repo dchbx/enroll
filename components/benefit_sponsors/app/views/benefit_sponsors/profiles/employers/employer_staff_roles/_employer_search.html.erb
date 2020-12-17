@@ -1,0 +1,31 @@
+<div class="container">
+  <br/>
+  <div class="col-12 no-pd">
+    <div class='table-responsive'>
+      <% if @employer_profile_organizations.present? %>
+        <table style='width: 60em; border-collapse: collapse; border: 1px solid #d5d5d5' class="employer-staff">
+          <thead style='height: 40px;'>
+          <th style='width: 18%; height: 40px; padding: 10px'> <%= l10n("legal_name") %></th>
+          <th style='width: 18%'> Fein</th>
+          <th style='width: 18%'> HBX ID</th>
+          <th style='width: 18%'> <%= l10n("select_this_employer") %></th>
+          </thead>
+          <% @employer_profile_organizations.each do |org| %>
+            <tbody class="select-employer">
+            <tr style='border: 1px solid #d5d5d5; height: 50px;'>
+              <td style="padding-left: 20px;"><%= org.legal_name %></td>
+              <td><%= org.fein %></td>
+              <td><%= truncate(org.hbx_id, length: 9, omission: '') %></td>
+              <td colspan="1">
+                <a href="javascript:void(0)" class='btn btn-primary select-employer-profile' style="color:#fff" onclick="selectEmployer(this);" data-employer_profile_id="<%= org.employer_profile._id %>"><%= l10n("select_this_employer").upcase %></a>
+              </td>
+            </tr>
+            </tbody>
+          <% end %>
+        </table>
+      <% else %>
+        <h4><span class="alert-error"> <%= l10n("no_employer_found") %></span></h4>
+    <% end %>
+    </div>
+  </div>
+</div>

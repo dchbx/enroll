@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe PeopleController, dbclean: :after_each do
@@ -138,6 +140,120 @@ RSpec.describe PeopleController, dbclean: :after_each do
         expect(response).to redirect_to(family_account_path)
         expect(flash[:notice]).to eq 'Person was successfully updated.'
       end
+    end
+  end
+
+  describe 'show_roles' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+      get :show_roles, params: {id: person.id}
+    end
+
+    it 'should return success status' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'should assign instance variable' do
+      expect(assigns(:person)).to eq person
+    end
+
+    it 'should render manage_account template' do
+      expect(response).to render_template("people/show_roles")
+    end
+  end
+
+  describe 'Manage Account' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+      get :manage_account, params: {id: person.id}
+    end
+
+    it 'should return success status' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'should assign instance variable' do
+      expect(assigns(:person)).to eq person
+    end
+
+    it 'should render manage_account template' do
+      expect(response).to render_template("people/manage_account")
+    end
+  end
+
+  describe 'available_accounts' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+      get :available_accounts, params: {id: person.id}
+    end
+
+    it 'should return success status' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'should assign instance variable' do
+      expect(assigns(:person)).to eq person
+    end
+
+    it 'should render manage_account template' do
+      expect(response).to render_template("people/available_accounts")
+    end
+  end
+
+  describe 'Personal Info' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+      get :personal_info, params: {id: person.id}
+    end
+
+    it 'should return success status' do
+      expect(response).to have_http_status(:success)
+    end
+
+    it 'should assign instance variable' do
+      expect(assigns(:person)).to eq person
+    end
+
+    it 'should render manage_account template' do
+      expect(response).to render_template("people/personal_info")
+    end
+  end
+
+  describe 'Update Personal Info' do
+    let(:user) { FactoryBot.build(:user) }
+    let(:invalid_phones_attributes) {{"0" => {"kind" => "home", "_destroy" => "false", "full_phone_number" => "(848) 484-84"}, "1" => {"kind" => "mobile", "_destroy" => "false", "full_phone_number" => ""}}}
+    let(:valid_phones_attributes) {{"0" => {"kind" => "home", "_destroy" => "false", "full_phone_number" => "(848) 484-8499"}, "1" => {"kind" => "mobile", "_destroy" => "false", "full_phone_number" => ""}}}
+    let(:person_params){{"dob" => "1985-10-01", "first_name" => "Nikola","gender" => "male","last_name" => "Rasevic","middle_name" => "Veljko", "is_incarcerated" => "false"}}
+    let(:person) {FactoryBot.create(:person, user: user)}
+
+    before do
+      sign_in(user)
+    end
+
+    it 'should not update existing person with invalid phone number' do
+      person_params[:phones_attributes] = invalid_phones_attributes
+      put :update_personal_info, params: {person: person_params, id: person.id}
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:alert]).to match('Person update failed. Phones is invalid')
+    end
+
+    it 'should update existing person with valid phone numbe' do
+      person_params[:phones_attributes] = valid_phones_attributes
+      put :update_personal_info, params: {person: person_params, id: person.id}
+      expect(response).to have_http_status(:redirect)
+      expect(flash[:notice]).to match('Person successfully updated.')
     end
   end
 end

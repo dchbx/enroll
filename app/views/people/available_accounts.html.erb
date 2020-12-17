@@ -1,0 +1,11 @@
+<% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/manage_account' %>
+<% end %>
+
+<div class="documents-tab" style="padding-top: 0px !important;">
+  <h2> Add New Portal </h2>
+
+  <p> Add additional roles or quickly jump to a portage using the links below. </p>
+
+  <%= render partial: 'people/available_accounts' %>
+</div>

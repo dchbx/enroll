@@ -24,16 +24,11 @@ nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color"
     - if signed_in?
       ul.list-group.list-group-flush.login-options.text-right
         li.list-group-item.user-actions.pt-0.pb-0
-          = render partial: "shared/my_portal_links"
-          .mt-3
-          a.header-text href="https://dchealthlink.com/help" target="_blank" Help |
-          = link_to "Logout", main_app.destroy_user_session_path, method: "delete", class: "header-text"
-        li.list-group-item.user-actions.pt-0.pb-0
-          strong
-            = user_first_name_last_name_and_suffix
-          - unless current_user.try(:person).try(:hbx_id).nil?
-            | &nbsp;
-            | &nbsp;
-            | My ID
-            | :
-            = truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')
+          span.my-portal-links
+            br
+            - unless current_user.try(:person).try(:hbx_id).nil?
+              span
+                | My ID
+                | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 9, omission: '')}
+            br
+            = render partial: "shared/my_portal_links"
