@@ -57,12 +57,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :carrier_appointments => {}).except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :carrier_appointments => {}).except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.approve!
       broker_role.reload
 
