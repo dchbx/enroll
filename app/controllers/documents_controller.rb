@@ -15,14 +15,17 @@ class DocumentsController < ApplicationController
   end
 
   def download_employer_document
-    send_file params[:path]
+    document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
+    send_file document.identifier
+  rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def authorized_download
     begin
       model = params[:model].camelize
       model_id = params[:model_id]
-      relation = params[:relation]
+      relation = ["documents"].include?(params[:relation]) ? params[:relation] : "documents"
       relation_id = params[:relation_id]
 
       #this is a fix for new model inbox-messages notice download
