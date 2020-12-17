@@ -30,10 +30,12 @@ class DocumentsController < ApplicationController
 
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
-        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile".safe_constantize
+        model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
       end
+      model_klass = ['BenefitSponsors::Organizations::AcaShopDcEmployerProfile', 'Person', "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"].include?(model) ? model.safe_constantize : nil
+      return unless model_klass.present?
 
-      model_object = model.find(model_id)
+      model_object = model_klass.find(model_id)
       documents = model_object.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
         uri = documents.find(relation_id).identifier
