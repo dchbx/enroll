@@ -89,14 +89,7 @@ class Exchanges::ResidentsController < ApplicationController
 
   def create
     begin
-      params.require(:person).permit(
-        :name_pfx, :first_name,
-        :middle_name, :last_name,
-        :name_sfx, :ssn, :dob,
-        :gender, :consumer, :no_ssn,
-        :is_applying_coverage
-      )
-      @resident_role = Factories::EnrollmentFactory.construct_resident_role(params[:person], actual_user)
+      @resident_role = Factories::EnrollmentFactory.construct_resident_role(params.require(:person).permit(person_parameters_list), actual_user)
       if @resident_role.present?
         @person = @resident_role.person
         session[:person_id] = @person.id
