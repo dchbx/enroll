@@ -31,7 +31,7 @@ hr
       strong Address
     .col-md-3.mb-3
       label for="inputAddress1" Address 1
-      = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", required: 'true', id:'inputAddress1'
+      = f.text_field :address_1, class:"form-control mb-1",  placeholder: "123 Main St", id:'inputAddress1'
       .invalid-feedback
         | Please provide a valid address.
     .col-md-3.mb-3
@@ -40,12 +40,12 @@ hr
 
     .col-md-3.mb-3
       label for="inputCity" City
-      = f.text_field :city, class: "form-control mb-1", required: true, placeholder: 'CITY', id: 'inputCity'
+      = f.text_field :city, class: "form-control mb-1", placeholder: 'CITY', id: 'inputCity'
       .invalid-feedback
         | Please provide a valid city.
     .col-md-3.mb-3
       label for="inputState" State
-      = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState', required: true)
+      = f.select(:state, options_for_select(State::NAME_IDS.map(&:last).sort_by {|c| c }, selected: f.object.try(:state)), {include_blank: "SELECT STATE"}, class:'form-control mb-1', id:'inputState')
       .invalid-feedback
         | Please select a state.
     .col-md-3.mb-3
@@ -67,7 +67,7 @@ hr
       strong Email
     .col-md-6.mb-3
       label for="inputAddress1" Kind
-      = f.select(:kind, options_for_select(Email::KINDS, selected: f.object.try(:kind)), {include_blank: "SELECT KIND"}, class:'form-control mb-1', id:'inputKind', required: true)
+      = f.select(:kind, options_for_select(Email::KINDS, selected: f.object.try(:kind)), {include_blank: "SELECT KIND"}, class:'form-control mb-1', id:'inputKind')
       .invalid-feedback
         | Please select a valid kind.
     .col-md-6.mb-3
