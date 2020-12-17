@@ -400,7 +400,7 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
       employee_role = @person.active_employee_roles.first
-      @manually_picked_role = params[:market] || "shop_market_events"
+      @manually_picked_role = ["individual_market_events", "fehb_market_events", "shop_market_events"].include?(params[:market]) ? params[:market] : "shop_market_events"
 
       employee_qle_market_scope = "shop_market_events"
       employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"
