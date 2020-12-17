@@ -57,7 +57,8 @@ module PermissionsConcern
     end
 
     def has_hbx_staff_role?
-      has_role?(:hbx_staff) || self.try(:person).try(:hbx_staff_role)
+      hbx_staff_role_present = !self.try(:person).try(:hbx_staff_role).nil?
+      has_role?(:hbx_staff) || hbx_staff_role_present
     end
 
     def has_csr_role?

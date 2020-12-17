@@ -38,10 +38,47 @@ registry:
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
-
       - key: :sep_carousel_message
         item: :sep_carousel
         is_enabled: true
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+  - namespace:
+      - :features
+      - :enroll_app
+      - :aca_shop
+    features:
+      - key: :aca_shop_dependent_age_off
+        item: Operations::Shop::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :aca_fehb_dependent_age_off
+        item: Operations::Fehb::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :monthly
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :aca_individual_dependent_age_off
+        item: Operations::Individual::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :age_off_relaxed_eligibility
+        item: Operations::AgeOffRelaxedEligibility.new
+        is_enabled: true

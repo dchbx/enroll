@@ -355,13 +355,13 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
 
     it "should create a new person" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      expect(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      expect(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
       subject.save
     end
 
     it "should create a new family member and call save_relevant_coverage_households" do
       person_properties[:dob] = Date.strptime(person_properties[:dob], "%Y-%m-%d")
-      allow(Person).to receive(:new).with(person_properties.merge({:citizen_status=>nil})).and_return(new_person)
+      allow(Person).to receive(:new).with(person_properties.merge({:citizen_status => nil, :age_off_excluded => nil})).and_return(new_person)
       expect(family).to receive(:save_relevant_coverage_households)
       subject.save
       expect(subject.id).to eq new_family_member_id
@@ -519,7 +519,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil})).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
@@ -528,7 +528,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
     it "should update the attributes of the person" do
       allow(subject).to receive(:assign_person_address).and_return true
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status=>nil, :no_ssn=>"0", :is_homeless=>nil, :is_temporarily_out_of_state=>nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)

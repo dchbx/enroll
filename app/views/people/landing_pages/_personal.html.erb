@@ -47,6 +47,11 @@
           <%= render 'shared/is_applying_for_coverage', f: f, first_checked: first_checked, second_checked: second_checked %>
         </div>
         <% end %>
+        <% if current_user.does_not_have_any_staff_role? && !current_user.has_insured_role? %>
+          <div class="row row-form-wrapper no-buffer">
+            <%= render 'shared/age_off_excluded', f: f%>
+          </div>
+          <% end %>
       </div>
     </div>
   </div>
