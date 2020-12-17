@@ -188,7 +188,11 @@
                     <% end %>
                   </header>
                 </section>
+
                 <div class="col-xs-2 top-view-details">
+                  <%if package.benefit_application.reinstated_id?%>
+                    <div class="right-view-details text-danger"><b><%= l10n("employers.plan_years.reinstated") %></b></div>
+                  <%end%>
                   <button class="nav-toggle row view" id="showhidebutton" onclick="EmployerProfile.viewDetails($(this))">View Details
                     <i class="fa fa-chevron-down fa-lg"></i>
                   </button>

@@ -58,3 +58,23 @@ And(/^initial employer ABC Widgets has updated (.*) effective period for reinsta
     employer_profile.benefit_applications.first.update_attributes!(effective_period: effective_period)
   end
 end
+
+Given("terminated benefit application effective_period updated") do
+  @terminated_ba = employer_profile.benefit_applications.first
+  start_on = @terminated_ba.effective_period.min
+  end_on = TimeKeeper.date_of_record.beginning_of_month - 1.day
+  effective_period = start_on..end_on
+  @terminated_ba.update_attributes!(effective_period: effective_period)
+end
+
+Given("active benefit application is a reinstated benefit application") do
+  reinstated_ba = employer_profile.benefit_applications.where(aasm_state: :active).first
+  start_on_ba = @terminated_ba.effective_period.max + 1.day
+  end_on_ba = reinstated_ba.effective_period.max
+  effective_period = start_on_ba..end_on_ba
+  reinstated_ba.update_attributes!(effective_period: effective_period, reinstated_id: @terminated_ba.id)
+end
+
+And("Employer see reinstated benefit application") do
+  expect(page).to have_content('Reinstated')
+end
