@@ -99,5 +99,6 @@ coverage
 .env
 .vscode
 
-# Ignore HUGO public dir
+# Ignore HUGO output dirs
 hugo/public
+hugo/static
