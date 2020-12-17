@@ -228,7 +228,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params.permit![:file]) || (!params.permit![:subject])
+    if (!params.permit(:file) || !params.permit(:subject))
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -246,7 +246,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        send_notice_upload_notifications(notice_document, params.permit(:file, :subject))
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -303,8 +303,17 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  # Example of what we might need to do
+  # uniq_cancel_params = params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
+  # example paraams
+  # => <ActionController::Parameters {"family"=>"5fdbb7addf54fe1f8d5c6205", "family_actions_id"=>"family_actions_5fdbb7addf54fe1f8d5c6205", "qle_id"=>"5fdbb7addf54fe1f8d5c6209",
+  #{ }"transition_effective_date_5fdbb7acdf54fe1f8d5c61c3"=>"12/17/2020", "transition_market_kind_5fdbb7acdf54fe1f8d5c61c3"=>"resident",
+  #{ }"transition_reason_5fdbb7acdf54fe1f8d5c61c3"=>"eligibility_failed_or_documents_not_received_by_due_date",
+  #{ }"transition_user_5fdbb7acdf54fe1f8d5c61c3"=>"5fdbb7acdf54fe1f8d5c61c3",
+  #{ }"format"=>"js", "controller"=>"insured/families", "action"=>"transition_family_members_update"} permitted: false>
   def transition_family_members_update
-    params_hash = params.permit!.to_h
+    # params_hash = params.permit!.to_h
+    params_hash = params.permit(:person, :family, :family_actions_id)
     @row_id = params_hash[:family_actions_id]
 
     params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
@@ -450,15 +459,21 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
+  def notice_permitted_params
+
+  end
+
   def file_path
     params.permit(:file)[:file].tempfile.path
   end
 
   def file_name
+    binding.pry
     params.permit![:file].original_filename
   end
 
   def file_content_type
+    binding.pry
     params.permit![:file].content_type
   end
 
