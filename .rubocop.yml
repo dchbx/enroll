@@ -110,7 +110,7 @@ Style/BlockComments:
 
 # We will want to turn this back on or customize it more fully
 Style/Documentation:
-  Enabled: false
+  Enabled: true
 
 Style/EachWithObject:
   Enabled: false
