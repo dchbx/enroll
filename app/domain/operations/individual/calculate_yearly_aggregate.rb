@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'dry/monads'
+require 'dry/monads/do'
+
 module Operations
   module Individual
+    # Calculate Yearly Aggregate amount based on current enrollment
     class CalculateYearlyAggregate
       include Dry::Monads[:result, :do]
       include FloatHelper
@@ -15,6 +19,7 @@ module Operations
       end
 
       private
+
       def validate(params)
         return Failure("Given object is not a valid hbx enrollment object") unless params[:hbx_enrollment].is_a?(HbxEnrollment)
         return Failure("Enrollment has no family") unless params[:hbx_enrollment].family.present?
@@ -44,15 +49,16 @@ module Operations
         effective_on = enrollment.effective_on
         applied_aptc = enrollment.applied_aptc_amount
         total_days = effective_on.end_of_month.day
-        no_of_days_aptc_consumed = if effective_on == effective_on.beginning_of_month
-        if termination_date.month != enrollment.effective_on.month
-          total_days
-        else termination_date.month == enrollment.effective_on.month
-          termination_date.day - (effective_on.day - 1)
-        end
-        else
-          total_days - (effective_on.day - 1)
-        end
+        no_of_days_aptc_consumed =
+          if effective_on == effective_on.beginning_of_month
+            if termination_date.month != enrollment.effective_on.month
+              total_days
+            elsif termination_date.month == enrollment.effective_on.month
+              termination_date.day - (effective_on.day - 1)
+            end
+          else
+            total_days - (effective_on.day - 1)
+          end
         no_of_days_aptc_consumed.fdiv(total_days).round(2) * applied_aptc
       end
 
