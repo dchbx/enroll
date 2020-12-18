@@ -10,6 +10,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
   before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
+  before_action :transition_family_members_update_params, only: %i[transition_family_members_update]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -228,7 +229,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params.permit(:file) || !params.permit(:subject))
+    if (!params[:file] || !params[:subject])
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -246,7 +247,8 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit(:file, :subject))
+        params.permit(:subject)
+        send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -303,25 +305,14 @@ class Insured::FamiliesController < FamiliesController
     end
   end
 
-  # Example of what we might need to do
-  # uniq_cancel_params = params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
-  # example paraams
-  # => <ActionController::Parameters {"family"=>"5fdbb7addf54fe1f8d5c6205", "family_actions_id"=>"family_actions_5fdbb7addf54fe1f8d5c6205", "qle_id"=>"5fdbb7addf54fe1f8d5c6209",
-  #{ }"transition_effective_date_5fdbb7acdf54fe1f8d5c61c3"=>"12/17/2020", "transition_market_kind_5fdbb7acdf54fe1f8d5c61c3"=>"resident",
-  #{ }"transition_reason_5fdbb7acdf54fe1f8d5c61c3"=>"eligibility_failed_or_documents_not_received_by_due_date",
-  #{ }"transition_user_5fdbb7acdf54fe1f8d5c61c3"=>"5fdbb7acdf54fe1f8d5c61c3",
-  #{ }"format"=>"js", "controller"=>"insured/families", "action"=>"transition_family_members_update"} permitted: false>
   def transition_family_members_update
-    # params_hash = params.permit!.to_h
-    params_hash = params.permit(:person, :family, :family_actions_id)
-    @row_id = params_hash[:family_actions_id]
-
-    params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
+    @row_id = params[:family_actions_id]
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(@permitted_param_keys).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
-    @family = Family.find(params_hash[:family])
+    @family = Family.find(params[:family])
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
@@ -337,6 +328,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def transition_family_members_update_params
+    dynamic_transition_params_keys = params.keys.map { |key| key.match(/transition_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
+    @permitted_param_keys = dynamic_transition_params_keys.push(non_dynamic_params_keys).flatten
+  end
 
   def fetch_terminate_date(terminate_date)
     term_date = @family.terminate_date_for_shop_by_enrollment(@enrollment)
@@ -468,13 +465,11 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def file_name
-    binding.pry
-    params.permit![:file].original_filename
+    params.permit(:file).original_filename
   end
 
   def file_content_type
-    binding.pry
-    params.permit![:file].content_type
+    params.permit(:file).content_type
   end
 
   def send_notice_upload_notifications(notice, subject)
