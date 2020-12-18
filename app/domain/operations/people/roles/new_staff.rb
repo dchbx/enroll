@@ -3,6 +3,8 @@
 module Operations
   module People
     module Roles
+      # New Staff operation is to initialize new employer staff with ability for self coverage
+      # This will return an entity, which we use in our ERB files.
       class NewStaff
         include Dry::Monads[:result, :do, :try]
 

@@ -6,6 +6,8 @@ require 'dry/monads/do'
 module Operations
   module People
     module Roles
+      # Find all operation is to find all the available roles for the given user.
+      # This will return an entity, which we use in our ERB files.
       class FindAll
         include Dry::Monads[:result, :do]
 

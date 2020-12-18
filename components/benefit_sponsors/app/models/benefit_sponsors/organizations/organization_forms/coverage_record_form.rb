@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Organizations
     module OrganizationForms
+      # This is Virtus form object which we initialize while showing/persisting coverage record
       class CoverageRecordForm
         include Virtus.model
         include ActiveModel::Validations

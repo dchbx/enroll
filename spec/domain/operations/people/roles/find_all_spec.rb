@@ -4,6 +4,7 @@ require 'rails_helper'
 
 module Operations
   module People
+    # Spec for Find All Operation
     module Roles
       RSpec.describe FindAll, type: :model, dbclean: :after_each do
         before :all do

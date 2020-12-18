@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Validators
+  # Staff Contract is to validate inital & submitted params while initalizing/persisting staff
   class StaffContract < Dry::Validation::Contract
 
     params do
