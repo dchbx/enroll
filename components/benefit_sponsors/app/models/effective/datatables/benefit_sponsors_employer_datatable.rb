@@ -73,6 +73,8 @@ module Effective
               ['Generate Invoice', generate_invoice_exchanges_hbx_profiles_path(ids: [row.id]), generate_invoice_link_type(@employer_profile)],
               ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
               [text_to_display(row), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.is_no_ssn_enabled), 'post_ajax'],
+              ['Show/Add Roles', benefit_sponsors.profiles_employers_employer_staff_roles_path(profile_id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"),
+               add_roles_link_type(pundit_allow(HbxProfile, :can_add_role?))],
               ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
               ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"),
                force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))],
@@ -135,6 +137,12 @@ module Effective
 
       def send_secure_message_link_type(allow)
         feature_enabled = ::EnrollRegistry.feature_enabled?(:send_secure_message_employer)
+        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow ? 'ajax' : 'hide'
+      end
+
+      def add_roles_link_type(allow)
+        feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
         policy_accepted_and_allow = feature_enabled && allow
         policy_accepted_and_allow ? 'ajax' : 'hide'
       end

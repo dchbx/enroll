@@ -59,13 +59,11 @@ module BenefitSponsors
         end
 
         def new_staff_member
-          # Add pundit policy
           authorize User, :add_roles?
           @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
         end
 
         def create_staff_member
-          # Add pundit policy
           authorize User, :add_roles?
           staff_params = params.permit!["staff_member"].to_h
           result = ::Operations::People::Roles::PersistStaff.new.call(params.permit!["staff_member"].to_h)
@@ -85,6 +83,13 @@ module BenefitSponsors
           return [] if @search_value.blank?
 
           @employer_profile_organizations = BenefitSponsors::Organizations::Organization.employer_profiles.datatable_search(@search_value)
+        end
+
+        def index
+          @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+          authorize @profile, :list_staff_roles?
+          @element_to_replace_id = params[:employer_actions_id]
+          @staff_people = Person.staff_for_employer(@profile)
         end
 
         private
