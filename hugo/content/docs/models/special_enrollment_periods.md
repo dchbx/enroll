@@ -1,7 +1,7 @@
 ---
 title: "Special Enrollment Periods/Qualifying Life Event Kinds"
 date: 2020-11-18T12:12:25-05:00
-draft: true
+draft: false
 ---
 
 The Enroll Application offers both employee self-attested, and caseworker-managed, Qualifying Life Events and resulting Special Enrollment Periods. 

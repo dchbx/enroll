@@ -17,7 +17,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
-      @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
+      @broker_applicants = @people.where("last_name" => /^#{Regexp.escape(page_no)}/i)
     else
       @broker_applicants = sort_by_latest_transition_time(@people).limit(20).entries
     end

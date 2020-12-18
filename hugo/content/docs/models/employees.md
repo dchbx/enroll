@@ -1,7 +1,7 @@
 ---
 title: "Employees"
 date: 2020-12-11T12:12:25-05:00
-draft: true
+draft: false
 ---
 
 In Enroll terminology, Employees are those employed by the various Employers who utilize Enroll to allow their employees to select coverage. 

@@ -181,7 +181,7 @@ module BenefitSponsors
         def find_broker_agency_profile(id = nil)
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
           @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile, :access_to_broker_agency_profile? if @broker_agency_profile
         end
 
         def user_not_authorized(exception)
