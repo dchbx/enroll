@@ -9,6 +9,10 @@ module SponsoredBenefits
         @form = form
       end
 
+      # Assign an agency to a list of organizations, also removing any current
+      #  assignments.
+      #
+      # @return [Void]
       def assign_general_agency(start_on: TimeKeeper.datetime_of_record)
         form.plan_design_organization_ids.each do |id|
           unless fire_previous_general_agency(id)
@@ -46,7 +50,13 @@ module SponsoredBenefits
         end
       end
 
-      def create_general_agency_account(id, broker_role_id, start_on=TimeKeeper.datetime_of_record, general_agency_profile_id=form.general_agency_profile_id, broker_agency_profile_id=form.broker_agency_profile_id)
+      def create_general_agency_account(
+        id,
+        broker_role_id,
+        start_on = TimeKeeper.datetime_of_record,
+        general_agency_profile_id = form.general_agency_profile_id,
+        broker_agency_profile_id = form.broker_agency_profile_id
+      )
         plan_design_organization(id).general_agency_accounts.build(
           start_on: start_on,
           broker_role_id: broker_role_id
