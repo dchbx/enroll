@@ -328,6 +328,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         expect(subject.selected_enrollment(family, employee_role, active_enrollment.coverage_kind)).to eq renewal_enrollment
       end
 
+      it 'should return nil if employee role is not present' do
+        expect(subject.selected_enrollment(family, nil, active_enrollment.coverage_kind)).to eq nil
+      end
+
       context 'it should not return any enrollment' do
 
         before do

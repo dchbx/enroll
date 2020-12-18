@@ -38,7 +38,7 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
   end
 
   def search_broker_agency
-    orgs = Organization.has_broker_agency_profile.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
+    orgs = Organization.has_broker_agency_profile.or({legal_name: /#{Regexp.escape(params[:broker_agency_search])}/i}, {"fein" => /#{Regexp.escape(params[:broker_agency_search])}/i})
 
     @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
   end
