@@ -4,6 +4,7 @@
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
+# CensusEmployee benefit_group_assignments updates
 class CensusEmployeesOverlappingBenefitGroupAssignmentsReport < MongoidMigrationTask
   def all_census_employees
     @all_census_employees ||= CensusEmployee.all
