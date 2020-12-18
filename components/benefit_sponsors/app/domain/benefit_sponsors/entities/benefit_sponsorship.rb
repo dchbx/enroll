@@ -14,7 +14,7 @@ module BenefitSponsors
       attribute :termination_reason,      Types::String.optional
       attribute :predecessor_id,          Types::Bson.optional
       attribute :source_kind,             Types::Strict::Symbol
-      attribute :registered_on,           Types::Strict::Date
+      attribute :registered_on,           Types::Date.optional
       attribute :is_no_ssn_enabled,       Types::Bool.optional
       attribute :ssn_enabled_on,          Types::Date.optional
       attribute :ssn_disabled_on,         Types::Date.optional
