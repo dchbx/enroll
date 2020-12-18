@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Entities
+  # Entity to initalize while showing/persisting staff record.
   class Staff < Dry::Struct
     transform_keys(&:to_sym)
 

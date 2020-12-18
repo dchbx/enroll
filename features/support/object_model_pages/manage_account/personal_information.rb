@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module ManageAccount
+  # To find out Personal information fields with ID, class attrs for cucumbers POM.
   class PersonalInformation
 
     def self.first_name
