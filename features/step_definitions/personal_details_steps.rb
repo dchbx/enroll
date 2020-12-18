@@ -63,7 +63,7 @@ And(/person should be able to click add (.*) portal/) do |role|
   if role == 'employer'
     visit "/benefit_sponsors/profiles/registrations/new_employer_profile_form?person_id=#{@person.id}&profile_type=benefit_sponsor"
   elsif role == 'poc'
-    visit  "/benefit_sponsors/profiles/employers/employer_staff_roles/new_staff_member?id=#{@person.id}"
+    visit "/benefit_sponsors/profiles/employers/employer_staff_roles/new_staff_member?id=#{@person.id}"
   end
 end
 
