@@ -8,7 +8,7 @@ Given("a matched Employee exists with only employee role") do
   benefit_sponsorship = benefit_sponsor.active_benefit_sponsorship
   employer_profile = benefit_sponsorship.profile
   benefit_package = benefit_sponsorship.benefit_applications.first.benefit_packages.first
-  bga = FactoryBot.build :benefit_group_assignment, benefit_package: benefit_package
+  bga = FactoryBot.build :benefit_group_assignment, benefit_package: benefit_package, is_active: true
   @employee_role = person.employee_roles[0]
   ce = FactoryBot.build(:census_employee,
                         first_name: person.first_name,
