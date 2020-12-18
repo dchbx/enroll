@@ -210,17 +210,12 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
        "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
     end
     let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true) }
-    let(:dependent_properties) { ActionController::Parameters.new({addresses: valid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
+    let(:dependent_properties) { {addresses: valid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
     let(:save_result) { false }
-    # let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
+    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before :each do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:new).with(dependent_properties).and_return(dependent)
-      allow(dependent).to receive(:save).and_return(save_result)
-      allow(dependent).to receive(:address=)
-      allow(dependent).to receive(:family_id).and_return(dependent_properties)
-      allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
       post :create, params: {dependent: dependent_properties}
     end
 
@@ -294,7 +289,8 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
 
       let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
-      let(:dependent_properties) { ActionController::Parameters.new({addresses: invalid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
+      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
+      let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
 
       it "should assign the dependent" do
