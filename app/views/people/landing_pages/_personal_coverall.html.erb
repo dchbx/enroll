@@ -36,6 +36,9 @@
               <label for="gender_female"><span>FEMALE</span></label>
             </div>
           </div>
+          <% if current_user.does_not_have_any_staff_role? %>
+            <%= render 'shared/age_off_excluded', f: f %>
+        <% end %>
         </div>
       </div>
     </div>

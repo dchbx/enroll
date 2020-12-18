@@ -248,8 +248,7 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:new_start_date) { effective_date.next_month }
       let(:new_end_date) { new_start_date + 1.year }
       let(:display_name) { 'Employee' }
-      let!(:contribution_unit)  { predecessor_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }      
-
+      let!(:contribution_unit)  { predecessor_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }
       around do |example|
         ClimateControl.modify(
           action: 'update_effective_period_and_approve',
