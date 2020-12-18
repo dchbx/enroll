@@ -169,16 +169,17 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
-      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
-      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-      employee_role = @person.active_employee_roles.first
-      if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-      elsif Settings.site.key == :dc
-        event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-      end
+    employee_role = @person.active_employee_roles.first
+
+    return unless @qle.present? && employee_role.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
+
+    benefit_application = employee_role.employer_profile.active_benefit_application
+    reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+    if Settings.site.key == :cca
+      trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
+    elsif Settings.site.key == :dc
+      event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
+      trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -400,7 +401,7 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
       employee_role = @person.active_employee_roles.first
-      @manually_picked_role = params[:market] || "shop_market_events"
+      @manually_picked_role = ["individual_market_events", "fehb_market_events", "shop_market_events"].include?(params[:market]) ? params[:market] : "shop_market_events"
 
       employee_qle_market_scope = "shop_market_events"
       employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"

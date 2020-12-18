@@ -355,6 +355,7 @@ Then(/Individual creates a new HBX account$/) do
 end
 
 When(/I click on none of the situations listed above apply checkbox$/) do
+  sleep 2
   expect(page).to have_content 'None of the situations listed above apply'
   find('#no_qle_checkbox').click
   expect(page).to have_content 'To enroll before open enrollment'

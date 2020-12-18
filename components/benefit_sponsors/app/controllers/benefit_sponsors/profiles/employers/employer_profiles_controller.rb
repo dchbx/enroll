@@ -118,7 +118,7 @@ module BenefitSponsors
             begin
               if @roster_upload_form.save
                 flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
-                redirect_to @roster_upload_form.redirection_url
+                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
               else
                 render @roster_upload_form.redirection_url || default_url
               end

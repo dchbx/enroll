@@ -611,5 +611,29 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       expect(census_employee.email.address).to eq ''
     end
   end
+
+  describe "GET confirm_effective_date", dbclean: :around_each do
+    let(:valid_confirmation_types) { CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES }
+
+    before :each do
+      permission = FactoryBot.create(:permission, :hbx_staff)
+      @user.person.hbx_staff_role.permission_id = permission.id
+      @user.person.hbx_staff_role.save!
+      expect(@user.person.hbx_staff_role.present?).to eq(true)
+      sign_in @user
+    end
+
+    it "should render proper template if valid params" do
+      valid_confirmation_types.each do |confirmation_type|
+        get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: confirmation_type }, :format => :js, xhr: true
+        expect(response).to render_template("employers/census_employees/#{confirmation_type}_effective_date")
+      end
+    end
+
+    it "should not render a template if user passes garbage params" do
+      get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: 'garbage' }, :format => :js, xhr: true
+      expect(response).to_not render_template("employers/census_employees/garbage_effective_date")
+    end
+  end
 end
 
