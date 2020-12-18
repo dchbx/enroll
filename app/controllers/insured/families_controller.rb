@@ -229,7 +229,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params[:file] || !params[:subject])
+    if !params[:file] || !params[:subject]
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -454,10 +454,6 @@ class Insured::FamiliesController < FamiliesController
       changing_hbxs = hbxs.changing
       changing_hbxs.update_all(changing: false) if changing_hbxs.present?
     end
-  end
-
-  def notice_permitted_params
-
   end
 
   def file_path
