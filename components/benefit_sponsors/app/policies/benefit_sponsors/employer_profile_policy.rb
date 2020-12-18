@@ -70,5 +70,15 @@ module BenefitSponsors
     def can_modify_employer?
       user.has_hbx_staff_role? && user.person.hbx_staff_role.permission.modify_employer
     end
+
+    def can_add_staff_roles?
+      user.person.hbx_staff_role.permission.can_add_staff_roles
+    end
+
+    def list_staff_roles?
+      return false if user.blank?
+      return true if  (user.has_hbx_staff_role? && can_add_staff_roles?) || is_broker_for_employer?(record) || is_general_agency_staff_for_employer?(record)
+      is_staff_role_for_employer?(record)
+    end
   end
 end

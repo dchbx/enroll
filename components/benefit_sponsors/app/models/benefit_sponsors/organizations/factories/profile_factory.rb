@@ -310,14 +310,10 @@ module BenefitSponsors
                                                 address: Address.new({kind: address[:kind],
                                                                       address_1: address[:kind],
                                                                       address_2: address[:address_2],
-                                                                      address_3: address[:address_3],
                                                                       city: address[:city],
                                                                       county: address[:county],
                                                                       state: address[:state],
-                                                                      location_state_code: address[:location_state_code],
-                                                                      full_text: address[:full_text],
-                                                                      zip: address[:zip],
-                                                                      country_name: address[:country_name]}),
+                                                                      zip: address[:zip]}),
                                                 email: Email.new({kind: email[:kind],
                                                                   address: email[:address]})}})
               end
@@ -328,6 +324,12 @@ module BenefitSponsors
             current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
             current_user.save!
             person.save!
+            approve_employer_staff_role
+          end
+
+          def approve_employer_staff_role
+            role = person.employer_staff_roles.where(benefit_sponsor_employer_profile_id: factory.profile_id.to_s, aasm_state: :is_active).last
+            role&.approve!
           end
 
           def fetch_organization(attributes)

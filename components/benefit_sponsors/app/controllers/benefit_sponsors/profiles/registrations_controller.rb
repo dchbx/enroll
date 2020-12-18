@@ -43,7 +43,7 @@ module BenefitSponsors
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render default_template, :flash => { :error => @agency.errors.full_messages }
+        render default_template, layout: layout_on_render, :flash => { :error => @agency.errors.full_messages }
       end
 
       def edit
@@ -78,6 +78,7 @@ module BenefitSponsors
 
       def new_employer_profile_form
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, person_id: params[:person_id])
+        authorize @agency, :new?
         set_ie_flash_by_announcement unless is_employer_profile?
         respond_to do |format|
           format.html
@@ -99,7 +100,13 @@ module BenefitSponsors
         end
       end
 
+      def layout_on_render
+        return 'bootstrap_4_two_column' if params[:manage_portals]
+        'two_column'
+      end
+
       def default_template
+        return :new_employer_profile_form if params[:manage_portals]
         :new
       end
 
