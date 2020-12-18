@@ -28,9 +28,63 @@ Then(/they attempt to submit a new password/) do
   sleep 1
 end
 
-
 And(/they should see a successful password message/) do
   expect(page).to have_text 'Password successfully changed'
+end
+
+And(/person filled all the fields in the employer information form/) do
+  fill_in Registration.email, with: 'chessmenwidgets@gmail.com'
+  fill_in Registration.area_code_personal_information, with: '444'
+  fill_in Registration.number_personal_information, with: '9894399'
+  fill_in Registration.legal_name, with: 'Chessmen Widgets'
+  fill_in Registration.dba, with: ''
+  fill_in Registration.fein, with: '989888399'
+  select "Tax Exempt Organization", from: Registration.kind
+  select "Primary", from: Registration.kind_office_location_dropdown
+  fill_in Registration.address, with: '123 H St'
+  fill_in Registration.address_two, with: ''
+  fill_in Registration.city, with: 'Washington'
+  select "DC", from: Registration.state_dropdown
+  fill_in Registration.zip, with: '20024'
+  fill_in Registration.area_code_office_location, with: '344'
+  fill_in Registration.number_office_location, with: '3434344'
+  select "Only Electronic communications", from: Registration.contact_method_dropdown
+end
+
+And(/person clicks on add portal/) do
+  page.execute_script("document.querySelector('#employer_registration_form').click()")
+end
+
+Then(/person should see employer home page/) do
+  expect(page).to have_content('My Health Benefits Program')
+end
+
+And(/person should be able to click add (.*) portal/) do |role|
+  if role == 'employer'
+    visit "/benefit_sponsors/profiles/registrations/new_employer_profile_form?person_id=#{@person.id}&profile_type=benefit_sponsor"
+  elsif role == 'poc'
+    visit  "/benefit_sponsors/profiles/employers/employer_staff_roles/new_staff_member?id=#{@person.id}"
+  end
+end
+
+Then(/person should be able to visit add new portal/) do
+  click_link 'Add New Portal'
+end
+
+Then(/person should be able to see available portals/) do
+  expect(page).to have_content 'Available Portals'
+end
+
+Then(/person (.*) see add new portal link/) do |add_new_portal_visible|
+  if add_new_portal_visible == 'should'
+    expect(page).to have_link 'Add New Portal'
+  else
+    expect(page).not_to have_link 'Add New Portal'
+  end
+end
+
+Then(/person should see available portals/) do
+  expect(page).to have_content('Available Portals')
 end
 
 And(/they should see a password error message/) do
@@ -61,14 +115,24 @@ And(/that a person with (.*) exists in EA/) do |role|
 end
 
 And(/person with (.*) signs in and visits manage account/) do |role|
-  person = Person.where(first_name: role.split(/\s/)[0]).first
-  user = person.user
+  @person = Person.where(first_name: role.split(/\s/)[0]).first
+  user = @person.user
   login_as user
-  visit "/people/#{person.id}/manage_account"
+  visit "/people/#{@person.id}/manage_account"
 end
 
 And(/person clicks on personal info section/) do
   click_link 'Personal Info'
+end
+
+And(/person clicks on my portals tab/) do
+  click_link 'My Portals'
+end
+
+Then(/person should see their (.*) information under active portals/) do |role|
+  link = @person.general_agency_staff_roles.present? ? @person.general_agency_staff_roles.first.general_agency_profile.legal_name : @person.full_name
+  find_link(link).visible?
+  expect(page).to have_content(role.split(/\s/)[0])
 end
 
 Then(/person should see his (.*) information/) do |role|
@@ -76,18 +140,15 @@ Then(/person should see his (.*) information/) do |role|
   expect(page).to have_css(ManageAccount::PersonalInformation.personal_information_form)
 end
 
-
 And(/person edits his information/) do
   fill_in ManageAccount::PersonalInformation.first_name, with: "Update"
   fill_in ManageAccount::PersonalInformation.last_name, with: "Person"
   select "Male", from: ManageAccount::PersonalInformation.gender
 end
 
-
 When(/person clicks update/) do
   page.execute_script("document.querySelector('#save-person').click()")
 end
-
 
 And(/person should see the successful message/) do
   expect(page).to have_content(ManageAccount::PersonalInformation.success_message)
