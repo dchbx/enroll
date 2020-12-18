@@ -138,8 +138,8 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
 
           it "should determine the earliest effective date is month after next" do
             # Need to revert the Date.new(2015, 10, 1) with following changes back on 5/1/2020
-            # expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
-            expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 10, 1)
+            expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 11, 1)
+            # expect(benefit_coverage_period.earliest_effective_date).to eq Date.new(2015, 10, 1)
           end
         end
 
