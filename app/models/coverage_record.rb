@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Coverage Record holds information of self coverage for employer staff
 class CoverageRecord
   include Mongoid::Document
   include Mongoid::Timestamps

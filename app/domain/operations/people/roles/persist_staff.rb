@@ -3,6 +3,8 @@
 module Operations
   module People
     module Roles
+      # Persist Staff operation is to persist employer staff with ability for self coverage
+      # This will return an entity, which we use in our ERB files.
       class PersistStaff
         include Dry::Monads[:result, :do, :try]
 

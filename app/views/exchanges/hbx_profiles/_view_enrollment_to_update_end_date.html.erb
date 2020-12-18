@@ -19,7 +19,7 @@
         jQuery('[id^="terminate_hbx_"]').each(function($) {
             if (this.checked) {
 
-                var dup_enr_ids = <%= raw @dup_enr_ids %>;
+                var dup_enr_ids = <%= h @dup_enr_ids %>;
                 var input_id = this.value;
                 var output = dup_enr_ids.includes(input_id);
                 var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value

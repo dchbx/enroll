@@ -87,6 +87,13 @@ module BenefitSponsors
           @employer_profile_organizations = BenefitSponsors::Organizations::Organization.employer_profiles.datatable_search(@search_value)
         end
 
+        def index
+          @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+          authorize @profile, :list_staff_roles?
+          @element_to_replace_id = params[:employer_actions_id]
+          @staff_people = Person.staff_for_employer(@profile)
+        end
+
         private
 
         def staff_params
