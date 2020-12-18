@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# This is to find attrs on registration page for cucumbers POM.
 class Registration
 
   include RSpec::Matchers
