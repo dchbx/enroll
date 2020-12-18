@@ -7,7 +7,7 @@ class SamlController < ApplicationController
   # end
 
   def login
-    relay_state = params["RelayState"]
+    relay_state = params['RelayState']
     response          = OneLogin::RubySaml::Response.new(params[:SAMLResponse], :allowed_clock_drift => 5.seconds)
     response.settings = saml_settings
 
@@ -15,8 +15,7 @@ class SamlController < ApplicationController
 
     if response.is_valid? && response.name_id.present?
       username = response.name_id.downcase
-
-      oim_user = User.where(oim_id: /^#{::Regexp.quote(username)}$/i).first
+      oim_user = User.where(oim_id: /^#{Regexp.escape(username)}$/i).first
 
       if oim_user.present?
         oim_user.idp_verified = true
@@ -30,9 +29,9 @@ class SamlController < ApplicationController
         sign_in(:user, oim_user)
         if !relay_state.blank?
           oim_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         elsif !oim_user.last_portal_visited.blank?
-          redirect_to oim_user.last_portal_visited, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(oim_user.last_portal_visited).to_s, flash: {notice: "Signed in Successfully."}
         else
           oim_user.update_attributes!(last_portal_visited: search_insured_consumer_role_index_path)
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
@@ -40,7 +39,8 @@ class SamlController < ApplicationController
       else
         new_password = User.generate_valid_password
         new_email = response.attributes['mail'].present? ? response.attributes['mail'] : ""
-        headless = User.where(email: /^#{::Regexp.quote(new_email)}$/i).first
+
+        headless = User.where(email: /^#{Regexp.escape(new_email)}$/i).first
         headless.destroy if headless.present? && !headless.person.present?
         new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)
         new_user.save!
@@ -55,7 +55,7 @@ class SamlController < ApplicationController
           redirect_to search_insured_consumer_role_index_path, flash: {notice: "Signed in Successfully."}
         else
           new_user.update_attributes!(last_portal_visited: relay_state)
-          redirect_to relay_state, flash: {notice: "Signed in Successfully."}
+          redirect_to URI.parse(relay_state).to_s, flash: {notice: "Signed in Successfully."}
         end
       end
     elsif !response.name_id.present?
@@ -80,15 +80,15 @@ class SamlController < ApplicationController
         ::IdpAccountManager::CURAM_NAVIGATION_FLAG
       )
       # redirect_to destroy_user_session_path
-      redirect_to SamlInformation.curam_landing_page_url
+      redirect_to URI.parse(SamlInformation.curam_landing_page_url).to_s
     else
-      redirect_to SamlInformation.iam_login_url
+      redirect_to URI.parse(SamlInformation.iam_login_url).to_s
     end
 
   end
 
   def logout
-    redirect_to SamlInformation.saml_logout_url
+    redirect_to URI.parse(SamlInformation.saml_logout_url).to_s
   end
 
   def redirection_test
