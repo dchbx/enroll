@@ -3,6 +3,8 @@
 module Entities
   module People
     module Roles
+      # Account entity that holds roles information.
+      # We use this entity to build forms
       class Account < Dry::Struct
         transform_keys(&:to_sym)
 

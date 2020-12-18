@@ -3,6 +3,8 @@
 module Entities
   module People
     module Roles
+      # Role entity holds information about role model.
+      # We use this entity to build forms in UI
       class Role < Dry::Struct
         transform_keys(&:to_sym)
 

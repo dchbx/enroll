@@ -4,6 +4,7 @@ require 'rails_helper'
 
 module Operations
   module People
+    # Spec for Persist Staff Operation
     module Roles
       RSpec.describe PersistStaff, type: :model, dbclean: :after_each do
         before :all do
