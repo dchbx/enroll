@@ -88,7 +88,7 @@ module BenefitSponsors
         def index
           @profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id])
           authorize @profile, :list_staff_roles?
-          @element_to_replace_id = params[:employer_actions_id]
+          @element_to_replace_id = params[:employer_actions_id].to_s
           @staff_people = Person.staff_for_employer(@profile)
         end
 
