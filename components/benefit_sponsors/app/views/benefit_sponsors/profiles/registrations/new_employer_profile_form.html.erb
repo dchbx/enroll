@@ -6,6 +6,7 @@
   <div class=" container personal-info-container no-pd">
     <%= form_for @agency, as: :agency, url: {action: "create"},  html: { class: "needs-ajax-validation s508", novalidate:true } do |f| %>
       <%= hidden_field_tag :manage_portals, true %>
+      <%= hidden_field_tag :person_id, @person_id %>
       <%= render partial: 'employer_profile_form', locals: {f: f} %>
     <% end %>
   </div>
