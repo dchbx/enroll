@@ -43,7 +43,8 @@ module BenefitSponsors
           flash[:error] = e.message
         end
         params[:profile_type] = profile_type
-        render default_template, layout: layout_on_render, :flash => { :error => @agency.errors.full_messages }
+        flash[:error] = @agency.errors.full_messages if flash[:error].blank?
+        render default_template, layout: layout_on_render
       end
 
       def edit
@@ -77,7 +78,8 @@ module BenefitSponsors
       end
 
       def new_employer_profile_form
-        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, person_id: params[:person_id])
+        @person_id = params[:person_id]
+        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, person_id: @person_id)
         authorize @agency, :new?
         set_ie_flash_by_announcement unless is_employer_profile?
         respond_to do |format|
@@ -127,8 +129,12 @@ module BenefitSponsors
       end
 
       def registration_params
-        current_user_id = current_user.present? ? current_user.id : nil
-        params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id})
+        current_user_id = Person.find(params[:person_id]).user.id if params[:manage_portals] && params[:person_id]
+        current_user_id ||= current_user.present? ? current_user.id : nil
+        params[:agency].merge!({
+          :profile_id => params["id"],
+          :current_user_id => current_user_id
+        })
         params[:agency].permit!
       end
 

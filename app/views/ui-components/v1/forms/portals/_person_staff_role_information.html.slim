@@ -2,21 +2,20 @@ legend Personal Information
 .row
   .col-md-4
     = f.hidden_field :person_id, value: f.object.person_id
-    - person = current_user.person.present? ? current_user.person : nil
     label for="inputFirstName"  First Name *
-    = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John', value: person.first_name, readonly: true
+    = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John', value: f.object.first_name, readonly: true
     .invalid-feedback
       |
         Please provide a first name.
   .col-md-4
     label for="inputLastName"  Last Name *
-    = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe', value: person.last_name, readonly: true
+    = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe', value: f.object.last_name, readonly: true
     .invalid-feedback
       |
         Please provide a last name.
   .col-md-4
     label for="inputDob"  Date of Birth *
-    = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', value: person.dob, required: true, readonly: true, maxlength:10, minlength:10, onblur:'validDob(this)'}
+    = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', value: f.object.dob, required: true, readonly: true, maxlength:10, minlength:10, onblur:'validDob(this)'}
     .invalid-feedback
       |
         Please provide a date of birth.

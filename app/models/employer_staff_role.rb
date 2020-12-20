@@ -41,7 +41,7 @@ class EmployerStaffRole
     state :is_closed    #Person employer staff role is not active
 
     event :approve do
-      transitions from: [:is_applicant, :is_active], to: :is_active, :after => [:create_census_employee]
+      transitions from: [:is_applicant, :is_active], to: :is_active, :after => [:update_coverage]
     end
     event :close_role do
       transitions from: [:is_applicant, :is_active, :is_closed], to: :is_closed
@@ -67,9 +67,19 @@ class EmployerStaffRole
     BenefitSponsors::Engine.routes.url_helpers.profiles_employers_employer_profile_path(profile, tab: 'home').to_s
   end
 
-  def create_census_employee
+  def update_coverage
     return unless has_coverage?
+    update_person
+    create_census_employee
+  end
 
+  def update_person
+    person.update_attributes(ssn: coverage_record.ssn, gender: coverage_record.gender)
+    address = coverage_record.address
+    person.addresses.create(kind: 'home', address_1: address.address_1, address_2: address.address_2, city: address.city, state: address.state, zip: address.zip) if address
+  end
+
+  def create_census_employee
     benefit_sponsorship = profile.benefit_sponsorships.first
     initial_benefit_packages = benefit_sponsorship.current_benefit_application.benefit_packages if benefit_sponsorship.current_benefit_application.present?
     renewing_benefit_packages = benefit_sponsorship.renewal_benefit_application.benefit_packages if benefit_sponsorship.renewal_benefit_application.present?

@@ -9,12 +9,20 @@ class Insured::EmployeeRolesController < ApplicationController
   end
 
   def privacy
+    @person_id = params[:person_id]
   end
 
   def search
     @no_previous_button = true
     @no_save_button = true
-    @person = ::Forms::EmployeeCandidate.new
+    person_params = {}
+    if params[:person_id].present?
+      person = Person.find(params[:person_id])
+      person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
+      person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
+      person_params[:dob] = person.dob.strftime("%Y-%m-%d")
+    end
+    @person = ::Forms::EmployeeCandidate.new(person_params)
     respond_to do |format|
       format.html
     end
