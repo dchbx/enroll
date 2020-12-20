@@ -12,7 +12,7 @@
   <br/>
   <div class="row">
     <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-      <%= link_to l10n("continue").to_s.upcase, search_insured_employee_index_path, class: 'btn btn-primary btn-block btn-lg' %>
+      <%= link_to l10n("continue").to_s.upcase, search_insured_employee_index_path(person_id: @person_id), class: 'btn btn-primary btn-block btn-lg' %>
     </div>
   </div>
 </div>
