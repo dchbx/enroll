@@ -1485,11 +1485,30 @@ class CensusEmployee < CensusMember
   private
 
   def notice_class(notice_type)
-    notice_class = ['IvlNotice', 'Notice', 'IvlNotices::ConditionalEligibilityNoticeBuilder', 'IvlNotices::CoverallToIvlTransitionNoticeBuilder', 'IvlNotices::DocumentsVerification', 'IvlNotices::EligibilityDenialNoticeBuilder', 'IvlNotices::EligibilityNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilderWithDateRange', 'IvlNotices::FinalCatastrophicPlanNotice', 'IvlNotices::IneligibilityNoticeBuilder', 'IvlNotices::IvlBacklogVerificationNoticeUqhp', 'IvlNotices::IvlRenewalNotice', 'IvlNotices::IvlTaxNotice', 'IvlNotices::IvlToCoverallTransitionNoticeBuilder', 'IvlNotices::IvlVtaNotice', 'IvlNotices::NoAppealVariableIvlRenewalNotice', 'IvlNotices::NoticeBuilder', 'IvlNotices::ReminderNotice', 'RenewalNotice', 'IvlNotices::SecondIvlRenewalNotice', 'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
-    if notice_class.nil?
-      raise "Unable to find the notice_class"
-    end
-    return notice_class
+    notice_class = ['IvlNotice',
+                    'Notice',
+                    'IvlNotices::ConditionalEligibilityNoticeBuilder',
+                    'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+                    'IvlNotices::DocumentsVerification',
+                    'IvlNotices::EligibilityDenialNoticeBuilder',
+                    'IvlNotices::EligibilityNoticeBuilder',
+                    'IvlNotices::EnrollmentNoticeBuilder',
+                    'IvlNotices::EnrollmentNoticeBuilderWithDateRange',
+                    'IvlNotices::FinalCatastrophicPlanNotice',
+                    'IvlNotices::IneligibilityNoticeBuilder',
+                    'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+                    'IvlNotices::IvlRenewalNotice',
+                    'IvlNotices::IvlTaxNotice',
+                    'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+                    'IvlNotices::IvlVtaNotice',
+                    'IvlNotices::NoAppealVariableIvlRenewalNotice',
+                    'IvlNotices::NoticeBuilder',
+                    'IvlNotices::ReminderNotice',
+                    'RenewalNotice',
+                    'IvlNotices::SecondIvlRenewalNotice',
+                    'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
+    raise "Unable to find the notice_class" if notice_class.nil?
+    notice_class
   end
 
   def record_transition
