@@ -20,7 +20,7 @@ class Insured::EmployeeRolesController < ApplicationController
       person = Person.find(params[:person_id])
       person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
       person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
-      person_params[:dob] = person.dob.strftime("%Y-%m-%d")
+      person_params[:dob] = person.dob&.strftime("%Y-%m-%d")
     end
     @person = ::Forms::EmployeeCandidate.new(person_params)
     respond_to do |format|
