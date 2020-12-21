@@ -222,7 +222,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "should assign the dependent" do
-        expect(assigns(:dependent).class).to eq (Forms::FamilyMember)
+        expect(assigns(:dependent).class).to eq(Forms::FamilyMember)
         expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
@@ -243,7 +243,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "should assign the dependent" do
-        expect(assigns(:dependent).class).to eq (Forms::FamilyMember)
+        expect(assigns(:dependent).class).to eq(Forms::FamilyMember)
         expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
@@ -270,7 +270,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       end
 
       it "should assign the dependent" do
-        expect(assigns(:dependent).class).to eq (Forms::FamilyMember)
+        expect(assigns(:dependent).class).to eq ::Forms::FamilyMember
         expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
@@ -317,7 +317,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
 
       it "should assign the dependent" do
-        expect(assigns(:dependent).class).to eq (Forms::FamilyMember)
+        expect(assigns(:dependent).class).to eq Forms::FamilyMember
         expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
@@ -408,7 +408,7 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
   describe "PUT update" do
     let(:address) { double }
-    let(:family_member) { double() }
+    let(:family_member) { double }
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -422,14 +422,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       {
         addresses: valid_addresses_attributes,
         :family_id => test_family.id,
-        same_with_primary: true,
+        same_with_primary: true
       }
     end
     let(:invalid_dependent_properties) do
       {
         addresses: invalid_addresses_attributes,
         :family_id => test_family.id,
-        same_with_primary: false,
+        same_with_primary: false
       }
     end
 
