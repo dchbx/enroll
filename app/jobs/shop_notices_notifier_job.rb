@@ -12,7 +12,7 @@ class ShopNoticesNotifierJob < ActiveJob::Base
     if event_kind.present?
       notice_trigger = event_kind.notice_triggers.first
 
-      builder = notice_trigger.notice_builder.camelize.constantize.new(recipient, {
+      builder = notice_class(notice_trigger.notice_builder).new(recipient, {
         template: notice_trigger.notice_template,
         subject: event_kind.title,
         event_name: notice_event,
@@ -20,6 +20,14 @@ class ShopNoticesNotifierJob < ActiveJob::Base
         mpi_indicator: notice_trigger.mpi_indicator,
         }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
     end
+  end
+
+  def notice_class(notice_type)
+    notice_class = ['IvlNotice', 'Notice', 'IvlNotices::ConditionalEligibilityNoticeBuilder', 'IvlNotices::CoverallToIvlTransitionNoticeBuilder', 'IvlNotices::DocumentsVerification', 'IvlNotices::EligibilityDenialNoticeBuilder', 'IvlNotices::EligibilityNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilderWithDateRange', 'IvlNotices::FinalCatastrophicPlanNotice', 'IvlNotices::IneligibilityNoticeBuilder', 'IvlNotices::IvlBacklogVerificationNoticeUqhp', 'IvlNotices::IvlRenewalNotice', 'IvlNotices::IvlTaxNotice', 'IvlNotices::IvlToCoverallTransitionNoticeBuilder', 'IvlNotices::IvlVtaNotice', 'IvlNotices::NoAppealVariableIvlRenewalNotice', 'IvlNotices::NoticeBuilder', 'IvlNotices::ReminderNotice', 'RenewalNotice', 'IvlNotices::SecondIvlRenewalNotice', 'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
+    if notice_class.nil?
+      raise "Unable to find the notice_class"
+    end
+    return notice_class
   end
 
   def build_options(event_object, notice_params)

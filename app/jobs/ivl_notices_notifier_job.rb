@@ -7,7 +7,7 @@ class IvlNoticesNotifierJob < ActiveJob::Base
     role = person.consumer_role || person.resident_role
     event_kind = ApplicationEventKind.where(:event_name => event).first
     notice_trigger = event_kind.notice_triggers.first
-    builder = notice_trigger.notice_builder.camelize.constantize.new(role, {
+    builder = notice_class(notice_trigger.notice_builder).new(role, {
               template: notice_trigger.notice_template,
               subject: event_kind.title,
               event_name: event,
@@ -15,5 +15,13 @@ class IvlNoticesNotifierJob < ActiveJob::Base
               mpi_indicator: notice_trigger.mpi_indicator,
               }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
 
+  end
+
+  def notice_class(notice_type)
+    notice_class = ['IvlNotice', 'Notice', 'IvlNotices::ConditionalEligibilityNoticeBuilder', 'IvlNotices::CoverallToIvlTransitionNoticeBuilder', 'IvlNotices::DocumentsVerification', 'IvlNotices::EligibilityDenialNoticeBuilder', 'IvlNotices::EligibilityNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilder', 'IvlNotices::EnrollmentNoticeBuilderWithDateRange', 'IvlNotices::FinalCatastrophicPlanNotice', 'IvlNotices::IneligibilityNoticeBuilder', 'IvlNotices::IvlBacklogVerificationNoticeUqhp', 'IvlNotices::IvlRenewalNotice', 'IvlNotices::IvlTaxNotice', 'IvlNotices::IvlToCoverallTransitionNoticeBuilder', 'IvlNotices::IvlVtaNotice', 'IvlNotices::NoAppealVariableIvlRenewalNotice', 'IvlNotices::NoticeBuilder', 'IvlNotices::ReminderNotice', 'RenewalNotice', 'IvlNotices::SecondIvlRenewalNotice', 'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
+    if notice_class.nil?
+      raise "Unable to find the notice_class"
+    end
+    return notice_class
   end
 end
