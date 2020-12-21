@@ -1,6 +1,7 @@
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 # frozen_string_literal: true
+# missing doc
 class EnrollmentOpenSponsorsReport < MongoidMigrationTask
 
   def migrate

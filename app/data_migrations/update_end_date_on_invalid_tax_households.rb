@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
-
+# missing doc
 class UpdateEndDateOnInvalidTaxHouseholds < MongoidMigrationTask
   def migrate
     Family.all_tax_households.no_timeout.each do |family|
