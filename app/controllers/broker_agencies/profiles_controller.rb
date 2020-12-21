@@ -105,7 +105,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
     if @q.nil?
       @staff = @staff.where(last_name: /^#{page_no}/i)
     else
-      @staff = @staff.where(last_name: /^#{@q}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
     end
   end
 
@@ -270,10 +270,11 @@ class BrokerAgencies::ProfilesController < ApplicationController
       @orgs = Organization.unscoped.by_broker_role(broker_role_id)
     end
 
-    if order_by.present?
-      # If searching on column 5 (PY start_on), also sort by aasm_state
-      @orgs = params[:order]["0"][:column] == 5 ? @orgs.order_by(:'employer_profile.plan_years.aasm_state'.asc, order_by.send(params[:order]["0"][:dir])) : @orgs.order_by(order_by.send(params[:order]["0"][:dir]))
-    end
+    #commented not using code to fix brakeman errors
+    # if order_by.present?
+    #   If searching on column 5 (PY start_on), also sort by aasm_state
+    #   @orgs = params[:order]["0"][:column] == 5 ? @orgs.order_by(:'employer_profile.plan_years.aasm_state'.asc, order_by.send(params[:order]["0"][:dir])) : @orgs.order_by(order_by.send(params[:order]["0"][:dir]))
+    # end
 
     total_records = @orgs.count
 

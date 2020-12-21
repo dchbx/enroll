@@ -350,7 +350,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
+      @census_employees = census_employees.where("last_name" => /^#{Regexp.escape(page_no)}/i).page(params[:pagina])
       #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     else
       @total_census_employees_quantity = census_employees.count
