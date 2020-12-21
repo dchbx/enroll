@@ -300,3 +300,4 @@ class TaxHousehold
     ::BenefitMarkets::Products::ProductFactory
   end
 end
+
