@@ -22,7 +22,6 @@ module BenefitSponsors
       end
 
       def create
-        binding.pry
         @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_create(registration_params)
         authorize @agency
         begin
@@ -125,9 +124,7 @@ module BenefitSponsors
           }
         )
 
-        if org_params[:profile_attributes][:office_locations_attributes].present?
-          org_params[:profile_attributes][:office_locations_attributes].delete_if {|key, value| value.blank?}
-        end
+        org_params[:profile_attributes][:office_locations_attributes].delete_if {|_key, value| value.blank?} if org_params[:profile_attributes][:office_locations_attributes].present?
 
         org_params
       end
