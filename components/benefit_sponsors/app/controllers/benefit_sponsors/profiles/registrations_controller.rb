@@ -104,11 +104,8 @@ module BenefitSponsors
 
       def registration_params
         current_user_id = current_user.present? ? current_user.id : nil
-        params[:agency].merge!({
-          :profile_id => params["id"],
-          :current_user_id => current_user_id
-        })
-        params.permit(agency: {})
+        agency_params = params.permit(agency: {})
+        agency_params[:agency].merge!({:profile_id => params["id"],:current_user_id => current_user_id})
       end
 
       def organization_params
