@@ -18,6 +18,7 @@ module Validators
         optional(:ssn).maybe(:string)
         optional(:dob).maybe(:date)
         optional(:hired_on).maybe(:date)
+        optional(:gender).maybe(:string)
         required(:is_applying_coverage).value(:bool)
         required(:address).maybe(:hash)
         required(:email).maybe(:hash)
