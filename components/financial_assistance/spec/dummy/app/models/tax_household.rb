@@ -162,6 +162,16 @@ class TaxHousehold
     total < 0.00 ? 0.00 : total
   end
 
+  def monthly_max_aptc(hbx_enrollment)
+    monthly_max_aptc = if EnrollRegistry[:calculate_yearly_aggregate].feature.is_enabled
+                         yearly_aggregate_amount = EnrollRegistry[:calculate_yearly_aggregate] { {hbx_enrollment: hbx_enrollment} }
+                         yearly_aggregate_amount.success? ? yearly_aggregate_amount.value! : 0
+                       else
+                         current_max_aptc.to_f
+                       end
+    float_fix(monthly_max_aptc)
+  end
+
   def total_benchmark_amount(family_members)
     total_sum = 0
     family_members.each do |family_member|
@@ -170,12 +180,12 @@ class TaxHousehold
     total_sum
   end
 
-  def aptc_available_amount_by_member
+  def aptc_available_amount_by_member(monthly_available_aptc, _excluding_enrollment_id = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
     aptc_ratio_by_member.each do |member_id, ratio|
-      aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
+      aptc_available_amount_hash[member_id] = monthly_available_aptc.to_f * ratio
     end
     # FIXME: should get hbx_enrollments by effective_starting_on
     household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year).map(&:hbx_enrollment_members).flatten.each do |enrollment_member|
@@ -197,8 +207,9 @@ class TaxHousehold
     total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
     elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
     decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
+    member_aptc_hash = aptc_available_amount_by_member(monthly_max_aptc(hbx_enrollment))
     hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
-      given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
+      given_aptc = (member_aptc_hash[enrollment_member.applicant_id.to_s] || 0) * elected_pct
       ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
       aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = if plan.coverage_kind == "dental"
                                                                                          0
