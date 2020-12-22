@@ -76,7 +76,7 @@ Then(/person should see success message/) do
   expect(page).to have_content ManageAccount::Portals::EmployerStaff.success_message
 end
 
-And (/person should see (.*)'s details under pending portals/) do |legal_name|
+And(/person should see (.*)'s details under pending portals/) do |legal_name|
   expect(page).to have_text legal_name
 end
 
