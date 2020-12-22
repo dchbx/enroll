@@ -386,6 +386,7 @@ aptc_errors:
   max_aptc_non_numeric: "Max APTC needs to be a numeric value."
   max_aptc_too_small: "Max APTC should be greater than or equal to the sum of APTC Applied for all enrollments."
   max_aptc_too_big: "Max APTC should be less than 9999.99"
+  cat_plan_error: 'APTC cannot be applied to a catastrophic plan.'
 
 #   ShopOpenEnrollmentBeginDueDayOfMonth = ShopOpenEnrollmentEndDueDayOfMonth - ShopOpenEnrollmentPeriodMinimum
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
