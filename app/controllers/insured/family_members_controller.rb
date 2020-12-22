@@ -67,7 +67,11 @@ class Insured::FamilyMembersController < ApplicationController
   end
 
   def create
-    @dependent = ::Forms::FamilyMember.new(params.require(:dependent).permit!)
+    @dependent = ::Forms::FamilyMember.new(params.require(:dependent).permit(
+      :family_id, 
+      :same_with_primary, 
+      :is_applying_coverage,
+      addresses: [:kind, :address_1, :address_2, :city, :state, :zip]))
 
     @address_errors = validate_address_params(params.require(:dependent).permit![:same_with_primary], params.require(:dependent).permit![:addresses])
 
