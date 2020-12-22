@@ -247,8 +247,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        params.permit(:subject)
-        send_notice_upload_notifications(notice_document, params[:subject])
+        send_notice_upload_notifications(notice_document, params.permit(:subject))
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
