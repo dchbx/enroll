@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Operations::Individual::CalculateYearlyAggregate do
+RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
   subject do
     described_class.new.call(hbx_enrollment: params)
@@ -77,7 +77,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      it "returns yearly aggregate amount" do
+      it "returns monthly aggregate amount" do
         expect(subject.success).to eq 3100.0
       end
     end
@@ -130,7 +130,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      it "returns yearly aggregate amount" do
+      it "returns monthly aggregate amount" do
         expect(subject.success).to eq 6744.5
       end
     end
@@ -183,7 +183,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      it "returns yearly aggregate amount" do
+      it "returns monthly aggregate amount" do
         expect(subject.success).to eq 7960.59
       end
     end
@@ -247,7 +247,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      it "returns yearly aggregate amount" do
+      it "returns monthly aggregate amount" do
         expect(subject.success).to eq 1882.14
       end
     end
@@ -312,7 +312,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      it "returns yearly aggregate amount" do
+      it "returns monthly aggregate amount" do
         expect(subject.success).to eq 6676.00
       end
     end

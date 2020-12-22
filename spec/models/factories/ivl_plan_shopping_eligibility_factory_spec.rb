@@ -58,7 +58,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -140,7 +140,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -193,7 +193,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -252,7 +252,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -266,7 +266,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned ON' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
                 enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
@@ -306,7 +306,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -320,7 +320,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
             context 'With yearly aggregate feature turned ON' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
                 enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
                 @eligibility_factory1 ||= described_class.new(enrollment1)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
