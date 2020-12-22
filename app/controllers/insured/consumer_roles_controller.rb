@@ -20,7 +20,7 @@ class Insured::ConsumerRolesController < ApplicationController
     if params[:aqhp].present?
       @key = :aqhp
       @val = params.permit(:aqhp).to_h
-    else 
+    else
       @key = :uqhp
       @val = params.permit(:uqhp).to_h
     end
