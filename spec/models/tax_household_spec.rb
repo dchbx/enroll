@@ -342,7 +342,7 @@ RSpec.describe TaxHousehold, type: :model do
       context 'when all family_members are eligible and monthly aggregate feature is turned OFF' do
         before do
           allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-          EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
         end
 
         it 'should return all members amount' do
@@ -354,7 +354,7 @@ RSpec.describe TaxHousehold, type: :model do
       context 'when all family_members eligible and monthly aggregate feature is turned ON' do
         before do
           allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-          EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
         end
 
         it 'should return all members amount' do
@@ -382,7 +382,7 @@ RSpec.describe TaxHousehold, type: :model do
 
       context 'When calculate_yearly_aggregate feature is turned OFF' do
         before do
-          EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
         end
 
         it 'should deduct benchmark cost' do
@@ -394,7 +394,7 @@ RSpec.describe TaxHousehold, type: :model do
 
       context 'When calculate_yearly_aggregate feature is turned ON' do
         before do
-          EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
         end
 
         it 'should deduct benchmark cost' do
@@ -450,7 +450,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           context "When yearly aggregate feature is turned OFF" do
             before do
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
             end
 
             it 'should return available APTC amount' do
@@ -462,7 +462,7 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
@@ -481,7 +481,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           context "When yearly aggregate feature is turned OFF" do
             before do
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
             end
 
             it 'should return available APTC amount' do
@@ -493,7 +493,7 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
@@ -515,7 +515,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           context "When yearly aggregate feature is turned OFF" do
             before do
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
             end
 
             it 'should return available APTC amount' do
@@ -527,7 +527,7 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
@@ -603,7 +603,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           context "When yearly aggregate feature is turned OFF" do
             before do
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
             end
 
             it 'should return available APTC amount' do
@@ -615,7 +615,7 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
@@ -693,7 +693,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           context "When yearly aggregate feature is turned OFF" do
             before do
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
             end
 
             it 'should return available APTC amount' do
@@ -705,7 +705,7 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(true)
+              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
