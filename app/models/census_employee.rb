@@ -1506,9 +1506,10 @@ class CensusEmployee < CensusMember
                     'IvlNotices::ReminderNotice',
                     'RenewalNotice',
                     'IvlNotices::SecondIvlRenewalNotice',
-                    'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
+                    'IvlNotices::VariableIvlRenewalNotice',
+                    'ShopEmployerNotices::OutOfPocketNotice'].find { |notice| notice == notice_type.classify }
     raise "Unable to find the notice_class" if notice_class.nil?
-    notice_class
+    notice_type.safe_constantize
   end
 
   def record_transition

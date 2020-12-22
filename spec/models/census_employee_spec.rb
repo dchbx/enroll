@@ -1144,7 +1144,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     let(:hbx_enrollment) {HbxEnrollment.new(coverage_kind: 'health', family: family)}
     let(:plan) {FactoryBot.create(:plan)}
-    let(:builder) {instance_double("ShopEmployerNotices::OutOfPocketNotice", :deliver => true)}
+    let(:builder_class) {"ShopEmployerNotices::OutOfPocketNotice"}
+    let(:builder) {instance_double(builder_class, :deliver => true)}
     let(:notice_triggers) {double("notice_triggers")}
     let(:notice_trigger) {instance_double("NoticeTrigger", :notice_template => "template", :mpi_indicator => "mpi_indicator")}
 
@@ -1154,7 +1155,8 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
       allow(census_employee).to receive_message_chain(:employer_profile, :plan_years).and_return([benefit_application])
       allow(census_employee).to receive_message_chain(:active_benefit_group, :reference_plan).and_return(plan)
       allow(notice_triggers).to receive(:first).and_return(notice_trigger)
-      allow(notice_trigger).to receive_message_chain(:notice_builder, :camelize, :constantize, :new).and_return(builder)
+      allow(notice_trigger).to receive_message_chain(:notice_builder, :classify).and_return(builder_class)
+      allow(notice_trigger).to receive_message_chain(:notice_builder, :safe_constantize, :new).and_return(builder)
       allow(notice_trigger).to receive_message_chain(:notice_trigger_element_group, :notice_peferences).and_return({})
       allow(ApplicationEventKind).to receive_message_chain(:where, :first).and_return(double("ApplicationEventKind", {:notice_triggers => notice_triggers, :title => "title", :event_name => "OutOfPocketNotice"}))
       allow_any_instance_of(Services::CheckbookServices::PlanComparision).to receive(:generate_url).and_return("fake_url")
