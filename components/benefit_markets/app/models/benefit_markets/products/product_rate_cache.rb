@@ -45,7 +45,7 @@ module BenefitMarkets
       end
 
       #This one is only for manual lookup if age record is not found
-      def single_lookup_rate(product, rate_schedule_date, rating_area, coverage_age)
+      def self.single_lookup_rate(product, rate_schedule_date, rating_area, coverage_age)
         calc_age = age_bounding(product.id, coverage_age)
         rate_calculation = product.premium_tables.collect do |pt|
           pt.premium_tuples.collect do |tuple|
