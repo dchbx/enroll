@@ -106,7 +106,7 @@ class Insured::GroupSelectionController < ApplicationController
     end
 
 
-    if (@adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?)
+    if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
       if sep.present?
