@@ -31,6 +31,6 @@ registry:
       - key: :cancel_renewals_for_term
         item: Operations::Individual::CancelRenewalEnrollment.new
         is_enabled: true
-      - key: :calculate_yearly_aggregate
-        item: Operations::Individual::CalculateYearlyAggregate.new
+      - key: :calculate_monthly_aggregate
+        item: Operations::Individual::CalculateMonthlyAggregate.new
         is_enabled: true
