@@ -22,7 +22,7 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id}).permit!
+    @person_params = params.require(:person).permit(person_parameters_list).merge({user_id: current_user.id}).to_h
     @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
@@ -177,7 +177,8 @@ class Insured::EmployeeRolesController < ApplicationController
       :name_sfx,
       :date_of_birth,
       :ssn,
-      :gender
+      :gender,
+      :user_id
     ]
   end
 
