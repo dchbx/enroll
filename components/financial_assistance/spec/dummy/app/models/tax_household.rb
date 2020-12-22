@@ -163,9 +163,9 @@ class TaxHousehold
   end
 
   def monthly_max_aptc(hbx_enrollment)
-    monthly_max_aggregate = if EnrollRegistry[:calculate_yearly_aggregate].feature.is_enabled
-                              yearly_aggregate_amount = EnrollRegistry[:calculate_yearly_aggregate] { {hbx_enrollment: hbx_enrollment} }
-                              yearly_aggregate_amount.success? ? yearly_aggregate_amount.value! : 0
+    monthly_max_aggregate = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
+                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] { {hbx_enrollment: hbx_enrollment} }
+                              monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
                             else
                               current_max_aptc.to_f
                             end
