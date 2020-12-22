@@ -6,14 +6,14 @@ require 'dry/monads/do'
 module Operations
   module Individual
     # Calculate Yearly Aggregate amount based on current enrollment
-    class CalculateYearlyAggregate
+    class CalculateMonthlyAggregate
       include Dry::Monads[:result, :do]
       include FloatHelper
 
       def call(params)
         validated_enrollment = yield validate(params)
         amount_consumed      = yield consumed_aptc_amount(validated_enrollment)
-        calculated_aggregate = yield calculate_yearly_aggregate(validated_enrollment, amount_consumed)
+        calculated_aggregate = yield calculate_monthly_aggregate(validated_enrollment, amount_consumed)
 
         Success(calculated_aggregate)
       end
@@ -87,8 +87,8 @@ module Operations
         enrollment.terminated_on || (base_enrollment.effective_on - 1.day)
       end
 
-      #logic to calculate the yearly Aggregate
-      def calculate_yearly_aggregate(base_enrollment, consumed_aptc)
+      #logic to calculate the monthly Aggregate
+      def calculate_monthly_aggregate(base_enrollment, consumed_aptc)
         latest_max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(base_enrollment.effective_on.year).latest_eligibility_determination.max_aptc.to_f
         available_annual_aggregate = (latest_max_aptc * 12) - consumed_aptc.to_f
         monthly_max = calculated_new_monthly_aggregate(base_enrollment, available_annual_aggregate)
