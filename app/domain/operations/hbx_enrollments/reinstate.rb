@@ -133,11 +133,11 @@ module Operations
         list_of_dates.each do |dao_date|
           family = new_enrollment.family
           enrollment_query = family.hbx_enrollments.where(sponsored_benefit_package_id: new_enrollment.sponsored_benefit_package_id).enrolled.shop_market.all_with_multiple_enrollment_members
-          if new_enrollment.is_shop?
-            shop_reinstate_enrollment(dao_date, enrollment_query)
-          elsif new_enrollment.fehb_profile.present?
+          if new_enrollment.fehb_profile.present?
             result = fehb_reinstate_enrollment(dao_date, @depenent_age_off_enr)
             @depenent_age_off_enr = result.nil? ? @depenent_age_off_enr : result
+          elsif new_enrollment.is_shop?
+            shop_reinstate_enrollment(dao_date, enrollment_query)
           end
         end
       end
@@ -151,12 +151,12 @@ module Operations
         end
       end
 
-      def fehb_reinstate_enrollment(dao_date, enrollment_query)
+      def fehb_reinstate_enrollment(dao_date, enrollment)
         fehb_dao = Operations::Fehb::DependentAgeOff.new
         if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :monthly
-          fehb_dao.call(new_date: dao_date, enrollment_query: enrollment_query)
+          fehb_dao.call(new_date: dao_date, enrollment: enrollment)
         elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
-          fehb_dao.call(new_date: dao_date, enrollment_query: enrollment_query) if dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d")
+          fehb_dao.call(new_date: dao_date, enrollment: enrollment) if dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d")
         end
       end
     end
