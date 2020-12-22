@@ -8,10 +8,10 @@ module Operations
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
 
-      def call(new_date:)
+      def call(new_date:, enrollment_query: nil)
         yield can_process_event(new_date)
         fehb_logger = yield initialize_logger("fehb")
-        query_criteria = yield fehb_query_criteria
+        query_criteria = yield fehb_query_criteria(enrollment_query)
         process_fehb_dep_age_off(query_criteria, fehb_logger, new_date)
       end
 
@@ -30,7 +30,8 @@ module Operations
         Success(logger_file)
       end
 
-      def fehb_query_criteria
+      def fehb_query_criteria(enrollment_query)
+        return Success(enrollment_query) unless enrollment_query.nil?
         Success(BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$$$/))
       end
 

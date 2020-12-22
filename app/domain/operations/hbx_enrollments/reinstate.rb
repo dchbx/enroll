@@ -18,7 +18,7 @@ module Operations
         values           = yield validate(params)
         new_enr          = yield new_hbx_enrollment(values)
         hbx_enrollment   = yield reinstate_hbx_enrollment(new_enr)
-
+        hbx_enrollment   = yield reinstating_dependent_age_off(hbx_enrollment)
         Success(hbx_enrollment)
       end
 
@@ -107,8 +107,52 @@ module Operations
           return Failure('Cannot transition to state coverage_selected on event begin_coverage.') unless new_enrollment.may_begin_coverage?
           new_enrollment.begin_coverage!
         end
-
         Success(new_enrollment)
+      end
+
+      def reinstating_dependent_age_off(new_enrollment)
+        reinstated_enrollment_query = new_enrollment.family.hbx_enrollments.where(hbx_id: new_enrollment.hbx_id)
+        system_beginning_month = TimeKeeper.date_of_record.beginning_of_month
+        dependent_age_off_dates = (new_enrollment_effective_month(new_enrollment)..system_beginning_month)
+        list_of_dates = dependent_age_off_dates.to_a.select {|k| k if k == k.beginning_of_month}
+        dependent_age_off_enr = dependent_age_off_enrollment(list_of_dates, reinstated_enrollment_query)
+        return new_enrollment if dependent_age_off_enr.nil?
+      end
+
+      def dependent_age_off_enrollment(list_of_dates, reinstated_enrollment_query)
+        list_of_dates.each do |dao_date|
+          if new_enrollment.is_shop?
+            shop_reinstate_enrollment(dao_date, reinstated_enrollment_query)
+          elsif new_enrollment.fehb_profile.present?
+            fehb_reinstate_enrollment(dao_date, reinstated_enrollment_query)
+          end
+        end
+      end
+
+      def new_enrollment_effective_month(new_enrollment)
+        if new_enrollment.effective_on == new_enrollment.effective_on.beginning_of_month
+          new_enrollment.effective_on
+        else
+          new_enrollment.effective_on.beginning_of_month.next_month
+        end
+      end
+
+      def shop_reinstate_enrollment(dao_date, reinstated_enrollment_query)
+        shop_dao = Operations::Shop::DependentAgeOff.new
+        if ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :monthly
+          shop_dao.call(new_date: dao_date, enrollment_query: reinstated_enrollment_query)
+        elsif ::EnrollRegistry[:aca_shop_dependent_age_off].settings(:period).item == :annual
+          shop_dao.call(new_date: dao_date, enrollment_query: reinstated_enrollment_query) if dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d")
+        end
+      end
+
+      def fehb_reinstate_enrollment(dao_date, reinstated_enrollment_query)
+        fehb_dao = Operations::Fehb::DependentAgeOff.new
+        if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :monthly
+          fehb_dao.call(new_date: dao_date, enrollment_query: reinstated_enrollment_query)
+        elsif ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
+          fehb_dao.call(new_date: dao_date, enrollment_query: reinstated_enrollment_query) if dao_date.strftime("%m/%d") == Date.today.beginning_of_year.strftime("%m/%d")
+        end
       end
     end
   end
