@@ -59,6 +59,27 @@ Then(/person should see employer home page/) do
   expect(page).to have_content('My Health Benefits Program')
 end
 
+Then(/person searches for (.*) employer/) do |legal_name|
+  fill_in ManageAccount::Portals::EmployerStaff.employer_search, with: legal_name
+  click_button 'Search'
+end
+
+Then(/person clicks on select this employer/) do
+  click_link 'SELECT THIS EMPLOYER'
+end
+
+Then(/person clicks on submit application/) do
+  page.execute_script("document.querySelector('#employer-staff-btn').click()")
+end
+
+Then(/person should see success message/) do
+  expect(page).to have_content ManageAccount::Portals::EmployerStaff.success_message
+end
+
+And (/person should see (.*)'s details under pending portals/) do |legal_name|
+  expect(page).to have_text legal_name
+end
+
 And(/person should be able to click add (.*) portal/) do |role|
   if role == 'employer'
     visit "/benefit_sponsors/profiles/registrations/new_employer_profile_form?person_id=#{@person.id}&profile_type=benefit_sponsor"
@@ -71,8 +92,12 @@ Then(/person should be able to visit add new portal/) do
   click_link 'Add New Portal'
 end
 
-Then(/person should be able to see available portals/) do
-  expect(page).to have_content 'Available Portals'
+Then(/person should be able to visit add new employer poc portal/) do
+  visit benefit_sponsors.new_staff_member_profiles_employers_employer_staff_roles_path(id: @person.id)
+end
+
+Then(/person should be able to see (.*) page/) do |text|
+  expect(page).to have_content text
 end
 
 Then(/person (.*) see add new portal link/) do |add_new_portal_visible|
@@ -129,9 +154,17 @@ And(/person clicks on my portals tab/) do
   click_link 'My Portals'
 end
 
+And(/person clicks on add new poc portal link/) do
+  visit "people/#{@person.id}/available_accounts"
+end
+
+Then(/person should see add new employer poc portal link/) do
+  expect(page).to have_content('Employer POC')
+end
+
 Then(/person should see their (.*) information under active portals/) do |role|
-  link = @person.general_agency_staff_roles.present? ? @person.general_agency_staff_roles.first.general_agency_profile.legal_name : @person.full_name
-  find_link(link).visible?
+  display_name = @person.general_agency_staff_roles.present? ? @person.general_agency_staff_roles.first.general_agency_profile.legal_name : @person.full_name
+  find(class: 'portal-label', text: display_name).visible?
   expect(page).to have_content(role.split(/\s/)[0])
 end
 

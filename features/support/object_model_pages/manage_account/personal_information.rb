@@ -21,7 +21,7 @@ module ManageAccount
     end
 
     def self.dob
-      'person[last_name]'
+      'person[dob]'
     end
 
     def self.social_security

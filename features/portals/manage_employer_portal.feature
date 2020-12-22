@@ -26,7 +26,7 @@ Feature: Any Person with User account should be able to manage employer portals
     And person clicks on my portals tab
     Then person should see their <role> information under active portals
     And person should be able to visit add new portal
-    Then person should be able to see available portals
+    Then person should be able to see Available Portals page
     And person should be able to click add employer portal
     Then person filled all the fields in the employer information form
     And person clicks on add portal
