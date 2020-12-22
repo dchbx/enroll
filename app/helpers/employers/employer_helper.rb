@@ -164,7 +164,7 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    initial_benefit_packages = @benefit_sponsorship.current_benefit_application.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
+    initial_benefit_packages = @benefit_sponsorship.current_benefit_application&.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
     renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
