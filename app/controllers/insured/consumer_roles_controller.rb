@@ -17,9 +17,13 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    params_hash = params.permit!.to_h
-    @val = params_hash[:aqhp] || params_hash[:uqhp]
-    @key = params_hash.key(@val)
+    if params[:aqhp].present?
+      @key = :aqhp
+      @val = params.permit(:aqhp).to_h
+    else 
+      @key = :uqhp
+      @val = params.permit(:uqhp).to_h
+    end
     @search_path = {@key => @val}
     if @person.try(:resident_role?)
       bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
@@ -58,7 +62,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).merge({user_id: current_user.id}).permit!.to_h
+    @person_params = params.require(:person).permit(person_parameters_list).merge({user_id: current_user.id}).to_h
     @consumer_candidate = ::Forms::ConsumerCandidate.new(@person_params)
     @person = @consumer_candidate
     @use_person = true #only used to manupulate form data
@@ -92,7 +96,7 @@ class Insured::ConsumerRolesController < ApplicationController
             found_person = @resident_candidate.match_person
             if found_person.present? && found_person.resident_role.present?
               begin
-                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.permit!, actual_user)
+                @resident_role = ::Factories::EnrollmentFactory.construct_resident_role(params.require(:person).permit(person_parameters_list), actual_user)
                 if @resident_role.present?
                   @person = @resident_role.person
                   session[:person_id] = @person.id
@@ -148,7 +152,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.permit!, actual_user)
+      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.require(:person).permit(person_parameters_list), actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
       else
@@ -379,7 +383,9 @@ class Insured::ConsumerRolesController < ApplicationController
       :no_dc_address_reason,
       :is_applying_coverage,
       :is_homeless,
-      :is_temporarily_out_of_state
+      :is_temporarily_out_of_state,
+      :user_id,
+      :dob_check
     ]
   end
 
