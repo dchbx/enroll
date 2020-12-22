@@ -176,13 +176,13 @@ class TaxHousehold
   end
 
   def monthly_max_aptc(hbx_enrollment)
-    monthly_max_aptc = if EnrollRegistry[:calculate_yearly_aggregate].feature.is_enabled
-                         yearly_aggregate_amount = EnrollRegistry[:calculate_yearly_aggregate] { {hbx_enrollment: hbx_enrollment} }
-                         yearly_aggregate_amount.success? ? yearly_aggregate_amount.value! : 0
-                       else
-                         current_max_aptc.to_f
-                       end
-    float_fix(monthly_max_aptc)
+    monthly_max_aggregate = if EnrollRegistry[:calculate_yearly_aggregate].feature.is_enabled
+                              yearly_aggregate_amount = EnrollRegistry[:calculate_yearly_aggregate] { {hbx_enrollment: hbx_enrollment} }
+                              yearly_aggregate_amount.success? ? yearly_aggregate_amount.value! : 0
+                            else
+                              current_max_aptc.to_f
+                            end
+    float_fix(monthly_max_aggregate)
   end
 
   def total_benchmark_amount(family_members, hbx_enrollment)
