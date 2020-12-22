@@ -332,7 +332,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1.id)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
@@ -385,7 +385,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
             context 'With yearly aggregate feature turned OFF' do
               before :each do
-                EnrollRegistry[:calculate_yearly_aggregate].feature.stub(:is_enabled).and_return(false)
+                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
                 @eligibility_factory1 ||= described_class.new(enrollment1.id)
                 @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
               end
