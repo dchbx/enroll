@@ -283,7 +283,7 @@ module BenefitSponsors
       if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor.blank?
         end_on.prev_year + 1.day
       else
-        start_on
+        benefit_sponsor_catalog.start_on
       end
     end
 

@@ -200,10 +200,26 @@ Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
   Capybara.ignore_hidden_elements = true
 end
 
+Then(/the user should see a dropdown for Reinstated Plan Year benefit package$/) do
+  # Selectric is weird
+  Capybara.ignore_hidden_elements = false
+  sleep(5)
+  expect(page).to have_text("Reinstated Benefit Package")
+  Capybara.ignore_hidden_elements = true
+end
+
 And(/census employee (.*?) has benefit group assignment of the off cycle benefit application$/) do |named_person|
   click_button 'Update Employee'
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   benefit_package_id = ce.benefit_sponsorship.off_cycle_benefit_application.benefit_packages[0].id #there's only one benefit package
+  expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
+end
+
+And(/census employee (.*?) has benefit group assignment of the future reinstated benefit application$/) do |named_person|
+  click_button 'Update Employee'
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  benefit_package_id = ce.benefit_sponsorship.future_active_reinstated_benefit_application.benefit_packages[0].id #there's only one benefit package
   expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
 end

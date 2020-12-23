@@ -62,6 +62,11 @@ Then(/^employer should see benefit application in termination pending state$/) d
   expect(page).to have_content("Termination Pending")
 end
 
+Then(/^employer should see termination pending and reinstated benefit_application$/) do
+  expect(page).to have_content("Active")
+  expect(page).to have_content("Termination Pending")
+end
+
 And(/^employer should see Add Plan Year link$/) do
   sleep(2)
   links = page.all('a')
