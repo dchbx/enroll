@@ -456,15 +456,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def file_path
-    params.permit(:file)[:file].send(:tempfile).path
+    params[:file]&.tempfile
   end
 
   def file_name
-    params.permit(:file).send(:original_filename)
+    params[:file]&.original_filename
   end
 
   def file_content_type
-    params.permit(:file).send(:content_type)
+    params[:file]&.content_type
   end
 
   def send_notice_upload_notifications(notice, subject)
