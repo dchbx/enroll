@@ -67,7 +67,7 @@ And(/^initial employer ABC Widgets application (.*)$/) do |aasm_state|
     application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
     application.schedule_enrollment_termination!
   elsif  aasm_state == 'terminated'
-    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.next_month.end_of_month
+    updated_dates = application.effective_period.min.to_date..TimeKeeper.date_of_record.prev_month.end_of_month
     application.update_attributes!(:effective_period => updated_dates, :terminated_on => TimeKeeper.date_of_record, termination_reason: 'nonpayment')
     application.terminate_enrollment!
   elsif ['retroactive_canceled', 'canceled'].include?(aasm_state)
