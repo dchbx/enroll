@@ -22,7 +22,13 @@ class Insured::EmployeeRolesController < ApplicationController
 
   def match
     @no_save_button = true
-    @person_params = params.require(:person).permit(person_parameters_list).merge({user_id: current_user.id}).to_h
+    @person_params = params.require(:person).permit(person_parameters_list).merge(
+      {
+        :user_id => current_user.id,
+        :no_ssn => params.dig(:person, :no_ssn),
+        :dob => params.dig(:jq_datepicker_ignore_person, :dob).to_date
+      }
+    )
     @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
