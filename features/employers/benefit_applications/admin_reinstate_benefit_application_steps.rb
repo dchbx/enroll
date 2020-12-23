@@ -43,7 +43,7 @@ When("Admin clicks on continue button for reinstating benefit_application") do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then("Admin will see a Successful message") do
+Then("Admin will see a Successfull message") do
   sleep 1
   expect(page).to have_content(/Plan Year Reinstated Successfully/)
 end
@@ -80,7 +80,6 @@ And(/^initial employer ABC Widgets application (.*)$/) do |aasm_state|
   end
 end
 
-
 Given("terminated benefit application effective_period updated") do
   @terminated_ba = employer_profile.benefit_applications.first
   start_on = @terminated_ba.effective_period.min
@@ -97,6 +96,14 @@ Given("active benefit application is a reinstated benefit application") do
   reinstated_ba.update_attributes!(effective_period: effective_period, reinstated_id: @terminated_ba.id)
 end
 
-And("Employer see reinstated benefit application") do
+And(/^(.*) should see reinstated indicator on benefit application$/) do |_user|
   expect(page).to have_content('Reinstated')
+end
+
+When("the Admin click on the employer ABC Widgets") do
+  find('.interaction-click-control-abc-widgets').click
+end
+
+Then("Admin lands on employer ABC Widgets profile") do
+  expect(page).to have_content('ABC Widgets')
 end
