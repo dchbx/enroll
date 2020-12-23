@@ -43,7 +43,7 @@ When("Admin clicks on continue button for reinstating benefit_application") do
   find('.btn', text: 'CONTINUE').click
 end
 
-Then("Admin will see a Successfull message") do
+Then("Admin will see a Successful message") do
   sleep 1
   expect(page).to have_content(/Plan Year Reinstated Successfully/)
 end
@@ -96,7 +96,7 @@ Given("active benefit application is a reinstated benefit application") do
   reinstated_ba.update_attributes!(effective_period: effective_period, reinstated_id: @terminated_ba.id)
 end
 
-And(/^(.*) should see reinstated indicator on benefit application$/) do |_user|
+And(/^(.*) should see a reinstated indicator on benefit application$/) do |_user|
   expect(page).to have_content('Reinstated')
 end
 
