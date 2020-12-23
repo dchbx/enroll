@@ -317,4 +317,80 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       end
     end
   end
+
+  describe "verify APTC amount for prior year" do
+    let(:start_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
+    let(:family) {FactoryBot.create(:family, :with_nuclear_family)}
+    let(:household) {FactoryBot.create(:household, family: family)}
+    let!(:eligibility_determination_1) {FactoryBot.create(:eligibility_determination, max_aptc: sample_max_aptc_1, determined_at: start_on + 8.months, tax_household: tax_household, csr_percent_as_integer: sample_csr_percent_1)}
+    let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year - 1,1,1), effective_ending_on: nil)}
+    let(:sample_max_aptc_1) {1200.00}
+    let(:sample_csr_percent_1) {87}
+
+    let!(:hbx1) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: household,
+                        is_active: true,
+                        aasm_state: 'coverage_terminated',
+                        changing: false,
+                        effective_on: start_on,
+                        terminated_on: (start_on + 2.months).end_of_month - 6.day,
+                        applied_aptc_amount: 300)
+    end
+    let!(:hbx2) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: household,
+                        is_active: true,
+                        aasm_state: 'coverage_terminated',
+                        changing: true,
+                        effective_on: (start_on + 2.months).end_of_month - 6.day,
+                        terminated_on: (start_on + 4.month) + 4.day,
+                        applied_aptc_amount: 200)
+    end
+    let!(:hbx3) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: household,
+                        is_active: true,
+                        aasm_state: 'coverage_enrolled',
+                        changing: true,
+                        effective_on: (start_on + 4.month) + 15.day,
+                        applied_aptc_amount: 200)
+    end
+    # this enrollment should not be considered by yearly aggregate calculations
+    let!(:hbx4) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: household,
+                        is_active: true,
+                        aasm_state: 'coverage_enrolled',
+                        changing: true,
+                        effective_on: (TimeKeeper.date_of_record.beginning_of_year + 1.month) + 15.day,
+                        applied_aptc_amount: 300)
+    end
+
+    let!(:base_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: household,
+                        is_active: true,
+                        aasm_state: 'shopping',
+                        changing: false,
+                        effective_on: Date.new(TimeKeeper.date_of_record.year - 1, 12, 1))
+    end
+
+    before(:each) do
+      allow(family).to receive(:active_household).and_return household
+    end
+
+    describe "calculated aggregate" do
+      let(:params) { base_enrollment }
+
+      it "returns yearly aggregate amount" do
+        expect(subject.success).to eq 11_977.41
+      end
+    end
+  end
 end
