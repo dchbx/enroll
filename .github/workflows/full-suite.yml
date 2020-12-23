@@ -1,6 +1,8 @@
 name: full check suite
 on:
   push:
+    paths-ignore:
+      - 'hugo/**'
   schedule:
     - cron: '0 6 * * *'
 
