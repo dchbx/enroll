@@ -30,6 +30,8 @@ Feature: Any Person with User account should be able to manage employer portals
     And person should be able to click add employer portal
     Then person filled all the fields in the employer information form
     And person clicks on add portal
+    Then person should see a modal confirmation popup
+    And person clicks on add role on pop up
     Then person should see employer home page
 
     Examples:
