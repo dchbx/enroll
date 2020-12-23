@@ -4,6 +4,8 @@ require 'dry/monads'
 require 'dry/monads/do'
 module Operations
   module Fehb
+    # Operation terminates enrollments with aged of dependents and creates new enrollments excluding the aged off dependents.
+    # This opeartion gets hit every 1st of and month and processes based on the yml settings to determine if the operations should be running annualy/monthly.
     class DependentAgeOff
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])

@@ -50,7 +50,7 @@ class PeopleController < ApplicationController
       if params[:commit].downcase.include?('exit')
         # Logout of session
       else
-        redirect_to person_person_landing(@person)
+        redirect_to person_person_landing_path(@person)
       end
     else
       render new, :error => "Please complete all required fields"

@@ -3,6 +3,8 @@
 require 'dry/monads'
 require 'dry/monads/do'
 module Operations
+  #Operation checks for the age eligibility for dependents when plan shopping, relaxed eligibility operation allows the dependent to be able to shop for plans,
+  # through out the defined eligibility period(annual/monthly) from yml based on the market settings.
   class AgeOffRelaxedEligibility
     include Config::SiteConcern
     include Dry::Monads[:result, :do]

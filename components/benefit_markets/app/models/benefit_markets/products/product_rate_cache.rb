@@ -44,6 +44,26 @@ module BenefitMarkets
         coverage_age
       end
 
+      #This one is only for manual lookup if age record is not found
+      def self.single_lookup_rate(product, rate_schedule_date, rating_area, coverage_age)
+        calc_age = age_bounding(product.id, coverage_age)
+        rate_calculation = product.premium_tables.collect do |pt|
+          pt.premium_tuples.collect do |tuple|
+            [{
+              start_on: pt.effective_period.min,
+              end_on: pt.effective_period.max,
+              cost: tuple.cost,
+              age: tuple.age,
+              rating_area: pt.rating_area.exchange_provided_code
+            }]
+          end
+        end.flatten
+
+        rate_calculation.detect do |rc|
+          rc[:age] == calc_age && rc[:rating_area] == rating_area && rc[:start_on] <= rate_schedule_date && rc[:end_on] >= rate_schedule_date
+        end
+      end
+
       # Return the base rate value from the product cache.
       # @param product [Product] the product for which I desire the value
       # @param rate_schedule_date [Date] the date on which the rate schedule
@@ -62,6 +82,12 @@ module BenefitMarkets
         age_record = $product_rate_calculation_cache[product.id][rating_area][calc_age].detect do |pt|
           (pt[:start_on] <= rate_schedule_date) && (pt[:end_on] >= rate_schedule_date)
         end
+
+        unless age_record.present?
+          #This one is only for manual lookup if age record is not found
+          age_record = single_lookup_rate(product, rate_schedule_date, rating_area, coverage_age)
+        end
+
         age_record[:cost]
       end
     end
