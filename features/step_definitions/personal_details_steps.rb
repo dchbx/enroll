@@ -55,6 +55,14 @@ And(/person clicks on add portal/) do
   page.execute_script("document.querySelector('#employer_registration_form').click()")
 end
 
+And(/person clicks on add role on pop up/) do
+  page.execute_script("document.querySelector('.add-role').click()")
+end
+
+Then(/person should see a modal confirmation popup/) do
+  page.execute_script("document.querySelector('#employer_registration_form').click()")
+end
+
 Then(/person should see employer home page/) do
   expect(page).to have_content('My Health Benefits Program')
 end
