@@ -180,7 +180,9 @@ class Insured::EmployeeRolesController < ApplicationController
       :date_of_birth,
       :ssn,
       :gender,
-      :user_id
+      :user_id,
+      :no_ssn,
+      :dob
     ]
   end
 
