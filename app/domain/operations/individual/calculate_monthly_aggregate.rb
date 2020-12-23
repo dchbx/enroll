@@ -29,7 +29,7 @@ module Operations
 
       def consumed_aptc_amount(base_enrollment)
         family = base_enrollment.family
-        aptc_enrollments = HbxEnrollment.enrollments_for_yearly_aggregate(family.id, base_enrollment.effective_on.year)
+        aptc_enrollments = HbxEnrollment.yearly_aggregate(family.id, base_enrollment.effective_on.year)
         consumed_aptc = 0
         aptc_enrollments.each do |enrollment|
           consumed_aptc += aptc_amount_consumed_by_enrollment(enrollment, base_enrollment)
@@ -47,7 +47,7 @@ module Operations
 
       def aptc_consumed_in_effective_month(enrollment, termination_date)
         effective_on = enrollment.effective_on
-        applied_aptc = enrollment.applied_aptc_amount
+        applied_aptc = enrollment.applied_aptc_amount.to_f
         total_days = effective_on.end_of_month.day
         no_of_days_aptc_consumed =
           if effective_on == effective_on.beginning_of_month
@@ -59,12 +59,12 @@ module Operations
           else
             total_days - (effective_on.day - 1)
           end
-        no_of_days_aptc_consumed.fdiv(total_days).round(2) * applied_aptc
+        no_of_days_aptc_consumed.fdiv(total_days) * applied_aptc
       end
 
       def aptc_consumed_in_full_months(enrollment, termination_date)
         effective_on = enrollment.effective_on
-        applied_aptc = enrollment.applied_aptc_amount
+        applied_aptc = enrollment.applied_aptc_amount.to_f
         if (termination_date.month - 1) <= effective_on.month
           0
         else
@@ -74,12 +74,12 @@ module Operations
 
       def aptc_consumed_in_terminated_month(enrollment, termination_date)
         effective_on   = enrollment.effective_on
-        applied_aptc   = enrollment.applied_aptc_amount
+        applied_aptc   = enrollment.applied_aptc_amount.to_f
         total_days     = termination_date.end_of_month.day
         if effective_on.month == termination_date.month
           0
         else
-          termination_date.day.fdiv(total_days).round(2) * applied_aptc
+          termination_date.day.fdiv(total_days) * applied_aptc
         end
       end
 
@@ -97,7 +97,7 @@ module Operations
 
       def calculated_new_monthly_aggregate(base_enrollment, available_annual_aggregate)
         total_no_of_months = pct_of_effective_month(base_enrollment) + number_of_remaining_full_months(base_enrollment)
-        (available_annual_aggregate / total_no_of_months).round(2)
+        round_down_float_two_decimals(available_annual_aggregate / total_no_of_months)
       end
 
       def pct_of_effective_month(base_enrollment)
