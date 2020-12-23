@@ -247,7 +247,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit(:subject))
+        send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -456,15 +456,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def file_path
-    params.permit(:file)[:file].tempfile.path
+    params.permit(:file)[:file].send(:tempfile).path
   end
 
   def file_name
-    params.permit(:file).original_filename
+    params.permit(:file).send(:original_filename)
   end
 
   def file_content_type
-    params.permit(:file).content_type
+    params.permit(:file).send(:content_type)
   end
 
   def send_notice_upload_notifications(notice, subject)
