@@ -389,7 +389,7 @@ RSpec.describe Operations::Individual::CalculateYearlyAggregate do
       let(:params) { base_enrollment }
 
       it "returns yearly aggregate amount" do
-        expect(subject.success).to eq 11975.0
+        expect(subject.success).to eq 11_975.0
       end
     end
   end
