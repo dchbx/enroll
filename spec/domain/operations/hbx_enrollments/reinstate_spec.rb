@@ -148,7 +148,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
     end
   end
 
-  describe 'age_off_dependents' do
+  describe 'age_off_dependents', dbclean: :after_each do
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
     let(:benefit_package) {initial_application.benefit_packages.first}
@@ -166,7 +166,7 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
              hired_on: TimeKeeper.date_of_record.prev_year - 3.months)
     end
     let!(:employee_role) {FactoryBot.create(:employee_role, person: person, census_employee: census_employee, benefit_sponsors_employer_profile_id: abc_profile.id)}
-    let(:shop_enrollment) do
+    let(:enrollment) do
       FactoryBot.create(:hbx_enrollment,
                         household: family.latest_household,
                         coverage_kind: "health",
@@ -179,31 +179,60 @@ RSpec.describe Operations::HbxEnrollments::Reinstate, :type => :model, dbclean: 
                         employee_role_id: employee_role.id,
                         rating_area_id: BSON::ObjectId.new)
     end
-    let!(:enr_mem1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, is_subscriber: family_member1.is_primary_applicant, hbx_enrollment: shop_enrollment) }
-    let!(:enr_mem2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: family_member2.is_primary_applicant, hbx_enrollment: shop_enrollment) }
-    let!(:enr_mem3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: family_member3.is_primary_applicant, hbx_enrollment: shop_enrollment) }
+    let!(:enr_mem1) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member1.id, is_subscriber: family_member1.is_primary_applicant, hbx_enrollment: enrollment) }
+    let!(:enr_mem2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: family_member2.is_primary_applicant, hbx_enrollment: enrollment) }
+    let!(:enr_mem3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: family_member3.is_primary_applicant, hbx_enrollment: enrollment) }
 
-    context 'shop market' do
+    context 'shop market', dbclean: :after_each do
       before do
         allow(::EnrollRegistry[:aca_shop_dependent_age_off].settings[0]).to receive(:item).and_return(:monthly)
         initial_application.update_attributes(effective_period: Date.new(2020,1,1)..Date.new(2020,12,31))
-        shop_enrollment.update_attributes(aasm_state: :coverage_terminated, terminated_on: Date.new(2020, 8,31))
+        enrollment.update_attributes(aasm_state: :coverage_terminated, terminated_on: Date.new(2020, 8,31))
         enr_mem2.person.update_attributes(dob: Date.new(1994, 8, 26))
-        enr_mem3.person.update_attributes(dob: Date.new(1994.year, 9, 26))
+        enr_mem3.person.update_attributes(dob: Date.new(1994, 9, 26))
         census_employee.benefit_group_assignments << BenefitGroupAssignment.new(start_on: Date.new(2020, 9, 1), benefit_package: benefit_package)
       end
       it 'should create new enrollment' do
-        family = shop_enrollment.family
+        family = enrollment.family
         expect(family.hbx_enrollments.count).to eq 1
-        subject.call({hbx_enrollment: shop_enrollment})
-        shop_enrollment.reload
-        expect(family.hbx_enrollments.count).to eq 3
+        subject.call({hbx_enrollment: enrollment})
+        enrollment.reload
+        expect(family.hbx_enrollments.count).to eq 4
       end
       it 'should drop dependents who are > 26 and create a new enrollment' do
-        family = shop_enrollment.family
+        family = enrollment.family
         expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
-        subject.call({hbx_enrollment: shop_enrollment})
-        shop_enrollment.reload
+        subject.call({hbx_enrollment: enrollment})
+        enrollment.reload
+        expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
+        expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 1
+      end
+    end
+
+    context 'fehb market', dbclean: :after_each do
+
+      before do
+        allow_any_instance_of(HbxEnrollment).to receive(:fehb_profile).and_return(true)
+        initial_application.update_attributes(effective_period: Date.new(2020,1,1)..Date.new(2020,12,31))
+        enrollment.update_attributes(aasm_state: :coverage_terminated, terminated_on: Date.new(2020, 8,31))
+        enr_mem2.person.update_attributes(dob: Date.new(1994, 8, 26))
+        enr_mem3.person.update_attributes(dob: Date.new(1994, 9, 26))
+        census_employee.benefit_group_assignments << BenefitGroupAssignment.new(start_on: Date.new(2020, 9, 1), benefit_package: current_benefit_package)
+      end
+
+      it 'should create new enrollment' do
+        family = enrollment.family
+        expect(family.hbx_enrollments.count).to eq 1
+        subject.call({hbx_enrollment: enrollment})
+        enrollment.reload
+        expect(family.hbx_enrollments.count).to eq 4
+      end
+
+      it 'should drop dependents who are > 26 and create a new enrollment' do
+        family = enrollment.family
+        expect(family.hbx_enrollments.coverage_enrolled.count).to eq 0
+        subject.call({hbx_enrollment: enrollment})
+        enrollment.reload
         expect(family.hbx_enrollments.coverage_enrolled.count).to eq 1
         expect(family.hbx_enrollments.coverage_enrolled.first.hbx_enrollment_members.count).to eq 1
       end

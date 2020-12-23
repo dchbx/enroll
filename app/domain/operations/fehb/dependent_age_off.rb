@@ -37,6 +37,7 @@ module Operations
 
       def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date)
         cut_off_age = EnrollRegistry[:aca_fehb_dependent_age_off].settings(:cut_off_age).item
+        @fehb_logger = fehb_logger
         if congressional_ers.class == HbxEnrollment
           new_enr = new_enrollment(congressional_ers, new_date, cut_off_age)
           new_enr.present? ? new_enr : nil
@@ -74,7 +75,7 @@ module Operations
         eligible_dependents = enr_members - age_off_enr_member
         terminate_and_reinstate_enrollment(enrollment, new_date, eligible_dependents)
       rescue StandardError => e
-        fehb_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
+        @fehb_logger.info "Unable to terminated enrollment #{enrollment.hbx_id} for #{e.message}"
       end
 
       def fetch_aged_off_people(relations, new_date, cut_off_age)
@@ -92,7 +93,7 @@ module Operations
         return unless reinstate_enrollment.may_reinstate_coverage?
         reinstate_enrollment.reinstate_coverage!
         reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage?
-        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && self.effective_on <= TimeKeeper.date_of_record
+        reinstate_enrollment.begin_coverage! if reinstate_enrollment.may_begin_coverage? && reinstate_enrollment.effective_on <= TimeKeeper.date_of_record
         reinstate_enrollment
       end
     end

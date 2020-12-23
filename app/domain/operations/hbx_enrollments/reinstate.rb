@@ -115,16 +115,8 @@ module Operations
         Success(new_enrollment)
       end
 
-      def new_enrollment_effective_month(new_enrollment)
-        if new_enrollment.effective_on == new_enrollment.effective_on.beginning_of_month
-          new_enrollment.effective_on
-        else
-          new_enrollment.effective_on.beginning_of_month.next_month
-        end
-      end
-
       def reinstate_dates(new_enrollment)
-        dependent_age_off_dates = (new_enrollment_effective_month(new_enrollment)..TimeKeeper.date_of_record.beginning_of_month)
+        dependent_age_off_dates = (new_enrollment.effective_on..TimeKeeper.date_of_record.beginning_of_month)
         dependent_age_off_dates.to_a.select {|date| date if date == date.beginning_of_month}
       end
 
