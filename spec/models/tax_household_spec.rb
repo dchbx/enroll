@@ -622,12 +622,13 @@ RSpec.describe TaxHousehold, type: :model do
           context "When yearly aggregate feature is turned ON" do
             before do
               shopping_hbx_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
+              aptc_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 10, 1))
               EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
             end
 
             it 'should return available APTC amount' do
               result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(5080.0)
+              expect(result.round(2)).to eq(5250.0)
             end
           end
         end
@@ -727,7 +728,7 @@ RSpec.describe TaxHousehold, type: :model do
 
             it 'should return available APTC amount' do
               result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(2533.67)
+              expect(result.round(2)).to eq(2533.66)
             end
           end
         end
