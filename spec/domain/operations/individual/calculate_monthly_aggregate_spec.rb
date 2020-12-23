@@ -131,7 +131,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       let(:params) { base_enrollment }
 
       it "returns monthly aggregate amount" do
-        expect(subject.success).to eq 6744.5
+        expect(subject.success).to eq 6745.05
       end
     end
   end
@@ -184,7 +184,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       let(:params) { base_enrollment }
 
       it "returns monthly aggregate amount" do
-        expect(subject.success).to eq 7960.59
+        expect(subject.success).to eq 7959.89
       end
     end
   end
@@ -248,7 +248,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       let(:params) { base_enrollment }
 
       it "returns monthly aggregate amount" do
-        expect(subject.success).to eq 1882.14
+        expect(subject.success).to eq 1882.48
       end
     end
   end
@@ -313,7 +313,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       let(:params) { base_enrollment }
 
       it "returns monthly aggregate amount" do
-        expect(subject.success).to eq 6676.00
+        expect(subject.success).to eq 6676.06
       end
     end
   end

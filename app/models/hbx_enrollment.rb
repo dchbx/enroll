@@ -385,10 +385,10 @@ class HbxEnrollment
     )
   }
 
-  scope :enrollments_for_yearly_aggregate, lambda { |family_id, year|
+  scope :yearly_aggregate, lambda { |family_id, year|
     where(:family_id => family_id,
           :effective_on => Date.new(year)..Date.new(year).end_of_year,
-          :aasm_state.in => (ENROLLED_STATUSES + TERMINATED_STATUSES),
+          :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + TERMINATED_STATUSES),
           :"applied_aptc_amount.cents".gt => 0)
   }
   # Rewritten from family scopes
