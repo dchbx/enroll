@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Worker class to process bulk notice
 class BulkNoticeWorker
   include Sidekiq::Worker
   include CableReady::Broadcaster

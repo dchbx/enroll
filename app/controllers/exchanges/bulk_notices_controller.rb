@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 module Exchanges
+  # Controller actions for bulk notices
   class BulkNoticesController < ApplicationController
     layout 'bootstrap_4'
 
