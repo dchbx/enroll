@@ -312,7 +312,7 @@ And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   end
 end
 
-And(/^employee should see (.*?) enrollment$/)do |enrollment_status|
+And(/^employee should see (.*?) enrollment$/) do |enrollment_status|
   if enrollment_status == 'terminated'
     expect(page).to have_content('Terminated')
   else

@@ -176,7 +176,7 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
   end
 end
 
-When(/^staff role clicks on button (.*?) for datatable$/)do |status|
+When(/^staff role clicks on button (.*?) for datatable$/) do |status|
   find(:xpath, "//*[@id='Tab:terminated']").click if status == 'terminated'
 end
 
@@ -185,14 +185,14 @@ And(/^staff role person clicks on employees link$/) do
   click_link 'Employees'
 end
 
-And(/^staff role clicks on Actions drop down for (.*?)$/) do |named_person|
+And(/^staff role clicks on Actions drop down for (.*?)$/) do |_named_person|
   find('.interaction-click-control-actions').click
 end
 
-And(/^staff role person (.*?) employee (.*?) with (.*?)$$/) do |action, named_person, date|
+And(/^staff role person (.*?) employee (.*?) with (.*?)$$/) do |action, _named_person, date|
   find_link(action.capitalize, wait: 10).visible?
   click_link(action.capitalize)
-  date =  date == 'pastdate' ?  TimeKeeper.date_of_record - 2.days : TimeKeeper.date_of_record + 1.month
+  date = date == 'pastdate' ? TimeKeeper.date_of_record - 2.days : TimeKeeper.date_of_record + 1.month
   find('input.text-center.date-picker').set date
   divs = page.all('div')
   home_div = divs.detect { |div| div[:id] == 'home' }
@@ -202,7 +202,7 @@ And(/^staff role person (.*?) employee (.*?) with (.*?)$$/) do |action, named_pe
   links.detect { |link| link.text == 'Terminate Employee'}.click
 end
 
-Then /^staff role should see the (.*) success flash notice$/ do |status|
+Then(/^staff role should see the (.*) success flash notice$/) do |status|
   sleep(3)
   result = case status
            when "terminated"
