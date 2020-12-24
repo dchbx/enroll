@@ -199,7 +199,7 @@ aca:
     employee_participation_ratio_minimum: <%= 2 / 3.0 %>
     non_owner_participation_count_minimum: 1
     binder_payment_due_on: 12
-    small_market_active_employee_limit: 200
+    small_market_active_employee_limit: 400
     new_employee_paper_application: true
     census_employees_template_file: 'DCHL Employee Census'
     coverage_start_period: "2 months"

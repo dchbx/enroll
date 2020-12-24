@@ -156,7 +156,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
       end
 
       it "should return array without next year added as it is not under_open_enrollment" do
-        tax_household10.update_attributes!(effective_starting_on: future_date )
+        tax_household10.update_attributes!(effective_starting_on: future_date, effective_ending_on: nil)
         expect(Admin::Aptc.years_with_tax_household(family10)).to eq [future_date.year]
       end
     end

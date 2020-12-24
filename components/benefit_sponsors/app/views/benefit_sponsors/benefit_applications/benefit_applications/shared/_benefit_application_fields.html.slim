@@ -172,7 +172,6 @@ javascript:
     var open_enrollment_end_on = document.querySelector("input#benefit_application_open_enrollment_end_on");
     var maxDate  = $(open_enrollment_end_on).attr("data-oe-max-Date") || $(open_enrollment_end_on).attr("data-oe-end-date");
 
-
     if (minDate) {
       initDatepicker(id,new Date(minDate),new Date(maxDate));
     } else {
