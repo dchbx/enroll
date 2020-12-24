@@ -33,10 +33,17 @@ h1.heading-text Add Benefit Package
     - oe_start_on = f.object.open_enrollment_start_on.present? ? Date.strptime(f.object.open_enrollment_start_on, "%m/%d/%Y") : nil
     - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
     .row.row-form-wrapper#uic-wrapper
+      - dates = f.object.start_on_options
+      - if dates[formatted_start_on]
+        - oe_min_date = dates[formatted_start_on][:open_enrollment_start_on]
+        - oe_max_date = dates[formatted_start_on][:open_enrollment_end_on]
+      - else
+        - oe_min_date = f.object.open_enrollment_start_on
+        - oe_max_date = f.object.open_enrollment_end_on
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on
+        = f.text_field :open_enrollment_start_on, class: "form-control", required: true, placeholder: 'OPEN ENROLLMENT START DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_start_on')", :"data-date-min" => f.object.start_on ? (Date.strptime(f.object.start_on, "%m/%d/%Y") - 2.months) : "", "data-oe-start-date" => oe_start_on, "data-oe-min-Date" => oe_min_date
       .col-md-6.col-sm-12
-        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", "data-oe-end-date" => oe_end_on
+        = f.text_field :open_enrollment_end_on, class: "form-control interaction-field-control-plan_year-open_enrollment_end_on", required: true, placeholder: 'OPEN ENROLLMENT END DATE', onmouseover:"showDatepicker('benefit_application_open_enrollment_end_on')", "data-oe-end-date" => oe_end_on, "data-oe-max-Date" => oe_max_date
 .row.pl-1
   h3 Add the total number of employees in your workforce
 .row
@@ -162,7 +169,9 @@ javascript:
     var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
     var targetDate = document.getElementById("baStartDate").value
     var minDate = document.querySelector("input#benefit_application_open_enrollment_start_on").dataset.dateMin;
-    var maxDate = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+    var open_enrollment_end_on = document.querySelector("input#benefit_application_open_enrollment_end_on");
+    var maxDate  = $(open_enrollment_end_on).attr("data-oe-max-Date") || $(open_enrollment_end_on).attr("data-oe-end-date");
+
 
     if (minDate) {
       initDatepicker(id,new Date(minDate),new Date(maxDate));
