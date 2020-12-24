@@ -25,7 +25,7 @@ Given("a matched Employee exists with only employee role") do
 end
 
 Given(/(.*) has a matched employee role/) do |_name|
-  steps %{
+  steps %(
     When Patrick Doe creates an HBX account
     When Employee goes to register as an employee
     Then Employee should see the employee search page
@@ -33,7 +33,7 @@ Given(/(.*) has a matched employee role/) do |_name|
     Then Employee should see the matched employee record form
     When Employee accepts the matched employer
     When Employee completes the matched employee form for Patrick Doe
-  }
+  )
 end
 
 def employee_by_legal_name(legal_name, person)
@@ -131,13 +131,13 @@ And(/Employee select "(.*?)" for "(.*?)" sep effective on kind and clicks contin
   expect(page).to have_content "Based on the information you entered, you may be eligible to enroll now but there is limited time"
   if qle_reason == 'covid-19'
     qle_on = TimeKeeper.date_of_record
-    
+
     effective_on_kind_date = case effective_on_kind
-    when 'fixed_first_of_next_month'
-      qle_on.end_of_month.next_day.to_s
-    when 'first_of_this_month'
-      qle_on.beginning_of_month.to_s
-    end
+                             when 'fixed_first_of_next_month'
+                               qle_on.end_of_month.next_day.to_s
+                             when 'first_of_this_month'
+                               qle_on.beginning_of_month.to_s
+                             end
 
     select effective_on_kind_date, from: 'effective_on_kind'
   else
@@ -149,23 +149,23 @@ end
 Then(/Employee should see the group selection page with "(.*?)" effective date/) do |effective_on_kind|
 
   effective_on = case effective_on_kind
-  when "first_of_this_month"
-    TimeKeeper.date_of_record.beginning_of_month
-  when "fixed_first_of_next_month"
-    TimeKeeper.date_of_record.end_of_month + 1.day
-  end
+                 when "first_of_this_month"
+                   TimeKeeper.date_of_record.beginning_of_month
+                 when "fixed_first_of_next_month"
+                   TimeKeeper.date_of_record.end_of_month + 1.day
+                 end
 
-  expect(find('#effective_date')).to have_content("EFFECTIVE DATE: #{effective_on.strftime("%m/%d/%Y")}")
+  expect(find('#effective_date')).to have_content("EFFECTIVE DATE: #{effective_on.strftime('%m/%d/%Y')}")
 end
 
 Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) do |screen, effective_on_kind|
-  
+
   effective_on = case effective_on_kind
-  when "first_of_this_month"
-    TimeKeeper.date_of_record.beginning_of_month
-  when "fixed_first_of_next_month"
-    TimeKeeper.date_of_record.end_of_month + 1.day
-  end
+                 when "first_of_this_month"
+                   TimeKeeper.date_of_record.beginning_of_month
+                 when "fixed_first_of_next_month"
+                   TimeKeeper.date_of_record.end_of_month + 1.day
+                 end
 
   find('.coverage_effective_date', text: effective_on.strftime("%m/%d/%Y"), wait: 5)
 
@@ -216,10 +216,45 @@ And(/census employee (.*?) has benefit group assignment of the off cycle benefit
   expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
 end
 
-And(/census employee (.*?) has benefit group assignment of the future reinstated benefit application$/) do |named_person|
+And(/census employee (.*?) has benefit group assignment of the (.*) reinstated benefit application$/) do |named_person, time_period|
   click_button 'Update Employee'
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
-  benefit_package_id = ce.benefit_sponsorship.future_active_reinstated_benefit_application.benefit_packages[0].id #there's only one benefit package
+  benefit_package_id = if time_period == 'future'
+                         ce.benefit_sponsorship.future_active_reinstated_benefit_application.benefit_packages[0].id #there's only one benefit package
+                       else
+                         ce.benefit_sponsorship.current_benefit_application.benefit_packages[0].id
+                       end
   expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
+end
+
+And(/^census employee (.*?) with (.*) and resinstated BA will have (.*) enrollments$/) do |named_person, aasm_state, _enr_count|
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  enrollments_count = ce.employee_role.person.primary_family.hbx_enrollments.count
+  enrollments_aasm_state = ce.employee_role.person.primary_family.hbx_enrollments.map(&:aasm_state)
+  if aasm_state == 'termination_pending'
+    expect(enrollments_count).to eq 2
+    expect(enrollments_aasm_state).to eq ["coverage_termination_pending", "coverage_enrolled"]
+  elsif aasm_state == 'terminated'
+    expect(enrollments_count).to eq 2
+    expect(enrollments_aasm_state).to eq ["coverage_terminated", "coverage_enrolled"]
+  elsif aasm_state == 'retroactive_canceled'
+    expect(enrollments_count).to eq 2
+    expect(enrollments_aasm_state).to eq ["coverage_canceled", "coverage_enrolled"]
+  else
+    expect(enrollments_count).to eq 1
+    expect(enrollments_aasm_state).to eq ["coverage_selected"]
+  end
+end
+
+And(/on census employee profile through roster will display (.*) active enrollment on it$/) do |count|
+  if count == 'two'
+    expect(page).to have_content "Coverage Termination Pending"
+    expect(page).to have_content "Coverage Enrolled"
+  elsif count == 'one'
+    expect(page).to have_content "Coverage Enrolled"
+  else
+    expect(page).not_to have_content "Coverage Enrolled"
+  end
 end

@@ -24,7 +24,7 @@ Then(/^the user will see Terminate button$/) do
   find('li', :text => 'Terminate').click
 end
 
-When(/^the user enters (mid_month|any_day|last_day) and other details for (voluntary|non-payment) termination$/) do |termination_date, termination_type|
+When(/^the user enters (mid_month|any_day|last_day|last_month) and other details for (voluntary|non-payment) termination$/) do |termination_date, termination_type|
   if termination_type == 'voluntary'
     find(:xpath, '//input[@id="term_actions_voluntary"]').click
   else
@@ -37,6 +37,8 @@ When(/^the user enters (mid_month|any_day|last_day) and other details for (volun
     fill_in "Select Term Date", with: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y').to_s
   elsif termination_date == 'last_day'
     fill_in "Select Term Date", with: @new_application.end_on.to_s
+  elsif termination_date == 'last_month'
+    fill_in "Select Term Date", with: TimeKeeper.date_of_record.end_of_month.last_month.strftime('%m/%d/%Y').to_s
   end
   find('h1', :text => 'Employers', wait: 10).click
 end
@@ -62,9 +64,13 @@ Then(/^employer should see benefit application in termination pending state$/) d
   expect(page).to have_content("Termination Pending")
 end
 
-Then(/^employer should see termination pending and reinstated benefit_application$/) do
+Then(/^employer should see (.*) and reinstated benefit_application$/) do |aasm_state|
   expect(page).to have_content("Active")
-  expect(page).to have_content("Termination Pending")
+  if aasm_state == "terminated"
+    expect(page).to have_content("Terminated")
+  else
+    expect(page).to have_content("Termination Pending")
+  end
 end
 
 Then(/^employer should see (.*) states$/) do |py_states|
@@ -77,4 +83,20 @@ And(/^employer should see Add Plan Year link$/) do
   links = page.all('a')
   add_plan_year_link = links.detect { |link| link.text == 'Add Plan Year' }
   expect(add_plan_year_link.nil?).to eq(false)
+end
+
+And(/^user able to see (.*) benefit package headers on the census employee roster$/) do |bp_count|
+  sleep(3)
+  expect(page.all("td").detect { |td| td[:class] == " col-string col-reinstated_benefit_package" }.text).to eq "First benefit package" if bp_count == 'two'
+  expect(page.all("td").detect { |td| td[:class] == " col-string col-benefit_package" }.text).to eq "First benefit package"
+end
+
+And(/^user able to see (.*) enrollment status headers on the census employee roster$/) do |es_count|
+  sleep(3)
+  if es_count == 'two'
+    expect(page.all("td").detect { |td| td[:class] == " col-string col-enrollment_status" }.text).to eq "Coverage Termination Pending (Health)"
+    expect(page.all("td").detect { |td| td[:class] == " col-string col-reinstated_enrollment_status" }.text).to eq "Enrolled (Health)"
+  else
+    expect(page.all("td").detect { |td| td[:class] == " col-string col-enrollment_status" }.text).to eq "Enrolled (Health)"
+  end
 end
