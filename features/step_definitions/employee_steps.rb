@@ -176,9 +176,46 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
   end
 end
 
-And(/staff role person clicks on employees link$/) do
+When(/^staff role clicks on button (.*?) for datatable$/)do |status|
+  find(:xpath, "//*[@id='Tab:terminated']").click if status == 'terminated'
+end
+
+
+And(/^staff role person clicks on employees link$/) do
   click_link 'Employees'
 end
+
+And(/^staff role clicks on Actions drop down for (.*?)$/) do |named_person|
+  find('.interaction-click-control-actions').click
+end
+
+And(/^staff role person (.*?) employee (.*?) with (.*?)$$/) do |action, named_person, date|
+  find_link(action.capitalize, wait: 10).visible?
+  click_link(action.capitalize)
+  date =  date == 'pastdate' ?  TimeKeeper.date_of_record - 2.days : TimeKeeper.date_of_record + 1.month
+  find('input.text-center.date-picker').set date
+  divs = page.all('div')
+  home_div = divs.detect { |div| div[:id] == 'home' }
+  home_div.click
+  links = page.all('a')
+  sleep(3)
+  links.detect { |link| link.text == 'Terminate Employee'}.click
+end
+
+Then /^staff role should see the (.*) success flash notice$/ do |status|
+  sleep(3)
+  result = case status
+           when "terminated"
+             "Successfully terminated Census Employee."
+           when "Initiate cobra"
+             "Successfully update Census Employee."
+           else
+             "Successfully rehired Census Employee."
+           end
+
+  expect(page).to have_content result
+end
+
 
 And(/staff role person clicks on employee (.*?)$/) do |named_person|
   sleep(5)

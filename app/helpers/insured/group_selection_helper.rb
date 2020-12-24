@@ -117,7 +117,7 @@ module Insured
       if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role, coverage_kind)
       else
-        active_enrollment(enrollments, employee_role, coverage_kind)
+        active_enrollment(family, enrollments, employee_role, coverage_kind)
       end
     end
 
@@ -131,10 +131,11 @@ module Insured
       ).first
     end
 
-    def active_enrollment(enrollments, employee_role, coverage_kind)
+    def active_enrollment(family, enrollments, employee_role, coverage_kind)
+      coverage_date = family&.current_sep&.effective_on
       enrollments.where(
         {
-          :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
+          :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package(coverage_date).try(:id),
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
           :coverage_kind => coverage_kind
         }

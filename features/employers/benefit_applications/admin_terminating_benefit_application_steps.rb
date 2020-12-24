@@ -20,6 +20,16 @@ When(/^the user clicks Actions for current benefit application$/) do
   actions_button.click
 end
 
+And(/^Admin reinstates benefit application$/) do
+  step 'the user clicks Actions for that benefit application'
+  step 'the user will see Reinstate button'
+  step 'Admin clicks on Reinstate button'
+  step 'Admin will see transmit to carrier checkbox'
+  step 'Admin clicks on Submit button'
+  step 'Admin will see confirmation pop modal'
+  step 'Admin clicks on continue button for reinstating benefit_application'
+end
+
 Then(/^the user will see Terminate button$/) do
   find('li', :text => 'Terminate').click
 end

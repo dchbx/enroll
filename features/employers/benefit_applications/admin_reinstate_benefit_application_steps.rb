@@ -41,6 +41,7 @@ end
 
 When("Admin clicks on continue button for reinstating benefit_application") do
   find('.btn', text: 'CONTINUE').click
+  sleep 1
 end
 
 Then("Admin will see a Successful message") do

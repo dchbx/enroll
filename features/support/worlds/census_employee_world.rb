@@ -312,6 +312,14 @@ And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   end
 end
 
+And(/^employee should see (.*?) enrollment$/)do |enrollment_status|
+  if enrollment_status == 'terminated'
+    expect(page).to have_content('Terminated')
+  else
+    expect(page).to have_content('Termination Pending')
+  end
+end
+
 And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
 
   step "Employees for #{legal_name} have both Benefit Group Assignments Employee role"

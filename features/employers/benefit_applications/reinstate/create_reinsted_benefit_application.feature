@@ -8,7 +8,9 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     And the Reinstate feature configuration is enabled
     And Qualifying life events are present
 
-  Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application and employees are able to plan shop
+Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
+          and employees are able to plan shop in both active and future reinstated applications
+
     Given initial employer ABC Widgets has active benefit application
     And there is a census employee record and employee role for Patrick Doe for employer ABC Widgets
     And census employee Patrick Doe has a past DOH
@@ -29,13 +31,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     When the user clicks Action for that Employer
     And the user clicks the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in
@@ -82,14 +78,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     When the user clicks Action for that Employer
     Then the user will see the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see Reinstate Start Date for <to_state> benefit application
-    And Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in
