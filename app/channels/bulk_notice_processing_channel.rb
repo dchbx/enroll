@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Action cable channel for processing bulk notices
 class BulkNoticeProcessingChannel < ApplicationCable::Channel
   def subscribed
     stream_from 'bulk-notice-processing'

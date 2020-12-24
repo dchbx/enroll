@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Class to hold reflex methods
 class BulkNoticeReflex < ApplicationReflex
   # Add Reflex methods in this file.
   #
