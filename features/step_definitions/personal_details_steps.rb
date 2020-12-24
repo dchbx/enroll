@@ -147,8 +147,12 @@ And(/that a person with (.*) exists in EA/) do |role|
   end
 end
 
+Then(/person should be able to visit add new employee portal/) do
+  click_button 'Add Portal'
+end
+
 And(/person with (.*) signs in and visits manage account/) do |role|
-  @person = Person.where(first_name: role.split(/\s/)[0]).first
+  @person ||= Person.where(first_name: role.split(/\s/)[0]).first
   user = @person.user
   login_as user
   visit "/people/#{@person.id}/manage_account"
@@ -162,7 +166,30 @@ And(/person clicks on my portals tab/) do
   click_link 'My Portals'
 end
 
-And(/person clicks on add new poc portal link/) do
+Given(/(.*) employer has (.*) as employer staff/) do |legal_name, named_person|
+  employer_profile = employer_profile(legal_name)
+  employer_staff_role = FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)
+  @person = FactoryBot.create(:person, first_name: people[named_person][:first_name], last_name: people[named_person][:last_name], dob: people[named_person][:dob_date])
+  @person.employer_staff_roles << employer_staff_role
+  @person.save
+  @staff_role ||= FactoryBot.create(:user, :person => @person, email: people[named_person][:email])
+end
+
+Then(/person should see their indentifying information/) do
+  expect(page).to have_content 'Personal Information'
+  expect(page).to have_text @person.first_name
+end
+
+Then(/person enters ssn under personal information for (.*)/) do |named_person|
+  fill_in Insured::Employee::PersonalInformation.ssn, with: number_to_ssn(@census_employee[named_person].ssn)
+  find('.interaction-click-control-continue').click
+end
+
+Then(/person clicks on Add Role/) do
+  click_link 'Add Role'
+end
+
+And(/person clicks on add new portal link/) do
   visit "people/#{@person.id}/available_accounts"
 end
 
