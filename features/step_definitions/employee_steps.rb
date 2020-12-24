@@ -265,33 +265,26 @@ And(/census employee (.*?) has benefit group assignment of the (.*) reinstated b
   expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
 end
 
-And(/^census employee (.*?) with (.*) and resinstated BA will have (.*) enrollments$/) do |named_person, aasm_state, _enr_count|
+And(/^census employee (.*?) with (.*) and resinstated BA will have two enrollments$/) do |named_person, aasm_state|
   person = people[named_person]
   ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
   enrollments_count = ce.employee_role.person.primary_family.hbx_enrollments.count
   enrollments_aasm_state = ce.employee_role.person.primary_family.hbx_enrollments.map(&:aasm_state)
+  expect(enrollments_count).to eq 2
   if aasm_state == 'termination_pending'
-    expect(enrollments_count).to eq 2
     expect(enrollments_aasm_state).to eq ["coverage_termination_pending", "coverage_enrolled"]
+    expect(page).to have_content "Coverage Termination Pending"
   elsif aasm_state == 'terminated'
-    expect(enrollments_count).to eq 2
     expect(enrollments_aasm_state).to eq ["coverage_terminated", "coverage_enrolled"]
-  elsif aasm_state == 'retroactive_canceled'
-    expect(enrollments_count).to eq 2
-    expect(enrollments_aasm_state).to eq ["coverage_canceled", "coverage_enrolled"]
+    expect(page).to have_content "Coverage Enrolled"
   else
-    expect(enrollments_count).to eq 1
-    expect(enrollments_aasm_state).to eq ["coverage_selected"]
+    expect(enrollments_aasm_state).to eq ["coverage_canceled", "coverage_enrolled"]
+    expect(page).to have_content "Coverage Enrolled"
   end
 end
 
-And(/on census employee profile through roster will display (.*) active enrollment on it$/) do |count|
-  if count == 'two'
-    expect(page).to have_content "Coverage Termination Pending"
-    expect(page).to have_content "Coverage Enrolled"
-  elsif count == 'one'
-    expect(page).to have_content "Coverage Enrolled"
-  else
-    expect(page).not_to have_content "Coverage Enrolled"
-  end
+
+And(/on census employee profile through roster will display one active reinstated enrollment on it$/) do
+  expect(page).to have_content "Reinstated Enrollment"
+  expect(page).to have_content "Coverage Enrolled"
 end

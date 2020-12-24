@@ -29,13 +29,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When the user clicks Action for that Employer
     And the user clicks the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in
@@ -63,14 +57,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When the user clicks Action for that Employer
     Then the user will see the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see Reinstate Start Date for <to_state> benefit application
-    And Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in

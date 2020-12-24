@@ -29,13 +29,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When the user clicks Action for that Employer
     And the user clicks the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in
@@ -67,14 +61,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     When the user clicks Action for that Employer
     Then the user will see the Plan Years button
     Then the user will select benefit application to reinstate
-    When the user clicks Actions for that benefit application
-    Then the user will see Reinstate button
-    When Admin clicks on Reinstate button
-    Then Admin will see Reinstate Start Date for <to_state> benefit application
-    And Admin will see transmit to carrier checkbox
-    When Admin clicks on Submit button
-    Then Admin will see confirmation pop modal
-    When Admin clicks on continue button for reinstating benefit_application
+    And Admin reinstates benefit application
     Then Admin will see a Successful message
     And user logs out
     And staff role person logged in
@@ -86,12 +73,12 @@ Feature: Ability for Admin to create an Reinstated benefit application and verif
     And user able to see one enrollment status headers on the census employee roster
     When staff role person clicks on employee Patrick Doe
     And census employee Patrick Doe has benefit group assignment of the current reinstated benefit application
-    And census employee Patrick Doe with <to_state> and resinstated BA will have <enr_count> enrollments
-    And on census employee profile through roster will display <count> active enrollment on it
+    And census employee Patrick Doe with <to_state> and resinstated BA will have two enrollments
+    And on census employee profile through roster will display one active reinstated enrollment on it 
     And user logs out
 
     Examples:
-      |    to_state          |  py_states                         | enr_count | count |
-      | retroactive_canceled |  [Canceled, Reinstated]            |   two     | one   |
-      |  canceled            |  [Canceled, Reinstated]            |   one     | zero  |
-      |  terminated          |  [Coverage Terminated, Reinstated] |   two     | one   |
+      |    to_state          |  py_states                         |
+      | retroactive_canceled |  [Canceled, Reinstated]            |
+      |  canceled            |  [Canceled, Reinstated]            |
+      |  terminated          |  [Coverage Terminated, Reinstated] |
