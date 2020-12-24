@@ -32,7 +32,7 @@ class DocumentsController < ApplicationController
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
       end
       model_klass = ['BenefitSponsors::Organizations::AcaShopDcEmployerProfile', 'Person', "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"].include?(model) ? model.safe_constantize : nil
-      return unless model_klass.present?
+      raise "Sorry! Invalid Request" unless model_klass
 
       model_object = model_klass.find(model_id)
       documents = model_object.send(relation.to_sym)
