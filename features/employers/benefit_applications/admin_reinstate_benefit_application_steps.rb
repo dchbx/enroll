@@ -77,6 +77,7 @@ And(/^initial employer ABC Widgets application (.*)$/) do |aasm_state|
     else
       application.update_attributes(aasm_state: :canceled)
       application.workflow_state_transitions << WorkflowStateTransition.new(from_state: 'active', to_state: 'canceled', event: 'cancel!')
+      application.benefit_packages.each(&:cancel_member_benefits)
     end
   end
 end
