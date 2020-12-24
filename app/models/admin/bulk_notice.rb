@@ -4,6 +4,7 @@
 # When Submitting Preview, we capture all
 
 module Admin
+  # Stores information about admin bulk notice
   class BulkNotice
     include Mongoid::Document
     include Mongoid::Timestamps
