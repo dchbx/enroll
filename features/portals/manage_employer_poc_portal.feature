@@ -10,7 +10,7 @@ Feature: Any Person with User account should be able to manage employer poc port
     And person with <role> signs in and visits manage account
     And person clicks on my portals tab
     Then person should see their <role> information under active portals
-    And person clicks on add new poc portal link
+    And person clicks on add new portal link
     And person should see add new employer poc portal link
     And person logs out
 
