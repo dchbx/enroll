@@ -67,7 +67,7 @@ module FinancialAssistance
 
     def create
       format_date(params)
-      @income = @applicant.incomes.build params.permit![:income]
+      @income = @applicant.incomes.build permit_params(params[:income])
       if @income.save
         render :create
       else

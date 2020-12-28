@@ -4,6 +4,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   include ::DataTablesAdapter
 
   before_action :check_broker_agency_staff_role, only: [:new, :create]
+  before_action :broker_profile_params, only: [:create, :update]
   before_action :check_admin_staff_role, only: [:index]
   before_action :find_hbx_profile, only: [:index]
   before_action :find_broker_agency_profile, only: [:show, :edit, :update, :employers, :assign, :update_assign, :employer_datatable, :manage_employers, :general_agency_index, :clear_assign_for_employer, :set_default_ga, :assign_history]
@@ -30,7 +31,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def create
-    params.permit!
     @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
 
     if @organization.save(current_user)
@@ -57,10 +57,9 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def update
     sanitize_broker_profile_params
-    params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
-    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.require(:organization))
+    broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -72,10 +71,8 @@ class BrokerAgencies::ProfilesController < ApplicationController
     @organization.assign_attributes(:office_locations => [])
     @organization.save(validate: false)
     person = @broker_agency_profile.primary_broker_role.person
-
     person.update_attributes(person_profile_params)
     @broker_agency_profile.update_attributes(languages_spoken_params.merge(ach_account_number: broker_agency_profile.ach_record.account_number, ach_routing_number: broker_agency_profile.ach_record.routing_number))
-
 
     if @organization.update_attributes(broker_profile_params)
       office_location = @organization.primary_office_location
@@ -445,6 +442,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   private
 
   def broker_profile_params
+    return unless params[:organization]
     params.require(:organization).permit(
       :legal_name,
       :dba,
