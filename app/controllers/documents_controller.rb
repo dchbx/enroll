@@ -16,7 +16,7 @@ class DocumentsController < ApplicationController
 
   def download_employer_document
     document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
-    send_file document.identifier
+    document.present? ? (send_file document.identifier) : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
   rescue StandardError => e
     redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
@@ -32,7 +32,7 @@ class DocumentsController < ApplicationController
       if model == "AcaShopCcaEmployerProfile"
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
       end
-      model_klass = ['BenefitSponsors::Organizations::AcaShopDcEmployerProfile', 'Person', "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"].include?(model) ? model.safe_constantize : nil
+      model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
       raise "Sorry! Invalid Request" unless model_klass
 
       model_object = model_klass.find(model_id)
