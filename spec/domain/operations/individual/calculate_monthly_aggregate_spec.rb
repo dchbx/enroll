@@ -199,8 +199,8 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
     let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil)}
     let(:sample_max_aptc_1) {1200.00}
     let(:sample_csr_percent_1) {87}
-    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx3, applicant_id: family_member1.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)}
-    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: base_enrollment, applicant_id: family_member2.id, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month)}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx3, applicant_id: family_member1.id, eligibility_date: TimeKeeper.date_of_record).beginning_of_month}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: base_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record).beginning_of_month}
     let!(:hbx1) do
       FactoryBot.create(:hbx_enrollment,
                         family: family,
