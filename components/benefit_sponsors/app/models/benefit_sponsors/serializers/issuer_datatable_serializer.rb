@@ -40,7 +40,7 @@ module BenefitSponsors
             "Delta Dental" => ['1-800-872-0500', '', ''],
             "Dentegra" => ['1-800-471-0284', '', ''],
             "Dominion" => ['1-855-224-3016', '', ''],
-            "Kaiser" => ['1-800-777-7902', '', ''],
+            "Kaiser Permanente" => ['1-800-777-7902', '', ''],
             "MetLife" => ['1-855-638-2221', '', ''],
             "UnitedHealthcare" => ['1-888-842-4571', '', '']
           }[legal_name] || []

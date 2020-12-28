@@ -59,7 +59,7 @@ RSpec.shared_context 'family with one member and one enrollment', :shared_contex
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
                       :silver,
-                      issuer_name: 'Kaiser',
+                      issuer_name: 'Kaiser Permanente',
                       renewal_product_id: product.id,
                       application_period: previous_year..previous_year.end_of_year)
   end
@@ -81,7 +81,7 @@ RSpec.shared_context 'family with one member and one enrollment and one renewal 
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
                       :silver,
-                      issuer_name: 'Kaiser',
+                      issuer_name: 'Kaiser Permanente',
                       application_period: next_year_date.beginning_of_year..next_year_date.end_of_year)
   end
 
@@ -167,7 +167,7 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
     FactoryBot.create(:benefit_markets_products_health_products_health_product,
                       :ivl_product,
                       :silver,
-                      issuer_name: 'Kaiser',
+                      issuer_name: 'Kaiser Permanente',
                       renewal_product_id: new_product.id,
                       application_period: previous_year..previous_year.end_of_year)
   end
