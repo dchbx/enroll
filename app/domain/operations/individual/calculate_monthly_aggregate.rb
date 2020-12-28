@@ -41,7 +41,7 @@ module Operations
         termination_date = calculate_termination_date(enrollment, base_enrollment)
         first_month_aptc = aptc_consumed_in_effective_month(enrollment, termination_date)
         full_months_aptc = aptc_consumed_in_full_months(enrollment, termination_date)
-        last_month_aptc = aptc_consumed_in_terminated_month(enrollment, termination_date)
+        last_month_aptc  = aptc_consumed_in_terminated_month(enrollment, termination_date)
         first_month_aptc + full_months_aptc + last_month_aptc
       end
 
