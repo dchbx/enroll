@@ -17,13 +17,9 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def privacy
     set_current_person(required: false)
-    if params[:aqhp].present?
-      @key = :aqhp
-      @val = params.permit(:aqhp).to_h
-    else
-      @key = :uqhp
-      @val = params.permit(:uqhp).to_h
-    end
+    params_hash = params.permit(:aqhp, :uqhp).to_h
+    @val = params_hash[:aqhp] || params_hash[:uqhp]
+    @key = params_hash.key(@val)
     @search_path = {@key => @val}
     if @person.try(:resident_role?)
       bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
@@ -152,7 +148,6 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      # @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.require(:person).permit(person_parameters_list), actual_user)
       @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params, actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
