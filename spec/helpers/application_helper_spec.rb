@@ -87,7 +87,7 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
+    let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser Permanente")}
     let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
 
     it "should return the named logo" do

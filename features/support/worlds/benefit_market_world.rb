@@ -98,7 +98,7 @@ module BenefitMarketWorld
   end
 
   def health_issuers
-    ['CareFirst', 'Kaiser']
+    ['CareFirst', 'Kaiser Permanente']
   end
 
   def health_products

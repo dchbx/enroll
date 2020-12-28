@@ -21,7 +21,7 @@ RSpec.describe Notifier::ConsumerRoleHelper, :type => :helper do
 
   context "#phone_number" do
     it "should return a phone number value for each legal name" do
-      legal_names = ["BEST Life", "CareFirst", "Delta Dental", "Dominion", "Kaiser"]
+      legal_names = ["BEST Life", "CareFirst", "Delta Dental", "Dominion", "Kaiser Permanente"]
       legal_names.each { |legal_name| expect(helper.phone_number(legal_name).length).to be > 1 }
     end
   end
