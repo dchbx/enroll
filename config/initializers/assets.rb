@@ -8,6 +8,6 @@ Rails.application.config.assets.version = '1.0'
 
 # Precompile additional assets.
 # application.js, application.css, and all non-JS/CSS in app/assets folder are already added.
-Rails.application.config.assets.precompile += %w[notifier/ckeditor/* glossary.js]
+Rails.application.config.assets.precompile += %w[standalone_effective_datatables.js notifier/ckeditor/* glossary.js standalone_effective_datatables.scss]
   
 

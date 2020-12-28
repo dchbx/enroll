@@ -1,0 +1,79 @@
+<% if EnrollRegistry.feature_enabled?(:sep_types) %>
+  <%= form_for @qle, url: exchanges_manage_sep_types_path, method: :post, html: {class: 'form-horizontal'} do |f| %>
+    <div class="container" style="margin-top: 15px; height: 100px; padding-left: 50px;" data-controller="sep-types">
+      <meta data-target='sep-types.metadata'
+        data-qle-reason="<%= @qle.reason%>"
+        data-qlek-reasons="<%= @qle.qlek_reasons%>"
+        data-other-reason="<%= @qle.other_reason || ''%>"
+        data-qle-market="<%= @qle.market_kind%>"
+        data-termination-kinds="<%= @qle.termination_on_kinds || []%>"
+        data-effective-kinds="<%= @qle.effective_on_kinds || []%>">
+      <% if @failure.present? %>
+        <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+          <% @failure[0].errors.to_h.each do |name, message| %>
+            <ul>
+              <li><%= "#{name.to_s.humanize}: #{message.first}" %></li>
+            </ul>
+          <% end %>
+        </div>
+      <% end %>
+      <div class="col-12">
+        <h3 class="heading-text">
+          <%= l10n("exchange.manage_sep_types.create_sep_type")%>
+        </h3>
+        <p>* indicates a required field</p>
+      </div>
+      <div class="col-12" style="line-height: 0.8; margin-top: 20px;" >
+        <div class="row justify-content-start">
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:start_on),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:end_on),f) %>
+          </div>
+        </div>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:title),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:tool_tip),f) %>
+        <%= build_option_field(EnrollRegistry[:sep_types].setting(:event_kind_label),f) %>
+        <div class="row justify-content-start">
+          <div class="col-6">
+            <div id= "market_kind" data-action='change->sep-types#marketChange'>
+              <%= build_option_field(EnrollRegistry[:sep_types].setting(:market_kind),f) %>
+            </div>
+          </div>
+          <div class="col-6" data-action='change->sep-types#reasonChange'>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:reason),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:other_reason),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:qle_event_date_kind),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_self_attested),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:pre_event_sep_in_days),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:post_event_sep_in_days),f) %>
+          </div>
+          <div class="col-6" id="effective_on_kinds">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:effective_on_kinds),f) %>
+          </div>
+          <div class="col-6">
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_start_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:coverage_end_on),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:is_visible),f) %>
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:date_options_available),f) %>
+          </div>
+          <div class="col-6" id= "termination_on_kinds" >
+            <%= build_option_field(EnrollRegistry[:sep_types].setting(:termination_on_kinds),f) %>
+          </div>
+        </div>
+      </div>
+      <div class="form-group <%=pundit_class(QualifyingLifeEventKind, :can_manage_qles?)%>">
+        <div class="col-sm-offset-2 col-sm-10">
+          <%= f.hidden_field :created_by, value: current_user.id %>
+          <%= f.hidden_field :updated_by, value: '' %>
+          <%= f.hidden_field :published_by, value: '' %>
+          <%= f.submit l10n("exchange.manage_sep_types.create_draft"), class:"btn btn-outline-primary" %>
+          <%= link_to l10n("exchange.manage_sep_types.cancel"), sep_types_dt_exchanges_manage_sep_types_path, class: 'btn btn-outline-primary' %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+<% end %>

@@ -9,24 +9,19 @@
                 <li class="nav-item">
                     <%= link_to "<span>BenefitMarketCatalogs</span>".html_safe, EnrollRegistry[:find_all_shop].item, remote: true, class: 'nav-link collapsed py-1', data: {target: '#submenu1sub1', toggle: 'collapse'} %>
 
-<!--                     <a class="nav-link collapsed py-1" href="#submenu1sub1" data-toggle="collapse" data-target="#submenu1sub1"><span>BenefitMarketCatalogs</span></a>
- -->                    <div class="collapse" id="submenu1sub1" aria-expanded="false">
+                    <div class="collapse" id="submenu1sub1" aria-expanded="false">
                         <ul class="flex-column nav pl-4">
-                           <li class="nav-item">
-                             <%#= link_to_feature(:find_all_shop) %>
-                             <%#= link_to "Index", EnrollRegistry[:find_all_shop].item, remote: true, class: 'nav-link p-1'%>
-                           </li>
+                           <li class="nav-item"></li>
                         </ul>
                     </div>
                 </li>
-<li class="nav-item">
-                    <%= link_to "<span>Qualifying Life Events</span>".html_safe, EnrollRegistry[:shop_qle_types].item, remote: true, class: 'nav-link collapsed py-1', data: {target: '#submenu1sub5', toggle: 'collapse'} %>
 
-<!--                     <a class="nav-link collapsed py-1" href="#submenu1sub1" data-toggle="collapse" data-target="#submenu1sub2"><span>Qualifying Life Events</span></a>
- -->                    <div class="collapse" id="submenu1sub5" aria-expanded="false">
+                <li class="nav-item">
+                    <%= link_to "<span>Qualifying Life Events</span>".html_safe, EnrollRegistry[:shop_qle_types].item, remote: true, class: 'nav-link collapsed py-1', data: {target: '#submenu1sub5', toggle: 'collapse'} %>
+                    <div class="collapse" id="submenu1sub5" aria-expanded="false">
                         <ul class="flex-column nav pl-4">
                            <li class="nav-item">
-                            <%= link_to "New", '/exchanges/manage_sep_types/new', remote: true, class: 'nav-link p-1'%>
+                            <%= link_to "New", EnrollRegistry[:shop_new_qle].item, remote: true, class: 'nav-link p-1'%>
                            </li>
                         </ul>
                     </div>
@@ -41,9 +36,7 @@
             <ul class="flex-column pl-2 nav">
                 <li class="nav-item">
                     <%= link_to "<span>BenefitMarketCatalogs</span>".html_safe, EnrollRegistry[:find_all_fehb].item, remote: true, class: 'nav-link collapsed py-1', data: {target: '#submenu2sub1', toggle: 'collapse'} %>
-
-<!--                     <a class="nav-link collapsed py-1" href="#submenu2sub1" data-toggle="collapse" data-target="#submenu2sub1"><span>BenefitMarketCatalogs</span></a>
- -->                    <div class="collapse" id="submenu2sub1" aria-expanded="false">
+                   <div class="collapse" id="submenu2sub1" aria-expanded="false">
                         <ul class="flex-column nav pl-4">
                             <li class="nav-item">
                             <%#= link_to "Index", EnrollRegistry[:find_all_fehb].item, remote: true, class: 'nav-link p-1'%>

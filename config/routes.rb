@@ -87,6 +87,7 @@ Rails.application.routes.draw do
         root 'manage_sep_types#sep_types_dt'
         collection do
           get 'sep_types_dt'
+          get 'qle_types'
           get 'sorting_sep_types'
           patch 'sort'
           get 'sep_type_to_publish'
@@ -111,6 +112,8 @@ Rails.application.routes.draw do
       resources :products, only: [:index]
     end
 
+    resources :configurations
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -133,6 +136,12 @@ Rails.application.routes.draw do
         get :broker_agency_index
         get :general_agency_index
         get :configuration
+        get :edit_feature
+        put :update_feature
+        get :catalogs_new
+        get :catalogs
+        get :find_feature
+        get :find_catalogs
         post :set_date
         post :update_setting
         get :staff_index

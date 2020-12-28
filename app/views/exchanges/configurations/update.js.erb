@@ -1,0 +1,5 @@
+<% if @feature.success? %>
+  $("#<%= @feature.success.key %>-alert").html("<div class='alert alert-success alert-dismissible fade show' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>Feature updated successfully.</div>").delay(3000).alert('clsoe');
+<% else %>
+  $("#<%= @feature.failure.key %>-alert").html("<div class='alert alert-danger fade show' role='alert'><button type='button' class='close' data-dismiss='alert' aria-label='Close'><span aria-hidden='true'>&times;</span></button>Something went wrong. Feature update failed.</div>");
+<% end %>

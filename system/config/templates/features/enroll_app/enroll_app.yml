@@ -1,13 +1,20 @@
 ---
 registry:
   - namespace:
-      - :features
+      path:
+        - :features
+      meta:
+        label: Features
+        content_type: :nav
+        description: 'Configuration settings for Features'
+        is_required: true
+        is_visible: true
     features:
       - key: :enroll_app
         is_enabled: true
         meta:
           label: Enroll Application
-          content_type: :boolean
+          content_type: :legend
           default: true
           description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
           is_required: true
@@ -15,10 +22,28 @@ registry:
         settings:
           - key: :application_name
             item: "enroll_dc"
+            meta:
+              label: Application Name
+              content_type: :text_field
+              description: Enter application name
+              is_required: false
+              is_visible: true
           - key: :copyright_period_start
             item: "2013"
+            meta:
+              label: Copyright Period Start
+              content_type: :text_field
+              description: Enter copyright period start calender year
+              is_required: false
+              is_visible: true
           - key: :policies_url
             item: "https://dchealthlink.com/"
+            meta:
+              label: Policies Url
+              content_type: :text_field
+              description: Enter healthlink policies link
+              is_required: false
+              is_visible: true
           - key: :faqs_url
             item: "https://dchealthlink.com/help"
           - key: :help_url

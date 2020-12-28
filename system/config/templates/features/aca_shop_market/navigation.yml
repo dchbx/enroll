@@ -1,0 +1,77 @@
+---
+registry:
+  - namespace:  
+      path:
+        - :enroll_app
+        - :aca_shop_market
+      meta:
+        label: Benefit Market Catalog
+        content_type: :nav
+        description: 'Configuration settings for Group Insurance Benefits'
+        is_required: true
+        is_visible: true
+    features:
+      - key: :find_all_shop
+        item: '/exchanges/hbx_profiles/find_catalogs?market_kind=aca_shop'
+        is_enabled: true
+        meta:
+          label: Find All Shop
+          content_type: :nav
+          default: :''
+          description: 'Find All Shop Benefit Market Catalogs'
+          is_required: true
+          is_visible: true
+  - namespace:
+      path:
+        - :enroll_app
+        - :aca_shop_market
+        - :benefit_market_catalog
+      meta:
+        label: Benefit Market Catalog
+        content_type: :nav
+        description: 'Configuration settings for Group Insurance Benefits'
+        is_required: true
+        is_visible: true
+    features:
+      - key: :shop_new_qle
+        item: '/exchanges/manage_sep_types/new' #.call(market_kind: :aca_shop, calender_year: TimeKeeper.date_of_record)
+        is_enabled: true
+        meta:
+          label: Shop New Qle
+          content_type: :nav
+          default: :''
+          description: 'Add New Qualifying Life Event'
+          is_required: true
+          is_visible: true
+      - key: :shop_qle_types
+        item: '/exchanges/manage_sep_types/qle_types?market_kind=aca_shop' #.call(market_kind: :aca_shop, calender_year: TimeKeeper.date_of_record)
+        is_enabled: true
+        meta:
+          label: Shop Qle Types
+          content_type: :nav
+          default: :''
+          description: 'Show All Shop Benefit Market Catalogs'
+          is_required: true
+          is_visible: true
+  - namespace:
+      path:
+        - :enroll_app
+        - :fehb_market
+        - :benefit_market_catalog
+      meta:
+        label: Benefit Market Catalog
+        content_type: :nav
+        description: 'Configuration settings for Federal Insurance Benefits'
+        is_required: true
+        is_visible: true
+    features:
+      - key: :find_all_fehb
+        item: "/exchanges/hbx_profiles/find_catalogs?market_kind=fehb" #BenefitMarkets::Operations::BenefitMarketCatalogs::FindAll.new
+        is_enabled: true
+        meta:
+          label: Find All Fehb
+          content_type: :nav
+          default: :''
+          description: 'Find All Fehb Benefit Market Catalogs'
+          is_required: true
+          is_visible: true

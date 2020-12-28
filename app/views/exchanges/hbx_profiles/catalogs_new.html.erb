@@ -1,26 +1,21 @@
 <%= render partial: "ui-components/v1/navs/primary_nav" %>
 
-<% content_for :head do %>
-  <%= javascript_include_tag 'standalone_effective_datatables' %>
-  <%= stylesheet_link_tag 'standalone_effective_datatables' %>
-<% end %>
-
-<div class="container">
+<!-- <div class="container">
   <div class="bottom-pd">
       <h1 class="heading-text">Enroll Configurations</h1>
-
-	  <div class="row mt-4" id="configurations">
-	  	<div class="col-md-3" style="overflow: scroll;">
+ -->
+	  <div class="row" id="configurations">
+	  	<div class="col-md-2" style="overflow: scroll; background-color: #e6e6e6;">
 	  		<%= render_configuration_navigation_menu %>
 	  	</div>
 
-	  	<div class="col-md-9">
+	  	<div class="col-md-10">
 	  		<div id="data_container"></div>
 	  	</div>
 	  </div>
-  </div>
+<!--   </div>
 </div>
-
+ -->
 <style>
 	body {
 		font-size: 1rem;
@@ -33,11 +28,16 @@
 	}
 
    #configurations .list-group {
-     color: black;
-   	 background-color: #fff;
+   	  color: black;
+   	  background-color: #fff;
+   }
+   #uic-primary-nav ul {
+   	margin-top: 0;
+   	margin-bottom: 0;
    }
 
-   #uic-primary-nav ul {
-	   margin-top: 0;
+   #configurations a {
+   	color: black;
+   	font-size: 1.1rem;
    }
 </style>

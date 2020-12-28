@@ -11,7 +11,6 @@ registry:
       - key: :assign_contribution_model_aca_shop
         item: BenefitMarkets::Operations::ContributionModels::Assign.new
         is_enabled: true
-
   - namespace:
     - :enroll_app
     - :fehb_market
@@ -23,22 +22,47 @@ registry:
       - key: :assign_contribution_model_fehb
         item: BenefitMarkets::Operations::ContributionModels::Assign.new
         is_enabled: false
-
   - namespace:
-    - :enroll_app
-    - :aca_shop_market
-    - :benefit_market_catalog
-    - :catalog_2019
-    - :contribution_model_criteria
+      path:
+        - :enroll_app
+        - :aca_shop_market
+        - :benefit_market_catalog
+        - :catalog_2019
+        - :contribution_model_criteria
+      meta:
+        label: Contribution Model Criteria 2019
+        content_type: :nav
+        description: 'Configuration settings for 2019 Contribution models'
+        is_required: true
+        is_visible: true
     features:
       - key: :initial_sponsor_jan_default_2019
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2019 Initial Sponsor January Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2019 Initial Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :initial
+            meta:
+              label: Benefit Application Kind
+              content_type: :text_field
+              description: Enter benefit application kind
+              is_required: false
+              is_visible: true
           - key: :effective_period
             item: <%= Date.new(2019,1,1)..Date.new(2019,1,31) %>
           - key: :order
@@ -65,10 +89,23 @@ registry:
             item: :initial_sponsor_default
       - key: :renewal_sponsor_jan_default_2019
         item: :contribution_model_criterion
+        meta:
+          label: 2019 Renewal Sponsor January Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2019 Renewal Sponsors
+          is_required: true
+          is_visible: true
         is_enabled: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period
@@ -96,20 +133,46 @@ registry:
           - key: :renewal_criterion_key
             item: :renewal_sponsor_default
   - namespace:
-    - :enroll_app
-    - :aca_shop_market
-    - :benefit_market_catalog
-    - :catalog_2020
-    - :contribution_model_criteria
+      path:
+        - :enroll_app
+        - :aca_shop_market
+        - :benefit_market_catalog
+        - :catalog_2020
+        - :contribution_model_criteria
+      meta:
+        label: Contribution Model Criteria 2020
+        content_type: :nav
+        description: 'Configuration settings for 2020 Contribution models'
+        is_required: true
+        is_visible: true
     features:
       - key: :initial_sponsor_jan_default_2020
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2020 Initial Sponsor January Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2020 Initial Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :initial
+            meta:
+              label: Benefit Application Kind
+              content_type: :text_field
+              description: Enter benefit application kind
+              is_required: false
+              is_visible: true
           - key: :effective_period
             item: <%= Date.new(2020,1,1)..Date.new(2020,1,31) %>
           - key: :order
@@ -118,6 +181,12 @@ registry:
             item: false
           - key: :renewal_criterion_key
             item: :initial_sponsor_jan_default
+            meta:
+              label: Renewal Criterion Key
+              content_type: :text_field
+              description: Enter renewal criterion key
+              is_required: false
+              is_visible: true
       - key: :initial_sponsor_default_2020
         item: :contribution_model_criterion
         is_enabled: true
@@ -136,10 +205,23 @@ registry:
             item: :initial_sponsor_default
       - key: :renewal_sponsor_jan_default_2020
         item: :contribution_model_criterion
+        meta:
+          label: 2020 Renewal January Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2020 Renewal Sponsors
+          is_required: true
+          is_visible: true
         is_enabled: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period
@@ -396,7 +478,6 @@ registry:
             item: 0
           - key: :fifty_percent_sponsor_fixed_percent_contribution_model
             item: <%= 2 / 3.0 %>
-
   - namespace:
     - :enroll_app
     - :aca_shop_market

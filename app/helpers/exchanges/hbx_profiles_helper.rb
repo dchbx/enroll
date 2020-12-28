@@ -33,5 +33,29 @@ module Exchanges
       person_roles << "General Agency Staff Role" if person.general_agency_staff_roles.present?
       person_roles
     end
+
+    def render_configuration_navigation_menu(options = {})
+
+      options = {namespace_options: {include_no_features_defined: true}}
+
+      # graph = EnrollRegistry[:feature_graph]
+
+      root_paths = [
+        [:features],
+        [:enroll_app, :aca_shop_market],
+        [:enroll_app, :fehb_market]
+      ]
+
+      # vertices = root_paths.collect{|path| graph.vertices.detect{|v| v.path == path}}
+      # options = {namespace_options: {starting_namespaces: vertices}}
+
+
+      # graph = EnrollRegistry[:feature_graph]
+      # options = {namespace_options: {include_no_features_defined: false, starting_namespaces: [graph.vertices[2], graph.vertices[3]]}}
+
+
+      nav = EnrollRegistry.navigation(options)
+      nav.render_html
+    end
   end
 end

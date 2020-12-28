@@ -1,0 +1,7 @@
+$('#data_container').html("<%= j render partial: 'qle_types', locals: {datatable: @datatable}  %>");
+
+initializeDataTables();
+  jQuery('.buttons-csv').hide()
+  jQuery('.buttons-excel').hide()
+  document.getElementsByClassName('dataTables_filter')[0].style.marginTop = '-25px'
+  document.getElementById('effective_datatable_wrapper').style.marginTop = '-15px'
