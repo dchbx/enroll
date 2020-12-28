@@ -7,7 +7,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
 
-  before_action :permit_params, only: [:family_index_dt]
+  before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -141,7 +141,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
-    result = ::Operations::SecureMessageAction.new.call(params: params.permit!.to_h, user: current_user)
+    result = ::Operations::SecureMessageAction.new.call(
+      params: params.permit(:actions_id, :body, :file, :resource_name, :resource_id, :subject, :controller).to_h,
+      user: current_user
+    )
     @error_on_save = result.failure if result.failure?
     respond_to do |format|
       if @error_on_save
@@ -438,7 +441,8 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    uniq_cancel_params = params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_cancel_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -458,7 +462,8 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    uniq_terminate_params = params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_terminate_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -852,8 +857,8 @@ def employer_poc
     end
   end
 
-  def permit_params
-    params.permit!
+  def permitted_params_family_index_dt
+    params.permit(:scopes)
   end
 
   def get_resource(params)
