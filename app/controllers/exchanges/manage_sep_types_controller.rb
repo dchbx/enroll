@@ -43,7 +43,6 @@ module Exchanges
             @failure = result.failure
             return render :edit
           else
-            binding.pry
             flash[:success] = l10n("controller.manage_sep_type.#{forms_qualifying_life_event_kind_form_params.to_h['publish'] ? 'publish_success' : 'update_success'}")
           end
         end
@@ -103,7 +102,7 @@ module Exchanges
       params.require(:qualifying_life_event_kind_form).permit(
         :start_on,:end_on,:title,:tool_tip,:pre_event_sep_in_days,
         :is_self_attested, :reason, :post_event_sep_in_days,
-        :market_kind,:effective_on_kinds, :ordinal_position
+        :market_kind, :effective_on_kinds, :ordinal_position
       ).to_h.symbolize_keys
     end
 
@@ -129,10 +128,12 @@ module Exchanges
           "title",
           "tool_tip",
           "updated_by",
+          "publish",
           effective_on_kinds: []
         ]
       )
-      forms_params.merge!({_id: params[:id]}) if params[:id]
+
+      forms_params.merge!({_id: params[:id]}) if params.dig(:id)
       forms_params
     end
 
