@@ -324,7 +324,6 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
   describe "verify APTC amount for prior year" do
     let(:start_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
-    let(:current_year) {TimeKeeper.date_of_record.beginning_of_year}
     let(:household) {FactoryBot.create(:household, family: family)}
     let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
     let(:family_member1) {FactoryBot.create(:family_member, family: household.family)}
