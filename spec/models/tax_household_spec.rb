@@ -640,7 +640,7 @@ RSpec.describe TaxHousehold, type: :model do
                               eligibility_date: TimeKeeper.date_of_record,
                               coverage_start_on: TimeKeeper.date_of_record,
                               hbx_enrollment: aptc_enrollment1,
-                              applied_aptc_amount: 32.21)
+                              applied_aptc_amount: 300)
           end
 
           let!(:aptc_enrollment1) do
@@ -663,7 +663,7 @@ RSpec.describe TaxHousehold, type: :model do
                               eligibility_date: TimeKeeper.date_of_record,
                               coverage_start_on: TimeKeeper.date_of_record,
                               hbx_enrollment: aptc_enrollment2,
-                              applied_aptc_amount: 278.68)
+                              applied_aptc_amount: 300)
           end
 
           let!(:aptc_enrollment2) do
@@ -678,7 +678,7 @@ RSpec.describe TaxHousehold, type: :model do
                               aasm_state: 'coverage_selected',
                               changing: false,
                               kind: 'individual',
-                              applied_aptc_amount: 278.68)
+                              applied_aptc_amount: 300)
           end
 
           let(:shopping_hbx_enrollment_member1) do
@@ -696,7 +696,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           before do
             tax_household_member3.update_attributes(is_ia_eligible: true)
-            eligibility_determination.update_attributes(max_aptc: 500.00)
+            eligibility_determination.update_attributes(max_aptc: 1200.00)
             aptc_enrollment2.household.reload
             aptc_enrollment1.household.reload
             hbx_enrollment.household.reload
@@ -714,7 +714,7 @@ RSpec.describe TaxHousehold, type: :model do
 
             it 'should return available APTC amount' do
               result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(189.11)
+              expect(result.round(2)).to eq(600.0)
             end
           end
 
@@ -728,7 +728,7 @@ RSpec.describe TaxHousehold, type: :model do
 
             it 'should return available APTC amount' do
               result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(2533.66)
+              expect(result.round(2)).to eq(5700.00)
             end
           end
         end
@@ -770,7 +770,7 @@ RSpec.describe TaxHousehold, type: :model do
                               submitted_at: TimeKeeper.date_of_record - 2.months,
                               aasm_state: 'coverage_selected',
                               household: family.active_household,
-                              applied_aptc_amount: 32.21)
+                              applied_aptc_amount: 300)
           end
 
           let!(:hbx_enrollment_member2) do
