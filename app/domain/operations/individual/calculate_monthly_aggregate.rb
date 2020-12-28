@@ -84,7 +84,15 @@ module Operations
       end
 
       def calculate_termination_date(enrollment, base_enrollment)
-        enrollment.terminated_on || (base_enrollment.effective_on - 1.day)
+        enrollment.terminated_on || new_temination_date(enrollment, base_enrollment)
+      end
+
+      def new_temination_date(enrollment, base_enrollment)
+        if enrollment.subscriber.applicant_id.to_s == base_enrollment.subscriber.applicant_id.to_s
+          base_enrollment.effective_on - 1.day
+        else
+          base_enrollment.effective_on.end_of_year
+        end
       end
 
       #logic to calculate the monthly Aggregate
