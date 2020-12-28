@@ -199,8 +199,8 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
     let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil)}
     let(:sample_max_aptc_1) {1200.00}
     let(:sample_csr_percent_1) {87}
-    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx3, applicant_id: family_member1.id, eligibility_date: TimeKeeper.date_of_record).beginning_of_month}
-    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: base_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record).beginning_of_month}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx3, applicant_id: family_member1.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: base_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.beginning_of_month)}
     let!(:hbx1) do
       FactoryBot.create(:hbx_enrollment,
                         family: family,
@@ -324,12 +324,17 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
   describe "verify APTC amount for prior year" do
     let(:start_on) {TimeKeeper.date_of_record.beginning_of_year - 1.year}
-    let(:family) {FactoryBot.create(:family, :with_nuclear_family)}
+    let(:current_year) {TimeKeeper.date_of_record.beginning_of_year}
     let(:household) {FactoryBot.create(:household, family: family)}
+    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
+    let(:family_member1) {FactoryBot.create(:family_member, family: household.family)}
+    let(:family_member2) {FactoryBot.create(:family_member, family: household.family)}
     let!(:eligibility_determination_1) {FactoryBot.create(:eligibility_determination, max_aptc: sample_max_aptc_1, determined_at: start_on + 8.months, tax_household: tax_household, csr_percent_as_integer: sample_csr_percent_1)}
-    let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year - 1,1,1), effective_ending_on: nil)}
+    let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil)}
     let(:sample_max_aptc_1) {1200.00}
     let(:sample_csr_percent_1) {87}
+    let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: hbx3, applicant_id: family_member1.id, eligibility_date: start_on)}
+    let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: base_enrollment, applicant_id: family_member2.id, eligibility_date: start_on)}
 
     let!(:hbx1) do
       FactoryBot.create(:hbx_enrollment,
@@ -382,7 +387,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
                         is_active: true,
                         aasm_state: 'shopping',
                         changing: false,
-                        effective_on: Date.new(TimeKeeper.date_of_record.year - 1, 12, 1))
+                        effective_on: start_on + 11.months)
     end
 
     before(:each) do
@@ -392,9 +397,9 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
     describe "calculated aggregate" do
       let(:params) { base_enrollment }
 
-      # it "returns yearly aggregate amount" do
-      #   expect(subject.success).to eq 11_977.41
-      # end
+      it "returns yearly aggregate amount" do
+        expect(subject.success).to eq 11_777.41
+      end
     end
   end
 end
