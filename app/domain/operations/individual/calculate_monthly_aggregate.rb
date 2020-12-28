@@ -91,7 +91,7 @@ module Operations
         if enrollment.subscriber.applicant_id.to_s == base_enrollment.subscriber.applicant_id.to_s
           base_enrollment.effective_on - 1.day
         else
-          base_enrollment.effective_on.end_of_year
+          enrollment.effective_on.end_of_year
         end
       end
 
