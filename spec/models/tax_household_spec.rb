@@ -654,7 +654,7 @@ RSpec.describe TaxHousehold, type: :model do
                               effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               aasm_state: 'coverage_selected',
                               household: family.active_household,
-                              applied_aptc_amount: 32.21)
+                              applied_aptc_amount: 300)
           end
 
           let!(:hbx_enrollment_member2) do
