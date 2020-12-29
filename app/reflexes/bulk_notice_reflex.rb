@@ -47,8 +47,9 @@ class BulkNoticeReflex < ApplicationReflex
     # this method loops through the given audience_ids and displays a normal badge or error badge if the types are wrong
     audience_ids.reduce('') do |badges, identifier|
       org_attrs = cache_or_fetch_org_attrs(identifier)
-      return badges if badges.include?(identifier) # already has a badge for this identifier
-      if org_attrs.key?(:error)
+      if badges.include?(identifier) # already has a badge for this identifier
+        badges
+      elsif org_attrs.key?(:error)
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], hbx_id: org_attrs[:hbx_id] })
       elsif org_attrs[:types].include?(audience_type)
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], hbx_id: org_attrs[:hbx_id] })
@@ -60,12 +61,13 @@ class BulkNoticeReflex < ApplicationReflex
 
   def cache_or_fetch_org_attrs(org_identifier)
     # this method accepts an org_identifier, which it uses to check for an existing cache or fetch the missing org with the given
-    # identifier, which should be either a FEIN or an HBX id
+    # identifier, which should be either a FEIN, Id or an HBX id
     session[:bulk_notice] ||= { audience: {} }
     return session[:bulk_notice][:audience][org_identifier] if session[:bulk_notice][:audience].key?(org_identifier)
 
     organization = BenefitSponsors::Organizations::Organization.where(fein: org_identifier).first ||
-                   BenefitSponsors::Organizations::Organization.where(hbx_id: org_identifier).first
+                   BenefitSponsors::Organizations::Organization.where(hbx_id: org_identifier).first ||
+                   BenefitSponsors::Organizations::Organization.where(id: org_identifier).first
     if organization
       session[:bulk_notice][:audience][organization.id.to_s] = { id: organization.id,
                                                                  legal_name: organization.legal_name,

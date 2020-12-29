@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers.rb")
 
 RSpec.describe BulkNoticeReflex, type: :reflex do
   describe "#new_identifier" do
@@ -53,6 +54,42 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
                                              hbx_id: '1236',
                                              profile_types: ['employer'])))
 
+          reflex.run(:new_identifier)
+        end
+
+        it 'will render a org badge for every match' do
+          expect(reflex).to have_received(:morph) do |_selector, raw|
+            html = Capybara::Node::Simple.new(raw)
+            expect(html).to have_css('span.badge-alt-blue', count: 3)
+          end
+        end
+      end
+    end
+
+    context 'of audience ids and identifiers' do
+      let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+      let(:organization_one)         do
+        profile = FactoryBot.create :benefit_sponsors_organizations_aca_shop_dc_employer_profile
+        profile.organization
+      end
+
+      let(:organization_two)         do
+        profile = FactoryBot.create :benefit_sponsors_organizations_aca_shop_dc_employer_profile
+        profile.organization
+      end
+
+      let(:organization_three)         do
+        profile = FactoryBot.create :benefit_sponsors_organizations_aca_shop_dc_employer_profile
+        profile.organization
+      end
+
+      let(:audience_ids) { [organization_three.id.to_s] }
+      let(:audience_type) { 'employer' }
+      let(:identifiers) { "#{organization_one.fein}\n#{organization_two.fein}" }
+      let(:session) { {} }
+
+      context 'all matches' do
+        before do
           reflex.run(:new_identifier)
         end
 
