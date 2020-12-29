@@ -172,7 +172,7 @@ Then(/I should see a security response success message/) do
 end
 
 And(/that a person with (.*) exists in EA/) do |role|
-
+  Person.create_indexes
   user = FactoryBot.create(:user)
   case role
   when 'Consumer'
