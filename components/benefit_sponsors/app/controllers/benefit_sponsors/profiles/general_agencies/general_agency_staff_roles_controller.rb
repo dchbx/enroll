@@ -3,6 +3,8 @@ module BenefitSponsors
     module GeneralAgencies
       class GeneralAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
 
+        layout 'bootstrap_4_two_column', :only => :new_staff_member
+
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
@@ -60,6 +62,24 @@ module BenefitSponsors
             flash[:error] = "Role was not removed because " + e.message
           end
           redirect_to profiles_general_agencies_general_agency_profile_path(id: params[:profile_id])
+        end
+
+        def new_staff_member
+          authorize User, :add_roles?
+          @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
+        end
+
+        def create_staff_member
+          authorize User, :add_roles?
+          staff_params = params.permit!["staff_member"].to_h
+          result = ::Operations::People::Roles::PersistStaff.new.call(params.permit!["staff_member"].to_h)
+          if result.success?
+            redirect_to main_app.show_roles_person_path(id: staff_params["person_id"])
+            flash[:notice] = result.value![:message]
+          else
+            redirect_to new_staff_member_profiles_general_agencies_general_agency_staff_roles_path(id: staff_params["person_id"])
+            flash[:error] = result.failure[:message]
+          end
         end
 
         def search_general_agency

@@ -22,6 +22,13 @@ RSpec.describe Validators::StaffContract, type: :model, dbclean: :after_each do
         expect(result.success?).to be_truthy
       end
     end
+
+    context 'without coverage record key' do
+      it 'should success' do
+        result = subject.call(params)
+        expect(result.success?).to be_truthy
+      end
+    end
   end
 
   context 'failure case' do

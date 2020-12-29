@@ -14,7 +14,7 @@ module Validators
       optional(:area_code).maybe(:string)
       optional(:number).maybe(:string)
       optional(:email).maybe(:string)
-      required(:coverage_record).schema do
+      optional(:coverage_record).schema do
         optional(:ssn).maybe(:string)
         optional(:dob).maybe(:date)
         optional(:hired_on).maybe(:date)
@@ -26,7 +26,7 @@ module Validators
     end
 
     rule(:coverage_record) do
-      if value[:is_applying_coverage]
+      if key? && value && value[:is_applying_coverage]
         address = value[:address]
         email = value[:email]
         if address&.is_a?(Hash)

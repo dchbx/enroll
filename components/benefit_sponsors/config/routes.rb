@@ -34,6 +34,8 @@ BenefitSponsors::Engine.routes.draw do
       resources :broker_agency_staff_roles do
         collection do
           get :search_broker_agency
+          get :new_staff_member
+          post :create_staff_member
         end
         member do
           get :approve
@@ -68,6 +70,8 @@ BenefitSponsors::Engine.routes.draw do
       resources :general_agency_staff_roles do
         collection do
           get :search_general_agency
+          get :new_staff_member
+          post :create_staff_member
         end
         member do
           get :approve

@@ -69,21 +69,54 @@ Then(/person should see employer home page/) do
   expect(page).to have_content('My Health Benefits Program')
 end
 
-Then(/person searches for (.*) employer/) do |legal_name|
+Then(/person searches for (.*) with name (.*)/) do |role, legal_name|
+  case role
+  when 'employer'
+    fill_in ManageAccount::Portals::EmployerStaff.employer_search, with: legal_name
+  when 'broker'
+    fill_in ManageAccount::Portals::BrokerStaff.broker_search, with: legal_name
+  when 'ga'
+    fill_in ManageAccount::Portals::GeneralAgencyStaff.general_agency_search, with: legal_name
+  end
+  click_button 'Search'
+end
+
+Then(/person searches for (.*) broker/) do |legal_name|
   fill_in ManageAccount::Portals::EmployerStaff.employer_search, with: legal_name
   click_button 'Search'
 end
 
-Then(/person clicks on select this employer/) do
-  click_link 'SELECT THIS EMPLOYER'
+Then(/person clicks on select this (.*)/) do |type|
+  case type
+  when 'employer'
+    click_link 'SELECT THIS EMPLOYER'
+  when 'broker'
+    click_link 'SELECT THIS BROKER'
+  when 'ga'
+    click_link 'SELECT THIS GENERAL AGENCY'
+  end
 end
 
-Then(/person clicks on submit application/) do
-  page.execute_script("document.querySelector('#employer-staff-btn').click()")
+Then(/person clicks on submit (.*) application/) do |app_type|
+  case app_type
+  when 'employer'
+    page.execute_script("document.querySelector('#employer-staff-btn').click()")
+  when 'broker'
+    page.execute_script("document.querySelector('#broker-staff-btn').click()")
+  when 'ga'
+    page.execute_script("document.querySelector('#general-agency-staff-btn').click()")
+  end
 end
 
-Then(/person should see success message/) do
-  expect(page).to have_content ManageAccount::Portals::EmployerStaff.success_message
+Then(/person should see (.*) success message/) do |role|
+  case role
+  when 'employer'
+    expect(page).to have_content ManageAccount::Portals::EmployerStaff.success_message
+  when 'broker'
+    expect(page).to have_content ManageAccount::Portals::BrokerStaff.success_message
+  when 'ga'
+    expect(page).to have_content ManageAccount::Portals::GeneralAgencyStaff.success_message
+  end
 end
 
 And(/person should see (.*)'s details under pending portals/) do |legal_name|
@@ -104,6 +137,14 @@ end
 
 Then(/person should be able to visit add new employer poc portal/) do
   visit benefit_sponsors.new_staff_member_profiles_employers_employer_staff_roles_path(id: @person.id)
+end
+
+Then(/person should be able to visit add new broker poc portal/) do
+  visit benefit_sponsors.new_staff_member_profiles_broker_agencies_broker_agency_staff_roles_path(id: @person.id)
+end
+
+Then(/person should be able to visit add new general agency poc portal/) do
+  visit benefit_sponsors.new_staff_member_profiles_general_agencies_general_agency_staff_roles_path(id: @person.id)
 end
 
 Then(/person should be able to see (.*) page/) do |text|
@@ -207,6 +248,14 @@ end
 
 Then(/person should see add new employer poc portal link/) do
   expect(page).to have_content('Employer POC')
+end
+
+Then(/person should see add new broker poc portal link/) do
+  expect(page).to have_content('Broker POC')
+end
+
+Then(/person should see add new general agency poc portal link/) do
+  expect(page).to have_content('General Agency POC')
 end
 
 Then(/person should see their (.*) information under active portals/) do |role|
