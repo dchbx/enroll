@@ -79,6 +79,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
       it "returns monthly aggregate amount" do
         expect(subject.success).to eq 3100.0
+        expect(base_enrollment.aggregate_aptc_amount).to eq Money.new(310000)
       end
     end
   end
@@ -132,6 +133,7 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
       it "returns monthly aggregate amount" do
         expect(subject.success).to eq 6745.05
+        expect(base_enrollment.aggregate_aptc_amount).to eq Money.new(674505)
       end
     end
   end
