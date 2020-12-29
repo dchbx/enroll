@@ -129,6 +129,7 @@ module Exchanges
           "tool_tip",
           "updated_by",
           "publish",
+          "other_reason",
           effective_on_kinds: []
         ]
       )
