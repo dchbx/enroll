@@ -52,7 +52,7 @@ module SponsoredBenefits
                 broker_agency_profile: account.broker_agency_profile,
                 status: 'Terminate'
               })
-              notify("acapi.info.events.employer.general_agent_terminated", {employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
+              notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
             end
           end
         end
@@ -172,7 +172,7 @@ module SponsoredBenefits
         broker_agency_profile_id = form.broker_agency_profile_id,
         bump_timestamp = false
       )
-        ts_bump = bump_timestamp ? 1 : 0
+        ts_bump = bump_timestamp ? 3 : 0
         timestamp = (Time.now + ts_bump.seconds).to_i
         plan_design_organization(id).general_agency_accounts.build(
           start_on: start_on,
