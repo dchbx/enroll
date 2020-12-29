@@ -3,6 +3,8 @@ module BenefitSponsors
     module BrokerAgencies
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
 
+        layout 'bootstrap_4_two_column', :only => :new_staff_member
+
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
@@ -65,6 +67,24 @@ module BenefitSponsors
         def search_broker_agency
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search(broker_staff_params)
           @broker_agency_profiles = @staff.broker_agency_search
+        end
+
+        def new_staff_member
+          authorize User, :add_roles?
+          @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
+        end
+
+        def create_staff_member
+          authorize User, :add_roles?
+          staff_params = params.permit!["staff_member"].to_h
+          result = ::Operations::People::Roles::PersistStaff.new.call(params.permit!["staff_member"].to_h)
+          if result.success?
+            redirect_to main_app.show_roles_person_path(id: staff_params["person_id"])
+            flash[:notice] = result.value![:message]
+          else
+            redirect_to new_staff_member_profiles_broker_agencies_broker_agency_staff_roles_path(id: staff_params["person_id"])
+            flash[:error] = result.failure[:message]
+          end
         end
 
         private

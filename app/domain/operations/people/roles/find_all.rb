@@ -133,9 +133,9 @@ module Operations
           case aasm_state.to_sym
           when :is_active, :active
             :active
-          when :is_applicant, :general_agency_pending, :broker_agency_pending
+          when :is_applicant, :general_agency_pending, :broker_agency_pending, :applicant
             :pending
-          when :is_closed, :general_agency_terminated, :broker_agency_terminated
+          when :is_closed, :general_agency_terminated, :broker_agency_terminated, :general_agency_declined, :denied, :decertified
             :inactive
           end
         end

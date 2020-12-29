@@ -30,7 +30,7 @@ module GeneralAgencyWorld
   end
 
   def general_agency_profile(legal_name = nil)
-    @general_agency_profile ||= general_agency_organization(legal_name).general_agency_profile if general_agency_organization(legal_name).present?
+    @general_agency_profile = general_agency_organization(legal_name).general_agency_profile if general_agency_organization(legal_name).present?
   end
 
   def assign_staff_to_general_agency(staff_name, legal_name)

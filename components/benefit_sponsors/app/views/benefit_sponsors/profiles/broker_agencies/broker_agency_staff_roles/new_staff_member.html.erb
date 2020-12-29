@@ -1,0 +1,10 @@
+<% content_for :navigation do %>
+  <%= render partial: 'ui-components/v1/navs/manage_account', locals: {person_id: @staff_member.person_id} %>
+<% end %>
+
+<div class="documents-tab" style="padding-top: 0px !important;">
+  <div class=" container personal-info-container no-pd">
+    <%= render partial: 'new_staff_member' %>
+  </div>
+
+</div>
