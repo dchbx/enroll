@@ -1,19 +1,21 @@
-Then(/Employee (.*) should click Manage Family/) do |named_person|
+# frozen_string_literal: true
+
+Then(/Employee (.*) should click Manage Family/) do |_named_person|
   find('a.interaction-click-control-manage-family').click
 end
 
-Then(/Employee (.*) should click the Personal Tab/) do |named_person|
+Then(/Employee (.*) should click the Personal Tab/) do |_named_person|
   find('a.interaction-click-control-personal').click
 end
 
-Then(/Employee (.*) should click Change my Password/) do |named_person|
+Then(/Employee (.*) should click Change my Password/) do |_named_person|
   if aca_security_questions
     wait_for_ajax
     page.execute_script("document.querySelector('#change_password_link').click()")
   end
 end
 
-Then(/Employee (.*) should click Update my security challenge responses/) do |named_person|
+Then(/Employee (.*) should click Update my security challenge responses/) do |_named_person|
   if aca_security_questions
     wait_for_ajax
     page.execute_script("document.querySelector('#update_security_responses_link').click()")
@@ -151,6 +153,10 @@ Then(/person should be able to visit add new employee portal/) do
   click_button 'Add Portal'
 end
 
+Then(/person should be able to visit add new consumer portal/) do
+  click_button 'Add New Portal'
+end
+
 And(/person with (.*) signs in and visits manage account/) do |role|
   @person ||= Person.where(first_name: role.split(/\s/)[0]).first
   user = @person.user
@@ -177,7 +183,13 @@ end
 
 Then(/person should see their indentifying information/) do
   expect(page).to have_content 'Personal Information'
-  expect(page).to have_text @person.first_name
+  first_name = @person.first_name
+  if first_name == 'GA'
+    first_name = 'General Agency'
+  else
+    first_name
+  end
+  expect(page).to have_text first_name
 end
 
 Then(/person enters ssn under personal information for (.*)/) do |named_person|
@@ -201,6 +213,10 @@ Then(/person should see their (.*) information under active portals/) do |role|
   display_name = @person.general_agency_staff_roles.present? ? @person.general_agency_staff_roles.first.general_agency_profile.legal_name : @person.full_name
   find(class: 'portal-label', text: display_name).visible?
   expect(page).to have_content(role.split(/\s/)[0])
+end
+
+Then(/^person should see newly created (.*) portal link$/) do |created_role|
+  expect(page).to have_content(created_role.split(/\s/)[0])
 end
 
 Then(/person should see his (.*) information/) do |role|
