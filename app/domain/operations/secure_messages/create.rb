@@ -31,7 +31,7 @@ module Operations
                    "#{Rails.application.routes.url_helpers.cartafact_document_download_path((message_params[:model_klass] || resource.class.to_s),
                                                                                             (message_params[:model_id] || resource.id.to_s), 'documents', document.id)}? \
                                                                                             content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" \
-                   " target='_blank'>" + document.title.gsub(/[^0-9a-z]/i,'') + "</a>"
+                   " target='_blank'>" + document.title.gsub(/[^0-9a-z.]/i,'') + "</a>"
                else
                  message_params[:body]
                end
