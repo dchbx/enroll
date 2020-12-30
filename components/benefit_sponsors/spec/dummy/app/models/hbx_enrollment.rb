@@ -608,12 +608,11 @@ class HbxEnrollment
     write_attribute(:hbx_id, HbxIdGenerator.generate_policy_id) if hbx_id.blank?
   end
 
-  def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
-    self.terminated_on ||= term_date
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
+  def propogate_cancel
+    # SHOP: Implement if we have requirement from buiness, event need to happen after cancel in shop.
+    # IVL: cancel renewals on cancelling active coverage.
+    return if is_shop?
+    ::EnrollRegistry[:cancel_renewals_for_term] { {hbx_enrollment: self} }
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
