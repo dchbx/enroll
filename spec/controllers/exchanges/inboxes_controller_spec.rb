@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe Exchanges::InboxesController do
   context "GET show / DELETE destroy" do
     let(:user) { double("User") }
-    let(:person) { double("Person") }
+    let(:person) { double("Person", agent?: false) }
     let(:hbx_profile) { double("HbxProfile") }
     let(:inbox) { double("Inbox") }
     let(:message){ double("Message", message_read: false ) }

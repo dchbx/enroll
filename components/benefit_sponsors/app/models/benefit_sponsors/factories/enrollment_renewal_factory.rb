@@ -24,6 +24,8 @@ module BenefitSponsors
         @sponsored_benefit  = new_benefit_package.sponsored_benefit_for(@base_enrollment.coverage_kind)
         @new_effective_on   = new_benefit_package.start_on
 
+        raise "Product not offered in renewal application" unless has_renewal_product?
+
         @renewal_enrollment = BenefitSponsors::Enrollments::EnrollmentBuilder.build do |builder|
 
           builder.init_enrollment(@base_enrollment.household)
@@ -49,6 +51,13 @@ module BenefitSponsors
         end
         @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members
         finalize_hbx_enrollment_members
+      end
+
+      def has_renewal_product?
+        return true if @base_enrollment.is_coverage_waived?
+
+        renewal_product = @base_enrollment.product.renewal_product
+        @sponsored_benefit.products(@new_effective_on).include?(renewal_product)
       end
 
       def finalize_hbx_enrollment_members

@@ -9,6 +9,10 @@ FactoryBot.define do
       profile.office_locations << build(:benefit_sponsors_locations_office_location, :with_massachusetts_address, :primary)
     end
 
+    after(:build) do |profile|
+      profile.inbox =  FactoryBot.build(:benefit_sponsors_inbox)
+    end
+
     transient do
       secondary_office_locations_count { 1 }
     end

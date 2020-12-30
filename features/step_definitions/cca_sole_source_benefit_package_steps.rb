@@ -34,7 +34,7 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
         kind: "work"
       }
     ),
-    :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "phone main"}),
+    :phone => BenefitSponsors::Locations::Phone.new({:area_code => "555", :number => "5555555", :kind => "work"}),
     is_primary: true
   })
   e_profile = ::BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.new({
@@ -52,7 +52,6 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
   @employer_profile = @employer_organization.profiles.first
   @benefit_sponsorship = @employer_profile.add_benefit_sponsorship
   @benefit_sponsorship.save!
-  service_areas = @benefit_sponsorship.service_areas_on(effective_date("start"))
   benefit_application = ::BenefitSponsors::BenefitApplications::BenefitApplicationFactory.call(
     @benefit_sponsorship,
     effective_period: (effective_date("start")..effective_date("end")),
@@ -61,7 +60,7 @@ Given (/^.*a CCA sole source employer health benefit package, in open enrollment
     pte_count: 0,
     msp_count: 0
   )
-  benefit_application.benefit_sponsor_catalog = @benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, benefit_application.effective_period.begin)
+  benefit_application.benefit_sponsor_catalog = @benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
   benefit_application.save!
   benefit_application.benefit_sponsor_catalog.save!
   @benefit_application = benefit_application

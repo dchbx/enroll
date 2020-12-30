@@ -1,0 +1,168 @@
+<div class="page-break">
+  <%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+  <table class="total_table address" border="0">
+    <tbody>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td><br></br></td>
+      </tr>
+      <tr>
+        <td>                   </td>
+      </tr>
+      <tr class="fssize1">
+        <td>                   </td>
+      </tr>
+      <tr>
+      <td>                   </td>
+      <tr>
+        <td>
+          <br>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <br>
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <br></br>
+      </tr>
+      <tr>
+        <td style="text-align: center"><h1><b>THIS IS A COVER PAGE</b></h1>
+        <hr style="height: 0px;  border-color: black; border-bottom: 0px; border-width: 1px 0 0 0;">
+        </td>
+      </tr>
+      <tr>
+        <td style="font-size: 18px; text-align: center;">
+          The enclosed letter has important information about your health or dental insurance, which may include steps you need to take to get or keep your insurance.
+        </td>
+      </tr>
+      <tr>
+        <br></br>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="total_table" border="0" style="margin-top: 260px;">
+    <tbody>
+      <tr>
+        <td><%= notice.mpi_indicator %></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="page-break">
+  <table class="total_table" border="0">
+    <tbody>
+      <tr>
+        <td style="color: #b3b3b3; font-size: 18px; text-align: center; padding-top: 300px;">
+          This page intentionally left blank.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<%= render partial: 'notices/shared/logo_and_address_shop', :locals => {notice: notice} %>
+<br>
+
+<table class="total_table address" border="0">
+  <tbody>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td><br></br></td>
+    </tr>
+    <tr>
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr class="fssize1">
+      <td>                   </td>
+    </tr>
+    <tr>
+    <td>                   </td>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% if (display_mpi_indicator.nil? && !notice.shop?) %>
+      <td style="text-align: right;"><%= notice.mpi_indicator %></td>
+    <% end %>
+    </tr>
+    <tr>
+      <td>
+        <br>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+  <tr>
+  <td></br></br></td>
+  </tr>
+    <tr class="wid50">
+      <td align="left"></td>
+    </tr>
+  <tr>
+  <td>                   </td>
+  </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td><h3>NOTICE - VOID FORM 1095-A TAX FORM</h3></td>
+    </tr>
+  </tbody>
+</table>
+
+<table class="total_table" border="0">
+  <tbody>
+    <tr>
+      <td>Dear                  </td>
+    </tr>
+  </tbody>
+</table>
+
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: "You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage.  After sending you that form, you or your insurance company told us you didn’t make any premium payments for the plan(s) with the Marketplace-assigned policy number(s) listed below. You’re receiving this notice and the enclosed voided Form 1095-A to reflect this updated information."} %>
+</br></br></br></br>
+<%= render partial: 'notices/shared/paragraph', :locals => {
+content: 'We have also told the IRS to disregard information we sent about your enrollment in the plan(s) listed above. You should not use the Form 1095-A for any of the above plans when you file your taxes.  This Form 1095-A is now void, as shown in the upper right corner of the enclosed form.  If you’ve already filed your taxes using this Form 1095-A, you may need to file an amended tax return.'} %>
+
+<% if notice.is_a_void_active_cover_letter %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Our records show that the plans with the Marketplace-assigned policy numbers listed below were active in #{previous_year}. The 1095-A Form(s) we sent you for the plan(s) listed below are still valid."} %>
+  </br></br></br></br>
+<% else %>
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: "Since you did not have other health coverage in #{previous_year}, you will not receive a new Form 1095-A for this tax year."} %>
+<% end %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
+ contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."], heading: 'If You Think This Form is Wrong', sub_heading: '', top_margin: '12px'} %>
+
+<%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
+ contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. #{Settings.site.short_name} cannot provide tax advice. For more information on these topics, consult a tax adviser."], heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+
+<div style="page-break-inside: avoid;">
+  <%= render partial: 'notices/shared/paragraph', :locals => {
+  content: 'If you have questions or concerns, we’re here to help.'} %>
+
+  <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
+  content: "The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>
+</div>
+
+<%= render partial: 'notices/shared/reference_paragraph', :locals => {
+contents: ['<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:',
+'DC individual mandate: DC Official Code §47-5102(a)',
+'Federal individual mandate: 26 U.S.C. §5000A',
+'Exchange requirement to send 1095-A: 26 U.S.C. §36B(f); 26 C.F.R. §1-36B-5',
+'Requirement to reconcile advance premium tax credit: 26 C.F.R. §1-36B-4']} %>

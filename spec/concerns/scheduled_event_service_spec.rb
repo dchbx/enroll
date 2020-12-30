@@ -5,11 +5,11 @@ describe "ScheduledEventService"  do
   context "Individual market kind" do
 
     it "should return settings day" do
-      expect(ScheduledEvent.individual_market_monthly_enrollment_due_on).to eq Setting.individual_market_monthly_enrollment_due_on
+      expect(ScheduledEvent.individual_market_monthly_enrollment_due_on).to eq EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
     end
 
     it "should return day from variable" do
-      expect(ScheduledEvent.instance_variable_get(:@individual_market_monthly_enrollment_due_on)).to eq Setting.individual_market_monthly_enrollment_due_on
+      expect(ScheduledEvent.instance_variable_get(:@individual_market_monthly_enrollment_due_on)).to eq EnrollRegistry[:special_enrollment_period].setting(:individual_market_monthly_enrollment_due_on).item
     end
 
     it "should return from scheduled_event day" do

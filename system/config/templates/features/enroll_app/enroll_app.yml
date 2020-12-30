@@ -1,0 +1,47 @@
+---
+registry:
+  - namespace:
+      - :features
+    features:
+      - key: :enroll_app
+        is_enabled: true
+        meta:
+          label: Enroll Application
+          content_type: :boolean
+          default: true
+          description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :application_name
+            item: "enroll_dc"
+          - key: :copyright_period_start
+            item: "2013"
+          - key: :policies_url
+            item: "https://dchealthlink.com/"
+          - key: :faqs_url
+            item: "https://dchealthlink.com/help"
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"
+          - key: :business_resource_center_url
+            item: "https://dchealthlink.com/smallbusiness/"
+          - key: :nondiscrimination_notice_url
+            item: "https://www.dchealthlink.com/nondiscrimination"
+          - key: :submit_docs_url
+            item: "https://www.dchealthlink.com/submit-docs"
+      - key: :pay_now_functionality
+        item: "kaiser_enabled"
+        is_enabled: true
+        settings:
+        - key: :carriers
+          item: 'Kaiser'
+      - key: :send_secure_message_family
+        item: :send_secure_message
+        is_enabled: true
+
+      - key: :sep_carousel_message
+        item: :sep_carousel
+        is_enabled: true
+        settings:
+          - key: :effective_period
+            item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>

@@ -41,7 +41,8 @@ module Forms
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
             termination_date = Date.strptime(params["termination_date_#{value}"], "%m/%d/%Y")
-            if termination_date >= ::TimeKeeper.date_of_record
+            # IVL enrollments go automatically to coverage_terminated
+            if termination_date >= ::TimeKeeper.date_of_record && hbx.is_shop?
               hbx.schedule_coverage_termination!(termination_date) if hbx.may_schedule_coverage_termination?
             elsif hbx.may_terminate_coverage?
               hbx.terminate_coverage!(termination_date)

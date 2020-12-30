@@ -73,6 +73,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
         "employee_profile.employer_name",
         "employee_profile.enrollment.waiver_plan_name",
         "employee_profile.enrollment.waiver_effective_on",
+        "employee_profile.enrollment_waiver_coverage_end_on",
         "employee_profile.broker.primary_fullname",
         "employee_profile.broker.organization",
         "employee_profile.broker.phone",
@@ -123,6 +124,10 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployeeWaiverConfirmation', dbcle
 
       it "should return waiver plan name" do
         expect(merge_model.enrollment.waiver_plan_name).to eq model_instance.product.name
+      end
+
+      it "should return waiver coverage end on" do
+        expect(merge_model.enrollment.waiver_coverage_end_on).to eq waived_enrollment.effective_on.prev_day.strftime('%m/%d/%Y')
       end
 
       it "should return waived effective on date" do

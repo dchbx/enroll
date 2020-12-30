@@ -146,7 +146,7 @@ module SponsoredBenefits
         let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
 
         it "should provide a valid open enrollment period for that effective date" do
-          expect(subject.open_enrollment_period_by_effective_date(effective_date)).to eq valid_open_enrollment_period
+          expect(subject.open_enrollment_period_by_effective_date(effective_date, false)).to eq valid_open_enrollment_period
         end
       end
 

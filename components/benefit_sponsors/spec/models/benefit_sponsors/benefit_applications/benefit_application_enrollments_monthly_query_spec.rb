@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery, :type => :model do
+RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery, :type => :model, dbclean: :after_each do
   let(:query) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentsMonthlyQuery.new(benefit_application) }
   let(:benefit_application) do
   	site = FactoryBot.create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key)
@@ -16,12 +16,14 @@ RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmen
       benefit_sponsorship.save
     end
     benefit_market = site.benefit_markets.first
+    issuer_profile = FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site)
     product_kinds = [:health, :dental]
     benefit_market_catalog = FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages,
         benefit_market: benefit_market,
         product_kinds: product_kinds,
         title: "SHOP Benefits for #{current_effective_date.year}",
-        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
+        application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year),
+        issuer_profile: issuer_profile
      )
     benefit_sponsorship = employer_profile.active_benefit_sponsorship
     aasm_state = :draft
@@ -41,7 +43,7 @@ RSpec.describe BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmen
       open_enrollment_period: application_dates[:open_enrollment_period],
       recorded_rating_area: rating_area,
    	  recorded_service_areas: [],
-      package_kind: package_kind
+      package_kind: package_kind,
     )
   end
   let(:person_with_family) { FactoryBot.create(:person, :with_family) }

@@ -1,0 +1,8 @@
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    features:
+      - key: :waived_members_eligiblity
+        item: :waived_members_eligiblity
+        is_enabled: true

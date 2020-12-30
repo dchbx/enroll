@@ -8,6 +8,7 @@ RSpec.describe InvitationsController do
   describe "GET claim" do
 
     before(:each) do
+      allow(user).to receive(:person).and_return nil
       sign_in(user)
       allow(Invitation).to receive(:find).with(invitation_id).and_return(invitation)
     end

@@ -10,6 +10,7 @@ FactoryBot.define do
     pre_event_sep_in_days { 0 }
     post_event_sep_in_days { 30 }
     is_self_attested { true }
+    is_visible { true }
     ordinal_position { 15 }
     tool_tip { "Enroll or add a family member because of marriage" }
 

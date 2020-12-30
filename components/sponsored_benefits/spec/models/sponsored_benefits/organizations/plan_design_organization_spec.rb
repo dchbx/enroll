@@ -117,6 +117,7 @@ module SponsoredBenefits
 
         context "active plan year present" do
           it "should return plan design proposal with renewal effective date and status" do
+            allow(employer_profile).to receive(:is_renewing_employer?).and_return false
             proposal = plan_design_organization.build_proposal_from_existing_employer_profile
             expect(proposal).to be_kind_of(SponsoredBenefits::Organizations::PlanDesignProposal)
             expect(proposal.effective_date).to eq start_on.next_year
@@ -128,6 +129,7 @@ module SponsoredBenefits
           let(:plan_year) { nil }
 
           it "should return plan design proposal with initial effective date and status" do
+            allow(employer_profile).to receive(:is_renewing_employer?).and_return false
             proposal = plan_design_organization.build_proposal_from_existing_employer_profile
             expect(proposal).to be_kind_of(SponsoredBenefits::Organizations::PlanDesignProposal)
             expect(proposal.effective_date).to eq calculated_dates[0]

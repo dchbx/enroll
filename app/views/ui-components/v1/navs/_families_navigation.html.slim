@@ -1,22 +1,26 @@
 nav
   ul#uic-families-right-menu
     li
-      = link_to l10n("my_site_short_name", site_short_name: site_short_name), family_account_path(tab: 'home')
+      = link_to l10n("my_site_short_name", site_short_name: site_short_name), main_app.family_account_path(tab: 'home')
     - if ( @person.has_active_employee_role? && @employee_role.employer_profile.broker_agency_profile.present?) || ( @person.has_active_consumer_role? &&  @person.primary_family.current_broker_agency.present? )
       li 
-        = link_to l10n("my_broker"), brokers_insured_families_path(tab: 'broker')
+        = link_to l10n("my_broker"), main_app.brokers_insured_families_path(tab: 'broker')
     - if any_members_with_consumer_role?(@family_members)
       li
-        = link_to verification_insured_families_path(tab: 'verification') do
+        = link_to main_app.verification_insured_families_path(tab: 'verification') do
           = l10n("documents")
           - if enrollment_group_unverified?(@person)
             span.badge.message-unread = l10n("action_needed")
+    - if @person.has_consumer_role? && EnrollRegistry.feature_enabled?(:financial_assistance)
+      li
+        = link_to financial_assistance.applications_path(tab: 'cost_savings') do
+          = l10n("cost_savings")
     - if current_user.has_hbx_staff_role? && has_active_resident_members?(@family_members)
       li
-        = link_to upload_application_insured_families_path(tab: 'verification') do
+        = link_to main_app.upload_application_insured_families_path(tab: 'verification') do
           = l10n("upload_paper_application")
     li
-      = link_to(inbox_insured_families_path(tab: 'messages')) do
+      = link_to(main_app.inbox_insured_families_path(tab: 'messages')) do
         = l10n("messages") 
         span.badge.message-unread.ml-half
           = @person.inbox.unread_messages.size
@@ -34,7 +38,7 @@ nav
         - @family_members.each do |f|
           span.twelve.ttc #{f.first_name} #{f.last_name}
           br
-      = link_to l10n("manage_family"), manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block mt-1'
+      = link_to l10n("manage_family"), main_app.manage_family_insured_families_path(tab: 'family'), class: 'btn btn-default btn-block mt-1'
           
 
       

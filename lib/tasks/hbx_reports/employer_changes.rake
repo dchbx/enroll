@@ -64,7 +64,7 @@ namespace :reports do
               select{|address| address.updated_at.strftime('%Y-%m-%d') != organization.created_at.strftime('%Y-%m-%d')}
           # select organiztaion phone number where phone number upadated in date range and exculding organization whose phone number updated on same day of  created date.
           phone_number_change = organization.office_locations.
-              where(:"phone.kind".in => ["phone main"],:"phone.updated_at" => date_range).flat_map(&:phone).
+              where(:"phone.kind".in => ["work"],:"phone.updated_at" => date_range).flat_map(&:phone).
               select{|phone| phone.updated_at.strftime('%Y-%m-%d') != organization.created_at.strftime('%Y-%m-%d')}
           # select organiztaion old broker(whose is_active=false) in date range and exculding organization broker when created date == updated date are same.
           old_broker = organization.employer_profile.broker_agency_accounts.unscoped.

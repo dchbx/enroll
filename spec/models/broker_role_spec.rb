@@ -181,18 +181,65 @@ describe BrokerRole, dbclean: :around_each do
       end
 
       context "and is denied by the HBX" do
-        before do
-          registered_broker_role.deny
-        end
 
         it "should transition to denied status" do
+          registered_broker_role.deny
           expect(registered_broker_role.aasm_state).to eq "denied"
         end
 
         it "should record the transition" do
+          registered_broker_role.deny
           expect(registered_broker_role.workflow_state_transitions.size).to eq 2
           expect(registered_broker_role.workflow_state_transitions.last.from_state).to eq "applicant"
           expect(registered_broker_role.workflow_state_transitions.last.to_state).to eq "denied"
+        end
+
+        it 'should transition from application_extended to denied' do
+          registered_broker_role.update_attributes(aasm_state: 'application_extended')
+          registered_broker_role.deny
+        end
+      end
+
+      context 'extend broker application' do
+
+        it 'should transition denied broker to application_extended' do
+          registered_broker_role.deny!
+          registered_broker_role.extend_application!
+          expect(registered_broker_role.aasm_state).to eq 'application_extended'
+        end
+
+        it 'should transition pending broker to application_extended' do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+          registered_broker_role.pending!
+          registered_broker_role.extend_application!
+          expect(registered_broker_role.aasm_state).to eq 'application_extended'
+        end
+
+        it 'should transition application_extended broker to application_extended' do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+          registered_broker_role.pending!
+          registered_broker_role.extend_application!
+          registered_broker_role.extend_application!
+          expect(registered_broker_role.aasm_state).to eq 'application_extended'
+        end
+      end
+
+      context 'broker agency accept' do
+        before :each do
+          allow(registered_broker_role).to receive(:is_primary_broker?).and_return(true)
+        end
+
+        it "should transition from broker_agency_pending to active status" do
+          registered_broker_role.pending!
+          registered_broker_role.broker_agency_accept!
+          expect(registered_broker_role.aasm_state).to eq "active"
+        end
+
+        it "should transition from application_extended to active status" do
+          registered_broker_role.pending!
+          registered_broker_role.extend_application!
+          registered_broker_role.broker_agency_accept!
+          expect(registered_broker_role.aasm_state).to eq "active"
         end
       end
 
@@ -284,11 +331,11 @@ describe BrokerRole, dbclean: :around_each do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
         expect(b1.phone.to_s).to eq b1.broker_agency_profile.phone
       end
-      it 'should return main office phone' do
+      it 'should return work phone' do
         b1 = BrokerRole.create(person: person0, npn: 10000000+rand(10000), provider_kind: provider_kind, broker_agency_profile: @ba)
-        person0.phones[1].update_attributes!(kind: 'phone main')
+        person0.phones[1].update_attributes!(kind: 'work')
         expect(b1.phone.to_s).not_to eq b1.broker_agency_profile.phone
-        expect(b1.phone.to_s).to eq person0.phones.where(kind: "phone main").first.to_s
+        expect(b1.phone.to_s).to eq person0.phones.where(kind: "work").first.to_s
       end
 
       it 'should return work phone if office phone & broker agency profile phone not present' do

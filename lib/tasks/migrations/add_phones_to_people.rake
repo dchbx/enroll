@@ -34,7 +34,7 @@ def phones
         "number" => "4288410",
         "extension" => nil,
         "full_phone_number" => "8014288410",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     },
 
@@ -46,7 +46,7 @@ def phones
         "number" => "3879162",
         "extension" => nil,
         "full_phone_number" => "2023879162",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     },
 
@@ -58,7 +58,7 @@ def phones
         "number" => "2847705",
         "extension" => nil,
         "full_phone_number" => "3232847705",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     },
 
@@ -70,7 +70,7 @@ def phones
         "number" => "2666850",
         "extension" => nil,
         "full_phone_number" => "8772666850",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     },
 
@@ -82,7 +82,7 @@ def phones
         "number" => "6224600",
         "extension" => nil,
         "full_phone_number" => "6036224600",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     },
 
@@ -94,7 +94,7 @@ def phones
         "number" => "2146718",
         "extension" => nil,
         "full_phone_number" => "3012146718",
-        "kind" => "phone main"
+        "kind" => "work"
       }
     }
   }

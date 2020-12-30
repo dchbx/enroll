@@ -52,7 +52,7 @@ module BenefitSponsors::Importers
         effective_period: (current_effective_date..current_effective_date.next_year.prev_day)
         )
       application.pull_benefit_sponsorship_attributes
-      application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(application.resolve_service_areas, application.effective_period.begin)
+      application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(application.effective_period.begin)
       catalog = application.benefit_sponsor_catalog
       catalog.benefit_application = application
       catalog.save

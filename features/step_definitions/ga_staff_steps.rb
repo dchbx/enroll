@@ -6,7 +6,8 @@ When(/^GA staff enters his personal information$/) do
   fill_in 'staff[last_name]', with: 'Martin'
   fill_in 'staff[dob]', with: '10/10/1984'
   find('#inputEmail').click
-  fill_in 'staff[email]', with: 'ricky.martin@example.com'
+  @staff_email = 'ricky.martin@example.com'
+  fill_in 'staff[email]', with: @staff_email
 end
 
 Then(/^GA Staff should see the General Agency Staff Registration form$/) do
@@ -62,16 +63,12 @@ Then(/^the primary staff should see the staff successfully removed message$/) do
 end
 
 Then /^new ga staff should receive an email$/ do
-  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
-  open_email(staff.email_address)
+  open_email(@staff_email)
 end
 
 When /^new ga staff visits the link received in the approval email$/ do
-  staff = general_agency_organization.general_agency_profile.general_agency_staff_roles.last
-  email_address = staff.email_address
-
-  open_email(email_address)
-  expect(current_email.to).to eq([email_address])
+  open_email(@staff_email)
+  expect(current_email.to).to eq([@staff_email])
 
   invitation_link = links_in_email(current_email).first
   invitation_link.sub!(/http\:\/\/127\.0\.0\.1\:3000/, '')
@@ -79,8 +76,7 @@ When /^new ga staff visits the link received in the approval email$/ do
 end
 
 When /^new ga staff completes the account creation form and hit the 'Submit' button$/ do
-  email_address = general_agency_organization.general_agency_profile.general_agency_staff_roles.last.email_address
-  fill_in "user[oim_id]", with: email_address
+  fill_in "user[oim_id]", with: @staff_email
   fill_in "user[password]", with: "aA1!aA1!aA1!"
   fill_in "user[password_confirmation]", with: "aA1!aA1!aA1!"
   find('.create-account-btn', wait: 10).click

@@ -31,7 +31,11 @@ module Notifier
     def enrollment_waiver_coverage_end_on
       return if parent_enrollment.blank?
 
-      merge_model.enrollment.waiver_coverage_end_on = parent_enrollment.terminated_on
+      merge_model.enrollment.waiver_coverage_end_on = if parent_enrollment.terminated_on.present?
+                                                        parent_enrollment.terminated_on
+                                                      else
+                                                        enrollment.effective_on.prev_day
+                                                      end
     end
 
     def enrollment_waiver_effective_on

@@ -61,7 +61,7 @@ attributes: !ruby/hash:BSON::Document
         _id: !ruby/object:BSON::ObjectId
           raw_data: !binary |-
             WxWP5p+ICzHOaecy
-        kind: phone main
+        kind: work
         country_code: ''
         area_code: '413'
         number: '7884226'

@@ -242,9 +242,13 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
     end
 
     context "Should update effective period and approve initial benefit application", dbclean: :after_each do
-      let(:effective_date) { predecessor_application.effective_period.min }
+      let(:current_effective_date)   { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+
+      let(:effective_date) { current_effective_date.prev_year }
       let(:new_start_date) { effective_date.next_month }
       let(:new_end_date) { new_start_date + 1.year }
+      let(:display_name) { 'Employee' }
+      let!(:contribution_unit)  { predecessor_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }      
 
       around do |example|
         ClimateControl.modify(
@@ -267,6 +271,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect(predecessor_application.end_on.to_date).to eq new_end_date
         expect(predecessor_application.aasm_state).to eq :approved
         expect(predecessor_application.benefit_sponsorship.aasm_state).to eq :applicant
+        cl = predecessor_application.benefit_packages[0].health_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: display_name).first
+        expect(contribution_unit.id).to eq cl.contribution_unit_id
       end
 
       it "should not update the initial benefit application" do
@@ -312,6 +318,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
       let(:new_start_date) { (effective_date + 2.months).beginning_of_month}
       let(:new_end_date) { new_start_date + 1.year }
       let(:current_effective_date)  { TimeKeeper.date_of_record }
+      let(:display_name) { 'Employee' }
+      let!(:contribution_unit)  { renewal_application.benefit_packages[0].health_sponsored_benefit.contribution_model.contribution_units.where(display_name: display_name).first }
 
       around do |example|
         ClimateControl.modify(
@@ -334,6 +342,8 @@ RSpec.describe ModifyBenefitApplication, dbclean: :after_each do
         expect(renewal_application.end_on.to_date).to eq new_end_date
         expect(renewal_application.aasm_state).to eq :approved
         expect(renewal_application.benefit_sponsorship.aasm_state).to eq :active
+        cl = renewal_application.benefit_packages[0].health_sponsored_benefit.sponsor_contribution.contribution_levels.where(display_name: display_name).first
+        expect(contribution_unit.id).to eq cl.contribution_unit_id
       end
 
       it "should not update the renewing benefit application" do

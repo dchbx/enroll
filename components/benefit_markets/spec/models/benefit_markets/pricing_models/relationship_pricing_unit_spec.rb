@@ -36,6 +36,11 @@ module BenefitMarkets
       end
 
       subject { pricing_model; pricing_unit }
+
+      before do
+        allow(subject).to receive(:pricing_model).and_return(pricing_model)
+      end
+
       it "is invalid" do
         expect(subject.valid?).to be_falsey
       end

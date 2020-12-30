@@ -258,10 +258,10 @@ module SponsoredBenefits
           calculate_start_on_dates.map {|date| [date.strftime("%B %Y"), date.to_s(:db) ]}
         end
 
-        def enrollment_timetable_by_effective_date(effective_date)
+        def enrollment_timetable_by_effective_date(effective_date, renewal_employer)
           effective_date            = effective_date.to_date.beginning_of_month
           effective_period          = effective_date..(effective_date + 1.year - 1.day)
-          open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date)
+          open_enrollment_period    = open_enrollment_period_by_effective_date(effective_date, renewal_employer)
           prior_month               = effective_date - 1.month
           binder_payment_due_on     = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
 
@@ -318,12 +318,18 @@ module SponsoredBenefits
         end
 
 
-        def open_enrollment_period_by_effective_date(effective_date)
+        def open_enrollment_period_by_effective_date(effective_date, renewal_employer)
           earliest_begin_date = effective_date - Settings.aca.shop_market.open_enrollment.maximum_length.months.months # toDo - check
           prior_month = effective_date - 1.month
 
-          begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
-          end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
+          if renewal_employer
+            begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
+            end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on + 3)
+          else
+            begin_on = Date.new(earliest_begin_date.year, earliest_begin_date.month, 1)
+            end_on   = Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.open_enrollment.monthly_end_on)
+          end
+
           begin_on..end_on
         end
 
@@ -384,7 +390,7 @@ module SponsoredBenefits
 
       def update_benefit_sponsor_catalog(benefit_application, benefit_sponsorship)
         #update benefit sponsor catalog details
-        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+        benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin)
         catalog = benefit_application.benefit_sponsor_catalog
         catalog.benefit_application = benefit_application
         catalog.save

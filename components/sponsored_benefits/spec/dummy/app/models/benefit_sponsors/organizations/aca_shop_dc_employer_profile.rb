@@ -12,6 +12,9 @@ module BenefitSponsors
         # Fix this
       end
 
+      def active_plan_year
+      end
+
       # def census_employees
       #   CensusEmployee.find_by_employer_profile(self)
       # end

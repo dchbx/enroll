@@ -120,7 +120,7 @@ class BenefitGroupAssignment
 
   def covered_families
     Family.where(:"_id".in => HbxEnrollment.where(
-      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id) 
+      benefit_group_assignment_id: BSON::ObjectId.from_string(self.id)
     ).pluck(:family_id)
   )
   end
@@ -153,7 +153,7 @@ class BenefitGroupAssignment
 
     if census_employee.cobra_begin_date.present?
       coverage_terminated_on = census_employee.cobra_begin_date.prev_day
-      hbx_enrollments = hbx_enrollments.select do |e| 
+      hbx_enrollments = hbx_enrollments.select do |e|
         e.effective_on < census_employee.cobra_begin_date && (e.terminated_on.blank? || e.terminated_on == coverage_terminated_on)
       end
     end
@@ -208,7 +208,12 @@ class BenefitGroupAssignment
 
   def hbx_enrollment
     return @hbx_enrollment if defined? @hbx_enrollment
-    @hbx_enrollment = HbxEnrollment.where(id: self.hbx_enrollment_id).first if hbx_enrollment_id.present?
+    @hbx_enrollment =
+      if hbx_enrollment_id.present?
+        HbxEnrollment.where(id: hbx_enrollment_id).first
+      else
+        hbx_enrollments.max_by(&:created_at)
+      end
   end
 
   def end_benefit(end_on)
@@ -341,7 +346,7 @@ class BenefitGroupAssignment
 
   def date_guards
     return if benefit_package.blank? || start_on.blank?
-    
+
     errors.add(:start_on, "can't occur outside plan year dates") unless benefit_package.effective_period.cover?(start_on)
     if end_on.present?
       errors.add(:end_on, "can't occur outside plan year dates") unless benefit_package.effective_period.cover?(end_on)

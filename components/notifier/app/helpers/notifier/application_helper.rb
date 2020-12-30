@@ -73,5 +73,10 @@ module Notifier
     def ivl_voter_application
       Settings.notices.individual.attachments.voter_application
     end
+
+    def calculate_age_by_dob(dob)
+      now = TimeKeeper.date_of_record
+      now.year - dob.year - (now.month > dob.month || (now.month == dob.month && now.day >= dob.day) ? 0 : 1)
+    end
   end
 end

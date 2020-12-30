@@ -14,7 +14,7 @@ module BenefitSponsors
 
     let!(:rating_area) { create_default(:benefit_markets_locations_rating_area) }
     let(:benefit_renewal_event) { "acapi.info.events.benefit_sponsorship.execute_benefit_renewal" }
-    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
     let(:aasm_state) { :active }
     let(:correlation_id) { "a correlation id" }
 

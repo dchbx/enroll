@@ -76,7 +76,7 @@ module BenefitSponsors
       def process_applications_missing_binder_payment
         application_effective_date = new_date.next_month.beginning_of_month
         scheduler = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        binder_next_day = scheduler.calculate_open_enrollment_date(application_effective_date)[:binder_payment_due_date].next_day
+        binder_next_day = scheduler.calculate_open_enrollment_date(false, application_effective_date)[:binder_payment_due_date].next_day
 
         if new_date == binder_next_day
           benefit_sponsorships = BenefitSponsorships::BenefitSponsorship.may_transition_as_initial_ineligible?(application_effective_date)
@@ -101,22 +101,23 @@ module BenefitSponsors
 
       def auto_transmit_monthly_benefit_sponsors
         if aca_shop_market_transmit_scheduled_employers
-          if (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month
+          if (new_date.prev_day.mday + 1) >= aca_shop_market_employer_transmission_day_of_month
             transmit_scheduled_benefit_sponsors(new_date)
           end
         end
       end
 
       def transmit_scheduled_benefit_sponsors(new_date, feins=[])
-        start_on = new_date.next_month.beginning_of_month
+        start_on = new_date.prev_day.next_month.beginning_of_month
+        transition_at = (new_date.prev_day.mday + 1) == aca_shop_market_employer_transmission_day_of_month ? nil : new_date.prev_day
         benefit_sponsors = BenefitSponsors::BenefitSponsorships::BenefitSponsorship
         benefit_sponsors = benefit_sponsors.find_by_feins(feins) if feins.any?
 
-        renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on)
+        renewal_benefit_sponsorships = benefit_sponsors.may_transmit_renewal_enrollment?(start_on, transition_at)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_eligible_event)
         execute_sponsor_event(renewal_benefit_sponsorships, :transmit_renewal_carrier_drop_event) if aca_shop_market_transmit_employer_carrier_drop_events
 
-        initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on)
+        initial_benefit_sponsorships = benefit_sponsors.may_transmit_initial_enrollment?(start_on, transition_at)
         execute_sponsor_event(initial_benefit_sponsorships, :transmit_initial_eligible_event)
       end
 
@@ -130,7 +131,9 @@ module BenefitSponsors
       private
 
       def execute_sponsor_event(benefit_sponsorships, event)
+        notify_logger("Event: #{event}. Process started at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
         BenefitSponsors::BenefitSponsorships::BenefitSponsorshipDirector.new(new_date).process(benefit_sponsorships, event)
+        notify_logger("Event: #{event}. Process ended at #{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%m-%d-%Y %H:%M:%S')}")
       end
 
       def process_events_for(&block)
@@ -144,6 +147,11 @@ module BenefitSponsors
 
       def initialize_logger
         @logger = Logger.new("#{Rails.root}/log/aca_shop_scheduled_events.log") unless defined? @logger
+      end
+
+      def notify_logger(message)
+        @logger.info(message)
+        log(message) unless Rails.env.test?
       end
     end
   end

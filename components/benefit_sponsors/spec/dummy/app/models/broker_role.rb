@@ -89,7 +89,9 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+    parent.phones.where(kind: "work").first || parent.phones.where(kind: "main").first || broker_agency_profile.phone
+  rescue StandardError => _e
+    ""
   end
 
   def email
@@ -104,6 +106,59 @@ class BrokerRole
     state :broker_agency_pending
     state :broker_agency_declined
     state :broker_agency_terminated
+    state :application_extended
+
+    event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
+      transitions from: [:applicant, :application_extended], to: :active, :guard => :is_primary_broker?
+      transitions from: :broker_agency_pending, to: :active, :guard => :is_primary_broker?
+      transitions from: :applicant, to: :broker_agency_pending
+    end
+
+    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
+      transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
+      transitions from: :broker_agency_pending, to: :broker_agency_pending, :guard => :is_primary_broker?
+    end
+
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do
+      transitions from: :broker_agency_pending, to: :active
+    end
+
+    event :broker_agency_decline, :after => :record_transition do
+      transitions from: :broker_agency_pending, to: :broker_agency_declined
+    end
+
+    event :broker_agency_terminate, :after => [:record_transition, :remove_broker_assignments] do
+      transitions from: :active, to: :broker_agency_terminated
+    end
+
+    event :deny, :after => [:record_transition, :notify_broker_denial]  do
+      transitions from: :applicant, to: :denied
+      transitions from: :broker_agency_pending, to: :denied
+    end
+
+    event :decertify, :after => [:record_transition, :remove_broker_assignments]  do
+      transitions from: :active, to: :decertified
+    end
+
+    # Attempt to achieve or return to good standing with HBX
+    event :reapply, :after => :record_transition  do
+      transitions from: [:applicant, :decertified, :denied, :broker_agency_declined], to: :applicant
+    end
+
+    # Moves between broker agency organizations that don't require HBX re-certification
+    event :transfer, :after => :record_transition  do
+      transitions from: [:active, :broker_agency_pending, :broker_agency_terminated], to: :applicant
+    end
+
+    # Not currently supported in UI.   Datafix only person.broker_role.recertify! refs #12398
+    event :recertify, :after => :record_transition do
+      transitions from: :decertified, to: :active
+    end
+
+    # Extends the broker application denial time
+    event :extend_application, :after => :record_transition do
+      transitions from: [:broker_agency_pending, :denied], to: :application_extended
+    end
   end
   
   class << self
@@ -136,6 +191,16 @@ class BrokerRole
       end
     end
 
+  end
+
+  private
+
+  def is_primary_broker?
+    return false unless broker_agency_profile
+    broker_agency_profile.primary_broker_role == self
+  end
+
+  def record_transition
   end
 
 end

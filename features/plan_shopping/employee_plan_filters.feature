@@ -1,9 +1,9 @@
 Feature: Employee products sorted when employee click on Plan name, Premium Amount, Deductible and Carrier.
-  Given Employer exists with enrolling plan year
-  Given New Employee is on Census Employee Roster
-  Given New Employee claimed his employee role
-  Then Employee goes for plan shopping
-  And Employee should be able to see available products and sorting enabled
+    Given Employer exists with enrolling plan year
+    Given New Employee is on Census Employee Roster
+    Given New Employee claimed his employee role
+    Then Employee goes for plan shopping
+    And Employee should be able to see available products and sorting enabled
 
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market

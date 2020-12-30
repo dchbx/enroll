@@ -1,0 +1,41 @@
+admin_user = User.where(:email => "admin@dc.gov").first
+
+permission = admin_user.person.hbx_staff_role.permission
+
+permission.update_attributes!({
+  modify_family: true,
+  modify_employer: true,
+  revert_application: true,
+  list_enrollments: true,
+  send_broker_agency_message: true,
+  approve_broker: true,
+  approve_ga: true,
+  modify_admin_tabs: true,
+  view_admin_tabs: true,
+  can_update_ssn: true,
+  can_complete_resident_application: true,
+  can_add_sep: true,
+  can_add_pdc: true,
+  can_lock_unlock: true,
+  can_view_username_and_email: true,
+  can_transition_family_members: true,
+  can_access_user_account_tab: true,
+  view_login_history: true,
+  can_reset_password: true,
+  can_extend_open_enrollment: true,
+  can_modify_plan_year: true,
+  can_create_benefit_application: true,
+  can_change_fein: true,
+  can_force_publish: true,
+  view_the_configuration_tab: true,
+  can_submit_time_travel_request: true,
+  can_view_application_types: true,
+  view_personal_info_page: true,
+  can_access_new_consumer_application_sub_tab: true,
+  can_access_outstanding_verification_sub_tab: true,
+  can_access_identity_verification_sub_tab: true,
+  can_access_accept_reject_identity_documents: true,
+  can_access_accept_reject_paper_application_documents: true,
+  can_delete_identity_application_documents: true,
+  can_access_pay_now: true
+})

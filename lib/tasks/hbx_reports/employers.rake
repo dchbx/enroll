@@ -12,7 +12,7 @@ namespace :reports do
       # census_employees = CensusEmployee.find_all_terminated(date_range: date_range)
       #employer_profiles = EmployerProfile.all
       # orgs = Organization.exists(employer_profile: true).order_by([:legal_name])
-      organizations = BenefitSponsors::Organizations::Organization.employer_profiles.order_by([:legal_name])
+      organizations = BenefitSponsors::Organizations::Organization.employer_profiles
 
       field_names  = %w(
           fein
@@ -58,7 +58,7 @@ namespace :reports do
             fein                  = er.fein
             legal_name            = er.legal_name
             dba                   = er.dba
-            employer_aasm_state   = er.aasm_state
+            employer_aasm_state   = ''
 
             staff_role = er.staff_roles.first
             if staff_role

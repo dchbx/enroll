@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 class DummyNoticeKind
-  attr_accessor :title, :event_name, :resource, :market_kind, :notice_number, :notice_path, :notice_type
+  attr_accessor :title, :event_name, :resource, :market_kind, :notice_number, :notice_path
   include Notifier::NoticeBuilder
 
   def initialize(params)
@@ -41,10 +41,8 @@ module Notifier
           allow(File).to receive(:delete)
           allow(subject).to receive(:resource).and_return(resource)
           allow(subject).to receive(:notice_path).and_return("notice_path")
-          allow(subject).to receive(:notice_type).and_return("notice")
           allow(Aws::S3Storage).to receive(:save).and_return(doc_uri)
         end
-
 
         context "ivl_market" do
           let(:resource) { ConsumerRole.new }
@@ -54,6 +52,7 @@ module Notifier
             allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
             allow(subject).to receive(:shop_market?).and_return(false)
             subject.store_paper_notice
+            expect(notice_filename_for_paper_notice).to include("IVL")
             expect(Aws::S3Storage).to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
           end
 
@@ -62,6 +61,7 @@ module Notifier
             allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
             allow(subject).to receive(:shop_market?).and_return(false)
             subject.store_paper_notice
+            expect(notice_filename_for_paper_notice).to include("IVL")
             expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
           end
         end
@@ -93,6 +93,7 @@ module Notifier
                 allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
                 allow(subject).to receive(:shop_market?).and_return(true)
                 subject.store_paper_notice
+                expect(notice_filename_for_paper_notice).to include("EE")
                 expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
               end
 
@@ -101,6 +102,7 @@ module Notifier
                 allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
                 allow(subject).to receive(:shop_market?).and_return(true)
                 subject.store_paper_notice
+                expect(notice_filename_for_paper_notice).to include("EE")
                 expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
               end
             end
@@ -132,6 +134,7 @@ module Notifier
                 allow(resource).to receive(:can_receive_paper_communication?).and_return(true)
                 allow(subject).to receive(:shop_market?).and_return(true)
                 subject.store_paper_notice
+                expect(notice_filename_for_paper_notice).to include("ER")
                 expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
               end
 
@@ -140,6 +143,7 @@ module Notifier
                 allow(resource).to receive(:can_receive_paper_communication?).and_return(false)
                 allow(subject).to receive(:shop_market?).and_return(true)
                 subject.store_paper_notice
+                expect(notice_filename_for_paper_notice).to include("ER")
                 expect(Aws::S3Storage).not_to have_received(:save).with(notice_path_for_paper_notice, bucket_name, notice_filename_for_paper_notice)
               end
             end
@@ -159,6 +163,33 @@ module Notifier
 
         it "should receive send_generic_notice_alert" do
           expect(UserMailer).to have_received(:generic_notice_alert)
+        end
+      end
+
+      describe 'inserts' do
+
+        context 'for IVL inserts' do
+
+          before do
+            allow(subject).to receive(:notice_path).and_return('tt_notice_path')
+            allow(subject).to receive(:join_pdfs).and_return(true)
+          end
+
+          context 'ivl_non_discrimination' do
+            it {expect(subject.ivl_non_discrimination).to be_truthy}
+          end
+
+          context 'ivl_taglines' do
+            it {expect(subject.ivl_taglines).to be_truthy}
+          end
+
+          context 'ivl_attach_envelope' do
+            it {expect(subject.ivl_attach_envelope).to be_truthy}
+          end
+
+          after do
+            File.delete('tt_notice_path') if File.exist?('tt_notice_path')
+          end
         end
       end
     end

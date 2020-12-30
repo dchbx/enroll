@@ -20,15 +20,15 @@ RSpec.describe "app/views/events/v2/organizations/_office_location.xml.haml" do
       end
 
       # temporary spec for phone kind
-      context "kind = phone main" do
+      context "kind = work" do
         before :each do
           office_location.address.kind="primary"
-          office_location.phone.kind="phone main"
+          office_location.phone.kind="work"
           render :template => "events/v2/organizations/_office_location.xml.haml", :locals => {:office_location => office_location}
           @doc = Nokogiri::XML(rendered)
         end
 
-        it "should have type as work for phone main kind" do
+        it "should have type as work for work kind" do
           expect(@doc.xpath("//phone/type").first.text).to eq "urn:openhbx:terms:v1:phone_type#work"
         end
       end

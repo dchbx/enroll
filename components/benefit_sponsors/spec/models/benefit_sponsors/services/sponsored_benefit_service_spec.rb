@@ -12,6 +12,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService, dbclean: :aft
   let(:current_effective_date)  { TimeKeeper.date_of_record }
   let(:benefit_market)      { site.benefit_markets.first }
   let(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
+    issuer_profile: issuer_profile,
     benefit_market: benefit_market,
     title: "SHOP Benefits for #{current_effective_date.year}",
     application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
@@ -262,11 +263,13 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService, dbclean: :aft
     let(:current_effective_date)  { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
     let(:sponsored_benefit)       { BenefitSponsors::SponsoredBenefits::DentalSponsoredBenefit.new }
 
-    let(:dental_product_package) { current_benefit_market_catalog.product_packages.by_product_kind(:dental).first }
+    let(:dental_product_package) { sponsor_catalog.product_packages.by_product_kind(:dental).first }
     let(:dental_reference_product) { dental_product_package.products[0] }
 
+    let(:sponsor_catalog) { initial_application.benefit_sponsor_catalog }
+
     let(:benefit_market_catalog) { current_benefit_market_catalog }
-    let(:product_package) { benefit_market_catalog.product_packages.where(package_kind: product_package_kind, product_kind: :dental).first }
+    let(:product_package) { sponsor_catalog.product_packages.where(package_kind: product_package_kind, product_kind: :dental).first }
 
     let(:sponsored_benefit_attributes) { {
       benefit_package_id: initial_application.benefit_packages[0].id,
@@ -303,7 +306,7 @@ RSpec.describe BenefitSponsors::Services::SponsoredBenefitService, dbclean: :aft
           allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
         end
 
-        it "should calculate employee cost details" do 
+        it "should calculate employee cost details" do
           subject.load_form_meta_data(form)
           result = subject.calculate_employee_cost_details(form)
         end

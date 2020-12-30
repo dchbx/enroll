@@ -70,6 +70,7 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include FederalHolidaysHelper
   config.include Config::AcaModelConcern
+  config.include L10nHelper
 
   config.infer_spec_type_from_file_location!
 

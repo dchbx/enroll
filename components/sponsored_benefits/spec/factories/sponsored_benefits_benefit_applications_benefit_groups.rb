@@ -1,5 +1,7 @@
 FactoryBot.define do
   factory :sponsored_benefits_benefit_applications_benefit_group, class: 'SponsoredBenefits::BenefitApplications::BenefitGroup' do
+
+    title { 'BQT benefit group' }
     effective_on_kind { "date_of_hire" }
     terminate_on_kind { "end_of_month" }
     plan_option_kind { "single_plan" }

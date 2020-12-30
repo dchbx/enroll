@@ -1,5 +1,12 @@
 module Insured::FamiliesHelper
 
+  def display_change_tax_credits_button?(hbx_enrollment)
+    hbx_enrollment.has_at_least_one_aptc_eligible_member?(hbx_enrollment.effective_on.year) &&
+    hbx_enrollment.product.can_use_aptc? &&
+    !hbx_enrollment.is_coverall? &&
+    hbx_enrollment.coverage_kind != 'dental'
+  end
+
   def plan_shopping_dependent_text(hbx_enrollment)
     subscriber, dependents = hbx_enrollment.hbx_enrollment_members.partition {|h| h.is_subscriber == true }
     if subscriber.present? && dependents.count == 0
@@ -14,12 +21,19 @@ module Insured::FamiliesHelper
   end
 
   def current_premium hbx_enrollment
-    if hbx_enrollment.is_shop?
-      hbx_enrollment.total_employee_cost
-    elsif hbx_enrollment.kind == 'coverall'
-      hbx_enrollment.total_premium
-    else
-      hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+    begin
+      if hbx_enrollment.is_shop?
+        hbx_enrollment.total_employee_cost
+      elsif hbx_enrollment.kind == 'coverall'
+        hbx_enrollment.total_premium
+      else
+        hbx_enrollment.total_premium > hbx_enrollment.applied_aptc_amount.to_f ? hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f : 0
+      end
+    rescue Exception => e
+      exception_message = "Current Premium calculation error for HBX Enrollment: #{hbx_enrollment.hbx_id.to_s}"
+      Rails.logger.error(exception_message) unless Rails.env.test?
+      puts(exception_message) unless Rails.env.test?
+      'Not Available.'
     end
   end
 
@@ -72,12 +86,29 @@ module Insured::FamiliesHelper
     end.join("&nbsp<label class='separator'></label>").html_safe
   end
 
+  def render_product_type_details(metal_level_kind, nationwide)
+    product_details = []
+
+    if metal_level_kind
+      product_level = metal_level_kind.to_s.try(:humanize)
+      product_details << "<span class=\"#{product_level.try(:downcase)}-icon\">#{product_level.titleize}</span>"
+    end
+
+    product_details << 'NATIONWIDE NETWORK' if nationwide
+
+    product_details.inject([]) do |data, element|
+      data << element.to_s
+    end.join("&nbsp<label class='separator'></label>").html_safe
+  end
+
   def qle_link_generater(qle, index)
     options = {class: 'qle-menu-item'}
     data = {
       title: qle.title, id: qle.id.to_s, label: qle.event_kind_label,
       is_self_attested: qle.is_self_attested,
-      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+      current_date: TimeKeeper.date_of_record.strftime("%m/%d/%Y"),
+      qle_event_date_kind: qle.qle_event_date_kind.to_s,
+      reason: qle.reason
     }
 
     if qle.tool_tip.present?
@@ -86,7 +117,10 @@ module Insured::FamiliesHelper
     else
       options.merge!(data: data)
     end
-    link_to qle.title, "javascript:void(0)", options
+
+    qle_title_html = "<u>#{qle.title}</u>".html_safe if qle.reason == 'covid-19'
+    
+    link_to qle_title_html || qle.title, "javascript:void(0)", options
   end
 
   def qle_link_generator_for_an_existing_qle(qle, link_title=nil)
@@ -100,46 +134,22 @@ module Insured::FamiliesHelper
     link_to link_title.present? ? link_title: "Shop for Plans", "javascript:void(0)", options
   end
 
-  def generate_options_for_effective_on_kinds(effective_on_kinds, qle_date)
-    return [] if effective_on_kinds.blank?
+  def generate_options_for_effective_on_kinds(qle, qle_date)
+    return [] if qle&.effective_on_kinds.blank?
+    qle.effective_on_kinds.collect { |kind| [find_effective_on(qle, qle_date, kind).to_s, kind] }.uniq(&:first)
+  end
 
-    options = []
-    effective_on_kinds.each do |kind|
-      case kind
-      when 'date_of_event'
-        options << [qle_date.to_s, kind]
-      when 'fixed_first_of_next_month'
-        options << [(qle_date.end_of_month + 1.day).to_s, kind]
-      end
-    end
-
-    options
+  def find_effective_on(qle, qle_date, kind)
+    special_enrollment_period = SpecialEnrollmentPeriod.new(effective_on_kind: kind)
+    special_enrollment_period.qualifying_life_event_kind = qle
+    special_enrollment_period.qle_on = qle_date
+    special_enrollment_period.effective_on
   end
 
   def newhire_enrollment_eligible?(employee_role)
     return false if employee_role.blank? || employee_role.census_employee.blank?
 
     employee_role.census_employee.newhire_enrollment_eligible? && employee_role.can_select_coverage?
-  end
-
-  def has_writing_agent?(employee_role)
-    employee_role.employer_profile.active_broker_agency_account.writing_agent rescue false
-  end
-
-  def disable_make_changes_button?(hbx_enrollment)
-    # return false if IVL
-    return false if hbx_enrollment.census_employee.blank?
-    return false if !hbx_enrollment.is_shop?
-    # Enable the button under these conditions
-      # 1) plan year under open enrollment period
-      # 2) new hire covered under enrolment period
-      # 3) qle enrolmlent period check
-    return false if hbx_enrollment.sponsored_benefit_package.open_enrollment_contains?(TimeKeeper.date_of_record)
-    return false if hbx_enrollment.employee_role &. can_enroll_as_new_hire?
-    return false if hbx_enrollment.family.is_under_special_enrollment_period? && hbx_enrollment.active_during?(hbx_enrollment.family.current_sep.effective_on)
-
-    # Disable only  if non of the above conditions match
-    true
   end
 
   def all_active_enrollment_with_aptc(family)
@@ -215,7 +225,7 @@ module Insured::FamiliesHelper
   end
 
   def person_has_any_roles?
-    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any? || current_user.has_hbx_staff_role?
+    @person.consumer_role.present? || @person.resident_role.present? || @person.active_employee_roles.any?
   end
 
   def is_strictly_open_enrollment_case?
@@ -269,7 +279,8 @@ module Insured::FamiliesHelper
 
   def build_consumer_role(person, family)
     if family.primary_applicant.person == person
-      person.build_consumer_role({:is_applicant => true})
+      contact_method = person.resident_role&.contact_method ? person.resident_role.contact_method : "Paper and Electronic communications"
+      person.build_consumer_role({:is_applicant => true, :contact_method => contact_method})
       person.save!
     else
       person.build_consumer_role({:is_applicant => false})
@@ -279,7 +290,8 @@ module Insured::FamiliesHelper
 
   def build_resident_role(person, family)
     if family.primary_applicant.person == person
-      person.build_resident_role({:is_applicant => true})
+      contact_method = person.consumer_role&.contact_method ? person.consumer_role.contact_method : "Paper and Electronic communications"
+      person.build_resident_role({:is_applicant => true, :contact_method => contact_method })
       person.save!
     else
       person.build_resident_role({:is_applicant => false})
@@ -296,4 +308,5 @@ module Insured::FamiliesHelper
       { @qle.title => @qle.reason }
     end
   end
+
 end

@@ -55,5 +55,28 @@ RSpec.describe VerificationType, :type => :model, dbclean: :after_each do
       expect(person.verification_types.all?{|type| type.validation_status == "pending"}).to be true
     end
 
+    context 'DC Residency' do
+      before do
+        @residency_verification_type = person.verification_types.by_name('DC Residency').first
+        @residency_verification_type.attest_type
+        @history_track = @residency_verification_type.history_tracks.last
+      end
+
+      it 'attest verification type' do
+        expect(@residency_verification_type.validation_status).to eq('attested')
+      end
+
+      it 'should update reason for verification type' do
+        expect(@residency_verification_type.update_reason).to eq('Self Attest DC Residency')
+      end
+
+      it 'should add update_reason to history tracks' do
+        expect(@history_track.modified.keys).to include('update_reason')
+      end
+
+      it 'should have update_reason as expected in history tracks' do
+        expect(@history_track.modified['update_reason']).to eq('Self Attest DC Residency')
+      end
+    end
   end
 end

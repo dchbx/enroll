@@ -24,8 +24,8 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     Then Employee should see the receipt page
     Then Employee should see the "my account" page
 
-    When Employee click the "Married" in qle carousel
-    And Employee select a past qle date
+    When Employee click the "Losing other health insurance" in qle carousel
+    And Employee select a current qle date
     Then Employee should see confirmation and clicks continue
     Then Employee should see the dependents page
     When Employee clicks Add Member

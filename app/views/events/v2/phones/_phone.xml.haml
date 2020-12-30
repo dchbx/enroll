@@ -1,5 +1,5 @@
 %phone
-  %type= "urn:openhbx:terms:v1:phone_type##{phone.kind =='phone main' ? 'work': phone.kind}"
+  %type= "urn:openhbx:terms:v1:phone_type##{phone.kind}"
   - if !phone.country_code.blank?
     %country_code=phone.country_code
   %area_code=phone.area_code

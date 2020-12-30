@@ -56,13 +56,35 @@ module Queries
                 end
               else
                 if @search_string.present?
-                  user.datatable_search(@search_string)
+                  user_datatable_search(@search_string)
                 else
                   user.all
                 end
               end
       users
     end
+
+    def user_datatable_search(query)
+      clean_str = query.strip
+      people_user_ids = if clean_str =~ /[a-z]/i
+                          Person.collection.aggregate([
+                                                          {"$match" => {"$text" => {"$search" => clean_str}}.merge(Person.search_hash(clean_str))},
+                                                          {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1, "user_id" => 1}},
+                                                          {"$sort" => {"last_name" => 1, "first_name" => 1}},
+                                                          {"$project" => {"user_id" => 1}}
+                                                      ], {allowDiskUse: true}).map do |rec|
+                            rec["user_id"]
+                          end
+                        else
+                          Person.search(query, nil, nil, true).pluck(:user_id)
+                        end
+      User.where(:"$or" => [
+                     { :oim_id => ::Regexp.compile(/.*#{query}.*/i) },
+                     { :email => ::Regexp.compile(/.*#{query}.*/i) },
+                     {:id => {"$in" => people_user_ids} }
+                 ])
+    end
+
 
     def skip(num)
       build_scope.skip(num)

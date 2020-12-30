@@ -5,10 +5,12 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_site_spec
 require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_spec_helpers"
 
 RSpec.describe "insured/group_selection/new.html.erb" do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:adapter) { instance_double(GroupSelectionPrevaricationAdapter) }
   context "coverage selection", dbclean: :after_each do
-  
-  include_context "setup initial benefit application"
 
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
@@ -19,6 +21,8 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       "application_period.min" => effective_period_start_on
     ).first
   end
+
+  include_context "setup initial benefit application"
 
   let(:effective_period_start_on) { current_effective_date }
   let(:effective_period_end_on) { effective_period_start_on + 1.year - 1.day }
@@ -79,6 +83,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       controller.request.path_parameters[:employee_role_id] = employee_role.id
 
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
       census_employee.benefit_group_assignments.first.benefit_group.plan_year.aasm_state = "enrolling"
     end
 
@@ -98,6 +103,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member2, nil, effective_on, nil).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member3, nil, effective_on, nil).and_return("ineligible_dental_row_#{employee_role.id}")
         allow(adapter).to receive(:class_for_ineligible_row).with(family_member4, nil, effective_on, nil).and_return("ineligible_health_row_#{employee_role.id} ineligible_dental_row_#{employee_role.id}")
+        allow(coverage_household).to receive(:valid_coverage_household_members).and_return(coverage_household_members)
         render :template => "insured/group_selection/new.html.erb"
       end
 
@@ -131,7 +137,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "should have a 'not eligible'" do
-        expect(rendered).to have_selector('td', text: 'This dependent is ineligible for employer-sponsored health coverage.', count: 2)
+        expect(rendered).to have_selector('td', text: 'Employer sponsored coverage is not yet available', count: 2)
       end
     end
   end
@@ -188,6 +194,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         controller.request.path_parameters[:consumer_role_id] = consumer_role.id
         allow(view).to receive(:shop_health_and_dental_attributes).and_return(false, false, false, true)
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+        allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
         allow(view).to receive(:can_employee_shop?).and_return(false)
         allow(consumer_role).to receive(:latest_active_tax_household_with_year).and_return nil
         allow(consumer_role2).to receive(:latest_active_tax_household_with_year).and_return nil
@@ -199,11 +206,20 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(person2).to receive(:is_resident_role_active?).and_return(false)
         allow(person3).to receive(:is_consumer_role_active?).and_return(true)
         allow(person3).to receive(:is_resident_role_active?).and_return(false)
+        allow(coverage_household_jail).to receive(:valid_coverage_household_members).and_return(coverage_household_members)
         sign_in current_user
       end
 
       context "base area" do
         before do
+          fm_hash = {}
+          rule1 = InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member1.id] = [false, rule1, nil]
+          rule2 = InsuredEligibleForBenefitRule.new(consumer_role2, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member2.id] = [false, rule2, nil]
+          rule3 = InsuredEligibleForBenefitRule.new(consumer_role3, benefit_package, {family: family, coverage_kind: "health", new_effective_on: TimeKeeper.date_of_record, market_kind: "individual"})
+          fm_hash[family_member1.id] = [false, rule3, nil]
+          assign(:fm_hash, fm_hash)
           render :template => "insured/group_selection/new.html.erb"
         end
 
@@ -407,7 +423,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:benefit_group) { current_benefit_package }
     let(:coverage_household) { double("coverage household", coverage_household_members: []) }
-    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: false)}
+    let(:hbx_enrollment) {double("hbx enrollment", coverage_selected?: true, id: "hbx_id", effective_on: (TimeKeeper.date_of_record.end_of_month + 1.day), employee_role: employee_role, benefit_group: benefit_group, is_shop?: true)}
     let(:employer_profile) { benefit_sponsorship.profile }
     let(:current_user) { FactoryBot.create(:user) }
 
@@ -417,7 +433,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       assign :person, person
       assign :employee_role, employee_role
       assign :coverage_household, coverage_household
-      assign :market_kind, 'individual'
+      assign :market_kind, 'shop'
       assign :change_plan, true
       assign :hbx_enrollment, hbx_enrollment
       assign :effective_on_date, TimeKeeper.date_of_record.beginning_of_month
@@ -437,6 +453,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
+      allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
       sign_in current_user
     end
 
@@ -453,6 +470,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
 
     it "should not show shop for new plan submit when single_plan" do
       allow(benefit_group).to receive(:plan_option_kind).and_return("single_plan")
+
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Shop for new plan']", count: 1)
     end
@@ -467,14 +485,12 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     it "when hbx_enrollment not terminated and not shop_for_plans" do
       assign(:shop_for_plans, "shop_for_plans")
       render file: "insured/group_selection/new.html.erb"
-      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
+      expect(rendered).to have_selector("input[value='Keep existing plan']", count: 1)
       expect(rendered).to have_selector("a", text: "Select Plan to Terminate",  count: 1)
     end
 
     it "when hbx_enrollment is terminated" do
-      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
-      allow(hbx_enrollment).to receive(:auto_renewing?).and_return(false)
-      allow(hbx_enrollment).to receive(:coverage_enrolled?).and_return(false)
+      allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(false)
       render file: "insured/group_selection/new.html.erb"
       expect(rendered).to have_selector("input[value='Keep existing plan']", count: 0)
     end
@@ -537,6 +553,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).and_return(true)
+      allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
     end
 
     it "should have the waive confirmation modal" do
@@ -572,6 +589,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, true, hbx_enrollment).and_return(true)
+      allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
 
     end
 
@@ -627,6 +645,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(view).to receive(:can_employee_shop?).and_return(false)
         allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+        allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
       end
 
       it "shouldn't see dental radio option" do
@@ -642,6 +661,11 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       it "shouldn't see marketplace options" do
         render file: "insured/group_selection/new.html.erb"
         expect(rendered).to have_selector('h3', text: 'Marketplace')
+      end
+
+      it "shouldn't see terminate plan" do
+        render file: "insured/group_selection/new.html.erb"
+        expect(rendered).to_not have_selector("a", text: "Select Plan to Terminate")
       end
     end
   end
@@ -667,12 +691,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).with(employee_role, nil, hbx_enrollment).and_return(true)
+      allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
     end
 
     it "shouldn't see waiver button" do
@@ -687,12 +713,13 @@ RSpec.describe "insured/group_selection/new.html.erb" do
     let(:enrollment) { double("HbxEnrollment", id: 'enr_id', employee_role: nil, benefit_group: benefit_group)}
     let(:employee_role) { double("EmployeeRole", id: 'er_id', person: person, census_employee: census_employee)}
     let(:benefit_group) { FactoryBot.create(:benefit_group) }
+    let(:coverage_household) { double("coverage household", coverage_household_members: []) }
 
     before do
       assign(:person, person)
       assign(:hbx_enrollment, enrollment)
       assign(:employee_role, employee_role)
-      assign(:coverage_household, double("CoverageHousehold", coverage_household_members: []))
+      assign :coverage_household, coverage_household
       assign(:benefit_group, benefit_group)
       assign(:adapter, adapter)
       allow(view).to receive(:can_shop_shop?).with(person).and_return true
@@ -701,12 +728,14 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       allow(view).to receive(:can_employee_shop?).and_return(false)
       allow(person).to receive(:active_employee_roles).and_return [employee_role]
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+      allow(view).to receive(:policy_helper).and_return(double("Policy", can_access_progress?: true))
       allow(adapter).to receive(:can_shop_shop?).with(person).and_return(true)
       allow(adapter).to receive(:is_fehb?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_resident?).with(person).and_return(false)
       allow(adapter).to receive(:can_shop_individual?).with(person).and_return(false)
       allow(adapter).to receive(:is_eligible_for_dental?).and_return(false)
+      allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
     end
 
     # Loading coverage household member records only once & displaying errors based on selection
@@ -762,6 +791,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return(true)
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
         allow(view).to receive(:can_employee_shop?).and_return(false)
+        allow(coverage_household).to receive(:valid_coverage_household_members).and_return([])
       end
 
       it "should see dental radio option" do
@@ -815,7 +845,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
         let(:census_employee) { FactoryBot.build_stubbed(:census_employee, benefit_group_assignments: [benefit_group_assignment]) }
         let(:benefit_group_assignment) { FactoryBot.build_stubbed(:benefit_group_assignment, benefit_group: benefit_group_no_dental) }
 
-        before(:each) do 
+        before(:each) do
           allow(adapter).to receive(:can_shop_shop?).and_return(true)
           allow(adapter).to receive(:can_shop_both_markets?).with(person).and_return(true)
         end

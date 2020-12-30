@@ -195,7 +195,7 @@ listing: "<strong>Remember, you must pay your monthly premium by #{notice.latest
 
 <% if (notice.documents_needed == true && !notice.cover_all?) %>
   <%= render partial: 'notices/shared/custom_listing', :locals => {
-  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong>If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
+  listing: "<strong>And don’t forget, the deadline to submit the documents we need from you is #{notice.due_date.strftime("%B %d, %Y")}.</strong> If you do not submit them by the deadline, you could lose your insurance. The list of documents you need to submit is on the next page."} %>
 <% end %>
 
 <br>

@@ -237,7 +237,6 @@ RSpec.describe Importers::Transcripts::EnrollmentTranscript, type: :model, dbcle
           source_enrollment_1.reload
 
           expect(source_enrollment_1.product).to eq source_plan
-          # binding.pry
           expect(source_enrollment_1.void?).to be_truthy
 
           enrollment = source_family.active_household.hbx_enrollments.where(:hbx_id.ne => source_enrollment_1.hbx_id).first

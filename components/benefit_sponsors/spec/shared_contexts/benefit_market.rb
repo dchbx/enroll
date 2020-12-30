@@ -4,8 +4,9 @@ require File.join(File.dirname(__FILE__), "..", "support/benefit_sponsors_produc
 RSpec.shared_context "setup benefit market with market catalogs and product packages", :shared_context => :metadata do
 
   let(:site)                    { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+
   let(:benefit_market)          { site.benefit_markets.first }
-  let(:current_benefit_market_catalog) do
+  let!(:current_benefit_market_catalog) do
     ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
       site,
       benefit_market,
@@ -16,7 +17,7 @@ RSpec.shared_context "setup benefit market with market catalogs and product pack
       ).first
   end
 
-  let(:renewal_benefit_market_catalog) do
+  let!(:renewal_benefit_market_catalog) do
     current_benefit_market_catalog
     BenefitMarkets::BenefitMarketCatalog.where(
         "application_period.min" => renewal_effective_date.beginning_of_year

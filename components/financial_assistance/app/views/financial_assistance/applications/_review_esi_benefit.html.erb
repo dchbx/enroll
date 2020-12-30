@@ -1,0 +1,63 @@
+<div class="border_bottom border-sides form-content">
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">Employer Name</div>
+    <div class="col-md-6"><%= benefit.employer_name %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">EMPLOYER ADDRESSS LINE 1</div>
+    <div class="col-md-6"><%= benefit.employer_address.address_1 %></div>
+  </div>
+
+  <% if benefit.employer_address.address_2.present? %>
+    <div class="row ptb no-buffer row-height">
+      <div class="col-md-6">EMPLOYER ADDRESSS LINE 2</div>
+      <div class="col-md-6"><%= benefit.employer_address.address_2 %></div>
+    </div>
+  <% end %>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">CITY</div>
+    <div class="col-md-6"><%= benefit.employer_address.city %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">STATE</div>
+    <div class="col-md-6"><%= benefit.employer_address.state %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">ZIP</div>
+    <div class="col-md-6"><%= benefit.employer_address.zip %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">EMPLOYER PHONE</div>
+    <div class="col-md-6"><%= format_phone(benefit.employer_phone.full_phone_number) %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">EMPLOYER IDENTIFICATION NO.(EIN)</div>
+    <div class="col-md-6"><%= benefit.employer_id %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">Is the employee currently in a waiting period and eligible to enroll in the next 3 months?</div>
+    <div class="col-md-6"><%= human_boolean(benefit.is_esi_waiting_period) %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">Does this employer offer a health plan that meets the minimum value standard?</div>
+    <div class="col-md-6"><%= human_boolean(benefit.is_esi_mec_met) %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height">
+    <div class="col-md-6">Who can be covered?</div>
+    <div class="col-md-6"><%= benefit.esi_covered %></div>
+  </div>
+
+  <div class="row ptb no-buffer row-height border_bottom">
+    <div class="col-md-6">How much would the employee only pay for the lowest cost minimum value standard plan?</div>
+    <div class="col-md-6"><%= format_benefit_cost(benefit.employee_cost, benefit.employee_cost_frequency) %></div>
+  </div>
+</div>

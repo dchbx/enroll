@@ -1,6 +1,10 @@
 require 'rails_helper'
 describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_each do
 
+  before :each do
+    DatabaseCleaner.clean
+  end
+
   let(:user){ create(:user) }
   let!(:person) { create(:person, :with_ssn, user: user) }
 
@@ -15,6 +19,10 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
     } }
 
   let(:subject) { Forms::ConsumerCandidate.new(params) }
+
+  after(:each) do
+    DatabaseCleaner.clean
+  end
 
   context "uniq ssn" do
 
@@ -156,6 +164,7 @@ describe Forms::ConsumerCandidate, "ssn validations" do
       allow(subject).to receive(:no_ssn).and_return("0")
       subject.ssn_or_checkbox
       expect(subject.errors.messages.present?).to eq true
+      expect(subject.errors[:base]).to eq ["Enter a valid social security number or select 'I don't have an SSN'"]
     end
 
     it "doesnt add errors when SSN is present" do

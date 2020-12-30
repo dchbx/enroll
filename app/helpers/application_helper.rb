@@ -1,4 +1,5 @@
 module ApplicationHelper
+  include FloatHelper
 
   def can_employee_shop?(date)
     return false if date.blank?
@@ -58,24 +59,21 @@ module ApplicationHelper
     (a_tab == current_tab) ? raw(" class=\"active\"") : ""
   end
 
-  def current_cost(plan_cost, ehb=0, hbx_enrollment=nil, source=nil, can_use_aptc=true)
+  #Purchased enrollment family premium (family home page - view details button on the enrollment)
+  def current_cost(hbx_enrollment = nil, source = nil)
     # source is account or shopping
-    if source == 'account' && hbx_enrollment.present? && hbx_enrollment.try(:applied_aptc_amount).to_f > 0
-      if hbx_enrollment.coverage_kind == 'health'
-        return (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
-      else
-        return hbx_enrollment.total_premium
-      end
-    end
+    return unless source == 'account' && hbx_enrollment.present? && hbx_enrollment.coverage_kind == 'health'
 
-    if session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
-      aptc_amount = session['elected_aptc'].to_f
-      ehb_premium = plan_cost * ehb
-      cost = plan_cost - [ehb_premium, aptc_amount].min
-      cost > 0 ? cost : 0
-    else
-      plan_cost
-    end
+    (hbx_enrollment.total_premium - hbx_enrollment.applied_aptc_amount.to_f)
+  end
+
+  #Shopping enrollment family premium (plan shopping page)
+  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc=true)
+    return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
+
+    aptc_amount = session['elected_aptc'].to_f
+    cost = float_fix(plan_cost - [plan_ehb_cost, aptc_amount].min)
+    cost > 0 ? cost.round(2) : 0
   end
 
   def datepicker_control(f, field_name, options = {}, value = "")
@@ -438,7 +436,7 @@ module ApplicationHelper
     carriers.each do |car|
       if Rails.env == "production"
         image = "logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
-        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image).digest_path}"
+        digest_image = "/assets/#{::Sprockets::Railtie.build_environment(Rails.application).find_asset(image)&.digest_path}"
         carrier_logo_hash[car.legal_name] = digest_image
       else
         image = "/assets/logo/carrier/#{car.legal_name.parameterize.underscore}.jpg"
@@ -479,6 +477,8 @@ module ApplicationHelper
         'Decertified Date'
       when 'denied'
         'Denied Date'
+      when 'extended'
+        'Extended Date'
       else
       end
     end
@@ -503,8 +503,9 @@ module ApplicationHelper
     covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
+    
     unless eligible.zero?
-      condition = (eligible <= 2) ? ((enrolled > (eligible - 1)) && (non_owner > 0)) : ((enrolled >= p_min) && (non_owner > 0))
+      condition = enrolled >= p_min && non_owner > 0
       condition = false if covered == 0 && waived > 0
       progress_bar_class = condition ? 'progress-bar-success' : 'progress-bar-danger'
       progress_bar_width = (enrolled * 100)/eligible
@@ -520,9 +521,9 @@ module ApplicationHelper
           concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
         end
 
-        if eligible >= 2
-          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe unless plan_year.start_on.to_date.month == 1
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) unless plan_year.start_on.to_date.month == 1
+        if eligible >= 2 && plan_year.employee_participation_ratio_minimum != 0
+          eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe
+          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) 
         end
 
         concat(content_tag(:div, class: 'progress-val') do
@@ -549,8 +550,11 @@ module ApplicationHelper
 
   def calculate_participation_minimum
     if @current_plan_year.present?
-      return 0 if @current_plan_year.eligible_to_enroll_count == 0
-      return (@current_plan_year.eligible_to_enroll_count * Settings.aca.shop_market.employee_participation_ratio_minimum).ceil
+      if @current_plan_year.eligible_to_enroll_count == 0
+        0
+      else
+        (@current_plan_year.eligible_to_enroll_count * @current_plan_year.employee_participation_ratio_minimum).ceil
+      end
     end
   end
 
@@ -752,7 +756,13 @@ module ApplicationHelper
   end
 
   def is_new_paper_application?(current_user, app_type)
+    app_type = app_type&.downcase
     current_user.has_hbx_staff_role? && app_type == "paper"
+  end
+
+  def is_new_in_person_application?(current_user, app_type)
+    app_type = app_type&.humanize&.downcase
+    current_user.has_hbx_staff_role? && app_type == "in person"
   end
 
   def load_captcha_widget?
@@ -769,6 +779,13 @@ module ApplicationHelper
     else
       false
     end
+  end
+
+  def can_show_covid_message_on_sep_carousel?(person)
+    return false unless sep_carousel_message_enabled?
+    return false unless person.present?
+    return true if person.consumer_role.present? || person.resident_role.present?
+    person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
   end
 
   def transition_family_members_link_type row, allow
@@ -835,5 +852,33 @@ module ApplicationHelper
 
   def round_down_float_two_decimals(float_number)
     BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
+  end
+
+  def external_application_configured?(application_name)
+    external_app = ::ExternalApplications::ApplicationProfile.find_by_application_name(application_name)
+    return false unless external_app
+    return false unless external_app.is_authorized_for?(current_user)
+    !external_app.url.blank?
+  end
+
+  def jwt_for_external_application
+    current_token = WhitelistedJwt.newest
+    return current_token.token if current_token
+    current_user.generate_jwt(warden.config[:default_scope], nil)
+  end
+
+  def csr_percentage_options_for_select
+    EligibilityDetermination::CSR_PERCENT_VALUES.inject([]) do |csr_options, csr|
+      ui_display = csr == '-1' ? 'limited' : csr
+      csr_options << [ui_display, csr]
+    end
+  end
+
+  def show_component(url) # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+    if url.split('/')[2] == "consumer_role" || url.split('/')[1] == "insured" && url.split('/')[2] == "interactive_identity_verifications" || url.split('/')[1] == "financial_assistance" && url.split('/')[2] == "applications" || url.split('/')[1] == "insured" && url.split('/')[2] == "family_members" || url.include?("family_relationships")
+      false
+    else
+      true
+    end
   end
 end

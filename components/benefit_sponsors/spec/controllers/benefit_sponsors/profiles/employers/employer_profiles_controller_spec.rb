@@ -92,8 +92,12 @@ module BenefitSponsors
           post :bulk_employee_upload, :params => {:employer_profile_id => benefit_sponsor.profiles.first.id, :file => file}
         end
 
-        it 'should upload sucessfully' do
+        it 'should upload successfully' do
           expect(response).to redirect_to(profiles_employers_employer_profile_path(benefit_sponsor.profiles.first, tab: 'employees'))
+        end
+
+        it 'should render flash message successfully' do
+          expect(flash[:notice]).to eq("2 records uploaded from CSV")
         end
       end
 

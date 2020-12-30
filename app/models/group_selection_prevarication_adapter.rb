@@ -75,6 +75,17 @@ class GroupSelectionPrevaricationAdapter
     end
   end
 
+  def if_family_has_active_shop_sep
+    latest_shop_or_fehb_sep = @family.latest_shop_sep || @family.latest_fehb_sep
+    return unless @previous_hbx_enrollment.present?
+    return unless @previous_hbx_enrollment.is_shop?
+    return unless latest_shop_or_fehb_sep.present?
+    benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
+    return unless benefit_package.effective_period.cover?(latest_shop_or_fehb_sep.effective_on)
+    @change_plan = 'change_by_qle'
+    yield
+  end
+
   def if_family_has_active_sep
     return nil if @previous_hbx_enrollment.blank?
     return unless @family.has_active_sep?(@previous_hbx_enrollment)
@@ -130,8 +141,17 @@ class GroupSelectionPrevaricationAdapter
   def disable_market_kinds(params)
     if (@change_plan == 'change_by_qle' || @enrollment_kind == 'sep')
       d_market_kind = (select_market(params) == "shop" || select_market(params) == "fehb") ? "individual" : "shop"
-      yield d_market_kind
+    else
+      d_market_kind = 'individual' if (@person.consumer_role.present? || @person.resident_role.present?) && !is_under_ivl_open_enrollment?
+
+      d_market_kind = 'shop' if !@employee_role&.is_eligible_to_enroll_without_qle?
     end
+
+    yield d_market_kind
+  end
+
+  def is_under_ivl_open_enrollment?
+    HbxProfile.current_hbx.present? ? HbxProfile.current_hbx.under_open_enrollment? : nil
   end
 
   def ivl_benefit
@@ -218,11 +238,16 @@ class GroupSelectionPrevaricationAdapter
   def select_benefit_group(params)
     return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
-    if @change_plan.present? && @previous_hbx_enrollment.present? && @previous_hbx_enrollment.is_shop?
-      @previous_hbx_enrollment.sponsored_benefit_package 
-    elsif (select_market(params) == 'shop' || select_market(params) == 'fehb') && possible_employee_role.present?
-      possible_employee_role.benefit_package(qle: is_qle?)
+    if possible_employee_role.present?
+      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?)
     end
+
+    if @change_plan.present? && @previous_hbx_enrollment.present?
+      possible_benefit_package = @previous_hbx_enrollment.sponsored_benefit_package
+      return possible_benefit_package if assigned_benefit_package && assigned_benefit_package.start_on != possible_benefit_package.start_on
+    end
+    
+    assigned_benefit_package
   end
 
   def renewal_enrollment(enrollments, employee_role)

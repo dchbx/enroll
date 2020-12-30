@@ -165,7 +165,7 @@ class Employers::CensusEmployeesController < ApplicationController
       if @census_employee.update_for_cobra(@cobra_date, current_user)
         flash[:notice] = "Successfully update Census Employee."
       else
-        flash[:error] = "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
+        flash[:error] = "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{site_short_name} at #{contact_center_phone_number} for further assistance."
       end
     else
       flash[:error] = "Please enter cobra date."
@@ -174,6 +174,7 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def confirm_effective_date
     confirmation_type = params[:type]
+    return unless CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES.include?(confirmation_type)
     render "#{confirmation_type}_effective_date"
   end
 

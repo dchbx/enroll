@@ -4,8 +4,8 @@
 - show_benefit_application_tile = params[:show_benefit_application_tile] ||= false
 
 - if @benefit_package_form.new_record?
-  h1.heading-text Select Your Plan Offering
-  h4 Let your plan participants choose any plan offered by one carrier, any plan available within a specific metal level or you can offer just one plan. It doesn't cost you more to let them choose by carrier (insurance company) or metal level.
+  h1.heading-text = l10n("employers.plan_years.benefit_package.select_your_plan_offering")
+  h4 = l10n("employers.plan_years.benefit_package.select_your_plan_offering.content")
   br
 - else
   .edit-offering.health
@@ -79,9 +79,9 @@
 
         #referencePlans.hidden
           .row
-            h2.heading-text.pull-left.pl-1 Select Your Reference Plan
-
-          h4 Now select a reference plan. The reference plan is used to cap employer costs. You’ll choose a reference plan. Then, your contribution towards employee premiums will be applied to the reference plan you choose regardless of which plans your employees select. After you select your reference plan, scroll down to review your costs.
+            h2.heading-text.pull-left.pl-1
+              = l10n("employers.plan_years.benefit_package.select_your_reference_plan")
+          h4 = l10n("employers.plan_years.benefit_package.select_your_reference_plan.content")
           #yourPlans
             .float-right.mb-2
               #yourPlanTotals
@@ -129,8 +129,7 @@ javascript:
   var planOptions = #{@benefit_package_form.catalog.plan_options.to_json.html_safe};
   var applicationStartOn = #{@benefit_package_form.service.benefit_application.effective_period.min.strftime("%m-%d").to_json.html_safe};
   var sponsorContributions = #{@benefit_package_form.catalog.sponsor_contributions(@benefit_package_form.id).to_json.html_safe};
-  var erCL = #{aca_shop_market_employer_contribution_percent_minimum};
-  var familyCL = #{aca_shop_market_employer_family_contribution_percent_minimum};
+  var minContributions = #{f.object.sponsor_contribution.min_contributions_map.to_json.html_safe};
 	var productsTotal;
 
   function radioSelected(element) {
@@ -489,9 +488,9 @@ javascript:
       if (applicationStartOn === "01-01") {
         enableNewPlanYearButton()
       } else {
-        if (eeContribution < erCL || employeeOnly < erCL) {
+        if (eeContribution < minContributions['Employee'] || employeeOnly < minContributions['Employee']) {
           disableNewPlanYearButton()
-        } else if (familyOnly < familyCL || spouse < familyCL || domesticPartner < familyCL || childUnder26 < familyCL) {
+        } else if (familyOnly < minContributions['Family'] || spouse < minContributions['Spouse'] || domesticPartner < minContributions['Domestic Partner'] || childUnder26 < minContributions['Child Under 26']) {
           disableNewPlanYearButton()
         }  else {
           enableNewPlanYearButton()

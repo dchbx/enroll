@@ -144,7 +144,8 @@ function updatePlanCost(elected_aptc) {
   for(var i=0; i<plans.length; i++){
     var plan = plans[i];
     var premium = parseFloat($(plan).data('plan-metal-premium'));
-    var ehb_premium = premium * parseFloat($(plan).data('plan-ehb'));
+    var ehb_premium = parseFloat($(plan).data('plan-metal-ehb-premium'));
+
     if ($(plan).data('can-use-aptc') == true){
       var premium_resp_amt = premium - Math.min.apply(null, [elected_amount, ehb_premium]);
     } else {
@@ -157,6 +158,11 @@ function updatePlanCost(elected_aptc) {
     $(plan).find('h2.plan-premium').html("$" + premium_resp_amt);
   };
 };
+
+function toFixedTrunc(x, n) {
+  var with2Decimals = x.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+  return with2Decimals;
+}
 
 function setMinMax(input, max_aptc) {
   if (input.value < 0) input.value = 0;

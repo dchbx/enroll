@@ -24,6 +24,5 @@ Feature: As an admin user I should have the ability to terminate a given Employe
       | voluntary        | any_day          |
       | non-payment      | mid_month        |
       | non-payment      | any_day          |
-
-  
-    
+      | voluntary        | last_day         |
+      | non-payment      | last_day         |

@@ -109,7 +109,8 @@ module Parsers::Xml::Cv::Importers
       primary_applicant_person = family_member_objects.detect{|f| f.is_primary_applicant}.person rescue nil
       return if primary_applicant_person.blank?
 
-      primary_applicant_person.person_relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
+      relationships = family_member_objects.map(&:person).map(&:person_relationships).flatten.compact rescue []
+      primary_applicant_person.person_relationships = relationships.reject{ |relation| relation.relative_id == primary_applicant_person.id }
     end
   end
 end

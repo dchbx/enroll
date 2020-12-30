@@ -55,6 +55,9 @@
               <% if broker_or_staff_role.may_recertify? %>
                 <%= submit_tag 'Re-Certify', name: 'recertify', class: "btn btn-primary  interaction-click-control-broker-recertify" %>
               <% end %>
+              <% if broker_or_staff_role.may_extend_application? %>
+                <%= submit_tag 'Extend', name: 'extend', class: "btn btn-primary  interaction-click-control-broker-extend" %>
+              <% end %>
             <% end %>
           </span>
         </div>

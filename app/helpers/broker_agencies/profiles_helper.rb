@@ -21,8 +21,20 @@ module BrokerAgencies::ProfilesHelper
     "#{date.prev_month.beginning_of_month.strftime('%b %Y')}" rescue nil
   end
 
-  def can_show_destroy?(current_user, staff)
-    return true if current_user.person == staff || staff.broker_role.present? || staff.general_agency_primary_staff.present?
+  def can_show_destroy_for_brokers?(broker_staff_member, total_broker_staff_count)
+    # Destroy button cannot be shown for final broker staff role
+    return false if total_broker_staff_count == 1
+    # Destroy button will always be shown to broker staff member OR
+    # Destroy button cannot be shown for broker staff member with broker role
+    broker_staff_member.broker_role.blank?
+  end
+
+  def can_show_destroy_for_ga?(ga_staff_member, total_ga_staff_count)
+    # Destroy button cannot be shown for final ga staff role
+    return false if total_ga_staff_count == 1
+    # Destroy button will always be shown to ga staff member OR
+    # Destroy button cannot be shown for ga primary staff role
+    ga_staff_member.general_agency_primary_staff.blank?
   end
 
   def disable_edit_broker_agency?(user)

@@ -16,7 +16,6 @@ class CcaEmployerProfilesMigration < Mongoid::Migration
         
         #build and create GeneralOrganization and its profiles
         status = create_profile(site_key, csv, logger)
-        # binding.pry
 
         if status
           puts "" unless Rails.env.test?

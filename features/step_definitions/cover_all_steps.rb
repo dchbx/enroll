@@ -49,18 +49,20 @@ Then(/HBX Admin should see a form to enter personal information$/) do
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'DC')]").click
   fill_in "person[addresses_attributes][0][zip]", :with => "20002"
+  expect(page).to have_css("#home_address_tooltip")
   find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Hbx Admin should see text Household Info$/) do
-  expect(page).to have_content('Household Info')
-  expect(page).to have_content('get insurance coverage for other members of your household')
+  expect(page).to have_content("#{l10n('family_information')}")
+  expect(page).to have_content('get health insurance coverage for other members of your family')
   find_link('Add Member').visible?
   find('.btn', text: 'CONTINUE').click
 end
 
 Then(/^Hbx Admin should see text Special Enrollment Period$/) do
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
+  sleep 2
   expect(page).to have_content('Special Enrollment Period')
   expect(page).to have_content('TOP LIFE CHANGES')
   expect(page).to have_content('Married')
@@ -117,6 +119,10 @@ end
 Then(/HBX Admin should see the home page with text coverage selected/) do
   expect(page).to have_content('Coverage Selected')
   screenshot("home_page")
+end
+
+Then(/^HBX Admin should see broker assister search box$/) do
+  expect(page).to have_content('Select a Broker or Assister')
 end
 
 Then(/^Hbx Admin should see an Transition family members link$/) do

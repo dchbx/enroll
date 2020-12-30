@@ -55,7 +55,7 @@ RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should update person main phone" do
-      general_agency_profile.primary_staff.person.phones[0].update_attributes(kind: "phone main")
+      general_agency_profile.primary_staff.person.phones[0].update_attributes(kind: "work")
       post :update, params:{id: general_agency_profile.id, organization: {id: org.id, first_name: "updated name", last_name: "updates", office_locations_attributes: {"0"=>
                                                                                                                                                                {"address_attributes"=>{"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
                                                                                                                                                                 "phone_attributes"=>{"kind"=>"phone main", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}}}}}

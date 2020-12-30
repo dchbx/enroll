@@ -11,21 +11,33 @@ module BenefitSponsors
   RSpec.describe BenefitApplications::BenefitApplication, type: :model, :dbclean => :after_each do
     let(:site) { ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_benefit_market }
     let(:benefit_market)          { site.benefit_markets.first }
-    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
-    let(:benefit_sponsorship)    { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(profile: employer_organization.employer_profile) }
+    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site.site_key}_employer_profile".to_sym, site: site) }
+    let(:employer_profile_1)        { employer_organization.employer_profile }
+    let(:benefit_sponsorship) do
+      sponsorship_1 = employer_profile_1.add_benefit_sponsorship
+      sponsorship_1.save
+      sponsorship_1
+    end
     let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
 
     let(:rating_area)  { create_default(:benefit_markets_locations_rating_area) }
+    let!(:rating_area2) {FactoryBot.create(:benefit_markets_locations_rating_area, active_year: TimeKeeper.date_of_record.next_year.year)}
     let(:service_area) { create_default(:benefit_markets_locations_service_area) }
     let(:sic_code)      { "001" }
 
-    let(:effective_period_start_on) { TimeKeeper.date_of_record.end_of_month + 1.day + 1.month }
+    let(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_month + 2.months }
     let(:effective_period_end_on)   { effective_period_start_on + 1.year - 1.day }
     let(:effective_period)          { effective_period_start_on..effective_period_end_on }
 
     let(:open_enrollment_period_start_on) { effective_period_start_on.prev_month }
     let(:open_enrollment_period_end_on)   { open_enrollment_period_start_on + 9.days }
     let(:open_enrollment_period)          { open_enrollment_period_start_on..open_enrollment_period_end_on }
+
+    let(:application_period_prev_year)        { (Date.new(effective_period_start_on.prev_year.year, 1, 1))..(Date.new(effective_period_start_on.prev_year.year, 12, 31)) }
+    let(:application_period_next_year)        { (Date.new(effective_period_start_on.next_year.year, 1, 1))..(Date.new(effective_period_start_on.next_year.year, 12, 31)) }
+    let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
+    let!(:benefit_market_catalog_next_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_next_year) }
+    let!(:benefit_market_catalog_prev_year)   { FactoryBot.create(:benefit_markets_benefit_market_catalog, :with_product_packages, issuer_profile: issuer_profile, benefit_market: benefit_market, application_period: application_period_prev_year) }
 
     let(:params) do
       {
@@ -481,12 +493,14 @@ module BenefitSponsors
     # end
 
     describe ".renew" do
+      before(:each) do
+        ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
+        ::BenefitMarkets::Products::ProductFactorCache.initialize_factor_cache!
+      end
 
       context "when renewal benefit sponsor catalog available" do
-
         # Create site
         # Create benefit market
-
         # Create employer organization with profile
         # Create benefit sponsorships
         # Create benefit applications
@@ -496,39 +510,67 @@ module BenefitSponsors
         let(:current_effective_date) { renewal_effective_date.prev_year }
         let(:effective_period) { current_effective_date..current_effective_date.next_year.prev_day }
         let(:package_kind)            { :single_issuer }
-
-        # let(:benefit_market) { create(:benefit_markets_benefit_market, site_urn: 'mhc', kind: :aca_shop, title: "MA Health Connector SHOP Market") }
-
-        # let(:current_benefit_market_catalog) { build(:benefit_markets_benefit_market_catalog, :with_product_packages,
-        #   title: "SHOP Benefits for #{current_effective_date.year}",
-        #   application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
-        # )}
-
-        # let(:renewal_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog,
-        #   title: "SHOP Benefits for #{renewal_effective_date.year}",
-        #   application_period: (renewal_effective_date.beginning_of_year..renewal_effective_date.end_of_year)
-        # )}
-
-        # let(:benefit_sponsorship) { create(:benefit_sponsors_benefit_sponsorship, benefit_market: benefit_market) }
-
+        let(:application_period_next_year)        { (Date.new(renewal_effective_date.year,1,1))..(Date.new(renewal_effective_date.year,12,31)) }
         let!(:employer_profile) {benefit_sponsorship.profile}
         let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
-        let(:benefit_package)   { create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application) }
-
-        let(:renewal_benefit_sponsor_catalog) { build(:benefit_markets_benefit_sponsor_catalog, effective_date: renewal_effective_date, effective_period: renewal_effective_date..renewal_effective_date.next_year.prev_day, open_enrollment_period: renewal_effective_date.prev_month..(renewal_effective_date - 15.days)) }
-
+        let(:benefit_package)   do
+          bp = create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application)
+          reference_product = bp.sponsored_benefits.first.reference_product
+          reference_product.renewal_product = product
+          reference_product.save!
+          bp
+        end
         let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_group_id:nil, benefit_package_id: benefit_package.id, is_active:true)}
         let!(:census_employee) { FactoryBot.create(:census_employee, employer_profile_id: nil, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment]) }
-
-        let!(:renewal_application) {initial_application.renew(renewal_benefit_sponsor_catalog)}
+        let(:renewal_application) do
+          application = initial_application.renew
+          application.save
+          application
+        end
         let(:renewal_bga) {FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: renewal_application.benefit_packages.first, census_employee: census_employee, is_active: false)}
-
+        let(:renewal_product_package)    { benefit_market_catalog_next_year.product_packages.detect { |package| package.package_kind == package_kind } }
+        let(:product) { renewal_product_package.products[0] }
 
         it "should generate renewal application" do
           expect(renewal_application.predecessor).to eq initial_application
           expect(renewal_application.effective_period.begin).to eq renewal_effective_date
-          expect(renewal_application.benefit_sponsor_catalog).to eq renewal_benefit_sponsor_catalog
+        end
+
+        context "send_employee_renewal_invites" do
+          let!(:census_employee_1) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let!(:census_employee_2) do
+            FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
+          end
+          let(:census_employee_scope) do
+            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+          end
+
+          let(:fake_email_address) {"fakeemail1@fakeemail.com" }
+
+          context "same employer, same email" do
+            before :each do
+              ::Invitation.destroy_all
+              renewal_application.save!
+              renewal_bga
+              CensusEmployee.all.each do |ce|
+                allow(ce).to receive(:email_address).and_return(fake_email_address)
+                allow(ce.renewal_benefit_group_assignment).to receive(:benefit_application).and_return(renewal_application)
+                allow(ce).to receive(:benefit_sponsors_employer_profile_id).and_return(employer_profile.id)
+              end
+              allow(renewal_application.benefit_sponsorship).to receive(:census_employees).and_return(census_employee_scope)
+              allow(TimeKeeper).to receive(:date_of_record).and_return(Time.now + 1.month)
+            end
+
+            it "should not send duplicate invitations, even with time travel activated" do
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+              renewal_application.send_employee_renewal_invites
+              expect(::Invitation.count).to eq(2)
+            end
+          end
         end
 
         context "when renewal application saved" do
@@ -595,6 +637,56 @@ module BenefitSponsors
           xit "should deactivate active benefit group assignment" do
             expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
           end
+        end
+
+        context "based on exchange's rules" do
+
+          context 'when current benefit application has flex rules and renewals are not allowed to get flex rules' do
+            let(:renewal_year) { initial_application.start_on.next_year.year }
+            let(:flex_setting) { initial_application.start_on.month == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_year}"] }
+            let(:flex_contribution_setting) { flex_setting.setting(:contribution_model_key) }
+            let(:flex_period) { flex_setting.setting(:effective_period).item }
+            let(:flex_setting_enabled) do
+              initial_application.start_on.month == 1 ? EnrollRegistry.feature_enabled?("renewal_sponsor_jan_default_#{renewal_year}") : EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_year}")
+            end
+            let(:contribution_model1) {renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model}
+
+            before :each do
+              allow(flex_contribution_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
+            end
+
+            it "should set minimum contributions percentage" do
+              expect(contribution_model1.key).to eq :fifty_percent_sponsor_fixed_percent_contribution_model if flex_setting_enabled && flex_period.cover?(renewal_application.start_on)
+            end
+          end
+
+          context 'when current benefit application doesnt have flex rules and renewals are allowed to get flex rules' do
+            let(:renewal_effective_period) { effective_period.min.next_year..effective_period.max.next_year }
+            let(:renewal_start_on_year) { renewal_effective_period.min.year }
+            let(:initial_flex_setting) do
+              effective_period.min.yday == 1 ? EnrollRegistry["initial_sponsor_jan_default_#{effective_period.min.year}"] : EnrollRegistry["initial_sponsor_default_#{effective_period.min.year}"]
+            end
+            let(:initial_flex_contribution_setting) { initial_flex_setting.setting(:contribution_model_key) }
+            let(:initial_flex_period) { flex_setting.setting(:effective_period).item }
+
+            let(:renewal_flex_setting) do
+              renewal_effective_period.min.yday == 1 ? EnrollRegistry["renewal_sponsor_jan_default_#{renewal_start_on_year}"] : EnrollRegistry["renewal_sponsor_default_#{renewal_start_on_year}"]
+            end
+            let(:renewal_flex_contribution_setting) { renewal_flex_setting.setting(:contribution_model_key) }
+            let(:renewal_flex_period) { renewal_flex_setting.setting(:effective_period).item }
+            let(:renewal_flex_setting_enabled) { EnrollRegistry.feature_enabled?("renewal_sponsor_default_#{renewal_start_on_year}") }
+            let(:contribution_model2) { renewal_application.benefit_packages.first.sponsored_benefits[0].contribution_model }
+
+            before :each do
+              allow(initial_flex_contribution_setting).to receive(:item).and_return(:fifty_percent_sponsor_fixed_percent_contribution_model)
+              allow(renewal_flex_contribution_setting).to receive(:item).and_return(:zero_percent_sponsor_fixed_percent_contribution_model)
+            end
+
+            it "should set minimum contributions percentage" do
+              expect(contribution_model2.key).to eq :zero_percent_sponsor_fixed_percent_contribution_model if renewal_flex_setting_enabled && renewal_flex_period.cover?(renewal_effective_period.min)
+            end
+          end
+
         end
       end
     end
@@ -724,7 +816,7 @@ module BenefitSponsors
         let(:valid_open_enrollment_period)    { valid_open_enrollment_begin_on..valid_open_enrollment_end_on }
 
         it "should provide a valid open enrollment period for that effective date" do
-          expect(subject.open_enrollment_period_by_effective_date(effective_date)).to eq valid_open_enrollment_period
+          expect(subject.open_enrollment_period_by_effective_date(false, effective_date)).to eq valid_open_enrollment_period
         end
       end
 
@@ -760,11 +852,11 @@ module BenefitSponsors
         end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
-          expect(subject.enrollment_timetable_by_effective_date(effective_date)).to eq valid_timetable
+          expect(subject.enrollment_timetable_by_effective_date(false, effective_date)).to eq valid_timetable
         end
 
         it "timetable date values should be valid" do
-          timetable = subject.enrollment_timetable_by_effective_date(effective_date)
+          timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
           expect(BenefitApplications::BenefitApplication.new(
                               effective_period: timetable[:effective_period],
@@ -904,6 +996,54 @@ module BenefitSponsors
       end
     end
 
+    describe '.active_and_cobra_enrolled_families',dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+      include_context "setup employees with benefits"
+
+      let!(:people) { create_list(:person, 5, :with_employee_role, :with_family) }
+
+      before do
+        people.each_with_index do |person, i|
+          ce = census_employees[i]
+          family = person.primary_family
+          ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+          FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
+        end
+      end
+
+      it 'should return enrolled families count' do
+        expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+      end
+
+      context 'when family has only enrolled in dental coverage' do
+
+        let(:dental_person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+        let(:dental_family) { dental_person.primary_family }
+        let!(:dental_sponsored_benefit) { true }
+        let(:dental_census_employee) do
+          ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+          ce.update_attributes!(employee_role_id: dental_person.employee_roles.first.id)
+          ce
+        end
+
+        let!(:dental_enrollment) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            family: dental_family,
+            household: dental_family.active_household,
+            benefit_group_assignment: dental_census_employee.benefit_group_assignments.first,
+            sponsored_benefit_package_id: dental_census_employee.benefit_group_assignments.first.benefit_package.id,
+            coverage_kind: 'dental'
+          )
+        end
+
+        it 'should return enrolled families count' do
+          expect(initial_application.active_and_cobra_enrolled_families.count).to eq benefit_sponsorship.census_employees.count
+        end
+      end
+    end
+
     describe '.predecessor_benefit_package', dbclean: :after_each do
       include_context "setup benefit market with market catalogs and product packages"
       include_context "setup renewal application"
@@ -929,6 +1069,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employment_terminated'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -940,6 +1081,7 @@ module BenefitSponsors
         ce.benefit_group_assignments.first.update_attributes!(start_on: renewal_application.effective_period.min + 1.day)
         ce.aasm_state = 'employee_termination_pending'
         ce.employment_terminated_on = term_date
+        ce.benefit_group_assignments.last.update(benefit_package_id: renewal_application.benefit_packages.first.id)
         ce.save(validate: false)
         expect(renewal_application.active_census_employees_under_py.count).to eq 4
       end
@@ -960,6 +1102,27 @@ module BenefitSponsors
         ce.aasm_state = 'employee_termination_pending'
         ce.employment_terminated_on = term_date
         expect(renewal_application.active_census_employees_under_py.count).to eq 5
+      end
+    end
+
+    describe '.all_waived_member_count', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
+      include_context "setup employees with benefits"
+
+      before :each do
+        employees = []
+        benefit_sponsorship.census_employees.each do |ce|
+          family = FactoryBot.create(:family, :with_primary_family_member)
+          allow(ce).to receive(:family).and_return(family)
+          allow(ce).to receive(:is_waived_under?).and_return true
+          employees << ce
+        end
+        allow(renewal_application).to receive(:active_census_employees_under_py).and_return(employees)
+      end
+
+      it 'should not return the waived EEs count' do
+        expect(renewal_application.all_waived_member_count).to eq 5
       end
     end
 
@@ -1074,6 +1237,202 @@ module BenefitSponsors
         end
       end
 
+    end
+
+    describe '.enrollment_quiet_period', dbclean: :after_each do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
+
+      context "when intital application open enrollment end date inside plan year start date", dbclean: :after_each do
+
+        it 'return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'return default quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          initial_quiet_period_end = initial_application.start_on + Settings.aca.shop_market.initial_application.quiet_period.month_offset.months + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+          expect(quiet_period.max).to eq TimeKeeper.end_of_exchange_day_from_utc(initial_quiet_period_end)
+        end
+      end
+
+      context "when intital application open enrollment end date outside plan year start date", dbclean: :after_each do
+
+        before do
+          initial_application.open_enrollment_period = (current_effective_date - 15.days..current_effective_date + 4.days)
+          initial_application.save
+        end
+
+        it 'return next day of open_enrollment_end date as quiet_period start date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.min.to_date).to eq initial_application.open_enrollment_period.max + 1.day
+        end
+
+        it 'return next day of quiet_period start date as quiet_period end date' do
+          quiet_period = initial_application.enrollment_quiet_period
+          expect(quiet_period.max).to eq quiet_period.min + 1.day
+        end
+
+      end
+    end
+
+
+describe '.is_renewing?' do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup renewal application"
+
+  let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
+    :with_benefit_package,
+    :benefit_sponsorship => benefit_sponsorship,
+    :aasm_state => 'enrollment_ineligible',
+    :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
+  )}
+
+  before do
+    benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
+  end
+
+  context "finding if plan year is a renewal or not" do
+    it 'renewing application should return true' do
+      expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+    end
+
+    it 'active application should return false' do
+      expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
+    end
+
+    it 'old ineligible application should return false' do
+      expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
+    end
+
+    it 'renewal application transitions to enrollment ineligible state' do
+      renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
+      expect(renewal_application.is_renewing?).to eq true
+    end
+  end
+end
+
+    describe '.employee_participation_ratio_minimum' do
+
+      let(:application) { subject.class.new(effective_period: effective_period) }
+      let(:market) { double(kind: :aca_shop) }
+      let(:start_on) { TimeKeeper.date_of_record }
+      let(:benefit_sponsor_catalog) { double(product_packages: [product_package])}
+      let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :fifty_percent_sponsor_fixed_percent_contribution_model))}
+
+      before do
+        allow(application).to receive(:benefit_market).and_return(market)
+        allow(application).to receive(:benefit_sponsor_catalog).and_return(benefit_sponsor_catalog)
+      end
+
+      context 'when resource registry feature not found' do
+
+        let(:start_on) { TimeKeeper.date_of_record + 2.years }
+
+        context "start on is on january 1st" do
+          let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+      end
+
+      context 'when resource registry feature not enabled' do
+        let(:market) { double(kind: :fehb) }
+
+        context "fehb market" do
+          it 'should have feature disabled' do
+            expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_falsey
+          end
+        end
+
+        context "start on is on january 1st" do
+          let(:effective_period) { start_on.beginning_of_year..start_on.end_of_year }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+
+          it 'should return system default minimum ratio' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
+          end
+        end
+      end
+
+      context 'when resourcer registry feature enabled' do
+        context "shop market" do
+          it 'should have feature enabled' do
+            expect(::EnrollRegistry.feature_enabled?("#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}")).to be_truthy
+          end
+        end
+
+        context "start on is not on january 1st" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:feature) { ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] }
+
+          it 'should return minimum participation ratio from registry' do
+            expect(application.employee_participation_ratio_minimum).to eq feature.settings(:fifty_percent_sponsor_fixed_percent_contribution_model).item
+          end
+        end
+
+        context "contribution key missing" do
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: nil))}
+
+          it 'should return error' do
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+              {
+                product_package: product_package,
+                calender_year: application.start_on.year
+              }
+            }
+
+            expect(result.failure?).to be_truthy
+            expect(result.failure).to eq "contribution key missing."
+          end
+
+          it 'should return minimum participation ratio using system default' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
+          end
+        end
+
+        context "contribution key is different from registry setting" do
+          let(:effective_period) { Date.new(start_on.year, 1, 1)..Date.new(start_on.year, 12, 31) }
+          let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :list_bill_contribution_model))}
+
+          it 'should return error' do
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+              {
+                product_package: product_package,
+                calender_year: application.start_on.year
+              }
+            }
+
+            expect(result.failure?).to be_truthy
+            expect(result.failure).to eq "unable to find minimum contribution for given contribution model."
+          end
+
+          it 'should return minimum participation ratio using system default' do
+            expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(application.start_on)
+          end
+        end
+      end
     end
   end
 end

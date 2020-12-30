@@ -27,7 +27,7 @@
 
         <%#= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/genral_agency_contacts", broker_agency_contacts: @general_agency_profile.genral_agency_contacts %>
         <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/office_locations", office_locations: @general_agency_profile.office_locations %>
-        <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/general_agency_staff_table", ga_staff: Person.staff_for_ga_including_pending(@general_agency_profile) %>
+        <%= render "benefit_sponsors/profiles/general_agencies/general_agency_profiles/general_agency_staff_table", ga_staff: Person.staff_for_ga_including_pending(@general_agency_profile).to_a %>
       </div>
     </div>
   </div>

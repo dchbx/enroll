@@ -1,0 +1,29 @@
+<div id="phone_info" class="row no-buffer no-border-top">
+  <div class="phone col-md-12 col-sm-12 col-xs-12 no-pd">
+
+    <%= f.fields_for :phones, errors: {}, fieldset: true do |phone|  %>
+      <% if((phone.index == 0) || (phone.index == 2)) %>
+        <div class="row row-form-wrapper no-buffer">
+      <% end %>
+    <div class="col-md-6 col-sm-6 no-pd">
+      <div class="form-group form-group-lg <%= 'border_bottom_no_zero' if ((phone.index == 0) || (phone.index == 2)) %>">
+
+	<% kind = phone.object.kind.upcase %>
+	<% required = "" %>
+        <% if kind == 'HOME' %>
+          <% required = "required" %>
+        <% end %>
+
+        <%= phone.hidden_field :kind %>
+        <%= phone.hidden_field :_destroy %>
+        <%= phone.text_field :full_phone_number, placeholder: "#{kind} PHONE", class: "#{required} number textfield floatlabel phone_number form-control" %>
+      </div>
+    </div>
+    <% if((phone.index == 1) || (phone.index == 3)) %>
+        </div>
+      <% end %>
+    <% end%>
+
+    <%= render 'shared/error_warning' %>
+  </div>
+</div>

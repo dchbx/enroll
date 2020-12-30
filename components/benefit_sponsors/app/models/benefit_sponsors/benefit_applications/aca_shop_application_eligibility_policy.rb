@@ -82,7 +82,7 @@ module BenefitSponsors
 
     rule  :benefit_packages_contains_reference_plans,
             validate: -> (benefit_application){
-              benefit_application.benefit_packages.any?{|bp| bp.reference_plan.present? }
+              benefit_application.benefit_packages.all?{|bp| bp.reference_plan.present? }
               },
             success:  -> (benfit_application)  { "validated successfully" },
             fail:     -> (benefit_application) { "application benefit packages must have reference plans" }

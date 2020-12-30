@@ -8,17 +8,19 @@ describe "insured/family_members/index.html.erb" do
   let(:dependent) { Forms::FamilyMember.new(family_id: family.id) }
   let(:employee_role) { FactoryBot.build(:employee_role) }
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
+  let(:resident_role) { FactoryBot.build(:resident_role) }
 
   before :each do
     sign_in user
     assign :person, person
     assign :family, family
     allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
+    allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true, can_access_progress?: true))
   end
 
   it "should have title" do
     render template: "insured/family_members/index.html.erb"
-    expect(rendered).to have_selector("h1", text: 'Family Members')
+    expect(rendered).to have_selector("h2", text: "#{l10n("family_information")}")
   end
 
   it "should have memo to indicate required fields" do
@@ -45,10 +47,14 @@ describe "insured/family_members/index.html.erb" do
       allow(view).to receive(:is_under_open_enrollment?).and_return false
       render template: "insured/family_members/index.html.erb"
     end
+  end
 
-    it "should call individual_progress" do
-      expect(rendered).to match /Verify Identity/
-      expect(rendered).to have_selector("a[href='/insured/families/find_sep?consumer_role_id=#{consumer_role.id}']", text: 'Continue')
+  context "when resident" do
+    before :each do
+      assign :type, "resident"
+      assign :resident_role, resident_role
+      allow(view).to receive(:is_under_open_enrollment?).and_return false
+      render template: "insured/family_members/index.html.erb"
     end
   end
 end

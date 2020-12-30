@@ -10,6 +10,7 @@ module SponsoredBenefits
     let!(:user_with_broker_role) { FactoryBot.create(:user, person: person ) }
 
     before do
+      allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
       plan_design_census_employee
       benefit_application
       person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)

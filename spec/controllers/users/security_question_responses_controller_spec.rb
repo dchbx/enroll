@@ -41,7 +41,6 @@ RSpec.describe Users::SecurityQuestionResponsesController, dbclean: :after_each 
       end
       it 'ss' do
         request.headers.merge!('HTTP_REFERER' => 'http://example.com')
-        # binding.pry
         expect(request.referer).to eq('http://example.com') 
       end
       it { expect(response).to have_http_status(:success) }

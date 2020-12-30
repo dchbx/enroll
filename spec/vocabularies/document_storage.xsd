@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://openhbx.org/api/terms/1.0"
+            targetNamespace="http://openhbx.org/api/terms/1.0"
+            elementFormDefault="qualified">
+  <xsd:include schemaLocation="individual.xsd"/>
+
+  <xsd:complexType name="DocumentListRequestType">
+	  <xsd:sequence>
+		  <xsd:element name="identity" type="PersonMatchIdentityType"/>
+	  </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="PersonMatchIdentityType">
+	  <xsd:sequence>
+		  <xsd:element name="name_first" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="name_last" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="ssn" type="FederalTaxIdType" minOccurs="0"/>
+		  <xsd:element name="dob" type="SimpleDateType" minOccurs="0"/>
+		  <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+		  <xsd:element name="hbx_member_id" type="xsd:string" minOccurs="0"/>
+	  </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="DocumentListItemType">
+	  <xsd:sequence>
+		  <xsd:element name="document_id" type="xsd:string"/>
+		  <xsd:element name="document_name" type="xsd:string"/>
+		  <xsd:element name="document_kind" type="xsd:string"/>
+	  </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="DocumentListResponseType">
+	  <xsd:sequence>
+		  <xsd:element name="document" type="DocumentListItemType" minOccurs="0" maxOccurs="unbounded"/>
+	  </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:element name="member_documents" type="DocumentListRequestType"/>
+  <xsd:element name="document_list" type="DocumentListResponseType"/>
+</xsd:schema> 

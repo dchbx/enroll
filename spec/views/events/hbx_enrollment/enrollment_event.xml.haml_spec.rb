@@ -77,4 +77,78 @@ RSpec.describe "app/views/events/enrollment_event.xml.haml" do
       expect(@doc.xpath("//x:qualifying_reason", "x" => "http://openhbx.org/api/terms/1.0").text).to eq "urn:openhbx:terms:v1:benefit_maintenance#non_payment"
     end
   end
+
+  context 'person_relationships' do
+    before :each do
+      @primary = hbx_enrollment.family.primary_person
+      @primary.person_relationships = [PersonRelationship.new(relative_id: @primary.id, kind: 'unrelated')]
+      @primary.save!
+      product = active_sponsored_benefit.reference_product
+      product.issuer_profile = issuer_profile
+      product.save
+      allow(hbx_enrollment).to receive(:decorated_hbx_enrollment).and_return(decorated_hbx_enrollment)
+    end
+
+    context 'one member family with invalid relationship' do
+      before do
+        @rendered_xml = render :template => 'events/enrollment_event', :locals => {hbx_enrollment: hbx_enrollment}
+      end
+
+      it 'should not include primary_relationship' do
+        expect(@rendered_xml).not_to include('person_relationship')
+      end
+    end
+
+    context 'two member family with one invalid relationship' do
+      let!(:person2) { FactoryBot.create(:person) }
+      let!(:family_member2) { FactoryBot.create(:family_member, family: hbx_enrollment.family, person: person2) }
+      let!(:hbx_enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
+      let(:member_enrollment2) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member2.id, product_price: BigDecimal(100), sponsor_contribution: BigDecimal(100))}
+
+      before do
+        decorated_hbx_enrollment.member_enrollments = [member_enrollment, member_enrollment2]
+        @primary.person_relationships << PersonRelationship.new(relative_id: person2.id, kind: 'child')
+        @kind = @primary.person_relationships.where(relative_id: person2.id).first.kind
+        @rendered_xml = render :template => 'events/enrollment_event', :locals => {hbx_enrollment: hbx_enrollment}
+        @doc = Nokogiri::XML(@rendered_xml)
+      end
+
+      it 'should not include primary_relationship' do
+        expect(@rendered_xml).not_to include('unrelated')
+      end
+
+      it 'should include dependent relationship' do
+        expect(@doc.xpath('//x:relationship_uri', 'x' => 'http://openhbx.org/api/terms/1.0').first.text.split('#').last).to eq(@kind)
+      end
+    end
+
+    context 'primary not on enrollment, subscriber with invalid relationship' do
+      let!(:person2) { FactoryBot.create(:person) }
+      let!(:person3) { FactoryBot.create(:person) }
+      let!(:family_member2) { FactoryBot.create(:family_member, family: family, person: person2) }
+      let!(:family_member3) { FactoryBot.create(:family_member, family: family, person: person3) }
+      let(:hbx_enrollment_member2) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member2.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
+      let!(:hbx_enrollment_member3) { FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member3.id, is_subscriber: false, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: hbx_enrollment)}
+      let(:member_enrollment2) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member2.id,product_price: BigDecimal(100),sponsor_contribution: BigDecimal(100))}
+      let(:member_enrollment3) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id: hbx_enrollment_member3.id, product_price: BigDecimal(100), sponsor_contribution: BigDecimal(100))}
+
+      before do
+        hbx_enrollment.hbx_enrollment_members = [hbx_enrollment_member2, hbx_enrollment_member3]
+        hbx_enrollment.save!
+        decorated_hbx_enrollment.member_enrollments = [member_enrollment2, member_enrollment3]
+        person2.person_relationships << PersonRelationship.new(relative_id: person2.id, kind: 'child')
+        @kind = person2.person_relationships.where(relative_id: person2.id).first.kind
+        @rendered_xml = render :template => 'events/enrollment_event', :locals => {hbx_enrollment: hbx_enrollment}
+        @doc = Nokogiri::XML(@rendered_xml)
+      end
+
+      it 'should not include subscriber to subscriber relationship' do
+        expect(@rendered_xml).not_to include('child')
+      end
+
+      it 'should not include any relationship tags' do
+        expect(@doc.xpath('//x:relationship_uri', 'x' => 'http://openhbx.org/api/terms/1.0')).to be_empty
+      end
+    end
+  end
 end

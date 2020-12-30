@@ -1,10 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe Insured::RidpDocumentsController, :type => :controller do
-  let(:user) { FactoryBot.create(:user) }
-  let(:person) { FactoryBot.build(:person, :with_consumer_role) }
-  let(:consumer_role) { {consumer_role: ''} }
-  let(:consumer_wrapper) { double }
+RSpec.describe Insured::RidpDocumentsController, type: :controller, dbclean: :after_each do
+  let!(:user) { FactoryBot.create(:user) }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role) }
+  let!(:consumer_role) { person.consumer_role }
 
   context "Failed Upload" do
     it "redirects" do
@@ -21,7 +20,7 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
       request.env["HTTP_REFERER"] = "/home"
       allow(user).to receive(:person).and_return person
       sign_in user
-      post :upload, params: {consumer_role: ""}
+      post :upload
       expect(flash[:notice]).not_to be_present
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).to eq "File not uploaded. Please select the file to upload."
@@ -34,13 +33,13 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
       let(:file) { double }
       let(:temp_file) { double }
       let(:consumer_role_params) {}
-      let(:params) { {person: {consumer_role: ''}, file: [file]} }
+      let(:params) { { person: person, file: [file], ridp_verification_type: 'Identity' } }
       let(:bucket_name) { 'id-verification' }
-      let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key" }
+      let(:doc_id) { "urn:openhbx:terms:v1:file_storage:s3:bucket:#{bucket_name}{#sample-key}" }
       let(:file_path) { File.dirname(__FILE__) } # a sample file path
       let(:cleaned_params) { {"0" => {"subject" => "I-327 (Reentry Permit)", "id" => "55e7fef5536167bb822e0000", "alien_number" => "999999999"}} }
 
-      it "redirects" do
+      before :each do
         request.env["HTTP_REFERER"] = "/home"
         allow(file).to receive(:original_filename).and_return("some-filename")
         allow(file).to receive(:tempfile).and_return(temp_file)
@@ -53,6 +52,9 @@ RSpec.describe Insured::RidpDocumentsController, :type => :controller do
         allow(Aws::S3Storage).to receive(:save).with(file_path, bucket_name).and_return(doc_id)
         sign_in user
         post :upload, params: params
+      end
+
+      it "redirects" do
         expect(flash[:notice]).to be_present
       end
     end

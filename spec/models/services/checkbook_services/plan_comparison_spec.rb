@@ -6,9 +6,9 @@ class ApplicationHelperModStubber
   extend ApplicationHelper
 end
 
-describe Services::CheckbookServices::PlanComparision do
+describe Services::CheckbookServices::PlanComparision, dbclean: :after_each do
 
-  let!(:census_employee) { FactoryBot.create(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, ssn: person.ssn, employee_role_id: employee_role.id, ssn: "112232222")}
+  let!(:census_employee) { FactoryBot.create(:census_employee, first_name: person.first_name, last_name: person.last_name, dob: person.dob, employee_role_id: employee_role.id, ssn: "112232222") }
   let!(:household) { FactoryBot.create(:household, family: person.primary_family)}
   let!(:ce_household) { census_employee.employee_role.person.primary_family.households.first }
 
@@ -21,7 +21,7 @@ describe Services::CheckbookServices::PlanComparision do
   let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, employee_role_id: employee_role.id, benefit_group_id: benefit_group.id)}
   let!(:hbx_enrollment1) { FactoryBot.create(:hbx_enrollment,family: family, kind: "individual", consumer_role_id: consumer_person.consumer_role.id, household: family.active_household)}
 
-  describe "when employee is not congress" do
+  describe "when employee is not congress", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,false) }
     let(:checkbook_url) {"http://checkbook_url"}
     let(:result) {double("HttpResponse", :parsed_response => {"URL" => "http://checkbook_url"})}
@@ -42,7 +42,7 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "when user is consumer" do
+  describe "when user is consumer", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
     let(:checkbook_url) {"http://checkbook_url"}
     let(:result) {double("HttpResponse", :parsed_response => {"URL" => checkbook_url})}
@@ -66,7 +66,7 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "when checkbook response is irregular or an exception is raised" do
+  describe "when checkbook response is irregular or an exception is raised", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment1,false) }
     let(:checkbook_url) {"http://checkbook_url"}
     let(:result) {double("HttpResponse", :parsed_response => {"URL" => ""})}
@@ -89,7 +89,7 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "#build_congress_employee_age" do
+  describe "#build_congress_employee_age", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
     context "when active household is present" do
       let(:person_congress) { FactoryBot.create(:person, :with_active_consumer_role, :with_consumer_role, dob: "1980-01-01") }
@@ -107,7 +107,7 @@ describe Services::CheckbookServices::PlanComparision do
   end
 
 
-  describe "#csr_value" do
+  describe "#csr_value", dbclean: :after_each do
     let!(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role) }
     let!(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: ivl_person) }
     let!(:ivl_household)    { ivl_family.active_household }
@@ -127,12 +127,12 @@ describe Services::CheckbookServices::PlanComparision do
         it "should return a value mapped to #{csr_kind} as all members are aptc eligible" do
           ivl_ed.update_attributes!(csr_eligibility_kind: csr_kind)
           csr = ::EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
-          expect(subject.csr_value).to eq csr.prepend('-')
+          expect(subject.csr_value).to eq ("-" + csr)
         end
       end
     end
 
-    context 'when at least one of the members are aptc ineligible' do
+    context 'when at least one of the members are aptc ineligible', dbclean: :after_each do
       let!(:ivl_thhm1)          { ivl_tax_household.tax_household_members << TaxHouseholdMember.new(applicant_id: dependent_fm_id, is_medicaid_chip_eligible: true) }
       let!(:ivl_enr_member1)    { FactoryBot.create(:hbx_enrollment_member, applicant_id: dependent_fm_id, hbx_enrollment: ivl_enrollment, is_subscriber: false, eligibility_date: thh_start_on) }
 
@@ -141,7 +141,7 @@ describe Services::CheckbookServices::PlanComparision do
       end
     end
 
-    context 'when there is no active tax household' do
+    context 'when there is no active tax household', dbclean: :after_each do
       it 'should return -01' do
         ivl_tax_household.update_attributes!(effective_ending_on: TimeKeeper.date_of_record.end_of_year)
         expect(subject.csr_value).to eq '-01'
@@ -149,7 +149,7 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "#aptc_value  " do
+  describe "#aptc_value", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
     context "when active household is present" do
       let(:tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: Date.new(TimeKeeper.date_of_record.year,1,1), effective_ending_on: nil)}
@@ -171,7 +171,7 @@ describe Services::CheckbookServices::PlanComparision do
     end
   end
 
-  describe "when employee is congress member" do
+  describe "when employee is congress member", dbclean: :after_each do
     subject { Services::CheckbookServices::PlanComparision.new(hbx_enrollment,true) }
     let(:checkbook_url) {"http://checkbook_url"}
 

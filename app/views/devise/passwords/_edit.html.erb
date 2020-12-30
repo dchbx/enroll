@@ -5,7 +5,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="passwordChangeModalLabel">Change my password</h4>
       </div>
-      <%= form_for(current_user, as: User, url: change_password_user_path(current_user), html: { method: :post }) do |f| %>
+      <%= form_for(current_user, as: User, url: main_app.change_password_user_path(current_user), html: { method: :post }) do |f| %>
         <div class="modal-body">
             <%= devise_error_messages! %>
 

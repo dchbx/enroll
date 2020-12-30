@@ -27,9 +27,8 @@ RSpec.shared_context "setup initial benefit application", :shared_context => :me
   #let!(:rating_area)   { create_default(:benefit_markets_locations_rating_area) }
   #let!(:service_areas) { benefit_sponsorship.service_areas_on(effective_period.min) }
 
-  let(:benefit_sponsor_catalog) {
-    benefit_sponsorship.benefit_sponsor_catalog_for(service_areas, effective_period.min)
-  }
+  let(:benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(effective_period.min) }
+
   let!(:initial_application)    { create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
                                         :with_benefit_package,
                                         passed_benefit_sponsor_catalog: benefit_sponsor_catalog,
@@ -81,7 +80,11 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
     BenefitSponsors::Organizations::GeneralOrganization.find(org_id)
   end
   let(:abc_profile)              { abc_organization.employer_profile }
-  let!(:benefit_sponsorship)     { abc_profile.add_benefit_sponsorship }
+  let!(:benefit_sponsorship) do
+    sponsorship = abc_profile.add_benefit_sponsorship
+    sponsorship.save
+    sponsorship
+  end
 
   let(:recorded_service_areas)   { 
     current_benefit_market_catalog

@@ -126,6 +126,7 @@ module BenefitSponsors
       context "search for broker agencies from employer portal" do
 
         before do
+          Person.create_indexes
           organization.update_attributes(legal_name: 'org1')
           broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
         end
@@ -149,6 +150,7 @@ module BenefitSponsors
       context "search for broker agencies from broker staff portal" do
 
         before do
+          Person.create_indexes
           organization.update_attributes(legal_name: 'org1')
           broker_agency_profile1.update_attributes(aasm_state: 'is_approved')
         end
@@ -184,6 +186,7 @@ module BenefitSponsors
       context "search for general agencies from ga staff portal" do
 
         before do
+          Person.create_indexes
           organization.update_attributes(legal_name: 'org1')
           general_agency_profile1.update_attributes(aasm_state: 'is_approved')
         end

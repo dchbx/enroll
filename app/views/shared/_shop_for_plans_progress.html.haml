@@ -26,7 +26,7 @@
 - if step == 2 && !no_purchase
   - enrollment = @hbx_enrollment || @enrollment
   - disabled_in_ivl = (enrollment && enrollment.is_shop?) ? '' : 'disabled'
-  = link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => "btn btn-lg btn-primary  btn-block #{disabled_in_ivl}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment)
+  = link_to 'Confirm', checkout_insured_plan_shopping_path(@enrollment.id, :plan_id => @plan.id, :change_plan => @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind), :class => "btn btn-lg btn-primary  btn-block #{disabled_in_ivl}", id: 'btn-continue', :method => :post, :disabled => disable_purchase?(!@enrollable, @enrollment), 'data-disable-with' => l10n("please_wait")
   %ul.list-unstyled.list-right-section
     %li
       %a.back{href: '#'}

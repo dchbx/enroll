@@ -9,8 +9,7 @@ module Mongorder
     fields.unshift([s_field.to_s, search_dir])
   end
 
-  def search(search_string, s_field = nil, s_order = nil)
-    search_order_expr = build_search_order_expression(s_field, s_order)
+  def search(search_string, s_field = nil, s_order = nil, disable_sort = false)
     search_scope = if search_string
                      self.where(
                        self.search_hash(search_string)
@@ -18,7 +17,13 @@ module Mongorder
                    else
                      self
                    end
-    search_scope.order_by(search_order_expr)
+
+    unless disable_sort
+      search_order_expr = build_search_order_expression(s_field, s_order)
+      return search_scope.order_by(search_order_expr)
+    end
+
+    search_scope
   end
 
 end

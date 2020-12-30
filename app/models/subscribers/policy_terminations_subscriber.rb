@@ -39,12 +39,25 @@ module Subscribers
               if en.may_terminate_for_non_payment? && qr_uri=='non_payment'
                 end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
                 if end_effective_date
-                  en.terminate_for_non_payment!(end_effective_date)
+                  if en.effective_on > end_effective_date
+                    en.cancel_coverage! if en.may_cancel_coverage?
+                  else
+                    next if en.terminated_on.present? && end_effective_date >= en.terminated_on
+                    en.update_attributes(terminated_on: end_effective_date) if en.terminated_on.present?
+                    en.terminate_for_non_payment!(end_effective_date)
+                  end
                 end
               elsif en.may_terminate_coverage?
                 end_effective_date = Date.strptime(end_effective_date_str, "%Y%m%d") rescue nil
                 if end_effective_date
-                  en.terminate_coverage!(end_effective_date)
+
+                  if en.effective_on > end_effective_date
+                    en.cancel_coverage! if en.may_cancel_coverage?
+                  else
+                    next if en.terminated_on.present? && end_effective_date >= en.terminated_on
+                    en.update_attributes(terminated_on: end_effective_date) if en.terminated_on.present?
+                    en.terminate_coverage!(end_effective_date)
+                  end
                 end
               end
             end

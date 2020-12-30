@@ -1,0 +1,11 @@
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    features:
+      - key: :waived_members_eligiblity
+        item: :waived_members_eligiblity
+        is_enabled: true
+      - key: :send_secure_message_employer
+        item: :send_secure_message
+        is_enabled: true

@@ -12,7 +12,7 @@ Then(/^the user will see Terminate button$/) do
   find('li', :text => 'Terminate').click
 end
 
-When(/^the user enters (mid_month|any_day) and other details for (voluntary|non-payment) termination$/) do |termination_date, termination_type|
+When(/^the user enters (mid_month|any_day|last_day) and other details for (voluntary|non-payment) termination$/) do |termination_date, termination_type|
   if termination_type == 'voluntary'
     find(:xpath, '//input[@id="term_actions_voluntary"]').click
   else
@@ -21,8 +21,10 @@ When(/^the user enters (mid_month|any_day) and other details for (voluntary|non-
 
   if termination_date == 'mid_month'
     fill_in "Select Term Date", with: TimeKeeper.date_of_record.end_of_month.prev_day.strftime('%m/%d/%Y').to_s
-  else
+  elsif termination_date == 'any_day'
     fill_in "Select Term Date", with: TimeKeeper.date_of_record.end_of_month.strftime('%m/%d/%Y').to_s
+  elsif termination_date == 'last_day'
+    fill_in "Select Term Date", with: @new_application.end_on.to_s
   end
   find('h1', :text => 'Employers', wait: 10).click
 end

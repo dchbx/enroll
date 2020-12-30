@@ -9,6 +9,8 @@ class BrokerRole
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
+  BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'all'].freeze
+
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
@@ -171,7 +173,9 @@ class BrokerRole
   end
 
   def phone
-    parent.phones.where(kind: "phone main").first || broker_agency_profile.phone || parent.phones.where(kind: "work").first rescue ""
+    parent.phones.where(kind: "work").first || parent.phones.where(kind: "main").first || broker_agency_profile.phone
+  rescue StandardError => _e
+    ""
   end
 
   def email=(new_email)
@@ -302,9 +306,10 @@ class BrokerRole
     state :broker_agency_pending
     state :broker_agency_declined
     state :broker_agency_terminated
+    state :application_extended
 
     event :approve, :after => [:record_transition, :send_invitation, :notify_updated] do
-      transitions from: :applicant, to: :active, :guard => :is_primary_broker?
+      transitions from: [:applicant, :application_extended], to: :active, :guard => :is_primary_broker?
       transitions from: :broker_agency_pending, to: :active, :guard => :is_primary_broker?
       transitions from: :applicant, to: :broker_agency_pending
     end
@@ -315,11 +320,11 @@ class BrokerRole
     end
 
     event :broker_agency_accept, :after => [:record_transition, :send_invitation, :notify_updated] do
-      transitions from: :broker_agency_pending, to: :active
+      transitions from: [:broker_agency_pending, :application_extended], to: :active
     end
 
     event :broker_agency_decline, :after => :record_transition do
-      transitions from: :broker_agency_pending, to: :broker_agency_declined
+      transitions from: [:broker_agency_pending, :application_extended], to: :broker_agency_declined
     end
 
     event :broker_agency_terminate, :after => [:record_transition, :remove_broker_assignments] do
@@ -327,8 +332,7 @@ class BrokerRole
     end
 
     event :deny, :after => [:record_transition, :notify_broker_denial]  do
-      transitions from: :applicant, to: :denied
-      transitions from: :broker_agency_pending, to: :denied
+      transitions from: [:applicant, :broker_agency_pending, :application_extended], to: :denied
     end
 
     event :decertify, :after => [:record_transition, :remove_broker_assignments]  do
@@ -348,6 +352,12 @@ class BrokerRole
     # Not currently supported in UI.   Datafix only person.broker_role.recertify! refs #12398
     event :recertify, :after => :record_transition do
       transitions from: :decertified, to: :active
+    end
+
+    # Extends the broker application denial time
+    event :extend_application, :after => :record_transition do
+      transitions from: :application_extended, to: :application_extended, :after => :notify_broker_pending
+      transitions from: [:broker_agency_pending, :denied], to: :application_extended
     end
   end
 

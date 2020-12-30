@@ -3,7 +3,7 @@
     <% if Settings.site.key == :dc %>
       <%= person_name %>,
       <br />
-      <div>Thank you for registering as a broker though <%= Settings.site.short_name %>.</div>
+      <div>Thank you for registering as a broker through <%= Settings.site.short_name %>.</div>
       <div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
     <% else %>
       <div>

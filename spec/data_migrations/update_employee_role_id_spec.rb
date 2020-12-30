@@ -14,9 +14,11 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
   describe 'update employee role id on the enrollments/census_employee', dbclean: :after_each do
     let(:current_effective_date)  { TimeKeeper.date_of_record.next_month.beginning_of_month }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let(:issuer_profile)     { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
                                             title: 'SHOP Benefits for #{current_effective_date.year}',
+                                            issuer_profile: issuer_profile,
                                             application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
                                           }
     let(:benefit_market)      { site.benefit_markets.first }

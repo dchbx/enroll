@@ -16,7 +16,7 @@ module BenefitSponsors
           redirect_to new_benefit_sponsorship_benefit_application_benefit_package_path(@benefit_application_form.service.benefit_sponsorship, @benefit_application_form.show_page_model)
         else
           flash[:error] = error_messages(@benefit_application_form)
-          render :new
+          redirect_to new_benefit_sponsorship_benefit_application_path(@benefit_application_form.benefit_sponsorship_id)
         end
       end
 

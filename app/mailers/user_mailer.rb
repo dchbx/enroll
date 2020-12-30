@@ -127,7 +127,7 @@ class UserMailer < ApplicationMailer
     if agent_email.present?
       subject = "New Client Notification -[#{name}] email provided - [#{insured_email}]"
       mail({to: agent_email, subject: subject, from: "no-reply@individual.#{site_domain_name}"}) do |format|
-        format.html { render "new_client_notification", :locals => { first_name: first_name, :role => role, name: name}}
+        format.html { render "new_client_notification", :locals => { :role => role, name: name, email: insured_email }}
       end
     end
   end

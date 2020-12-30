@@ -26,7 +26,7 @@ class CensusEmployeePolicy < ApplicationPolicy
     return true if (@user.has_role?(:broker) || @user.has_broker_role?) && @record.employer_profile.try(:active_broker) == @user.person
     return true if has_valid_broker_staff_role?(@user, @record)
     return true if (@user.has_role?(:employer_staff) || @user.has_employer_staff_role?) && @user.person.employer_staff_roles.map(&:benefit_sponsor_employer_profile_id).map(&:to_s).include?(@record.benefit_sponsors_employer_profile_id.to_s)
-    return false if !@user.has_role?(:general_agency_staff) || !@user.has_general_agency_staff_role?
+    return false if !@user.has_role?(:general_agency_staff) && !@user.has_general_agency_staff_role?
     ga_id = @user.person.general_agency_staff_roles.last.general_agency_profile.id
     employer_id = @record.employer_profile.id
     return false if ga_id.nil? || employer_id.nil?

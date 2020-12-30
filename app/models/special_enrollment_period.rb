@@ -108,6 +108,9 @@ class SpecialEnrollmentPeriod
 
   def qualifying_life_event_kind=(new_qualifying_life_event_kind)
     raise ArgumentError.new("expected QualifyingLifeEventKind") unless new_qualifying_life_event_kind.is_a?(QualifyingLifeEventKind)
+    unless new_qualifying_life_event_kind.active?
+      raise StandardError, "Qualifying life event kind is expired" if (self.created_at.present? && (new_qualifying_life_event_kind.start_on..new_qualifying_life_event_kind.end_on).exclude?(self.created_at.to_date)) || self.created_at.blank?
+    end
     self.qualifying_life_event_kind_id = new_qualifying_life_event_kind._id
     self.title = new_qualifying_life_event_kind.title
     @qualifying_life_event_kind = new_qualifying_life_event_kind
@@ -166,6 +169,35 @@ class SpecialEnrollmentPeriod
     family.special_enrollment_periods.detect() { |sep| sep._id == id } unless family.blank?
   end
 
+  def termination_dates(effective_on_date)
+    termination_kinds = qualifying_life_event_kind.termination_on_kinds
+    termination_kinds.inject([]) do |dates, termination_kind|
+      term_date = fetch_termiation_date(termination_kind)
+      dates << if term_date < effective_on_date
+                 effective_on_date
+               else
+                 term_date
+               end
+    end.uniq
+  end
+
+  def fetch_termiation_date(termination_kind)
+    case termination_kind
+    when 'end_of_event_month'
+      qle_on.end_of_month
+    when 'date_before_event'
+      qle_on - 1.day
+    when 'end_of_last_month_of_reporting'
+      [created_at.prev_month.end_of_month.to_date, qle_on.end_of_month].max
+    when 'end_of_reporting_month'
+      [created_at.end_of_month.to_date, qle_on.end_of_month].max
+    when 'end_of_month_before_last'
+      [(created_at - 2.months).end_of_month.to_date, qle_on.end_of_month].max
+    when 'exact_date'
+      qle_on
+    end
+  end
+
 private
   def next_poss_effective_date_within_range
     return if next_poss_effective_date.blank?
@@ -207,8 +239,10 @@ private
   end
 
   def set_date_period
-    self.start_on = qle_on - @qualifying_life_event_kind.pre_event_sep_in_days.days
-    self.end_on   = qle_on + @qualifying_life_event_kind.post_event_sep_in_days.days
+    qle = @qualifying_life_event_kind
+    targeted_date = (qle.coverage_start_on.present? && qle.coverage_end_on.present?) || qle.qle_event_date_kind == :submitted_at ? (self.created_at ||= TimeKeeper.date_of_record).to_date : qle_on
+    self.start_on = targeted_date - qle.pre_event_sep_in_days.days
+    self.end_on   = targeted_date + qle.post_event_sep_in_days.days
 
     # Use end_on date as boundary guard for lapsed SEPs
     @reference_date = [submitted_at.to_date, end_on].min
@@ -219,25 +253,59 @@ private
   def set_effective_on
     return unless self.start_on.present? && self.qualifying_life_event_kind.present?
     self.effective_on = case effective_on_kind
-    when "date_of_event"
-      qle_on
-    when "exact_date"
-      qle_on
-    when "first_of_month"
-      first_of_month_effective_date
-    when "first_of_next_month"
-      first_of_next_month_effective_date
-    when "fixed_first_of_next_month"
-      fixed_first_of_next_month_effective_date
-    end
+                        when "date_of_event"
+                          qle_on
+                        when "date_of_event_plus_one"
+                          qle_on.next_day
+                        when "first_of_month"
+                          first_of_month_effective_date
+                        when "first_of_this_month"
+                          first_of_this_month_effective_date
+                        when "first_of_next_month"
+                          first_of_next_month_effective_date
+                        when "first_of_next_month_coinciding"
+                          first_of_next_month_coinciding_effective_date
+                        when "first_of_next_month_plan_selection"
+                          first_of_next_month_plan_selection_effective_date
+                        when "fixed_first_of_next_month"
+                          fixed_first_of_next_month_effective_date
+                        when "first_of_reporting_month"
+                          first_of_reporting_month_effective_date
+                        when "first_of_next_month_reporting"
+                          first_of_next_month_reporting_effective_date
+                        end
   end
 
   def first_of_month_effective_date
-    if @reference_date.day <= SpecialEnrollmentPeriod.individual_market_monthly_enrollment_due_on
+    if reference_date.day <= EnrollRegistry[:special_enrollment_period].setting(:fifteenth_of_the_month).item
       # if submitted_at.day <= Settings.aca.individual_market.monthly_enrollment_due_on
-      @earliest_effective_date.end_of_month + 1.day
+      earliest_effective_date.end_of_month + 1.day
     else
-      @earliest_effective_date.next_month.end_of_month + 1.day
+      earliest_effective_date.next_month.end_of_month + 1.day
+    end
+  end
+
+  def first_of_this_month_effective_date
+    qle_on.beginning_of_month
+  end
+
+  def reference_date
+    [submitted_at.to_date, end_on].min
+  end
+
+  def earliest_effective_date
+    [reference_date, qle_on].max
+  end
+
+  def first_of_next_month_plan_selection_effective_date
+    earliest_effective_date.end_of_month + 1.day
+  end
+
+  def first_of_next_month_coinciding_effective_date
+    if qle_on == qle_on.beginning_of_month
+      qle_on
+    else
+      qle_on.end_of_month + 1.day
     end
   end
 
@@ -285,6 +353,13 @@ private
     end
   end
 
+  def first_of_reporting_month_effective_date
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.beginning_of_month, qle_on.end_of_month + 1.day].max
+  end
+
+  def first_of_next_month_reporting_effective_date
+    [(self.created_at ||= TimeKeeper.date_of_record).to_date.end_of_month + 1.day, qle_on.end_of_month + 1.day].max
+  end
 
   ## TODO - Validation for SHOP, EE SEP cannot be granted unless effective_on >= initial coverage effective on, except for
   ## HBX_Admin override

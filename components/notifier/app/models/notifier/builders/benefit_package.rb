@@ -7,13 +7,13 @@ module Notifier
 
       def benefit_application_benefit_packages
         benefit_packages = employer_profile.benefit_applications.published_or_renewing_published.first.benefit_packages
-        merge_model.benefit_packages = build_benefit_packages(benefit_packages)
+        merge_model.benefit_application.benefit_packages = build_benefit_packages(benefit_packages)
       end
 
       def build_benefit_packages(benefit_packages)
         benefit_packages.collect do |benefit_package|
           b_package = Notifier::MergeDataModels::BenefitPackage.new
-          b_package.start_on = benefit_package.start_on
+          b_package.start_on = benefit_package.start_on.to_date
           b_package.title = benefit_package.title.titleize
           b_package.sponsored_benefits = build_sponsored_benenfits(benefit_package.sponsored_benefits)
           b_package
@@ -40,13 +40,15 @@ module Notifier
       end
 
       def plan_offerings_text(sponsored_benefit)
-        case sponsored_benefit.product_package_kind
-        when "single_carrier"
+        case sponsored_benefit.product_package_kind.to_s
+        when "single_issuer"
           "All plans from #{sponsored_benefit.reference_product.issuer_profile.legal_name.titleize}"
         when "metal_level"
           "#{sponsored_benefit.reference_product.metal_level.titleize} metal level"
-        when "single_plan"
+        when "single_product"
           "#{sponsored_benefit.reference_product.issuer_profile.legal_name.titleize} - #{sponsored_benefit.reference_product.title.titleize}"
+        when 'multi_product'
+          'Custom'
         end
       end
 

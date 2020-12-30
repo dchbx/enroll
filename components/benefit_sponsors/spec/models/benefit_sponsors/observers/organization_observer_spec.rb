@@ -15,6 +15,20 @@ module BenefitSponsors
             observer_instance.update(organization, nil)
             expect(observer_instance).to have_received(:notify).with('acapi.info.events.employer.fein_corrected', {:employer_id=> organization.hbx_id, :event_name=>"fein_corrected"})
           end
+
+          it 'DBA updated' do
+            allow_any_instance_of(OrganizationObserver).to receive(:notify)
+            organization.assign_attributes(dba: "test")
+            observer_instance.update(organization, nil)
+            expect(observer_instance).to have_received(:notify).with('acapi.info.events.employer.name_changed', {:employer_id => organization.hbx_id, :event_name => "name_changed"})
+          end
+
+          it 'legal_name updated' do
+            allow_any_instance_of(OrganizationObserver).to receive(:notify)
+            organization.assign_attributes(legal_name: "test")
+            observer_instance.update(organization, nil)
+            expect(observer_instance).to have_received(:notify).with('acapi.info.events.employer.name_changed', {:employer_id => organization.hbx_id, :event_name => "name_changed"})
+          end
         end
       end
     end

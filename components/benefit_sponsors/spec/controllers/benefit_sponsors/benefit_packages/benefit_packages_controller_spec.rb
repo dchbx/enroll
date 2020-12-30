@@ -32,7 +32,11 @@ module BenefitSponsors
     # let!(:benefit_market_catalog)  { benefit_market.benefit_market_catalogs.first }
     let(:organization)        { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
     let(:employer_profile)    { organization.employer_profile }
-    let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+    let(:benefit_sponsorship) do
+      sponsorship = employer_profile.add_benefit_sponsorship
+      sponsorship.save
+      sponsorship
+    end
     let!(:benefit_sponsorship_id) { benefit_sponsorship.id.to_s }
 
     let(:form_class)  { BenefitSponsors::Forms::BenefitPackageForm }

@@ -1,0 +1,9 @@
+<div id="immigration_other_with_alien_number_fields_container">
+  <%= c.hidden_field :vlp_subject, value: "Other (With Alien Number)" %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/alien_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/passport_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/servis_id", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/expiration_date", locals: {v: c, name: "Passport"} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/country_of_citizenship", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/document_description", locals: {v: c} %>
+</div>

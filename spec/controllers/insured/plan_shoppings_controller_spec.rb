@@ -134,6 +134,26 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       get :receipt, params: {id: "id"}
       expect(assigns(:employer_profile)).to eq abc_profile
     end
+
+    context "#send_receipt_emails" do
+      it "should send send secure message to IVL person inbox" do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+        sign_in(user)
+        expect(person.inbox.messages.count).to eq(1)
+        get :receipt, params: {id: "id"}
+        expect(person.inbox.messages.count).to eq(2)
+        expect(person.inbox.messages.last.subject).to eq("Your Enrollment Confirmation")
+      end
+
+      it "should send send secure message to SHOP person inbox"do
+        allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
+        sign_in(user)
+        expect(person.inbox.messages.count).to eq(1)
+        get :receipt, params: {id: "id"}
+        expect(person.inbox.messages.count).to eq(2)
+        expect(person.inbox.messages.last.subject).to eq("Your Enrollment Confirmation")
+      end
+    end
   end
 
   context "GET thankyou", :dbclean => :around_each do
@@ -416,6 +436,20 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       post :terminate, params: {id: "hbx_id", terminate_reason: "Because"}
       hbx_enrollment.reload
       expect(hbx_enrollment.terminate_reason).to eq "Because"
+    end
+
+    context 'for terminate_date' do
+      let(:terminate_date) { TimeKeeper.date_of_record.next_month.end_of_month }
+
+      before do
+        post :terminate, params: {id: 'hbx_id',
+                                  terminate_reason: 'Because',
+                                  terminate_date: terminate_date.to_s}
+      end
+
+      it 'terminated on date should be terminate_date' do
+        expect(hbx_enrollment.terminated_on).to eq terminate_date
+      end
     end
   end
 

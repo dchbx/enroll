@@ -3,68 +3,80 @@
 <% if individual_market_is_enabled? %>
   <div id="consumer_fields" class="focus_effect">
     <div class="row row-form-wrapper no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-        <label>Are you a US Citizen or US National? *</label>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
+        <label class="run-glossary">Is this person a US citizen or US national? *</label>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :us_citizen, true, required: true, class: "required floatlabel" %>
           <%= f.label :us_citizen, :value => true do %>
-            <span>Yes</span>
+            <span class="yes_no_pair">Yes</span>
           <% end %>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :us_citizen, false, required: true, class: "required floatlabel" %>
           <%= f.label :us_citizen, :value => false do %>
-            <span>No</span>
+            <span class="yes_no_pair">No</span>
           <% end %>
         </div>
+      </div>
+      <div class="col-md-2 not-sure-margin left-seprator">
+        <a href="#us_citizen" data-toggle="modal" data-target="#us_citizen">Not sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "us_citizen"} %>
       </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_naturalized_citizen_container(f.object) %>" id="naturalized_citizen_container">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
-        <label>Are you a naturalized citizen? *</label>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
+        <label>Is this person a naturalized citizen? *</label>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, true, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => true do %>
-            <span>Yes</span>
+            <span class="yes_no_pair">Yes</span>
           <% end %>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-1 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :naturalized_citizen, false, required: true, class: "required floatlabel" %>
           <%= f.label :naturalized_citizen, :value => false do %>
-            <span>No</span>
+            <span class="yes_no_pair">No</span>
           <% end %>
         </div>
+      </div>
+      <div class="col-md-2 not-sure-margin left-seprator">
+        <a href="#naturalized_citizen" data-toggle="modal" data-target="#naturalized_citizen">Not sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "naturalized_citizen"} %>
       </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless show_immigration_status_container(f.object) %>" id="immigration_status_container">
-      <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg">
+      <div class="col-lg-6 col-md-6 col-sm-4 col-xs-6 form-group form-group-lg top-buffer">
         <label>Do you have eligible immigration status? *</label>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, true, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => true do %>
-            <span>Yes</span>
+            <span class="yes_no_pair">Yes</span>
           <% end %>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-1 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio skinned-form-controls skinned-form-controls-mac">
           <%= f.radio_button :eligible_immigration_status, false, class: "required floatlabel" %>
           <%= f.label :eligible_immigration_status, :value => false do %>
-            <span>No</span>
+            <span class="yes_no_pair">No</span>
           <% end %>
         </div>
+      </div>
+      <div class="col-md-2 not-sure-margin left-seprator" >
+        <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
       </div>
     </div>
     <%= f.fields_for find_consumer_role_for_fields(f.object) do |c| %>
@@ -74,18 +86,18 @@
     <div class="row row-form-wrapper no-buffer" id='indian_tribe_area'>
       <div class="row no-buffer">
         <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-          <label>Are you a member of an American Indian or Alaskan Native tribe? *</label>
+          <label class="run-glossary">Is this person a member of an American Indian or Alaska Native Tribe? *</label>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
           <div class="radio">
             <%= f.radio_button :indian_tribe_member, "true", class: "required floatlabel", id: 'indian_tribe_member_yes' %>
-            <label for="indian_tribe_member_yes"><span>Yes</span></label>
+            <label for="indian_tribe_member_yes"><span class="yes_no_pair">Yes</span></label>
           </div>
         </div>
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
           <div class="radio">
             <%= f.radio_button :indian_tribe_member, "false", class: "required floatlabel", id: 'indian_tribe_member_no' %>
-            <label for="indian_tribe_member_no"><span>No</span></label>
+            <label for="indian_tribe_member_no"><span class="yes_no_pair">No</span></label>
           </div>
         </div>
       </div>
@@ -103,20 +115,24 @@
     </div>
 
     <div class="row row-form-wrapper no-buffer">
-      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
-        <label class="required no-pd">Are you currently incarcerated? *</label>
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 top-buffer">
+        <label class="required no-pd">Is this person currently incarcerated? *</label>
       </div>
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
         <div class="radio">
           <%= f.radio_button :is_incarcerated, true, class: "required floatlabel", id: 'radio_incarcerated_yes', required: true %>
-          <label for="radio_incarcerated_yes"><span>Yes</span></label>
+          <label for="radio_incarcerated_yes"><span class="yes_no_pair">Yes</span></label>
         </div>
       </div>
-      <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
+      <div class="col-lg-1 col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
         <div class="radio">
           <%= f.radio_button :is_incarcerated, false, class: "required floatlabel", id: 'radio_incarcerated_no', required: true %>
-          <label for="radio_incarcerated_no"><span>No</span></label>
+          <label for="radio_incarcerated_no"><span class="yes_no_pair">No</span></label>
         </div>
+      </div>
+      <div class="col-md-2 not-sure-margin left-seprator">
+        <a href="#is_incarcerated" data-toggle="modal" data-target="#is_incarcerated">Not sure?</a>
+        <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
       </div>
     </div>
   </div>

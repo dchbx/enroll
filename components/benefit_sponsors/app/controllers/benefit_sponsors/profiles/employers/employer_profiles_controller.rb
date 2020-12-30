@@ -57,7 +57,7 @@ module BenefitSponsors
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
             when 'inbox'
 
             else
@@ -114,9 +114,11 @@ module BenefitSponsors
           if roster_upload_file_type.include?(file_content_type)
             file = params.require(:file)
             @roster_upload_form = BenefitSponsors::Forms::RosterUploadForm.call(file, @employer_profile)
+            roaster_upload_count = @roster_upload_form.census_records.length
             begin
               if @roster_upload_form.save
-                redirect_to @roster_upload_form.redirection_url
+                flash[:notice] = "#{roaster_upload_count } records uploaded from CSV"
+                redirect_to URI.parse(@roster_upload_form.redirection_url).to_s
               else
                 render @roster_upload_form.redirection_url || default_url
               end
@@ -291,7 +293,7 @@ module BenefitSponsors
                 sponsored_benefit = primary.sponsored_benefit
                 product = @product_info[element.group_enrollment.product[:id]]
                 next if census_employee.blank?
-                csv << [  
+                csv << [
                           census_employee.full_name,
                           census_employee.ssn,
                           census_employee.dob,

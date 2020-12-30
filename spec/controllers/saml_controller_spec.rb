@@ -160,13 +160,13 @@ RSpec.describe SamlController do
         sign_in user
         allow(::IdpAccountManager).to receive(:update_navigation_flag).with(user.oim_id, user.email, ::IdpAccountManager::CURAM_NAVIGATION_FLAG)
         get :navigate_to_assistance
-        expect(response).to redirect_to(SamlInformation.curam_landing_page_url)
+        expect(response).to redirect_to(URI.parse(SamlInformation.curam_landing_page_url).to_s)
       end
     end
 
     context "user not logged on" do
       it "should redirect user to login URL" do
-        allow(controller).to receive(:current_user).and_return(false)
+        allow(controller).to receive(:current_user).and_return(nil)
         get :navigate_to_assistance
         expect(response).to redirect_to(SamlInformation.iam_login_url)
       end

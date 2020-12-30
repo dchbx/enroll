@@ -74,6 +74,37 @@ RSpec.describe DocumentsController, :type => :controller do
         expect(flash[:success]).to eq('Request was sent to Local Residency.')
       end
     end
+
+    context 'Call Hub for DHS verification(immigration status)' do
+      before :each do
+        person.verification_types = [FactoryBot.build(:verification_type, type_name: 'Immigration status')]
+        person.save!
+        person.consumer_role.update_attributes(aasm_state: 'verification_outstanding', active_vlp_document_id: person.consumer_role.vlp_documents.first.id)
+        @immigration_type = person.verification_types.where(type_name: 'Immigration status').first
+        @immigration_type.update_attributes!(inactive: false)
+      end
+
+      it 'should redirect if verification type is Immigration status' do
+        post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: document.id }
+        expect(flash[:success]).to eq('Request was sent to FedHub.')
+      end
+
+      context 'invalid vlp document type' do
+        let(:bad_document) { FactoryBot.build(:vlp_document, subject: 'Other (With Alien Number)') }
+
+        before do
+          person.consumer_role.vlp_documents = [bad_document]
+          person.consumer_role.active_vlp_document_id = bad_document.id
+          person.save!
+          @immigration_type.update_attributes!(inactive: false)
+        end
+
+        it 'should redirect if verification type is Immigration status' do
+          post :fed_hub_request, params: { verification_type: @immigration_type.id, person_id: person.id, id: bad_document.id }
+          expect(flash[:danger]).to eq('Please fill in your information for Document Description.')
+        end
+      end
+    end
   end
 
   describe "PUT extend due date" do
@@ -188,6 +219,36 @@ RSpec.describe DocumentsController, :type => :controller do
         post :update_ridp_verification_type, params: { person_id: person.id }
         expect(response).to have_http_status(:redirect)
       end
+    end
+  end
+
+  describe "GET cartafact_download" do
+
+    context 'not passing current user' do
+      let(:tempfile) do
+        tf = Tempfile.new('test.pdf')
+        tf.write("DATA GOES HERE")
+        tf.rewind
+        tf
+      end
+
+      let(:operation_success) do
+        double(
+          success?: true,
+          value!: tempfile
+        )
+      end
+
+      before do
+        allow(Operations::Documents::Download).to receive(:call).and_return(operation_success)
+        get :cartafact_download, params: {model: "test", model_id: "1234", relation: "test", relation_id: "1234"}
+      end
+
+      it 'should pass' do
+        expect(response.status).to eq(200)
+        expect(response.headers["Content-Disposition"]).to eq 'attachment'
+      end
+
     end
   end
 end

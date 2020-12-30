@@ -55,6 +55,20 @@ module BenefitSponsors
       end
     end
 
+    def set_ie_flash_by_announcement
+      return unless check_browser_compatibility
+      return unless flash.blank? || flash[:warning].blank?
+
+      announcements = Announcement.announcements_for_web
+      dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
+      announcements -= dismiss_announcements
+      flash.now[:warning] = announcements
+    end
+
+    def check_browser_compatibility
+      browser.ie? && !Settings.site.support_for_ie_browser
+    end
+
     def cur_page_no(alph="a")
       page_string = params.permit(:page)[:page]
       page_string.blank? ? alph : page_string.to_s
@@ -90,10 +104,10 @@ module BenefitSponsors
     def set_last_portal_visited
       if controller_name == "broker_agency_profiles" && action_name == "show"
         return if (current_user.blank? || (current_user.person.present? && !current_user.person.broker_role.present?) ||current_user.last_portal_visited == request.referrer)
-        current_user.update_attributes(last_portal_visited: request.referrer)
+        current_user.update_attributes(last_portal_visited: request.path)
       elsif controller_name == "general_agency_profiles" && action_name == "show"
         return if (current_user.blank? || (current_user.person.present? && !current_user.person.general_agency_staff_roles.present?) ||current_user.last_portal_visited == request.referrer)
-        current_user.update_attributes(last_portal_visited: request.referrer)
+        current_user.update_attributes(last_portal_visited: request.path)
       end
     end
 

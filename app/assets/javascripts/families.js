@@ -39,3 +39,8 @@ function enableTransition() {
   });
 
 }
+
+function fetchDate(id){
+  var date = document.getElementById(id).value;
+  document.getElementById(`terminate_date_${id}`).value = date;
+}

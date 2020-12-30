@@ -2,10 +2,11 @@ class QualifyingLifeEventKind
   include Mongoid::Document
   include Mongoid::Timestamps
   include Config::AcaModelConcern
+  include AASM
 
   # Model Changes to support IVL needs
   ## effective_on_kinds -- type changed to Array to support multiple choices (view to provide choice when size > 1)
-  ### added enumerations to EffectiveOnKinds with following definitions:
+  ### added enumerations to EFFECTIVEONKINDS with following definitions:
   ###   exact_date: specific date provided
   ###   date_of_event: specific date upon which the QLE occurred
   ###   first_of_month: first of month following the 15th of month rule
@@ -21,7 +22,9 @@ class QualifyingLifeEventKind
   MARKET_KINDS = %w[shop individual fehb].freeze
 
   # first_of_next_month: not subject to 15th of month effective date rule
-  EffectiveOnKinds = %w(date_of_event first_of_month first_of_next_month fixed_first_of_next_month exact_date)
+  EFFECTIVE_ON_KINDS = %w[date_of_event first_of_month first_of_next_month first_of_this_month fixed_first_of_next_month].freeze
+
+  TERMINATION_ON_KINDS = %w[end_of_event_month date_before_event end_of_reporting_month end_of_last_month_of_reporting exact_date].freeze
 
   REASON_KINDS = [
     "lost_access_to_mec",
@@ -58,40 +61,69 @@ class QualifyingLifeEventKind
     "exceptional_circumstances_civic_service",
     "exceptional_circumstances",
     "eligibility_failed_or_documents_not_received_by_due_date",
-    "eligibility_documents_provided"
+    "eligibility_documents_provided",
+    "open_enrollment",
+    "cobra",
+    "foster_care",
+    "location_change",
+    "citizen_status_change",
+    "eligibility_change_assistance",
+    "exceptional_circumstances_hardship_exemption",
+    "medical_coverage_order",
+    "add_child_due_to_marriage",
+    "entering_domestic_partnership",
+    "employer_cobra_non_payment",
+    "voluntary_dropping_cobra",
+    "release_from_incarceration",
+    "drop_person_due_to_divorce",
+    "termination_of_domestic_partnership",
+    "drop_self_due_to_new_eligibility",
+    "drop_family_member_due_to_new_eligibility",
+    "new_hire",
+    "passive_renewal"
   ]
+
+  QLE_EVENT_DATE_KINDS = [:submitted_at, :qle_on]
 
   field :event_kind_label, type: String
   field :action_kind, type: String
 
   field :title, type: String
-  field :action_kind, type: String
   field :effective_on_kinds, type: Array, default: []
   field :reason, type: String
   field :edi_code, type: String
-  field :market_kind, type: String # Deprecated
+  field :market_kind, type: String
   field :tool_tip, type: String
   field :pre_event_sep_in_days, type: Integer
-  field :is_self_attested, type: Mongoid::Boolean
+  field :is_self_attested, type: Mongoid::Boolean # is_self_attested set to true QLE can be claimed by Consumer/EE.
   field :date_options_available, type: Mongoid::Boolean
   field :post_event_sep_in_days, type: Integer
   field :ordinal_position, type: Integer
+  field :aasm_state, type: Symbol, default: :draft
 
-  field :is_active, type: Boolean, default: true
+  field :is_active, type: Boolean, default: false
   field :event_on, type: Date
-  field :coverage_effective_on, type: Date
+  field :qle_event_date_kind, type: Symbol, default: :qle_on
+  field :coverage_effective_on, type: Date # Deprecated
   field :start_on, type: Date
   field :end_on, type: Date
+  field :is_visible, type: Mongoid::Boolean  # is_visible set to true QLE's will be displayed to Consumer/EE in carousel
+  field :termination_on_kinds, type: Array, default: []
+  field :coverage_start_on, type: Date
+  field :coverage_end_on, type: Date
+  field :updated_by, type: BSON::ObjectId
+  field :published_by, type: BSON::ObjectId
+  field :created_by, type: BSON::ObjectId
 
   index({action_kind: 1})
-  index({market: 1, ordinal_position: 1 })
+  index({market_kind: 1, ordinal_position: 1 })
   index({start_on: 1, end_on: 1})
 
   # validates :effective_on_kinds,
   #           presence: true,
   #           allow_blank: false,
   #           allow_nil:   false,
-  #           inclusion: {in: EffectiveOnKinds}
+  #           inclusion: {in: EFFECTIVEONKINDS}
 
   validates :market_kind,
             presence: true,
@@ -104,8 +136,21 @@ class QualifyingLifeEventKind
   validates_presence_of :title, :market_kind, :effective_on_kinds, :pre_event_sep_in_days,
                         :post_event_sep_in_days
 
-  scope :active, ->{ where(is_active: true).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+  validate :qle_date_guards
+  embeds_many :workflow_state_transitions, as: :transitional
+
+  scope :active_by_state, ->{ where(is_active: true, :aasm_state.in => [:active, :expire_pending]).where(:created_at.ne => nil).order(ordinal_position: :asc) }
+
+  scope :active,  ->{ where(is_active: true).by_date.where(:created_at.ne => nil).order(ordinal_position: :asc) }
   scope :by_market_kind, ->(market_kind){ where(market_kind: market_kind) }
+  scope :non_draft, ->{ where(:aasm_state.nin => [:draft]) }
+  scope :by_date, ->(date = TimeKeeper.date_of_record){ where(
+    :"$or" => [
+      {:start_on.lte => date, :end_on.gte => date},
+      {:start_on.lte => date, :end_on => {:$eq => nil}},
+      {:start_on => {:$eq => nil}, :end_on => {:$eq => nil}}
+    ]
+  )}
 
   # Business rules for EmployeeGainingMedicare
   # If coverage ends on last day of month and plan selected before loss of coverage:
@@ -185,9 +230,45 @@ class QualifyingLifeEventKind
     reason == "lost_access_to_mec"
   end
 
+  aasm do
+    state :draft, initial: true
+    state :active
+    state :expire_pending
+    state :expired
+
+    event :publish, :after => [:record_transition, :update_qle_reason_types] do
+      transitions from: :draft, to: :active, :guard => :has_valid_title?, :after => [:activate_qle, :set_ordinal_position]
+    end
+
+    event :schedule_expiration, :after => :record_transition do
+      transitions from: [:active, :expire_pending], to: :expire_pending, :guard => :can_be_expire_pending?, :after => :update_end_date
+    end
+
+    event :expire, :after => [:record_transition] do
+      transitions from: [:active, :expire_pending], to: :expired, :guard => :can_be_expired?, :after => [:update_end_date, :deactivate_qle]
+    end
+
+    event :advance_date, :after => [:record_transition] do
+      transitions from: [:active, :expire_pending], to: :expired, :after => [:deactivate_qle]
+    end
+  end
+
+  def record_transition
+    self.workflow_state_transitions << WorkflowStateTransition.new(from_state: aasm.from_state,
+                                                                   to_state: aasm.to_state,
+                                                                   event: aasm.current_event)
+  end
+
   class << self
+
+    def advance_day(new_date)
+      QualifyingLifeEventKind.where(:end_on.lt => new_date, :aasm_state.in => [:active, :expire_pending]).each do |qle|
+        qle.advance_date! if qle.may_advance_date?
+      end
+    end
+
     def shop_market_events
-      by_market_kind('shop').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => false).active.to_a
     end
 
     def shop_market_events_admin
@@ -195,11 +276,11 @@ class QualifyingLifeEventKind
     end
 
     def shop_market_non_self_attested_events
-      by_market_kind('shop').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('shop').and(:is_visible.ne => true).active.to_a
     end
 
     def fehb_market_events
-      by_market_kind('fehb').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => false).active.to_a
     end
 
     def fehb_market_events_admin
@@ -207,11 +288,11 @@ class QualifyingLifeEventKind
     end
 
     def fehb_market_non_self_attested_events
-      by_market_kind('fehb').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('fehb').and(:is_visible.ne => true).active.to_a
     end
 
     def individual_market_events
-      by_market_kind('individual').and(:is_self_attested.ne => false).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => false).active.to_a
     end
 
     def individual_market_events_admin
@@ -219,7 +300,7 @@ class QualifyingLifeEventKind
     end
 
     def individual_market_non_self_attested_events
-      by_market_kind('individual').and(:is_self_attested.ne => true).active.to_a
+      by_market_kind('individual').and(:is_visible.ne => true).active.to_a
     end
 
     def individual_market_events_without_transition_member_action
@@ -245,5 +326,56 @@ class QualifyingLifeEventKind
     start_date = TimeKeeper.date_of_record - post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + pre_event_sep_in_days.try(:days)
       "(must fall between #{start_date.strftime("%B %d")} and #{end_date.strftime("%B %d")})"
+  end
+
+  def active?
+    return false unless is_active
+    end_on.blank? || (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+
+  private
+
+  def can_be_expire_pending?(end_date = TimeKeeper.date_of_record)
+    [:active, :expire_pending].include?(aasm_state) && end_date >= TimeKeeper.date_of_record &&
+      self.class.by_market_kind(market_kind).by_date(end_date).active_by_state.where(:id.ne => id).pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
+  end
+
+  def can_be_expired?(end_date = TimeKeeper.date_of_record)
+    [:active, :expire_pending].include?(aasm_state) && TimeKeeper.date_of_record > end_date
+  end
+
+  def has_valid_title?
+    self.class.by_market_kind(market_kind).by_date(start_on).active_by_state.pluck(:title).map(&:parameterize).uniq.exclude?(title.parameterize)
+  end
+
+  def update_end_date(end_date = TimeKeeper.date_of_record)
+    self.update_attributes({ end_on: end_date })
+  end
+
+  def set_ordinal_position
+    qlek = self.class.by_market_kind(market_kind).active_by_state.order(ordinal_position: :asc).last
+    self.update_attributes(ordinal_position: qlek.ordinal_position + 1) if qlek
+  end
+
+  def update_qle_reason_types
+    reasons = self.class.non_draft.pluck(:reason).uniq
+    Types.send(:remove_const, "QLEKREASONS")
+    Types.const_set("QLEKREASONS", Types::Coercible::String.enum(*reasons))
+  end
+
+  def activate_qle
+    self.update_attributes(is_active: true)
+  end
+
+  def deactivate_qle
+    self.update_attributes(is_active: false)
+  end
+
+  def qle_date_guards
+    errors.add(:start_on, "start_on cannot be nil when end_on date present") if end_on.present? && start_on.blank?
+
+    if start_on.present? && end_on.present?
+      errors.add(:end_on, "end_on cannot preceed start_on date") if self.end_on < self.start_on
+    end
   end
 end

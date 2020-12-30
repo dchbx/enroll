@@ -60,8 +60,10 @@ class Exchanges::AgentsController < ApplicationController
 
   def check_agent_role
     redirect_to root_path, :flash => { :error => "You must be an Agent:  CSR, CAC, IPA or a Broker" } unless user_permission_satisfied?
-    current_user.last_portal_visited = home_exchanges_agents_path
-    current_user.save!
+    # Do we need to update home_exchanges_agents_path as the last_portal_visited for agents ?
+    # What's the use of saving this path as last_portal_visited ?
+    # current_user.last_portal_visited = home_exchanges_agents_path
+    # current_user.save!
   end
 
   def check_for_paper_app

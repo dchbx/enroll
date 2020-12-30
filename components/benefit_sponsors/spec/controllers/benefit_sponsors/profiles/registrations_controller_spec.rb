@@ -19,7 +19,7 @@ module BenefitSponsors
 
     let(:phone_attributes) {
       {
-        :kind => "phone main",
+        :kind => "work",
         :number => "8768776",
         :area_code => "876",
         :extension => "extension"
@@ -119,6 +119,7 @@ module BenefitSponsors
 
     before :each do
       allow(Settings.site).to receive(:key).and_return(:dc)
+      allow(controller).to receive(:set_ie_flash_by_announcement).and_return true
     end
 
     shared_examples_for "initialize registration form" do |action, params, profile_type|

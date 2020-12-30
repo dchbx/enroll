@@ -14,6 +14,7 @@ FactoryBot.define do
     title                 { "2018 Single Issuer Health Products" }
 
     contribution_model { create(:benefit_markets_contribution_models_contribution_model) }
+    contribution_models { [create(:benefit_markets_contribution_models_contribution_model), create(:benefit_markets_contribution_models_contribution_model, key: :fifty_percent_sponsor_fixed_percent_contribution_model)] }
     pricing_model { create(:benefit_markets_pricing_models_pricing_model) }
 
     transient do

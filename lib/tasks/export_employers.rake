@@ -49,6 +49,10 @@ namespace :employers do
 
       benefit_sponsorship ||= profile.active_benefit_sponsorship
 
+      if assigned_contribution_model = sponsored_benefit&.contribution_model
+        flexible_contributions_enabled  = (assigned_contribution_model.key.to_s == 'zero_percent_sponsor_fixed_percent_contribution_model') ? true : false
+      end
+
       broker_account = benefit_sponsorship.broker_agency_accounts.first
       broker_role = broker_account.broker_agency_profile.primary_broker_role if broker_account.present?
       
@@ -114,7 +118,8 @@ namespace :employers do
         broker_account.try(:broker_agency_profile).try(:legal_name),
         broker_role.try(:person).try(:full_name),
         broker_role.try(:npn),
-        broker_account.try(:start_on)
+        broker_account.try(:start_on),
+        flexible_contributions_enabled || ''
       ]
     end
 
@@ -130,7 +135,7 @@ namespace :employers do
                                 benefit_group.reference_plan.name benefit_group.effective_on_kind benefit_group.effective_on_offset
                                 plan_year.start_on plan_year.end_on plan_year.open_enrollment_start_on plan_year.open_enrollment_end_on
                                 plan_year.fte_count plan_year.pte_count plan_year.msp_count plan_year.status plan_year.publish_date broker_agency_account.corporate_npn broker_agency_account.legal_name
-                                broker.name broker.npn broker.assigned_on)
+                                broker.name broker.npn broker.assigned_on flexible_contributions_enabled)
       csv << headers
 
       puts "No general agency profile for CCA Employers" unless general_agency_enabled?

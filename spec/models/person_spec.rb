@@ -85,7 +85,25 @@ describe Person, :dbclean => :after_each do
           expect(person.inbox.unread_messages.count).to eq 1
         end
 
+        it "has correct welcome message for consumer role" do
+          person.save
+          expect(person.inbox.messages.first.body).to include("Make sure you pay attention to deadlines.")
+        end
+      end
 
+      context "with broker role" do
+        let(:params) {valid_params}
+        let(:person) {Person.new(**params)}
+        let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+
+        before do
+          FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+        end
+
+        it "has correct welcome message for broker role" do
+          person.save
+          expect(person.inbox.messages.first.body).not_to include("Make sure you pay attention to deadlines.")
+        end
       end
 
       context "with no first_name" do
@@ -370,8 +388,8 @@ describe Person, :dbclean => :after_each do
         errors = { citizenship: "Citizenship status is required.",
                          naturalized: "Naturalized citizen is required.",
                          immigration: "Eligible immigration status is required.",
-                         native: "American Indian / Alaskan Native status is required.",
-                         tribal_id_presence: "Tribal id is required when native american / alaskan native is selected",
+                         native: "American Indian / Alaska Native status is required.",
+                         tribal_id_presence: "Tribal id is required when native american / alaska native is selected",
                          tribal_id: "Tribal id must be 9 digits",
                          incarceration: "Incarceration status is required." }
 
@@ -746,15 +764,65 @@ describe Person, :dbclean => :after_each do
     end
   end
 
-  describe "with no relationship to a dependent" do
-    describe "after ensure_relationship_with" do
-      it "should have the new relationship"
-    end
-  end
+  describe 'ensure_relationship_with' do
+    let(:person10) { FactoryBot.create(:person) }
 
-  describe "with an existing relationship to a dependent" do
-    describe "after ensure_relationship_with a different type of relationship" do
-      it "should correct the existing relationship"
+    describe 'with no relationship to a dependent' do
+      context 'after ensure_relationship_with' do
+        let(:person11) { FactoryBot.create(:person) }
+
+        before do
+          person10.ensure_relationship_with(person11, 'child')
+          person10.save!
+        end
+
+        it 'should have the new relationship' do
+          expect(person10.person_relationships.first.relative_id).to eq(person11.id)
+        end
+
+        it 'should have fixed number of relationships' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    describe 'with an existing relationship to a dependent' do
+      context 'after ensure_relationship_with a different type of relationship' do
+        let(:person11) do
+          human = FactoryBot.create(:person)
+          person10.person_relationships << PersonRelationship.new(relative_id: human.id, kind: 'child')
+          person10.save!
+          human
+        end
+
+        before do
+          person10.ensure_relationship_with(person11, 'spouse')
+          person10.save!
+        end
+
+        it "should correct the existing relationship" do
+          expect(person10.person_relationships.first.kind).to eq('spouse')
+        end
+
+        it 'should not have the old relationship' do
+          expect(person10.person_relationships.count).to eq(1)
+        end
+      end
+    end
+
+    context 'should not create a relationship from self to self' do
+      before do
+        person10.ensure_relationship_with(person10, 'unrelated')
+        person10.save!
+      end
+
+      it 'should not create any relationships' do
+        expect(person10.person_relationships).to be_empty
+      end
+
+      it 'should have fixed number of relationships' do
+        expect(person10.person_relationships.count).to be_zero
+      end
     end
   end
 
@@ -899,19 +967,22 @@ describe Person, :dbclean => :after_each do
 
     it "should false" do
       person.no_dc_address = false
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should false" do
       person.no_dc_address = true
-      person.no_dc_address_reason = ""
+      person.is_homeless = false
+      person.is_temporarily_out_of_state = false
       expect(person.residency_eligible?).to be_falsey
     end
 
     it "should true" do
       person.no_dc_address = true
-      person.no_dc_address_reason = "I am Homeless"
+      person.is_homeless = true
+      person.is_temporarily_out_of_state = true
       expect(person.residency_eligible?).to be_truthy
     end
   end
@@ -929,17 +1000,17 @@ describe Person, :dbclean => :after_each do
   end
 
   describe "is_dc_resident?" do
-    context "when no_dc_address is true" do
-      let(:person) { Person.new(no_dc_address: true) }
+    context "when person is homeless or temp outside of DC" do
+      let(:person) { Person.new }
 
-      it "return false with no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return "reason"
+      it "return true when person is_homeless" do
+        allow(person).to receive(:is_homeless?).and_return true
         expect(person.is_dc_resident?).to eq true
       end
 
-      it "return true without no_dc_address_reason" do
-        allow(person).to receive(:no_dc_address_reason).and_return ""
-        expect(person.is_dc_resident?).to eq false
+      it "return true when person is_temporarily_out_of_state" do
+        allow(person).to receive(:is_temporarily_out_of_state?).and_return true
+        expect(person.is_dc_resident?).to eq true
       end
     end
 
@@ -1019,18 +1090,6 @@ describe Person, :dbclean => :after_each do
 
       it "creates family with households and tax_households" do
         expect(family1.households.first.tax_households).not_to be_empty
-      end
-
-      it "true if person family households present" do
-        expect(@person_aqhp.check_households(family1)).to eq true
-      end
-
-      it "true if person family households tax_households present" do
-        expect(@person_aqhp.check_tax_households(family1)).to eq true
-      end
-
-      it "returns true if persons is AQHP" do
-        expect(@person_aqhp.is_aqhp?).to eq true
       end
     end
   end
@@ -1328,6 +1387,35 @@ describe Person, :dbclean => :after_each do
     end
   end
 
+  describe '.brokers_matching_search_criteria' do
+    let(:person) { FactoryBot.create(:person, :with_broker_role)}
+    let(:broker_agency_profile) {FactoryBot.create(:broker_agency_profile)}
+    let(:name) { person.full_name}
+
+    before do
+      Person.create_indexes
+      FactoryBot.create(:broker_agency_staff_role, broker_agency_profile_id: broker_agency_profile.id, person: person, broker_agency_profile: broker_agency_profile, aasm_state: 'active')
+      person.broker_role.update_attributes!(aasm_state: "active")
+      person.broker_role.update_attributes!(npn: "11111111")
+      person.save!
+    end
+
+    context 'when searched with first_name and last_name' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria(name)
+        expect(people.count).to eq(1)
+        expect(people.first.full_name).to eq(name)
+      end
+    end
+
+    context 'when searched with npn' do
+      it 'should return matching agency' do
+        people = Person.brokers_matching_search_criteria("11111111")
+        expect(people.count).to eq(1)
+        expect(people.first.broker_role.npn).to eq(person.broker_role.npn)
+      end
+    end
+  end
 
   describe "staff_for_employer", dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"

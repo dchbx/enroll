@@ -29,6 +29,7 @@ module BenefitSponsors
         issuer_profile_id: issuer_profile_id,
         hios_id: "#{hios_base}-01",
         hios_base_id: hios_base,
+        dental_level: 'high',
         csr_variant_id: "01",
         service_area_id: service_area_id,
         kind: :dental,

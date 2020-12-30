@@ -92,7 +92,8 @@ module SponsoredBenefits
       end
 
       def enrollment_dates
-        BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date)
+        is_renewing = @employer_profile.is_renewing_employer?
+        BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date, is_renewing)
       end
 
       def serialize_attributes(attributes)

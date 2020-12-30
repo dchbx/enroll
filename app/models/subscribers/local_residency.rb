@@ -1,6 +1,8 @@
 module Subscribers
   class LocalResidency < ::Acapi::Subscription
     include Acapi::Notifiers
+    include ::Config::AcaHelper
+
     def self.subscription_details
       ["acapi.info.events.residency.verification_response"]
     end
@@ -28,7 +30,11 @@ module Subscribers
                                                                                          event_response_record_id: event_response_record.id)
 
         if "503" == return_status.to_s
-          consumer_role.fail_residency!
+          if self_attest_residency_enabled?
+            consumer_role.pass_residency!(fetch_event_args)
+          else
+            consumer_role.fail_residency!
+          end
           consumer_role.save
           return
         end
@@ -48,7 +54,11 @@ module Subscribers
 
     def update_consumer_role(consumer_role, xml_hash)
       if xml_hash[:residency_verification_response].eql? 'ADDRESS_NOT_IN_AREA'
-        consumer_role.fail_residency!
+        if self_attest_residency_enabled?
+          consumer_role.pass_residency!(fetch_event_args)
+        else
+          consumer_role.fail_residency!
+        end
       else
         consumer_role.pass_residency!
       end
@@ -62,6 +72,10 @@ module Subscribers
 
     def find_person(person_hbx_id)
       Person.where(hbx_id:person_hbx_id).first
+    end
+
+    def fetch_event_args
+      OpenStruct.new(self_attest_residency: true)
     end
   end
 end

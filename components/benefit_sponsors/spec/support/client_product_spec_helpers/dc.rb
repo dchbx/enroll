@@ -28,6 +28,7 @@ module BenefitSponsors
         title: title,
         issuer_profile_id: issuer_profile_id,
         hios_id: "#{hios_base}-01",
+        dental_level: 'high',
         hios_base_id: hios_base,
         csr_variant_id: "01",
         service_area_id: service_area_id,
@@ -461,7 +462,8 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -482,7 +484,8 @@ module BenefitSponsors
         package_kind: :metal_level,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -503,28 +506,8 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
-      }
-    end
-    
-    def metal_level_health_product_package_from_product_props(product_props_list, effective_period)
-      selected_products = product_props_list.select do |p_props|
-        p_props[:product_package_kinds].include?(:metal_level) && (p_props[:kind] == :health)
-      end
-      product_package_id = BSON::ObjectId.new
-      {
-        "_id": product_package_id,
-        title: "Metal Level",
-        application_period: {
-          min: effective_period.min,
-          max: effective_period.max
-        },
-        benefit_kind: :aca_shop,
-        product_kind: :health,
-        package_kind: :metal_level,
-        products: selected_products,
-        pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -545,7 +528,8 @@ module BenefitSponsors
         package_kind: :multi_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -566,7 +550,8 @@ module BenefitSponsors
         package_kind: :single_issuer,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 
@@ -587,7 +572,8 @@ module BenefitSponsors
         package_kind: :single_product,
         products: selected_products,
         pricing_model: ::BenefitSponsors::PricingModelSpecHelpers.list_bill_pricing_model,
-        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.list_bill_contribution_model
+        contribution_model: ::BenefitSponsors::ContributionModelSpecHelpers.fifty_percent_contribution_model,
+        contribution_models: ::BenefitSponsors::ContributionModelSpecHelpers.contribution_models
       }
     end
 

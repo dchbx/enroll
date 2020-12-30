@@ -6,8 +6,8 @@ Feature: As an admin user I should have the ability to extend the OE
     Given benefit market catalog exists for draft initial employer with health benefits
     And there is an employer ABC Widgets
     And initial employer ABC Widgets has draft benefit application
-  
-   Scenario Outline: As an HBX Staff with Super Admin subroles I should <action> force publish button based on <date_to_compare_with> and publish_due_day_of_month of benefit application
+
+  Scenario Outline: As an HBX Staff with Super Admin subroles I should <action> force publish button based on <date_to_compare_with> and publish_due_day_of_month of benefit application
 
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
     When the system date is <system_date_value> than the <date_to_compare_with>
@@ -17,9 +17,9 @@ Feature: As an admin user I should have the ability to extend the OE
     Then the user will <action> the Force Publish button
 
     Examples:
-      | system_date_value  | date_to_compare_with                 | date_compare | action  |
-      | greater            | earliest_start_prior_to_effective_on | less         | not see |
-      | less               | monthly_open_enrollment_end_on       | greater      | see     |
+      | system_date_value | date_to_compare_with                 | date_compare | action  |
+      | greater           | earliest_start_prior_to_effective_on | less         | not see |
+      | less              | monthly_open_enrollment_end_on       | greater      | see     |
 
   Scenario: Draft application published between submission deadline & application effective date
     Given that a user with a HBX staff role with Super Admin subrole exists and is logged in
@@ -46,10 +46,10 @@ Feature: As an admin user I should have the ability to extend the OE
     # And ask to confirm intention to publish.
 
     Examples:
-      |compare_fte         |     state_check    |
-      |more than           |        is          |
-      |more than           |        is not      |
-      |less than or equal  |        is not      |
+      | compare_fte        | state_check |
+      | more than          | is          |
+      | more than          | is not      |
+      | less than or equal | is not      |
 
 
   Scenario: Application force published with eligibility warnings should go to publish pending state

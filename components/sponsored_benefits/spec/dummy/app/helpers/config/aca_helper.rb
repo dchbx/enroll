@@ -15,6 +15,36 @@ module Config::AcaHelper
     @aca_shop_market_employer_family_contribution_percent_minimum ||= Settings.aca.shop_market.employer_family_contribution_percent_minimum
   end
 
+  def flexible_contribution_model_enabled_for_bqt_for_initial_period
+    ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:initial_application_period).item
+  end
+
+  def flexible_contribution_model_enabled_for_bqt_for_renewal_period
+    ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:renewal_application_period).item
+  end
+
+  def retrive_date(val)
+    (val.split('-').first.size == 4) ? Date.strptime(val,"%Y-%m-%d") : Date.strptime(val,"%m/%d/%Y")
+  end
+
+  def flexible_family_contribution_percent_minimum_for_bqt
+    @flexible_family_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_family_contribution_percent_minimum).item
+  end
+
+  def flexible_employer_contribution_percent_minimum_for_bqt
+    @flexible_employer_contribution_percent_minimum_for_bqt ||= ::EnrollRegistry[:flexible_contribution_model_for_bqt].setting(:employer_contribution_percent_minimum).item
+  end
+
+  def family_contribution_percent_minimum_for_application_start_on(start_on, is_renewing)
+    application_period = is_renewing ? flexible_contribution_model_enabled_for_bqt_for_renewal_period : flexible_contribution_model_enabled_for_bqt_for_initial_period
+    application_period.cover?(start_on) ? flexible_family_contribution_percent_minimum_for_bqt : aca_shop_market_employer_family_contribution_percent_minimum
+  end
+
+  def employer_contribution_percent_minimum_for_application_start_on(start_on, is_renewing)
+    application_period = is_renewing ? flexible_contribution_model_enabled_for_bqt_for_renewal_period : flexible_contribution_model_enabled_for_bqt_for_initial_period
+    application_period.cover?(start_on) ? flexible_employer_contribution_percent_minimum_for_bqt : aca_shop_market_employer_contribution_percent_minimum
+  end
+
   def aca_shop_market_employer_contribution_percent_minimum
     @aca_shop_market_employer_contribution_percent_minimum ||= Settings.aca.shop_market.employer_contribution_percent_minimum
   end

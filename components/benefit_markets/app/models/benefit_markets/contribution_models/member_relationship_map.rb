@@ -34,9 +34,9 @@ module BenefitMarkets
       when :>
         type_count > count
       when :<=
-        type_count <= count
+          type_count <= count
       when :>=
-        type_count >= count
+          type_count >= count
       else
         type_count == count
       end
@@ -45,9 +45,11 @@ module BenefitMarkets
     protected
 
     def search_member_relationships
+
       return nil if contribution_unit.blank?
       return nil if contribution_unit.contribution_model.blank?
       return nil if contribution_unit.contribution_model.member_relationships.blank?
+      
       contribution_unit.contribution_model.member_relationships.detect do |mrel|
         mrel.relationship_name == relationship_name
       end

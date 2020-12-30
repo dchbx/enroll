@@ -7,8 +7,8 @@
 <%= hidden_field_tag :contribution_url, organizations_plan_design_proposal_contributions_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :benefit_groups_url, organizations_plan_design_proposal_benefit_groups_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :plan_comparison_url, new_organizations_plan_design_proposal_plan_comparison_path(plan_design_proposal.id) %>
-<%= hidden_field_tag :employer_min_employee_contribution, aca_shop_market_employer_contribution_percent_minimum %>
-<%= hidden_field_tag :employer_min_family_contribution, aca_shop_market_employer_family_contribution_percent_minimum %>
+<%= hidden_field_tag :employer_min_employee_contribution, employer_contribution_percent_minimum_for_application_start_on(plan_design_proposal.effective_date.to_date, plan_design_organization.is_renewing_employer?) %>
+<%= hidden_field_tag :employer_min_family_contribution, family_contribution_percent_minimum_for_application_start_on(plan_design_proposal.effective_date.to_date, plan_design_organization.is_renewing_employer?) %>
 <%= hidden_field_tag :publish_proposal_url, sponsored_benefits.organizations_plan_design_proposal_publish_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :copy_proposal_url, sponsored_benefits.organizations_plan_design_proposal_proposal_copies_path(plan_design_proposal.id) %>
 <%= hidden_field_tag :benefits_kind, kind %>

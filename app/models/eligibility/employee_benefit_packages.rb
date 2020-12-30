@@ -101,7 +101,7 @@ module Eligibility
 
     def published_benefit_group_assignment
       benefit_group_assignments.detect do |benefit_group_assignment|
-        benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+        benefit_group_assignment.benefit_group.plan_year.is_submitted?
       end
     end
 
@@ -114,7 +114,7 @@ module Eligibility
     end
 
     def renewal_published_benefit_group
-      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.employees_are_matchable?
+      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.is_submitted?
         renewal_benefit_group_assignment.benefit_group
       end
     end

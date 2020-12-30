@@ -57,12 +57,12 @@
             <% if show_termination_reasons? %>
             <td colspan="2">
               <div class="term_action_radios hidden">
-                <%= select_tag "term_reason_#{application.id}", options_for_select(@reasons), onchange: "validateFormat('#{application.id}', '#{TimeKeeper.format_date(application.start_on)}', '#{TimeKeeper.format_date(application.end_on)}')", include_blank: l10n("exchange.employer_applications.select_term_reason") %>
+                <%= select_tag "term_reason_#{application.id}", options_for_select(@reasons), onchange: "validateFormat('#{application.id}', '#{TimeKeeper.format_date(application.start_on)}', '#{TimeKeeper.format_date(application.end_on.next_day)}')", include_blank: l10n("exchange.employer_applications.select_term_reason") %>
               </div>
             </td>
             <% end %>
             <td colspan="2">
-              <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
+              <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on.next_day) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
             <td colspan="2">
               <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, disabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>

@@ -38,7 +38,9 @@ module Insured
     end
 
     def create
-      @interactive_verification = ::IdentityVerification::InteractiveVerification.new(params.require(:interactive_verification).permit!.to_h)
+      @interactive_verification = ::IdentityVerification::InteractiveVerification.new(
+        params.require(:interactive_verification).permit(:session_id, :transaction_id, questions_attributes: {}).to_h
+      )
       respond_to do |format|
         format.html do
           if @interactive_verification.valid?
@@ -96,7 +98,9 @@ module Insured
         consumer_user.save!
       end
       consumer_role.move_identity_documents_to_verified
-      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : insured_family_members_path(:consumer_role_id => consumer_role.id)
+      consumer_redirection_path = insured_family_members_path(:consumer_role_id => consumer_role.id)
+      consumer_redirection_path = help_paying_coverage_insured_consumer_role_index_path if EnrollRegistry.feature_enabled?(:financial_assistance)
+      redirect_to consumer_role.admin_bookmark_url.present? ? consumer_role.admin_bookmark_url : consumer_redirection_path
     end
 
     def render_session_start

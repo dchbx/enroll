@@ -93,6 +93,7 @@ RSpec.describe Exchanges::ScheduledEventsController do
 
   describe "GET#current_events" do
     before do
+      allow(user).to receive(:person).and_return person
       get :current_events, params: {event: 'system'}
     end
 

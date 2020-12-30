@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.routes.draw do
   require 'resque/server'
 #  mount Resque::Server, at: '/jobs'
@@ -7,6 +9,7 @@ Rails.application.routes.draw do
   mount TransportGateway::Engine,     at: "/transport_gateway"
   mount TransportProfiles::Engine,    at: "/transport_profiles"
   mount Notifier::Engine,             at: "/notifier"
+  mount FinancialAssistance::Engine,  at: '/financial_assistance'
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
@@ -22,6 +25,7 @@ Rails.application.routes.draw do
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
+  get 'unsupported_browser' => 'users#unsupported_browser'
 
   match "hbx_admin/about_us" => "hbx_admin#about_us", as: :about_us, via: :get
   match "hbx_admin/update_aptc_csr" => "hbx_admin#update_aptc_csr", as: :update_aptc_csr, via: [:get, :post]
@@ -76,6 +80,22 @@ Rails.application.routes.draw do
       get :resume_resident_enrollment, on: :collection
       get :ridp_bypass, on: :collection
       get :find_sep, on: :collection
+    end
+
+    if EnrollRegistry.feature_enabled?(:sep_types)
+      resources :manage_sep_types do
+        root 'manage_sep_types#sep_types_dt'
+        collection do
+          get 'sep_types_dt'
+          get 'sorting_sep_types'
+          patch 'sort'
+          get 'sep_type_to_publish'
+          get 'sep_type_to_expire'
+          post 'publish_sep_type'
+          post 'expire_sep_type'
+          get 'clone'
+        end
+      end
     end
 
     resources :scheduled_events do
@@ -145,6 +165,8 @@ Rails.application.routes.draw do
         post :extend_open_enrollment
         post :close_extended_open_enrollment
         get :new_benefit_application
+        get :new_secure_message
+        post :create_send_secure_message
         post :create_benefit_application
         get :edit_fein
         post :update_fein
@@ -280,13 +302,15 @@ Rails.application.routes.draw do
       post :match, on: :collection
       post :build, on: :collection
       get :ridp_agreement, on: :collection
+      get :help_paying_coverage, to: 'consumer_roles/help_paying_coverage', on: :collection, as: :help_paying_coverage
+      get :help_paying_coverage_response, to: 'consumer_roles/help_paying_coverage_response', on: :collection, as: :help_paying_coverage_response
       post :update_application_type
       get :upload_ridp_document, on: :collection
       get :immigration_document_options, on: :collection
       ##get :privacy, on: :collection
     end
 
-    resources :employee, :controller=>"employee_roles", only: [:create, :edit, :update, :show] do
+    resources :employee, :controller => "employee_roles", only: [:create, :edit, :update, :show] do
       collection do
         get 'new_message_to_broker'
         post 'send_message_to_broker'
@@ -308,7 +332,11 @@ Rails.application.routes.draw do
 
     resources :group_selections, controller: "group_selection", only: [:new, :create] do
       collection do
+        post :cancel
+        post :edit_aptc
+        post :term_or_cancel
         post :terminate
+        get :edit_plan
         get :terminate_selection
         get :terminate_confirm
       end
@@ -319,10 +347,10 @@ Rails.application.routes.draw do
   namespace :employers do
 
     # Redirect from Enroll old model to Enroll new model
-    match '/employer_profiles/new' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    match '/employer_profiles/new', to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
     #match '/employer_profiles/:id/*path' , to: redirect('/'), via: [:get, :post]
     #match '/employer_profiles/:id' , to: redirect('/'), via: [:get, :post]
-    match '/' , to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
+    match '/', to: redirect('/benefit_sponsors/profiles/registrations/new?profile_type=benefit_sponsor'), via: [:get, :post]
 
     post 'search', to: 'employers#search'
 
@@ -334,7 +362,7 @@ Rails.application.routes.draw do
       end
     end
 
-    #TODO REFACTOR
+    #TODO: refactor
     resources :people do
       collection do
         get 'search'
@@ -447,7 +475,7 @@ Rails.application.routes.draw do
         get :staff_index
         get :agency_messages
         get :assign_history
-        get  :commission_statements
+        get :commission_statements
       end
       member do
         get :general_agency_index
@@ -552,16 +580,6 @@ Rails.application.routes.draw do
 
   resources :translations
 
-  namespace :api, :defaults => {:format => 'xml'} do
-    namespace :v1 do
-      resources :slcsp, :only => []  do
-        collection do
-          post :plan
-        end
-      end
-    end
-  end
-
   ############################# TO DELETE BELOW ##############################
 
   # FIXME: Do this properly later
@@ -574,7 +592,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :people do #TODO Delete
+  resources :people do #TODO: delete
     get 'select_employer'
     get 'my_account'
 
@@ -590,7 +608,7 @@ Rails.application.routes.draw do
 
   end
 
-  match 'families/home', to: 'insured/families#home', via:[:get], as: "family_account"
+  match 'families/home', to: 'insured/families#home', via: [:get], as: "family_account"
 
   match "hbx_profiles/edit_dob_ssn" => "exchanges/hbx_profiles#edit_dob_ssn", as: :edit_dob_ssn, via: [:get, :post]
   match "hbx_profiles/update_dob_ssn" => "exchanges/hbx_profiles#update_dob_ssn", as: :update_dob_ssn, via: [:get, :post], defaults: { format: 'js' }
@@ -620,8 +638,9 @@ Rails.application.routes.draw do
 
   get "document/download/:bucket/:key" => "documents#download", as: :document_download
   get "document/authorized_download/:model/:model_id/:relation/:relation_id" => "documents#authorized_download", as: :authorized_document_download
+  get "document/cartafact_download/:model/:model_id/:relation/:relation_id" => "documents#cartafact_download", as: :cartafact_document_download
 
-  resources :documents, only: [ :new, :create, :destroy, :update] do
+  resources :documents, only: [:new, :create, :destroy, :update] do
     get :document_reader,on: :member
     get :autocomplete_organization_legal_name, :on => :collection
     collection do
@@ -700,5 +719,56 @@ Rails.application.routes.draw do
   #   end
   #
   # You can have the root of your site routed with "root"
+
+  # API check_ach_routing
+
+  resources :external_applications, only: [:show]
+
+  namespace :api, defaults: {format: 'json'} do
+    namespace :v1 do
+      scope module: :api do
+        get :ping
+      end
+
+      resources :brokers, only: %i[index show] do
+        collection do
+          get :broker_staff
+        end
+      end
+
+      resources :agencies, only: %i[index] do
+        collection do
+          get :agency_staff
+          get 'agency_staff/:person_id', to: 'agencies#agency_staff_detail'
+          post 'agency_staff/:person_id/terminate/:role_id', to: 'agencies#terminate'
+          patch 'agency_staff/:person_id', to: 'agencies#update_person'
+          patch 'agency_staff/:person_id/email', to: 'agencies#update_email'
+          get :primary_agency_staff
+        end
+      end
+
+      resources :slcsp, :only => []  do
+        collection do
+          post :plan
+        end
+      end
+    end
+
+    namespace :v2 do
+      resources :auth_tokens, only: [] do
+        collection do
+          post :refresh
+          delete :logout
+        end
+      end
+
+      resources :users, only: [] do
+        collection do
+          get :current
+        end
+      end
+    end
+  end
+
   root 'welcome#index'
 end

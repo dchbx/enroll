@@ -11,14 +11,17 @@ describe UpdateEmployeeRoleId, dbclean: :after_each do
   describe "update predecessor id on the enrollments", dbclean: :after_each do
     let(:current_effective_date)  { TimeKeeper.date_of_record }
     let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
+    let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
     let!(:old_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
+                                            issuer_profile: issuer_profile,
                                             title: "SHOP Benefits for #{current_effective_date.year - 1.year}",
                                             application_period: (current_effective_date.next_month.beginning_of_month - 1.year ..current_effective_date.end_of_month))
                                           }
 
     let!(:renewing_benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                             benefit_market: benefit_market,
+                                            issuer_profile: issuer_profile,
                                             title: "SHOP Benefits for #{current_effective_date.year}",
                                             application_period: (current_effective_date.next_month.beginning_of_month..current_effective_date.end_of_month + 1.year ))
                                           }

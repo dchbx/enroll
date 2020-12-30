@@ -358,7 +358,30 @@ RSpec.describe EnrollmentShopping::EnrollmentBuilder, dbclean: :around_each do
             expect(enrollment.sponsored_benefit_package).to eq current_benefit_package
             expect(enrollment.sponsored_benefit).to eq current_benefit_package.sponsored_benefit_for(coverage_kind)
             expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
-          end      
+          end
+
+          context "during special enrollment period with change to bga for two benefit packages case" do
+            let!(:benefit_package2) { FactoryBot.create(:benefit_sponsors_benefit_packages_benefit_package, benefit_application: initial_application) }
+            let!(:dental_benefit) { FactoryBot.create(:benefit_sponsors_sponsored_benefits_dental_sponsored_benefit, benefit_package: benefit_package2) }
+            let!(:bga2) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package2, census_employee: ce, start_on: initial_application.effective_period.min) }
+
+            before :each do
+              ce.benefit_group_assignments.first.update_attributes(end_on: start_on.end_of_month, is_active: false)
+              initial_application.benefit_packages << benefit_package2
+            end
+            it "should build an enrollment from previous #{coverage_kind} enrollment" do
+              expect(enrollment.valid?).to be_truthy
+              expect(enrollment.coverage_kind).to eq coverage_kind
+              expect(enrollment.effective_on).to eq previous_enrollment.effective_on
+              expect(enrollment.enrollment_kind).to eq 'special_enrollment'
+              expect(enrollment.hbx_enrollment_members).to be_present
+              expect(enrollment.hbx_enrollment_members.collect(&:applicant_id)).to eq family_member_ids
+              expect(enrollment.benefit_sponsorship).to eq benefit_sponsorship
+              expect(enrollment.sponsored_benefit_package).to eq benefit_package2
+              expect(enrollment.sponsored_benefit).to eq benefit_package2.sponsored_benefit_for(coverage_kind)
+              expect(enrollment.waiver_reason).to eq "this is waiver reason" if state == "waiver"
+            end
+          end
         end
       end
     end

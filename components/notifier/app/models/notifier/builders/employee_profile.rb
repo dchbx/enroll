@@ -195,8 +195,7 @@ module Notifier
     end
 
     def special_enrollment_period_event_on
-      event_on = special_enrollment_period.nil? ? payload['notice_params']['qle_event_on'] : format_date(special_enrollment_period.event_on)
-      merge_model.special_enrollment_period.event_on = event_on
+      merge_model.special_enrollment_period.event_on = payload['notice_params'] && payload['notice_params']['qle_event_on'] || format_date(special_enrollment_period.event_on)
     end
 
     def future_sep?
@@ -204,7 +203,7 @@ module Notifier
     end
 
     def special_enrollment_period_title
-      merge_model.special_enrollment_period.title = special_enrollment_period.nil? ? payload['notice_params']['qle_title'] : special_enrollment_period.title
+      merge_model.special_enrollment_period.title = payload['notice_params'] && payload['notice_params']['qle_title'] || special_enrollment_period.title
     end
 
     def special_enrollment_period_qle_reported_on

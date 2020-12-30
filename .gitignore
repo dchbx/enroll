@@ -53,7 +53,6 @@ __MACOSX
 .project
 tags
 
-spec/vocabularies
 components/**/spec/dummy/tmp
 components/**/spec/examples.txt
 plan_xmls.zip
@@ -86,6 +85,7 @@ fixture_dumps
 
 /public/packs
 /public/packs-test
+/public/assets
 /node_modules
 /yarn-error.log
 yarn-debug.log*
@@ -93,7 +93,12 @@ yarn-debug.log*
 
 # Ignore YARD generated doc
 doc
-angular_documentation
-angular_coverage
 rubocop
 coverage
+
+.env
+.vscode
+
+# Ignore HUGO output dirs
+hugo/public
+hugo/static

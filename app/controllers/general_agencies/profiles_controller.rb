@@ -2,6 +2,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
   skip_before_action :require_login, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
   skip_before_action :authenticate_me!, only: [:new_agency, :new_agency_staff, :create, :search_general_agency]
   #before_action :find_hbx_profile, only: [:index]
+  before_action :general_agency_profile_params, only: [:update]
   before_action :find_general_agency_profile, only: [:show, :edit, :update, :employers, :families, :staffs, :agency_messages]
   before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
   before_action :check_general_agency_profile_permissions_index, only: [:index]
@@ -26,7 +27,6 @@ class GeneralAgencies::ProfilesController < ApplicationController
   def update
     authorize HbxProfile, :modify_admin_tabs?
     sanitize_agency_profile_params
-    params.permit!
 
     @organization = Organization.find(params[:organization][:id])
     @organization_dup = @organization.office_locations.as_json
@@ -247,7 +247,7 @@ class GeneralAgencies::ProfilesController < ApplicationController
 
   def update_ga_staff_phone(office_location, person)
     phone = office_location.phone
-    broker_main_phone = person.phones.where(kind: "phone main").first
+    broker_main_phone = person.phones.where(kind: "work").first
     if broker_main_phone.present?
       broker_main_phone.update_attributes!(
         kind: phone.kind,

@@ -106,6 +106,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
       end
       it "POST, send_message_to_broker" do
         allow(person).to receive(:user).and_return(user)
+        allow(person).to receive(:agent?).and_return(true)
         allow(broker_role).to receive(:person).and_return(person)
         sign_in user
         post :send_message_to_broker, params: {hbx_enrollment_id: hbx_enrollment.id}
@@ -132,6 +133,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
     before :each do
       allow(EmployeeRole).to receive(:find).and_return(employee_role)
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:agent?).and_return(false)
       allow(Forms::EmployeeRole).to receive(:new).and_return(person)
       allow(employee_role).to receive(:new_census_employee).and_return(census_employee)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
@@ -261,6 +263,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
     let(:user) { double("User",id: user_id, email: "somdfinkething@gmail.com") }
 
     before(:each) do
+      allow(user).to receive(:person).and_return(nil)
       sign_in(user)
       allow(mock_employee_candidate).to receive(:match_census_employees).and_return(found_census_employees)
       allow(census_employee).to receive(:is_active?).and_return(true)
@@ -338,6 +341,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
 
     it "renders the 'welcome' template when user has no employee role" do
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:agent?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(false)
       allow(user).to receive(:last_portal_visited=).and_return(true)
       allow(user).to receive(:save!).and_return(true)
@@ -349,6 +353,7 @@ RSpec.describe Insured::EmployeeRolesController, :dbclean => :around_each do
 
     it "renders the 'my account' template when user has employee role" do
       allow(user).to receive(:person).and_return(person)
+      allow(person).to receive(:agent?).and_return(false)
       allow(person).to receive(:has_active_employee_role?).and_return(true)
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:bookmark_url).and_return(family_account_path)

@@ -1,0 +1,30 @@
+<div class="col-md-4 confirmation hidden" id="cancel-plan-form">
+  <h3><%= l10n("cancel_plan") %></h3>
+  <p id="cancel-msg" class="action-msg hidden"><%= l10n("do_you_want_to_cancel_this_plan") %></p>
+  <%= radio_button_tag :agreement, "action-confirm-yes" %>&nbsp;<%= l10n("yes") %><br>
+  <%= radio_button_tag :agreement, "action-confirm-no" %>&nbsp;<%= l10n("no") %>
+  <br/>
+  <div id="cancel-form" class="hidden">
+    <%= form_for @self_term_or_cancel_form,
+      as: :self_term_or_cancel_form,
+      url: term_or_cancel_insured_group_selections_path do |f| %>
+      <%= hidden_field_tag :hbx_enrollment_id, locals[:hbx_enrollment][:id] %>
+      <%= hidden_field_tag :term_or_cancel, locals[:term_or_cancel] %>
+      <%= hidden_field_tag :family_id, locals[:family_id] %>
+      <% calendar_enabled = !(locals[:term_or_cancel] == 'cancel') %>
+      <% if calendar_enabled %>
+        <h5 id="enter-text">Choose the last day you want to be covered. The earliest date you can choose is today.</h5>
+        <%# Keep blank space in placeholder. Otherwise, "You forgot to add placeholder attribute!" appears %>
+        <div class="col-md-8 aptc-no-left-padding">
+          <%= text_field_tag 'term_date', '', :'data-date-min'=> "+0d", placeholder: " ",
+              class: "required date-picker term-date-picker floatlabel form-control",
+              required: true, id: "term-date" %>
+        </div>
+        <br><br><br>
+      <% end %>
+      <div class="col-md-8 aptc-no-left-padding">
+        <%= f.submit l10n("cancel_plan"), class: 'button btn btn-lg btn-primary btn-block col-md-6', id: 'btn-cancel', :disabled => true %>
+      </div>
+    <% end %>
+  </div>
+</div>

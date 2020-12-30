@@ -15,6 +15,7 @@ module SponsoredBenefits
 
     describe "POST create" do
       before do
+        allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
         plan_design_census_employee
         benefit_application.benefit_sponsorship.update_attributes(initial_enrollment_period: enrollment_period)
         sign_in user_with_broker_role

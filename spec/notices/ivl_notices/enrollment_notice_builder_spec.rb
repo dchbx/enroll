@@ -2,23 +2,27 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
-  let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
-  let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
+  let(:person) { FactoryBot.create(:person)}
+  let!(:consumer_role) { FactoryBot.create(:consumer_role, person: person) }
+  let(:min_verification_due_date) { TimeKeeper.date_of_record + 10.days }
+  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000", min_verification_due_date: min_verification_due_date)}
   let(:issuer_profile) { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
   let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', issuer_profile: issuer_profile)}
+  let(:hbx_enrollment_members) { [hbx_enrollment_member] }
   let!(:hbx_enrollment) do
     FactoryBot.create(
       :hbx_enrollment,
       created_at: (TimeKeeper.date_of_record.in_time_zone("Eastern Time (US & Canada)") - 2.days),
       family: family,
       household: family.households.first,
+      hbx_enrollment_members: hbx_enrollment_members,
       kind: "individual",
       is_any_enrollment_member_outstanding: true,
       aasm_state: 'coverage_selected',
       product: product
     )
   end
-  let!(:hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family.family_members.first.id,is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month )}
+  let!(:hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record.prev_month) }
   let(:application_event){ double("ApplicationEventKind",{
                             :name =>'Enrollment Notice',
                             :notice_template => 'notices/ivl/enrollment_notice',
@@ -36,6 +40,10 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:citizenship_type) { FactoryBot.build(:verification_type, type_name: 'Citizenship')}
   let(:ssn_type) { FactoryBot.build(:verification_type, type_name: 'Social Security Number')}
+
+  after(:each) do
+    DatabaseCleaner.clean
+  end
 
   describe "New" do
     before do
@@ -143,20 +151,27 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
     context "when there are outstanding verification family members" do
       let!(:person2) { FactoryBot.create(:person, :with_consumer_role)}
       let!(:family_member2) { FactoryBot.create(:family_member, family: family, is_active: true, person: person2) }
-      let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member,hbx_enrollment: hbx_enrollment, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.prev_month)}
+      let!(:hbx_enrollment_member2) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family_member2.id, eligibility_date: TimeKeeper.date_of_record.prev_month)}
+      let(:hbx_enrollment_members) { [hbx_enrollment_member, hbx_enrollment_member2] }
+      let(:due_date) { family.min_verification_due_date.present? && family.min_verification_due_date > TimeKeeper.date_of_record ? family.min_verification_due_date : @eligibility_notice.min_notice_due_date(family) }
+
       it "should return a future date when present" do
         person.consumer_role.save!
         person2.consumer_role.save!
         @eligibility_notice.build
-        expect(@eligibility_notice.notice.due_date).to eq @eligibility_notice.min_notice_due_date(family)
+        expect(@eligibility_notice.notice.due_date).to eq due_date
       end
 
-      it "should return nil when no future dates are present" do
-        allow(family).to receive(:contingent_enrolled_active_family_members).and_return([])
-        person.consumer_role.save!
-        person2.consumer_role.save!
-        @eligibility_notice.build
-        expect(@eligibility_notice.notice.due_date).to eq nil
+      context 'when no future dates are present' do
+        let(:min_verification_due_date) { nil }
+
+        it "should return nil " do
+          allow(family).to receive(:contingent_enrolled_active_family_members).and_return([])
+          person.consumer_role.save!
+          person2.consumer_role.save!
+          @eligibility_notice.build
+          expect(@eligibility_notice.notice.due_date).to eq nil
+        end
       end
     end
 
@@ -167,6 +182,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
         args = OpenStruct.new
         args.determined_at = TimeKeeper.datetime_of_record - 1.month
         args.vlp_authority = "ssa"
+        person.consumer_role.update_attributes(aasm_state: 'unverified')
         person.consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: args.determined_at, body: payload})
         person.consumer_role.coverage_purchased!
         person.consumer_role.ssn_valid_citizenship_valid!(args)
@@ -184,10 +200,10 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
       @eligibility_notice = IvlNotices::EnrollmentNoticeBuilder.new(person.consumer_role, valid_params)
     end
 
-    it "should render not documents section when the family came in through curam(Assisted)" do
+    it "should render documents section when the family came in through curam(Assisted)" do
       @eligibility_notice.append_hbe
       @eligibility_notice.build
-      expect(@eligibility_notice).not_to receive :attach_required_documents
+      expect(@eligibility_notice).to receive :attach_required_documents
       @eligibility_notice.attach_docs
     end
 
@@ -216,6 +232,7 @@ RSpec.describe IvlNotices::EnrollmentNoticeBuilder, dbclean: :after_each do
 
   describe "render template and generate pdf" do
     before do
+      person.consumer_role.update_attributes(aasm_state: 'verification_outstanding')
       allow(person).to receive("primary_family").and_return(family)
       allow(person).to receive(:families).and_return([family])
       allow(person).to receive_message_chain("families.first.primary_applicant.person").and_return(person)

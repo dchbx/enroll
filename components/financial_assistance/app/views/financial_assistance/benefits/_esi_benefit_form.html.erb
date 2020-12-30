@@ -1,0 +1,150 @@
+<%= benefit_form_for @application, @applicant, benefit do |f| %>
+  <div class="focus_effect_module row-edit-border">
+    <%= f.hidden_field :kind, value: kind %>
+    <%= f.hidden_field :insurance_kind, value: insurance_kind %>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-12">
+        <%= f.text_field :employer_name, placeholder: 'EMPLOYER NAME *', required: true, class: "floatlabel" %>
+      </div>
+    </div>
+
+    <%= f.fields_for :employer_address do |benefit_fields| %>
+      <%= benefit_fields.hidden_field :kind, value: 'work' %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6">
+          <%= benefit_fields.text_field :address_1, placeholder: 'EMPLOYER ADDRESS LINE 1 *', value: benefit.employer_address.try(:address_1), required: true, class: "floatlabel ph-width" %>
+        </div>
+        <div class="col-md-6">
+          <%= benefit_fields.text_field :address_2, placeholder: 'EMPLOYER ADDRESS LINE 2 (APT, UNIT, ETC.)', value: benefit.employer_address.try(:address_2), class: "floatlabel ph-width" %>
+        </div>
+      </div>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-4">
+          <%= benefit_fields.text_field :city, placeholder: 'CITY *', required: true, value: benefit.employer_address.try(:city), class: "floatlabel" %>
+        </div>
+        <div class="col-md-4 fa-select select-box">
+          <%= benefit_fields.label :state, 'State *', class: "label-color" %>
+          <%= benefit_fields.select :state, options_for_select(state_options, selected: benefit.employer_address.try(:state)), {prompt: 'Choose' }, {:required => true} %>
+        </div>
+        <div class="col-md-4">
+          <%= benefit_fields.text_field :zip, placeholder: 'ZIP *', required: true, value: benefit.employer_address.try(:zip), class: "floatlabel zip" %>
+        </div>
+      </div>
+    <% end %>
+
+    <%= f.fields_for :employer_phone do |phone_fields| %>
+      <%= phone_fields.hidden_field :kind, value: "work" %>
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-6">
+          <%= phone_fields.text_field :full_phone_number, placeholder: 'PHONE NUMBER *', required: true, value: benefit.employer_phone.try(:full_phone_number), class: "floatlabel phone_number" %>
+        </div>
+        <div class="col-md-6">
+          <%= f.text_field :employer_id, placeholder: 'EMPLOYER IDENTIFICATION NO.(EIN)', class: "floatlabel ph-width fien_field" %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color">Is the employee currently in a waiting period and eligible to enroll in the next 3 months? *</label>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_waiting_period, true, class: "required floatlabel", id: "benefit_is_esi_waiting_period_#{benefit.id}_true" %>
+          <%= f.label "is_esi_waiting_period_#{benefit.id}", :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_waiting_period, false, class: "required floatlabel", id: "benefit_is_esi_waiting_period_#{benefit.id}_false" %>
+          <%= f.label "is_esi_waiting_period_#{benefit.id}", :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+      <div class='col-md-2'>
+        <a href="#is_esi_waiting_period" data-toggle="modal" data-target="#is_esi_waiting_period_<%= benefit.id %>" id="is_esi_waiting_period_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_waiting_period", id: "is_esi_waiting_period_#{benefit.id}" } %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer fa-align-elements">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg">
+        <label class="fa-text-color">Does this employer offer a health plan that meets the minimum value standard? *</label>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_mec_met, true, class: "required floatlabel", id: "benefit_is_esi_mec_met_#{benefit.id}_true" %>
+          <%= f.label "is_esi_mec_met_#{benefit.id}", :value => true do %>
+            <span>Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :is_esi_mec_met, false, class: "required floatlabel", id: "benefit_is_esi_mec_met_#{benefit.id}_false" %>
+          <%= f.label "is_esi_mec_met_#{benefit.id}", :value => false do %>
+            <span>No</span>
+          <% end %>
+        </div>
+      </div>
+      <div class='col-md-2'>
+        <a href="#is_esi_mec_met" data-toggle="modal" data-target="#is_esi_mec_met_<%= benefit.id %>" id="is_esi_mec_met_not_sure" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "is_esi_mec_met", id: "is_esi_mec_met_#{benefit.id}" } %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-5 fa-select select-box">
+        <%= f.label :esi_covered, 'Who can be covered? *', class: "label-color" %>
+        <%= f.select :esi_covered, options_for_select({"Self" => "self", "Self And Spouse" => "self_and_spouse", "Family" => "family" }, selected: benefit.esi_covered), {prompt: 'Choose' }, {:required => true} %>
+      </div>
+      <div class="col-md-6">
+        <div class="col-md-6">
+          <%= f.text_field :start_on, placeholder: 'FROM *', required: true, id: "start_on_#{benefit.id}", class: "datepicker-js floatlabel" %>
+        </div>
+        <div class="col-md-6">
+          <%= f.text_field :end_on, placeholder: 'TO', id: "end_on_#{benefit.id}", class: "datepicker-js floatlabel" %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper radio-align no-buffer">
+      <div class='col-md-9 labelforcoverage'>
+        <span class="fa-text-color">How much would the employee only pay for the lowest cost minimum value standard plan? *</span>
+      </div>
+      <div class='col-md-2 not-sure-margin'>
+        <a href="#employee_cost" data-toggle="modal" data-target="#employee_cost_<%= benefit.id %>" id="employee_cost" class="interaction-click-control-not-sure? benefit-support-modal">Not sure?</a>
+        <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "employee_cost", id: "employee_cost_#{benefit.id}" } %>
+      </div>
+    </div>
+
+    <div class="row row-form-wrapper no-buffer row-height">
+      <div class="col-md-3">
+        <%= f.label :frequency_kind, 'Amount *', class: "amount label-color" %>
+        <%= f.text_field :employee_cost, placeholder: '0.00', value: "", required: true %>
+      </div>
+      <div class="col-md-3 fa-select select-box">
+        <%= f.label :employee_cost_frequency, 'How Often *', class: "label-color" %>
+        <%= f.select :employee_cost_frequency, options_for_select(frequency_kind_options, selected: benefit.employee_cost_frequency), {prompt: 'Choose' }, {:required => true} %>
+      </div>
+    </div>
+  </div>
+
+    <div class="row">
+      <div class="col-md-3 pull-right">
+        <a class="btn btn-default benefit-cancel">Cancel</a>
+        <%= f.submit 'Save', class: 'btn btn-danger' %>
+      </div>
+    </div>
+<% end %>
+
+<script>
+  $( function() {
+    $( "#benefit_start_on" ).datepicker();
+    $( "#benefit_end_on" ).datepicker();
+  } );
+</script>

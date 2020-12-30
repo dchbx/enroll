@@ -1,0 +1,179 @@
+version: v1.0
+name: First pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - echo $TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - gem install semaphore_test_boosters
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - rspec_booster --job $SEMAPHORE_JOB_INDEX/$SEMAPHORE_JOB_COUNT
+          parallelism: 8
+      env_vars:
+        - name: TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN
+          value: '{spec,components/benefit_markets/spec,components/benefit_sponsors,components/notifier,components/sponsored_benefits,components/transport_gateway,components/transport_profiles}/**/*_spec.rb'
+    dependencies: []
+  - name: Cucumbers
+    dependencies:
+      - Engines - Benefit Markets
+      - Engines - Notifier
+      - Engines - Transport Gateway
+      - Engines - Transport Profiles
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: Cucumber
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - gem install semaphore_test_boosters
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cucumber_booster --job $SEMAPHORE_JOB_INDEX/$SEMAPHORE_JOB_COUNT
+          parallelism: 8
+  - name: Engines - Benefit Markets
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/benefit_markets && bundle install && bundle exec rspec
+  - name: Engines - Notifier
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/notifier && bundle install && bundle exec rspec
+  - name: Engines - Sponsored Benefits
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/sponsored_benefits && bundle install && bundle exec rspec
+  - name: Engines - Transport Gateway
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/transport_gateway && bundle install && bundle exec rspec
+  - name: Engines - Transport Profiles
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/transport_profiles && bundle install && bundle exec rspec
+  - name: Engines - Benefit Sponsors
+    dependencies:
+      - RSpec
+    task:
+      prologue:
+        commands:
+          - checkout
+      jobs:
+        - name: RSpec
+          commands:
+            - echo $TEST_BOOSTERS_RSPEC_TEST_FILE_PATTERN
+            - sem-service start mongodb 3.6
+            - sem-version ruby 2.5.1
+            - sem-version node 10
+            - gem install bundler -v 2.0.1
+            - cache restore
+            - bundle install --path vendor/bundle
+            - yarn install
+            - cache store
+            - NODE_ENV=test RAILS_ENV=test ./bin/webpack
+            - cd components/benefit_sponsors && bundle install && gem install semaphore_test_boosters && rspec_booster --job $SEMAPHORE_JOB_INDEX/$SEMAPHORE_JOB_COUNT
+          parallelism: 3

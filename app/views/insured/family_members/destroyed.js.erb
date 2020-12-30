@@ -1,3 +1,11 @@
-$("#add_member_list_<%= @dependent.id %>").remove();
-$("#dependent_buttons").removeClass('hidden');
-$('#qle_flow_info').removeClass('hidden');
+<% if @dependent.errors.full_messages.present? %>
+$('#family_error_messages').append("<%= escape_javascript render partial: 'destroyed' %>");
+<% else %>
+  $("#add_member_list_<%= @dependent.id %>").remove();
+  $("#dependent_buttons").removeClass('hidden');
+  $('#qle_flow_info').removeClass('hidden');
+<% end %>
+
+<% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['destroy'].include? controller.action_name)  %>
+  $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+<% end %>

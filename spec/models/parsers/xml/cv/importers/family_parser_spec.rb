@@ -73,6 +73,11 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         expect(family_members.map(&:primary_relationship)).to eq ['self', 'child']
       end
 
+      it 'should get relationships' do
+        primary_person = subject.get_family_object.primary_person
+        expect(primary_person.person_relationships.map(&:kind)).to eq ['child']
+      end
+
       it "person should have relationships" do
         family_members = subject.get_family_object.family_members
         family_members.each do |fm|
@@ -89,6 +94,24 @@ describe Parsers::Xml::Cv::Importers::FamilyParser do
         family = subject.get_family_object
         expect(family.created_at.present?).to eq true
         expect(family.updated_at.present?).to eq true
+      end
+
+      context 'person relationships' do
+        before do
+          @primary_person = subject.get_family_object.primary_person
+        end
+
+        it 'should only create relationships to dependents' do
+          expect(@primary_person.person_relationships.map(&:kind)).to eq(['child'])
+        end
+
+        it 'should not create self relationship into the db' do
+          expect(@primary_person.person_relationships.map(&:kind)).not_to include('self')
+        end
+
+        it 'should not create any relationships from primary to primary' do
+          expect(@primary_person.person_relationships.where(relative_id: @primary_person.id).first).to be_nil
+        end
       end
     end
   end

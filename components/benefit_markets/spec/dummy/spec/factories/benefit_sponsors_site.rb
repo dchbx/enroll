@@ -18,7 +18,7 @@ FactoryBot.define do
 
     trait :with_benefit_market do
       after :build do |site, evaluator|
-        site.benefit_markets << build(:benefit_markets_benefit_market, kind: evaluator.kind)
+        site.benefit_markets << create(:benefit_markets_benefit_market, kind: evaluator.kind, site: site)
       end
     end
 
@@ -28,8 +28,18 @@ FactoryBot.define do
       end
     end
 
+    trait :with_benefit_market_catalog_and_product_packages do
+      after :create do |site, evaluator|
+        create(:benefit_markets_benefit_market_catalog, :with_product_packages, benefit_market: site.benefit_markets[0], issuer_profile: BenefitSponsors::Organizations::IssuerProfile.new)
+      end
+    end
+
     trait :cca do
       site_key { :cca }
+    end
+
+    trait :dc do
+      site_key { :dc }
     end
   end
 end

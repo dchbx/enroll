@@ -15,7 +15,7 @@ module BenefitSponsors
       attribute :dob, String
       attribute :gender, String
       attribute :hired_on, String
-      attribute :employment_terminated_on, Date
+      attribute :employment_terminated_on, String
       attribute :is_business_owner, String
       attribute :no_ssn_allowed, Boolean
       

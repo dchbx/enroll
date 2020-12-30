@@ -33,6 +33,7 @@ module Subscribers
       throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
       stupid_family_id = family.id
       active_household = family.active_household
+      throw(:processing_issue, "ERROR: Invalid family due to #{family.errors.messages}") unless family.valid?
       family.save! # In case the tax household does not exist
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
@@ -53,7 +54,7 @@ module Subscribers
       #throw(:processing_issue, "ERROR: Integrated case id does not match existing family for xml") unless ecase_id_valid?(family, verified_family)
       family.e_case_id = verified_family.integrated_case_id
       begin
-        active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
+        newly_created_thh = active_household.build_or_update_tax_household_from_primary(verified_primary_family_member, primary_person, active_verified_household)
       rescue
         throw(:processing_issue, "Failure to update tax household")
       end
@@ -70,15 +71,11 @@ module Subscribers
             active_verified_tax_household = active_verified_tax_households.select{|vth| vth.id == verified_primary_family_member.id.split('#').last && vth.tax_household_members.any?{|vthm| vthm.id == p[2][0]}}.first
             if active_verified_tax_household.present?
               new_tax_household_member = active_verified_tax_household.tax_household_members.select{|thm| thm.id == p[2][0]}.first
-              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member)
+              active_household.add_tax_household_family_member(new_family_member,new_tax_household_member, newly_created_thh)
             end
           end
         end
-        if active_household.latest_active_tax_household.present?
-          unless active_household.latest_active_tax_household.eligibility_determinations.present?
-            log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => "error"})
-          end
-        end
+        log("ERROR: No eligibility_determinations found for tax_household: #{xml}", {:severity => 'error'}) if newly_created_thh.present? && !newly_created_thh.eligibility_determinations.present?
       rescue
         log("ERROR: Unable to create tax household from xml: #{xml}", {:severity => "error"})
       end
@@ -146,6 +143,7 @@ module Subscribers
               ssn: verified_family_member.person_demographics.ssn == "999999999" ? "" : verified_family_member.person_demographics.ssn ,
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
+            throw(:processing_issue, "Invalid Person due to #{new_member.errors.messages}") unless new_member.valid?
             new_member.save!
             find_or_build_consumer_role(new_member)
             update_vlp_for_consumer_role(new_member.consumer_role, verified_family_member)

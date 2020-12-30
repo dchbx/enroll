@@ -97,6 +97,7 @@ class Person
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :general_agency_staff_certified,     -> { where("general_agency_staff_roles.aasm_state" => { "$eq" => :active })}
+  scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active]})}
 
   def move_encrypted_ssn_errors
     deleted_messages = errors.delete(:encrypted_ssn)
@@ -244,7 +245,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "phone main" }
+    phones.detect { |phone| phone.kind == "main" }
   end
 
   def home_phone
@@ -285,6 +286,18 @@ class Person
           {"broker_role.npn" => s_rex}
           ] + additional_exprs(clean_str))
         })
+    end
+
+    def brokers_matching_search_criteria(search_str)
+      broker_role_certified.search_first_name_last_name_npn(search_str)
+    end
+
+    def agencies_with_matching_broker(search_str)
+      if brokers_matching_search_criteria(search_str).exists(:"broker_role.benefit_sponsors_broker_agency_profile_id" => true)
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:benefit_sponsors_broker_agency_profile_id)
+      else
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:broker_agency_profile_id)
+      end
     end
 
     def general_agencies_matching_search_criteria(search_str)
@@ -472,7 +485,11 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{Settings.site.short_name}"
-    welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    if broker_role || broker_agency_staff_roles.present?
+      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    else
+      welcome_body = "#{Settings.site.site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{Settings.site.site_short_name}<br/>#{Settings.contact_center.short_number}<br/>TTY: #{Settings.contact_center.tty_number}"
+    end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{Settings.site.short_name}")
   end

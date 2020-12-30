@@ -66,6 +66,7 @@ Rails.application.configure do
   config.wells_fargo_api_version = '3000'
   config.wells_fargo_private_key_location = '/wfpk.pem'
   config.wells_fargo_api_date_format = '%Y-%m-%dT%H:%M:%S.0000000%z'
+  config.cartafact_document_upload_url = 'http://localhost:3004/api/v1/documents'
 
   #Queue adapter
   config.active_job.queue_adapter = :test

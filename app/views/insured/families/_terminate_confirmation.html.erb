@@ -9,15 +9,15 @@
         <%= hidden_field_tag 'terminate', 'terminate' %>
         <%= hidden_field_tag 'change_plan', @change_plan %>
         <%= hidden_field_tag 'hbx_enrollment_id', enrollment.id %>
+        <%= hidden_field_tag "terminate_date_#{enrollment.hbx_id}" %>
         <div class="modal-body">
           <%= select_tag "terminate_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), {include_blank: l10n("insured.please_select_terminate_reason"), onchange: "EmployeeRole.disableTerminateSubmit('#{enrollment.id}')"} %>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n('.close') %></button>
-          <%= submit_tag l10n('.submit'), class: 'btn btn-primary terminate_reason_submit', disabled: true %>
+          <%= submit_tag l10n('.submit'), onclick: "fetchDate('#{enrollment.hbx_id}')",  class: 'btn btn-primary terminate_reason_submit', disabled: true %>
         </div>
       <% end %>
     </div>
   </div>
 </div>
-

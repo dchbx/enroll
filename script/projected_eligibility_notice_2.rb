@@ -3,9 +3,9 @@ begin
   @data_hash = {}
 
   csv_path = if Rails.env.production?
-               "proj_elig_report_aqhp_2019.csv"
+               "proj_elig_report_aqhp.csv"
              else
-               "#{Rails.root}/spec/test_data/notices/proj_elig_report_aqhp_2019_test_data.csv"
+               "#{Rails.root}/spec/test_data/notices/proj_elig_report_aqhp_test_data.csv"
              end
 
   CSV.foreach(csv_path, :headers => true).each do |d|

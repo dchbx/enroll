@@ -10,7 +10,6 @@ require 'webdrivers'
 require 'cucumber/rails'
 require 'email_spec/cucumber'
 require 'rspec/expectations'
-require 'capybara/cucumber'
 require 'capybara-screenshot/cucumber'
 require 'cucumber/rspec/doubles'
 
@@ -94,6 +93,11 @@ Capybara.register_driver :selenium_chrome do |app|
     options: options,
     http_client: client
   )
+end
+
+unless (env_no = ENV['TEST_ENV_NUMBER'].to_i).zero?
+  # As described in the readme
+  Capybara.server_port = 8888 + env_no
 end
 
 Capybara.default_driver = :selenium_chrome

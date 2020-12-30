@@ -148,7 +148,7 @@ module BenefitSponsors
         if @terminate_queue.present?
           return false if self.errors.present?
           @terminate_queue.each do |row, employee_termination_map|
-            employee_termination_map.employee.terminate_employment(employee_termination_map.employment_terminated_on)
+            employee_termination_map.employee.terminate_employment(Date.strptime(employee_termination_map.employment_terminated_on, '%m/%d/%Y'))
           end
         end
         true

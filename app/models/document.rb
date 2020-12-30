@@ -9,6 +9,11 @@ class Document
 
   ACCESS_RIGHTS = %w(public pii_restricted)
 
+  RESOURCE_LIST = %w[BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+                     BenefitSponsors::Organizations::FehbEmployerProfile
+                     BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+                     EmployeeRole Person ConsumerRole].freeze
+
   after_save :notify_on_save
 
   # Enable polymorphic associations
@@ -18,7 +23,7 @@ class Document
   field :title, type: String, default: "untitled"
 
   # Entity responsible for making the resource - person, organization or service
-  field :creator, type: String, default: "mhc"
+  field :creator, type: String, default: Settings.site.publisher
 
   # Controlled vocabulary w/classification codes. Mapped to ConsumerRole::VLP_DOCUMENT_KINDS
   field :subject, type: String
@@ -27,7 +32,7 @@ class Document
   field :description, type: String
 
   # Entity responsible for making the resource available - person, organization or service
-  field :publisher, type: String, default: "mhc"
+  field :publisher, type: String, default: Settings.site.publisher
 
   # Entity responsible for making contributions to the resource - person, organization or service
   field :contributor, type: String
@@ -62,6 +67,8 @@ class Document
   field :tags, type: Array, default: []
 
   field :size, type: String
+
+  field :doc_identifier, type: String
 
   validates_presence_of :title, :creator, :publisher, :type, :format, :source, :language
 

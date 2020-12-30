@@ -61,6 +61,11 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_force_publish => :environment
 end
 
+namespace :permissions do
+  desc 'hbx admin can send secure message'
+  DefinePermissions.define_task :hbx_admin_can_send_secure_message => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_extend_open_enrollment
 namespace :permissions do
   desc 'hbx admin can extend open enrollment'
@@ -77,6 +82,12 @@ end
 namespace :permissions do
   desc 'hbx admin can create benefit application'
   DefinePermissions.define_task :hbx_admin_can_create_benefit_application => :environment
+end
+
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_manage_qles
+namespace :permissions do
+  desc 'hbx admin can manage SEP types create, update & updation of ordinal position'
+  DefinePermissions.define_task :hbx_admin_can_manage_qles => :environment
 end
 
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
@@ -151,6 +162,10 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_access_pay_now => :environment
 end
 
+namespace :permissions do
+  desc 'assign the most current permissions'
+  DefinePermissions.define_task :assign_current_permissions => :environment
+end
 
 #rake permissions:hbx_admin_can_reset_password
 
@@ -181,3 +196,4 @@ end
 #rake permissions:hbx_admin_can_update_ssn
 #rake permissions:hbx_admin_can_complete_resident_application
 #rake permissions:hbx_admin_can_access_pay_now
+#bundle exec rake permissions:hbx_admin_can_send_secure_message

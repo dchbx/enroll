@@ -60,7 +60,7 @@
     <%= f.fields_for :phone, f.object.phone, errors: {}, fieldset: false do |phone| %>
     <div id="phone_info" class="row no-buffer row-form-wrapper">
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-        <%= phone.select :kind, options_for_select(phone.object.office_kind_options.map {|p| [p.to_s.humanize, p.to_s]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
+        <%= phone.select :kind, options_for_select(phone.object.office_kind_options.map {|p| [p.to_s.humanize, "work"]}),class: "floatlabel form-control interaction-choice-control-office-location-phone-kind", required: true, placeholder: 'KIND' %>
       </div>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :area_code, class: "floatlabel form-control area_code interaction-field-control-office-location-phone-area-code area-code", required: true, placeholder: 'AREA CODE', oninvalid:"checkAreaCode(this);", oninput:"checkAreaCode(this);" %>

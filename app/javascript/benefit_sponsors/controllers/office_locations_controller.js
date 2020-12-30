@@ -45,7 +45,7 @@ export default class extends Controller {
       var name = input.getAttribute('name').replace('[0]', `[${totalLocationsCount}]`);
       input.setAttribute('name', name)
 
-      if (input.value != "phone main" && input.id != "kindSelect") {
+      if (input.value != "work" && input.id != "kindSelect") {
         input.value = ''
       }
 

@@ -30,7 +30,7 @@
   </div>
 <% else %>
   <% action_path = find_sep_insured_families_path  %>
-  <% if is_under_open_enrollment? || @employee_role.try(:is_eligible_to_enroll_without_qle?) || @person.consumer_role.present? || @person.resident_role.present? %>
+  <% if @employee_role.try(:is_eligible_to_enroll_without_qle?) || ((@person.consumer_role.present? || @person.resident_role.present?) &&is_under_open_enrollment?) %>
     <% action_path = new_insured_group_selection_path %>
   <% end %>
 
@@ -52,7 +52,7 @@
             </div>
             <strong><%= l10n("insured.shop_for_health_and_dental_plans")%></strong>
           </div>
-          <% if @family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)%>
+          <% if (@family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)) || (@employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending?)%>
             <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
               <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
                 <%= l10n("insured.shop_for_plans")%>
@@ -90,14 +90,18 @@
 
               <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
                 <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
+              <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank?  %>
+                <p><%= "You have been terminated by your employer" %> "<%= @employee_role.employer_profile.legal_name %>"
+                  <%= "with an effective date of" %> <%= format_date @employee_role.census_employee.employment_terminated_on.end_of_month %> </p>
               <% else %>
-                <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin
-                <% if is_under_open_enrollment?  %>
-                  <%= format_date ivl_enrollment_effective_date %>.
-                <%elsif @employee_role.try(:is_under_open_enrollment?) %>
-                  <%= format_date @employee_role.benefit_begin_date %>.
+                <% if @employee_role.present? && @employee_role.census_employee.is_employee_in_term_pending? %>
+                <% else %>
+                  <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?) %>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
+                  <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
+                    <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date ivl_enrollment_effective_date %>.</p>
+                  <% end %>
                 <% end %>
-                </p>
               <% end %>
 
               <% if @family.latest_active_sep %>

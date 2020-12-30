@@ -16,6 +16,7 @@ module SponsoredBenefits
 
     describe "GET new" do
       it "should return success" do
+        allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
         sign_in user_with_broker_role
         benefit_application.benefit_sponsorship.update_attributes(initial_enrollment_period: enrollment_period)
         get :new, params: {plan_design_proposal_id: plan_design_proposal.id, profile_id: broker_agency_profile.id}

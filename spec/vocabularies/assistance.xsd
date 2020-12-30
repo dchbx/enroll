@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2014 rel. 2 (x64) (http://www.altova.com) by Dan Thomas (private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:vc="http://www.w3.org/2007/XMLSchema-versioning" elementFormDefault="qualified" attributeFormDefault="unqualified" vc:minVersion="1.1">
+	<xs:element name="aceds_id" type="xs:string"/>
+	<xs:element name="concern_role_id" type="xs:string"/>
+	<xs:element name="curam_applicant" type="CuramApplicantType"/>
+	<xs:element name="curam_applicants">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="curam_applicant" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="hbx_person_id" type="xs:anyURI"/>
+	<xs:element name="integrated_cases">
+		<xs:annotation>
+			<xs:documentation>Comment describing your root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="integrated_case" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="integrated_case_reference"/>
+							<xs:element name="application_submission_date"/>
+							<xs:element ref="curam_applicants"/>
+							<xs:element name="product_delivery_cases">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="product_delivery_case" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="pdc_case_reference"/>
+													<xs:element name="pdc_product_type"/>
+													<xs:element name="pdc_product_type_description"/>
+													<xs:element name="pdc_primary_applicant_name"/>
+													<xs:element name="pdc_primary_applicant_id" minOccurs="0"/>
+													<xs:element name="pdc_primary_applicant_person_id"/>
+													<xs:element name="pdc_primary_applicant_hbx_person_id" minOccurs="0"/>
+													<xs:element name="pdc_applicants">
+														<xs:complexType>
+															<xs:sequence>
+																<xs:element name="pdc_applicant" maxOccurs="unbounded">
+																	<xs:complexType>
+																		<xs:sequence>
+																			<xs:element ref="person_id" minOccurs="0"/>
+																			<xs:element ref="hbx_person_id" minOccurs="0"/>
+																			<xs:element ref="participant_id" minOccurs="0"/>
+																			<xs:element ref="concern_role_id" minOccurs="0"/>
+																			<xs:element name="applicant_name"/>
+																			<xs:element name="consent_applicant"/>
+																			<xs:element name="is_enrolled_for_es_coverage"/>
+																			<xs:element name="consent_applicant_participant_id" minOccurs="0"/>
+																			<xs:element name="is_without_assistance"/>
+																			<xs:element name="years_to_renew_coverage"/>
+																			<xs:element name="coverage_renewal_year"/>
+																			<xs:element name="financial_assistance"/>
+																			<xs:element name="ia_eligible"/>
+																			<xs:element name="medicaid_chip_eligible"/>
+																			<xs:element name="receiving_benefit"/>
+																			<xs:element name="projected_amount"/>
+																			<xs:element name="participant_projected_income"/>
+																			<xs:element name="projected_income_start_date"/>
+																			<xs:element name="projected_income_end_date"/>
+																			<xs:element name="application_submission_date"/>
+																		</xs:sequence>
+																	</xs:complexType>
+																</xs:element>
+															</xs:sequence>
+														</xs:complexType>
+													</xs:element>
+													<xs:element name="pdc_status_code"/>
+													<xs:element name="pdc_registration_date"/>
+													<xs:group ref="ResourceTimestampGroup"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:group ref="ResourceTimestampGroup"/>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="participant_id" type="xs:string"/>
+	<xs:element name="person_id" type="xs:string"/>
+	<xs:complexType name="CuramApplicantType">
+		<xs:sequence>
+			<xs:element name="identifier_sets">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="identifier_set" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element ref="person_id"/>
+									<xs:element ref="participant_id" minOccurs="0"/>
+									<xs:element ref="hbx_person_id" minOccurs="0"/>
+									<xs:element ref="aceds_id" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element ref="concern_role_id"/>
+			<xs:element name="full_name"/>
+			<xs:element name="name_first" type="xs:string" minOccurs="0"/>
+			<xs:element name="name_middle" type="xs:string" minOccurs="0"/>
+			<xs:element name="name_last" type="xs:string" minOccurs="0"/>
+			<xs:element name="is_primary_applicant" type="xs:string"/>
+			<xs:element name="date_of_birth"/>
+			<xs:element name="age"/>
+			<xs:element name="gender" type="xs:string"/>
+			<xs:element name="ssn" type="xs:string"/>
+			<xs:element name="aptc_amount" minOccurs="0"/>
+			<xs:element name="csr" minOccurs="0"/>
+			<xs:element name="is_resident" type="EmptyBooleanType" minOccurs="0"/>
+			<xs:element name="is_pregnancy" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="pregnancy_end_date" type="xs:date" minOccurs="0"/>
+			<xs:element name="enrolled_on_medicaid_during_pregnancy" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_applicant" type="xs:boolean"/>
+			<xs:element name="citizen_status"/>
+			<xs:element name="tax_filing_status"/>
+			<xs:element name="tax_filing_together"/>
+                        <xs:element name="tax_dependents">
+                                <xs:complexType>
+                                        <xs:sequence>
+                                                <xs:element name="tax_dependent" minOccurs="0"/>
+                                        </xs:sequence>
+                                </xs:complexType>
+                        </xs:element>
+			<xs:element name="incarceration_status"/>
+			<xs:element name="household_size"/>
+			<xs:element name="incomes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="income" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="amount" minOccurs="0"/>
+									<xs:element name="frequency" minOccurs="0"/>
+									<xs:element name="income_type" minOccurs="0"/>
+									<xs:element name="start_date" minOccurs="0"/>
+									<xs:element name="end_date" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="benefits">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="benefit" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="type" minOccurs="0"/>
+									<xs:element name="start_date" minOccurs="0"/>
+									<xs:element name="end_date" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="deductions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="deduction" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="type" minOccurs="0"/>
+									<xs:element name="amount" minOccurs="0"/>
+									<xs:element name="frequency" minOccurs="0"/>
+									<xs:element name="start_date" minOccurs="0"/>
+									<xs:element name="end_date" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="address" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="address_line_1" minOccurs="0"/>
+						<xs:element name="address_line_2" minOccurs="0"/>
+						<xs:element name="address_line_3" minOccurs="0"/>
+						<xs:element name="city" minOccurs="0"/>
+						<xs:element name="county" minOccurs="0"/>
+						<xs:element name="state" minOccurs="0"/>
+						<xs:element name="postal_code" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="email_address" minOccurs="0"/>
+			<xs:element name="telephone_number" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="country_code" minOccurs="0"/>
+						<xs:element name="area_code" minOccurs="0"/>
+						<xs:element name="number" minOccurs="0"/>
+						<xs:element name="number_full" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="relationships">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="relationship" minOccurs="0" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="relationship_type" minOccurs="0"/>
+									<xs:element name="related_participant_id" minOccurs="0"/>
+									<xs:element name="person_id" minOccurs="0"/>
+									<xs:element name="hbx_person_id" minOccurs="0"/>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:group ref="ResourceTimestampGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CuramIntegratedCaseType">
+		<xs:sequence/>
+	</xs:complexType>
+	<xs:simpleType name="EmptyBooleanType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="true"/>
+			<xs:enumeration value="false"/>
+			<xs:enumeration value=""/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:group name="ResourceTimestampGroup">
+		<xs:sequence>
+			<xs:element name="created_at" type="xs:dateTime"/>
+			<xs:element name="modified_at" type="xs:dateTime"/>
+			<xs:element name="version" type="xs:integer" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group>
+</xs:schema>

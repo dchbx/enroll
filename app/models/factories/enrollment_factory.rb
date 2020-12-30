@@ -350,7 +350,7 @@ module Factories
       role = case roles.count
       when 0
         # Assign employee-specifc attributes
-        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on, benefit_sponsors_employer_profile_id: employer_profile.id )
+        person.employee_roles.build(employer_profile: employer_profile, hired_on: hired_on, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id )
         # when 1
         #   roles.first
         # else
@@ -367,7 +367,9 @@ module Factories
       applicant = family.primary_applicant
       applicant ||= initialize_primary_applicant(family, person)
       person.relatives.each do |related_person|
-        family.add_family_member(related_person)
+        if family.find_family_member_by_person(related_person).is_active?
+          family.add_family_member(related_person)
+        end
       end
       dependents.each do |dependent|
         initialize_dependent(family, person, dependent)

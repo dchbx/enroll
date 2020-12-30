@@ -90,8 +90,12 @@ class Insured::RidpDocumentsController < ApplicationController
     ridp_type = params[:ridp_verification_type]
     document = @docs_owner.consumer_role.ridp_documents.build
     success = document.update_attributes({:identifier=>file_uri, :subject => title, :title=>title, :status=>"downloaded", :ridp_verification_type=>ridp_type, :uploaded_at => TimeKeeper.date_of_record})
-    person_consumer_role.mark_ridp_doc_uploaded(ridp_type)
-    @doc_errors = document.errors.full_messages unless success
+
+    if success
+      person_consumer_role.mark_ridp_doc_uploaded(ridp_type)
+    else
+      @doc_errors = document.errors.full_messages
+    end
     @docs_owner.save
   end
 

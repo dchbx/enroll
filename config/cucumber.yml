@@ -1,9 +1,5 @@
-<%
-rerun = File.file?('rerun.txt') ? IO.read('rerun.txt') : ""
-rerun_opts = rerun.to_s.strip.empty? ? "--format #{ENV['CUCUMBER_FORMAT'] || 'progress'} features" : "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} #{rerun}"
-std_opts = "--format #{ENV['CUCUMBER_FORMAT'] || 'pretty'} --strict --tags  'not @wip' --tags 'not @ma_only' --tags 'not @quoting_enabled' --tags  'not @more_than_sole_source'"
-%>
-default: <%= std_opts %> -r features
-wip: --tags @wip:11 --wip features
-rerun: <%= rerun_opts %> --format rerun --out rerun.txt --strict --tags ~@wip
-screenshots: <%= std_opts %> -r features SCREENSHOTS=true
+default: --format pretty --fail-fast --order random --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only' -r features --profile semaphoreci
+everything: --format pretty --strict -r features
+semaphoreci: -q
+gh-report: --format json --out ci/cucumber/gh-cucumber-report.json --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only' -r features
+local-report: --format json --out ci/cucumber/local-cucumber-report.json --fail-fast --strict --tags 'not @wip and not @broken and not @flaky and not @ma_only' -r features

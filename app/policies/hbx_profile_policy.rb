@@ -73,6 +73,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_force_publish
   end
 
+  def can_send_secure_message?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_send_secure_message
+  end
+
   def show?
     @user.has_role?(:hbx_staff) ||
       @user.has_role?(:csr) ||

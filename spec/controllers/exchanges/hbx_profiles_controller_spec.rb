@@ -7,7 +7,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "various index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile")}
 
@@ -46,7 +46,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "binder methods" do
     let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_profile) { double("HbxProfile") }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: FactoryBot.create(:permission))}
     let(:employer_profile){ FactoryBot.create(:employer_profile, aasm_state: "enrolling") }
@@ -75,9 +75,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "new" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
 
     it "renders new" do
+      allow(user).to receive(:person).and_return person
       allow(user).to receive(:has_role?).with(:hbx_staff).and_return true
       allow(user).to receive(:has_hbx_staff_role?).and_return(true)
       sign_in(user)
@@ -88,7 +89,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "inbox" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("HbxProfile", id: double("id"))}
 
@@ -217,7 +218,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "#check_hbx_staff_role" do
     let(:user) { double("user")}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
 
     it "should render the new template" do
       allow(user).to receive(:has_hbx_staff_role?).and_return(false)
@@ -231,7 +232,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "#view_the_configuration_tab?" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
     let(:user_2) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:admin_permission) { double("permission", name: "super_admin", view_the_configuration_tab: true)}
@@ -306,7 +307,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "Show" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false, :has_csr_role? => false, :last_portal_visited => nil)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
 
@@ -335,12 +336,14 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "#generate_invoice" do
+    let(:person) { double("person", agent?: true)}
     let(:user) { double("user", :has_hbx_staff_role? => true)}
     let(:employer_profile) { double("EmployerProfile", id: double("id"))}
     let(:organization){ Organization.new }
     let(:hbx_enrollment) { FactoryBot.build_stubbed :hbx_enrollment }
 
     before :each do
+      allow(user).to receive(:person).and_return(person)
       sign_in(user)
       allow(organization).to receive(:employer_profile?).and_return(employer_profile)
       allow(employer_profile).to receive(:enrollments_for_billing).and_return([hbx_enrollment])
@@ -431,7 +434,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "CSR redirection from Show" do
     let(:user) { double("user", :has_hbx_staff_role? => false, :has_employer_staff_role? => false, :has_csr_role? => true, :last_portal_visited => nil)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile", inbox: double("inbox", unread_messages: double("test")))}
 
@@ -453,7 +456,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET employer index" do
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
 
@@ -476,7 +479,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
   describe "GET family index" do
     let(:user) { double("User")}
-    let(:person) { double("Person")}
+    let(:person) { double("person", agent?: true)}
     let(:hbx_staff_role) { double("hbx_staff_role")}
     let(:hbx_profile) { double("hbx_profile")}
     let(:csr_role) { double("csr_role", cac: false)}
@@ -701,8 +704,84 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
   end
 
+  describe 'POST create_send_secure_message, :dbclean => :after_each' do
+    render_views
+
+    let(:person) { FactoryBot.create(:person, :with_family) }
+    let(:user) { double("user", person: person, :has_hbx_staff_role? => true) }
+    let!(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
+    let(:employer_profile) {organization.employer_profile}
+
+    let(:profile_valid_params) {{resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+    let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
+
+    let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+
+    before do
+      sign_in(user)
+    end
+
+    it 'should render back to new_secure_message if there is a failure' do
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response).to render_template('new_secure_message')
+    end
+
+    it 'should throw error message if subject and body is not passed' do
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response.body).to have_content('Please enter subject')
+    end
+
+    it 'should throw error message if actions id is not passed' do
+      invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+      get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+      expect(response.body).to have_content('must be filled')
+    end
+
+    context 'when resource is profile' do
+      it 'should set instance variables' do
+        invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+        expect(assigns(:resource)).to eq employer_profile
+        expect(assigns(:subject)).to eq invalid_params[:subject]
+        expect(assigns(:body)).to eq invalid_params[:body]
+      end
+
+      it 'should send secure message if all values are passed' do
+        get :create_send_secure_message, xhr:  true, params:  profile_valid_params
+
+        expect(response).to render_template("create_send_secure_message")
+        expect(response.body).to have_content(/Message Sent successfully/i)
+      end
+    end
+
+    context 'when resource is person' do
+      it 'should set instance variables' do
+        invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '', resource_name: person.class.to_s}
+        get :create_send_secure_message, xhr:  true, params:  invalid_params
+
+        expect(assigns(:resource)).to eq person
+        expect(assigns(:subject)).to eq invalid_params[:subject]
+        expect(assigns(:body)).to eq invalid_params[:body]
+      end
+
+      it 'should send secure message if all values are passed' do
+        get :create_send_secure_message, xhr:  true, params:  person_valid_params
+
+        expect(response).to render_template("create_send_secure_message")
+        expect(response.body).to have_content(/Message Sent successfully/i)
+      end
+    end
+
+  end
 
   describe "POST update_dob_ssn", :dbclean => :after_each do
+    render_views
+
     include_context 'setup benefit market with market catalogs and product packages'
     include_context 'setup initial benefit application'
 
@@ -719,8 +798,22 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:valid_ssn) { "234-45-8390" }
     let(:valid_dob) { "03/17/1987" }
     let(:valid_dob2) {'1987-03-17'}
-    let(:employee_role) { FactoryBot.build(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-    let(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, employer_profile: abc_profile) }
+    let(:employer_profile) { abc_profile }
+    let(:organization) { abc_organization }
+    let(:hired_on) {TimeKeeper.date_of_record.beginning_of_month}
+
+    let!(:census_employees) {
+      FactoryBot.create :benefit_sponsors_census_employee, :owner, employer_profile: employer_profile, benefit_sponsorship: organization.active_benefit_sponsorship
+      FactoryBot.create :benefit_sponsors_census_employee, employer_profile: employer_profile, hired_on: hired_on, benefit_sponsorship: organization.active_benefit_sponsorship
+    }
+
+    let(:ce) {employer_profile.census_employees.non_business_owner.first}
+
+    let(:employee_role) {
+      employee_person = FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name, ssn: valid_ssn, no_ssn: false)
+      FactoryBot.create(:benefit_sponsors_employee_role, person: employee_person, census_employee: ce, employer_profile: employer_profile)
+    }
+
 
     before do
       allow(employee_role.census_employee).to receive(:employer_profile).and_return(abc_profile)
@@ -764,6 +857,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it "should render update enrollment if the save is successful" do
+      person1.consumer_role.update_attributes!(active_vlp_document_id: person1.consumer_role.vlp_documents.first.id)
       allow(hbx_staff_role).to receive(:permission).and_return permission_yes
       allow(person1).to receive(:primary_family).and_return family1
       sign_in(user)
@@ -778,6 +872,47 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       sign_in(user)
       get :update_dob_ssn, xhr: true
       expect(response).not_to have_http_status(:success)
+    end
+
+
+    it "should set instance variable dont_update_ssn to true if employer has ssn/tin functionality enabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(assigns(:dont_update_ssn)). to eq true
+    end
+
+    it "cannot update ssn for employee if employer has ssn/tin functionality enabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(response).to render_template("update_enrollment")
+      expect(response.body).to have_content((/SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN/))
+    end
+
+    it "should set instance variable dont_update_ssn to nil if employer has ssn/tin functionality disabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(assigns(:dont_update_ssn)). to eq nil
+    end
+
+    it "can update ssn for employee if employer has ssn/tin functionality disabled" do
+      allow(hbx_staff_role).to receive(:permission).and_return permission_yes
+      employer_profile.active_benefit_sponsorship.update_attributes!(is_no_ssn_enabled: true)
+      sign_in(user)
+      expect(response).to have_http_status(:success)
+      @params = {:person => {:pid => employee_role.person.id, :ssn => "", :dob => valid_dob2}, :jq_datepicker_ignore_person => {:dob => valid_dob}, :format => 'js'}
+      get :update_dob_ssn, xhr:  true, params:  @params
+      expect(response).to render_template("update_enrollment")
+      expect(response.body).to have_content(("DOB / SSN Update Successful"))
     end
 
   end
@@ -1139,7 +1274,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "extend open enrollment" do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
@@ -1220,7 +1355,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   describe "close open enrollment", :dbclean => :around_each do
 
     let(:user) { double("user", :has_hbx_staff_role? => true, :has_employer_staff_role? => false)}
-    let(:person) { double("person")}
+    let(:person) { double("person", agent?: true)}
     let(:permission) { double(can_extend_open_enrollment: true) }
     let(:hbx_staff_role) { double("hbx_staff_role", permission: permission)}
     let(:hbx_profile) { double("HbxProfile")}
@@ -1268,12 +1403,16 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
                                 bs.save!
                                 bs
                                }
-    let(:effective_period)     { (TimeKeeper.date_of_record + 3.months)..(TimeKeeper.date_of_record + 1.year + 3.months - 1.day) }
+    let(:start_on)              { TimeKeeper.date_of_record.beginning_of_month + 2.months }
+    let!(:effective_period)     { start_on..start_on.next_year.prev_day }
     let!(:current_benefit_market_catalog) do
-      BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+      BenefitSponsors::ProductSpecHelpers.construct_simple_benefit_market_catalog(site, benefit_market, effective_period)
       benefit_market.benefit_market_catalogs.where(
-        "application_period.min" => effective_period.min.to_s
+        "application_period.min" => effective_period.min.to_date
       ).first
+    end
+    let!(:benefit_application) do
+      create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog, benefit_sponsorship: benefit_sponsorship, effective_period:effective_period, aasm_state: :draft)
     end
 
     let!(:valid_params)   {
@@ -1281,8 +1420,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         benefit_sponsorship_id: benefit_sponsorship.id.to_s,
         start_on: effective_period.min,
         end_on: effective_period.max,
-        open_enrollment_start_on: TimeKeeper.date_of_record + 2.months,
-        open_enrollment_end_on: TimeKeeper.date_of_record + 2.months + 20.day
+        open_enrollment_start_on: start_on.prev_month,
+        open_enrollment_end_on: start_on - 20.days
       }
     }
 

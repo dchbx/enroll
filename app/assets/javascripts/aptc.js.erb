@@ -16,6 +16,10 @@ var APTCModule = ( function( window, undefined ) {
     // Create an array of hash that contains [hbx_id, changed_applied_aptc_value] for all the enrollments
     var aptc_applied_input_elements = $('#enrollmentsDiv').find("input[name^='aptc_applied_']");
     var applied_aptcs_array = [];
+
+    // Disable update button while recalculating
+    $('.toggle_update_btn').addClass('disabled');
+
     for (var i=0; i<aptc_applied_input_elements.length; i++) {
       var hbx_id  = aptc_applied_input_elements[i].id;
       var aptc_applied = aptc_applied_input_elements[i].value;

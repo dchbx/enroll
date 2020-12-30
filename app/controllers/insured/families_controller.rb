@@ -10,6 +10,7 @@ class Insured::FamiliesController < FamiliesController
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
   before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
+  before_action :transition_family_members_update_params, only: %i[transition_family_members_update]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -117,6 +118,7 @@ class Insured::FamiliesController < FamiliesController
     @resident = @person.is_resident_role_active?
     respond_to do |format|
       format.html
+      format.js
     end
   end
 
@@ -138,20 +140,28 @@ class Insured::FamiliesController < FamiliesController
 
   def check_qle_date
     today = TimeKeeper.date_of_record
-    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     start_date = today - 30.days
     end_date = today + 30.days
+    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
 
     if params[:qle_id].present?
       @qle = QualifyingLifeEventKind.find(params[:qle_id])
+      @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
       start_date = today - @qle.post_event_sep_in_days.try(:days)
       end_date = today + @qle.pre_event_sep_in_days.try(:days)
-      @effective_on_options = @qle.employee_gaining_medicare(@qle_date) if @qle.is_dependent_loss_of_coverage?
       @qle_reason_val = params[:qle_reason_val] if params[:qle_reason_val].present?
       @qle_end_on = @qle_date + @qle.post_event_sep_in_days.try(:days)
     end
-
-    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qle_date ||= if @qle
+                    @qle.qle_event_date_kind == :qle_on ? @qle_event_date : today
+                  else
+                    @qle_event_date
+                  end
+    @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
+                        (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
+                      else
+                        (start_date..end_date).cover?(@qle_date)
+                      end
     if @person.has_active_employee_role? && !(@qle.present? && @qle.individual?)
       @future_qualified_date = (@qle_date > today) ? true : false
     end
@@ -160,16 +170,17 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
-      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
-      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-      employee_role = @person.active_employee_roles.first
-      if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
-      elsif Settings.site.key == :dc
-        event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_date.strftime("%m/%d/%Y"))
-      end
+    employee_role = @person.active_employee_roles.first
+
+    return unless @qle.present? && employee_role.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
+
+    benefit_application = employee_role.employer_profile.active_benefit_application
+    reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+    if Settings.site.key == :cca
+      trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
+    elsif Settings.site.key == :dc
+      event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
+      trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -208,7 +219,7 @@ class Insured::FamiliesController < FamiliesController
 
       @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
       @terminate = params[:terminate].present? ? params[:terminate] : ''
-      @terminate_date = @family.terminate_date_for_shop_by_enrollment(@enrollment) if @terminate.present?
+      @terminate_date = fetch_terminate_date(params["terminate_date_#{@enrollment.hbx_id}"]) if @terminate.present?
       @terminate_reason = params[:terminate_reason] || ''
       render :layout => 'application'
     else
@@ -218,7 +229,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params.permit![:file]) || (!params.permit![:subject])
+    if !params[:file] || !params[:subject]
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -236,7 +247,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -294,15 +305,13 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def transition_family_members_update
-    params_hash = params.permit!.to_h
-    @row_id = params_hash[:family_actions_id]
-
-    params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
+    @row_id = params[:family_actions_id]
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(@permitted_param_keys).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
-    @family = Family.find(params_hash[:family])
+    @family = Family.find(params[:family])
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
@@ -318,6 +327,23 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def transition_family_members_update_params
+    dynamic_transition_params_keys = params.keys.map { |key| key.match(/transition_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
+    @permitted_param_keys = dynamic_transition_params_keys.push(non_dynamic_params_keys).flatten
+  end
+
+  def fetch_terminate_date(terminate_date)
+    term_date = @family.terminate_date_for_shop_by_enrollment(@enrollment)
+    return term_date unless terminate_date.present?
+
+    begin
+      Date.strptime(terminate_date, "%m/%d/%Y")
+    rescue StandardError
+      term_date
+    end
+  end
 
   def can_view_entire_family_enrollment_history?
     authorize Family, :can_view_entire_family_enrollment_history?
@@ -380,7 +406,7 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
       employee_role = @person.active_employee_roles.first
-      @manually_picked_role = params[:market] || "shop_market_events"
+      @manually_picked_role = ["individual_market_events", "fehb_market_events", "shop_market_events"].include?(params[:market]) ? params[:market] : "shop_market_events"
 
       employee_qle_market_scope = "shop_market_events"
       employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"
@@ -390,9 +416,9 @@ class Insured::FamiliesController < FamiliesController
         @qualifying_life_events += QualifyingLifeEventKind.send @manually_picked_role + '_without_transition_member_action' if @manually_picked_role == "individual_market_events"
       else
         if @manually_picked_role == "individual_market_events"
-          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events_admin
+          @qualifying_life_events += QualifyingLifeEventKind.individual_market_events
         elsif @manually_picked_role
-          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope + '_admin'
+          @qualifying_life_events += QualifyingLifeEventKind.send employee_qle_market_scope
         end
       end
     elsif @person.active_employee_roles.present? || @person.consumer_role.present? || @person.resident_role.present?
@@ -407,7 +433,7 @@ class Insured::FamiliesController < FamiliesController
         redirect_to edit_insured_employee_path(@person.active_employee_roles.first)
       end
     elsif @person.is_consumer_role_active?
-      if !(@person.addresses.present? || @person.no_dc_address.present? || @person.no_dc_address_reason.present?)
+      if !(@person.addresses.present? || (@person.is_homeless || @person.is_temporarily_out_of_state))
         redirect_to edit_insured_consumer_role_path(@person.consumer_role)
       elsif ridp_redirection
         redirect_to ridp_agreement_insured_consumer_role_index_path
@@ -430,15 +456,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def file_path
-    params.permit(:file)[:file].tempfile.path
+    params[:file]&.tempfile
   end
 
   def file_name
-    params.permit![:file].original_filename
+    params[:file]&.original_filename
   end
 
   def file_content_type
-    params.permit![:file].content_type
+    params[:file]&.content_type
   end
 
   def send_notice_upload_notifications(notice, subject)
@@ -462,11 +488,16 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def calculate_dates
-    @qle_date = Date.strptime(params[:date_val], "%m/%d/%Y")
+    @qle_event_date = Date.strptime(params[:date_val], "%m/%d/%Y")
     @qle = QualifyingLifeEventKind.find(params[:qle_id])
+    @qle_date = @qle.qle_event_date_kind == :qle_on ? @qle_event_date : TimeKeeper.date_of_record
     start_date = TimeKeeper.date_of_record - @qle.post_event_sep_in_days.try(:days)
     end_date = TimeKeeper.date_of_record + @qle.pre_event_sep_in_days.try(:days)
-    @qualified_date = (start_date <= @qle_date && @qle_date <= end_date) ? true : false
+    @qualified_date = if @qle && @qle.coverage_start_on.present? && @qle.coverage_end_on.present?
+                        (@qle.coverage_start_on..@qle.coverage_end_on).cover?(@qle_date)
+                      else
+                        (start_date..end_date).cover?(@qle_date)
+                      end
     @qle_date_calc = @qle_date - aca_qle_period.days
 
     if @person.resident_role?
@@ -474,5 +505,4 @@ class Insured::FamiliesController < FamiliesController
     end
 
   end
-
 end

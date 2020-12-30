@@ -29,7 +29,7 @@
         <%= active_broker.person.full_name.titleize %>
         <br/>
         <a href="tel:1-<%= active_broker.phone %>">1
-          <%= active_broker.phone.to_s if active_broker.phone.present? %></a>
+          <%= active_broker.person.main_phone.to_s if active_broker.person.main_phone.present? %></a>
         <br/>
         <%= mail_to active_broker.email.address, active_broker.email.address %>
       </div>

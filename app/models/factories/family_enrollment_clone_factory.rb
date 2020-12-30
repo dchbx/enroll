@@ -6,6 +6,8 @@ module Factories
     def clone_for_cobra
       raise ArgumentError if !defined?(family) || !defined?(census_employee)
       clone_enrollment = clone_cobra_enrollment
+      return if clone_enrollment.blank?
+
       clone_enrollment.decorated_hbx_enrollment
       save_clone_enrollment(clone_enrollment)
     end
@@ -33,31 +35,33 @@ module Factories
     def clone_cobra_enrollment
       clone_enrollment = family.active_household.hbx_enrollments.new
       clone_enrollment.family = family
-      clone_enrollment.sponsored_benefit_package_id = enrollment.sponsored_benefit_package_id
-      clone_enrollment.employee_role_id = enrollment.employee_role_id
-      clone_enrollment.product_id = enrollment.product_id
-      clone_enrollment.coverage_kind = enrollment.coverage_kind
+      sponsored_benefit_package = fetch_sponsored_benefit_package(enrollment)
+      return if sponsored_benefit_package.blank?
 
-      clone_enrollment.kind = 'employer_sponsored_cobra'
+      clone_enrollment.sponsored_benefit_package_id = sponsored_benefit_package.id
+      clone_enrollment.employee_role_id = enrollment.employee_role_id
       effective_on = effective_on_for_cobra(enrollment)
       clone_enrollment.effective_on = effective_on
+
+      product = fetch_product(enrollment, sponsored_benefit_package, effective_on)
+      return if product.blank?
+
+      clone_enrollment.product_id = product.id
+      clone_enrollment.predecessor_enrollment_id = enrollment.id
+      clone_enrollment.coverage_kind = enrollment.coverage_kind
+      clone_enrollment.kind = 'employer_sponsored_cobra'
       clone_enrollment.external_enrollment = enrollment.external_enrollment
+
       clone_enrollment.benefit_sponsorship_id = enrollment.benefit_sponsorship_id
-      clone_enrollment.sponsored_benefit_id = enrollment.sponsored_benefit_id
-      clone_enrollment.rating_area_id = enrollment.rating_area_id
-      clone_enrollment.issuer_profile_id = enrollment.issuer_profile_id
-      assignment = census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+      clone_enrollment.sponsored_benefit_id = sponsored_benefit_package.sponsored_benefit_for(enrollment.coverage_kind).id
+      clone_enrollment.rating_area_id = sponsored_benefit_package.recorded_rating_area.id
+      clone_enrollment.issuer_profile_id = product.issuer_profile_id
+      assignment = census_employee.benefit_group_assignment_by_package(sponsored_benefit_package.id)
       clone_enrollment.benefit_group_assignment_id = assignment.id
       clone_enrollment.hbx_enrollment_members = clone_enrollment_members
 
-      if enrollment.sponsored_benefit_package.benefit_application.is_renewing?
-        clone_enrollment.aasm_state = 'auto_renewing'
-      else
-        clone_enrollment.select_coverage
-        if TimeKeeper.date_of_record >= effective_on && !enrollment.external_enrollment
-          clone_enrollment.begin_coverage
-        end
-      end
+      clone_enrollment.select_coverage
+      clone_enrollment.begin_coverage if TimeKeeper.date_of_record >= effective_on && !enrollment.external_enrollment
 
       clone_enrollment.generate_hbx_signature
       clone_enrollment
@@ -73,6 +77,32 @@ module Factories
           coverage_start_on: enrollment.effective_on,
           is_subscriber: hbx_enrollment_member.is_subscriber
         })
+      end
+    end
+
+    def fetch_sponsored_benefit_package(enrollment)
+      effective_on = effective_on_for_cobra(enrollment)
+      benefit_application = enrollment.sponsored_benefit_package.benefit_application
+      if benefit_application.effective_period.cover?(effective_on)
+        enrollment.sponsored_benefit_package
+      else
+        renewal_application = benefit_application.successors[0]
+        if renewal_application && renewal_application.benefit_packages.count == 1
+          renewal_application.benefit_packages[0]
+        else
+          renewal_bp = benefit_application.successor_benefit_package(enrollment.sponsored_benefit_package)
+          renewal_bp if renewal_bp && renewal_bp.benefit_application.effective_period.cover?(effective_on)
+        end
+      end
+    end
+
+    def fetch_product(enrollment, sponsored_benefit_package, effective_on)
+      if enrollment.sponsored_benefit_package_id == sponsored_benefit_package.id
+        enrollment.product
+      else
+        sponsored_benefit = sponsored_benefit_package.sponsored_benefit_for(enrollment.coverage_kind)
+        renewal_product = enrollment.product.renewal_product
+        renewal_product if renewal_product && sponsored_benefit.products(effective_on).include?(renewal_product)
       end
     end
 

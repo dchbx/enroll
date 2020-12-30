@@ -1,6 +1,6 @@
 <% person = member.person %>
 <table class="sub-table">
-  <% person.verification_types.each do |v_type| %>
+  <% if person.present? %>
       <tr>
           <!-- >>>> hbx admin inclusion -->
         <td>

@@ -29,7 +29,7 @@
       <div class="row no-buffer child-row">
         <div class="col-md-12 no-pd col-sm-12 col-xs-12">   
           <%= link_to "Reset", edit_dob_ssn_path(id: @person.id, family_actions_id: "family_actions_#{@person.primary_family.id.to_s}"), class: "btn btn-info", remote: true %>
-          <%= f.submit "Update", data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%> 
+          <%= f.submit "Update", 'data-disable-with' => l10n("please_wait"), data: { confirm: 'Are you sure?' }, :class => "btn btn-primary", :size => '100px'%>
         </div>
       </div>        
     <% end %>

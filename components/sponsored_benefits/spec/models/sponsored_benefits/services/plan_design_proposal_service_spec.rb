@@ -14,6 +14,7 @@ RSpec.describe SponsoredBenefits::Services::PlanDesignProposalService, type: :mo
 
   before do
     DatabaseCleaner.clean
+    allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
   end
 
   describe "model attributes", dbclean: :after_each do

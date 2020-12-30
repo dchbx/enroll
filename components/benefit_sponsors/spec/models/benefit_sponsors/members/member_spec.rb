@@ -154,16 +154,16 @@ module BenefitSponsors
         it "should correctly calculate the member's age" do
           member.dob = date_of_birth
           expect(member.age_on(today)).to eq age_today
-          expect(member.age_on(today + 1)).to eq age_tomorrow
+          if (TimeKeeper.date_of_record + 1.day).strftime("%m/%e") == "02/29"
+            expect(member.age_on(today + 1)).to eq age_today
+          else
+            expect(member.age_on(today + 1)).to eq age_tomorrow
+          end
         end
 
       end
 
-
-
     end
-
-
 
   end
 end

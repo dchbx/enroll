@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
-  s.add_dependency "rails", "~> 5.2.3"
+  s.add_dependency "rails", "~> 5.2.4.3"
   s.add_dependency "slim", "~> 3.0.8"
   s.add_dependency "mongoid", "~> 7.0.2"
   s.add_dependency "aasm", "~> 4.8.0"
@@ -29,6 +29,14 @@ Gem::Specification.new do |s|
   s.add_dependency 'kaminari', '~> 0.17.0'
   s.add_dependency 'sass', '~> 3.7.3'
   s.add_dependency 'webpacker',                 '~> 4.0.2'
+  s.add_dependency 'dry-types'
+  s.add_dependency 'dry-schema', '~> 1.0'
+  s.add_dependency 'dry-validation', '~> 1.0'
+  s.add_dependency 'dry-initializer'
+  s.add_dependency 'dry-auto_inject', '0.6.1'
+  s.add_dependency 'dry-container'
+  s.add_dependency 'dry-struct'
+  s.add_dependency 'dry-monads'
 
   s.test_files = Dir["spec/**/*"]
 

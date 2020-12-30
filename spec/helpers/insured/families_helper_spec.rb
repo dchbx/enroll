@@ -1,8 +1,8 @@
 require "rails_helper"
 
-RSpec.describe Insured::FamiliesHelper, :type => :helper do
+RSpec.describe Insured::FamiliesHelper, :type => :helper, dbclean: :after_each  do
 
-  describe "#plan_shopping_dependent_text" do
+  describe "#plan_shopping_dependent_text", dbclean: :after_each  do
     let(:person) { FactoryBot.build_stubbed(:person)}
     let(:family) { FactoryBot.build_stubbed(:family, :with_primary_family_member, person: person) }
     let(:household) { FactoryBot.build_stubbed(:household, family: family) }
@@ -25,16 +25,190 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
   end
 
-  describe "#generate_options_for_effective_on_kinds" do
-    it "it should return blank array" do
-      options = helper.generate_options_for_effective_on_kinds([], TimeKeeper.date_of_record)
-      expect(options).to eq []
+  describe "#generate_options_for_effective_on_kinds", dbclean: :after_each  do
+    let(:qle) {FactoryBot.create(:qualifying_life_event_kind, effective_on_kinds: ['date_of_event', 'fixed_first_of_next_month'])}
+    let(:person) {FactoryBot.create(:person, :with_family)}
+    let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
+    let(:date) { TimeKeeper.date_of_record }
+
+    context "QLEK with no effective_on_kind" do
+      it "it should return blank array" do
+        options = helper.generate_options_for_effective_on_kinds(nil, TimeKeeper.date_of_record)
+        expect(options).to eq []
+      end
     end
 
-    it "it should return options" do
-      date = TimeKeeper.date_of_record
-      options = helper.generate_options_for_effective_on_kinds(['date_of_event', 'fixed_first_of_next_month'], TimeKeeper.date_of_record)
-      expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month+1.day).to_s, 'fixed_first_of_next_month']]
+    context "QLEK with effective_on_kind" do
+
+      before :each do
+        assign(:family, family)
+      end
+
+      context "QLEK with date_of_event, fixed_first_of_next_month effective_on_kind" do
+        it "it should return options" do
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'date_of_event'], [(date.end_of_month + 1.day).to_s, 'fixed_first_of_next_month']]
+        end
+      end
+
+      context "QLEK with first_of_this_month effective_on_kind" do
+
+        it "it should return options for first_of_this_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_this_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_this_month']]
+        end
+
+        it "it should return options for first_of_this_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_this_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.beginning_of_month.to_s, 'first_of_this_month']]
+        end
+      end
+
+      context "QLEK with first_of_month effective_on_kind" do
+
+        it "it should return options for first_of_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_month']]
+        end
+
+        it "it should return options for first_of_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date.day <= 15 ? date.end_of_month + 1.day : date.next_month.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_month']]
+        end
+      end
+
+      context "QLEK with first_of_next_month effective_on_kind" do
+
+        it "it should return options for first_of_next_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date <= date.beginning_of_month ? date : date.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_next_month']]
+        end
+
+        it "it should return options for first_of_next_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month']]
+        end
+      end
+
+      context "QLEK with first_of_next_month_coinciding effective_on_kind" do
+
+        it "it should return options for first_of_next_month_coinciding for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_coinciding'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date == date.beginning_of_month ? date : date.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_next_month_coinciding']]
+        end
+
+        it "it should return options for first_of_next_month_coinciding for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_coinciding'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          effective_date = date == date.beginning_of_month ? date : date.end_of_month + 1.day
+          expect(options).to eq [[effective_date.to_s, 'first_of_next_month_coinciding']]
+        end
+      end
+
+      context "QLEK with first_of_next_month_plan_selection effective_on_kind" do
+
+        it "it should return options for first_of_next_month_plan_selection for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_plan_selection']]
+        end
+
+        it "it should return options for first_of_next_month_plan_selection for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_plan_selection'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_plan_selection']]
+        end
+      end
+
+      context "QLEK with first_of_reporting_month effective_on_kind" do
+
+        it "it should return options for first_of_reporting_month for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_month.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+
+        it "it should return options for first_of_reporting_month for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_month.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+      end
+
+      context "QLEK with first_of_next_month_reporting effective_on_kind" do
+
+        it "it should return options for first_of_next_month_reporting for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['first_of_next_month_reporting'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_reporting']]
+        end
+
+        it "it should return options for first_of_next_month_reporting for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['first_of_next_month_reporting'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[(date.end_of_month + 1.day).to_s, 'first_of_next_month_reporting']]
+        end
+      end
+
+      context "QLEK with date_of_event effective_on_kind" do
+
+        it "it should return options for date_of_event for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'date_of_event']]
+        end
+
+        it "it should return options for date_of_event for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['date_of_event'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.to_s, 'date_of_event']]
+        end
+      end
+
+      context "QLEK with similar effective_on_kinds" do
+
+        it "it should return uniq options" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options.count).to eq 1
+          expect(options).to eq [[date.to_s, 'date_of_event']]
+        end
+      end
+
+      context "QLE with event and reporting effective kinds" do
+
+        it "it should return dates based on effective kinds" do
+          qle.update_attributes(qle_event_date_kind: :submitted_at, effective_on_kinds: ['date_of_event', 'first_of_reporting_month'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record.last_month)
+          expect(options).to eq [[TimeKeeper.date_of_record.last_month.to_s, 'date_of_event'],[TimeKeeper.date_of_record.beginning_of_month.to_s, 'first_of_reporting_month']]
+        end
+      end
+
+      context "QLEK with date_of_event_plus_one effective_on_kind" do
+
+        it "it should return options for date_of_event_plus_one for shop market" do
+          qle.update_attributes(market_kind: 'shop', effective_on_kinds: ['date_of_event_plus_one'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_day.to_s, 'date_of_event_plus_one']]
+        end
+
+        it "it should return options for date_of_event_plus_one for individual market" do
+          qle.update_attributes(market_kind: 'individual', effective_on_kinds: ['date_of_event_plus_one'])
+          options = helper.generate_options_for_effective_on_kinds(qle, TimeKeeper.date_of_record)
+          expect(options).to eq [[date.next_day.to_s, 'date_of_event_plus_one']]
+        end
+      end
     end
   end
 
@@ -53,6 +227,37 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
 
     it "should return health plan with metal_level = bronze" do
       expect(helper.render_plan_type_details(health_plan_2016)).to eq "<span class=\"silver-icon\">Silver</span>"
+    end
+  end
+
+  describe "#current_premium", dbclean: :after_each do
+    let!(:hbx_enrollment_double) do
+      double(
+        :is_shop? => false,
+        :kind => "coverall",
+        :hbx_id => "12345"
+      )
+    end
+
+    context "SHOP hbx_enrollment" do
+      before :each do
+        allow(hbx_enrollment_double).to receive(:is_shop?).and_return(true)
+        allow(hbx_enrollment_double).to receive(:total_employee_cost).and_return("$100.00")
+      end
+
+      it "shows total employee cost" do
+        expect(helper.current_premium(hbx_enrollment_double)).to eq("$100.00")
+      end
+    end
+
+    context "hbx_enrollment total_premium throws error" do
+      before :each do
+        hbx_enrollment_double.stub(:total_premium).and_raise(StandardError.new("error"))
+      end
+
+      it "should not throw exception" do
+        expect(helper.current_premium(hbx_enrollment_double)).to eq('Not Available.')
+      end
     end
   end
 
@@ -238,10 +443,20 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
   context "build resident role " do
     let(:person) { FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
+    let(:consumer_person) { FactoryBot.create(:person, :with_family, :with_consumer_role) }
 
-    it "should build consumer role for a person" do
+    it "should build resident role for a person" do
       helper.build_resident_role(person,family)
       expect(person.resident_role.present?). to eq true
+      expect(person.resident_role.contact_method). to eq "Paper and Electronic communications"
+    end
+
+    it "should build resident role for a person and with their consumer role contact method" do
+      expect(consumer_person.consumer_role.contact_method). to eq "Paper and Electronic communications"
+      consumer_person.consumer_role.update_attributes!(contact_method: "Only Electronic communications")
+      helper.build_resident_role(consumer_person, consumer_person.primary_family)
+      expect(consumer_person.resident_role.present?). to eq true
+      expect(consumer_person.resident_role.contact_method). to eq "Only Electronic communications"
     end
   end
 
@@ -301,147 +516,6 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
         end
       end
     end
-
-    describe "#disable_make_changes_button?" do
-      let(:hbx_enrollment) do
-        instance_double(
-          HbxEnrollment,
-          census_employee: census_employee,
-          is_shop?: is_shop,
-          sponsored_benefit_package: sponsored_benefit_package,
-          employee_role: employee_role,
-          family: family
-        )
-      end
-
-      let(:census_employee) do
-        instance_double(CensusEmployee)
-      end
-
-      let(:is_shop) { true }
-
-      let(:todays_date) { double }
-
-      let(:sponsored_benefit_package) do
-        instance_double(
-          BenefitSponsors::BenefitPackages::BenefitPackage
-        )
-      end
-
-      let(:employee_role) do
-        instance_double(
-          EmployeeRole,
-          can_enroll_as_new_hire?: can_enroll_as_new_hire
-        )
-      end
-
-      let(:family) do
-        instance_double(
-          Family,
-          current_sep: current_sep,
-          is_under_special_enrollment_period?: under_special_enrollment_period
-        )
-      end
-
-      let(:current_sep) { double(effective_on: active_during_date) }
-
-      let(:active_during_date) { double }
-
-      let(:under_special_enrollment_period) { false }
-      let(:open_enrollment_contains) { false }
-      let(:can_enroll_as_new_hire) { false }
-      let(:active_during) { false }
-
-      before :each do
-        allow(TimeKeeper).to receive(:date_of_record).and_return(todays_date)
-        allow(sponsored_benefit_package).to receive(:open_enrollment_contains?).
-          with(todays_date).and_return(open_enrollment_contains)
-        allow(hbx_enrollment).to receive(:active_during?).
-          with(active_during_date).and_return(active_during)
-      end
-
-      context "given a non-census employee enrollment" do
-        let(:census_employee) { nil }
-
-        it "does not disable the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
-        end
-      end
-      context "given an enrollment which has a census employee, but is not shop" do
-        let(:is_shop) { false }
-
-        it "does not disable the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
-        end
-      end
-
-      context "given:
-      - a census employee enrollment
-      - which is shop
-      - when inside open enrollment for the same benefit package as this enrollment
-      " do
-
-        let(:open_enrollment_contains) { true }
-
-        it "does not disable the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
-        end
-      end
-
-      context "given:
-      - a census employee enrollment
-      - which is shop
-      - but is not inside the open enrollment period
-      - but the corresponding employee role can enroll as a new hire
-      " do
-        let(:can_enroll_as_new_hire) { true }
-
-        it "does not disable the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
-        end
-      end
-
-      context "given:
-      - a census employee enrollment
-      - which is shop
-      - but is not inside the open enrollment period
-      - and the corresponding employee role can not enroll as a new hire
-      - but the family is under a special enrollment period which overlaps with when this enrollment is active
-      " do
-        let(:under_special_enrollment_period) { true }
-        let(:active_during) { true }
-
-        it "does not disable the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_falsey
-        end
-      end
-      context "given:
-      - a census employee enrollment
-      - which is shop
-      - but is not inside the open enrollment period
-      - and the corresponding employee role can not enroll as a new hire
-      - and the family is not under a special enrollment period
-      " do
-
-        it "disables the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
-        end
-      end
-      context "given:
-      - a census employee enrollment
-      - which is shop
-      - but is not inside the open enrollment period
-      - and the corresponding employee role can not enroll as a new hire
-      - and the family is under a special enrollment period, but the SEP doesn't overlap with this enrollment's active period
-      " do
-        let(:under_special_enrollment_period) { true }
-
-        it "disables the Make Changes button" do
-          expect(helper.disable_make_changes_button?(hbx_enrollment)).to be_truthy
-        end
-      end
-    end
-
   end
 
   describe "#Enrollment coverage", dbclean: :after_each do
@@ -490,6 +564,16 @@ RSpec.describe Insured::FamiliesHelper, :type => :helper do
       it "should return terminated date for term enrollment" do
         expect(enrollment_coverage_end(termed_shop_hbx_enrollment)).to eq terminated_on
       end
+    end
+  end
+
+  describe '#render_product_type_details', dbclean: :after_each do
+    it 'should return gold icon with nationwide' do
+      expect(helper.render_product_type_details(:gold, true)).to eq "<span class=\"gold-icon\">Gold</span>&nbsp<label class='separator'></label>NATIONWIDE NETWORK"
+    end
+
+    it 'should return gold icon without nationwide' do
+      expect(helper.render_product_type_details(:gold, false)).to eq "<span class=\"gold-icon\">Gold</span>"
     end
   end
 end

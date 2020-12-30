@@ -1,0 +1,3 @@
+ic_number,policy.id,policy.subscriber.coverage_start_on,policy.aasm_state,policy.plan.coverage_kind,policy.plan.metal_level,policy.plan.plan_name,policy.total_premium,deductible,family_deductible,subscriber_id,member_id,enr,first_name,last_name,incarcerated,citizen_status,outstanding_verification_types,document_due_date,resident,dependent,uqhp_eligible
+9440181766,12121212,1/1/20,auto_renewing,health,silver,"BlueChoice HMO Standard Silver $4,000",1751.08,"$4,000.00",$8000 per group,5519383,5519383,5519383,Bahu,Bali,N,us_citizen,,,Yes,No,Yes
+9440181777,12121212,1/1/20,auto_renewing,health,silver,"BlueChoice HMO Standard Silver $4,000",1751.08,"$4,000.00",$8000 per group,5519384,5519384,5519384,Ballala,Deva,N,us_citizen,,,Yes,Yes,Yes

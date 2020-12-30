@@ -187,14 +187,14 @@ class VitalSign
 
   def all_individual_eligibility_determinations
     families = Family.and(
-        {:"households.tax_households.eligibility_determinations.determined_on".gte => @start_at},
-        {:"households.tax_households.eligibility_determinations.determined_on".lte => @end_at}
+        {:"households.tax_households.eligibility_determinations.determined_at".gte => @start_at},
+        {:"households.tax_households.eligibility_determinations.determined_at".lte => @end_at}
       )
 
     @all_individual_eligibility_determinations = families.flat_map() do |family|
       family.households.flat_map() do |household|
         household.tax_households.flat_map() do |tax_household|
-          tax_household.eligibility_determinations.gte(determined_on: @start_at).lte(determined_on: @end_at)
+          tax_household.eligibility_determinations.gte(determined_at: @start_at).lte(determined_at: @end_at)
         end
       end
     end

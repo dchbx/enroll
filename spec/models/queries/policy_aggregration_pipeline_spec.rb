@@ -3,7 +3,7 @@ require "rails_helper"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_each do
+describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :around_each do
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"
@@ -29,9 +29,9 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
   let!(:person) {FactoryBot.create(:person, first_name: ce.first_name, last_name: ce.last_name, ssn:ce.ssn)}
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person:person)}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
-  let!(:initial_enrollment) { 
-    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                        household: family.active_household, 
+  let!(:initial_enrollment) {
+    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
                         aasm_state: "coverage_enrolled",
                         family: family,
                         effective_on: effective_on,
@@ -41,15 +41,15 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                         benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
                         employee_role_id: employee_role.id,
                         submitted_at: Date.new(2018,6,21)
-                        ) 
+                        )
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
   }
   let!(:initial_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: initial_enrollment) }
-  let!(:renewal_enrollment) { 
-    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                        household: family.active_household, 
+  let!(:renewal_enrollment) {
+    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
                         family: family,
                         effective_on: effective_on,
                         aasm_state: "coverage_selected",
@@ -58,15 +58,15 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                         sponsored_benefit_package_id: renewal_application.benefit_packages.first.id,
                         benefit_sponsorship_id: renewal_application.benefit_sponsorship.id,
                         employee_role_id: employee_role.id
-                        ) 
+                        )
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
   }
 
-  let!(:bad_enrollment) { 
-    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product, 
-                        household: family.active_household, 
+  let!(:bad_enrollment) {
+    hbx_enrollment = FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                        household: family.active_household,
                         aasm_state: "inactive",
                         family: family,
                         effective_on: (effective_on - 2.years),
@@ -76,7 +76,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
                         benefit_sponsorship_id: predecessor_application.benefit_sponsorship.id,
                         employee_role_id: employee_role.id,
                         submitted_at: Date.new(2015,6,21)
-                        ) 
+                        )
     hbx_enrollment.benefit_sponsorship = benefit_sponsorship
     hbx_enrollment.save!
     hbx_enrollment
@@ -84,7 +84,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
   let!(:renewal_hbx_enrollment_member) {FactoryBot.create(:hbx_enrollment_member, applicant_id: person.id, hbx_enrollment: renewal_enrollment) }
   let!(:good_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::ENROLLED_STATUSES).map(&:hbx_id)}
   let!(:bad_enrollment_hbx_ids) {HbxEnrollment.where(:aasm_state.in => HbxEnrollment::SELECTED_AND_WAIVED).map(&:hbx_id)}
-  
+
   before do
     ce.update_attributes(:employee_role_id => employee_role.id )
   end
@@ -95,19 +95,19 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
       expect(subject.pipeline).to eq (aggregation)
       expect(subject.base_pipeline).to eq (aggregation)
     end
-    
+
     it 'add' do
       value = subject.add(step)
       expect(value.length).to eq aggregation.length + 1
     end
-    
+
     it 'open_enrollment' do
       value = subject.open_enrollment
-      expect(value.pipeline[1]).to eq (open_enrollment_query)  
+      expect(value.pipeline[1]).to eq (open_enrollment_query)
     end
 
     it '.filter_to_employers_hbx_ids' do
-      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list}) 
+      orgs = BenefitSponsors::Organizations::Organization.where(:hbx_id => {"$in" => hbx_id_list})
       benefit_group_ids = orgs.map(&:active_benefit_sponsorship).flat_map(&:benefit_applications).flat_map(&:benefit_packages).map(&:_id)
       expect(subject.pipeline.count).to be 1
       subject.filter_to_employers_hbx_ids(hbx_id_list)
@@ -115,8 +115,8 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
       expect([subject.pipeline[1]]).to eq [{"$match"=> {"sponsored_benefit_package_id"=>
                                                         {"$in"=>
                                                         [benefit_group_ids[0], benefit_group_ids[1]]}}}]
-                                                          
-                                                        expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids                                                
+
+                                                        expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.exclude_employers_by_hbx_ids' do
@@ -129,7 +129,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
       expect(subject.pipeline.count).to be 1
       value = subject.filter_to_active
       expect(subject.pipeline.count).to be 2
-    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids 
+    expect(subject.evaluate.map{|a|a['hbx_id']}).to eq good_enrollment_hbx_ids
     end
 
     it '.with_effective_date' do
@@ -143,7 +143,7 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
     end
 
     it '.list_of_hbx_ids' do
-      expect(subject.list_of_hbx_ids).to eq good_enrollment_hbx_ids 
+      expect(subject.list_of_hbx_ids).to eq good_enrollment_hbx_ids
     end
 
     it '.filter_to_shopping_completed' do
@@ -158,6 +158,3 @@ describe Queries::PolicyAggregationPipeline, "Policy Queries", dbclean: :after_e
 
   end
 end
-
-
-

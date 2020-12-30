@@ -69,6 +69,19 @@ Given(/^there is a Broker Agency exists for (.*?)$/) do |broker_agency_name|
   broker_agency_profile(broker_agency_name).update_attributes!(aasm_state: 'is_approved')
 end
 
+
+# Following step will move broker role to the given state
+# ex: the broker Max Planck application is in denied
+#     the broker Max Planck application is in applicant
+#     the broker Max Planck application is in decertified
+And(/^the broker (.*?) application is in (.*?) state$/) do |broker_name, broker_role_state|
+  @brokers[broker_name].update_attributes(aasm_state: broker_role_state)
+  # makes the current broker as the primary broker of the organization
+  broker_agency_profile.update_attributes!(primary_broker_role_id: @brokers[broker_name].id)
+  # Don't need a staff role for this scenario
+  @brokers[broker_name].person.broker_agency_staff_roles[0].destroy
+end
+
 And(/^the broker (.*?) is primary broker for (.*?)$/) do |broker_name, broker_agency_name|
   assign_broker_to_broker_agency(broker_name, broker_agency_name)
 end
@@ -87,11 +100,16 @@ Then(/^Hbx Admin is on Broker Index and clicks Broker Applicants$/) do
   find('.interaction-click-control-broker-applications').click
 end
 
+Then(/^Hbx Admin clicks on (.*?) tab$/) do |tab_name|
+  find("label", text: tab_name.titleize).click
+end
+
 Then(/^Hbx Admin is on Broker Index and clicks Broker Agencies$/) do
   find('.interaction-click-control-broker-agencies').click
 end
 
-Then(/^Hbx Admin the clicks on current broker applicant show button$/) do
+Then(/^Hbx Admin clicks on the current broker applicant show button$/) do
+  wait_for_ajax
   find_all('.interaction-click-control-broker-show').first.click
 end
 

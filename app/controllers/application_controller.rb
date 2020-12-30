@@ -8,6 +8,8 @@ class ApplicationController < ActionController::Base
   after_action :update_url, :unless => :format_js?
   helper BenefitSponsors::Engine.helpers
 
+  NON_AUTHENTICATE_KINDS = %w[welcome saml broker_roles office_locations invitations security_question_responses].freeze
+
   def format_js?
    request.format.js?
   end
@@ -65,7 +67,7 @@ class ApplicationController < ActionController::Base
 
   def authenticate_me!
     # Skip auth if you are trying to log in
-    return true if ["welcome","saml", "broker_roles", "office_locations", "invitations", 'security_question_responses'].include?(controller_name.downcase)
+    return true if (NON_AUTHENTICATE_KINDS.include?(controller_name.downcase) || action_name == 'unsupported_browser')
     authenticate_user!
   end
 
@@ -83,8 +85,8 @@ class ApplicationController < ActionController::Base
 
   private
 
-    def strong_params 
-      params.permit!
+    def strong_params
+      params.permit(:controller, :action)
     end
 
     def secure_message(from_provider, to_provider, subject, body)
@@ -134,6 +136,7 @@ class ApplicationController < ActionController::Base
     end
 
     def update_url
+      return if current_user&.person&.agent?
       if (controller_name == "employer_profiles" && action_name == "show") ||
           (controller_name == "families" && action_name == "home") ||
           (controller_name == "profiles" && action_name == "new") ||
@@ -153,6 +156,7 @@ class ApplicationController < ActionController::Base
   protected
   # Broker Signup form should be accessibile for anonymous users
     def authentication_not_required?
+      action_name == 'unsupported_browser' ||
       devise_controller? ||
       (controller_name == "broker_roles") ||
       (controller_name == "office_locations") ||
@@ -196,9 +200,32 @@ class ApplicationController < ActionController::Base
       log(message, :severity=>'error')
     end
 
+    def confirm_last_portal(request, resource)
+      # This is only necessary in environments other than production.
+      # If data is imported from production to another environment a user's :last_portal_visited may still point to prod, causing errors.
+      # In the case a user's last_portal_visited is not from the current environment, it will redirect to root of the current environment.
+      current_host = URI(request.referrer).host
+      last_portal_visited = resource.try(:last_portal_visited)
+      if last_portal_visited
+        local_path = current_host + URI(last_portal_visited).path
+        # get host of url. If localhost return last portal path, if remote host check that host environments match between last_portals
+        last_portal_host = URI(last_portal_visited).host
+        if last_portal_host
+          redirect_path = current_host == last_portal_host ? last_portal_visited : local_path
+        else
+          redirect_path = last_portal_visited
+        end
+      else
+        redirect_path = root_path
+      end
+
+      redirect_path
+    end
+
     def after_sign_in_path_for(resource)
       if request.referrer =~ /sign_in/
-        session[:portal] || resource.try(:last_portal_visited) || root_path
+        redirect_path = confirm_last_portal(request, resource)
+        session[:portal] || redirect_path
       else
         session[:portal] || request.referer || root_path
       end
@@ -320,7 +347,7 @@ class ApplicationController < ActionController::Base
       set_current_person
       bookmark_url = url || request.original_url
       role = current_user.has_hbx_staff_role?
-      @person.consumer_role.update_attributes(:admin_bookmark_url => bookmark_url) if role != nil && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
+      @person.consumer_role.update_attribute(:admin_bookmark_url, bookmark_url) if !role.nil? && !prior_ridp_bookmark_urls(bookmark_url) && @person.has_consumer_role?
     end
 
     def hbx_staff_and_consumer_role(role)
@@ -367,6 +394,20 @@ class ApplicationController < ActionController::Base
       session[:last_market_visited] = 'resident'
     end
 
+    def save_faa_bookmark(url)
+      current_person = get_current_person
+      return if current_person.consumer_role.blank?
+      current_person.consumer_role.update_attribute(:bookmark_url, url) if current_person.consumer_role.identity_verified?
+    end
+
+    def get_current_person # rubocop:disable Naming/AccessorMethodName
+      if current_user.try(:person).try(:agent?) && session[:person_id].present?
+        Person.find(session[:person_id])
+      else
+        current_user.person
+      end
+    end
+
     def stashed_user_password
       session["stashed_password"]
     end
@@ -388,4 +429,18 @@ class ApplicationController < ActionController::Base
         flash.now[:warning] = announcements
       end
     end
+
+  def set_ie_flash_by_announcement
+    return unless check_browser_compatibility
+    return unless flash.blank? || flash[:warning].blank?
+
+    announcements = Announcement.announcements_for_web
+    dismiss_announcements = JSON.parse(session[:dismiss_announcements] || '[]')
+    announcements -= dismiss_announcements
+    flash.now[:warning] = announcements
+  end
+
+  def check_browser_compatibility
+    browser.ie? && !support_for_ie_browser?
+  end
 end

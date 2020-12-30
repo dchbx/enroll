@@ -64,20 +64,8 @@ module Services
         active_tax_house_hold = @hbx_enrollment.household.latest_active_tax_household_with_year(enrollment_year)
         return '-01' unless active_tax_house_hold
 
-        case active_tax_house_hold.valid_csr_kind(hbx_enrollment)
-        when 'csr_100'
-          '-01'
-        when 'csr_94'
-          '-06'
-        when 'csr_87'
-          '-05'
-        when 'csr_73'
-          '-04'
-        when 'csr_0'
-          '-02'
-        when 'limited'
-          '-03'
-        end
+        csr_kind = active_tax_house_hold.valid_csr_kind(hbx_enrollment)
+        '-' + EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
       end
 
       def aptc_value

@@ -18,10 +18,8 @@ module BenefitSponsors
   class BenefitApplications::AcaShopEnrollmentEligibilityPolicy
     include BenefitMarkets::BusinessRulesEngine
 
-    # ENROLLMENT_RATIO_MINIMUM = 0.75
     rule  :minimum_participation_rule,
-            # validate: ->(benefit_application){ benefit_application.enrollment_ratio >= ENROLLMENT_RATIO_MINIMUM },
-            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum },
+            validate: ->(benefit_application){benefit_application.enrollment_ratio >= benefit_application.employee_participation_ratio_minimum},
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"Number of eligible members enrolling: (#{benefit_application.total_enrolled_count}) is less than minimum required: #{benefit_application.eligible_to_enroll_count * benefit_application.employee_participation_ratio_minimum}" }
 
@@ -38,33 +36,25 @@ module BenefitSponsors
             success:  ->(benefit_application){"validated successfully"},
             fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
 
+    rule :all_waived_members_eligiblity,
+         validate: ->(benefit_application){ benefit_application.total_enrolled_count > benefit_application.all_waived_member_count },
+         success: ->(_benefit_application){"validated successfully"},
+         fail: ->(_benefit_application){"At least one eligible member enrolling must not be waived" }
+
+
     business_policy :enrollment_elgibility_policy,
                     rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count]
 
-    # For 1/1 effective date minimum participation rule does not apply
-    # 1+ non-owner rule does apply
-    business_policy :non_minimum_participation_enrollment_eligiblity_policy,
-                    rules: [:non_business_owner_enrollment_count, :minimum_eligible_member_count]
-
+    business_policy :enrollment_elgibility_extended_policy,
+                    rules: [:minimum_participation_rule, :non_business_owner_enrollment_count, :minimum_eligible_member_count, :all_waived_members_eligiblity]
 
     def business_policies_for(model_instance, event_name)
       if model_instance.is_a?(BenefitSponsors::BenefitApplications::BenefitApplication)
-        case event_name
-          when :end_open_enrollment
-            enrollment_eligiblity_policy_for(model_instance)
-          else
-            enrollment_eligiblity_policy_for(model_instance)
+        if ::EnrollRegistry.feature_enabled?(:waived_members_eligiblity) && event_name == :end_open_enrollment
+          business_policies[:enrollment_elgibility_extended_policy]
+        else
+          business_policies[:enrollment_elgibility_policy]
         end
-      end
-    end
-
-    private
-
-    def enrollment_eligiblity_policy_for(model_instance)
-      if model_instance.start_on.yday == 1
-        business_policies[:non_minimum_participation_enrollment_eligiblity_policy]
-      else
-        business_policies[:enrollment_elgibility_policy]
       end
     end
   end

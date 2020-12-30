@@ -5,6 +5,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 module BenefitSponsors
   RSpec.describe Profiles::BrokerAgencies::BrokerAgencyProfilesController, type: :controller, dbclean: :after_each do
 
+    before :all do
+      DatabaseCleaner.clean
+    end
+
     routes { BenefitSponsors::Engine.routes }
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
@@ -198,7 +202,7 @@ module BenefitSponsors
           sign_in(user_with_hbx_staff_role)
           allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
           get :family_datatable, params: { id: bap_id }, xhr: true
-          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id, organization.profiles.first.market_kind)
         end
 
         it "should return a family" do
@@ -233,7 +237,7 @@ module BenefitSponsors
           sign_in(user_with_hbx_staff_role)
           allow(controller).to receive(:extract_datatable_parameters).and_return(dt_query)
           get :family_datatable, params: { id: bap_id }, xhr: true
-          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id)
+          @query = ::BenefitSponsors::Queries::BrokerFamiliesQuery.new(nil, organization.profiles.first.id, organization.profiles.first.market_kind)
         end
 
         it "should not return family" do

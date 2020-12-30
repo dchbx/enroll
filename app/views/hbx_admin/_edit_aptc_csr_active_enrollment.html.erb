@@ -40,7 +40,7 @@
             <%= link_to '<i class="fa fa-chevron-left"></i> Back'.html_safe, family_index_dt_exchanges_hbx_profiles_path, remote: false,  class: 'btn btn-default btn-lg', "aria-expanded" => "true" %>
           </td>
           <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination and/or creation of enrollments with the updated APTC values. Are you sure ? ' } , class: "btn btn-primary btn-lg"%></td>
+          <td><%= f.submit "Update", data: { confirm: 'This may result in new Eligibility Determination and/or creation of enrollments with the updated APTC values. Are you sure ? ' } , class: "btn btn-primary btn-lg toggle_update_btn" %></td>
         </tr>
       </div>
 

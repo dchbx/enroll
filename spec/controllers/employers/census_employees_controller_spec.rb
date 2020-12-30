@@ -484,7 +484,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
           allow(census_employee).to receive(:update_for_cobra).and_return false
           get :cobra, params: {census_employee_id: census_employee.id, employer_profile_id: employer_profile_id, cobra_date: cobra_date.to_s}, :format => :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee because termination date is over 6 months in the past. Please contact #{Settings.site.short_name} at #{Settings.contact_center.phone_number} for further assistance."
+          expect(flash[:error]).to eq "COBRA cannot be initiated for this employee with the effective date entered. Please contact #{Settings.site.short_name} at #{Settings.contact_center.phone_number} for further assistance."
         end
       end
 
@@ -592,7 +592,7 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
 
   describe "GET benefit_group", dbclean: :around_each do
     it "should be render benefit_group template" do
-      sign_in
+      sign_in @user
       allow(EmployerProfile).to receive(:find).with(employer_profile_id).and_return(employer_profile)
       allow(CensusEmployee).to receive(:find).and_return(census_employee)
       post :benefit_group, params: {id: census_employee.id, employer_profile_id: employer_profile_id, census_employee: {}}
@@ -609,6 +609,30 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
       census_employee.email.update(address:'', kind:'')
       expect(census_employee.email.kind).to eq ''
       expect(census_employee.email.address).to eq ''
+    end
+  end
+
+  describe "GET confirm_effective_date", dbclean: :around_each do
+    let(:valid_confirmation_types) { CensusEmployee::CONFIRMATION_EFFECTIVE_DATE_TYPES }
+
+    before :each do
+      permission = FactoryBot.create(:permission, :hbx_staff)
+      @user.person.hbx_staff_role.permission_id = permission.id
+      @user.person.hbx_staff_role.save!
+      expect(@user.person.hbx_staff_role.present?).to eq(true)
+      sign_in @user
+    end
+
+    it "should render proper template if valid params" do
+      valid_confirmation_types.each do |confirmation_type|
+        get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: confirmation_type }, :format => :js, xhr: true
+        expect(response).to render_template("employers/census_employees/#{confirmation_type}_effective_date")
+      end
+    end
+
+    it "should not render a template if user passes garbage params" do
+      get :confirm_effective_date, params: { id: census_employee.id, employer_profile_id: employer_profile_id, type: 'garbage' }, :format => :js, xhr: true
+      expect(response).to_not render_template("employers/census_employees/garbage_effective_date")
     end
   end
 end

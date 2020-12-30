@@ -13,8 +13,15 @@ describe FixTitleForExistingQuotes, dbclean: :around_each do
   end
 
   describe "fix title for existing quotes", dbclean: :around_each do
+    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+    let!(:org_benefit_sponsorship) do
+      bs = organization.employer_profile.add_benefit_sponsorship
+      bs.save
+    end
+
     let(:broker_agency) { FactoryBot.create(:broker_agency_profile)}
-    let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile, owner_profile_id: broker_agency.id) }
+    let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization, :with_profile, sponsor_profile_id: organization.employer_profile.id, owner_profile_id: broker_agency.id) }
     let(:proposal) { plan_design_organization.plan_design_proposals.first }
     let(:profile) do
       profile = proposal.profile
@@ -28,6 +35,7 @@ describe FixTitleForExistingQuotes, dbclean: :around_each do
     let(:plan) { FactoryBot.create(:plan, :with_premium_tables)}
     let!(:benefit_group) do
       bg = benefit_application.benefit_groups.first
+      bg.title = ""
       bg.relationship_benefits.build(relationship: "employee", premium_pct: 100)
       bg.assign_attributes(reference_plan_id: plan.id, elected_plans: [plan])
       bg.save!

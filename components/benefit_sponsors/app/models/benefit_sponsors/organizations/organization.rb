@@ -39,7 +39,7 @@ module BenefitSponsors
 
       MA_ENTITY_KINDS = ENTITY_KINDS
 
-      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected"}
+      FIELD_AND_EVENT_NAMES_MAP = {"legal_name" => "name_changed", "fein" => "fein_corrected", "dba" => "name_changed"}.freeze
 
       field :hbx_id, type: String
 
@@ -130,7 +130,7 @@ module BenefitSponsors
       index({ legal_name: 1 })
       index({ hbx_id: 1 })
       index({ dba: 1 },   { sparse: true })
-      index({ fein: 1 },  { unique: true, sparse: true })
+      index({ fein: 1 },  { :sparse => true, :name => "temporary_org_fein_non_unique" })
       index({ :"profiles._id" => 1 })
       index({ :"profiles._type" => 1 })
 
@@ -142,6 +142,7 @@ module BenefitSponsors
       scope :employer_profiles,       ->{ where(:"profiles._type" => /.*EmployerProfile$/) }
       scope :broker_agency_profiles,  ->{ where(:"profiles._type" => /.*BrokerAgencyProfile$/) }
       scope :general_agency_profiles, ->{ where(:"profiles._type" => /.*GeneralAgencyProfile$/) }
+      scope :all_agency_profiles,     ->{ where(:"profiles._type" => /.*AgencyProfile$/) }
       scope :issuer_profiles,         ->{ where(:"profiles._type" => /.*IssuerProfile$/) }
       scope :by_general_agency_profile,       ->( general_agency_profile_id ) { where(:'employer_profile.general_agency_accounts' => {:$elemMatch => { aasm_state: "active", general_agency_profile_id: general_agency_profile_id } }) }
 
@@ -185,6 +186,27 @@ module BenefitSponsors
       scope :'employer_profiles_enrolled',    -> {}
 
       scope :datatable_search, ->(query) { self.where({"$or" => ([{"legal_name" => ::Regexp.compile(::Regexp.escape(query), true)}, {"fein" => ::Regexp.compile(::Regexp.escape(query), true)}, {"hbx_id" => ::Regexp.compile(::Regexp.escape(query), true)}])}) }
+
+      #
+      # API fields
+      #
+
+      # For API. Going to look at better serialization
+      def agency_profile_id
+          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._id.to_s
+      end
+
+      def agency_profile_type
+          self.profiles.select{ |profile| ['BenefitSponsors::Organizations::GeneralAgencyProfile','BenefitSponsors::Organizations::BrokerAgencyProfile'].include?(profile._type)}.first._type
+      end
+
+      def organization_id
+          self._id
+      end
+
+      #
+      # End: API fields
+      #
 
       # Strip non-numeric characters
       def fein=(new_fein)
@@ -322,21 +344,21 @@ module BenefitSponsors
         def search_agencies_by_criteria(search_params)
           query_params = build_query_params(search_params)
           if query_params.any?
-            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
+            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({ "$and" => build_query_params(search_params) })
           else
-            self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
+            approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
           end
         end
 
         def broker_agencies_with_matching_agency_or_broker(search_params, value = nil)
           if search_params[:q].present?
-            orgs2 = self.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
+            orgs2 = approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop']).where({
               :"profiles._id" => {
-                "$in" => BrokerRole.agencies_with_matching_broker(search_params[:q])
+                "$in" => Person.agencies_with_matching_broker(search_params[:q])
               }
             })
 
-            brokers = BrokerRole.brokers_matching_search_criteria(search_params[:q])
+            brokers = Person.brokers_matching_search_criteria(search_params[:q])
             if brokers.any?
               search_params.delete(:q)
               if search_params.empty?

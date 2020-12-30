@@ -15,8 +15,12 @@ class AddFamilyMemberToCoverageHousehold < MongoidMigrationTask
 
         if active_family_members.count == 1
           family_member = active_family_members.first
-          primary_family.active_household.add_household_coverage_member(family_member)
-          primary_family.save
+          household = primary_family.active_household
+          household.add_household_coverage_member(family_member)
+          household.coverage_households.each do |coverage_household|
+            coverage_household.save unless coverage_household.persisted?
+          end
+          household.save
           puts "CHM created successfully" unless Rails.env.test?
         else
           puts "No/Duplicate Family Members Found for dependent_hbx_id: #{dependent_hbx_id}" unless Rails.env.test?

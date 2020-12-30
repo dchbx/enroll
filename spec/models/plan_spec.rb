@@ -153,6 +153,10 @@ RSpec.describe Plan, dbclean: :after_each do
         TimeKeeper.set_date_of_record_unprotected!(current_date)
       end
 
+      after :each do
+        TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+
       context "when carrier mappings not present" do
         it "should return same carrier renewal plan" do
           expect(sole_source_plan.renewal_plan).to eq renewal_health_plan

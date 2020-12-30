@@ -53,7 +53,7 @@
         <% end %>
         <% if show_pay_now? %>
           <% if can_access_pay_now_button %>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal" id="kp-pay-now" data-enrollment="<%= @enrollment.hbx_id %>">Pay Now</button>
+            <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal" data-enrollment="<%= @enrollment.hbx_id %>">Pay Now</button>
           <% else %>
             <button class="btn btn-primary disabled">Pay Now</button>
           <% end %>
@@ -292,9 +292,39 @@
         </p>
       </div>
       <div class="modal-footer">
-        <%= link_to "LEAVE DC HEALTH LINK", "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org", {type: "button", class: "btn btn-default pull-left", id: "payment-redirect-kp", target: "_blank"} %>
-        <button type="button" class="btn btn-default" data-dismiss="modal">GO BACK</button>
+        <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
+          <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
+          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
+          <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
+            Leave DC Health LINK
+          </button>
+        </form>
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+
+<script>
+$("#pay-now").on('click', function (e) {
+    e.preventDefault();
+    $.ajax({
+        type: "GET",
+        url: "/payment_transactions/generate_saml_response",
+        data: {enrollment_id: $("#pay-now").val()},
+        success: function (response) {
+          if (response["error"] != null){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else if (response["status"] == 404){
+            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
+          else{
+            document.getElementById("sp").value = response["SAMLResponse"];
+            $("#pay_now_form").submit();
+          }
+        },
+        error: function (response) {
+            // error handling
+        }
+    });
+  });
+</script>

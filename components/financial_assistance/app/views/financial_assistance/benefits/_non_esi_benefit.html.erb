@@ -1,0 +1,22 @@
+<div id="<%= dom_id benefit %>" class="benefit row-form-adjustment">
+  <div class="focus_effect_module benefit-show">
+      <div class="row row-form-wrapper no-buffer row-height">
+        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">FROM</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.start_on %></span>
+        </div>
+        <div class="col-md-5 no-pd form-group-lg no-pd class-fa-household">
+          <label class="static_label label-floatlabel">TO</label>
+          <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= benefit.end_on %></span>
+        </div>
+        <div class="col-md-2 no-pd form-group-lg class-fa-household fa-adjustment">
+          <a class="benefit-edit edit-pr"><i class="fa fa-pencil fa-lg" aria-hidden="true"></i></a>
+          <a class="benefit-delete"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
+        </div>
+      </div>
+  </div>
+
+  <div class="edit-benefit-form hidden">
+    <%= render partial: 'financial_assistance/benefits/non_esi_benefit_form', locals: { benefit: benefit, insurance_kind: benefit.insurance_kind, kind: benefit.kind} %>
+  </div>
+</div>

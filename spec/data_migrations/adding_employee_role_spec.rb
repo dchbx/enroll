@@ -7,7 +7,11 @@ describe AddingEmployeeRole, dbclean: :after_each do
   let(:employer_profile) { org.employer_profile }
   let!(:rating_area) { FactoryBot.create_default :benefit_markets_locations_rating_area }
   let!(:service_area) { FactoryBot.create_default :benefit_markets_locations_service_area }
-  let(:benefit_sponsorship) { employer_profile.add_benefit_sponsorship }
+  let(:benefit_sponsorship) do
+    sponsorship = employer_profile.add_benefit_sponsorship
+    sponsorship.save
+    sponsorship
+  end
   let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
   let(:benefit_market) { site.benefit_markets.first }
   let(:benefit_market_catalog) { benefit_market.benefit_market_catalogs.first }

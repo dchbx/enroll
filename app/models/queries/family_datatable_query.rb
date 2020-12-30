@@ -80,7 +80,7 @@ module Queries
           rec["_id"]
         end
       else
-        Person.search(s_string, nil, nil).pluck(:_id)
+        Person.search(s_string, nil, nil, true).pluck(:_id)
       end
     end
 

@@ -171,7 +171,7 @@ class Plan
   scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
 
   # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
-  scope :silver_level_by_csr_kind, ->(csr_kind = "csr_100"){ where(
+  scope :silver_level_by_csr_kind, ->(csr_kind = 'csr_0'){ where(
                                           metal_level: "silver").and(
                                           csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
                                         )
@@ -249,7 +249,7 @@ class Plan
         )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") {
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = 'csr_0') {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
@@ -262,7 +262,7 @@ class Plan
       )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") {
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = 'csr_0') {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
@@ -558,7 +558,7 @@ class Plan
       when 'health'
         shopping_family_member_ids = hbx_enrollment.hbx_enrollment_members.map(&:applicant_id) rescue nil
         csr_kind = tax_household.latest_eligibility_determination.csr_eligibility_kind rescue nil
-        csr_kind = tax_household.tax_household_members.where(:applicant_id.in =>  shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? "csr_100" : csr_kind rescue nil
+        csr_kind = tax_household.tax_household_members.where(:applicant_id.in => shopping_family_member_ids).map(&:is_ia_eligible).include?(false) ? 'csr_0' : csr_kind rescue nil
         if csr_kind.present?
           Plan.individual_health_by_active_year_and_csr_kind_with_catastrophic(active_year, csr_kind).with_premium_tables
         else

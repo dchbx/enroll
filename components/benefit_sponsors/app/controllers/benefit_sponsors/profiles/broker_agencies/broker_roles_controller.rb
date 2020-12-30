@@ -36,7 +36,7 @@ module BenefitSponsors
         end
 
         def search_broker_agency
-          orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles.or({legal_name: /#{params[:broker_agency_search]}/i}, {"fein" => /#{params[:broker_agency_search]}/i})
+          orgs = BenefitSponsors::Organizations::Organization.broker_agency_profiles.or({legal_name: /#{Regexp.escape(params[:broker_agency_search])}/i}, {"fein" => /#{Regexp.escape(params[:broker_agency_search])}/i})
 
           @broker_agency_profiles = orgs.present? ? orgs.map(&:broker_agency_profile) : []
         end
@@ -91,10 +91,10 @@ module BenefitSponsors
 
         def initiate_broker_profile
           return if params[:broker_agency].blank?
-          params[:broker_agency].permit!
+          broker_agency_params = params.permit(broker_agency: {})
           @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new
           #@profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(market_kind: :aca_shop, entity_kind: params[:broker_agency][:entity_kind].to_sym)
-          @broker_agency = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(@profile, params[:broker_agency])
+          @broker_agency = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(@profile, broker_agency_params)
         end
 
         def assign_filter_and_agency_type

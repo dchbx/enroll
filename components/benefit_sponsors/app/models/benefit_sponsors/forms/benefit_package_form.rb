@@ -42,7 +42,7 @@ module BenefitSponsors
 
       def self.for_new(benefit_application_id)
         form = self.new(:benefit_application_id => benefit_application_id)
-        form.sponsored_benefits = SponsoredBenefitForm.for_new
+        form.sponsored_benefits = SponsoredBenefitForm.for_new({application: form.service.find_benefit_application(form)})
         form.service.load_default_form_params(form)
         form.service.load_form_metadata(form)
         form

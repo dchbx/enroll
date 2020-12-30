@@ -1,4 +1,4 @@
-<% insured = (current_user.try(:has_consumer_role?) && current_user.identity_verified_date.nil? == false) || current_user.try(:has_employee_role?) %>
+<% insured = (current_user.try(:has_consumer_role?) && current_user.consumer_identity_verified?) || current_user.try(:has_employee_role?) %>
 <% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
 <% employer = employer_staff.first %>
 <% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>

@@ -1,0 +1,4 @@
+<%= text_field_tag cell.id, nil, placeholder: cell.placeholder, required: cell.required, class: "floatlabel thank_you_field" %>
+<% person = @enrollment.try(:household).try(:family).try(:primary_applicant).try(:person) || @person %>
+<%= hidden_field_tag 'subscriber_first_name', person.first_name.downcase %>
+<%= hidden_field_tag 'subscriber_last_name', person.last_name.downcase %>

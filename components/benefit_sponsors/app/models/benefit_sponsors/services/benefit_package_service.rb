@@ -298,7 +298,8 @@ module BenefitSponsors
             display_name: contribution_level.display_name,
             contribution_factor: contribution_level.contribution_factor,
             is_offered: contribution_level.is_offered,
-            contribution_unit_id: contribution_level.contribution_unit_id
+            contribution_unit_id: contribution_level.contribution_unit_id,
+            min_contribution_factor: contribution_level.min_contribution_factor
           })
         end
         Forms::SponsorContributionForm.new({contribution_levels: contribution_levels})

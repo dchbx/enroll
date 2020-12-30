@@ -50,7 +50,7 @@ class PeopleController < ApplicationController
       if params[:commit].downcase.include?('exit')
         # Logout of session
       else
-        redirect_to person_person_landing(@person)
+        redirect_to person_person_landing_path(@person)
       end
     else
       render new, :error => "Please complete all required fields"
@@ -141,7 +141,7 @@ class PeopleController < ApplicationController
       @dependent = family.family_members.new(id: params[:family_member][:id], person: member)
       respond_to do |format|
         if member.save && @dependent.save
-          @person.person_relationships.create(kind: params[:family_member][:primary_relationship], relative_id: member.id)
+          @person.ensure_relationship_with(member, params[:family_member][:primary_relationship])
           family.households.first.coverage_households.first.coverage_household_members.find_or_create_by(applicant_id: params[:family_member][:id])
           format.js { flash.now[:notice] = "Family Member Added." }
         else
@@ -194,24 +194,31 @@ class PeopleController < ApplicationController
     @family = @person.primary_family
     @person.updated_by = current_user.oim_id unless current_user.nil?
     if @person.is_consumer_role_active? && request.referer.include?("insured/families/personal")
-      update_vlp_documents(@person.consumer_role, 'person')
+      @valid_vlp = update_vlp_documents(@person.consumer_role, 'person')
       redirect_path = personal_insured_families_path
     else
       redirect_path = family_account_path
     end
+    @person.consumer_role.update_is_applying_coverage_status(person_params[:is_applying_coverage]) if @person.is_consumer_role_active?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role)
+    @native_status_changed = native_status_changed?(@person.consumer_role)
     respond_to do |format|
-      if @person.update_attributes(person_params.except(:is_applying_coverage))
-        if @person.is_consumer_role_active?
-          @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, no_dc_address: person_params["no_dc_address"], dc_status: @dc_status)
+      if @valid_vlp != false && @person.update_attributes(person_params.except(:is_applying_coverage))
+        if @person.is_consumer_role_active? && person_params[:is_applying_coverage] == "true"
+          @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
+          @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, is_homeless: person_params["is_homeless"], is_temporarily_out_of_state: person_params["is_temporarily_out_of_state"], dc_status: @dc_status)
         end
         @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
         # if dual role, this will update both ivl and ee
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
-        format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
-        format.json { head :no_content }
+        if params[:page].eql? "from_registration"
+          format.js
+          format.html{redirect_back(fallback_location: root_path)}
+        else
+          format.html { redirect_to redirect_path, notice: 'Person was successfully updated.' }
+          format.json { head :no_content }
+        end
       else
-        @person.addresses = @old_addresses
         if @person.is_consumer_role_active?
           bubble_consumer_role_errors_by_person(@person)
           @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@person.consumer_role)
@@ -371,7 +378,8 @@ private
       {:ethnicity => []},
       :tribal_id,
       :no_dc_address,
-      :no_dc_address_reason,
+      :is_homeless,
+      :is_temporarily_out_of_state,
       :id,
       :consumer_role,
       :is_applying_coverage
@@ -379,6 +387,6 @@ private
   end
 
   def dependent_params
-    params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
+    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k) }.permit(*person_parameters_list)
   end
 end

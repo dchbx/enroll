@@ -1,6 +1,7 @@
 class Person
   include Config::AcaModelConcern
   include Config::SiteModelConcern
+  include Config::ContactCenterModelConcern
   include Mongoid::Document
   include SetCurrentUser
   include Mongoid::Timestamps
@@ -34,7 +35,8 @@ class Person
                         :race,
                         :tribal_id,
                         :no_dc_address,
-                        :no_dc_address_reason,
+                        :is_homeless,
+                        :is_temporarily_out_of_state,
                         :is_active,
                         :no_ssn],
                 :modifier_field => :modifier,
@@ -94,6 +96,10 @@ class Person
   field :updated_by, type: String
   field :no_ssn, type: String #ConsumerRole TODO TODOJF
   field :is_physically_disabled, type: Boolean
+  field :is_applying_for_assistance, type: Boolean
+
+  field :is_homeless, type: Boolean, default: false
+  field :is_temporarily_out_of_state, type: Boolean, default: false
 
 
   delegate :is_applying_coverage, to: :consumer_role, allow_nil: true
@@ -201,8 +207,9 @@ class Person
   index({"broker_role.broker_agency_id" => 1})
   index({"broker_role.benefit_sponsors_broker_agency_profile_id" => 1})
   index({"broker_role.npn" => 1}, {sparse: true, unique: true})
+
   index({"general_agency_staff_roles.npn" => 1}, {sparse: true})
-  index({"general_agency_staff_roles.is_primary" => 1}, {sparse: true})
+  index({"general_agency_staff_roles.is_primary" => 1})
   index({"general_agency_staff_roles.benefit_sponsors_general_agency_profile_id" => 1}, {sparse: true})
 
   index({"first_name" => 1, "last_name" => 1, "broker_role.npn" => 1}, {name: "first_name_last_name_broker_npn_search"})
@@ -244,6 +251,11 @@ class Person
   index({"hbx_csr_role._id" => 1})
   index({"hbx_assister._id" => 1})
 
+  index(
+    {"broker_agency_staff_roles._id" => 1},
+    {name: "person_broker_agency_staff_role_id_search"}
+  )
+
   scope :all_consumer_roles,          -> { exists(consumer_role: true) }
   scope :all_resident_roles,          -> { exists(resident_role: true) }
   scope :all_employee_roles,          -> { exists(employee_roles: true) }
@@ -255,6 +267,17 @@ class Person
   scope :all_hbx_staff_roles,         -> { exists(hbx_staff_role: true) }
   scope :all_csr_roles,               -> { exists(csr_role: true) }
   scope :all_assister_roles,          -> { exists(assister_role: true) }
+  scope :all_broker_staff_roles,      -> { exists(broker_agency_staff_roles: true) }
+  scope :all_agency_staff_roles,      -> do
+    where(
+      {
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true } },
+          { "general_agency_staff_roles" => { "$exists" => true }, "general_agency_staff_roles.is_primary" => {"$ne" => false} }
+        ]
+      }
+    )
+  end
 
   scope :by_hbx_id, ->(person_hbx_id) { where(hbx_id: person_hbx_id) }
   scope :by_broker_role_npn, ->(br_npn) { where("broker_role.npn" => br_npn) }
@@ -267,6 +290,7 @@ class Person
   scope :broker_role_pending,       -> { where("broker_role.aasm_state" => { "$eq" => :broker_agency_pending })}
   scope :broker_role_certified,     -> { where("broker_role.aasm_state" => { "$in" => [:active]})}
   scope :broker_role_decertified,   -> { where("broker_role.aasm_state" => { "$eq" => :decertified })}
+  scope :broker_role_extended,      -> { where("broker_role.aasm_state" => { "$eq" => :application_extended })}
   scope :broker_role_denied,        -> { where("broker_role.aasm_state" => { "$eq" => :denied })}
   scope :by_ssn,                    ->(ssn) { where(encrypted_ssn: Person.encrypt_ssn(ssn)) }
   scope :unverified_persons,        -> { where(:'consumer_role.aasm_state' => { "$ne" => "fully_verified" })}
@@ -288,7 +312,81 @@ class Person
 
   after_create :notify_created
   after_update :notify_updated
+  after_update :person_create_or_update_handler
 
+  def self.api_staff_roles
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_agency_staff_roles" => { "$exists" => true, "$not" => {"$size" => 0} } },
+          { "general_agency_staff_roles.is_primary" =>  false }
+        ]
+      }
+    )
+  end
+
+  def self.api_primary_staff_roles
+    Person.where(
+      {
+      "is_active" => true,
+      "$or" => [
+          { "broker_role._id" => {"$exists" => true} },
+          { "general_agency_staff_roles.is_primary" =>  true }
+        ]
+      }
+    )
+  end
+
+  def agency_roles
+    role_data(broker_agency_staff_roles, :benefit_sponsors_broker_agency_profile_id) + role_data(general_agency_staff_roles, :benefit_sponsors_general_agency_profile_id)
+  end
+
+  def role_data(data, agency)
+    data.collect do |role|
+      {
+        aasm_state: role.aasm_state,
+        agency_profile_id: role.try(agency).to_s,
+        type: role.class.name,
+        role_id: role._id.to_s,
+        history: role.workflow_state_transitions
+      }
+    end
+  end
+
+  def agent_emails
+    self.emails.collect do |email|
+      {
+        id: email.id.to_s,
+        kind: email.kind,
+        address: email.address
+      }
+    end
+  end
+
+  def has_active_enrollment
+    if self.families.present?
+      self.families.each do |family|
+        household = family.active_household
+        if household && household.hbx_enrollments.where(:'aasm_state'.in => HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES).present?
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def agent_npn
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:npn) || self.broker_role.try(:npn)
+  end
+
+  def agent_role_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:id) || self.broker_role.try(:id)
+  end
+
+  def connected_profile_id
+    self.general_agency_staff_roles.select{|role| role.is_primary }.try(:first).try(:benefit_sponsors_general_agency_profile_id) || self.broker_role.try(:benefit_sponsors_broker_agency_profile_id)
+  end
 
   def active_general_agency_staff_roles
     general_agency_staff_roles.where(:aasm_state => :active)
@@ -328,21 +426,10 @@ class Person
     notify(PERSON_UPDATED_EVENT_NAME, {:individual_id => self.hbx_id } )
   end
 
-  def is_aqhp?
-    family = self.primary_family if self.primary_family
-    if family
-      check_households(family) && check_tax_households(family)
-    else
-      false
-    end
-  end
-
-  def check_households family
-    family.households.present? ? true : false
-  end
-
-  def check_tax_households family
-    family.households.first.tax_households.present? ? true : false
+  def person_create_or_update_handler
+    ::Operations::FinancialAssistance::PersonCreateOrUpdateHandler.new.call({person: self, event: :person_updated}) if ::EnrollRegistry.feature_enabled?(:financial_assistance)
+  rescue StandardError => e
+    Rails.logger.error {"FAA Engine: Unable to do action Operations::FinancialAssistance::PersonCreateOrUpdateHandler for person with object_id: #{self.id} due to #{e.message}"}
   end
 
   def completed_identity_verification?
@@ -381,6 +468,10 @@ class Person
 
   def gender=(new_gender)
     write_attribute(:gender, new_gender.to_s.downcase)
+  end
+
+  def financial_assistance_identifier
+    primary_family&.id
   end
 
   # Get the {Family} where this {Person} is the primary family member
@@ -469,7 +560,7 @@ class Person
     end
     if existing_relationship
       existing_relationship.update_attributes(:kind => relationship)
-    else
+    elsif id != person.id
       self.person_relationships << PersonRelationship.new({
         :kind => relationship,
         :relative_id => person.id
@@ -516,7 +607,7 @@ class Person
   end
 
   def main_phone
-    phones.detect { |phone| phone.kind == "phone main" }
+    phones.detect { |phone| phone.kind == "main" }
   end
 
   def home_phone
@@ -595,7 +686,7 @@ class Person
   end
 
   def residency_eligible?
-    no_dc_address and no_dc_address_reason.present?
+    is_homeless? || is_temporarily_out_of_state?
   end
 
   def age_on(date)
@@ -607,13 +698,20 @@ class Person
     end
   end
 
+  def is_homeless?
+    is_homeless
+  end
+
+  def is_temporarily_out_of_state?
+    is_temporarily_out_of_state
+  end
+
   def is_dc_resident?
-    return false if no_dc_address == true && no_dc_address_reason.blank?
-    return true if no_dc_address == true && no_dc_address_reason.present?
+    return true if is_homeless? || is_temporarily_out_of_state?
 
     address_to_use = addresses.collect(&:kind).include?('home') ? 'home' : 'mailing'
     addresses.each{|address| return true if address.kind == address_to_use && address.state == aca_state_abbreviation}
-    return false
+    false
   end
 
   def current_individual_market_transition
@@ -702,6 +800,26 @@ class Person
       end
     end
 
+    def broker_ga_search_hash(s_str)
+      clean_str = s_str.strip
+      s_rex = Regexp.new("^" + Regexp.escape(clean_str), true)
+      if clean_str =~ /[a-z]/i
+        {
+          "$or" => ([
+            {"first_name" => s_rex},
+            {"last_name" => s_rex},
+          ] + additional_exprs(clean_str))
+        }
+      else
+        {
+          "$or" => [
+            {"broker_role.npn" => s_rex},
+            {"general_agency_staff_roles.npn" => s_rex}
+          ]
+        }
+      end
+    end
+
     def additional_exprs(clean_str)
       additional_exprs = []
       if clean_str.include?(" ")
@@ -713,17 +831,35 @@ class Person
       additional_exprs
     end
 
-    def search_first_name_last_name_npn(s_str, query=self)
+    def search_first_name_last_name_npn(s_str, query = self)
       clean_str = s_str.strip
-      s_rex = ::Regexp.new(::Regexp.escape(s_str.strip), true)
-      query.where({
-        "$or" => ([
-          {"first_name" => s_rex},
-          {"last_name" => s_rex},
-          {"broker_role.npn" => s_rex},
-          {"general_agency_staff_roles.npn" => s_rex}
-          ] + additional_exprs(clean_str))
-        })
+      if clean_str =~ /[a-z]/i
+        people_user_ids = query.collection.aggregate([
+                            {"$match" => {
+                              "$text" => {"$search" => clean_str}
+                            }.merge(Person.broker_ga_search_hash(clean_str))},
+                            {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
+                            {"$sort" => {"last_name" => 1, "first_name" => 1}},
+                            {"$project" => {"_id" => 1}}
+                          ], {allowDiskUse: true}).map do |rec|
+                            rec["_id"]
+                          end
+        query.where(:id => {"$in" => people_user_ids})
+      else
+        query.where(broker_ga_search_hash(s_str))
+      end
+    end
+
+    def brokers_matching_search_criteria(search_str)
+      broker_role_certified.search_first_name_last_name_npn(search_str)
+    end
+
+    def agencies_with_matching_broker(search_str)
+      if brokers_matching_search_criteria(search_str).exists(:"broker_role.benefit_sponsors_broker_agency_profile_id" => true)
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:benefit_sponsors_broker_agency_profile_id)
+      else
+        brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:broker_agency_profile_id)
+      end
     end
 
     def general_agencies_matching_search_criteria(search_str)
@@ -1109,7 +1245,11 @@ class Person
 
   def create_inbox
     welcome_subject = "Welcome to #{site_short_name}"
-    welcome_body = "#{site_short_name} is the #{aca_state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    if broker_role || broker_agency_staff_roles.present?
+      welcome_body = "#{Settings.site.short_name} is the #{Settings.aca.state_name}'s on-line marketplace to shop, compare, and select health insurance that meets your health needs and budgets."
+    else
+      welcome_body = "#{site_short_name} is ready to help you get quality, affordable medical or dental coverage that meets your needs and budget.<br/><br/>Now that you’ve created an account, take a moment to explore your account features. Remember there’s limited time to sign up for a plan. Make sure you pay attention to deadlines.<br/><br/>If you have any questions or concerns, we’re here to help.<br/><br/>#{site_short_name}<br/>#{contact_center_short_number}<br/>TTY: #{contact_center_tty_number}"
+    end
     mailbox = Inbox.create(recipient: self)
     mailbox.messages.create(subject: welcome_subject, body: welcome_body, from: "#{site_short_name}")
   end
@@ -1157,9 +1297,9 @@ class Person
   end
 
   def native_american_validation
-    self.errors.add(:base, "American Indian / Alaskan Native status is required.") if indian_tribe_member.to_s.blank?
+    self.errors.add(:base, "American Indian / Alaska Native status is required.") if indian_tribe_member.to_s.blank?
     if !tribal_id.present? && @us_citizen == true && @indian_tribe_member == true
-      self.errors.add(:base, "Tribal id is required when native american / alaskan native is selected")
+      self.errors.add(:base, "Tribal id is required when native american / alaska native is selected")
     elsif tribal_id.present? && !tribal_id.match("[0-9]{9}")
       self.errors.add(:base, "Tribal id must be 9 digits")
     end

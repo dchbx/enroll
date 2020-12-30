@@ -98,7 +98,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::GenerateInitialEmployerInvoice', d
 
       it "should retrun due date" do
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        expect(merge_model.date_due).to eq (schedular.calculate_open_enrollment_date(TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y"))
+        expect(merge_model.date_due).to eq (schedular.calculate_open_enrollment_date(benefit_application.is_renewing? ,TimeKeeper.date_of_record.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y"))
       end
     end
   end

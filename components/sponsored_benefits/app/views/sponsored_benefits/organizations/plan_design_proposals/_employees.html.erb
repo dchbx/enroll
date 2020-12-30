@@ -8,7 +8,7 @@
         <%if individual_market_is_enabled? %>
           <p>Use the detailed roster below to specify the enrollees for this business. The details below are from this Employer's current roster. You can upload a new roster for this quote if required.<br><br><strong>Important:</strong> When using this quoting tool for employers that currently offer coverage through DC Health Link it is important to know that the current employee roster may not reflect the current enrollments for the group. Any changes to enrollment information that has been made through an employee account may not be reflected on the employee roster. Please review the employee roster for accuracy prior to using this quoting tool for a more accurate estimate for your group.</p>
         <%else%>
-          <p>Use the detailed roster below to specify the enrollees for this business. The details below are from this Employer's current roster. You can upload a new roster for this quote if required.</p>
+          <p><%= l10n("broker_agencies.profiles.detailed_roster_information", upload_employee_roster: new_plan_design_proposal_plan_design_census_employee_path(@plan_design_proposal.proposal.id, modal: 'upload')) %></p>
         <%end%>
 
         <div id="new_employee_form">

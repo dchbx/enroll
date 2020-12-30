@@ -215,3 +215,18 @@ a > img {
 #fontawesome a {padding:.5em; display:block; float:left; width:100px; border:1px solid #fff; -webkit-border-radius:5px; border-radius:5px; white-space:normal; text-align:center; height:68px;}
 #fontawesome a:hover, #fontawesome a.active {border:1px solid #ddd; background:#eee;}
 #fontawesome span {font-size:24px; color:#000;}
+
+.fasm_check_circle {
+  list-style: none;
+  padding-left: 15px;
+}
+
+.fasm_check_circle li {
+  padding-left: 0em;
+}
+
+.fasm_check_circle li:before {
+  font-family: 'FontAwesome';
+  content: "\f058";
+  margin:0 5px 0 -15px;
+}

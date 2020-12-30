@@ -1,0 +1,1166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 (x64) (http://www.altova.com) by Dan Thomas (Private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified">
+	<xs:include schemaLocation="plan.xsd"/>
+	<xs:element name="organization" type="OrganizationWithRolesType"/>
+	<xs:simpleType name="BusinessEntityKindType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#c_corporation"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#s_corporation"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#partnership"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#tax_exempt_organization"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#limited_liability_corporation"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#limited_liability_partnership"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#household_employer"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#governmental_employer"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#foreign_embassy_or_consulate"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:group name="OrganizationTypeCommonElementsGroup">
+		<xs:annotation>
+			<xs:documentation>Information common to all organization types</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="name" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Organization formal name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dba" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Doing Business As in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name as presesnted in UI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="abbreviation" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name in shortened, free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:complexType name="OrganizationType" abstract="true">
+		<xs:annotation>
+			<xs:documentation>Base class for companies and agencies</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+			<xs:element name="fein" type="FederalTaxIdType" minOccurs="0"/>
+			<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+			<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+			<xs:element ref="contacts" minOccurs="0"/>
+			<xs:element name="is_active" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="extended_attributes" type="xs:anyType" minOccurs="0"/>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CarrierType">
+		<xs:annotation>
+			<xs:documentation>A benefit provider</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="OrganizationType">
+				<xs:sequence>
+					<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+					<xs:element name="fein" type="FederalTaxIdType" minOccurs="0"/>
+					<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+					<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+					<xs:element ref="contacts" minOccurs="0"/>
+					<xs:element name="is_active" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Indicator that organization is operative on the HBX</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="BrokerAgencyAttributesType">
+		<xs:sequence>
+			<xs:element name="npn" type="NpnIdType"/>
+			<xs:element name="primary_broker" type="BrokerType"/>
+			<xs:element name="brokers" type="BrokerAgencyBrokersListType"/>
+			<xs:element name="tpa" type="TpaType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerAgencyBrokersListType">
+		<xs:sequence>
+			<xs:element name="broker" type="BrokerType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerType">
+		<xs:annotation>
+			<xs:documentation>An insurance specialist who provides advice and sells insurance to businesses and consumers</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="person" type="PersonType">
+				<xs:annotation>
+					<xs:documentation>Name and contact information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="npn" type="NpnIdType">
+				<xs:annotation>
+					<xs:documentation>Broker's National Producer Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BrokerPaymentAccountType">
+		<xs:annotation>
+                	<xs:documentation>Describes account payment information for brokers.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="routing_number" type="xs:string"/>
+			<xs:element name="account_number" type="xs:string"/>
+			<xs:element name="account_active_on" type="xs:date"/>
+			<xs:element name="account_inactive_on" type="xs:date" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BrokerPaymentAccountsType">
+		<xs:sequence>
+			<xs:element name="broker_payment_account" type="BrokerPaymentAccountType" minOccurs="1" maxOccurs="unbounded"/>
+	        </xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="BrokerRoleType">
+		<xs:annotation>
+			<xs:documentation>An individual playing the role of a broker.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="npn" type="NpnIdType"/>
+			<xs:element name="broker_agency" type="BrokerAgencyLinkType"/>
+			<xs:element name="broker_payment_accounts" type="BrokerPaymentAccountsType" minOccurs="0"/> 
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="HbxType">
+		<xs:annotation>
+			<xs:documentation>Health Benefit Exchange organization</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="OrganizationType">
+				<xs:sequence>
+					<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+					<xs:element name="fein" type="FederalTaxIdType" minOccurs="0"/>
+					<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+					<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+					<xs:element ref="contacts" minOccurs="0"/>
+					<xs:element name="is_active" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="extended_attributes" type="xs:anyType" minOccurs="0"/>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ResponsibleEntityType">
+		<xs:annotation>
+			<xs:documentation>An Entity's HBX activity associated with sponsoring insurance coverage for others</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="entity_identifier" type="EntityNameType"/>
+			<xs:element name="organization" type="OrganizationType" minOccurs="0"/>
+			<xs:element name="policies" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="policy" type="PolicyLinkType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="EntityNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#case_manager"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#key_person"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#parent"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#responsible_party"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#guardian"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#ex_spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#significant_other"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#legal_representative"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#power_of_attorney"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:entity#other_insured"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="GAAssignmentType">
+		<xs:sequence>
+			<xs:element name="general_agency" type="GeneralAgencyLinkType"/>
+			<xs:element name="start_on" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>The effective date this agency was permitted to begin managing this organization</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="end_on" type="SimpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The effective date this agency was no longer allowed to manage this organization.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GAAssignmentListType">
+		<xs:sequence>
+			<xs:element name="ga_assignment" type="GAAssignmentType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerAccountType">
+		<xs:sequence>
+			<xs:element name="broker_agency" type="BrokerAgencyLinkType"/>
+			<xs:element name="writing_agent" type="BrokerType">
+				<xs:annotation>
+					<xs:documentation>Broker representative for this organization</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tpa" type="TpaType" minOccurs="0"/>
+			<xs:element name="start_on" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>The effective date this broker began representing this organization</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="end_on" type="SimpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The effective date this broker was terminated by this organization</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ga_assignments" type="GAAssignmentListType" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>General Agencies selected by a broker to manage this account</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerAccountListType">
+		<xs:sequence>
+			<xs:element name="broker_account" type="BrokerAccountType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerAgencyProfileType">
+		<xs:sequence>
+			<xs:element name="npn" type="NpnIdType" minOccurs="0"/>
+			<xs:element name="primary_broker" type="BrokerType"/>
+			<xs:element name="brokers" type="BrokerAgencyBrokersListType" minOccurs="0"/>
+			<xs:element name="tpa" type="TpaType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PlanYearListType">
+		<xs:sequence>
+			<xs:element name="plan_year" type="PlanYearType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmployerPlanListType">
+		<xs:annotation>
+			<xs:documentation>SHOP employer-selected benefits model</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="PlanType">
+				<xs:sequence>
+					<xs:element name="id" type="IdentifierType"/>
+					<xs:element name="name" type="xs:string"/>
+					<xs:element name="active_year" type="PlanActiveYearType"/>
+					<xs:element name="is_dental_only" type="xs:boolean"/>
+					<xs:element name="carrier" type="CarrierLinkType"/>
+					<xs:element name="metal_level" type="PlanMetalLevelNameType"/>
+					<xs:element name="coverage_type" type="QhpBenefitCoverageNameType"/>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="RelationshipBenefitRelationshipType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#employee"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#domestic_partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#child_under_26"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#child_26_and_over"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#disabled_child_26_and_over"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employee_census_relationship#spouse"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="ContributionPercentType">
+		<xs:restriction base="xs:decimal">
+			<xs:maxInclusive value="100"/>
+			<xs:minInclusive value="0"/>
+			<xs:fractionDigits value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="RelationshipBenefitType">
+		<xs:sequence>
+			<xs:element name="relationship" type="RelationshipBenefitRelationshipType"/>
+			<xs:element name="offered" type="xs:boolean"/>
+			<xs:element name="contribution_percent" type="ContributionPercentType"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="RelationshipBenefitsListType">
+		<xs:sequence>
+			<xs:element name="relationship_benefit" type="RelationshipBenefitType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BenefitGroupType">
+		<xs:annotation>
+			<xs:documentation>A named set of benefits applicable to a particular group.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType" minOccurs="0"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="group_size" type="xs:integer" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="participation_rate" type="ParticipationRateType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="rating_area" type="xs:string" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="reference_plan" type="PlanLinkType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="elected_plans">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="elected_plan" type="PlanLinkType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="federal_contributions" type="xs:anyType"/>
+				<xs:element name="relationship_benefits" type="RelationshipBenefitsListType"/>
+				<xs:element name="composite_rating_tiers" type="CompositeRatingTierListType"/>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmployerElectedPlanType">
+		<xs:complexContent>
+			<xs:extension base="EmployerPlanListType">
+				<xs:sequence>
+					<xs:element name="group_id" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Carrier-assigned employer group identifier</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="policy_number" type="xs:string" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Carrier-assigned policy number</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PlanYearType">
+		<xs:annotation>
+			<xs:documentation>A period of benefits availble to an entity.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType" minOccurs="0"/>
+			<xs:element name="plan_year_start" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Date when employer-sponsored benefit eligibility begins</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="plan_year_end" type="SimpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date when employer-sponsored benefit eligibility ends</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fte_count" type="xs:integer">
+				<xs:annotation>
+					<xs:documentation>Number of full-time-employees</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pte_count" type="xs:integer" default="0">
+				<xs:annotation>
+					<xs:documentation>Number of part-time employees</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="open_enrollment_start" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Open enrollment period start date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="open_enrollment_end" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Open enrollment period end date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="benefit_groups" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="benefit_group" type="BenefitGroupType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:group ref="ResourceTimestampGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="EmployerCensusFamilyRelationshipNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#self"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#spouse"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#domestic_partner"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#child_under_26"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#child_26_and_over"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employers#disabled_child_26_and_over"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EmployerCensusFamilyMemberType" abstract="true">
+		<xs:sequence>
+			<xs:element name="name" type="PersonNameType"/>
+			<xs:element name="email" type="EmailType" minOccurs="0"/>
+			<xs:element name="address" type="AddressType"/>
+			<xs:element name="relationship" type="EmployerCensusFamilyRelationshipNameType">
+				<xs:annotation>
+					<xs:documentation>The family relationship between this member and the employee</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="gender" type="GenderNameType"/>
+			<xs:element name="dob" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Date of Birth</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="status" type="EmployerCensusFamilyStatusNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>An employee's state with respect to their eligibility to enroll on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ssn" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Social Security Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="date_of_hire" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="date_of_termination" type="SimpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>End date of employment</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="is_business_owner" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>This employee has an ownership stake in the company</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="coverage_terminated_on" type="SimpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Final date through which coverage was effective</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmployerCensusFamilyEmployeeType">
+		<xs:complexContent>
+			<xs:restriction base="EmployerCensusFamilyMemberType">
+				<xs:sequence>
+					<xs:element name="name" type="PersonNameType"/>
+					<xs:element name="email" type="EmailType" minOccurs="0"/>
+					<xs:element name="address" type="AddressType"/>
+					<xs:element name="relationship" type="EmployerCensusFamilyRelationshipNameType"/>
+					<xs:element name="gender" type="GenderNameType"/>
+					<xs:element name="dob" type="SimpleDateType"/>
+					<xs:element name="status" type="EmployerCensusFamilyStatusNameType" minOccurs="0"/>
+					<xs:element name="ssn">
+						<xs:annotation>
+							<xs:documentation>Social Security Number</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="date_of_hire" type="SimpleDateType"/>
+					<xs:element name="date_of_termination" type="SimpleDateType" minOccurs="0"/>
+					<xs:element name="is_business_owner" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This employee has an ownership stake in the company</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="coverage_terminated_on" type="SimpleDateType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Final date through which coverage was effective</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EmployerCensusFamilyDependentType">
+		<xs:complexContent>
+			<xs:restriction base="EmployerCensusFamilyMemberType">
+				<xs:sequence>
+					<xs:element name="name" type="PersonNameType"/>
+					<xs:element name="email" type="EmailType" minOccurs="0"/>
+					<xs:element name="address" type="AddressType"/>
+					<xs:element name="relationship" type="EmployerCensusFamilyRelationshipNameType"/>
+					<xs:element name="gender" type="GenderNameType"/>
+					<xs:element name="dob" type="SimpleDateType"/>
+					<xs:element name="ssn" minOccurs="0"/>
+					<xs:element name="is_business_owner" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>This employee has an ownership stake in the company</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="coverage_terminated_on" type="SimpleDateType" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Final date through which coverage was effective</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EmployerCensusFamilyType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierSimpleType"/>
+			<xs:element name="employee" type="EmployerCensusFamilyEmployeeType"/>
+			<xs:element name="dependents" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="dependent" type="EmployerCensusFamilyDependentType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="employer_census_families">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="employer_census_family" type="EmployerCensusFamilyType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="EmployerProfileType">
+		<xs:annotation>
+			<xs:documentation>Information Specific to an organization operating as an Employer.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="business_entity_kind" type="BusinessEntityKindType">
+				<xs:annotation>
+					<xs:documentation>Entity legal form from enumerated list</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sic_code" type="SicCodeType" minOccurs="0"/>
+			<xs:element name="brokers" type="BrokerAccountListType" minOccurs="0"/>
+			<xs:element name="plan_years" type="PlanYearListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of time periods when this employer sponsored benefits</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shop_transfer" type="ShopTransferType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Present for SHOP employers transferred to HBX from issuers</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="employer_census_families" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of rostered employees, their dependents and identifying information</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OrganizationWithRolesType">
+		<xs:annotation>
+			<xs:documentation>Container that encompasses different roles which may be played by an organization</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+			<xs:element name="fein" type="FederalTaxIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Federal Employer Identification Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of places where this organization operates</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="website" type="xs:anyURI" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>URL to home page on the World Wide Web</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element ref="contacts" minOccurs="0"/>
+			<xs:element name="is_active" type="xs:boolean">
+				<xs:annotation>
+					<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="broker_agency_profile" type="BrokerAgencyProfileType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Additional identifying information if this entity is a Broker on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="employer_profile" type="EmployerProfileType" minOccurs="0"/>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerAgencyType">
+		<xs:annotation>
+			<xs:documentation>An organization specializing in advice about and sale of insurance products to businesses and consumers</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="OrganizationWithRolesType">
+				<xs:sequence>
+					<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+					<xs:element name="fein" type="FederalTaxIdType" minOccurs="0"/>
+					<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+					<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+					<xs:element ref="contacts" minOccurs="0"/>
+					<xs:element name="is_active" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="broker_agency_profile" type="BrokerAgencyProfileType"/>
+					<xs:element name="employer_profile" type="EmployerProfileType" minOccurs="0"/>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EmployerOrganizationType">
+		<xs:annotation>
+			<xs:documentation>An organization that sponsors benefit coverage for its employees</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="OrganizationWithRolesType">
+				<xs:sequence>
+					<xs:group ref="OrganizationTypeCommonElementsGroup"/>
+					<xs:element name="fein" type="FederalTaxIdType"/>
+					<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+					<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+					<xs:element ref="contacts" minOccurs="0"/>
+					<xs:element name="is_active" type="xs:boolean">
+						<xs:annotation>
+							<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="broker_agency_profile" type="BrokerAgencyProfileType" minOccurs="0"/>
+					<xs:element name="employer_profile" type="EmployerProfileType"/>
+					<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="EmployerEventNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:events:v1:employer#created">
+				<xs:annotation>
+					<xs:documentation>A new employer has successfully registered on the exchange.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#address_changed">
+				<xs:annotation>
+					<xs:documentation>An employer's office address has changed</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#contact_changed">
+				<xs:annotation>
+					<xs:documentation>An employer has changed designated point-of-contact (POC) or that contact's information.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#fein_corrected">
+				<xs:annotation>
+					<xs:documentation>Correcting an employer's previously provided, erroneous Federal Employer Identification Number (FEIN) </xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#name_changed">
+				<xs:annotation>
+					<xs:documentation>The legal name or DBA of an employer  has changed.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#broker_added">
+				<xs:annotation>
+					<xs:documentation>An employer has designated a new broker representative</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#broker_terminated">
+				<xs:annotation>
+					<xs:documentation>A benefit sponsor has terminated an existing broker representative.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#general_agent_added">
+				<xs:annotation>
+					<xs:documentation>A broker has designated a GA for the referenced sponsor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#general_agent_terminated">
+				<xs:annotation>
+					<xs:documentation>A broker has terminated an existing GA for referenced sponsor</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_open_enrollment_ended">
+				<xs:annotation>
+					<xs:documentation>A new employer's first open enrollment period on the HBX has ended</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_binder_paid">
+				<xs:annotation>
+					<xs:documentation>A new employer has submitted payment-in-full for first premium.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_application_approved">
+				<xs:annotation>
+					<xs:documentation>A new employer has met requirements to enroll employees through the HBX.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_initial_application_eligible">
+				<xs:annotation>
+					<xs:documentation>A new employer has met both eligibility and enrollment requirements to offer benefit coverage through the HBX.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_voluntary">
+				<xs:annotation>
+					<xs:documentation>An existing sponsor has elected to discontinue offering benefits through the HBX.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_nonpayment">
+				<xs:annotation>
+					<xs:documentation>An existing employer's sponsorship, and associated employee enrollments, are discontinued due to premium non-payment.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_terminated_relocated">
+				<xs:annotation>
+					<xs:documentation>An existing sponsor is ineligible to offer benefits through the HBX due to relocating primary office outside service area.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_open_enrollment_ended">
+				<xs:annotation>
+					<xs:documentation>A returning sponsor's open enrollment period for has ended</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_carrier_dropped">
+				<xs:annotation>
+					<xs:documentation>A returning employer has discontinued offering an incumbent carrier's benefits for the renewal coverage period</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_terminated_voluntary">
+				<xs:annotation>
+					<xs:documentation>A returning employer has elected to discontinue offering benefits through the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_terminated_ineligible">
+				<xs:annotation>
+					<xs:documentation>A returning employer has failed to meet eligibility and/or enrollment requirements to offer benefits for the renewal coverage period</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_renewal_application_eligible">
+				<xs:annotation>
+					<xs:documentation>A returning employer has met both eligibility and enrollment requirements to offer benefits for the renewal coverage period</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_expired">
+				<xs:annotation>
+					<xs:documentation>A new or returning employer is ineligible to offer benefits through the HBX due to not meeting eligibility and/or enrollment requirements in a timely manner</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_period_reinstated">
+				<xs:annotation>
+					<xs:documentation>A new or returning employer is being re-activated after previously being terminated from the exchange in the middle of their coverage year.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_carrier_group_id_assigned">
+				<xs:annotation>
+					<xs:documentation>A carrier has assigned a group ID to the benefit group of an employer.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#plan_year_corrected">
+				<xs:annotation>
+					<xs:documentation>Via either the exchange or an appeal by an employer, plan year offerings and contribution models have been corrected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:events:v1:employer#benefit_coverage_mid_plan_year_initial_eligible">
+				<xs:annotation>
+					<xs:documentation>Signal that the employer is a mid-year conversion employer</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="EmployerInformationAssignmentResponseType">
+		<xs:sequence>
+			<xs:element name="carrier" type="CarrierLinkType"/>
+			<xs:element name="benefit_groups">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="benefit_group" type="BenefitGroupLinkType" minOccurs="1" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="OrganizationServiceEventBodyType">
+		<xs:complexContent>
+			<xs:restriction base="ServiceBodyType">
+				<xs:sequence>
+				<xs:choice>
+					<xs:element name="organization" type="OrganizationWithRolesType"/>
+					<xs:element name="organization_identifiers_assigned" type="EmployerInformationAssignmentResponseType" />
+				</xs:choice>
+			        </xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="ShopTransferType">
+		<xs:annotation>
+			<xs:documentation>Information about employers converted from remote carriers to the exchange.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="source_carrier" type="CarrierLinkType" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="hbx_active_on" type="xs:date">
+				<xs:annotation>
+					<xs:documentation>Date when transferred employer profile is initially published on the HBX.  Typically three months prior to first effective date</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="EmployerEventApplicationHeadersType">
+		<xs:sequence>
+			<xs:element name="carrier_id" type="IdentifierType"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="EmployerEventHeaderType">
+		<xs:complexContent>
+			<xs:restriction base="EnvelopeHeaderType">
+				<xs:sequence>
+					<xs:element name="application_header_properties" type="EmployerEventApplicationHeadersType"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="EmployerEventType">
+		<xs:annotation>
+			<xs:documentation>A notification event for employer organizations, submitted to carrier partners.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ServiceEventType">
+				<xs:sequence>
+					<xs:element name="event_name" type="EmployerEventNameType" minOccurs="0"/>
+					<xs:element ref="resource_instance_uri" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>URN(s) for the employer instance that is subject of this event</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element ref="extended_resource_instance_uri" minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>URN(s) for additional uris which may be used to reference the subject of this event.</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="header" type="EmployerEventHeaderType" minOccurs="0"/>
+					<xs:element name="body" type="OrganizationServiceEventBodyType"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:simpleType name="EmployerDigestEventNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:events:v1:employer#digest_period_ended"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EmployerEventsType">
+		<xs:sequence>
+			<xs:element name="coverage_period" type="DateTimeRangeType">
+				<xs:annotation>
+					<xs:documentation>The start and end timestamps for events listed in this digest instance</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="employer_event" type="EmployerEventType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmployerDigestServiceEventBodyType">
+		<xs:complexContent>
+			<xs:restriction base="ServiceBodyType">
+				<xs:sequence>
+					<xs:element name="employer_events" type="EmployerEventsType">
+						<xs:annotation>
+							<xs:documentation>Collection of employer profile event messages</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="EmployerDigestEventType">
+		<xs:annotation>
+			<xs:documentation>A full digest of employer changes, submitted to Carrier partners as a batch.</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:restriction base="ServiceEventType">
+				<xs:sequence>
+					<xs:element name="event_name" type="EmployerDigestEventNameType"/>
+					<xs:element ref="resource_instance_uri">
+						<xs:annotation>
+							<xs:documentation>A URI uniquely referencing the issuer/carrier associated with the event</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="header" type="EnvelopeHeaderType" minOccurs="0"/>
+					<xs:element name="body" type="EmployerDigestServiceEventBodyType"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:element name="employer_digest_event" type="EmployerDigestEventType">
+		<xs:annotation>
+			<xs:documentation>A compilation of employer events</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="EmployerRequestType">
+		<xs:annotation>
+			<xs:documentation>Service call to Employer resource</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="header">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceHeaderType">
+							<xs:sequence>
+								<xs:element name="hbx_id" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="submitted_timestamp" type="xs:dateTime">
+									<xs:annotation>
+										<xs:documentation>UTC date and time when event occured</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="authorization" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>Authentication/authorization credentials</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="message_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Value that uniqely identifies message</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="originating_service" type="xs:anyURI" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>The urn of the requesting service</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="reply_to" type="xs:anyURI" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Designates the consumer service endpoint where to transmit response</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="request">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceRequestType">
+							<xs:sequence>
+								<xs:element name="request_name" type="EmployerRequestNameType">
+									<xs:annotation>
+										<xs:documentation>Uniform Resource Name (URN) for this request e.g.; urn:openhbx:requests:v1:individual</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="parameters" type="xs:anyType" minOccurs="0"/>
+								<xs:element name="metadata" type="ServiceMetadataType" minOccurs="0"/>
+								<xs:element name="body" type="xs:anyType" minOccurs="0"/>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="EmployerRequestNameType">
+		<xs:annotation>
+			<xs:documentation>Request methods supported by the Employer resource</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#by_id"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#by_census_member">
+				<xs:annotation>
+					<xs:documentation>Find all employers where the identified individual appears as an employee or dependent</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#create"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#update"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#suspend"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#terminate"/>
+			<xs:enumeration value="urn:openhbx:requests:v1:employer#reinstate"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="EmployerResponseType">
+		<xs:annotation>
+			<xs:documentation>Response message for requests sent to the Employer resource</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="header">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceHeaderType">
+							<xs:sequence>
+								<xs:element name="hbx_id" type="xs:string">
+									<xs:annotation>
+										<xs:documentation>CMS-assigned Health Benefit Exchange identifier, e.g. DC0</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="submitted_timestamp" type="xs:dateTime">
+									<xs:annotation>
+										<xs:documentation>UTC date and time when event occured</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="status" type="ServiceStatusType">
+									<xs:annotation>
+										<xs:documentation>Indicate success or failure of a request to a service</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="message_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Value that uniqely identifies message</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="fault_to" type="xs:anyURI" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Endpoint to transmit unrecoverable error</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="correlation_id" type="xs:string" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Attribute to associate the current message with previous message ID or application-specifc ID</xs:documentation>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="metadata">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceMetadataType">
+							<xs:sequence>
+								<xs:element name="result_set" type="ServiceResultSetType"/>
+								<xs:any namespace="##any" processContents="lax" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Wildcard to support schema extension</xs:documentation>
+									</xs:annotation>
+								</xs:any>
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="body">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:restriction base="ServiceBodyType">
+							<xs:sequence>
+								<xs:element ref="employers" />
+							</xs:sequence>
+						</xs:restriction>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="EmployerCensusFamilyStatusNameType">
+		<xs:annotation>
+			<xs:documentation>A rostered employee's state with respect to their employer and eligibility to enroll on the HBX</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employer_census_family_status#eligible">
+				<xs:annotation>
+					<xs:documentation>Employee is present on the Employer roster, but isn't active on the HBX system</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:employer_census_family_status#employee_role_linked">
+				<xs:annotation>
+					<xs:documentation>Employee has successfully associated the Employer roster record with individual and family records</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:employer_census_family_status#employment_terminated">
+				<xs:annotation>
+					<xs:documentation>Employment with this Employer is terminated for this rostered employee</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:employer_census_family_status#rehired">
+				<xs:annotation>
+					<xs:documentation>The employee was rehired by the Employer and has a separate, more recent census employee record</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:element name="employers" type="EmployerProfilesListType"/>
+
+	<xs:complexType name="EmployerProfilesListType">
+		<xs:sequence>
+			<xs:element name="employer" type="EmployerOrganizationType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:element name="employer_request" type="EmployerRequestType"/>
+	<xs:element name="employer_response" type="EmployerResponseType"/>
+
+	<xs:simpleType name="CompositeRatingTierNameType">
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:composite_rating_tier#employee_only">
+				<xs:annotation>
+					<xs:documentation>Employee Only</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:composite_rating_tier#employee_and_spouse">
+				<xs:annotation>
+					<xs:documentation>Employee and spouse</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:composite_rating_tier#employee_and_one_or_more_dependents">
+				<xs:annotation>
+					<xs:documentation>Employee and one or more dependents</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:composite_rating_tier#family">
+				<xs:annotation>
+					<xs:documentation>Family</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="CompositeRatingTierType">
+		<xs:sequence>
+			<xs:element name="tier_name" type="CompositeRatingTierNameType"/>
+			<xs:element name="premium" type="CurrencyType"/>
+			<xs:element name="contribution_percent" type="ContributionPercentType"/>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:simpleType name="ParticipationRateType">
+		<xs:restriction base="xs:decimal">
+			<xs:maxInclusive value="1.0"/>
+			<xs:minInclusive value="0.0"/>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:complexType name="CompositeRatingTierListType">
+		<xs:sequence>
+			<xs:element name="composite_rating_tier" type="CompositeRatingTierType" minOccurs="1" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

@@ -175,4 +175,107 @@ RSpec.describe GroupSelectionPrevaricationAdapter, dbclean: :after_each do
       end
     end
   end
+
+  context '.if_family_has_active_shop_sep' do
+    let(:person1) { FactoryBot.create(:person, :with_family, :with_employee_role, first_name: "mock")}
+    let(:family1) { person1.primary_family }
+    let(:family_member_ids) {{"0" => family1.family_members.first.id}}
+    let!(:new_household) {family1.households.where(:id => {"$ne" => family.households.first.id.to_s}).first}
+    let(:start_on) { TimeKeeper.date_of_record }
+    let(:benefit_package) {hbx_enrollment.sponsored_benefit_package}
+    let(:special_enrollment_period) {[double("SpecialEnrollmentPeriod")]}
+    let!(:sep) do
+      family1.special_enrollment_periods.create(
+        qualifying_life_event_kind: qle,
+        qle_on: qle.created_at,
+        effective_on_kind: qle.event_kind_label,
+        effective_on: benefit_package.effective_period.min,
+        start_on: start_on,
+        end_on: start_on + 30.days
+      )
+    end
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product)}
+
+    let!(:hbx_enrollment) do
+      FactoryBot.create(:hbx_enrollment,
+                        household: family.active_household,
+                        family: family,
+                        coverage_kind: 'health',
+                        effective_on: enrollment_effective_date,
+                        enrollment_kind: 'special_enrollment',
+                        kind: 'employer_sponsored',
+                        sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                        product: product)
+    end
+
+    let(:group_selection_params) do
+      {
+        :person_id => person1.id,
+        :employee_role_id => person1.employee_roles.first.id,
+        :market_kind => "shop",
+        :change_plan => "change_plan",
+        :hbx_enrollment_id => hbx_enrollment.id,
+        :family_member_ids => family_member_ids,
+        :enrollment_kind => 'special_enrollment',
+        :coverage_kind => hbx_enrollment.coverage_kind
+      }
+    end
+
+    let(:params2) { ActionController::Parameters.new(group_selection_params) }
+    subject(:adapter2) { GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params2) }
+
+    context 'change_plan for shop qle' do
+      let(:qle) do
+        QualifyingLifeEventKind.create(
+          title: "Married",
+          tool_tip: "Enroll or add a family member because of marriage",
+          action_kind: "add_benefit",
+          event_kind_label: "Date of married",
+          market_kind: "shop",
+          ordinal_position: 15,
+          reason: "marriage",
+          edi_code: "32-MARRIAGE",
+          effective_on_kinds: ["first_of_next_month"],
+          pre_event_sep_in_days: 0,
+          post_event_sep_in_days: 30,
+          is_self_attested: true
+        )
+
+        it 'should set change_plan' do
+          expect(adapter2.change_plan).to eq 'change_plan'
+          adapter2.if_family_has_active_shop_sep do
+            expect(adapter2.change_plan).to eq 'change_by_qle'
+          end
+        end
+      end
+    end
+
+    context 'change_plan for fehb qle' do
+      let(:qle) do
+        QualifyingLifeEventKind.create(
+          title: "Married",
+          tool_tip: "Enroll or add a family member because of marriage",
+          action_kind: "add_benefit",
+          event_kind_label: "Date of married",
+          market_kind: "fehb",
+          ordinal_position: 15,
+          reason: "marriage",
+          edi_code: "32-MARRIAGE",
+          effective_on_kinds: ["first_of_next_month"],
+          pre_event_sep_in_days: 0,
+          post_event_sep_in_days: 30,
+          is_self_attested: true,
+          is_active: true
+        )
+      end
+
+      it 'should set change_plan' do
+        expect(adapter2.change_plan).to eq 'change_plan'
+        adapter2.if_family_has_active_shop_sep do
+          expect(adapter2.change_plan).to eq 'change_by_qle'
+        end
+      end
+    end
+  end
+
 end

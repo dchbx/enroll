@@ -119,6 +119,10 @@ describe ChangeEnrollmentDetails do
       let(:benefit_application) { ::BenefitSponsors::BenefitApplications::BenefitApplication.new }
       let(:benefit_package) { ::BenefitSponsors::BenefitPackages::BenefitPackage.new }
 
+      before do
+        hbx_enrollment.update_attributes(sponsored_benefit_package_id: benefit_package.id)
+      end
+
       
       it "should change the aasm state " do
         ClimateControl.modify hbx_id: hbx_enrollment.hbx_id.to_s, action: "change_enrollment_status", new_aasm_state: "move_to_enrolled" do

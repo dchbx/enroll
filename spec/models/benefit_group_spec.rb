@@ -1,6 +1,10 @@
 # frozen_string_literal: true.
 require 'rails_helper'
 
+class AcaHelperModStubber
+  extend ::Config::AcaHelper
+end
+
 describe BenefitGroup, dbclean: :after_each do
   context "an employer profile with census_employees exists" do
     let!(:employer_profile) { FactoryBot.create(:employer_profile)}
@@ -702,8 +706,13 @@ describe BenefitGroup, type: :model, dbclean: :after_each do
 
         it "should fail validation when less than HBX minimum" do
           benefit_group.relationship_benefits.find_by(relationship: "employee").premium_pct = invalid_minimum_contribution
-          expect(benefit_group.valid?).to be_falsey
-          expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
+          if AcaHelperModStubber.flexible_contribution_model_enabled_for_bqt_for_initial_period.cover?(plan_year.start_on)
+            expect(benefit_group.valid?).to be_truthy
+            expect(benefit_group.errors[:relationship_benefits].any?).to be_falsey
+          else
+            expect(benefit_group.valid?).to be_falsey
+            expect(benefit_group.errors[:relationship_benefits].any?).to be_truthy
+          end
         end
       end
     end

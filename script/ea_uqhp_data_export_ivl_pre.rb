@@ -2,7 +2,11 @@ batch_size = 500
 offset = 0
 enrollment_count = HbxEnrollment.current_year.count
 
-product_ids = BenefitMarkets::Products::Product.aca_individual_market.by_year(2019).pluck(:_id)
+unless ARGV[0].present?
+  puts "Please include the year to pull active enrollments from (e.g. 2020)" unless Rails.env.test?
+  exit
+end
+product_ids = BenefitMarkets::Products::Product.aca_individual_market.by_year(ARGV[0].to_i).pluck(:_id)
 
 csv = CSV.open("ea_uqhp_data_export_ivl_pre_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv", "w")
 csv << %w(family.id policy.id policy.subscriber.coverage_start_on policy.aasm_state policy.plan.coverage_kind policy.plan.metal_level policy.plan.plan_name policy.subscriber.person.hbx_id
@@ -44,8 +48,9 @@ while offset < enrollment_count
       next if !(['unassisted_qhp', 'individual'].include? policy.kind) || policy.family.has_aptc_hbx_enrollment?
 
       person = policy.subscriber.person
-
-      add_to_csv(csv, policy, person, false)
+      family = policy.family
+      is_dependent = person != family.primary_person
+      add_to_csv(csv, policy, person, is_dependent)
 
       policy.hbx_enrollment_members.each do |hbx_enrollment_member|
         add_to_csv(csv, policy, hbx_enrollment_member.person, true) if hbx_enrollment_member.person != person

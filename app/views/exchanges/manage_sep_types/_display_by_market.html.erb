@@ -1,0 +1,15 @@
+<div id="<%= market_kind %>" class="container tab-pane <%= display %>"><br>
+  <h3><%= l10n("exchange.manage_sep_types.titles")%></h3>
+  <p><%= l10n("exchange.manage_sep_types.sort_description")%></p>
+  <div class="container">
+    <div class="row">
+      <div data-controller="drag" data-drag-url="/exchanges/manage_sep_types/:id/move">
+        <% @sortable.where(market_kind: market_kind).active_by_state.each_with_index do |sort, i|%>
+            <div id='<%= "#{sort.reason}_#{sort.market_kind}" %>' data-id="<%= sort.id %>" data-ordinal_position="<%= sort.ordinal_position %>" data-index="<%=i%>" data-market_kind="<%=sort.market_kind%>" class="card card-body mb-4">
+              <%= sort.title%>
+            </div>
+        <%end%>
+      </div>
+    </div>
+  </div>
+</div>

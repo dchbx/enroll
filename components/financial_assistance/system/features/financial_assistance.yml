@@ -1,0 +1,61 @@
+---
+registry:
+  - namespace:
+    - :services
+    features:
+      - key: :faa_ext_service
+        is_enabled: true
+        settings:
+          - key: :aceds_curam
+            item: false
+  - namespace:
+    - :general
+    features:
+      - key: :us_state
+        is_enabled: true
+        settings:
+          - key: :abbreviation
+            item: 'DC'
+          - key: :name
+            item: 'District of Columbia'
+  - namespace:
+    - :enrollment_dates
+    features:
+      - key: :application_new_year_effective_date
+        is_enabled: true
+        item:
+          day_of_month: 1
+          month_of_year: 11
+      - key: :enrollment_due_day_of_month
+        item: 15
+        is_enabled: true
+      - key: :earliest_effective_date
+        item: FinancialAssistance::Operations::EnrollmentDates::EarliestEffectiveDate.new
+        is_enabled: true
+      - key: :application_year
+        item: FinancialAssistance::Operations::EnrollmentDates::ApplicationYear.new
+        is_enabled: true
+  - namespace:
+    - :benchmark_plans
+    features:
+      - key: :benchmark_plan_2020
+        is_enabled: true
+        settings:
+          - key: :name
+            item: 'Plan Name'
+          - key: :hios_id
+            item: 'HIOS-ID'
+          - key: :is_dental_only
+            item: false
+          - key: :metal_level
+            item: :silver
+          - key: :coverage_kind
+            item: :health
+          - key: :ehb
+            item: 0.80
+          - key: :carrier_name
+            item: "Carrier Name"
+
+  # TODO eligibility engine connectivity(HAVEN) settings
+  # TODO mec service connectivity settings
+

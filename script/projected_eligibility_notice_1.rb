@@ -3,9 +3,9 @@ begin
   @data_hash = {}
 
   csv_path = if Rails.env.production?
-               "proj_elig_report_uqhp_2019.csv"
+               "proj_elig_report_uqhp.csv"
              else
-               "#{Rails.root}/spec/test_data/notices/proj_elig_report_uqhp_2019_test_data.csv"
+               "#{Rails.root}/spec/test_data/notices/proj_elig_report_uqhp_test_data.csv"
              end
 
   CSV.foreach(csv_path, :headers => true).each do |d|
@@ -49,7 +49,7 @@ CSV.open(file_name, "w", force_quotes: true) do |csv|
           event_object: consumer_role,
           notice_event: 'projected_eligibility_notice',
           notice_params: {
-            primary_member: subscriber.to_hash,
+            primary_member: subscriber&.to_hash,
             dependents: dependents.map(&:to_hash),
             uqhp_event: 'uqhp_projected_eligibility_notice_1'
           }

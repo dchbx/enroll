@@ -1,4 +1,4 @@
-<div class = "table-responsive table-override">
+<div id="get-info-table" class = "table-responsive table-override">
   <h4> UserName/eMail view </h4>
   <% user = @person.user %>
   <table class = "table table-striped table-bordered" style="table-layout: fixed;">
@@ -19,7 +19,7 @@
         <td> <%= user.present? ? user.oim_id : "Nil" %> </td>
         <td> <%= user.present? ? user.email : "Nil" %> </td>
         <% if user.present? %>
-          <td> <%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.last_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
+          <td> <%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").to_date %> <strong>(<%= user.current_sign_in_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p") %>)</strong></td>
         <% else %>
           <td> Nil </td>
         <% end %>

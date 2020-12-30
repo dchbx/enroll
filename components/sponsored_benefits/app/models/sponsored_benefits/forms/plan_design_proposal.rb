@@ -123,7 +123,8 @@ module SponsoredBenefits
         sponsorship = @proposal.profile.benefit_sponsorships.first
         sponsorship.assign_attributes({initial_enrollment_period: initial_enrollment_period, annual_enrollment_period_begin_month: @effective_date.month})
         if sponsorship.present?
-          enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date)
+          renewal_employer = @plan_design_organization.is_renewing_employer?
+          enrollment_dates = BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(@effective_date, renewal_employer)
           benefit_application = (sponsorship.benefit_applications.first || sponsorship.benefit_applications.build)
           benefit_application.effective_period= enrollment_dates[:effective_period]
           benefit_application.open_enrollment_period= enrollment_dates[:open_enrollment_period]

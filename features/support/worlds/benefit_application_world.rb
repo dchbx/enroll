@@ -73,6 +73,9 @@ module BenefitApplicationWorld
                        recorded_rating_area: rating_area,
                        recorded_service_areas: [service_area],
                        package_kind: package_kind)
+    @new_application.benefit_sponsor_catalog.benefit_application = @new_application
+    @new_application.benefit_sponsor_catalog.save!
+    @new_application
   end
 
   def create_applications(predecessor_status: , new_application_status: )
@@ -170,7 +173,14 @@ end
 #     renewal employer Acme Inc. has expired  and renewal active benefit applications
 And(/^renewal employer (.*) has (.*) and renewal (.*) benefit applications$/) do |legal_name, earlier_application_status, new_application_status|
   @employer_profile = employer_profile(legal_name)
-  create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
+  earlier_application = create_application(new_application_status: earlier_application_status.to_sym)
+  rating_area(earlier_application.start_on.next_year.year)
+  @renewal_application = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(earlier_application).renew_application[1]
+  @renewal_application.update_attributes!(aasm_state: new_application_status.to_sym)
+
+  # Following code will create renewal application but its assigning the wrong contribution to the product_packages and hence cukes will fail
+  # For now, creating the renewal application using the service so that it assigns the correct contribution model.
+  # create_applications(predecessor_status: earlier_application_status.to_sym, new_application_status: new_application_status.to_sym)
 end
 
 # Following step will create initial benefit application with given state
@@ -206,4 +216,13 @@ And(/^employer (.*?) has a (.*?) benefit application with offering health and de
   current_catalog.save!
   expect(current_application.benefit_packages.present?).to eq(true)
   expect(current_sponsorship.benefit_applications.present?).to eq(true)
+end
+
+And(/(.*) is updated on benefit market catalog/) do |min_contribution_factor|
+  @benefit_market_catalog.product_packages.each do |product_package|
+    product_package.contribution_model.contribution_units.each do |contribution_unit|
+      contribution_unit.minimum_contribution_factor = min_contribution_factor
+    end
+  end
+  @benefit_market_catalog.save
 end

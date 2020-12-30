@@ -11,6 +11,8 @@ module BenefitSponsors
 
 
     let(:current_user) { FactoryBot.create :user }
+    let(:current_user_2) { FactoryBot.create :user }
+    let(:person) { FactoryBot.create(:person, first_name: "Dany", last_name: "Targ", dob: dob, user: current_user_2) }
     let(:fein) { "878998789" }
     let(:dob) { TimeKeeper.date_of_record - 60.years }
     let(:state) { Settings.aca.state_abbreviation }
@@ -181,6 +183,18 @@ module BenefitSponsors
         end
       end
 
+      context 'when person matching the provided personal information already exists' do
+        let(:invalid_employer_params) {valid_employer_params.merge!({person_id: person.id})}
+        let(:profile_factory) do
+          profile_factory_class.call(invalid_employer_params)
+        end
+
+        it 'should throw an error' do
+          expect(profile_factory.errors.messages[:staff_role]).to eq ["a person matching the provided personal information has already been claimed by another user.  Please contact HBX."]
+        end
+
+      end
+
       context 'when type is broker agency' do
         let(:profile_factory) { profile_factory_class.call(valid_broker_params) }
 
@@ -228,7 +242,7 @@ module BenefitSponsors
           let(:profile_factory)           { profile_factory_class.call(invalid_broker_params) }
 
           it 'should throw an error' do
-            expect(profile_factory.errors.messages[:organization]).to eq ["NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465."]
+            expect(profile_factory.errors.messages[:organization].first).to match /npn/i
           end
         end
       end
@@ -267,8 +281,9 @@ module BenefitSponsors
 
     context '.update' do
       context 'when type is benefit sponsor' do
+
         let!(:abc_organization) do
-          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site)
+          FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, :with_broker_agency_profile, site: site)
         end
         let!(:benefit_sponsorship) do
           benefit_sponsorship = employer_profile.add_benefit_sponsorship
@@ -279,6 +294,12 @@ module BenefitSponsors
         let(:employer_profile) { abc_organization.employer_profile }
         let(:new_organization_name) { "Texas Tech Agency" }
         let(:office_location) { abc_organization.employer_profile.primary_office_location }
+        let(:broker_agency_profile) { abc_organization.profiles.first }
+        let(:plan_design_organization) { FactoryBot.create(:sponsored_benefits_plan_design_organization,
+          owner_profile_id: employer_profile.id,
+          sponsor_profile_id: broker_agency_profile.id
+        )}
+        let!(:update_plan_design) {plan_design_organization.update_attributes!(has_active_broker_relationship: true)}
 
         let(:valid_employer_params_update) do
           {
@@ -345,6 +366,12 @@ module BenefitSponsors
 
         it 'should update phone' do
           expect(abc_organization.employer_profile.primary_office_location.phone.number).to eq phone_number
+        end
+
+        it 'should update plan design organization' do
+          plan_design_organization.reload
+          expect(abc_organization.legal_name).to eq plan_design_organization.legal_name
+          expect(abc_organization.dba).to eq plan_design_organization.dba
         end
       end
 

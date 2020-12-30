@@ -3,11 +3,11 @@
     .col-xs-6.offered-heading
       .text-uppercase.text-center 
         | Offered 
-        i.fas.fa-question-circle data-toggle='tooltip' title=offered_tool_tip_helper.html_safe
+        i.fas.fa-question-circle data-toggle='tooltip' title=l10n("employers.plan_years.benefit_package.contributions.offered")
     .col-xs-6.offered-heading
       .text-uppercase.text-center 
         | Employer Contribution 
-        i.fas.fa-question-circle data-toggle='tooltip' title=employer_contribution_tool_tip_helper.html_safe
+        i.fas.fa-question-circle data-toggle='tooltip' title=l10n("employers.plan_years.benefit_package.contributions.employer_contribution", aca_shop_market_employer_contribution_percent_minimum: aca_shop_market_employer_contribution_percent_minimum, aca_shop_market_employer_family_contribution_percent_minimum: aca_shop_market_employer_family_contribution_percent_minimum)
   .col-xs-12#benefitFields
 
 

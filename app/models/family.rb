@@ -18,6 +18,7 @@ class Family
   include Sortable
   include Mongoid::Autoinc
   include DocumentsVerificationStatus
+  include RemoveFamilyMember
 
   IMMEDIATE_FAMILY = %w(self spouse life_partner child ward foster_child adopted_child stepson_or_stepdaughter stepchild domestic_partner)
 
@@ -83,6 +84,7 @@ class Family
   index({"households.tax_households.eligibility_determinations.determined_on" => 1})
   index({"households.tax_households.eligibility_determinations.determined_at" => 1})
   index({"households.tax_households.eligibility_determinations.max_aptc.cents" => 1})
+  index({"households.tax_households.eligibility_determinations.csr_percent_as_integer" => 1}, {name: 'csr_percent_as_integer_index'})
 
   index({"irs_groups.hbx_assigned_id" => 1})
 
@@ -143,8 +145,8 @@ class Family
 
 
   scope :by_eligibility_determination_date_range, ->(start_at, end_at){ where(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".gte => start_at).and(
-                                                        :"households.tax_households.eligibility_determinations.determined_on".lte => end_at
+                                                        :"households.tax_households.eligibility_determinations.determined_at".gte => start_at).and(
+                                                        :"households.tax_households.eligibility_determinations.determined_at".lte => end_at
                                                       )
                                                     }
   scope :all_with_hbx_enrollments, -> { where(:"_id".in => HbxEnrollment.all.distinct(:family_id)) }
@@ -222,6 +224,16 @@ class Family
     ).distinct(:family_id)
   ) }
 
+  scope :active_and_cobra_enrolled, ->(benefit_application) {
+    active_family_ids = benefit_application.active_census_employees.collect{|ce| ce.family.nil? ? nil : ce.family.id }.compact
+    where(:"_id".in => HbxEnrollment.where(
+    :"sponsored_benefit_package_id".in => benefit_application.benefit_packages.pluck(:_id),
+    :"aasm_state".nin => %w(coverage_canceled shopping coverage_terminated),
+    :coverage_kind.in => ["health", "dental"],
+    :"family_id".in => active_family_ids
+    ).distinct(:family_id)
+  ) }
+
   def active_broker_agency_account
     broker_agency_accounts.detect { |baa| baa.is_active? }
   end
@@ -266,7 +278,15 @@ class Family
   end
 
   def currently_enrolled_products(enrollment)
-    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind)
+    enrolled_enrollments = active_household.hbx_enrollments.enrolled_and_renewing.by_coverage_kind(enrollment.coverage_kind).select do |enr|
+      enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
+    end
+
+    if enrolled_enrollments.blank?
+      enrolled_enrollments = active_household.hbx_enrollments.terminated.by_coverage_kind(enrollment.coverage_kind).by_terminated_period((enrollment.effective_on - 1.day)).select do |enr|
+        enr.subscriber.applicant_id == enrollment.subscriber.applicant_id
+      end
+    end
     enrolled_enrollments.map(&:product)
   end
 
@@ -580,6 +600,29 @@ class Family
     special_enrollment_periods.individual_market.order_by(:submitted_at.desc).to_a.detect(&:is_active?)
   end
 
+  def latest_active_sep_for(enrollment)
+    return unless enrollment.is_shop?
+    enrollment.fehb_profile.present? ? latest_fehb_sep : latest_shop_sep
+  end
+
+  def options_for_termination_dates(enrollments)
+    return {} unless enrollments
+
+    enrollments.inject({}) do |date_hash, enrollment|
+      latest_sep = latest_active_sep_for(enrollment)
+      term_date = latest_sep ? latest_sep.termination_dates(enrollment.effective_on) : TimeKeeper.date_of_record.end_of_month
+      date_hash[enrollment.id.to_s] = term_date
+      date_hash
+    end
+  end
+
+  def latest_shop_sep_termination_kinds(enrollment)
+    latest_sep = latest_active_sep_for(enrollment)
+    return unless latest_sep
+
+    latest_sep.qualifying_life_event_kind.termination_on_kinds
+  end
+
   def terminate_date_for_shop_by_enrollment(enrollment=nil)
     latest_sep = latest_shop_sep || latest_fehb_sep
     if latest_sep.present?
@@ -659,15 +702,45 @@ class Family
   #
   # @param [ Person ] person The {Person} to remove from the family.
   def remove_family_member(person)
-    family_member = find_family_member_by_person(person)
-    if family_member.present?
-      family_member.is_active = false
-      active_household.remove_family_member(family_member)
+    # Check if duplicate family member that shares person record with another family_member
+    family_members_with_person_id = family_members.where(person_id: person.id)
+    # Deleting the family member  if there is more than 1 object with same person id
+    if family_members_with_person_id.count > 1
+      fm_ids = family_members_with_person_id.pluck(:id)
+      if duplicate_enr_members_or_tax_members_present?(fm_ids)
+        return [false, "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"]
+      else
+        status, messages = remove_duplicate_members(fm_ids)
+        self.reload
+        [status, "Successfully removed duplicate members"]
+      end
+    else
+      # This will also destroy the coverage_household_member
+      if family_members_with_person_id.present?
+        family_member = family_members_with_person_id.first
+        # Note: Forms::FamilyMember.rb calls the save on destroy!
+        # here is_active is only set in memory
+        family_member.is_active = false
+        active_household.remove_family_member(family_member)
+      end
+      [true, "Successfully removed family member"]
     end
-
-    family_member
   end
 
+  def duplicate_members_present_on_enrollments?(fm_ids)
+    enrollments = hbx_enrollments.where(:"aasm_state".nin => ["shopping"])
+    enrollment_member_fm_ids = enrollments.flat_map(&:hbx_enrollment_members).map(&:applicant_id)
+    (enrollment_member_fm_ids & fm_ids).present?
+  end
+
+  def duplicate_members_present_on_active_tax_households?(fm_ids)
+    tax_household_applicant_ids =  active_household.tax_household_applicant_ids
+    (tax_household_applicant_ids & fm_ids).present?
+  end
+
+  def duplicate_enr_members_or_tax_members_present?(fm_ids)
+    duplicate_members_present_on_enrollments?(fm_ids) || duplicate_members_present_on_active_tax_households?(fm_ids)
+  end
   # Determine if {Person} is a member of this family
   #
   # @example Is this person a family member?
@@ -1024,14 +1097,17 @@ class Family
 
   def all_persons_vlp_documents_status
     outstanding_types = []
+    fully_uploaded = []
+    in_review = []
     self.active_family_members.each do |member|
-      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending", "review"].include? type.validation_status }
+      outstanding_types = outstanding_types + member.person.verification_types.active.select{|type| ["outstanding", "pending"].include? type.validation_status }
+      in_review = in_review + member.person.verification_types.active.select{|type| ["review"].include? type.validation_status }
+      fully_uploaded = fully_uploaded + member.person.verification_types.active.select{ |type| type.type_verified? }
     end
-    fully_uploaded = outstanding_types.any? ? outstanding_types.all?{ |type| (type.type_documents.any? && !type.rejected) } : nil
-    partially_uploaded = outstanding_types.any? ? outstanding_types.any?{ |type| (type.type_documents.any? && !type.rejected)} : nil
-    if fully_uploaded
+
+    if (fully_uploaded.any? || in_review.any?) && !outstanding_types.any?
       "Fully Uploaded"
-    elsif partially_uploaded
+    elsif outstanding_types.any? && in_review.any?
       "Partially Uploaded"
     else
       "None"
@@ -1057,6 +1133,14 @@ class Family
 
   def has_curam_or_mobile_application_type?
     ['Curam', 'Mobile'].include? application_type
+  end
+
+  def has_in_person_application_type?
+    application_type == 'In Person'
+  end
+
+  def has_paper_paplication_type?
+    application_type == 'Paper'
   end
 
   def set_due_date_on_verification_types
@@ -1086,6 +1170,16 @@ class Family
 
   def has_active_sep?(pre_enrollment)
     pre_enrollment.is_ivl_by_kind? && latest_ivl_sep&.start_on&.year == pre_enrollment.effective_on.year
+  end
+
+  def benchmark_product_id
+    bcp = HbxProfile.bcp_by_oe_dates || HbxProfile.bcp_by_effective_period
+    bcp.slcsp_id
+  end
+
+  def application_applicable_year
+    bcp = HbxProfile.bcp_by_oe_dates
+    bcp.present? ? bcp.start_on.year : TimeKeeper.date_of_record.year
   end
 
 private

@@ -2806,7 +2806,7 @@
               <cellValue>MAN001</cellValue>
             </networkID>
             <serviceAreaID cellLocation="Benefits_Package_1-F.9">
-              <cellValue>MAS001</cellValue>
+              <cellValue>DCS001</cellValue>
             </serviceAreaID>
             <formularyID cellLocation="Benefits_Package_1-G.9">
               <cellValue>MAF001</cellValue>
@@ -8423,7 +8423,7 @@
               <cellValue>MAN001</cellValue>
             </networkID>
             <serviceAreaID cellLocation="Benefits_Package_2-F.9">
-              <cellValue>MAS001</cellValue>
+              <cellValue>DCS001</cellValue>
             </serviceAreaID>
             <formularyID cellLocation="Benefits_Package_2-G.9">
               <cellValue>MAF002</cellValue>

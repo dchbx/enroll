@@ -10,6 +10,8 @@ gemspec
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
 group :development, :test do

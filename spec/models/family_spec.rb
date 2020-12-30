@@ -2,7 +2,7 @@ require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
-describe Family, "given a primary applicant and a dependent" do
+describe Family, "given a primary applicant and a dependent", dbclean: :after_each do
   let(:person) { Person.new }
   let(:dependent) { Person.new }
   let(:household) { Household.new(:is_active => true) }
@@ -531,6 +531,76 @@ describe Family, dbclean: :around_each do
       end
     end
   end
+
+  context 'for options_for_termination_dates', dbclean: :after_each do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family) }
+
+    before do
+      @termination_dates = family10.options_for_termination_dates([enrollment])
+    end
+
+    it 'should include sep qle_on' do
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on)
+    end
+
+    it 'should include end_of_month of sep qle_on' do
+      expect(@termination_dates[enrollment.id.to_s]).to include(sep10.qle_on.end_of_month)
+    end
+  end
+
+  context 'for latest_shop_sep_termination_kinds' do
+    let!(:family10) { FactoryBot.create(:family, :with_primary_family_member) }
+    let!(:enrollment) { FactoryBot.create(:hbx_enrollment, family: family10) }
+    let!(:sep10) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'shop', termination_on_kinds: ['end_of_event_month', 'exact_date'])
+      sep
+    end
+
+    let!(:fehb_sep) do
+      sep = FactoryBot.create(:special_enrollment_period, family: family10)
+      sep.qualifying_life_event_kind.update_attributes!(market_kind: 'fehb', termination_on_kinds: ['end_of_reporting_month', 'end_of_month_before_last'])
+      sep
+    end
+
+    context "termination kinds for SHOP sep" do
+
+      before do
+        @termination_kinds = family10.latest_shop_sep_termination_kinds(enrollment)
+        allow(enrollment).to receive(:fehb_profile).and_return false
+      end
+
+      it 'should include exact_date' do
+        expect(@termination_kinds).to include('exact_date')
+      end
+
+      it 'should include end_of_event_month' do
+        expect(@termination_kinds).to include('end_of_event_month')
+      end
+    end
+
+    context "termination kinds for FEHB sep" do
+
+      before do
+        allow(enrollment).to receive(:fehb_profile).and_return true
+        @termination_kinds = family10.latest_shop_sep_termination_kinds(enrollment)
+      end
+
+      it 'should include exact_date' do
+        expect(@termination_kinds).to include('end_of_reporting_month')
+      end
+
+      it 'should include end_of_event_month' do
+        expect(@termination_kinds).to include('end_of_month_before_last')
+      end
+    end
+  end
 end
 
 describe "special enrollment periods" do
@@ -904,14 +974,23 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
   end
 
   context "one ivl open enrollment period" do
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
 
     it "should be in open enrollment" do
-      expect(family.is_under_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 1
+      end
     end
 
     it "should not be in shop open enrollment" do
@@ -923,11 +1002,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 
@@ -935,7 +1022,8 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
     let(:person) {FactoryBot.create(:person)}
     let!(:benefit_group) { current_benefit_package }
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
@@ -947,7 +1035,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should have two current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 2
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 1
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 2
+      end
     end
 
     it "should be in shop open enrollment" do
@@ -959,11 +1051,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 
@@ -971,7 +1071,8 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
-    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :single_open_enrollment_coverage_period, coverage_year: TimeKeeper.date_of_record.year) }
+    let(:bcp_oe_end_on) { hbx_profile.benefit_sponsorship.benefit_coverage_periods.first.open_enrollment_end_on }
     let(:person) {FactoryBot.create(:person)}
     let!(:benefit_group) { current_benefit_package }
     let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: benefit_group ) }
@@ -988,7 +1089,11 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should have three current eligible open enrollments" do
-      expect(family.current_eligible_open_enrollments.count).to eq 3
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_eligible_open_enrollments.count).to eq 2
+      else
+        expect(family.current_eligible_open_enrollments.count).to eq 3
+      end
     end
 
     it "should be in shop open enrollment" do
@@ -1000,11 +1105,19 @@ describe Family, "enrollment periods", :model, dbclean: :around_each do
     end
 
     it "should be in ivl open enrollment" do
-      expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.is_under_ivl_open_enrollment?).to be_falsey
+      else
+        expect(family.is_under_ivl_open_enrollment?).to be_truthy
+      end
     end
 
     it "should have one current ivl eligible open enrollments" do
-      expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      if TimeKeeper.date_of_record > bcp_oe_end_on
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 0
+      else
+        expect(family.current_ivl_eligible_open_enrollments.count).to eq 1
+      end
     end
   end
 end
@@ -1376,6 +1489,149 @@ context "verifying employee_role is active?" do
   end
 end
 
+describe "remove_family_member" do
+  let(:family) { FactoryBot.create(:family, :with_primary_family_member_and_dependent)}
+  let(:dependent1) { family.family_members.where(is_primary_applicant: false).first }
+  let(:dependent2) { family.family_members.where(is_primary_applicant: false).last }
+
+  context "should remove family member and set is active to false if no duplicates FM exists" do
+
+    it "should set is active to false for dependent1" do
+      expect(family.family_members.active.count).to eq 3
+      family.remove_family_member(dependent1.person)
+      expect(family.family_members.active.count).to eq 2
+      expect(dependent1.is_active).to eq false
+    end
+  end
+
+  context "should remove all duplicate family members" do
+
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      dup_fm
+    end
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      dup_fm
+    end
+
+    it "should set is active to false for dependent1" do
+      expect(family.family_members.active.count).to eq 5
+      family.remove_family_member(dependent1.person)
+      expect(family.family_members.active.count).to eq 3
+    end
+  end
+
+  context "should remove all family members along with coverage household members" do
+
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    it 'should raise document not found error' do
+      family.remove_family_member(dependent1.person)
+      expect { family.family_members.find(duplicate_family_member_1.id.to_s) }.to raise_error(Mongoid::Errors::DocumentNotFound)
+    end
+
+    it 'should delete CHM record' do
+      family.remove_family_member(dependent1.person)
+      chmms = family.active_household.coverage_households.flat_map(&:coverage_household_members)
+      expect(family.family_members.count).to eq(chmms.count)
+      expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member_1.id.to_s)
+    end
+  end
+
+  context "should remove all family members along with coverage household members and hbx enrollment members(in shopping enrollments)" do
+    let!(:duplicate_family_member_1) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    let!(:duplicate_family_member_2) do
+      family.family_members << FamilyMember.new(person_id: dependent1.person.id)
+      dup_fm = family.family_members.last
+      dup_fm.save(validate: false)
+      family.active_household.add_household_coverage_member(dup_fm)
+      dup_fm
+    end
+
+    let!(:enrollment) do
+      enr = FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, aasm_state: "shopping")
+      enr.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: dependent1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enr.hbx_enrollment_members.first.save!
+      enr.save!
+      enr
+    end
+
+    let!(:matched_hbx_member_1) do
+      enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: duplicate_family_member_1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enrollment.hbx_enrollment_members.last.save!
+      enrollment.save!
+      enrollment.hbx_enrollment_members.last
+    end
+
+
+    let!(:matched_hbx_member_2) do
+      enrollment.hbx_enrollment_members << HbxEnrollmentMember.new(applicant_id: duplicate_family_member_1.id.to_s, eligibility_date: Time.zone.today, coverage_start_on: Time.zone.today)
+      enrollment.hbx_enrollment_members.last.save!
+      enrollment.save!
+      enrollment.hbx_enrollment_members.last
+    end
+
+    let!(:size) {enrollment.hbx_enrollment_members.count}
+
+    it 'should delete FM, CHM and HBXM records' do
+      family.remove_family_member(dependent1.person)
+      chmms = family.active_household.coverage_households.flat_map(&:coverage_household_members)
+      expect(family.family_members.count).to eq(chmms.count)
+      enrollment.reload
+      expect(enrollment.hbx_enrollment_members.count).not_to eq(size)
+      expect(chmms.map(&:family_member_id).map(&:to_s)).not_to include(duplicate_family_member_1.id.to_s)
+    end
+
+    it 'should return false if duplicate members are present on enrollments' do
+      enrollment.update_attributes(aasm_state: "coverage_selected")
+      status, message = family.remove_family_member(dependent1.person)
+
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
+    end
+
+    it 'should return false if duplicate members are present on active tax households' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return true
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq false
+      expect(message).to eq "Cannot remove the duplicate members as they are present on enrollments/tax households. Please call customer service at 1-855-532-5465"
+    end
+
+    it 'should return true if duplicate members are not present on active tax households or enrollments' do
+      allow(family).to receive(:duplicate_members_present_on_active_tax_households?).and_return false
+      allow(family).to receive(:duplicate_members_present_on_enrollments?).and_return false
+      status, message = family.remove_family_member(dependent1.person)
+      expect(status).to eq true
+    end
+
+  end
+end
+
 describe "active dependents" do
   let!(:person) { FactoryBot.create(:person, :with_consumer_role)}
   let!(:person2) { FactoryBot.create(:person, :with_consumer_role)}
@@ -1437,7 +1693,7 @@ describe Family, "scopes", dbclean: :after_each do
         plan_id: plan.id,
         sponsored_benefit_package_id: current_benefit_package.id,
         aasm_state:"coverage_selected"
-  
+
         )
       }
 
@@ -1459,7 +1715,20 @@ describe Family, "scopes", dbclean: :after_each do
     end
   end
 
-  context 'scopes' do 
+  context 'scopes' do
+    context "outstanding verifications" do
+      let(:none_uploaded_person) do
+        FactoryBot.create(:person)
+      end
+      let!(:none_uploaded_family) do
+        FactoryBot.create(:family, :with_primary_family_member, person: none_uploaded_person)
+      end
+
+      it "should not return uploaded verifications" do
+        expect(none_uploaded_family.all_persons_vlp_documents_status).to eq("None")
+      end
+    end
+
     context '.all_enrollments_by_benefit_package' do
       let(:benefit_package_to_test) do
         double(:benefit_package, :_id => 1)
@@ -1516,13 +1785,19 @@ describe Family, "scopes", dbclean: :after_each do
       expect(Family.enrolled_under_benefit_application(initial_application)).to include family
     end
 
+    it '.active_and_cobra_enrolled' do
+      allow(census_employee).to receive(:family).and_return(family)
+      allow(initial_application).to receive(:active_census_employees).and_return([census_employee])
+      expect(Family.active_and_cobra_enrolled(initial_application)).to include family
+    end
+
     it '.by_enrollment_shop_market' do
       expect(Family.by_enrollment_shop_market).to include family
     end
   end
 
-  context 'send_enrollment_notice_for_ivl ' do 
-    it '.enrollment_notice_for_ivl_families' do 
+  context 'send_enrollment_notice_for_ivl ' do
+    it '.enrollment_notice_for_ivl_families' do
       expect(Family.send_enrollment_notice_for_ivl(created_at)).to include family
     end
   end
@@ -1558,6 +1833,85 @@ describe "terminated_enrollments", dbclean: :after_each do
   it "should include termination and termination pending enrollments only" do
     expect(family.terminated_enrollments.count).to eq 2
     expect(family.terminated_enrollments.map(&:aasm_state)).to eq ["coverage_termination_pending", "coverage_terminated"]
+  end
+end
+
+describe "#currently_enrolled_products", dbclean: :after_each do
+  let!(:person) { FactoryBot.create(:person)}
+  let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
+  let!(:household) { FactoryBot.create(:household, family: family) }
+  let!(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let!(:effective_on) { TimeKeeper.date_of_record.beginning_of_month}
+  let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+
+  let!(:active_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      product: product,
+                      aasm_state: 'coverage_selected',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+  let!(:shopping_enrollment) {
+    FactoryBot.create(:hbx_enrollment,
+                      family: family,
+                      effective_on: effective_on,
+                      household: family.active_household,
+                      coverage_kind: "health",
+                      aasm_state: 'shopping',
+                      hbx_enrollment_members: [hbx_enrollment_member]
+    )}
+
+
+  context "when consumer has active enrollment" do
+    it "should return current active enrolled product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [active_enrollment.product]
+    end
+  end
+
+  context "when consumer has contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 1.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return contionus coverage product" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq [term_enrollment.product]
+    end
+  end
+
+  context "when consumer no contionus coverage" do
+
+    let!(:term_enrollment) {
+      FactoryBot.create(:hbx_enrollment,
+                        family: family,
+                        household: family.active_household,
+                        coverage_kind: "health",
+                        product: product,
+                        terminated_on: effective_on - 2.day,
+                        aasm_state: 'coverage_terminated',
+                        hbx_enrollment_members: [hbx_enrollment_member]
+      )}
+
+    before do
+      active_enrollment.cancel_coverage!
+    end
+
+    it "should return []" do
+      expect(family.currently_enrolled_products(shopping_enrollment)).to eq []
+    end
   end
 end
 

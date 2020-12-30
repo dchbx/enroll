@@ -1,11 +1,15 @@
 require "benefit_markets/engine"
 require 'benefit_markets/business_rules_engine'
-
 require "virtus"
 require "mongoid"
 require "aasm"
 require 'config'
 require "slim"
+require 'dry-types'
+require 'dry-validation'
+require 'dry-struct'
+require 'dry-monads'
+require BenefitMarkets::Engine.root.join('app/domain/benefit_markets/types')
 
 module BenefitMarkets
 

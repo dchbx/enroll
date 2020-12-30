@@ -126,7 +126,7 @@ module Notifier
 
     def date_due
       schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-      merge_model.date_due = schedular.calculate_open_enrollment_date(current_sys_date.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
+      merge_model.date_due = schedular.calculate_open_enrollment_date(false, current_sys_date.next_month.beginning_of_month)[:binder_payment_due_date].strftime("%m/%d/%Y")
     end
   end
 end

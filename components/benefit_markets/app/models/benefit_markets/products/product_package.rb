@@ -9,6 +9,15 @@ module BenefitMarkets
     include Mongoid::Document
     include Mongoid::Timestamps
 
+    # Added this module as a temporary fix for EMPLOYER FLEXIBILITY PROJECT
+    module ContributionModuleAssociation
+      def contribution_model
+        assigned_contribution_model || super
+      end
+    end
+
+    prepend ContributionModuleAssociation
+
     embedded_in :packagable, polymorphic: true
 
     field :application_period,      type: Range
@@ -22,6 +31,12 @@ module BenefitMarkets
                 class_name: "BenefitMarkets::Products::Product"
 
     embeds_one  :contribution_model,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_one  :assigned_contribution_model,
+                class_name: "BenefitMarkets::ContributionModels::ContributionModel"
+
+    embeds_many :contribution_models,
                 class_name: "BenefitMarkets::ContributionModels::ContributionModel"
 
     embeds_one  :pricing_model,
@@ -44,6 +59,17 @@ module BenefitMarkets
         :application_period, :product_kind, :package_kind, :title, :description, :product_multiplicity,
         :contribution_model, :pricing_model
         ]
+    end
+
+    def products=(attributes)
+      attributes.each do |attribute|
+        if attribute.is_a?(Hash)
+          kind = attribute[:kind].to_s.titleize
+          self.products.build(attribute.merge(_type: "BenefitMarkets::Products::#{kind}Products::#{kind}Product"))
+        else
+          self.products.push(attribute)
+        end
+      end
     end
 
     def lowest_cost_product(effective_date)
@@ -114,7 +140,9 @@ module BenefitMarkets
     end
 
     def issuer_profile_products_for(issuer_profile)
-      return @issuer_profile_products if defined?(@issuer_profile_products)
+      return @issuer_profile_products if defined?(@issuer_profile_products) && @profile_hash&.has_value?(issuer_profile.id)
+      @profile_hash = Hash.new
+      @profile_hash["issuer_profile_id"] = issuer_profile.id
       @issuer_profile_products = products.by_issuer_profile(issuer_profile)
     end
 

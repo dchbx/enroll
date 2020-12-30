@@ -5,7 +5,7 @@
 
       <%= f.hidden_field :kind %>
       <%= f.hidden_field :_destroy %>
-      <%= f.email_field :address, placeholder: "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
+      <%= f.email_field :address, placeholder:  kind.eql?('HOME') ? l10n("personal_email_address") : "#{kind.capitalize} Email Address", class: "floatlabel form-control" %>
     </div>
   </div>
 </div>

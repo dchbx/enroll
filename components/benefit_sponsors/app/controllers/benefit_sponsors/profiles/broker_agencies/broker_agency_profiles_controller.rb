@@ -22,7 +22,7 @@ module BenefitSponsors
           "4"     => "employer_profile.aasm_state",
           "5"     => "employer_profile.plan_years.start_on"
         }
-        
+
         def create
           json = request.body.read
           body_json = JSON.parse(json)
@@ -58,7 +58,7 @@ module BenefitSponsors
           if @q.nil?
             @staff = @staff.where(last_name: /^#{page_no}/i)
           else
-            @staff = @staff.where(last_name: /^#{@q}/i)
+            @staff = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
           end
         end
 
@@ -68,7 +68,7 @@ module BenefitSponsors
           find_broker_agency_profile(BSON::ObjectId.from_string(params.permit(:id)[:id]))
           dt_query = extract_datatable_parameters
 
-          query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id)
+          query = BenefitSponsors::Queries::BrokerFamiliesQuery.new(dt_query.search_string, @broker_agency_profile.id, @broker_agency_profile.market_kind)
           @total_records = query.total_count
           @records_filtered = query.filtered_count
           @families = query.filtered_scope.skip(dt_query.skip).limit(dt_query.take).to_a
@@ -181,7 +181,7 @@ module BenefitSponsors
         def find_broker_agency_profile(id = nil)
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
           @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile, :access_to_broker_agency_profile? if @broker_agency_profile
         end
 
         def user_not_authorized(exception)
@@ -198,8 +198,8 @@ module BenefitSponsors
         end
 
         def eligible_brokers
-          Person.where('broker_role.benefit_sponsors_broker_agency_profile_id': {:$exists => true})
-                .where(:'broker_role.aasm_state' => 'active').any_in(:'broker_role.market_kind' => [person_market_kind, 'both'])
+          broker_profile_ids= BenefitSponsors::Organizations::Organization.broker_agency_profiles.approved_broker_agencies.broker_agencies_by_market_kind(['both', person_market_kind]).map(&:broker_agency_profile).pluck(:id)
+          Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id".in => broker_profile_ids, :"broker_role.aasm_state" => "active")
         end
 
         def update_ga_for_employers(broker_agency_profile, old_default_ga=nil)

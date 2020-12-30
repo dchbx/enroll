@@ -71,6 +71,8 @@ module BenefitSponsors
 
       field :size, type: String
 
+      field :doc_identifier, type: String
+
       validates_presence_of :identifier, :title, :creator, :publisher, :type, :format, :source, :language
 
       validates :rights,

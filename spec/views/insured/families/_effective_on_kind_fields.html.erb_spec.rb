@@ -4,7 +4,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
   let(:qlk) {FactoryBot.create(:qualifying_life_event_kind)}
   before :each do
     assign :qle, qlk
-    assign :qle_date, TimeKeeper.date_of_record
+    assign :qle_event_date, TimeKeeper.date_of_record
   end
 
   it "should show hidden field" do
@@ -21,7 +21,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
 
   context "when Had a baby" do
     before :each do
-      assign :qle_date, TimeKeeper.date_of_record
+      assign :qle_event_date, TimeKeeper.date_of_record
       allow(qlk).to receive(:reason).and_return("birth")
       allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event', 'fixed_first_of_next_month'])
       render "insured/families/effective_on_kind_fields"
@@ -39,7 +39,7 @@ RSpec.describe "insured/families/_effective_on_kind_fields.html.erb" do
 
   context "when Adopted a child" do
     before :each do
-      assign :qle_date, TimeKeeper.date_of_record
+      assign :qle_event_date, TimeKeeper.date_of_record
       allow(qlk).to receive(:reason).and_return("adoption")
       allow(qlk).to receive(:effective_on_kinds).and_return(['date_of_event', 'fixed_first_of_next_month'])
       render "insured/families/effective_on_kind_fields"

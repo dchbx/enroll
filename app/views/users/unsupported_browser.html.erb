@@ -1,0 +1,19 @@
+<div class="container" style="margin-top: 5px;">
+  <div class="alert alert-success" role="alert">
+    <h4 class="alert-heading"><strong><%= l10n('browser.support.your_browser_is_not_supported') %></strong></h4>
+    <p>On <%= Date.strptime(Settings.site.block_ie_browser_after.to_s, '%m/%d/%y').strftime('%B %d, %Y') %>
+      , <%= Settings.site.short_name %> <%= l10n('browser.support.support_info') %></p>
+    <br>
+    <ul>
+      <li><a href='https://www.microsoft.com/en-us/edge' target='_blank'>Microsoft Edge</a></li>
+      <li><a href='https://www.google.com/chrome/' target='_blank'>Chrome</a></li>
+      <li><a href='https://www.mozilla.org/en-US/firefox/' target='_blank'>Firefox</a></li>
+      <li><a href='https://www.opera.com/download' target='_blank'>Opera</a></li>
+    </ul>
+    <hr>
+    <p class="mb-0"><strong><%= l10n('browser.support.questions?') %></strong></p>
+    <br>
+    <p><%= l10n('browser.support.call_customer_service_at') %> <%= Settings.contact_center.alt_phone_number %>
+      (TTY: <%= Settings.contact_center.tty_number %> <%= l10n('browser.support.for_disabled_people') %>) <%= l10n('browser.support.available_time') %></p>
+  </div>
+</div>

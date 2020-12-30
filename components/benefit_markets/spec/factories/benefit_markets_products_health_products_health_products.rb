@@ -11,10 +11,13 @@ FactoryBot.define do
     ehb                  { 0.9943 }
     metal_level_kind     { BenefitMarkets::Products::HealthProducts::HealthProduct::METAL_LEVEL_KINDS.sample }
     dc_in_network        { true }
+    nationwide           { true }
+    deductible           { "$500 per person" }
     family_deductible    { "$500 per person | $1000 per group" }
 
     product_package_kinds { [:single_product, :single_issuer, :metal_level] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
+    hios_base_id          { hios_id.split('-')[0] }
 
     service_area { create(:benefit_markets_locations_service_area) }
 
@@ -89,7 +92,7 @@ FactoryBot.define do
     # association :service_area, factory: :benefit_markets_locations_service_area, strategy: :create
 
     after(:build) do |product, evaluator|
-      product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period)
+      product.premium_tables << build_list(:benefit_markets_products_premium_table, 1, effective_period: product.application_period, rating_area: FactoryBot.create(:benefit_markets_locations_rating_area))
     end
 
     factory :active_individual_health_product,       traits: [:ivl_product]

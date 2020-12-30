@@ -301,6 +301,10 @@ module BenefitSponsors
         }
       end
 
+      before do
+        Person.create_indexes
+      end
+
       context "with valid form attributes " do
 
         let!(:broker_search_form) { BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_broker_agency_search params }
@@ -337,6 +341,10 @@ module BenefitSponsors
           filter_criteria: {"q" => general_agency_profile.legal_name},
           is_general_agency_registration_page: "true"
         }
+      end
+
+      before do
+        Person.create_indexes
       end
 
       context "with valid form attributes " do

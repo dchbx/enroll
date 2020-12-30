@@ -1,0 +1,102 @@
+<%if @error_on_save %>
+  <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
+    <%@error_on_save.each do |err|%>
+      <li><%=err[1][0]%></li>
+    <%end%>
+  </div>
+<%end%>
+
+<form id="secure_message_form" onsubmit="return false;" >
+  <div>
+    <div class="bottom-pd">
+      <div class="row no-buffer">
+        <div class="col-md-6 col-md-offset-3 input-no-pd bottom-pd">
+          <h3>New Message</h3>
+          <table class="table table-message-wrapper">
+            <tbody>
+            <tr>
+              <th style="text-transform: capitalize;">Recipient:</th>
+              <td>&nbsp; &nbsp;<b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
+            </tr>
+            <tr>
+              <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+              <td><%= text_field_tag :subject, @subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+              <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true  %></td>
+            </tr>
+            <tr>
+              <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
+              <td><%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+            </tr>
+            </tbody>
+          </table>
+          <% resource = @resource %>
+          <%= hidden_field_tag :resource_id, resource.id %>
+          <%= hidden_field_tag :resource_name, resource.class %>
+          <%= hidden_field_tag :actions_id, @element_to_replace_id %>
+          <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
+          <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal" id="sendSecure" role="dialog">
+    <div class="modal-dialog" style="width: 500px;">
+      <div class="modal-content">
+        <div class="modal-body" style="text-align: center;">
+          <p>Are you sure you want to <b>Send/Upload</b> this message?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmSecureMsg(event); return false;'>Confirm</button>
+          <button type="button" class="btn btn-default pull-left" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+
+<script type="text/javascript">
+
+  $(document).on('click', '#send_secure_message', function(e) {
+
+    var file_value = $('#file')[0].value;
+
+    $(".btn-confirmation").removeAttr('disabled');
+
+    if (file_value != "") {
+      $('#body').attr('required', false)
+    }
+
+    if ( $('#secure_message_form')[0].checkValidity() ) {
+      $('#sendSecure').modal('show')
+    }
+  });
+
+  function confirmSecureMsg(event){
+    $(".btn-confirmation").attr('disabled', 'disabled');
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    $('.modal-backdrop').removeClass('modal-backdrop');
+    $('.modal-open').removeClass('modal-open');
+
+    var formData = new FormData($('#secure_message_form')[0]);
+
+    $.ajax({
+      url: '/exchanges/hbx_profiles/create_send_secure_message.js',
+      type: "POST",
+      data : formData,
+      contentType: false,
+      processData: false,
+    });
+  }
+
+  function closeRow(element) {
+    element.closest('tr').remove();
+  }
+
+</script>

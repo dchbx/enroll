@@ -5,6 +5,7 @@ require "#{Rails.root}/spec/shared_contexts/enrollment.rb"
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe Enrollments::IndividualMarket::FamilyEnrollmentRenewal, type: :model, :dbclean => :after_each do
+    include FloatHelper
 
     let(:current_date) { Date.new(calender_year, 11, 1) }
 
@@ -82,7 +83,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
                         household: family.active_household,
                         coverage_kind: coverage_kind,
                         resident_role_id: family.primary_person.consumer_role.id,
-                        effective_on: Date.new(2019,1,1),
+                        effective_on: Date.new(Date.current.year,1,1),
                         kind: "coverall",
                         product_id: current_cat_product.id,
                         aasm_state: 'coverage_selected')
@@ -107,6 +108,10 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     before do
       TimeKeeper.set_date_of_record_unprotected!(current_date)
+    end
+
+    after :each do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
     describe ".clone_enrollment_members" do
@@ -230,7 +235,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             enrollment_renewal.enrollment = catastrophic_enrollment
             enrollment_renewal.assisted = assisted
             enrollment_renewal.aptc_values = aptc_values
-            enrollment_renewal.renewal_coverage_start = Date.new(2020,1,1)
+            enrollment_renewal.renewal_coverage_start = Date.new(Date.current.year + 1,1,1)
             enrollment_renewal
           end
           let(:child1_dob) { current_date.next_month - 30.years }
@@ -335,7 +340,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           enr.save!
           expect(enr.kind).to eq subject.enrollment.kind
           renewel_enrollment = subject.assisted_enrollment(enr)
-          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).round(2))
+          #BigDecimal needed to round down
+          expect(renewel_enrollment.applied_aptc_amount.to_f).to eq((BigDecimal.new((renewel_enrollment.total_premium * renewel_enrollment.product.ehb).to_s).round(2, BigDecimal::ROUND_DOWN)).round(2))
         end
 
         it "should append APTC values" do

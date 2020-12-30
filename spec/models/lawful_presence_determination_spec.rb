@@ -3,6 +3,11 @@ require 'aasm/rspec'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 describe LawfulPresenceDetermination do
+
+  after :each do
+    DatabaseCleaner.clean
+  end
+
   let(:consumer_role) {
     FactoryBot.create(:consumer_role_object)
   }
@@ -19,7 +24,7 @@ describe LawfulPresenceDetermination do
 
   describe "being given an ssa response which fails" do
     before :each do
-      consumer_role.coverage_purchased!("args")
+      consumer_role.coverage_purchased!
     end
     it "should have the ssa response document" do
       consumer_role.lawful_presence_determination.ssa_responses << EventResponse.new({received_at: Time.now, body: payload})
@@ -44,7 +49,7 @@ describe LawfulPresenceDetermination do
 
   describe "being given an vlp response which fails" do
     before :each do
-      consumer_role.coverage_purchased!("args")
+      consumer_role.coverage_purchased!
     end
     it "should have the vlp response document" do
       consumer_role.lawful_presence_determination.vlp_responses << EventResponse.new({received_at: Time.now, body: payload})

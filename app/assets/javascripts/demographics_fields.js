@@ -176,8 +176,13 @@ function validationForIndianTribeMember() {
     if ($('input[name="person[is_applying_coverage]"]').length > 0 && $('input[name="person[is_applying_coverage]"]').not(":checked").val() == "true"){
       return true;
     }
+
+    if ($('input[name="dependent[is_applying_coverage]"]').length > 0 && $('input[name="dependent[is_applying_coverage]"]').not(":checked").val() == "true"){
+      return true;
+    }
+
     if (!$("input#indian_tribe_member_yes").is(':checked') && !$("input#indian_tribe_member_no").is(':checked')) {
-      alert("Please select the option for 'Are you a member of an American Indian or Alaskan Native tribe?'");
+      alert("Please select the option for 'Is this person a member of an American Indian or Alaska Native Tribe?'");
       e.preventDefault && e.preventDefault();
       return false;
     };
@@ -212,7 +217,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="person[us_citizen]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you a US Citizen or US National?');
+      alert('Please provide an answer for question: Is this person a US Citizen or US National?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -222,7 +227,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('input[name="person[is_incarcerated]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you currently incarcerated?');
+      alert('Please provide an answer for question: Is this person currently incarcerated?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -232,7 +237,7 @@ var PersonValidations = (function(window, undefined) {
       return true;
     }
     if ($('#naturalized_citizen_container').is(':visible') && $('input[name="person[naturalized_citizen]"]').not(":checked").length == 2) {
-      alert('Please provide an answer for question: Are you a naturalized citizen?');
+      alert('Please provide an answer for question: Is this person a naturalized citizen?');
       PersonValidations.restoreRequiredAttributes(e);
     }
   }
@@ -247,7 +252,7 @@ var PersonValidations = (function(window, undefined) {
   function validationForVlpDocuments(e) {
     if ($('#vlp_documents_container').is(':visible')) {
       $('.vlp_doc_area input.doc_fields').each(function() {
-        if ($(this).attr('placeholder') == 'Citizenship Number') {
+        if ($(this).attr('placeholder') == 'Certificate Number') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
@@ -255,7 +260,17 @@ var PersonValidations = (function(window, undefined) {
 
           }
         }
-        if ($(this).attr('placeholder') == 'Alien Number') {
+        if ($('#immigration_doc_type').val() == 'Naturalization Certificate' || $('#immigration_doc_type').val() == 'Certificate of Citizenship') {
+        }
+        else {
+          if ($(this).attr('placeholder') == 'Alien Number') {
+            if ($(this).val().length < 1) {
+              alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
+              PersonValidations.restoreRequiredAttributes(e);
+            } else {}
+          }
+        }
+        if ($(this).attr('placeholder') == 'Document Description') {
           if ($(this).val().length < 1) {
             alert('Please fill in your information for ' + $(this).attr('placeholder') + '.');
             PersonValidations.restoreRequiredAttributes(e);
@@ -273,7 +288,7 @@ var PersonValidations = (function(window, undefined) {
             PersonValidations.restoreRequiredAttributes(e);
           } else {}
         }
-        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
+        if ($('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)' || $('#immigration_doc_type').val() == 'Temporary I-551 Stamp (on passport or I-94)' || $('#immigration_doc_type').val() == 'Other (With Alien Number)' || $('#immigration_doc_type').val() == 'Other (With I-94 Number)') {
 
         } else {
           if ($(this).attr('placeholder') == 'Passport Number') {
@@ -298,6 +313,15 @@ var PersonValidations = (function(window, undefined) {
 //
 //          } else {}
 //        }
+        if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-94 (Arrival/Departure Record) in Unexpired Foreign Passport') {
+          if ($(this).attr('placeholder') == 'Passport Expiration Date') {
+            if ($(this).val().length != 10) {
+             alert('Please fill in your information for ' + $(this).attr('placeholder') + ' with a MM/DD/YYYY format.');
+             PersonValidations.restoreRequiredAttributes(e);
+
+            } else {}
+          }
+        }
         if ($('#immigration_doc_type').val() == 'Unexpired Foreign Passport' || $('#immigration_doc_type').val() == 'I-20 (Certificate of Eligibility for Nonimmigrant (F-1) Student Status)' || $('#immigration_doc_type').val() == 'DS2019 (Certificate of Eligibility for Exchange Visitor (J-1) Status)') {
 
         } else {
@@ -342,6 +366,10 @@ var PersonValidations = (function(window, undefined) {
 })(window);
 
 $(document).on('turbolinks:load', function () {
+  demographicValidations();
+});
+
+function demographicValidations(){
   applyListeners();
   validationForIndianTribeMember();
 
@@ -354,4 +382,4 @@ $(document).on('turbolinks:load', function () {
   });
 
   isApplyingCoverage("person");
-});
+}

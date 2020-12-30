@@ -41,6 +41,11 @@ class GeneralAgencyStaffRole
       transitions from: :active, to: :decertified
     end
 
+    # Attempt to achieve or return to good standing with HBX
+    event :reapply, :after => :record_transition  do
+      transitions from: [:applicant, :decertified, :denied], to: :applicant
+    end
+
     event :general_agency_terminate do
       transitions from: [:active, :general_agency_pending], to: :general_agency_terminated
     end
@@ -80,4 +85,6 @@ class GeneralAgencyStaffRole
     end
   end
 
+  def record_transition
+  end
 end

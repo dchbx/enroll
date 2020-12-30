@@ -3,7 +3,7 @@
     <div class="container">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
         <li role="presentation" id="home-tab" <%= menu_tab_class(active_tab, "home-tab") %>>
-          <%= link_to(main_app.broker_agencies_profile_path(@broker_agency_profile), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
+          <%= link_to(benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile), "aria-expanded" => "true", "aria-controls" => "home", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("home")%></span>
             <span title="Home" aria-hidden="true" class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg"></span>
           <% end %>
@@ -15,7 +15,7 @@
           <% end %>
         </li>
         <li role="presentation" id="families-tab" <%= menu_tab_class(active_tab, "families-tab") %>>
-          <%= link_to(main_app.family_index_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
+          <%= link_to(benefit_sponsors.family_index_profiles_broker_agencies_broker_agency_profiles_path(id: @broker_agency_profile.id ), "aria-expanded" => "true", :remote => true, "aria-controls" => "families", "role" => "tab" ) do  %>
             <span class="hidden-xs"><%= l10n("families")%></span>
             <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Families"></span>
           <% end %>
@@ -36,12 +36,7 @@
           </li>
           -->
         <% end %>
-        <li role="presentation" id="quote-roster-tab" <%= menu_tab_class(active_tab, "quote-roster-tab") %>>
-          <%= link_to main_app.my_quotes_broker_agencies_broker_role_quotes_path(@broker_agency_profile.primary_broker_role), "aria-expanded" => "true",  "role" => "tab", 'data-no-turbolink' => true  do  %>
-            <span class="hidden-xs">Quoting Tool</span>
-            <span class="glyphicon glyphicon-user hidden-md hidden-sm hidden-lg" title="Quoting Tool"></span>
-          <% end %>
-        </li>
+        <%#removing code related to Quoting Tool button in UI as per required in #81780%>
         <!--
         <li role="presentation" id="assign-history-tab" <%= menu_tab_class(active_tab, "assign-history-tab") %>>
          <%= link_to(main_app.assign_history_broker_agencies_profiles_path(id: @id), "aria-expanded" => "true", :remote => true, "aria-controls" => "assign", "role" => "tab" ) do  %>

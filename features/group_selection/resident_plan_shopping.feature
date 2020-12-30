@@ -4,7 +4,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age less than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -17,7 +17,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age less than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -31,7 +31,7 @@ Feature: IVL plan purchase
     Given a Resident exists
     And the Resident is logged in
     And Resident has a dependent in child relationship with age greater than 26
-    When Resident visits home page with qle
+    When Resident has QLE and goes to home page
     And Resident clicked on "Married" qle
     And I select a past qle date
     Then I should see confirmation and continue
@@ -48,18 +48,3 @@ Feature: IVL plan purchase
     When Resident checks the primary person
     And Resident clicked on shop for new plan
     Then Resident should see primary person
-
-  Scenario: IVL plan shopping by clicking on 'make changes' button on enrollment
-    Given a Resident exists
-    And the Resident is logged in
-    And Resident has a dependent in child relationship with age greater than 26
-    And Resident has a dependent in spouse relationship with age greater than 26
-    And Resident also has a health enrollment with primary person covered
-    When Resident visits home page with qle
-    Then Resident should see the enrollment with make changes button
-    When Resident clicked on make changes button
-    Then Resident should see the ineligible family member disabled and unchecked
-    And Resident should see the eligible family member enabled and checked
-    And Resident should also see the reason for ineligibility
-    When Resident clicked on shop for new plan
-    Then Resident should see primary and valid dependent

@@ -6,13 +6,13 @@
     <th class='col-sm-2'></th>
   </tr>
 </thead>
-
 <tbody>
   <% @staff.each do |staff| %>
+    <% organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => staff.broker_role.benefit_sponsors_broker_agency_profile_id).first %>
     <tr class='row'>
       <td class='col-sm-4'><%= staff.first_name + ' ' + staff.last_name %></td>
-      <td class='col-sm-3'><%= BenefitSponsors::Organizations::Organization.where(:"profiles._id" => staff.broker_role.benefit_sponsors_broker_agency_profile_id).first.legal_name %></td>
-      <td class='col-sm-3'><% market_kind = staff.broker_role.market_kind %>
+      <td class='col-sm-3'><%= organization.legal_name %></td>
+      <td class='col-sm-3'><% market_kind = organization.broker_agency_profile.market_kind.to_s %>
         <%= (market_kind.eql? "both") ? "SHOP & Individual" : market_kind.titleize %><%= l10n("market")%></td>
       <td class='col-sm-2'><a href='#' data-broker='<%=staff.broker_role.id%>' class='broker_select_button'><%= l10n("select")%></a></td>
    </tr>

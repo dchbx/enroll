@@ -40,5 +40,5 @@ Feature: Employer Profile
     Then Point of Contact count is 1
     When John adds an EmployerStaffRole to Sarah
     Then Point of Contact count is 2
-    When John removes EmployerStaffRole from John
+    # When John removes EmployerStaffRole from John  #Ticket-85321
     Then John logs out

@@ -30,6 +30,7 @@ module BenefitSponsors
     let(:broker_managenement_form_class) { BenefitSponsors::Organizations::OrganizationForms::BrokerManagementForm }
 
     before :each do
+      Person.create_indexes
       user_with_hbx_staff_role.person.build_hbx_staff_role(hbx_profile_id: organization_with_hbx_profile.hbx_profile.id)
       user_with_hbx_staff_role.person.hbx_staff_role.save!
 

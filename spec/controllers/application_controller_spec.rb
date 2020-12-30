@@ -7,6 +7,21 @@ RSpec.describe ApplicationController do
     end
   end
 
+  context '#set_ie_flash_by_announcement' do
+    let(:ie_user_agent) { 'Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 5.1; Trident/4.0)' }
+    let(:browser) { Browser.new(ie_user_agent) }
+    it 'should not have any flash message set when browser is not ie' do
+      controller.send(:set_ie_flash_by_announcement)
+      expect(flash[:warning]).to eq nil
+    end
+
+    it 'should not have ie flash message set when browser is ie' do
+      allow(controller).to receive(:browser).and_return browser
+      controller.send(:set_ie_flash_by_announcement)
+      expect(flash[:warning]).to eq nil
+    end
+  end
+
   context "when not signed in" do
     context "with default sign in behavior" do
       before do
@@ -63,6 +78,12 @@ RSpec.describe ApplicationController do
 
     it "doesn't set portal in session" do
       expect(session[:portal]).not_to be
+    end
+
+    it "confirms user's last portal's environment before redirecting" do
+      request.session[:portal] = nil
+      allow(@request).to receive(:referrer) {'http://localhost:3000/'}
+      expect(controller.send(:confirm_last_portal, @request, user)).to eq root_path
     end
   end
 

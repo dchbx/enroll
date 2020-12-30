@@ -282,6 +282,13 @@ module BenefitMarkets
       end
     end
 
+    context '#display_carrier_logo' do
+      let!(:legal_name) {'Blue Cross Blue Shield'}
 
+      it 'should display carrier logo' do
+        allow(subject).to receive(:find_carrier_info).and_return(legal_name)
+        expect(subject.display_carrier_logo).to eq "<img src=\"\/assets\/logo\/carrier\/#{legal_name.parameterize.underscore}.jpg\" width=\"50\"/>"
+      end
+    end
   end
 end

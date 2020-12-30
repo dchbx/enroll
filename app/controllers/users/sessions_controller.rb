@@ -3,6 +3,7 @@ class Users::SessionsController < Devise::SessionsController
   include RecaptchaConcern if Settings.aca.recaptcha_enabled
 
   after_action :log_failed_login, :only => :new
+  before_action :set_ie_flash_by_announcement, only: [:new]
 
   def create
     self.resource = warden.authenticate!(auth_options)
@@ -12,6 +13,11 @@ class Users::SessionsController < Devise::SessionsController
     location = after_sign_in_path_for(resource)
     flash[:warning] = current_user.get_announcements_by_roles_and_portal(location) if current_user.present?
     respond_with resource, location: location
+  end
+
+  def destroy
+    current_user.revoke_all_jwts!
+    super
   end
 
   private

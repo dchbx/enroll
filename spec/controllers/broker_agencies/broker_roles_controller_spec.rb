@@ -122,7 +122,7 @@ RSpec.describe BrokerAgencies::BrokerRolesController do
 
       let(:phone_attributes) {
         {
-          kind: "phone main",
+          kind: "work",
           area_code: "202",
           number: "324-2232"
         }

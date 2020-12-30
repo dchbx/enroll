@@ -5,9 +5,17 @@
       <div class="seps-panel panel panel-default">
         <div class="panel-heading" style="margin-bottom: 10px;">
           <div class="row">
-            <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12 info-wrapper">
-              <h4><strong><%= l10n("insured.families.final_sep_experienced_any_events") %></strong></h4>
-            </div>
+            <div class="row">
+            <% if can_show_covid_message_on_sep_carousel?(@person) %>
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 info-wrapper qle-carousel">
+                <h4><strong><%= l10n("insured.families.covid_sep_carousel_message") %></strong></h4>
+              </div>
+            <% else %>
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 info-wrapper qle-carousel">
+                <h4><strong><%= l10n("insured.families.final_sep_experienced_any_events") %></strong></h4>
+              </div>
+            <% end %>
+          </div>
           </div>
           <hr>
         </div>
@@ -19,7 +27,7 @@
             </div>
           </div>
         </div>
-      </div
+      </div>
 
       <%#= form_tag(:insured_plan_shopping) do %>
       <%= hidden_field_tag 'id', @hbx_enrollment_id %>

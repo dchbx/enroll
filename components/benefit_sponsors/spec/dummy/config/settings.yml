@@ -150,6 +150,7 @@ aca:
   recaptcha_enabled: false
   security_questions: false
   user_accounts_enabled: true
+  support_for_ie_browser: false
   plan_options_available: ["single_plan", "single_carrier", "metal_level"]
   dental_plan_options_available: ["multi_product", "single_issuer"]
   default_dental_option_kind: 'multi_product'

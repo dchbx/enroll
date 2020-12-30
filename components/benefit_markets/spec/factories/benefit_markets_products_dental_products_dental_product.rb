@@ -8,6 +8,7 @@ FactoryBot.define do
     sequence(:title)     { |n| "Dental BlueChoice Silver#{n} 2,000" }
     description          { "Highest rated and highest value" }
     premium_ages         { 20..65 }
+    dental_level         { 'high' }
     # health_plan_kind     :pos
     ehb                  { 0.9943 }
     network_information  { 'DC Metro' }
@@ -15,6 +16,8 @@ FactoryBot.define do
 
     product_package_kinds { [:single_product] }
     sequence(:hios_id, (10..99).cycle)  { |n| "41842DC04000#{n}-01" }
+    hios_base_id { hios_id }
+    dental_plan_kind { [:ppo, :hmo, :epo].sample }
 
     service_area { create(:benefit_markets_locations_service_area) }
 

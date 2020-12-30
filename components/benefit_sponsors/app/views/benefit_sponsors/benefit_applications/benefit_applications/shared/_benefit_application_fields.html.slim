@@ -28,7 +28,7 @@ h1.heading-text Add Benefit Package
         = f.text_field :end_on, class: "form-control", required: true, placeholder: 'END ON', readonly: true
 .row.pl-1
   h3.mr-1 Select your open enrollment dates
-  h4.i.fas.fa-question-circle data-toggle='tooltip' title=plan_shop_tool_tip_helper
+  h4.i.fas.fa-question-circle data-toggle='tooltip' title=l10n("employers.plan_years.oe_tool_tip", site_short_name: site_short_name, contact_center_phone_number: contact_center_phone_number)
   .col-md-12.col-sm-12.col-xs-12.p0
     - oe_start_on = f.object.open_enrollment_start_on.present? ? Date.strptime(f.object.open_enrollment_start_on, "%m/%d/%Y") : nil
     - oe_end_on = f.object.open_enrollment_end_on.present? ? Date.strptime(f.object.open_enrollment_end_on, "%m/%d/%Y") : nil
@@ -159,8 +159,11 @@ javascript:
 
   function showDatepicker(id) {
     //selectedDate(document.getElementById("baStartDate"));
+    var date = JSON.parse('#{@benefit_application_form.start_on_options.to_json.html_safe}');
+    var targetDate = document.getElementById("baStartDate").value
     var minDate = document.querySelector("input#benefit_application_open_enrollment_start_on").dataset.dateMin;
-    var maxDate = document.querySelector("input#benefit_application_open_enrollment_end_on").dataset.oeEndDate;
+    var maxDate = getFormattedDate(date[targetDate]["open_enrollment_end_on"]);
+
     if (minDate) {
       initDatepicker(id,new Date(minDate),new Date(maxDate));
     } else {

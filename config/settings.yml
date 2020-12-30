@@ -6,7 +6,7 @@ site:
   home_url: "https://www.dchealthlink.com/"
   home_business_url: "https://www.dchealthlink.com/smallbusiness/overview"
   # copyright_period_start: "2013"
-  # help_url: "https://www.dchealthlink.com/help"
+  help_url: "https://www.dchealthlink.com/help"
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
@@ -56,6 +56,10 @@ site:
   faa_enabled: false # TODO: Remove this after configuring the settings.
   ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
   curam_enabled?: true
+  support_for_ie_browser: true
+  block_ie_browser: false
+  block_ie_browser_after: <%= Date.new(2020,6,1) %>
+  publisher: "dchl"
 
   exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
@@ -176,15 +180,15 @@ aca:
       days: 95
 
     open_enrollment:
-      start_on: <%= Date.new(2019,11,1) %>
-      end_on: <%= Date.new(2020,01,31) %>
+      start_on: <%= Date.new(2020,11,1) %>
+      end_on: <%= Date.new(2021,1,31) %>
     dc_resident_application: true
     transition_family_members_link: true
       # dc_resident_application: true
       # transition_family_members_link: true
     upcoming_open_enrollment:
-      start_on: <%= Date.new(2019,11,1) %>
-      end_on: <%= Date.new(2020,01,31) %>
+      start_on: <%= Date.new(2021,11,1) %>
+      end_on: <%= Date.new(2022,01,31) %>
 
   shop_market:
     valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
@@ -247,6 +251,7 @@ aca:
       non_binder_paid_notice_day_of_month: 16
       earliest_start_prior_to_effective_on:
         months: -3
+        # Will occur the day after the date here
         day_of_month: 0
       appeal_period_after_application_denial:
         days: 30
@@ -260,6 +265,7 @@ aca:
     renewal_application:
       earliest_start_prior_to_effective_on:
         months: -3
+        # Will occur the day after the date here
         day_of_month: 0
       monthly_open_enrollment_end_on: 13
       publish_due_day_of_month: 10
@@ -398,3 +404,8 @@ style:
   primary_icon_color: '#333333'
   qle_header_color: '#333333'
   primary_header_font: "'Open Sans', serif"
+
+external_applications:
+  admin:
+    url: <%= ENV['ANGULAR_ADMIN_APPLICATION_URL'] %>
+    pundit_policy: AngularAdminApplicationPolicy

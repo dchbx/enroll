@@ -2,11 +2,16 @@ module Enrollments
   module Replicator
     class Reinstatement
 
-      attr_accessor :base_enrollment, :new_effective_date
+      attr_accessor :base_enrollment, :new_effective_date, :new_aptc, :year, :duplicate_hbx, :reinstate_enrollment
 
-      def initialize(enrollment, effective_date)
+      def initialize(enrollment, effective_date, new_aptc=nil)
         @base_enrollment = enrollment
         @new_effective_date = effective_date
+        @new_aptc = new_aptc
+        @year = effective_date.year
+        # TODO: dupliate_hbx was in the inherited code but was undefined. Need to know
+        # what it is supposed to be
+        @duplicate_hbx = enrollment.dup
       end
 
       def benefit_application
@@ -92,38 +97,67 @@ module Enrollments
       end
 
       def build
-        family = base_enrollment.family
         reinstated_enrollment = HbxEnrollment.new
-        reinstated_enrollment.family = family
-        reinstated_enrollment.household = family.active_household
-
-
-        reinstated_enrollment.effective_on = new_effective_date
-        reinstated_enrollment.coverage_kind = base_enrollment.coverage_kind
-        reinstated_enrollment.enrollment_kind = base_enrollment.enrollment_kind
-        reinstated_enrollment.kind = base_enrollment.kind
-        reinstated_enrollment.predecessor_enrollment_id = base_enrollment.id
-
+        @reinstate_enrollment = reinstated_enrollment
+        assign_attributes_to_reinstate_enrollment(reinstated_enrollment, common_params)
         if base_enrollment.is_shop?
-          if can_be_reinstated?
-            reinstated_enrollment.employee_role_id = base_enrollment.employee_role_id
-            reinstated_enrollment.benefit_group_assignment_id = reinstatement_benefit_group_assignment
-            reinstated_enrollment.sponsored_benefit_package_id = reinstatement_sponsored_benefit_package.id
-            reinstated_enrollment.sponsored_benefit_id = reinstatement_sponsored_benefit.id
-            reinstated_enrollment.benefit_sponsorship_id = base_enrollment.benefit_sponsorship_id
-            reinstated_enrollment.product_id = reinstatement_plan.id
-            reinstated_enrollment.rating_area_id = reinstate_rating_area
-            reinstated_enrollment.issuer_profile_id = reinstatement_plan.issuer_profile_id
+          assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_shop_params) if can_be_reinstated?
+        elsif base_enrollment.is_ivl_by_kind?
+          assign_attributes_to_reinstate_enrollment(reinstated_enrollment, form_ivl_params)
+          if new_aptc.blank?
+            reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
+            reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
           end
+        end
+        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
+        if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
+          base_enrollment.terminate_coverage!
+          base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
         else
-          reinstated_enrollment.product_id = base_enrollment.product_id
-          reinstated_enrollment.consumer_role_id = base_enrollment.consumer_role_id
-          reinstated_enrollment.elected_aptc_pct = base_enrollment.elected_aptc_pct
-          reinstated_enrollment.applied_aptc_amount = base_enrollment.applied_aptc_amount
+          base_enrollment.cancel_coverage! if base_enrollment.may_cancel_coverage?
         end
 
-        reinstated_enrollment.hbx_enrollment_members = clone_hbx_enrollment_members
+        @reinstate_enrollment = reinstated_enrollment
         reinstated_enrollment
+      end
+
+      def assign_attributes_to_reinstate_enrollment(enrollment, options = {})
+        enrollment.assign_attributes(options)
+      end
+
+      def form_shop_params
+        {
+          employee_role_id: base_enrollment.employee_role_id,
+          benefit_group_assignment_id: reinstatement_benefit_group_assignment,
+          sponsored_benefit_package_id: reinstatement_sponsored_benefit_package.id,
+          sponsored_benefit_id: reinstatement_sponsored_benefit.id,
+          benefit_sponsorship_id: base_enrollment.benefit_sponsorship_id,
+          product_id: reinstatement_plan.id,
+          rating_area_id: reinstate_rating_area,
+          issuer_profile_id: reinstatement_plan.issuer_profile_id
+        }
+      end
+
+      def form_ivl_params
+        # TODO: Query is too long
+        # TODO: undefined local variable or method `year' for #<Enrollments::Replicator::Reinstatement:0x00007fca4bcb2970>
+        {
+          product_id: base_enrollment.product_id,
+          consumer_role_id: base_enrollment.consumer_role_id
+        }
+      end
+
+      def common_params
+        {
+          family: base_enrollment.family,
+          household: base_enrollment.family.active_household,
+          effective_on: new_effective_date,
+          coverage_kind: base_enrollment.coverage_kind,
+          enrollment_kind: base_enrollment.enrollment_kind,
+          kind: base_enrollment.kind,
+          predecessor_enrollment_id: base_enrollment.id,
+          hbx_enrollment_members: clone_hbx_enrollment_members
+        }
       end
 
       def member_coverage_start_date(hbx_enrollment_member)

@@ -2,14 +2,14 @@ require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
-  it { should validate_presence_of :determined_on }
+  it { should validate_presence_of :determined_at }
   it { should validate_presence_of :max_aptc }
   it { should validate_presence_of :csr_percent_as_integer }
 
   let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:household)                     { family.households.first }
   let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
-  let(:determined_on)                 { TimeKeeper.datetime_of_record }
+  let(:determined_at)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }
   let(:csr_eligibility_kind)          { "csr_94" }
@@ -18,16 +18,17 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
 
   let(:max_aptc_default)                { 0.00 }
   let(:csr_percent_as_integer_default)  { 0 }
-  let(:csr_eligibility_kind_default)    { "csr_100" }
+  let(:csr_eligibility_kind_default)    { 'csr_0' }
 
   let(:valid_params){
       {
         tax_household: tax_household,
-        determined_on: determined_on,
+        determined_at: determined_at,
         max_aptc: max_aptc,
         csr_percent_as_integer: csr_percent_as_integer,
         e_pdc_id: e_pdc_id,
         premium_credit_strategy_kind: premium_credit_strategy_kind,
+        source: 'Admin'
       }
     }
 
@@ -46,11 +47,23 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
       end
     end
 
-    context "with no determined on" do
-      let(:params) {valid_params.except(:determined_on)}
+    context "with no determined at" do
+      let(:valid_params){
+        {
+          tax_household: tax_household,
+          determined_at: nil,
+          max_aptc: max_aptc,
+          csr_percent_as_integer: csr_percent_as_integer,
+          e_pdc_id: e_pdc_id,
+          premium_credit_strategy_kind: premium_credit_strategy_kind,
+        }
+      }
+      before :each do
+        allow(tax_household).to receive(:submitted_at).and_return(nil)
+      end
 
       it "should fail validation" do
-        expect(EligibilityDetermination.create(**params).errors[:determined_on].any?).to be_truthy
+        expect(EligibilityDetermination.create(**valid_params).errors[:determined_at].any?).to be_truthy
       end
     end
 
@@ -86,6 +99,37 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
           expect(EligibilityDetermination.find(eligibility_determination.id)).to eq eligibility_determination
         end
       end
+    end
+
+    context 'for csr_eligibility_kind' do
+      shared_examples_for 'ensures csr_eligibility_kind field value' do |csr_percent_as_integer, csr_eligibility_kind|
+        before do
+          @eligibility_determination = EligibilityDetermination.new({csr_percent_as_integer: csr_percent_as_integer})
+        end
+
+        it 'should match with expected csr_eligibility_kind for given csr_percent_as_integer' do
+          expect(@eligibility_determination.csr_eligibility_kind).to eq(csr_eligibility_kind)
+        end
+      end
+
+      context 'a valid csr_percent_as_integer' do
+        it_behaves_like 'ensures csr_eligibility_kind field value', 100, 'csr_100'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 94, 'csr_94'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 87, 'csr_87'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 73, 'csr_73'
+        it_behaves_like 'ensures csr_eligibility_kind field value', 0, 'csr_0'
+        it_behaves_like 'ensures csr_eligibility_kind field value', -1, 'csr_limited'
+      end
+    end
+  end
+
+  context 'SOURCE_KINDS' do
+    it 'should have constant SOURCE_KINDS' do
+      expect(subject.class).to be_const_defined(:SOURCE_KINDS)
+    end
+
+    it 'should have constant SOURCE_KINDS with a specific set of list' do
+      expect(::EligibilityDetermination::SOURCE_KINDS).to eq(['Curam', 'Admin', 'Renewals', 'Faa'])
     end
   end
 end

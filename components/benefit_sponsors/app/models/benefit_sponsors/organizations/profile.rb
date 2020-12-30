@@ -49,6 +49,10 @@ module BenefitSponsors
 
       after_save :publish_profile_event
 
+      def profile_type
+        self._type
+      end
+
       def publish_profile_event
         if primary_office_location && primary_office_location.changed?
           benefit_sponsorships.each do |benefit_sponsorship|

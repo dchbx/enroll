@@ -1,15 +1,15 @@
 Feature: Hbx Admin creates a New Consumer Application for ivl users
 
-Background: Hbx Admin navigates into the new consumer application with paper application option and goes forward till DOCUMENT UPLOAD page
-  Given Hbx Admin exists
-  When Hbx Admin logs on to the Hbx Portal
-  And admin has navigated into the NEW CONSUMER APPLICATION
-  And the Admin is on the Personal Info page for the family
-  And the Admin clicks the Application Type drop down
-  And the Admin selects the Paper application option
-  And all other mandatory fields on the page have been populated
-  When Admin clicks CONTINUE button
-  Then the Admin will be navigated to the DOCUMENT UPLOAD page
+  Background: Hbx Admin navigates into the new consumer application with paper application option and goes forward till DOCUMENT UPLOAD page
+    Given Hbx Admin exists
+    When Hbx Admin logs on to the Hbx Portal
+    And admin has navigated into the NEW CONSUMER APPLICATION
+    And the Admin is on the Personal Info page for the family
+    And the Admin clicks the Application Type drop down
+    And the Admin selects the Paper application option
+    And all other mandatory fields on the page have been populated
+    When Admin clicks CONTINUE button
+    Then the Admin will be navigated to the DOCUMENT UPLOAD page
 
   Scenario: Hbx Admin uploads and verifies application document
     Given Hbx Admin is on ridp document upload page

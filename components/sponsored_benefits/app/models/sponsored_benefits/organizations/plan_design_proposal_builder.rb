@@ -46,8 +46,8 @@ module SponsoredBenefits
       end
 
       def add_benefit_application(new_benefit_application)
-
-        enrollment_timetable = SponsoredBenefits::BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(effective_date)
+        is_renewing =  @plan_design_organization.is_renewing_employer?
+        enrollment_timetable = SponsoredBenefits::BenefitApplications::BenefitApplication.enrollment_timetable_by_effective_date(effective_date, is_renewing)
         @benefit_application = SponsoredBenefits::BenefitApplications::BenefitApplication.new(effective_period: enrollment_timetable[:effective_period], open_enrollment_period:  enrollment_timetable[:open_enrollment_period])
         # fail NotImplementedError, 'abstract'
       end

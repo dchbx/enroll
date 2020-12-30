@@ -2,6 +2,7 @@ Feature: Consumer verification process
 
   Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
+    Given the FAA feature configuration is enabled
     * Individual visits the Insured portal during open enrollment
     * Individual creates HBX account
     * I should see a successful sign up message
@@ -14,6 +15,8 @@ Feature: Consumer verification process
     * Individual click continue button
     * Individual agrees to the privacy agreeement
     * Individual should see identity verification page and clicks on submit
+    * Individual should be on the Help Paying for Coverage page
+    * Individual does not apply for assistance and clicks continue
     * Individual should see the dependents form
     * I click on continue button on household info form
     * I click on continue button on group selection page
@@ -30,7 +33,7 @@ Feature: Consumer verification process
     And consumer has outstanding verification and unverified enrollments
     When the consumer visits verification page
     Then consumer should see Verification Due date label
-    And consumer should see Documents FAQ link
+    And consumer should see Documents We Accept link
     And the consumer should see documents verification page
 
   Scenario: Consumer is fully_verified should see verification types

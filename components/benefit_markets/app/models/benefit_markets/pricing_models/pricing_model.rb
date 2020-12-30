@@ -42,6 +42,26 @@ module BenefitMarkets
         new_pricing_model
       end
 
+      def pricing_units=(params)
+        params.each do |param|
+          if param.is_a?(BenefitMarkets::PricingModels::PricingUnit)
+            pricing_units << param
+          else
+            pricing_units << pricing_unit_class.new(param)
+          end
+        end
+      end
+
+      def pricing_unit_class
+        sub_class =
+          if price_calculator_kind.demodulize.match?(/ListBillPricingCalculator/)
+            "RelationshipPricingUnit"
+          else
+            "TieredPricingUnit"
+          end
+        "::BenefitMarkets::PricingModels::#{sub_class}".constantize
+      end
+
       def find_by_pricing_unit(pricing_unit_id)
         pricing_units.find(pricing_unit_id)
       end

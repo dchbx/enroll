@@ -1,6 +1,6 @@
 <% plan_carrier = Caches::MongoidCache.lookup(BenefitSponsors::Organizations::Organization.issuer_profiles, plan.issuer_profile_id) { plan.issuer_profile } %>
 
-<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= ivl_metal_network(plan) %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
+<div class="module plan-row panel panel-default" data-plan-id="<%= plan.id %>" data-plan-category="<%= plan.product_type ? plan.product_type.downcase : '' %>" data-plan-metal-level="<%= plan.metal_level.downcase %>" data-plan-metal-network="<%= ivl_metal_network(plan) %>" data-plan-metal-premium="<%= plan.total_employee_cost %>" data-plan-metal-ehb-premium="<%= plan.total_ehb_premium %>" data-plan-metal-deductible="<%= plan.deductible == 'Not Applicable' ? '$0' : plan.deductible %>" data-plan-name="<%= plan.name %>" data-plan-carrier="<%= plan_carrier.try(:legal_name) %>" data-plan-hsa-eligibility="<%= ivl_hsa_status(@plan_hsa_status, plan) %>" data-plan-ehb="<%= plan.ehb %>" data-can-use-aptc="<%= plan.can_use_aptc? %>">
   <div class="panel-body">
     <div class="row">
       <% if plan.try(:is_standard_plan) %>
@@ -28,7 +28,11 @@
       </div>
       <div class="col-md-3">
         <div class="price-wrapper pull-right">
-          <h2 class="no-buffer plan-premium"><%= number_to_currency(current_cost(plan.total_employee_cost, plan.ehb, nil, 'shopping', plan.can_use_aptc?)) %></h2>
+          <% if @tax_household.present? && params[:market_kind]=='individual' %>
+            <h2 class="no-buffer plan-premium"><%= number_to_currency(shopping_group_premium(plan.total_employee_cost, plan.total_ehb_premium, plan.can_use_aptc?)) %></h2>
+          <% else %>
+            <h2 class="no-buffer plan-premium"><%= number_to_currency(plan.total_employee_cost) %></h2>
+          <% end %>
           <small>/<%= l10n("month") %></small>
         </div>
       </div>
@@ -86,9 +90,9 @@
         </div>
       </div>
         <div class="col-md-5 col-sm-5 col-xs-5 text-right" style="padding-left: 0;">
-          <% if @tax_household.present? && params[:market_kind]=='individual'%>
+          <% if @tax_household.present? && params[:market_kind]=='individual' && params[:coverage_kind] == 'health' %>
             <% eligibility_kind = @tax_household.valid_csr_kind(@hbx_enrollment) %>
-            <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != "csr_100" && plan.metal_level != "silver" %>
+            <% if (EligibilityDetermination::CSR_KINDS.include? eligibility_kind) && eligibility_kind != 'csr_0' && plan.metal_level != "silver" %>
               <%= link_to l10n("select_plan"), "javascript:void(0)", class: 'btn btn-default btn-right', data: {'toggle': 'modal', 'target': "#csrEligibleReminder-#{plan.id}"} %> &nbsp;
               <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'dn btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
               <%= render partial: "shared/csr_eligible_reminder_modal", locals: { plan: plan } %>
@@ -98,7 +102,7 @@
           <% else %>
             <%= link_to(l10n("select_plan"), "javascript:void(0)", {class: 'btn btn-default btn-right plan-select select', data: {url: thankyou_insured_plan_shopping_path(@hbx_enrollment, plan_id: plan.id, change_plan: @change_plan, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind)}}) %>
           <% end %>
-          <%= link_to l10n("see_details"), summary_products_plans_path({:standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default", :remote => true} %>
+          <%= link_to l10n("see_details"), summary_products_plans_path({plan_id: plan.id, :standard_component_id => plan.hios_id, hbx_enrollment_id: @hbx_enrollment.id, market_kind: @market_kind, coverage_kind: @coverage_kind, enrollment_kind: @enrollment_kind, active_year: plan.try(:active_year)}), {:class => "btn btn-default", :remote => true} %>
         </div>
     </div>
   </div>

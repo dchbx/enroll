@@ -200,6 +200,24 @@ module BenefitSponsors
       end
     end
 
+    describe ".has_employer_staff_role_for_profile??" do
+      context "Staff for Employer profile" do
+
+        it "should return true if employer staff is active to a employer profile" do
+          params = { profile_id: employer_profile.id, profile_type: "employer_profile" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, employer_profile)). to eq true
+        end
+
+        it "should return false if employer staff is not active to a employer profile" do
+          person.employer_staff_roles.first.update_attributes(aasm_state: "is_closed")
+          params = { profile_id: employer_profile.id, profile_type: "employer_profile" }
+          service = subject.new params
+          expect(service.is_staff_for_agency?(user, employer_profile)). to eq false
+        end
+      end
+    end
+
     describe ".is_general_agency_staff_for_employer?" do
 
       let(:plan_design_organization) do
@@ -240,6 +258,19 @@ module BenefitSponsors
       it "should return false if general agency staff is not assigned to a general agency profile" do
         person.general_agency_staff_roles.each{|staff| staff.update_attributes(benefit_sponsors_general_agency_profile_id: nil)}
         expect(service.is_general_agency_staff_for_employer?(user, nil)).to eq false
+      end
+
+      it "should return true if employer staff is active to a employer profile" do
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency" }
+        service = subject.new params
+        expect(service.has_general_agency_staff_role_for_profile?(user, general_agency_profile)). to eq true
+      end
+
+      it "should return false if employer staff is not active to a employer profile" do
+        person.general_agency_staff_roles.first.update_attributes(aasm_state: "general_agency_terminated")
+        params = { profile_id: general_agency_profile.id, profile_type: "general_agency" }
+        service = subject.new params
+        expect(service.has_general_agency_staff_role_for_profile?(user, general_agency_profile)). to eq false
       end
     end
   end

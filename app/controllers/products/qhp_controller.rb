@@ -13,16 +13,17 @@ class Products::QhpController < ApplicationController
     @standard_component_ids = params[:standard_component_ids]
     @hbx_enrollment_id = params[:hbx_enrollment_id]
     @active_year = params[:active_year]
-    if @market_kind == 'employer_sponsored' && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
+    if (@market_kind == 'aca_shop' || @market_kind == 'fehb') && (@coverage_kind == 'health' || @coverage_kind == "dental") # 2016 plans have shop dental plans too.
       sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-      products = @hbx_enrollment.sponsored_benefit.products(@hbx_enrollment.effective_on)
+      effective_on = @hbx_enrollment.sponsored_benefit_package.start_on
+      products = @hbx_enrollment.sponsored_benefit.products(effective_on)
       @member_groups = sponsored_cost_calculator.groups_for_products(products)
       employee_cost_hash = {}
       @member_groups.each do |member_group|
         employee_cost_hash[member_group.group_enrollment.product.hios_id] = (member_group.group_enrollment.product_cost_total.to_f - member_group.group_enrollment.sponsor_contribution_total.to_f).round(2)
       end
       @qhps = find_qhp_cost_share_variances.each do |qhp|
-        qhp[:total_employee_cost] = employee_cost_hash[qhp.product.hios_id]
+        qhp[:total_employee_cost] = employee_cost_hash[qhp.product_for(@market_kind).hios_id]
       end
     else
       tax_household = get_shopping_tax_household_from_person(current_user.person, @hbx_enrollment.effective_on.year)
@@ -31,7 +32,7 @@ class Products::QhpController < ApplicationController
 
       @qhps = @qhps.each do |qhp|
         qhp.hios_plan_and_variant_id = qhp.hios_plan_and_variant_id[0..13] if @coverage_kind == "dental"
-        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.product, @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
+        qhp[:total_employee_cost] = UnassistedPlanCostDecorator.new(qhp.product_for(@market_kind), @hbx_enrollment, session[:elected_aptc], tax_household).total_employee_cost
       end
     end
 
@@ -54,10 +55,15 @@ class Products::QhpController < ApplicationController
 
     if @hbx_enrollment.is_shop?
       sponsored_cost_calculator = HbxEnrollmentSponsoredCostCalculator.new(@hbx_enrollment)
-      @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product]).first
+      @member_group = sponsored_cost_calculator.groups_for_products([@qhp.product_for(@market_kind)]).first
     else
       @hbx_enrollment.reset_dates_on_previously_covered_members(@qhp.product)
       @member_group = @hbx_enrollment.build_plan_premium(qhp_plan: @qhp.product)
+    end
+
+    if params[:plan_id].present?
+      plan = BenefitMarkets::Products::Product.find(params[:plan_id])
+      @plan ||= UnassistedPlanCostDecorator.new(plan, @hbx_enrollment)
     end
 
     respond_to do |format|
@@ -84,7 +90,14 @@ class Products::QhpController < ApplicationController
       return
     end
     @enrollment_kind = (params[:enrollment_kind] == "sep" || @hbx_enrollment.enrollment_kind == "special_enrollment") ? "sep" : ''
-    @market_kind = (params[:market_kind] == "shop" || @hbx_enrollment.is_shop?) ? "employer_sponsored" : "individual"
+    @market_kind = if params[:market_kind] == "fehb"
+                     "fehb"
+                   elsif params[:market_kind] == "shop" || @hbx_enrollment.is_shop?
+                     "aca_shop"
+                   else
+                     "aca_individual"
+                   end
+
     @coverage_kind = if @hbx_enrollment.product.present?
       @hbx_enrollment.product.kind.to_s
     else

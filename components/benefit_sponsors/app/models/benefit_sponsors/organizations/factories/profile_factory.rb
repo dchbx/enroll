@@ -3,6 +3,7 @@ module BenefitSponsors
   module Organizations
     module Factories
       class ProfileFactory
+        include BenefitSponsors::RegistrationHelper
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
@@ -29,11 +30,19 @@ module BenefitSponsors
           factory_obj.update_representative(attributes[:staff_roles_attributes][0]) if attributes[:staff_roles_attributes].present?
           updated = if organization.valid?
             organization.save!
+            update_plan_design_organization(organization)
           else
             factory_obj.errors.add(:organization, organization.errors.full_messages)
             false
           end
           return factory_obj
+        end
+
+        def self.update_plan_design_organization(organization)
+          return unless is_employer_profile?
+          plan_design_organization = ::SponsoredBenefits::Organizations::PlanDesignOrganization.where(sponsor_profile_id: organization.employer_profile.id, has_active_broker_relationship: true).first
+          return if plan_design_organization.blank?
+          plan_design_organization.update_attributes!(legal_name: organization.legal_name, dba: organization.dba)
         end
 
         def update_representative(attributes)
@@ -219,7 +228,7 @@ module BenefitSponsors
           if matched_people.count == 1
             mp = matched_people.first
             if is_employer_profile? && mp.user.present?
-              if mp.user.id.to_s != current_user.id
+              if mp.user.id.to_s != current_user.id.to_s
                 errors.add(:staff_role, "a person matching the provided personal information has already been claimed by another user.  Please contact HBX.")
                 return false
               end
@@ -553,7 +562,7 @@ module BenefitSponsors
         def npn_already_taken?(npn)
           if is_broker_profile?
             if Person.where("broker_role.npn" => npn).any?
-              errors.add(:organization, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
+              errors.add(:organization, l10n("broker_agencies.profiles.npn_taken_error"))
               return true
             end
           end

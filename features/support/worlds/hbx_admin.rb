@@ -16,7 +16,7 @@ module HbxAdminWorld
     @u1 = User.create( email: 'hbx_admin_role@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: 'hbx_admin_role@dc.gov', roles: ["hbx_staff"])
     hbx_profile_id = FactoryBot.create(:hbx_profile).id
     p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: @u1)
-    permission_hbx_staff = FactoryBot.create(:permission, :hbx_staff)
+    permission_hbx_staff = FactoryBot.create(:permission, subrole.to_sym)
     HbxStaffRole.create!( person: p1, permission_id: permission_hbx_staff.id, subrole: subrole, hbx_profile_id: hbx_profile_id)
   end
 end
@@ -32,6 +32,10 @@ end
 
 Given(/^a Hbx admin with hbx_staff role exists$/) do
   hbx_admin_with_subrole 'hbx_staff'
+end
+
+Given(/^a Hbx admin with hbx_tier3 role exists$/) do
+  hbx_admin_with_subrole 'hbx_tier3'
 end
 
 Given(/^a Hbx admin with hbx_read_only role exists$/) do

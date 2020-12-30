@@ -91,6 +91,22 @@ describe Factories::EnrollmentFactory, :dbclean => :after_each do
           expect(census_employee.employee_role).to be_nil
         end
       end
+
+      context 'should build_employee_role with active dependents' do
+        let(:family)  {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: existing_person)}
+        let(:dependent2) {family.family_members.last}
+
+        before do
+          allow(existing_person).to receive("primary_family").and_return(family)
+          allow(existing_person).to receive(:families).and_return([family])
+          dependent2.update_attributes!(is_active: false)
+          Factories::EnrollmentFactory.build_employee_role(existing_person, nil, employer_profile,census_employee, hired_on)
+        end
+
+        it 'should not turn a non_active dependent to active' do
+          expect(dependent2.is_active?).to eq false
+        end
+      end
     end
 
     describe "add consumer role to existing employee role" do

@@ -1,0 +1,13 @@
+<div class="alert alert-error">
+  <a class='close' data-dismiss='alert'>x</a>
+  <h4>
+    <%= "Correct the following to add this family member:" %>
+  </h4>
+  <ul>
+    <% address_errors.each do |errors| %>
+      <% errors.each do |key, value| %>
+        <li> <%= value.first %> </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

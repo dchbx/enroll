@@ -1,0 +1,34 @@
+- if assistance_tax_household_member.eligibility_determination_id == assistance_tax_household._id
+  %assistance_tax_household_member
+    %individual
+      = render :partial => 'financial_assistance/events/individuals/individual', :object => assistance_tax_household_member, as: :individual, :locals=> {family_id: financial_assistance_application.family_id.to_s}
+      %is_primary_applicant= assistance_tax_household_member.is_primary_applicant
+      %is_consent_applicant= assistance_tax_household_member.is_consent_applicant
+      %is_coverage_applicant= assistance_tax_household_member.is_applying_coverage
+      - if assistance_tax_household_member.is_without_assistance.present?
+        %is_without_assistance= assistance_tax_household_member.is_without_assistance
+      - if assistance_tax_household_member.is_ia_eligible.present?
+        %is_insurance_assistance_eligible= assistance_tax_household_member.is_ia_eligible?
+      - if assistance_tax_household_member.is_medicaid_chip_eligible.present?
+        %is_medicaid_chip_eligible= assistance_tax_household_member.is_medicaid_chip_eligible?
+      - if assistance_tax_household_member.is_non_magi_medicaid_eligible.present?
+        %is_non_magi_medicaid_eligible= assistance_tax_household_member.is_non_magi_medicaid_eligible
+      - if assistance_tax_household_member.is_totally_ineligible.present?
+        %is_totally_ineligible= assistance_tax_household_member.is_totally_ineligible
+        - unless assistance_tax_household_member.is_disabled.blank? && assistance_tax_household_member.is_tobacco_user.blank?
+          %person_health
+          - unless assistance_tax_household_member.is_tobacco_user.blank?
+            %is_tobacco_user= assistance_tax_household_member.is_tobacco_user
+    %citizen_status= assistance_tax_household_member.citizen_status
+    - unless assistance_tax_household_member.citizen_status == 'us_citizen'
+      = render :partial => 'financial_assistance/events/lawful_presence/immigration_information', :object => assistance_tax_household_member, as: :applicant
+    = render :partial => 'financial_assistance/events/applicant_information', :object => assistance_tax_household_member, as: :applicant
+    %incomes
+      - if assistance_tax_household_member.incomes.size > 0
+        = render :partial => 'financial_assistance/events/income', :collection => assistance_tax_household_member.incomes, as: :income
+    %deductions
+      - if assistance_tax_household_member.deductions.size > 0
+        = render :partial => 'financial_assistance/events/deduction', :collection => assistance_tax_household_member.deductions, as: :deduction
+    %benefits
+      - if assistance_tax_household_member.benefits.size > 0
+        = render :partial => 'financial_assistance/events/benefit', :collection => assistance_tax_household_member.benefits, as: :benefit

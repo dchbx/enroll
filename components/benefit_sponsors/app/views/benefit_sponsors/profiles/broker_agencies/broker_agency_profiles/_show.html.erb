@@ -24,6 +24,6 @@
 
   <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_contacts", broker_agency_contacts: @broker_agency_profile.broker_agency_contacts %>
   <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/office_locations", office_locations: @broker_agency_profile.office_locations %>
-  <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_staff_table", broker_staff: Person.staff_for_broker_including_pending(@broker_agency_profile) %>
-  
+  <%= render "benefit_sponsors/profiles/broker_agencies/broker_agency_profiles/broker_agency_staff_table", broker_staff: Person.staff_for_broker_including_pending(@broker_agency_profile).to_a %>
+
 </div>

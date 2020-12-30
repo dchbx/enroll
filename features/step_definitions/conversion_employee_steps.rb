@@ -284,6 +284,15 @@ When(/Employee select a past qle date/) do
   end
 end
 
+When(/Employee select a current qle date/) do
+  expect(page).to have_content "Married"
+  screenshot("past_qle_date")
+  fill_in "qle_date", :with => TimeKeeper.date_of_record.strftime("%m/%d/%Y")
+  within '#qle-date-chose' do
+    find('.interaction-click-control-continue').click
+  end
+end
+
 When(/Employee select a qle date based on expired plan year/) do
   screenshot("past_qle_date")
   fill_in "qle_date", :with => (renewal_effective_date - 20.days).strftime("%m/%d/%Y")
@@ -299,6 +308,6 @@ Then(/Employee should see confirmation and clicks continue/) do
 end
 
 Then(/Employee should see family members page and clicks continue/) do
-  expect(page).to have_content "Household Info: Family Members"
+  expect(page).to have_content "#{l10n('family_information')}"
   find('#dependent_buttons .interaction-click-control-continue', :wait => 5).click
 end

@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 (x64) (http://www.altova.com) by Dan Thomas (Private) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified">
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:element name="enrollees">
+		<xs:annotation>
+			<xs:documentation>Collection of policy enrollee member instances</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="enrollee" type="IdentifierSimpleType" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="GeneralAgencyLinkType">
+		<xs:annotation>
+			<xs:documentation>Reference to a General Agency instance</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType">
+				<xs:annotation>
+					<xs:documentation>General Agency NPN and HBX-assigned IDs when known</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Organization formal name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dba" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Doing Business As in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name as presesnted in UI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="npn" type="NpnIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>General Agency's National Producer Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fein" type="FederalTaxIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Federal Employer Identifier Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BrokerLinkType">
+		<xs:annotation>
+			<xs:documentation>Reference to a Broker instance</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType">
+				<xs:annotation>
+					<xs:documentation>Broker NPN and HBX-assigned IDs when known</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Organization formal name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="dba" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Doing Business As in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name as presesnted in UI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="website" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="tpa" type="TpaType" minOccurs="0"/>
+			<xs:element name="is_active" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="CarrierLinkType">
+		<xs:annotation>
+			<xs:documentation>Reference to a Carrier instance</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="name" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Organization formal name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name as presesnted in UI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="is_active" type="xs:boolean" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Indicator that organization  is operative on the HBX</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EmployerLinkType">
+		<xs:annotation>
+			<xs:documentation>Reference to an Employer instance </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="name" type="nonEmptyString"/>
+			<xs:element name="dba" minOccurs="0"/>
+			<xs:element name="fein" type="FederalTaxIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Federal Employer Identifier Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+      <xs:element ref="contacts" minOccurs="0"/>
+      <xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+    </xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EnrolleeBenefitType">
+		<xs:sequence>
+			<xs:element name="premium_amount" type="CurrencyType">
+				<xs:annotation>
+					<xs:documentation>Represents the amount of the total premium allocated to a member.  In the case of a composite rated enrollment, this value should be ignored and not encoded in interchange formats such as EDI X12.  In those cases this will carry a default value of 0.00.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="eligibility_begin_date" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="begin_date" type="SimpleDateType"/>
+			<xs:element name="end_date" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="carrier_assigned_policy_id" type="xs:string" minOccurs="0"/>
+			<xs:element name="carrier_assigned_enrollee_id" type="xs:string" minOccurs="0"/>
+			<xs:element name="coverage_level" type="CoverageLevelNameType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="EnrolleeLinkType">
+		<xs:sequence>
+			<xs:element name="individual" type="IndividualLinkType"/>
+			<xs:element name="employment_status" type="EmploymentStatusNameType"/>
+			<xs:element name="is_physically_disabled" type="xs:boolean" default="false"/>
+			<xs:element name="benefit" type="EnrolleeBenefitType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="IndividualLinkType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="person" type="PersonType"/>
+			<xs:group ref="ResourceTimestampGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:group name="PlanCommonElementsGroup">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType">
+				<xs:annotation>
+					<xs:documentation>Include HIOS Plan ID and HBX-assigned ID when known</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="name" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Display name for plan in free form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="active_year" type="PlanActiveYearType"/>
+			<xs:element name="is_dental_only" type="xs:boolean"/>
+			<xs:element name="carrier" type="CarrierLinkType"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:complexType name="PlanLinkType">
+		<xs:sequence>
+			<xs:group ref="PlanCommonElementsGroup"/>
+			<xs:element name="metal_level" type="PlanMetalLevelNameType"/>
+			<xs:element name="coverage_type" type="QhpBenefitCoverageNameType"/>
+			<xs:element name="ehb_percent" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Essential Health Benefit factor</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="PolicyLinkType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element ref="enrollees"/>
+			<xs:element name="plan" type="PlanLinkType"/>
+			<xs:element name="market" type="AcaMarketPlaceNameType"/>
+			<xs:element name="coverage_period" type="DateRangeType"/>
+			<xs:element name="policy_state" type="PolicyStateNameType"/>
+			<xs:element name="is_active" type="xs:boolean"/>
+			<xs:group ref="ResourceTimestampGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="CoverageLevelNameType">
+		<xs:annotation>
+			<xs:documentation>Enumerated list of household member types included under a policy</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:coverage_level#individual"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:coverage_level#family"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:coverage_level#employee_only"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:coverage_level#employee_and_spouse"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EmploymentStatusNameType">
+		<xs:annotation>
+			<xs:documentation>A subscriber's employment status at time of enrollment</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#active"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#full_time"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#part_time"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#terminated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#leave_of_absence"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:employment_status#retired"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PolicyStateNameType">
+		<xs:annotation>
+			<xs:documentation>Enumerated list of the possible modes or status of a policy </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:anyURI">
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#quote">
+				<xs:annotation>
+					<xs:documentation>Use for plan renewals, non-binding quotes</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#submitted"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#resubmitted"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#effectuated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#carrier_rejected"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#carrier_canceled"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#carrier_terminated"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#hbx_invalid"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#hbx_rejected"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#hbx_canceled"/>
+			<xs:enumeration value="urn:openhbx:terms:v1:policy_state#hbx_terminated"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="BrokerAgencyLinkType">
+		<xs:annotation>
+			<xs:documentation>An organization specializing in advice about and sale of insurance products to businesses and consumers</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="name" type="nonEmptyString">
+				<xs:annotation>
+					<xs:documentation>Organization formal name in free-form text</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="display_name" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Organization name as presesnted in UI</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fein" type="FederalTaxIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Federal Employer Identifier Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="npn" type="NpnIdType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Broker's National Producer Number</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="office_locations" type="OfficeLocationListType" minOccurs="0"/>
+			<xs:group ref="ResourceTimestampGroup" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="BenefitGroupLinkType">
+		<xs:annotation>
+			<xs:documentation>A reference to a named benefit group.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="name" type="xs:string"/>
+			<xs:element name="employer" type="EmployerLinkType" />
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

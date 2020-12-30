@@ -29,7 +29,7 @@ class ReportForBadEligibileFamilies < MongoidMigrationTask
           eligibility_determination = tax_household.latest_eligibility_determination
           members = tax_household.tax_household_members
           #If TaxHousehold is APTC eligible and none of the tax_household_members are IA eligible
-          if (eligibility_determination.max_aptc.to_f > 0.0 || eligibility_determination.csr_eligibility_kind != "csr_100")
+          if eligibility_determination.max_aptc.to_f > 0.0 || eligibility_determination.csr_eligibility_kind != 'csr_0'
             if !members.map(&:is_ia_eligible).include?(true)
               members.each do |tax_household_member|
                 csv << [

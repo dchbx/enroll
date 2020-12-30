@@ -7,7 +7,7 @@
       <div class="col-lg-9 col-md-9 col-sm-10 col-xs-12">
         <div class="col-md-12 col-sm-12 no-pd col-xs-12" id="confirm_plan">
           <h1 class="darkblue"><%= l10n('confirm_your_plan_selection') %></h1>
-          <h4>Please review your current plan selection. Select PREVIOUS if you want to change your plan selection. When you're satisfied with your plan, carefully review and acknowledge the Agreement below along with the Terms and Conditions. You must also provide an electronic signature at the bottom of the page. When you're finished, select CONFIRM to submit your enrollment to your insurance company. You don't have to pay today.</h4>
+          <h4><%= l10n('insured.plan_shoppings.thankyou.confirm_your_plan_selection.content') %></h4>
           <% if @enrollment.employee_role.present? %>
           <% else %>
             <h4><strong><%= l10n("important") %>:</strong> <%= l10n("insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll") %></h4>

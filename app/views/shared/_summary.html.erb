@@ -128,7 +128,7 @@
 </div>
 <div class="col-md-6 col-sm-6 col-xs-12" style="display: none;">
 <div class="row">
-  <% if @market_kind == "employer_sponsored" && @coverage_kind == 'health' %>
+  <% if (@market_kind == "aca_shop" || @market_kind == "fehb") && @coverage_kind == 'health' %>
   <div class="col-md-4 col-sm-4 col-xs-12">
     <h3><%= number_to_currency(@plan.total_premium) %></h3>
     <small>Premium</small>

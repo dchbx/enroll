@@ -6,7 +6,7 @@ end
 
 describe FakesController do
   let(:consumer_role) { FactoryBot.build(:consumer_role) }
-  let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016" }}}, naturalized_citizen: false, eligible_immigration_status: false } }
+  let(:params) { { consumer_role: { vlp_documents_attributes: { "0" => { expiration_date: "06/23/2016", 'sevis_id' => '' }}}, naturalized_citizen: false, eligible_immigration_status: false } }
   let(:person_params) { ActionController::Parameters.new({person: params }) }
   let(:dependent_params) { ActionController::Parameters.new({dependent: params }) }
 
@@ -22,6 +22,16 @@ describe FakesController do
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(String)
         expect(subject.update_vlp_documents(consumer_role, person_kind))
         expect(subject.params[person_kind][:consumer_role][:vlp_documents_attributes]["0"][:expiration_date]).to be_a(DateTime)
+      end
+
+      context 'active_vlp_document_id' do
+        before :each do
+          subject.update_vlp_documents(consumer_role, person_kind)
+        end
+
+        it 'should return a value which is a bson object' do
+          expect(consumer_role.active_vlp_document_id).to be_a BSON::ObjectId
+        end
       end
     end
 
@@ -41,6 +51,7 @@ describe FakesController do
           consumer_role.vlp_documents = []
           consumer_role.vlp_documents << FactoryBot.build(:vlp_document, :subject => doc_subject)
           consumer_role.citizen_status = citizen_status
+          consumer_role.active_vlp_document_id = consumer_role.vlp_documents.first.id
         end
         it "returns nil if no consumer role" do
           expect(subject.get_vlp_doc_subject_by_consumer_role(nil)).to be_nil
@@ -60,14 +71,32 @@ describe FakesController do
     VlpDocument::VLP_DOCUMENT_KINDS.each do |document|
       it_behaves_like "returns vlp document subject", document, "eligible_immigration_status"
     end
+
+    context 'get_vlp_doc_subject_by_consumer_role' do
+      before :each do
+        vlp_doc1 = FactoryBot.build(:vlp_document, updated_at: TimeKeeper.date_of_record)
+        vlp_doc2 = FactoryBot.build(:vlp_document, :subject => 'I-551 (Permanent Resident Card)', updated_at: (TimeKeeper.date_of_record + 1.day))
+        consumer_role.vlp_documents = [vlp_doc1, vlp_doc2]
+        consumer_role.save!
+        consumer_role.update_attributes!(active_vlp_document_id: consumer_role.vlp_documents.first.id)
+      end
+
+      it 'should return vlp document which is active and not the one which has the latest updated at' do
+        expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).to eq 'I-327 (Reentry Permit)'
+      end
+
+      it 'should not return vlp document which has the latest updated at' do
+        expect(subject.get_vlp_doc_subject_by_consumer_role(consumer_role)).not_to eq consumer_role.vlp_documents.order_by(:updated_at => 'desc').first.subject
+      end
+    end
   end
 
   context "#sensitive_info_changed?" do
 
-    let(:person_params) { { person:  { no_dc_address: "true" } } }
+    let(:person_params) { { person:  { is_homeless: "true" } } }
     let(:params) { ActionController::Parameters.new(person_params)}
 
-    let(:person) { FactoryBot.create(:person, :with_consumer_role, :no_dc_address => false)}
+    let(:person) { FactoryBot.create(:person, :with_consumer_role, :is_homeless => false)}
 
     before do
       allow(subject).to receive(:params).and_return params
@@ -88,8 +117,210 @@ describe FakesController do
     end
 
     it "should return true as dc_status if the past addreess is in non-dc" do
-      person.update_attributes(no_dc_address: true)
+      person.update_attributes(is_homeless: true)
       expect(subject.sensitive_info_changed?(person.consumer_role)[1]).to eq true
+    end
+  end
+
+  context '#validate_vlp_params' do
+    context 'for primary' do
+      let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+
+      context 'invalid case' do
+        let(:invalid_params) do
+          {
+            'person' => {
+              "naturalized_citizen" => 'true',
+              'consumer_role' => {
+                'vlp_documents_attributes' => {
+                  '0' => {
+                    'subject' => 'Other (With Alien Number)',
+                    'alien_number' => '123456789',
+                    'passport_number' => 'Jsdhf73',
+                    'sevis_id' => '1234567891',
+                    'expiration_date' => '02/29/2020',
+                    'country_of_citizenship' => 'Algeria',
+                    'card_number' => ''
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(invalid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+        end
+
+        it 'should add errors to the object if params are invalid' do
+          expect(person.errors.full_messages).to eq(['Please fill in your information for Document Description.'])
+        end
+      end
+
+      context 'valid case' do
+        let(:valid_params) do
+          {
+            'person' => {
+
+              'consumer_role' => {
+                'vlp_documents_attributes' => {
+                  '0' => {
+                    'subject' => 'Other (With Alien Number)',
+                    'alien_number' => '123456789',
+                    'passport_number' => 'Jsdhf73',
+                    'sevis_id' => '1234567891',
+                    'expiration_date' => '02/29/2020',
+                    'country_of_citizenship' => 'Algeria',
+                    'description' => 'Some type of document',
+                    'card_number' => ''
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(valid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'person', person.consumer_role, nil)
+        end
+
+        it 'should not add any errors to the object if params are valid' do
+          expect(person.errors.full_messages).to be_empty
+        end
+      end
+
+      context "already verified case" do
+        context "naturalized citizen" do
+          let(:naturalized_params) do
+            {
+              'person' => {
+                'naturalized_citizen' => "true",
+                'consumer_role' => {
+                  'vlp_documents_attributes' => {
+                    '0' => {
+                      'subject' => 'Other (With Alien Number)',
+                      'alien_number' => '123456789',
+                      'passport_number' => 'Jsdhf73',
+                      'sevis_id' => '1234567891',
+                      'expiration_date' => '02/29/2020',
+                      'country_of_citizenship' => 'Algeria',
+                      'description' => 'Some type of document',
+                      'card_number' => ''
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let(:params) { ActionController::Parameters.new(naturalized_params)}
+          it "should return true" do
+            expect(subject.validate_vlp_params(params, 'person', double, double)).to eq(true)
+          end
+        end
+
+        context "eligible immigration status" do
+          let(:eligible_immigration_params) do
+            {
+              'person' => {
+                'eligible_immigration_status' => "true",
+                'consumer_role' => {
+                  'vlp_documents_attributes' => {
+                    '0' => {
+                      'subject' => 'Other (With Alien Number)',
+                      'alien_number' => '123456789',
+                      'passport_number' => 'Jsdhf73',
+                      'sevis_id' => '1234567891',
+                      'expiration_date' => '02/29/2020',
+                      'country_of_citizenship' => 'Algeria',
+                      'description' => 'Some type of document',
+                      'card_number' => ''
+                    }
+                  }
+                }
+              }
+            }
+          end
+
+          let(:params) { ActionController::Parameters.new(eligible_immigration_params)}
+          it "should return true" do
+            expect(subject.validate_vlp_params(params, 'person', double, double)).to eq(true)
+
+          end
+        end
+      end
+    end
+
+    context 'for dependent' do
+      let(:dependent) { ::Forms::FamilyMember.new }
+
+      context 'invalid case' do
+        let(:invalid_params) do
+          {
+            'dependent' => {
+              'naturalized_citizen' => 'true',
+              'consumer_role' => {
+                'vlp_documents_attributes' => {
+                  '0' => {
+                    'subject' => 'Other (With Alien Number)',
+                    'alien_number' => '123456789',
+                    'passport_number' => 'Jsdhf73',
+                    'sevis_id' => '1234567891',
+                    'expiration_date' => '02/29/2020',
+                    'country_of_citizenship' => 'Algeria'
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(invalid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'dependent', nil, dependent)
+        end
+
+        it 'should add errors to the object if params are invalid' do
+          expect(dependent.errors.full_messages).to eq(['Please fill in your information for Document Description.'])
+        end
+      end
+
+      context 'valid case' do
+        let(:valid_params) do
+          {
+            'dependent' => {
+              'consumer_role' => {
+                'vlp_documents_attributes' => {
+                  '0' => {
+                    'subject' => 'Other (With Alien Number)',
+                    'alien_number' => '123456789',
+                    'passport_number' => 'Jsdhf73',
+                    'sevis_id' => '1234567891',
+                    'expiration_date' => '02/29/2020',
+                    'country_of_citizenship' => 'Algeria',
+                    'description' => 'Some type of document'
+                  }
+                }
+              }
+            }
+          }
+        end
+
+        let(:params) { ActionController::Parameters.new(valid_params)}
+
+        before do
+          subject.validate_vlp_params(params, 'dependent', nil, dependent)
+        end
+
+        it 'should not add any errors to the object if params are valid' do
+          expect(dependent.errors.full_messages).to be_empty
+        end
+      end
     end
   end
 end

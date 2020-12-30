@@ -13,12 +13,12 @@ And(/^the Admin is on the Personal Info page for the family$/) do
   find(:xpath, '//label[@for="radio_male"]', wait: 10).click
   find('.btn', text: 'CONTINUE', wait: 10).click
 
-  expect(page).to have_content('Thank you. Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Please select CONTINUE.')
+  expect(page).to have_content('Next, we need to verify if you or you and your family are eligible to enroll in coverage through DC Health Link. Select CONTINUE.')
   find('.interaction-click-control-continue', wait: 10).click
 end
 
 And(/^the Admin clicks the Application Type drop down$/) do
-	find(:xpath, "//*[@id='new_person_wrapper']/div/div[1]/div[1]/div[2]/div/div[2]", wait: 10).click
+  find('span.label', text: 'choose *', wait: 10).click
 end
 
 And(/^the Admin selects the Phone application option$/) do
@@ -86,5 +86,5 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an application$/)
 end
 
 Then(/^the Admin can navigate to the next page and finish the application$/) do
-  expect(page).to have_content('Household Info: Family Members')
+  expect(page).to have_content("#{l10n('family_information')}")
 end

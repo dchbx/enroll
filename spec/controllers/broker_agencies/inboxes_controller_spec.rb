@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean: :after_each do
-  let(:hbx_profile) { double(id: double("hbx_profile_id"))}
+  let(:hbx_profile) { FactoryBot.create(:benefit_sponsors_organizations_hbx_profile)}
   let(:user) { double("user") }
   let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
   let(:benefit_sponsor)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
@@ -16,7 +16,6 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
       sign_in user
       allow(Person).to receive(:find).and_return(inbox_provider)
       allow(BrokerAgencyProfile).to receive(:where).and_return(inbox_provider)
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(user).to receive(:person).and_return(person)
       allow(person).to receive(:_id).and_return('xxx')
     end
@@ -38,7 +37,7 @@ RSpec.describe BrokerAgencies::InboxesController, :type => :controller, dbclean:
       sign_in(user)
       allow(Person).to receive(:find).and_return(inbox_provider)
       allow(BrokerAgencyProfile).to receive(:find).and_return(inbox_provider)
-      allow(HbxProfile).to receive(:find).and_return(hbx_profile)
+      allow(BenefitSponsors::Organizations::HbxProfile).to receive(:find).and_return(hbx_profile)
       allow(inbox_provider).to receive(:inbox).and_return(inbox)
       allow(inbox_provider.inbox).to receive(:post_message).and_return(inbox)
       allow(hbx_profile).to receive(:inbox).and_return(inbox)

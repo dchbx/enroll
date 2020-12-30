@@ -88,6 +88,21 @@ class Products::QhpCostShareVariance
     end
   end
 
+  def product_for(market_kind = 'aca_shop')
+    qhp_product = product
+
+    return qhp_product if qhp_product.benefit_market_kind == market_kind.to_sym || dental?
+
+    Rails.cache.fetch("qcsv--#{market_kind}-product-#{qhp.active_year}-hios-id-#{hios_plan_and_variant_id}", expires_in: 5.hours) do
+      BenefitMarkets::Products::Product.where(
+        :hios_base_id => /#{qhp_product.hios_base_id}/,
+        :"application_period.min".gte => Date.new(qhp.active_year, 1, 1), :"application_period.max".lte => Date.new(qhp.active_year, 1, 1).end_of_year,
+        :kind => qhp_product.kind,
+        :benefit_market_kind => market_kind.to_sym
+      ).first
+    end
+  end
+
   private
 
   def dental?

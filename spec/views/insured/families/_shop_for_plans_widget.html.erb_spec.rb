@@ -10,6 +10,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
   let(:hbx_enrollments) {double}
   let(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:current_user) { FactoryBot.create(:user)}
+  let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
 
 
   context "with hbx_enrollments" do
@@ -23,6 +24,7 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
         allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
         allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
         allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+        allow(employee_role).to receive(:census_employee).and_return(census_employee)
         allow(current_user).to receive(:has_employee_role?).and_return(true)
         allow(person).to receive(:active_employee_roles).and_return([employee_role])
         allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
@@ -76,6 +78,8 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
       allow(view).to receive(:policy_helper).and_return(double("Policy", updateable?: true))
       allow(person).to receive(:active_employee_roles).and_return([employee_role])
       allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(true)
+      allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+      allow(employer_profile).to receive(:published_plan_year).and_return(plan_year)
       allow(employee_role).to receive(:census_employee).and_return(census_employee)
       allow(view).to receive(:is_under_open_enrollment?).and_return(true)
       sign_in(current_user)
@@ -91,6 +95,62 @@ RSpec.describe "insured/families/_shop_for_plans_widget.html.erb",dbclean: :arou
       it "should not have the text 'You are not under open enrollment period.'" do
         render "insured/families/shop_for_plans_widget"
         expect(rendered).not_to have_content "You are not under open enrollment period."
+      end
+    end
+
+    context 'Employee in terminated status' do
+      context 'During Employer OE' do
+        before :each do
+          assign :family, family
+          @employee_role = employee_role
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
+          allow(employee_role).to receive(:census_employee).and_return(census_employee)
+          allow(employee_role).to receive(:is_under_open_enrollment?).and_return(true)
+          allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        end
+
+        it 'should show text terminated by employer if census employee is terminated and has no active seps' do
+          census_employee.update_attributes(employment_terminated_on: TimeKeeper.date_of_record)
+          allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(true)
+          render "insured/families/shop_for_plans_widget"
+          expect(rendered).to have_text "You have been terminated by your employer"
+        end
+
+        it 'should show link enroll today text if census employee is terminated with future sep which falls in renewal PY' do
+          allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(false)
+          allow(employee_role).to receive(:benefit_begin_date).and_return(TimeKeeper.date_of_record)
+          render "insured/families/shop_for_plans_widget"
+          expect(rendered).to have_content 'coverage will begin'
+          expect(rendered).to have_link('enroll today')
+          expect(rendered).not_to have_content 'for Open Enrollment Period.'
+        end
+
+        it 'should show SEP text if census employee is terminated and has active seps' do
+          allow(family).to receive(:active_seps).and_return([sep])
+          allow(family).to receive(:latest_active_sep).and_return(sep)
+          allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(true)
+          render 'insured/families/shop_for_plans_widget'
+          expect(rendered).to have_text 'You qualify for a Special Enrollment Period (SEP) because you'
+        end
+      end
+
+      context 'outside Employer OE' do
+        before :each do
+          assign :family, family
+          @employee_role = employee_role
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employee_role).to receive(:is_eligible_to_enroll_without_qle?).and_return(false)
+          allow(employee_role).to receive(:census_employee).and_return(census_employee)
+          allow(employee_role).to receive(:is_under_open_enrollment?).and_return(false)
+          allow(view).to receive(:is_under_open_enrollment?).and_return(false)
+        end
+
+        it 'should show text terminated by employer if census employee is terminated and has no active seps' do
+          allow(census_employee).to receive(:is_employee_in_term_pending?).and_return(true)
+          render 'insured/families/shop_for_plans_widget'
+          expect(rendered).not_to have_text 'You have been terminated by your employer'
+        end
       end
     end
 

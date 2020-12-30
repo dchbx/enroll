@@ -53,7 +53,7 @@ module Transcripts
         end
       else
         # TODO: Fix this for Conversion ER
-        employer_profile = BenefitSponsors::Organizations::Organization.where(fein: enrollment.employer_profile.fein).first.employer_profile
+        employer_profile = BenefitSponsors::Organizations::Organization.where(hbx_id: enrollment.employer_profile.hbx_id).first.employer_profile
         plan_year = employer_profile.find_plan_year_by_effective_date(enrollment.effective_on)
         id_list = plan_year.benefit_groups.collect(&:_id).uniq if plan_year.present?
       end

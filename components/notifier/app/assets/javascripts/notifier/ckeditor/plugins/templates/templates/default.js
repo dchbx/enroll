@@ -116,6 +116,41 @@ CKEDITOR.addTemplates( 'default', {
 	"<li>TTY: #{Settings.contact_center.tty_number}</li>" +
 	"<li>Online at: <a href='#{Settings.site.home_url}'>#{Settings.site.website_name}</a></li>" +
 "</ul>"
+	},
+	{
+		title: 'Consumer Template',
+		image: 'template1.gif',
+		description: 'Standard template for the notices received by Consumers.',
+		html:
+			"<p>&nbsp;</p>" +
+			"<p>#{consumer_role.notice_date}</p>" +
+			"<p><strong>SUBJECT: &lt;Change subject&gt;</strong></p>" +
+			"<p>Dear #{consumer_role.first_name}:</p>" +
+			"<p>&lt;Paste Your Notice Body Here&gt;</p>" +
+			"<br/>" +
+			"<div style='display:block; page-break-inside: avoid;'>" +
+				"<table border='0' class='total_table' style='margin-top: -20px;'>" +
+					"<tbody>" +
+						"<tr class='fssizeuser'>" +
+							"<td>If you have questions or concerns, we&rsquo;re here to help.<br />" +
+								"<br />" +
+								"The #{Settings.site.short_name} Team<br />" +
+								"<br />" +
+							"_____________________________________________________________________________________________________________</td>" +
+						"</tr>" +
+					"</tbody>" +
+				"</table>" +
+			"</div>" +
+			"<p>&nbsp;</p>" +
+			"<div style='display:block; page-break-inside: avoid;'>" +
+				"<table border='0' class='total_table reference' style='margin-top: -40px;'>" +
+					"<tbody>" +
+						"<tr>" +
+							"<td style='padding-top: 2px;'><strong>Legal Reference: </strong> The following laws, regulations and rules apply to this letter:</td>" +
+						"</tr>" +
+					"</tbody>" +
+				"</table>" +
+			"</div>"
 	}
 	]
 } );

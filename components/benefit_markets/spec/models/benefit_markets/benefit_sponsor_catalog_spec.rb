@@ -28,6 +28,11 @@ module BenefitMarkets
       }
     end
 
+    # Mocking benefit application in order to avoid adding models to the dummy
+    before :each do
+      allow_any_instance_of(BenefitMarkets::BenefitSponsorCatalog).to receive(:benefit_application).and_return nil
+    end
+
     context "A new model instance" do
 
      # it { is_expected.to be_mongoid_document }

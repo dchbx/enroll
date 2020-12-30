@@ -6,27 +6,37 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean: :after_each do
 
   include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup renewal application"
-  
-  let(:predecessor_application_catalog) { true }
-  let!(:sponsored_benefit_package) { predecessor_application.benefit_packages[0] }
+  include_context "setup initial benefit application"
+
+  let(:initial_app_start_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month.prev_year }
+  let(:effective_period) { initial_app_start_date..initial_app_start_date.next_year.prev_day }
+  let!(:renewal_application) { BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(initial_application).renew_application[1] }
+  let(:renewal_benefit_package) { renewal_application.benefit_packages[0] }
+  let!(:sponsored_benefit_package) { initial_application.benefit_packages[0] }
   let!(:sponsored_benefit) { sponsored_benefit_package.health_sponsored_benefit }
   let!(:product) { sponsored_benefit.reference_product }
   let!(:employer_profile) {benefit_sponsorship.profile}
-  let!(:update_renewal_app) {renewal_application.update_attributes(aasm_state: :enrollment_eligible)}
+  let!(:update_renewal_app) { renewal_application.update_attributes(aasm_state: :enrollment_eligible) }
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }
   let(:employee_role) { FactoryBot.create :employee_role, employer_profile: employer_profile }
   let!(:active_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package)}
-  let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: benefit_package.start_on, benefit_package: benefit_package)}
-  let!(:ce) { FactoryBot.create :census_employee, :owner, employer_profile: employer_profile, employee_role_id: employee_role.id ,benefit_group_assignments:[active_benefit_group_assignment, renewal_benefit_group_assignment]}
+  let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: renewal_benefit_package.start_on, benefit_package: renewal_benefit_package)}
+  let!(:ce) do
+    FactoryBot.create :census_employee,
+                      :owner,
+                      employer_profile: employer_profile,
+                      dob: Date.new((coverage_terminated_on.year - 30), 9,8),
+                      employee_role_id: employee_role.id,
+                      benefit_group_assignments: [active_benefit_group_assignment, renewal_benefit_group_assignment]
+  end
   let!(:ce_update){ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: coverage_terminated_on.next_day, coverage_terminated_on: coverage_terminated_on)}
 
-
   let!(:family) {
-    person = FactoryBot.create(:person, :with_family, last_name: ce.last_name, first_name: ce.first_name)
-    employee_role = FactoryBot.create(:employee_role, person: person, census_employee: ce, employer_profile: employer_profile)
+    employee_role.person.update_attributes(dob: ce.dob, ssn: ce.ssn)
+    employee_role.update_attributes(census_employee: ce)
+    person = employee_role.person
     ce.update_attributes!({employee_role: employee_role})
-    family_rec = person.primary_family
+    family_rec = Family.find_or_build_from_employee_role(employee_role)
     hbx_enrollment_mem = FactoryBot.build(:hbx_enrollment_member, eligibility_date:Time.now,applicant_id:person.primary_family.family_members.first.id,coverage_start_on:ce.active_benefit_group_assignment.benefit_package.start_on)
     family_rec.save!
     FactoryBot.create(
@@ -51,13 +61,13 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
     family_rec.reload
   }
 
-  let!(:clone_enrollment){family.enrollments.first}
+  let!(:clone_enrollment){family.enrollments.select{|e| e.kind == "employer_sponsored"}.first}
 
   let(:generate_cobra_enrollment) {
     factory = Factories::FamilyEnrollmentCloneFactory.new
     factory.family = family
     factory.census_employee = ce
-    factory.enrollment = family.enrollments.first
+    factory.enrollment = clone_enrollment
     factory.clone_for_cobra
   }
 
@@ -93,6 +103,12 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       expect(family.enrollments.map(&:kind)).to include('employer_sponsored_cobra')
     end
 
+    it 'should have predecessor_enrollment_id on cobra enrollment' do
+      generate_cobra_enrollment
+      predecessor_enrollment_id = family.enrollments.select{|e| e.kind == 'employer_sponsored_cobra' && e.aasm_state == 'coverage_enrolled'}.first.predecessor_enrollment_id
+      expect(predecessor_enrollment_id).to eq clone_enrollment.id
+    end
+
     it 'should have hbx enrollment members' do
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
@@ -124,6 +140,26 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
       cobra_enrollment = family.enrollments.detect {|e| e.is_cobra_status?}
       expect(cobra_enrollment.hbx_enrollment_members.first.coverage_start_on).to eq clone_enrollment.effective_on
     end
+  end
 
+  describe 'cobra effective on matches renewal application start on' do
+
+    let(:external_enrollment)          { false }
+    let(:terminated_on)                { renewal_application.effective_period.min.prev_day }
+    let!(:terminated_census_employee)  { ce.update_attributes(aasm_state: 'cobra_linked', cobra_begin_date: terminated_on.next_day, coverage_terminated_on: terminated_on)}
+
+    it 'should generate cobra enrollment under renewal application' do
+      generate_cobra_enrollment
+      cobra_enrollment = family.enrollments.detect(&:is_cobra_status?)
+      expect(cobra_enrollment.coverage_selected?).to be_truthy
+      expect(cobra_enrollment.effective_on).to eq renewal_application.effective_period.min
+      expect(cobra_enrollment.sponsored_benefit_package_id).to eq renewal_application.benefit_packages.first.id
+    end
+
+    it 'should not generate enrollment if product is not offering under renewal application' do
+      allow(clone_enrollment.product).to receive(:renewal_product).and_return(nil)
+      generate_cobra_enrollment
+      expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
+    end
   end
 end

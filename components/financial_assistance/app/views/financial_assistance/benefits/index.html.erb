@@ -1,0 +1,151 @@
+<div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 row">
+  <div class="col-lg-9 col-md-9 col-sm-9 col-xs-12 bottom-pd">
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="title-icon">
+          <span class="fa-icon fa fa-stethoscope fa-3x"></span>
+        </div>
+        <h2 class="fa-darkblue">Health Coverage for <%= @applicant.first_name.titleize %></h2>
+      </div>
+    </div>
+    <p>Tell us about other health coverage options for this person. When you're finished, select CONTINUE.</p>
+    <br/>
+
+    <!--is enrolled driver question-->
+    <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">Is this person currently enrolled in health coverage? *</span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_enrolled_health_coverage", true, @applicant.has_enrolled_health_coverage?, class: "radio-yml" ) %>
+          <label class="radio-yml" for="enrolled_in_health_coverage_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_enrolled_health_coverage", false, @applicant.has_enrolled_health_coverage == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="enrolled_in_health_coverage_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+            <a href="#has_enrolled_health_coverage" data-toggle="modal" data-target="#has_enrolled_health_coverage" class="interaction-click-control-not-sure?">Not sure?</a>
+            <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_enrolled_health_coverage"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class='benefit-kinds', id='enrolled-benefit-kinds'>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>
+    </div>
+    <br/>
+
+    <!--is eligible driver question-->
+    <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
+      <div class="col-md-6 labelforcoverage">
+        <span class="fa-text-color">Does this person currently have access to other health coverage that they are not enrolled in, including coverage they could get through another person? *</span>
+      </div>
+      <div class="col-md-6 mt11">
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_eligible_health_coverage", true, @applicant.has_eligible_health_coverage?, class: "radio-yml" ) %>
+          <label class="radio-yml" for="eligible_for_health_coverage_yes">Yes</label>
+        </div>
+        <div class="col-md-3 no-padding">
+          <%= radio_button_tag("has_eligible_health_coverage", false, @applicant.has_eligible_health_coverage == false, class: "radio-yml" ) %>
+          <label class="radio-yml" for="ieligible_for_health_coverage_no">No</label>
+        </div>
+        <div class="col-md-6 left-seprator">
+           <a href="#has_eligible_health_coverage" data-toggle="modal" data-target="#has_eligible_health_coverage" class="interaction-click-control-not-sure?">Not sure?</a>
+           <%= render partial: 'financial_assistance/shared/modal_support_text', locals: {key: "has_eligible_health_coverage"} %>
+        </div>
+      </div>
+    </div>
+    <br />
+
+    <div class='benefit-kinds', id='eligible-benefit-kinds'>
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
+    </div>
+
+    <div class="col-md-4 col-sm-4 col-xs-4">
+    <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
+    </div>
+
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="back-link">
+          <i class="fa fa-caret-left fa-2x" aria-hidden="true"></i>
+          <a href="javascript:void(0);" onclick="notifyUserPrompt(this)" data-path="<%= edit_application_path(@application) %>"> <b>BACK TO ALL HOUSEHOLD MEMBERS</b> </a> <span>(Go back and work on another person)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy benefit modal -->
+  <div class="modal fade" id="destroyBenefit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to remove everything you have entered <strong>for this Benefit?
+          <br />
+           This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden destroy all benefits modal -->
+  <div class="modal fade" id="destroyAllBenefits" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete all of these benefits?<strong>Are you sure you want to continue?<br />This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
+          <button type="button" class="btn btn-primary modal-continue-button">CONTINUE & REMOVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden unsaved benefits modal -->
+  <div class="modal fade" id="unsavedBenefitChangesWarning" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <span class="glyphicon glyphicon-remove close" aria-hidden="true" data-dismiss="modal" aria-label="Close"></span>
+          <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
+        </div>
+        <div class="modal-body">
+          If you leave without saving, you will lose all your changes.<br />
+          <strong>This cannot be undone.</strong>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">STAY ON THIS PAGE</button>
+          <button type="button" class="btn btn-primary">LEAVE WITHOUT SAVING</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--Right NAV-->
+  <div class='col-md-3'>
+    <%= render partial: 'financial_assistance/shared/right_nav', locals: {
+      previous_url: application_applicant_deductions_path(@application, @applicant),
+      next_url: other_questions_application_applicant_path(@application, @applicant)
+    } %>
+  </div>
+</div>
+
+<%= render partial: '/financial_assistance/shared/to_previous_modal' %>

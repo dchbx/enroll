@@ -7,7 +7,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
 
-  before_action :permit_params, only: [:family_index_dt]
+  before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -122,12 +122,36 @@ class Exchanges::HbxProfilesController < ApplicationController
     @orgs = Organization.search(@q).exists(employer_profile: true)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i) if page_no.present?
 
-    @employer_profiles = @organizations.map {|o| o.employer_profile}
+    @employer_profiles = @organizations&.map {|o| o.employer_profile}
 
     respond_to do |format|
       format.html { render "employers/employer_profiles/index" }
+    end
+  end
+
+  def new_secure_message
+    @resource = get_resource_for_secure_form(params)
+    @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
+  end
+
+  def create_send_secure_message
+    @resource = get_resource(params)
+    @subject = params[:subject].presence
+    @body = params[:body].presence
+    @element_to_replace_id = params[:actions_id]
+    result = ::Operations::SecureMessageAction.new.call(
+      params: params.permit(:actions_id, :body, :file, :resource_name, :resource_id, :subject, :controller).to_h,
+      user: current_user
+    )
+    @error_on_save = result.failure if result.failure?
+    respond_to do |format|
+      if @error_on_save
+        format.js { render "new_secure_message"}
+      else
+        format.js { "Message Sent successfully"  }
+      end
     end
   end
 
@@ -239,7 +263,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -254,7 +278,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -417,7 +441,8 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    uniq_cancel_params = params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_cancel_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -437,7 +462,8 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    uniq_terminate_params = params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_terminate_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -600,26 +626,14 @@ def employer_poc
     @element_to_replace_id = params[:person][:family_actions_id]
     @person = Person.find(params[:person][:pid]) if !params[:person].blank? && !params[:person][:pid].blank?
     @ssn_match = Person.find_by_ssn(params[:person][:ssn]) unless params[:person][:ssn].blank?
-    @ssn_fields = @person.employee_roles.map{|e| e.census_employee.is_no_ssn_allowed?} if @person.employee_roles.present?
+    @ssn_fields = @person.employee_roles.map{|e| e.census_employee.is_no_ssn_allowed?} if @person.active_employee_roles.present?
     @info_changed, @dc_status = sensitive_info_changed?(@person.consumer_role) if @person.consumer_role
+    @ssn_require = @ssn_fields.present? && @ssn_fields.include?(false)
     if !@ssn_match.blank? && (@ssn_match.id != @person.id) # If there is a SSN match with another person.
       @dont_allow_change = true
-    elsif @ssn_fields.present? && @ssn_fields.include?(false)
-      @dont_update_ssn = true
     else
-      begin
-        if params[:person][:ssn].present?
-          @person.update_attributes!(encrypted_ssn: Person.encrypt_ssn(params[:person][:ssn]))
-        else
-          @person.unset(:encrypted_ssn)
-        end
-        @person.update_attributes!(dob: Date.strptime(params[:jq_datepicker_ignore_person][:dob], '%m/%d/%Y').to_date)
-        @person.consumer_role.check_for_critical_changes(@person.primary_family, info_changed: @info_changed, no_dc_address: "false", dc_status: @dc_status) if @person.consumer_role && @person.is_consumer_role_active?
-        CensusEmployee.update_census_employee_records(@person, current_user)
-      rescue Exception => e
-        @error_on_save = @person.errors.messages
-        @error_on_save[:census_employee] = [e.summary] if @person.errors.messages.blank? && e.present?
-      end
+      result = ::Operations::UpdateDobSsn.new.call(person_id: @person.id, params: params, info_changed: @info_changed, dc_status: @dc_status, current_user: current_user, ssn_require: @ssn_require)
+      @error_on_save, @dont_update_ssn = result.failure? ? result.failure : result.success
     end
     respond_to do |format|
       format.js { render "edit_enrollment", person: @person, :family_actions_id => params[:person][:family_actions_id]  } if @error_on_save
@@ -843,8 +857,26 @@ def employer_poc
     end
   end
 
-  def permit_params
-    params.permit!
+  def permitted_params_family_index_dt
+    params.permit(:scopes)
+  end
+
+  def get_resource(params)
+    return nil if params[:resource_id].blank?
+
+    if params[:resource_name].classify.constantize == Person
+      Person.find(params[:resource_id])
+    else
+      BenefitSponsors::Organizations::Profile.find(params[:resource_id])
+    end
+  end
+
+  def get_resource_for_secure_form(params)
+    if params[:person_id].present?
+      Person.find(params[:person_id])
+    elsif params[:profile_id].present?
+      BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+    end
   end
 
   def benefit_application_error_messages(obj)

@@ -6,13 +6,14 @@ RSpec.describe "employee_enrollments.html.slim.rb", :type => :view, dbclean: :af
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:current_effective_date)  { Date.new(2018,2,1) }
+  let(:current_effective_date)  { Date.new(TimeKeeper.date_of_record.year, 2, 1) }
   let(:census_employees) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package) }
 
   describe "employer profile home page" do
 
     before :each do
       assign(:current_plan_year, initial_application)
+      allow(initial_application).to receive(:employee_participation_ratio_minimum).and_return(Settings.aca.shop_market.employee_participation_ratio_minimum)
       render partial: "ui-components/v1/cards/employee_enrollments"
     end
 

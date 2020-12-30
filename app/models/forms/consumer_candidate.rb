@@ -34,7 +34,7 @@ module Forms
       return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
 
       if ssn.blank? && no_ssn == "0"
-        errors.add(:base, 'Check No SSN box or enter a valid SSN')
+        errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'")
       end
     end
 

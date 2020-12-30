@@ -36,7 +36,7 @@ Given /(\w+) is a person who has not logged on$/ do |name|
 end
 
 Then  /(\w+) signs in to portal/ do |name|
-  if page.has_link? 'Sign In Existing Account'
+  if page.has_link? 'Sign In'
     find('.interaction-click-control-sign-in-existing-account').click
   end
   person = Person.where(first_name: name).first

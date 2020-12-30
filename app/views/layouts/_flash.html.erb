@@ -1,11 +1,9 @@
 <div class="row flash module">
-  <div class="alert alert-<%= type %>">
+  <div class="alert alert-<%= type %>" style="width: 100%; margin-top: 0px !important;">
     <div class="row">
-      <div class="col-md-12">
-        <div class="row">
-          <a class="close" data-dismiss="alert" href="#">×</a>
-          <%= raw message %>
-        </div>
+      <div class="col-xs-12" style="width: 100%; max-width: 1170px; margin: auto;">
+        <a class="close" data-dismiss="alert" href="#">×</a>
+        <%= h message %>
       </div>
     </div>
   </div>

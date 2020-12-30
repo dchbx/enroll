@@ -63,7 +63,7 @@ And(/^an uploaded application in REVIEW status is present$/) do
 end
 
 And(/^an uploaded identity verification in REVIEW status is present$/) do
-  doc_id  = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
+  doc_id = "urn:openhbx:terms:v1:file_storage:s3:bucket:'id-verification'{#sample-key}"
   file_path = File.dirname(__FILE__)
   allow_any_instance_of(Insured::RidpDocumentsController).to receive(:file_path).and_return(file_path)
   allow(Aws::S3Storage).to receive(:save).with(file_path, 'id-verification').and_return(doc_id)
@@ -160,7 +160,7 @@ When(/^Experian is unable to verify Identity for the consumer$/) do
 end
 
 When(/^an Experian Error screen appears for the consumer$/) do
-  expect(page).to have_content('Your identity could not be confirmed by Experian')
+  expect(page).to have_content('Experian, the third-party service we use to verify your identity, could not confirm your information.')
 end
 
 When(/^an uploaded Identity verification in VERIFIED status is present on failed experian screen$/) do

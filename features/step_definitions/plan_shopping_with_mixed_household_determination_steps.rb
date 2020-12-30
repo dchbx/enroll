@@ -12,16 +12,13 @@ Then(/^the page should redirect to thankyou page$/) do
 end
 
 Given(/^the page should not have any csr plans$/) do
-  expect(page).not_to have_css('.fa-check-square-o')
+  expect(page).not_to have_css('.fa-check-square')
 end
 
 When(/^csr plans exists in db$/) do
   update_a_standard_plan_to_be_csr
 end
 
-Then(/user clicks continue button on household info form/) do
-  click_link "Continue"
-end
 
 When(/^the db has standard plans$/) do
   reset_plans_to_be_standard
@@ -41,19 +38,9 @@ Then(/^user clicks close button$/) do
 end
 
 Then(/^the page should have csr plans$/) do
-  expect(page).to have_css('.fa-check-square-o')
-end
-
-When(/^user is shopping for Health benefit$/) do
-  wait_for_ajax
-  expect(page).to have_content("Select Plan")
+  expect(page).to have_css('.fa-check-square')
 end
 
 Given(/^every individual is eligible for Plan shopping for CSR plans$/) do
   create_aptc_only_eligibilty_for_the_family
-end
-
-When(/^every member in the tax household group is eligible for CSR$/) do
-  wait_for_ajax
-  expect(page).to have_content("Select Plan")
 end

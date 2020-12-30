@@ -15,7 +15,6 @@ RSpec.describe BrokerAgencies::QuotesController, type: :controller, dbclean: :ar
 
   describe "Create", :dbclean => :around_each do
     before do
-      allow(user).to receive_message_chain(:person,:broker_role,:id){person.broker_role.id}
       allow(user).to receive(:has_broker_role?){true}
     end
     context "with valid quote params" do

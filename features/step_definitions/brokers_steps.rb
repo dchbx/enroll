@@ -350,7 +350,7 @@ Then(/^.+ goes to the Consumer page$/) do
 end
 
 Then(/^Primary Broker should see (.*?) account$/) do |name|
-  find('.family_members h1', text: 'Household Info: Family Members', wait: 5)
+  find('.family_members h2', text: "#{l10n('family_information')}", wait: 5)
   find('.family_members span', text: name, wait: 5)
 end
 
@@ -406,4 +406,42 @@ end
 Then(/^the county should not be autopopulated appropriately$/) do
   wait_for_ajax
   expect(page).not_to have_select("organization[office_locations_attributes][0][address_attributes][county]", :options => ['Test County'])
+end
+
+Then(/broker (.*?) should receive application (.*?) notification$/) do |broker_name, notification_kind|
+  broker_email_address = @brokers[broker_name]&.email_address
+  subject =
+    case notification_kind
+    when 'denial'
+      'Broker application denied'
+    when 'approval'
+      "Invitation to create your Broker account on #{site_short_name}"
+    when 'extended'
+      'Action Needed - Complete Broker Training for DC Health Link for Business'
+    end
+  open_email(
+    broker_email_address,
+    :with_subject => subject
+  )
+  expect(current_email.to).to eq([broker_email_address])
+end
+
+Then(/^.+ should see broker (.*?) under extended tab$/) do |broker_name|
+  expect(page).to have_content(broker_name)
+end
+
+When(/^.+ click deny broker button$/) do
+  find('.interaction-click-control-broker-deny').click
+end
+
+When(/^.+ click extend broker button$/) do
+  find('.interaction-click-control-broker-extend').click
+end
+
+Then(/^.+ should see the broker application denied message$/) do
+  expect(page).to have_content('Broker applicant denied.')
+end
+
+Then(/^.+ should see the broker application extended message$/) do
+  expect(page).to have_content('Broker applicant is now extended.')
 end

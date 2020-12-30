@@ -45,6 +45,10 @@ Then(/^I should only see user with employee role$/) do
   expect(page).to have_content("Unlocked")
 end
 
+Then(/^I should see subrole field on datatable$/) do
+  expect(page).to have_content("Permission level")
+end
+
 When(/^I click All button$/)do
   find(:xpath, '//*[@id="Tab:all"]').click
 end

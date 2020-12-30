@@ -130,7 +130,7 @@ class BenefitApplicationMigration < Mongoid::Migration
       end
     end
 
-    @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.min)
+    @benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.min)
     catalog_product_hios_id = self.benefit_sponsor_catalog_products(@benefit_sponsor_catalog, plan_year)
     plan_year_plan_hios_ids = self.get_plan_hios_ids_of_plan_year(plan_year)
 

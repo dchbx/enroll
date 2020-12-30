@@ -155,7 +155,7 @@ module Notifier
     def benefit_application_binder_payment_due_date
       if current_benefit_application.present?
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(current_benefit_application.start_on))
+        merge_model.benefit_application.binder_payment_due_date = format_date(schedular.map_binder_payment_due_date_by_start_on(current_benefit_application.is_renewing?, current_benefit_application.start_on))
       end
     end
 

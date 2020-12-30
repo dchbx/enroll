@@ -1,9 +1,9 @@
 Feature: Employee Sign Up when Employer exists and has a matching roster employer
-  In order for the Employee to purchase insurance
-  Given my Employer exists and Employee is on the Employee Roster
-  Given my Employer has an unpublished Plan Year
-  The Employee should not be able to match Employer
-  When my Employer publishes the Plan Year
+    In order for the Employee to purchase insurance
+    Given my Employer exists and Employee is on the Employee Roster
+    Given my Employer has an unpublished Plan Year
+    The Employee should not be able to match Employer
+    When my Employer publishes the Plan Year
   The Employee should be able to match Employer
   The Employee should be able to purchase Insurance
 

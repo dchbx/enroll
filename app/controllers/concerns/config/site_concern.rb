@@ -18,4 +18,8 @@ module Config::SiteConcern
   def site_redirect_on_timeout_route
     Settings.site.curam_enabled? ? SamlInformation.iam_login_url : new_user_session_path
   end
+
+  def support_for_ie_browser?
+    Settings.site.support_for_ie_browser
+  end
 end

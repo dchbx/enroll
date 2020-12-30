@@ -13,8 +13,10 @@ RSpec.describe 'upload the invoice to s3', :type => :task, dbclean: :after_each 
   let(:site)                { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
 
   let(:benefit_market)      { site.benefit_markets.first }
+  let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
   let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                           benefit_market: benefit_market,
+                                          issuer_profile: issuer_profile,
                                           title: "SHOP Benefits for #{current_effective_date.year}",
                                           application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
                                         }

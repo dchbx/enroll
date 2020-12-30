@@ -6,7 +6,6 @@ describe "ProjectedEligibilityNotice_2" do
   end
 
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, first_name: "Test", last_name: "Data", dob: "02/12/1981", hbx_id: "a16f4029916445fcab3dbc44bb7aadd0") }
-  let!(:user) {FactoryBot.create(:user, person: person) }
   let!(:family100) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
 
   it "should create projected_eligibility_notice_aqhp report" do

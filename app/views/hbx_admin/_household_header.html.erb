@@ -20,7 +20,7 @@
       <td width = "15px;" ></td>
       <td width="18%" style="border: thin solid;">
         <div class="selectric-labeled">
-          <%= select_tag "csr_percentage", options_for_select(EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.keys.map{|variant| variant.gsub('csr_','')} , csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
+          <%= select_tag "csr_percentage", options_for_select(csr_percentage_options_for_select, csr_percent_as_integer), onchange: "APTCModule.calculateAvailableAPTC('household')"%>
         </div>
         
       </td>

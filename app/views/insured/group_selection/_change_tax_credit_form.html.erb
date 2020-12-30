@@ -1,0 +1,45 @@
+<div class="col-md-4 confirmation hidden" id="change-tax-credit-form">
+  <h3 class="title no-buffer">
+    <%= l10n("change_tax_credit") %>
+  </h3>
+    <p id="aptc-msg" class="action-msg hidden margin-top-15px"><%= l10n("are_you_sure_you_want_to_update_aptc") %></p>
+  <%= radio_button_tag :agreement, "action-confirm-yes-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("yes") %><br>
+  <%= radio_button_tag :agreement, "action-confirm-no-change-tax-credit" %>&nbsp;&nbsp;<%= l10n("no") %>
+  <div id="calendar-div" class="row hidden">
+    <%= form_tag edit_aptc_insured_group_selections_path(hbx_enrollment_id: locals[:hbx_enrollment][:id]), :method => :post do %>
+    <div class='col-md-12'>
+      <div id="applied-aptc-text" class="hidden">
+        <h5 class="col-md-12 aptc-no-left-padding"><b>Effective date: </b><%= locals[:new_effective_on_date] %></h5>
+        <h5 class="col-md-12 aptc-no-left-padding"><b>Maximum tax credit available: </b>$<span id="max_aptc_available"><%= locals[:available_aptc] %></span></h5>
+        <h5 class="col-md-12 aptc-no-left-padding"><b>Tax credit applied (%)</b></h5>
+        <span class="col-md-12" align= "center">
+          <output id="aptc_applied_pct_1_percent" name="aptc_applied_pct">
+            <%= number_to_percentage(float_fix(@self_term_or_cancel_form[:elected_aptc_pct].to_f * 100)).split(".")[0] + "%" %>
+          </output>
+        </span>
+        <%# Specify the value attribute on slider to move to right starting spot %>
+        <% slider_starting_value = @self_term_or_cancel_form[:elected_aptc_pct] %>
+        <input id="applied_pct_1" name='applied_pct_1' type="range" min="0" value="<%= slider_starting_value %>" max="1" step="0.05" style = "padding: 0px;">
+        <h5><b>Tax credit value ($)</b></h5>
+        <input type="text" name="aptc_applied_total" id="aptc_applied_total"
+        value="$<%= @self_term_or_cancel_form[:default_tax_credit_value] %>" placeholder="APTC Applied" class="form-control" size="8px">
+        <h5><strong>Your new premium:</strong></h5>
+        <div id="current_total_premium" class='hidden'>
+          <% if [locals[:hbx_enrollment].total_premium, locals[:available_aptc], locals[:hbx_enrollment].elected_aptc_pct].all? %>
+            <%= float_fix(locals[:hbx_enrollment].total_premium - (locals[:available_aptc] * locals[:hbx_enrollment].elected_aptc_pct)) %>
+          <% end %>
+        </div>
+        <div id="enrollment_total_premium" class='hidden'>
+          <%= locals[:hbx_enrollment].total_premium %>
+        </div>
+        <span>
+          $<span id="new-premium">
+            <%= ('%.2f' % @self_term_or_cancel_form[:new_enrollment_premium]) %>
+          </span>/month
+        </span>
+      </div>
+      <br>
+      <%= submit_tag l10n("update_tax_credit"), class: 'button btn btn-lg btn-primary btn-block interaction-click-control-action-confirm', id: 'update-aptc-button', :disabled => true %>
+    <% end %>
+  </div>
+</div>

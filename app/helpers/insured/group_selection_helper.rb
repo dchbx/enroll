@@ -55,8 +55,8 @@ module Insured
 
     def view_market_places(person)
       markets = []
-      # markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
-      # markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
+      markets += BenefitMarkets::Products::Product::MARKET_KINDS if can_shop_both_markets?(person)
+      markets += BenefitMarkets::Products::Product::INDIVIDUAL_MARKET_KINDS if can_shop_individual_or_resident?(person)
       markets += ['shop'] if can_shop_shop?(person)
       markets += ['individual'] if can_shop_individual?(person)
       markets += ['coverall'] if can_shop_resident?(person)
@@ -88,6 +88,14 @@ module Insured
       end
     end
 
+    def get_ivl_market_kind(person)
+      if can_shop_individual?(person) || can_shop_individual_or_resident?(person)
+        'individual'
+      elsif can_shop_resident?(person)
+        'coverall'
+      end
+    end
+
     def select_benefit_group(qle, employee_role)
       if (@market_kind == "shop" || @market_kind == "fehb") && employee_role.present?
         employee_role.benefit_group(qle: qle)
@@ -101,9 +109,11 @@ module Insured
     end
 
     def selected_enrollment(family, employee_role, coverage_kind)
+      return unless employee_role.present?
+
       employer_profile = employee_role.employer_profile
       benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, family.current_sep.effective_on)} || employer_profile.published_benefit_application
-      enrollments = family.active_household.hbx_enrollments
+      enrollments = family.active_household&.hbx_enrollments
       if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role, coverage_kind)
       else

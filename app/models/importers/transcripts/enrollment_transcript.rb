@@ -377,7 +377,7 @@ module Importers::Transcripts
             family = matched_person.primary_family
           end
         else
-          employer_profile = BenefitSponsors::Organizations::Organization.employer_by_fein(@other_enrollment.employer_profile.fein).first.employer_profile
+          employer_profile = BenefitSponsors::Organizations::Organization.employer_by_hbx_id(@other_enrollment.employer_profile.hbx_id).first.employer_profile
 
           raise 'EmployerProfile missing!' if employer_profile.blank?
 

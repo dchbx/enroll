@@ -14,6 +14,8 @@ describe "a monthly inital employer quiet period enrollments query" do
        - employee C has purchased:
          - One health enrollment during Quiet Period(Enrollment 4)
          - One dental enrollment during Quiet Period(Enrollment 5)
+         - One cobra health enrollment during Quiet Period(cobra_health_enrollment)
+         - One cobra dental enrollment during Quiet Period(cobra_dental_enrollment)
          - Then another health enrollment outside Quiet Period(Enrollment 6)
        - employee D has purchased:
          - One health enrollment early hours of 29th UTC time(Enrollment 7)
@@ -102,6 +104,14 @@ describe "a monthly inital employer quiet period enrollments query" do
         create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date.prev_day, coverage_kind: 'dental')
       }
 
+      let!(:cobra_health_enrollment) {
+        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, kind: 'employer_sponsored_cobra', employee_role: employee_C, submitted_at: quiet_period_end_date.prev_day)
+      }
+
+      let!(:cobra_dental_enrollment) {
+        create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, kind: 'employer_sponsored_cobra', employee_role: employee_C, submitted_at: quiet_period_end_date.prev_day, coverage_kind: 'dental')
+      }
+
       let!(:enrollment_6) {
         create_enrollment(family: employee_C.person.primary_family, benefit_group_assignment: employee_C.census_employee.active_benefit_group_assignment, employee_role: employee_C, submitted_at: quiet_period_end_date + 2.days)
       }
@@ -179,6 +189,16 @@ describe "a monthly inital employer quiet period enrollments query" do
       it "includes enrollment 5" do
         result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
         expect(result).to include(enrollment_5.hbx_id)
+      end
+
+      it "includes cobra_health_enrollment" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(cobra_health_enrollment.hbx_id)
+      end
+
+      it "includes cobra_dental_enrollment" do
+        result = Queries::NamedPolicyQueries.shop_quiet_period_enrollments(effective_on, ['coverage_selected'])
+        expect(result).to include(cobra_dental_enrollment.hbx_id)
       end
 
       it "does not include enrollment 6" do
@@ -424,7 +444,7 @@ describe "a monthly inital employer quiet period enrollments query" do
     employee_role
   end
 
-  def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health', parent: nil)
+  def create_enrollment(family: nil, benefit_group_assignment: nil, employee_role: nil, status: 'coverage_selected', submitted_at: nil, kind: 'employer_sponsored', enrollment_kind: 'open_enrollment', effective_date: nil, coverage_kind: 'health', parent: nil)
     benefit_group = benefit_group_assignment.benefit_group
     sponsored_benefit = benefit_group.sponsored_benefit_for(coverage_kind)
     enrollment = FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
@@ -434,7 +454,7 @@ describe "a monthly inital employer quiet period enrollments query" do
       family: family,
       effective_on: effective_date || benefit_group.start_on,
       enrollment_kind: enrollment_kind,
-      kind: "employer_sponsored",
+      kind: kind,
       submitted_at: submitted_at,
       benefit_sponsorship_id: benefit_group.benefit_sponsorship.id,
       sponsored_benefit_package_id: benefit_group.id,

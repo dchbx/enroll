@@ -31,7 +31,7 @@ module SponsoredBenefits
                         "county"    =>  "Hampden"
                       },
                     "phone_attributes" =>
-                      { "kind"      =>  "phone main",
+                      { "kind"      =>  "work",
                         "area_code" =>  "",
                         "number"    =>  "",
                         "extension" =>  ""

@@ -83,7 +83,7 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
   describe "GET search", dbclean: :after_each do
     let(:user) { double("user")}
-    let(:person) { double("Person")}
+    let(:person) { double("Person", agent?: false)}
     before(:each) do
       allow(user).to receive(:person).and_return(person)
       sign_in user
@@ -99,8 +99,11 @@ RSpec.describe Employers::EmployerProfilesController, dbclean: :after_each do
 
 
   describe "GET export_census_employees", dbclean: :after_each do
+    include_context "setup benefit market with market catalogs and product packages"
+    include_context "setup initial benefit application"
+
     let(:user) { FactoryBot.create(:user) }
-    let(:employer_profile) { FactoryBot.create(:employer_profile) }
+    let(:employer_profile) { abc_profile }
 
     it "should export cvs" do
       sign_in(user)

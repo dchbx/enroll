@@ -9,6 +9,7 @@ module Effective
         table_column :email, :label => 'USER EMAIL', :proc => Proc.new { |row| row.email }, :filter => false, :sortable => false
         table_column :status, :label => 'Status', :proc => Proc.new { |row| status(row) }, :filter => false, :sortable => false
         table_column :role_type, :label => 'Role Type', :proc => Proc.new { |row| row.roles.join(', ') }, :filter => false, :sortable => false
+        table_column :permission, :label => 'Permission level', :proc => Proc.new { |row| permission_type(row) }, :filter => false, :sortable => false
         table_column :actions, :width => '50px', :proc => Proc.new { |row|
                                dropdown = [
                                    # Link Structure: ['Link Name', link_path(:params), 'link_type'], link_type can be 'ajax', 'static', or 'disabled'
@@ -35,6 +36,10 @@ module Effective
       def status(row)
         return "Unlocked" if row.locked_at.blank? && row.unlock_token.blank?
         "Locked"
+      end
+
+      def permission_type(row)
+        row&.person&.hbx_staff_role&.permission&.name || 'N/A'
       end
 
       def global_search?

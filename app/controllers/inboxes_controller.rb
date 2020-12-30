@@ -52,7 +52,7 @@ class InboxesController < ApplicationController
   end
 
   def find_hbx_profile
-    @profile = HbxProfile.find(params["profile_id"])
+    @profile = ::BenefitSponsors::Organizations::HbxProfile.find(params["profile_id"])
   end
 
   def find_message
@@ -61,6 +61,6 @@ class InboxesController < ApplicationController
 
   def set_inbox_and_assign_message
     @inbox = @inbox_provider.inbox
-    @new_message = Message.new(params.require(:message).permit!)
+    @new_message = Message.new(params.require(:message).permit(:subject, :body, :folder, :to, :from))
   end
 end

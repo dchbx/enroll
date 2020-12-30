@@ -14,7 +14,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def search
     @no_previous_button = true
     @no_save_button = true
-    @person = Forms::EmployeeCandidate.new
+    @person = ::Forms::EmployeeCandidate.new
     respond_to do |format|
       format.html
     end
@@ -23,7 +23,7 @@ class Insured::EmployeeRolesController < ApplicationController
   def match
     @no_save_button = true
     @person_params = params.require(:person).merge({user_id: current_user.id}).permit!
-    @employee_candidate = Forms::EmployeeCandidate.new(@person_params)
+    @employee_candidate = ::Forms::EmployeeCandidate.new(@person_params)
     @person = @employee_candidate
     if @employee_candidate.valid?
       @found_census_employees = @employee_candidate.match_census_employees.select{|census_employee| census_employee.is_active? }
@@ -37,7 +37,7 @@ class Insured::EmployeeRolesController < ApplicationController
         # Sends an external email to EE when the EE match fails
         UserMailer.send_employee_ineligibility_notice(current_user.email, full_name).deliver_now unless current_user.email.blank?
       else
-        @employment_relationships = Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
+        @employment_relationships = ::Factories::EmploymentRelationshipFactory.build(@employee_candidate, @found_census_employees)
         respond_to do |format|
           format.html { render 'match' }
         end

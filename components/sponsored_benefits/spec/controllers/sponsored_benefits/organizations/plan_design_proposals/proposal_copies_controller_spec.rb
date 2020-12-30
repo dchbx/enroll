@@ -11,6 +11,7 @@ module SponsoredBenefits
 
     describe "POST #create" do
       it "should return a success response" do
+        allow_any_instance_of(SponsoredBenefits::Organizations::PlanDesignOrganization).to receive(:is_renewing_employer?).and_return(false)
         person.broker_role.update_attributes(broker_agency_profile_id: plan_design_organization.owner_profile_id)
         sign_in user_with_broker_role
         post :create, params: {plan_design_proposal_id: plan_design_proposal.id.to_s}

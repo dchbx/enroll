@@ -26,7 +26,8 @@ RSpec.describe Insured::ConsumerRolesController do
         is_resident_role_active?: false,
         no_dc_address: false,
         has_multiple_roles?: false,
-        id: person_id
+        id: person_id,
+        agent?: false
       )
     end
     let(:consumer_role) do
@@ -69,6 +70,67 @@ RSpec.describe Insured::ConsumerRolesController do
       it "does not change the 'is_applying_coverage' value for the dependent" do
         expect(consumer_role).not_to receive(:update_attribute)
         put :update, params: {id: consumer_role_id, person: person_update_properties, exit_after_method: true}
+      end
+    end
+  end
+
+  describe "help_paying_coverage" do
+
+    context 'when FAA feature enabled' do
+      let(:user) { FactoryBot.create :user, :with_consumer_role }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(true)
+        sign_in user
+      end
+
+      subject { get :help_paying_coverage }
+
+      it 'renders help_paying_coverage template' do
+        expect(subject).to render_template('insured/consumer_roles/help_paying_coverage')
+      end
+    end
+
+    context 'when FAA feature disabled' do
+      let(:user) { FactoryBot.create :user, :with_consumer_role }
+
+      before do
+        allow(EnrollRegistry).to receive(:feature_enabled?).with(:financial_assistance).and_return(false)
+        sign_in user
+      end
+
+      subject { get :help_paying_coverage }
+
+      it 'renders help_paying_coverage template' do
+        expect(subject).to render_template(:file => "#{Rails.root}/public/404.html")
+      end
+    end
+  end
+
+  describe "help_paying_for_coverage_response" do
+    let(:user) { FactoryBot.create :user, :with_consumer_role }
+    before { sign_in user }
+
+    subject { get :help_paying_coverage_response, params: params }
+
+    context "is_applying_for_assistance false" do
+      let(:params) { { is_applying_for_assistance: false } }
+
+      it 'redirects to insured_family_members_path' do
+        expect(subject).to redirect_to(insured_family_members_path(consumer_role_id: user.person.consumer_role.id))
+      end
+    end
+
+    context "is_applying_for_assistance true" do
+      let(:params) { { is_applying_for_assistance: true } }
+      let(:result) { ::Dry::Monads::Result::Success.new(1) }
+
+      it "redirects to financial assistance's checklist" do
+        expect(Operations::FinancialAssistance::Apply).to receive(:new) do
+          double(call: result)
+        end
+
+        expect(subject).to redirect_to('/financial_assistance/applications/1/application_checklist')
       end
     end
   end

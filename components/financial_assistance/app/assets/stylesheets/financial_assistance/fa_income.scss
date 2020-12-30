@@ -1,0 +1,136 @@
+div.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.other-income-kind, .deduction-kind, .benefit-kind {
+  padding-bottom: 10px;
+  clear: both;
+}
+
+.row-form-wrapper.radio-align {
+  border-top: 1px solid #ddd;
+}
+
+.row-form-wrapper.radio-align .labelforcoverage {
+  color: #909090;
+  font-size: 14px;
+  font-weight:400;
+  padding: 5px;
+  vertical-align: middle;
+  letter-spacing: 0.04em;
+}
+
+.lightgray {
+  color: #909090;
+}
+
+.suitcase{
+  font-size: 20px;
+
+.fa-suitcase + .fa-usd {
+    padding-top: 3px;
+  }
+}
+
+.deduction-delete > i, .deduction-edit > i,  .income-edit > i, .income-delete > i,  .self-employed-income-edit > i, .self-employed-income-delete > i {
+  vertical-align: middle;
+  padding-top: 12px;
+}
+
+.title-icon, .fa-darkblue {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.title-icon {
+  margin-right: 10px;
+  margin-bottom: -14px;
+}
+
+.darkblue {
+  color: #003260;
+}
+.cancel-save-mt {
+  margin-top: 10px;
+}
+
+.deducticon-rectangle {
+  border: 3px solid #007bc4;
+  padding: 0 4px 2px 3px;
+  border-radius: 4px;
+  }
+
+.benefit-checkbox{
+  padding: inherit;
+}
+
+.no-padding
+{
+  padding: 0px;
+}
+
+.mt11 {
+  margin-top: 11px;
+}
+
+.back-link{
+  margin-left: 15px;
+}
+.back-link i {
+  margin-right: 10px;
+  height: 31px;
+  vertical-align: middle;
+}
+.back-link a {
+  font-weight: bold;
+}
+.back-link span {
+  color: #909090;
+}
+
+.faa-amount {
+  margin-left: 10px
+}
+
+.fa-select {
+
+  .fa-frequency-kind {
+    width: 90%;
+  }
+
+  .selectric
+  {
+    height: 20px;
+    .label
+    {
+      height: 16px;
+      line-height: 14px;
+    }
+
+    .button
+    {
+      height: 18px;
+    }
+  }
+}
+.label-color {
+  font-weight: bold;
+  color: rgb(131, 135, 128);
+  font-size: 11px;
+}
+.amount {
+  padding-left: 10px;
+}
+.ph-width{
+  width: 100%;
+}
+.row-edit-border {
+  border: 2px solid #007bc4 !important;
+}
+.deduction-kind > .row {
+  padding: 10px 0px;
+}
+.other-income-kind .row{
+   padding: 10px 0px;
+}

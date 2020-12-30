@@ -12,7 +12,7 @@ module BenefitSponsors
     include_context "setup benefit market with market catalogs and product packages"
 
     include_context "setup initial benefit application" do
-      let(:current_effective_date) { (TimeKeeper.date_of_record + 2.months).beginning_of_month }
+      let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month }
     end
 
     describe '.terminate_application' do
@@ -48,7 +48,7 @@ module BenefitSponsors
 
       context "when employer has renewing application" do
 
-        let!(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(benefit_sponsorship.service_areas_on(current_effective_date.next_year), current_effective_date.next_year) }
+        let!(:renewal_benefit_sponsor_catalog) { benefit_sponsorship.benefit_sponsor_catalog_for(current_effective_date.next_year) }
         let!(:renewal_application)             { initial_application.renew(renewal_benefit_sponsor_catalog) }
 
         before do

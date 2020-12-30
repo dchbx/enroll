@@ -4,6 +4,11 @@
 namespace :notice do
   desc "Generate shop employer notices"
   task :shop_employer_notice_event => :environment do |task, args|
+    def trigger_notice(employer_profile)
+      observer = ::Observers::NoticeObserver.new
+      plan_year = employer_profile.plan_years.first
+      observer.deliver(recipient: employer_profile, event_object: plan_year, notice_event: @event_name)
+    end
 
     @employer_ids = ENV['employer_ids']
     @hbx_ids = ENV['hbx_ids']
@@ -34,11 +39,5 @@ namespace :notice do
         puts "Please provide either hbx_id or feins as arguments" unless Rails.env.test?
       end
     end
-  end
-
-  def trigger_notice(employer_profile)
-    observer = Observers::NoticeObserver.new
-    plan_year = employer_profile.plan_years.first
-    observer.deliver(recipient: employer_profile, event_object: plan_year, notice_event: @event_name)
   end
 end

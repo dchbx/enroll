@@ -1,52 +1,39 @@
-<div style='width: 400px; margin-left: 50px'>
-  <img src="<%= asset_path( Settings.site.mailer_logo_file_name ) %>" style='margin-left: 140px; margin-top:30px; width: 200px; margin-bottom:30px;' title=<%= "#{site_short_name}" %>/>
-<p>
-Congratulations <%= @person.first_name + ' ' + @person.last_name%>,
-</p>
-<p>
-You're successfully enrolled in <%= @plan.title %>.
-</p>
+<% if @enrollment.is_shop? %>
+  <div style='width: 400px; margin-left: 50px'>
+    <p>
+      <%= @person&.first_name %>,<br/><br/>
 
-<% if @market_kind != 'individual' %>
-<p>
-  Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.employee_cost_total %>.</b><br>
-  Your employer contributes <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.sponsor_contribution_total %></b> towards your monthly premium.<br>
-  Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %>.</b>
-</p>
-<p>
-  Thank you for enrolling into employer-sponsored coverage through <%= site_short_name %>.
-</p>
+      This confirms that you're enrolled in the <b><%= @plan&.title %></b> plan offered by your employer.<br/><br/>
+
+      Your monthly premium contribution is <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.employee_cost_total %>.</b> Your employer contributes <b><%= ActionView::Base.new.number_to_currency @member_group.group_enrollment.sponsor_contribution_total %></b> towards your monthly premium.</p><br/>
+
+      Your coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>.<br/><br/>
+
+      Thank you for enrolling in coverage through <%= Settings.site.short_name %>.<br/><br/>
+
+      <%= Settings.site.short_name %><br/>
+      <%= Settings.contact_center.short_number %><br/>
+      TTY: <%= Settings.contact_center.tty %><br/>
+    </p>
+  </div>
 <% else %>
-<p>
-  <% if @enrollment.applied_aptc_amount.to_f > 0 %>
-  Your monthly total family premium is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f) %>.</b><br>
-  Your Advanced Premium Tax Credit is <b><%= ActionView::Base.new.number_to_currency(@enrollment.applied_aptc_amount.to_f) %>.</b><br>
-  <% end %>
-  Your monthly cost is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f - @enrollment.applied_aptc_amount.to_f) %>.</b><br>
-</p>
-<p> Your coverage start date is:
-  <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>
-</p>
-<p>Thank you for your order. </p>
-<% end %>
+  <div style='width: 400px; margin-left: 50px'>
+    <p>
+      <%= @person&.first_name %>,<br/><br/>
 
-<%= site_short_name %> <br>
-PHONE: <%= contact_center_phone_number %> <% contact_center_alt_phone_number %><br>
-TTY/TDD 711-1-532-5465<br>
-Monday-Saturday 8:00am - 8:00pm <br>
-E-Mail: <%= contact_center_email_address %>
-<br>
-<br>
-<a href="https://www.facebook.com/pages/DC-Health-Benefit-Exchange/254860577970621" target="_blank" title="click to visit us on facebook">
-<img src="http://cdn.filnetinc.com/img/36px_facebook.png" style="height:23px" alt="spacer" />
-</a>
-<a href="https://twitter.com/DCHealthLink" target="_blank" title="click to visit us on twitter">
-	<img src="http://cdn.filnetinc.com/img/36px_twitter.png"  style="height:23px" alt="spacer" />
-</a>
-<a href="http://www.youtube.com/channel/UCb0vgdZ2ZuGK1xFjauVkMsg" target="_blank" title="click to visit us on youtube"><img src="http://cdn.filnetinc.com/img/36px_youtube.png"  style="height:23px" alt="spacer" />
-</a>
-<br><br>
-<p style='font-size: 70%'>
-	Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only. Generic disclaimer on this message is for intended recipients only.
-</p>
-</div>
+      This confirms enrollment in <b><%= @plan&.title %></b> through the Individual & Family marketplace.<br/><br/>
+        
+      Your monthly premium payment is <b><%= ActionView::Base.new.number_to_currency(@plan.total_premium.to_f - @enrollment.applied_aptc_amount.to_f) %></b>.</br><br/>
+  
+      The coverage start date is <b><%= @enrollment.effective_on.strftime("%m/%d/%Y") %></b>.<br/><br/>
+      
+      You need to make your first monthly premium payment directly to your insurance company to activate your plan. You should receive a bill from your insurance company soon that tells you how to pay and your payment deadline. If you haven’t received a bill in 7-10 days, call your insurance company right away so you don’t miss the deadline and lose your coverage.<br/><br/>
+
+      Thank you for enrolling in coverage through <%= Settings.site.short_name %>.<br/><br/>
+
+      <%= Settings.site.short_name %><br/>
+      <%= Settings.contact_center.short_number %><br/>
+      TTY: <%= Settings.contact_center.tty %><br/>
+    </p>
+  </div>
+<% end %>

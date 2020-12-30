@@ -19,7 +19,7 @@ Feature: HBX Admin should be able to send the broker application to pending stat
     Then Hbx Admin is on Broker Index of the Admin Dashboard
     When Hbx Admin is on Broker Index and clicks Broker Applicants
     Then Hbx Admin should see the list of broker applicants
-    And Hbx Admin the clicks on current broker applicant show button
+    And Hbx Admin clicks on the current broker applicant show button
     And Hbx Admin should see broker application with carrier appointments
     When Admin clicks on the pending button
     Then Hbx Admin views a successful message

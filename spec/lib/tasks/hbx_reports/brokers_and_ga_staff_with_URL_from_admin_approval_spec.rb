@@ -6,7 +6,8 @@ describe 'Broker and GA Staff Roles Invitations Monthly report', :dbclean => :af
   context 'reports:shop brokers_and_ga_staff_with_URL_from_admin_approval' do
 
     before do
-      Rails.application.class.load_tasks
+      load File.expand_path("#{Rails.root}/lib/tasks/hbx_reports/brokers_and_ga_staff_with_URL_from_admin_approval.rake", __FILE__)
+      Rake::Task.define_task(:environment)
     end
 
     it "should invoke without errors" do

@@ -134,6 +134,9 @@
     }
 
 javascript:
+  var selectedBenefitSponsorsID = "#{params[:benefit_sponsorship_id]}";
+  var selectedBenefitApplicationID = "#{params[:benefit_application_id]}";
+  var selectedBenefitPackageID = "#{params[:benefit_package_id]}";
   var productOptionKind = 'single_issuer';
   var sponsorContribution = String;
   var filteredProducts = String;
@@ -156,6 +159,59 @@ javascript:
     spouse:spouse || 0,
     domesticPartner:domesticPartner || 0,
     childUnder26:childUnder26 || 0
+  }
+
+
+  function viewSummary(element) {
+    selectedSummaryTitle = element.dataset.planTitle;
+    selectedReferencePlanID = element.dataset.planId;
+    document.getElementById('viewSummaryTitle').innerHTML = selectedSummaryTitle;
+    //$('#viewSummaryModal').data('bs.modal').$backdrop.css('background-color','transparent');
+    fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
+      .then((res)=> res.json())
+      .then((data)=> {
+        data[1].map((s)=> {
+        document.getElementById('sbcLink').setAttribute('href', data[2])
+        var tr = document.createElement('tr');
+        var tbody = document.getElementById('modalSummaryData');
+        tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+        tbody.appendChild(tr)
+        });
+      })
+      .then($('#viewSummaryModal').modal('show'))
+      showLess = false
+  }
+
+  function showMoreDetails() {
+    if (showLess) {
+      document.getElementById('modalSummaryData').innerHTML = '';
+      fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID)
+        .then((res)=> res.json())
+        .then((data)=> {
+          data[1].map((s)=> {
+          document.getElementById('sbcLink').setAttribute('href', data[2])
+          var tr = document.createElement('tr');
+          var tbody = document.getElementById('modalSummaryData');
+          tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+          tbody.appendChild(tr)
+          })
+        })
+        .then(document.getElementById('btnMoreDetails').innerHTML = "More Details")
+        showLess = false;
+    } else {
+      fetch('/benefit_sponsors/benefit_sponsorships/'+selectedBenefitSponsorsID+'/benefit_applications/'+selectedBenefitApplicationID+'/benefit_packages/reference_product_summary?reference_plan_id='+selectedReferencePlanID+'&details=details')
+        .then((res)=> res.json())
+        .then((data)=> {
+          data[1].map((s)=> {
+          var tr = document.createElement('tr');
+          var tbody = document.getElementById('modalSummaryData');
+          tr.innerHTML = `<td style="background-color:#f5f5f5">${s.visit_type}</td><td>${s.copay_in_network_tier_1}</td><td>${s.co_insurance_in_network_tier_1}</td>`;
+          tbody.appendChild(tr)
+          })
+        })
+        .then(document.getElementById('btnMoreDetails').innerHTML = "Fewer Details")
+        showLess = true;
+        }
   }
 
   function radioSelected(element) {
@@ -558,3 +614,33 @@ javascript:
 			  }
 		}
 	}
+
+
+// Shows view summary modal
+.modal.fade#viewSummaryModal tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  .modal-dialog role="document"
+    .modal-content
+      .modal-header
+        button.close type="button" data-dismiss="modal" aria-label="close" x
+        h4.heading-text.mt-0.mb-0.col-10#viewSummaryTitle
+      .modal-body
+        table.table.compare-table#modalSummaryData style="font-size:11px"
+          tr
+            td.active
+              strong PLAN BENEFITS
+            td
+              strong CO-PAY
+            td
+              strong COINSURANCE
+          tbody#modalSummaryData
+
+      .modal-footer
+        .pull-left
+          a href="/" id="sbcLink" target="_blank"
+            i.far.fa-file-pdf.fa-2x.mr-1
+            | Summary of Benefits and Coverage
+        .pull-right
+          button.btn.btn-default.btn-sm#btnMoreDetails type="button" onclick="showMoreDetails()" More Details
+          button.btn.btn-default.btn-sm#closeModal type="button" data-dismiss="modal" style="margin-top:-1px" Close
+
+

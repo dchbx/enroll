@@ -15,7 +15,7 @@
             <%= text_field_tag "person[max_aptc]", nil, class: "required input_txt", :input_html => { width: '100%' } %>
           </td>
           <td class="select_person_csr">
-            <%= select_tag "person[csr]", options_for_select(EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP.keys.map{|variant| variant.gsub('csr_', '')}), prompt: 'Select one' %>
+            <%= select_tag "person[csr]", options_for_select(csr_percentage_options_for_select), prompt: 'Select one' %>
           </td>
           <td>
             <%= datepicker_control f, :effective_date, {:class => "interaction-field-control-census-employee-dob input_txt", :value => params[:effective_date].present? ? Date.strptime(params[:effective_date], '%m/%d/%Y') : nil, :placeholder => "EFFECTIVE DATE", required: true} %>

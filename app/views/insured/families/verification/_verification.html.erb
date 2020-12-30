@@ -80,7 +80,7 @@
                           <div class="v-doc col-md-11">
                             <% if vlp_doc.identifier.present? %>
                               <% key = vlp_doc.identifier.split('#').last %>
-                              <%= link_to "#{vlp_doc.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", title: "Download", data: {"toggle": "tooltip"} %>
+                              <%= link_to "#{vlp_doc.title.titleize} <i class='fa fa-download fa-lg' aria-hidden='true'></i>".html_safe, "/insured/verification_documents/download/#{key}", :target => '_blank', title: "Download", data: {"toggle": "tooltip"} %>
                             <% end %>
                           </div>
                           <div class="v-doc col-md-1">

@@ -1,3 +1,4 @@
+$(".application-warnings").empty();
 <% @benefit_application_form.errors.messages.each_value do |warning| %>
   $(".application-warnings").append("<li><%= warning.join(' ') %></li>");
 <% end %>

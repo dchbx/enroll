@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
+  before_action :cartafact_download_params, only: [:cartafact_download]
   respond_to :html, :js
 
   def download
@@ -14,22 +15,27 @@ class DocumentsController < ApplicationController
   end
 
   def download_employer_document
-    send_file params[:path]
+    document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
+    document.present? ? (send_file document.identifier) : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
+  rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def authorized_download
     begin
       model = params[:model].camelize
       model_id = params[:model_id]
-      relation = params[:relation]
+      relation = ["documents"].include?(params[:relation]) ? params[:relation] : "documents"
       relation_id = params[:relation_id]
 
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile"
       end
+      model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
+      raise "Sorry! Invalid Request" unless model_klass
 
-      model_object = Object.const_get(model).find(model_id)
+      model_object = model_klass.find(model_id)
       documents = model_object.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
         uri = documents.find(relation_id).identifier
@@ -40,6 +46,19 @@ class DocumentsController < ApplicationController
     rescue => e
       redirect_back(fallback_location: root_path, :flash => {error: e.message})
     end
+  end
+
+  def cartafact_download
+    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h, user: current_user})
+    if result.success?
+      response_data = result.value!
+      send_data response_data, get_options(params)
+    else
+      errors = result.failure
+      redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
+    end
+  rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def update_verification_type
@@ -102,15 +121,13 @@ class DocumentsController < ApplicationController
   end
 
   def fed_hub_request
-    if @verification_type.type_name == 'DC Residency'
-      @person.consumer_role.invoke_residency_verification!
-    else
-      @person.consumer_role.redetermine_verification!(verification_attr)
-    end
+    request_hash = {person_id: @person.id, verification_type: @verification_type.type_name}
+    result = ::Operations::CallFedHub.new.call(request_hash)
+    key, message = result.failure? ? result.failure : result.success
+
     respond_to do |format|
       format.html {
-        hub =  @verification_type.type_name == 'DC Residency' ? 'Local Residency' : 'FedHub'
-        flash[:success] = "Request was sent to #{hub}."
+        flash[key] = message
         redirect_back(fallback_location: root_path)
       }
       format.js
@@ -190,10 +207,6 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def download_employer_document
-    send_file params[:path]
-  end
-
   def download_documents
     docs = Document.find(params[:ids])
     docs.each do |doc|
@@ -233,6 +246,11 @@ class DocumentsController < ApplicationController
   end
 
   private
+
+  def cartafact_download_params
+    params.permit(:user, :relation_id, :model, :model_id)
+  end
+
   def updateable?
     authorize Family, :updateable?
   end

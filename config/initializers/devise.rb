@@ -10,6 +10,10 @@ Devise.setup do |config|
     manager.failure_app = CustomFailureApp
   end
 
+  config.jwt do |jwt|
+    jwt.secret = "2f79bac651f5ebedd286c976febdf8bb7f74b7f1a8013ba23c0f8e5a42faaaedc53f2c9e1062ecbcb48a277636bc9b45cc24a0a5512df0862520c366c0c01489"
+  end
+
   # The secret key used by Devise. Devise uses this key to generate
   # random tokens. Changing this key will render invalid all existing
   # confirmation, reset password and unlock tokens in the database.

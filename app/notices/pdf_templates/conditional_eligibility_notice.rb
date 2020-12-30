@@ -43,7 +43,7 @@ module PdfTemplates
     attribute :same_plan_health_enrollment, Boolean
     attribute :same_plan_dental_enrollment, Boolean
     attribute :is_an_aqhp_cover_letter, Boolean
-
+    attribute :is_a_void_active_cover_letter, Boolean
 
     def other_enrollments
       enrollments.reject{|enrollment| enrollments.index(enrollment).zero? }

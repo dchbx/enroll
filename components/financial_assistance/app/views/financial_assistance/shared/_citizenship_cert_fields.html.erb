@@ -1,0 +1,5 @@
+<div id="immigration_citizenship_cert_container">
+  <%= c.hidden_field :vlp_subject, value: 'Certificate of Citizenship' %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/citizenship_number", locals: {v: c} %>
+  <%= render :partial => "financial_assistance/applicants/docs_shared/alien_number", locals: {v: c} %>
+</div>

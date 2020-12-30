@@ -18,7 +18,9 @@ gem "benefit_markets", path: "../benefit_markets"
 gem "sponsored_benefits", path: "../sponsored_benefits"
 gem "effective_datatables", path: ".../../../../project_gems/effective_datatables-2.6.14"
 gem 'acapi', git: "https://github.com/dchbx/acapi.git", branch: 'master'
-gem 'webpacker'
+gem 'webpacker', '~> 4.0.2'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
+# gem 'resource_registry',  git: '../../../resource_registry'
 
 group :development, :test do
   gem 'rails-controller-testing'

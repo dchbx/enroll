@@ -4,6 +4,10 @@ module BenefitSponsors
   RSpec.describe Forms::BenefitApplicationForm, type: :model, dbclean: :after_each do
 
     subject { BenefitSponsors::Forms::BenefitApplicationForm.new }
+    let!(:site) { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key) }
+    let!(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{Settings.site.key}_employer_profile".to_sym, site: site) }
+    let!(:employer_profile)    { organization.employer_profile }
+    let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
 
     describe "model attributes" do
       it {
@@ -85,8 +89,7 @@ module BenefitSponsors
     end
 
     describe ".submit_application" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
-      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_package, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to submit application and" do
@@ -105,7 +108,6 @@ module BenefitSponsors
     end
 
     describe ".force_submit_application_with_eligibility_errors" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
@@ -119,7 +121,6 @@ module BenefitSponsors
     end
 
     describe ".revert" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
@@ -139,7 +140,6 @@ module BenefitSponsors
     end
 
     describe ".persist" do
-      let!(:benefit_sponsorship) { FactoryBot.build(:benefit_sponsors_benefit_sponsorship)}
       let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, benefit_sponsorship:benefit_sponsorship) }
       let(:benefit_application_form) { FactoryBot.build(:benefit_sponsors_forms_benefit_application)}
       let!(:service_object) { double("BenefitApplicationService")}
@@ -217,6 +217,59 @@ module BenefitSponsors
         it 'should add errors to the form instance' do
           @ba_form2.valid?
           expect(@ba_form2.errors.full_messages).to include("Open Enrollment Start Date can't be later than the Open Enrollment End Date")
+        end
+      end
+    end
+
+    describe 'validate form for oe dates - non admin' do
+
+      let(:start_on) { TimeKeeper.date_of_record + 3.months }
+      let(:oe_start_on) { TimeKeeper.date_of_record + 2.months }
+
+      let(:valid_params) do
+        {
+          admin_datatable_action: false,
+          benefit_sponsorship_id: 'id',
+          start_on: start_on,
+          end_on: start_on.next_year.prev_day,
+          open_enrollment_start_on: oe_start_on,
+          open_enrollment_end_on: oe_start_on.next_week
+        }
+      end
+
+      let(:invalid_params) do
+        {
+          admin_datatable_action: false,
+          benefit_sponsorship_id: 'id',
+          start_on: start_on,
+          end_on: start_on.next_year.prev_day,
+          open_enrollment_start_on: oe_start_on,
+          open_enrollment_end_on: oe_start_on
+        }
+      end
+
+      context 'for valid params' do
+        before :each do
+          @ba_form1 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(valid_params)
+        end
+
+        it 'should return true when validated' do
+          expect(@ba_form1.valid?).to be_truthy
+        end
+      end
+
+      context 'for invalid params' do
+        before :each do
+          @ba_form2 = ::BenefitSponsors::Forms::BenefitApplicationForm.new(invalid_params)
+        end
+
+        it 'should return false when validated' do
+          expect(@ba_form2.valid?).to be_falsey
+        end
+
+        it 'should add errors to the form instance' do
+          @ba_form2.valid?
+          expect(@ba_form2.errors.full_messages).to include("Open Enrollment Dates are not valid")
         end
       end
     end

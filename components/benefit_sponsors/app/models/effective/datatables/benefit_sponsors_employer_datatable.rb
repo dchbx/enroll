@@ -74,7 +74,10 @@ module Effective
               ['Create Plan Year', main_app.new_benefit_application_exchanges_hbx_profiles_path(benefit_sponsorship_id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_create_benefit_application?) ? 'ajax' : 'hide'],
               [text_to_display(row), disable_ssn_requirement_exchanges_hbx_profiles_path(ids: [row], no_ssn_field: row.is_no_ssn_enabled), 'post_ajax'],
               ['Change FEIN', edit_fein_exchanges_hbx_profiles_path(id: row.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), pundit_allow(HbxProfile, :can_change_fein?) ? "ajax" : "hide"],
-              ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"), force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))]
+              ['Force Publish', edit_force_publish_exchanges_hbx_profiles_path(id: @employer_profile.latest_benefit_sponsorship.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"),
+               force_publish_link_type(row, pundit_allow(HbxProfile, :can_force_publish?))],
+              ['Send Secure Message', main_app.new_secure_message_exchanges_hbx_profiles_path(profile_id: @employer_profile.id, employer_actions_id: "employer_actions_#{@employer_profile.id}"),
+               send_secure_message_link_type(pundit_allow(HbxProfile, :can_send_secure_message?))]
           ]
 
           dropdown.insert(2,['Plan Years', exchanges_employer_applications_path(employer_id: row, employers_action_id: "employer_actions_#{@employer_profile.id}"), 'ajax']) if pundit_allow(HbxProfile, :can_modify_plan_year?)
@@ -128,6 +131,12 @@ module Effective
 
       def business_policy_accepted?(draft_application)
         TimeKeeper.date_of_record > draft_application.last_day_to_publish && TimeKeeper.date_of_record < draft_application.start_on
+      end
+
+      def send_secure_message_link_type(allow)
+        feature_enabled = ::EnrollRegistry.feature_enabled?(:send_secure_message_employer)
+        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow ? 'ajax' : 'hide'
       end
 
       def force_publish_link_type(benefit_sponsorship, allow)

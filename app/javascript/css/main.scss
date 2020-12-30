@@ -4,8 +4,18 @@
 body {
   background-color: $medium-gray;
   -webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+  -moz-osx-font-smoothing: grayscale;
   font-family: 'Open Sans', sans-serif;
+}
+
+.card-body {
+    flex: 1 1 auto;
+    min-height: 1px;
+    padding: 0.25rem;
+}
+
+.manage_sep_types .mb-4, .my-4 {
+    margin-bottom: 0.50rem !important;
 }
 
 .nm-content {
@@ -29,4 +39,32 @@ footer {
 
 .welcome-text {
   margin-top: 70px;
+}
+
+#sort_notification_msg {
+  display: none;
+  opacity: 1;
+  border-color: #c3e6cb;
+  max-width: 466px;
+  margin-left: 295px;
+}
+
+#sort_notification_msg.success{
+  background-color: #d4edda;
+}
+
+#sort_notification_msg .success{
+  background-color: #d4edda;
+}
+
+#sort_notification_msg.error{
+  background-color: #ecb4b4;
+}
+
+#sort_notification_msg .error{
+  background-color: #ecb4b4;
+}
+
+.right-align{
+  margin-left: 690px;
 }

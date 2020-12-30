@@ -150,6 +150,14 @@ def people
     "CSR" => {
       email: "sherry.buckner@dc.gov",
       password: 'aA1!aA1!aA1!'
+    },
+    "Ricky Martin" => {
+      first_name: "Ricky",
+      last_name: "Martin",
+      dob_date: '10/10/1984',
+      broker_census_employee: true,
+      password: 'aA1!aA1!aA1!',
+      ssn: "222335220"
     }
   }
 end
@@ -270,14 +278,29 @@ end
 
 Given(/^a Hbx admin with super admin access exists$/) do
   #Note: creates an enrollment for testing purposes in the UI
-  p_staff = Permission.create(name: 'hbx_staff', modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
-      send_broker_agency_message: true, approve_broker: true, approve_ga: true,
-      modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true)
+  p_staff = Permission.create(name: 'hbx_staff',
+                              modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
+                              send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                              modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true,
+                              can_access_new_consumer_application_sub_tab: true, can_access_accept_reject_paper_application_documents: true, can_access_pay_now: true)
   person = people['Hbx Admin']
   hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
   user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
   FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
   FactoryBot.create :hbx_enrollment,family:user.primary_family, household:user.primary_family.active_household
+end
+
+Given(/^a Hbx admin with tier 3 access exists$/) do
+  #Note: creates an enrollment for testing purposes in the UI
+  p_staff = Permission.create(name: 'hbx_staff',
+                              modify_family: true, list_enrollments: true, send_broker_agency_message: true, approve_broker: true, approve_ga: true,
+                              modify_admin_tabs: true, view_admin_tabs: true, can_update_ssn: true, can_complete_resident_application: true,
+                              can_access_new_consumer_application_sub_tab: true, can_access_accept_reject_paper_application_documents: true, can_access_pay_now: true)
+  person = people['Hbx Admin']
+  hbx_profile = FactoryBot.create :hbx_profile, :no_open_enrollment_coverage_period
+  user = FactoryBot.create :user, :with_family, :with_hbx_staff_role, email: person[:email], password: person[:password], password_confirmation: person[:password]
+  FactoryBot.create :hbx_staff_role, person: user.person, hbx_profile: hbx_profile, permission_id: p_staff.id
+  FactoryBot.create :hbx_enrollment,family: user.primary_family, household: user.primary_family.active_household
 end
 
 Given(/^a Hbx admin with read only permissions exists$/) do
@@ -453,7 +476,7 @@ Then(/^(?:.+) should be logged on as an unlinked employee$/) do
 end
 
 When (/^(.*) logs? out$/) do |someone|
-  find_link('Logout', wait: 1)
+  find_link('Logout', wait: 5)
   click_link "Logout"
   visit "/"
   find('.container.welcome', wait: 5) do |element|
@@ -603,7 +626,7 @@ When(/^.+ completes? the matched employee form for (.*)$/) do |named_person|
   fill_in "person[phones_attributes][0][full_phone_number]", :with => phone_number
   screenshot("personal_info_complete")
   expect(page).to have_field("HOME PHONE", with: phone_number) if person[:home_phone].present?
-  expect(page).to have_selector('.selectric', text: Settings.aca.shop_market.employee.default_contact_method)
+  expect(page).to have_selector('.selectric', text: 'Only electronic communications')
   find('.interaction-click-control-continue', text: 'CONTINUE', wait: 5).click
 end
 
@@ -627,8 +650,7 @@ And(/^.+ selects the first plan available$/) do
 end
 
 Then(/^.+ should see the dependents page$/) do
-  find('.interaction-click-control-add-member', wait: 10)
-  expect(page).to have_content('Add Member')
+  expect(page).to have_content('Add New Person')
   screenshot("dependents_page")
 end
 
@@ -652,7 +674,7 @@ Then(/^.+ should see ([^"]*) dependents*$/) do |n|
 end
 
 When(/^.+ clicks? Add Member$/) do
-  click_link("Add Member", :visible => true)
+  click_link 'Add New Person'
 end
 
 Then(/^.+ should see the new dependent form$/) do
@@ -665,8 +687,8 @@ When(/^.+ enters? the dependent info of .+ daughter$/) do
   date = TimeKeeper.date_of_record - 28.years
   dob = date.to_s
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: dob
-  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, "//li[@data-index='3'][contains(., 'Child')]").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Child')]").click
+  find(:xpath, "//label[@for='radio_female']").click
   find(:xpath, "//label[@for='radio_female']").click
 end
 
@@ -677,8 +699,8 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
   find('#dependents_info_wrapper').click
   sleep 1
-  find(:xpath, "//span[@class='label'][contains(., 'This Person Is')]").click
-  find(:xpath, "//li[@data-index='1'][contains(., 'Spouse')]").click
+  find("span", :text => "choose").click
+  find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
   find(:xpath, "//label[@for='radio_female']").click
   fill_in 'dependent[addresses][0][address_1]', with: '123 STREET'
   fill_in 'dependent[addresses][0][city]', with: 'WASHINGTON'
@@ -689,7 +711,7 @@ end
 
 When(/^.+ clicks? confirm member$/) do
   all(:css, ".mz").last.click
-  expect(page).to have_link('Add Member')
+  expect(page).to have_link('Add New Person')
 end
 
 When(/^.+ clicks? continue on the dependents page$/) do
@@ -745,6 +767,10 @@ Then(/^.+ should see the list of plans$/) do
   screenshot("plan_shopping")
 end
 
+And(/^.+ should see the Metal Level filter$/) do
+  expect(page).to have_content('Metal Level')
+end
+
 When(/^.+ sorts by (.*)/) do |sort|
   @plan_names = find_all('.plan-row').collect{|row| row.find('h3 a', wait: 5).text}
   find(".interaction-click-control-#{sort.downcase.gsub(/\s/, '-')}", wait: 5).click
@@ -756,7 +782,7 @@ end
 
 When(/^.+ filters plans by Carrier/) do
   find('.selectric-interaction-choice-control-carrier').click
-  carrier_option = find('li.interaction-choice-control-carrier-1', wait: 5)
+  carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
   find(".interaction-click-control-apply", wait: 5).click
@@ -801,6 +827,7 @@ When(/^.+ clicks? on Confirm button on the coverage summary page$/) do
 end
 
 Then(/^.+ should see the receipt page$/) do
+  find('h1.darkblue', wait: 10)
   expect(page).to have_content('Enrollment Submitted')
   screenshot("receipt_page")
   find('.interaction-click-control-continue').click
@@ -824,8 +851,8 @@ When(/^.+ clicks? a qle event$/) do
   @browser.element(text: /You may be eligible for a special enrollment period./i).wait_until_present
   expect(@browser.element(text: /You may be eligible for a special enrollment period./i).visible?).to be_truthy
   scroll_then_click(@browser.element(class: /interaction-click-control-continue/))
-  @browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  @browser.element(text: "#{l10n('family_information')}").wait_until_present
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   scroll_then_click(@browser.a(id: /btn_household_continue/))
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present
   expect(@browser.element(text: /Choose Benefits: Covered Family Members/i).visible?).to be_truthy
@@ -857,6 +884,25 @@ When(/^.+ goes to to home tab$/) do
   @browser.element(class: /interaction-click-control-my-dc-health-link/).fire_event('onclick')
 end
 
+And(/^.+ clicks the most recent message in the inbox$/) do
+  message_link = page.all('tr').detect { |tr| tr[:class] == "msg-inbox-unread" }
+  message_link.click
+end
+
+Then(/^.+ should see the appropriate (.*?) template text$/) do |market_name|
+  case market_name
+  when 'SHOP'
+    expect(page).to have_content("Your Enrollment Confirmation")
+    expect(page).to have_content('plan offered by your employer.')
+    expect(page).to have_content('Your employer contributes')
+    expect(page).to have_content('Thank you for enrolling in coverage through DC Health Link')
+    # In the email signature
+    [Settings.site.short_name, Settings.contact_center.short_number, Settings.contact_center.tty].each do |email_signature_line|
+      expect(page).to have_content(email_signature_line)
+    end
+  end
+end
+
 Then(/^.+ should see the current plan year$/) do
   @browser.element(text: /My Health Benefits Program/i).wait_until_present
   # expect(@browser.h5(text: /Plan Year/i).visible?).to be_truthy
@@ -885,6 +931,7 @@ end
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) tab$/) do |tab_name|
   click_link 'HBX Portal' if page.has_link?('HBX Portal')
   find(:xpath, "//li[contains(., '#{tab_name}')]", :wait => 10).click
+  wait_for_ajax
 end
 
 When(/^(?:General){0}.+ clicks? on the ((?:General|Staff){0}.+) dropdown$/) do |tab_name|
@@ -920,6 +967,7 @@ end
 
 When(/^I click on "(.*?)" button on household info page$/) do |select_action|
   click_link "Continue"
+  sleep 5
   click_button "Shop for new plan"
 end
 
@@ -972,7 +1020,7 @@ end
 
 Then(/^I should see the dependents and group selection page$/) do
   #@browser.element(text: /Household Info: Family Members/i).wait_until_present
-  expect(@browser.element(text: /Household Info: Family Members/i).visible?).to be_truthy
+  expect(@browser.element(text: "#{l10n('family_information')}").visible?).to be_truthy
   @browser.element(class: /interaction-click-control-continue/).wait_until_present
   @browser.execute_script("$('.interaction-click-control-continue')[1].click();")
   @browser.element(text: /Choose Benefits: Covered Family Members/i).wait_until_present

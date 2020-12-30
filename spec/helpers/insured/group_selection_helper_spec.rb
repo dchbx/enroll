@@ -3,6 +3,10 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_each do
+  after :all do
+    DatabaseCleaner.clean
+  end
+
   let(:subject)  { Class.new { extend Insured::GroupSelectionHelper } }
 
   describe "#can shop individual" do
@@ -201,6 +205,62 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
       allow(person).to receive(:is_resident_role_active?).and_return(true)
       expect(helper.view_market_places(person)).to eq ["coverall"]
     end
+
+    it "should return individual & coverall if can_shop_individual_or_resident? return true" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(true)
+      expect(helper.view_market_places(person)).to eq ["individual", "coverall"]
+    end
+
+    it "should return individual if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
+      expect(helper.view_market_places(person)).to eq ["individual"]
+    end
+
+    it "should return coverall if can_shop_individual_or_resident? return false" do
+      allow(person).to receive(:is_consumer_role_active?).and_return(false)
+      allow(person).to receive(:is_resident_role_active?).and_return(true)
+      allow(person).to receive(:has_active_resident_member?).and_return(false)
+      expect(helper.view_market_places(person)).to eq ["coverall"]
+    end
+  end
+
+  describe "#get_ivl_market_kind" do
+
+    let(:person) {FactoryBot.create(:person)}
+    context "family has primary person with consumer role active" do
+      it 'should return individual market if person has active consumer role' do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+        allow(person).to receive(:is_resident_role_active?).and_return(false)
+        expect(helper.get_ivl_market_kind(person)).to eq "individual"
+      end
+    end
+
+    context "family has primary person with resident role active" do
+      it 'should return coverall market if person has active resident role' do
+        allow(person).to receive(:is_consumer_role_active?).and_return(false)
+        allow(person).to receive(:is_resident_role_active?).and_return(true)
+        expect(helper.get_ivl_market_kind(person)).to eq "coverall"
+      end
+    end
+
+    context "family has primary person with resident role active and dependent with consumer role active" do
+      it 'should return individual market for the family' do
+        allow(person).to receive(:is_resident_role_active?).and_return(true)
+        allow(person).to receive(:has_active_consumer_member?).and_return(true)
+        expect(helper.get_ivl_market_kind(person)).to eq "individual"
+      end
+    end
+
+    context "family has primary person with consumer role active and dependent with resident role active" do
+      it 'should return individual market for the family' do
+        allow(person).to receive(:is_consumer_role_active?).and_return(true)
+        allow(person).to receive(:has_active_resident_member?).and_return(true)
+        expect(helper.get_ivl_market_kind(person)).to eq "individual"
+      end
+    end
+
   end
 
   describe "#selected_enrollment" do
@@ -266,6 +326,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         allow(employee_role.census_employee).to receive(:renewal_published_benefit_package).and_return(benefit_package)
         sep.update_attribute(:effective_on, renewal_application.start_on + 2.days)
         expect(subject.selected_enrollment(family, employee_role, active_enrollment.coverage_kind)).to eq renewal_enrollment
+      end
+
+      it 'should return nil if employee role is not present' do
+        expect(subject.selected_enrollment(family, nil, active_enrollment.coverage_kind)).to eq nil
       end
 
       context 'it should not return any enrollment' do
@@ -672,10 +736,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
 
     let(:active_bg) { double("ActiveBenefitGroup", plan_year: double("ActivePlanYear")) }
     let(:renewal_bg) { double("RenewalBenefitGroup", plan_year: double("RenewingPlanYear")) }
-    let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
     let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: employer_profile)}
     let(:census_employee) { double("CensusEmployee", active_benefit_group: active_bg, employer_profile: employer_profile)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: employee_role.person)}
+    let!(:sep) { FactoryBot.create(:special_enrollment_period, family: family, effective_on: TimeKeeper.date_of_record)}
 
     before do
       allow(employee_role).to receive(:census_employee).and_return census_employee
@@ -724,6 +788,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(renewal_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return false
+          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if active benefit group offers dental" do
@@ -743,6 +808,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           allow(active_bg).to receive(:is_offering_dental?).and_return true
           allow(sep).to receive(:is_eligible?).and_return true
           allow(helper).to receive(:is_covered_plan_year?).with(renewal_bg.plan_year, sep.effective_on).and_return true
+          sep.update_attributes!(start_on: TimeKeeper.date_of_record - 10.days, end_on: TimeKeeper.date_of_record + 10.days) unless sep.is_active?
         end
 
         it "should return true if renewal benefit group offers dental" do

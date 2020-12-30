@@ -102,7 +102,7 @@ RSpec.describe 'BenefitSponsors::ModelEvents::EmployerInvoiceAvailableNotice', d
 
       it "should return plan year start date" do
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
-        expect(merge_model.benefit_application.binder_payment_due_date).to eq schedular.map_binder_payment_due_date_by_start_on(benefit_application.start_on).strftime("%m/%d/%Y")
+        expect(merge_model.benefit_application.binder_payment_due_date).to eq schedular.map_binder_payment_due_date_by_start_on(false, benefit_application.start_on).strftime("%m/%d/%Y")
       end
 
       it "should return false when there is no broker linked to employer" do

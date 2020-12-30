@@ -20,7 +20,7 @@
           = f.hidden_field :no_ssn, value: @person_params[:no_ssn]
           = f.hidden_field :gender, value: @person_params[:gender]
           = hidden_field_tag :persisted, true
-          = f.submit :class => "hidden", :id => "stay-as-individual"
+          = f.submit :class => "hidden", :id => "stay-as-individual", data: { disable_with: "Submitting..." }
         // ======
         #person_search_results
           = render partial: 'insured/employee_roles/select_employer'

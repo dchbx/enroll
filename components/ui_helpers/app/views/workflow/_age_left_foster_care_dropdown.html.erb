@@ -1,0 +1,6 @@
+<%= label_tag cell.name.titleize.upcase%>
+<% now = Time.now.utc.to_date
+  dob = @model.family_member.person.dob
+  age = now.year - dob.year - ((now.month > dob.month || (now.month == dob.month && now.day >= dob.day)) ? 0 : 1)
+   %>
+<%= select_tag(cell.name_attribute, options_for_select([*1..age]), prompt: ' NONE', disabled: cell.disabled, required: cell.required, class: "form-control") %>

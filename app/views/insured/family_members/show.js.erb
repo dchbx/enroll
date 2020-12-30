@@ -10,3 +10,7 @@ if ($("#add_member_list_<%= @dependent.id %>").length) {
 <% end %>
 
 $("#dependent_buttons").removeClass('hidden');
+
+<% if ::EnrollRegistry.feature_enabled?(:financial_assistance) &&  (['create', 'update', 'destroy'].include? controller.action_name)  %>
+  $('#faa_flow_info').html("<%= escape_javascript(render partial: 'insured/families/faa_popup') %>");
+<% end %>

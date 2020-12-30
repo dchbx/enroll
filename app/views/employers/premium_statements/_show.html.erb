@@ -9,7 +9,7 @@
 
   <% if @datatable.present? %>
 
-  <%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-5'> <'col-sm-5'f> >" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true,buttons: ['csv','excel'],"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]})  %>
+  <%= h render_datatable(@datatable,{ sDom: "<'row'<'col-sm-5'> <'col-sm-5'f> >" + "<'row'<'col-sm-10'tr>>"+ "<'row'<'col-sm-9'i> <'col-sm-3'l>>"+ "<'row'<'col-sm-10'p>>", autowidth: true,buttons: ['csv','excel'],"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]})  %>
   <% else %>
     <div class="col-xs-4">No employees enrolled.</div>
   <% end %>

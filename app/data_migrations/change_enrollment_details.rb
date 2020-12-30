@@ -180,7 +180,11 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
   def transfer_enrollment_from_glue_to_enroll
     # This method needs to be updated to new model
-    ts = TranscriptGenerator.new
+    ts = if ENV['market'].present?
+           TranscriptGenerator.new(ENV['market'].to_s)
+         else
+           TranscriptGenerator.new
+         end
     ts.display_enrollment_transcripts
   end
 end

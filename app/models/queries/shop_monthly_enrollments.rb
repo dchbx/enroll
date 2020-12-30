@@ -124,7 +124,7 @@ module Queries
     def quiet_period_coverage_expression
       {
         "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-        "kind" => "employer_sponsored",
+        "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
         "workflow_state_transitions" => { 
           "$elemMatch" => quiet_period_expression 
         }
@@ -135,7 +135,7 @@ module Queries
       {
           "effective_on" => {"$gt" => @effective_on},
           "sponsored_benefit_id" => { "$in" => collect_benefit_group_ids },
-          "kind" => "employer_sponsored",
+          "kind" => {"$in" => ["employer_sponsored", "employer_sponsored_cobra"]},
           "submitted_at" => {"$lt" => quiet_period.begin}
       }
     end

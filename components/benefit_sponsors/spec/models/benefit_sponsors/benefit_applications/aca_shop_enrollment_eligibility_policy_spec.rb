@@ -4,6 +4,11 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_applicatio
 
 module BenefitSponsors
   RSpec.describe BenefitApplications::AcaShopEnrollmentEligibilityPolicy, type: :model, :dbclean => :after_each do
+    before(:all) do
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
+    end
+
+
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
     include_context "setup employees with benefits"
@@ -59,45 +64,22 @@ module BenefitSponsors
           expect(policy.is_satisfied?(benefit_application)).to eq false
         end
       end
-    end
 
-    describe "Validates non_minimum_participation_enrollment_eligiblity_policy business policy" do
-
-      let!(:policy_name) {:non_minimum_participation_enrollment_eligiblity_policy}
-      let!(:policy) {subject.business_policies[policy_name]}
-
-      context "When all the census employees are emrolled" do
-
+      context "When all the census employees are waived" do
         before do
+          employees = []
           benefit_sponsorship.census_employees.each do |ce|
             family = FactoryBot.create(:family, :with_primary_family_member)
             allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.save
+            allow(ce).to receive(:is_waived_under?).and_return true
+            employees << ce
           end
+          allow(benefit_application).to receive(:active_census_employees_under_py).and_return(employees)
         end
 
-        it "should satisfy rules" do
-          expect(policy.is_satisfied?(benefit_application)).to eq true
-        end
-
-      end
-
-      context "When less then minimum participation of the census employees are emrolled" do
-
-        before do
-          benefit_sponsorship.census_employees.each do |ce|
-            family = FactoryBot.create(:family, :with_primary_family_member)
-            allow(ce).to receive(:family).and_return(family)
-            allow(benefit_application).to receive(:active_census_employees_under_py).and_return([ce])
-            FactoryBot.create(:hbx_enrollment, family: family, household: family.active_household, benefit_group_assignment: ce.benefit_group_assignments.first, sponsored_benefit_package_id: ce.benefit_group_assignments.first.benefit_package.id)
-            ce.save
-          end
-        end
-
-        it "should satisfy rules" do
-          expect(policy.is_satisfied?(benefit_application)).to eq true
+        it "should fail the policy" do
+          policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
+          expect(policy.is_satisfied?(benefit_application)).to eq false
         end
       end
     end
@@ -180,7 +162,7 @@ module BenefitSponsors
         end
       end
 
-      context "When less then minimum participation of the census employees are emrolled" do
+      context "When less than minimum participation of the census employees are emrolled" do
 
         let!(:load_enrollments) do
           benefit_sponsorship.census_employees.limit(3).each do |ce|
@@ -209,8 +191,14 @@ module BenefitSponsors
 
         # For 1/1 effective date minimum participation rule does not apply
         # 1+ non-owner rule does apply
+
+        before do
+          allow(benefit_application).to receive(:employee_participation_ratio_minimum).and_return(0.75) unless benefit_application.start_on.yday == 1
+        end
+
         it "should fail the policy" do
           policy = subject.business_policies_for(benefit_application, :end_open_enrollment)
+          # Making the system to default to amnesty rules for release 1.
           if benefit_application.start_on.yday == 1
             expect(policy.is_satisfied?(benefit_application)).to eq true
           else

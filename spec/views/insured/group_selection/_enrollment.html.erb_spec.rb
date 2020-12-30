@@ -22,6 +22,11 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:active_household) {family.active_household}
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: active_household )}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
+    let!(:sep) do
+      local_sep = FactoryBot.create(:special_enrollment_period, family: family)
+      local_sep.qualifying_life_event_kind.update_attributes!(termination_on_kinds: ['end_of_event_month'])
+      local_sep
+    end
 
     before :each do
       allow(hbx_enrollment).to receive(:product).and_return(product)
@@ -35,6 +40,7 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       assign :employee_role, employee_role
       assign :person, person
       assign :family, family
+      assign :termination_date_options, { hbx_enrollment.id.to_s => ['end_of_event_month']}
       render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
     end
 
@@ -68,6 +74,11 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
 
     it "should have terminate confirmation modal" do
       expect(rendered).to have_selector('h4', text: 'Select Terminate Reason')
+    end
+
+    it 'should have css terminated_on' do
+      expect(rendered).to have_css("select[name='terminated_on']")
+      expect(rendered).to have_selector("[name='terminated_on']")
     end
   end
 

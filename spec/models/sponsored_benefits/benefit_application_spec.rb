@@ -40,9 +40,11 @@ module SponsoredBenefits
 
       let(:benefit_market)      { site.benefit_markets.first }
       let(:current_effective_date)  { TimeKeeper.date_of_record }
+      let!(:issuer_profile)  { FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: site}
       let!(:benefit_market_catalog) { create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                              benefit_market: benefit_market,
                                              title: "SHOP Benefits for #{current_effective_date.year}",
+                                             issuer_profile: issuer_profile,
                                              application_period: (effective_period_start_on.beginning_of_year..effective_period_start_on.end_of_year))
 
       }

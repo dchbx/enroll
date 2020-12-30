@@ -71,7 +71,7 @@
 		}
 	} );
 } )();
-CKEDITOR.config.line_height = '1;2;3;4;5;6;7;8;9;10;11;12;13;14;15;16;17;18;19;20;21;22;23;24;25;26;27;28;29;30;31;32;33;34;35;36;37;38;39;40;41;42;43;44;45;46;47;48;49;50;51;52;53;54;55;56;57;58;59;60;61;62;63;64;65;66;67;68;69;70;71;72';
+CKEDITOR.config.line_height = "1em;1.1em;1.2em;1.3em;1.4em;Default(1.5em);1.6em;1.7em;1.8em;1.9em;2em;2.5em;3em;3.5em;4em;4.5em;5em;";
 CKEDITOR.config.lineHeight_style = {
 	element: 'span',
 	styles: { 'line-height': '#(size)' },

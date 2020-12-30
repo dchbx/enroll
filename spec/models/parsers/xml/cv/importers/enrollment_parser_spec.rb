@@ -55,7 +55,7 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
       it "should get fein and legal_name by employee_role" do
         employee_role = subject.get_enrollment_object.employee_role
         org = employee_role.employer_profile.organization
-        expect(org.fein).to eq '555002222'
+        expect(org.hbx_id).to eq '555002222'
         expect(org.legal_name).to eq 'United States Senate'
       end
 
@@ -63,6 +63,24 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
         enrollment = subject.get_enrollment_object
         expect(enrollment.effective_on).to eq Date.new(2016,1,1)
         expect(enrollment.terminated_on).to eq Date.new(2016,12,31)
+      end
+
+      context 'person relationships' do
+        before do
+          @primary_person = subject.get_enrollment_object.family.primary_person
+        end
+
+        it 'should only create relationships to dependents' do
+          expect(@primary_person.person_relationships.map(&:kind)).to eq(['spouse'])
+        end
+
+        it 'should not create self relationship into the db' do
+          expect(@primary_person.person_relationships.map(&:kind)).not_to include('self')
+        end
+
+        it 'should not create any relationships from primary to primary' do
+          expect(@primary_person.person_relationships.where(relative_id: @primary_person.id).first).to be_nil
+        end
       end
     end
 
@@ -91,6 +109,24 @@ describe Parsers::Xml::Cv::Importers::EnrollmentParser do
     it "should get applied_aptc_amount" do
       enrollment = subject.get_enrollment_object
       expect(enrollment.applied_aptc_amount).to eq Money.new(19465)
+    end
+
+    context 'person relationships' do
+      before do
+        @primary_person = subject.get_enrollment_object.family.primary_person
+      end
+
+      it 'should only create relationships to dependents' do
+        expect(@primary_person.person_relationships.map(&:kind)).to eq(['spouse'])
+      end
+
+      it 'should not create self relationship into the db' do
+        expect(@primary_person.person_relationships.map(&:kind)).not_to include('self')
+      end
+
+      it 'should not create any relationships from primary to primary' do
+        expect(@primary_person.person_relationships.where(relative_id: @primary_person.id).first).to be_nil
+      end
     end
   end
 end

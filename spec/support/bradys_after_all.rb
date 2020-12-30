@@ -106,11 +106,11 @@ module BradysAfterAll
 
       last_year = TimeKeeper.date_of_record - 1.years
       mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: last_year)
-      mikes_family.latest_household.tax_households.first.eligibility_determinations << EligibilityDetermination.new(max_aptc: 200, csr_eligibility_kind: 'csr_100', csr_percent_as_integer: 100, determined_at: last_year, determined_on: last_year)
+      mikes_family.latest_household.tax_households.first.eligibility_determinations << EligibilityDetermination.new(max_aptc: 200, csr_eligibility_kind: 'csr_100', csr_percent_as_integer: 100, determined_at: last_year, determined_on: last_year, source: 'Admin')
 
       current_date = TimeKeeper.date_of_record
       mikes_family.latest_household.tax_households << TaxHousehold.new(effective_ending_on: nil, effective_starting_on: current_date)
-      mikes_family.latest_household.tax_households.last.eligibility_determinations << EligibilityDetermination.new(max_aptc: 100, csr_eligibility_kind: 'csr_87', csr_percent_as_integer: 87, determined_at: current_date, determined_on: current_date)
+      mikes_family.latest_household.tax_households.last.eligibility_determinations << EligibilityDetermination.new(max_aptc: 100, csr_eligibility_kind: 'csr_87', csr_percent_as_integer: 87, determined_at: current_date, determined_on: current_date, source: 'Admin')
     end
 
     attr_reader :mikes_coverage_household, :carols_coverage_household
@@ -129,16 +129,19 @@ module BradysAfterAll
     attr_reader :carols_benefit_group, :carols_plan_year, :carols_census_employee, :carols_census_family, :carols_hired_on
 
     def create_brady_census_families
-      @site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca)
+      @site = create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, Settings.site.key.to_sym)
 
       create_brady_coverage_households
       create_brady_employers
+
+      issuer_profile = FactoryBot.create :benefit_sponsors_organizations_issuer_profile, assigned_site: @site
 
       current_effective_date   = TimeKeeper.date_of_record.beginning_of_month
       benefit_market = @site.benefit_markets.first
       current_benefit_market_catalog =  create(:benefit_markets_benefit_market_catalog, :with_product_packages,
                                                 benefit_market: benefit_market,
                                                 title: "SHOP Benefits for #{current_effective_date.year}",
+                                                issuer_profile: issuer_profile,
                                                 application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
                                               )
                                           
@@ -147,6 +150,8 @@ module BradysAfterAll
       open_enrollment_period   = effective_period.min.prev_month..(effective_period.min - 10.days)
 
       @mikes_benefit_sponsorship = @mikes_employer.add_benefit_sponsorship
+      @mikes_benefit_sponsorship.save
+
       recorded_service_areas  = mikes_benefit_sponsorship.service_areas_on(effective_period.min)
   
       @mikes_plan_year        = create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,

@@ -100,6 +100,7 @@ module BenefitSponsors
 
       it_behaves_like "should not permit for a user with consumer role", :family_index?
       it_behaves_like "should not permit for a user with consumer role", :family_datatable?
+      it_behaves_like "should not permit for a user with consumer role", :redirect_signup?
 
       it 'should permit the user with consumer role for staff_index?' do
         expect(policy.staff_index?).to be_truthy

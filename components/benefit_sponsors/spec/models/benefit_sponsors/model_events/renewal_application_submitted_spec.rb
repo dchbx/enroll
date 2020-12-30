@@ -17,12 +17,18 @@ RSpec.describe 'ModelEvents::RenewalApplicationSubmitted', dbclean: :after_each 
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: employer_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: employer_profile.id)}
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, first_name: person.first_name, last_name: person.last_name) }
-  let!(:benefit_sponsorship)    { employer_profile.add_benefit_sponsorship }
+  let!(:benefit_sponsorship) do
+    sponsorship = employer_profile.add_benefit_sponsorship
+    sponsorship.save
+    sponsorship
+  end
   let!(:benefit_market) { site.benefit_markets.first }
+  let(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, assigned_site: site) }
   let!(:benefit_market_catalog) do
     create(:benefit_markets_benefit_market_catalog, :with_product_packages,
            benefit_market: benefit_market,
            title: "SHOP Benefits for #{current_effective_date.year}",
+           issuer_profile: issuer_profile,
            application_period: (current_effective_date.beginning_of_year..current_effective_date.end_of_year))
   end
 

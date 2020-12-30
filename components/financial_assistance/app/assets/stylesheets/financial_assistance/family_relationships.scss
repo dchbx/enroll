@@ -1,0 +1,96 @@
+.usercard,
+.knowmore {
+	background-color: #fff;
+	padding: 15px;
+	border: 1px solid #ddd;
+}
+.usercard .card-detail-titles {
+  font-weight: bold;
+	color: #909090;    
+}
+
+.household .card-detail-titles {
+  font-weight: 600;
+  font-size: 10px;
+  /*margin-bottom: 5px;*/
+  text-transform: uppercase;
+}
+
+/* Family Relationships */
+.dd-rel, .icon-rel {
+	display: inline-block;
+}
+.dd-rel {
+	vertical-align: top;
+  width: 46%;
+}
+.icon-rel {
+	vertical-align: middle;
+	margin-top: -2px;
+	line-height: 22px;
+}
+.icon-rel .fa {
+	vertical-align: middle;
+	margin-right: 3px;
+}
+.dd-rel .selectric-relation {
+	float:right;
+	width: 88%;
+}
+.dd-rel .selectric {
+  height: 15px;
+}
+.dd-rel .selectric .label {
+	line-height: 18px;
+}
+.dd-rel .selectric .button {
+	height: 18px;
+}
+.icn-out {
+  -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: #007BC4;
+  color: transparent;
+}
+.relation {
+  width: 83%;
+  style: float;
+}
+.select-relation{
+  width: 56%;
+  float: left;
+}
+.select-relation .selectric-wrapper .selectric {
+  height: 15px;
+  width: 100%;
+  max-width:100%;
+}
+.select-relation .selectric-wrapper .selectric .label {
+  line-height: 18px;
+    max-width: 99%;
+}
+.select-relation .selectric-wrapper .selectric .button {
+  height: 18px;
+}
+.select-positioning{
+  float:left;
+}
+.missing_relation{
+  border-style: solid;
+  border-color: #0079C0;
+}
+
+.review-relations {
+  background-color: #fff;
+  padding-left: 17px;
+  padding-right: 17px;
+  padding-top: 5px;
+  padding-bottom: 2px;
+  border: 1px solid #ddd;
+  border-top: none;
+}
+
+.review-relations .review-relation-headers {
+  font-weight: bold;
+  color: #909090;
+  font-size: 10px;
+}

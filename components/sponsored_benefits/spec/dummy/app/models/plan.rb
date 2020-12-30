@@ -75,7 +75,7 @@ class Plan
   scope :metal_level_sans_silver,  ->{ where(:metal_leval.in => %w(platinum gold bronze catastrophic))}
 
   # Plan.metal_level_sans_silver.silver_level_by_csr_kind("csr_87")
-  scope :silver_level_by_csr_kind, ->(csr_kind = "csr_100"){ where(
+  scope :silver_level_by_csr_kind, ->(csr_kind = 'csr_0'){ where(
                                           metal_level: "silver").and(
                                           csr_variant_id: EligibilityDetermination::CSR_KIND_TO_PLAN_VARIANT_MAP[csr_kind]
                                         )
@@ -162,7 +162,7 @@ class Plan
         )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = "csr_100") {
+  scope :individual_health_by_active_year_and_csr_kind, ->(active_year, csr_kind = 'csr_0') {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},
@@ -175,7 +175,7 @@ class Plan
       )
     }
 
-  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = "csr_100") {
+  scope :individual_health_by_active_year_and_csr_kind_with_catastrophic, ->(active_year, csr_kind = 'csr_0') {
     where(
       "$and" => [
           {:active_year => active_year, :market => "individual", :coverage_kind => "health"},

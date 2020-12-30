@@ -44,7 +44,7 @@ module EnrollmentShopping
         member.is_subscriber?
       end
 
-      benefit_package ||= previous_enrollment.sponsored_benefit_package
+      benefit_package ||= benefit_package_for(previous_enrollment: previous_enrollment, employee_role: @employee_role, effective_date: enrollment.effective_on)
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
       set_benefit_information(enrollment, sponsored_benefit, benefit_package)
 
@@ -174,7 +174,7 @@ module EnrollmentShopping
 
       build_enrollment_members(enrollment, family_member_ids)
 
-      benefit_package ||= previous_enrollment.sponsored_benefit_package
+      benefit_package ||= benefit_package_for(previous_enrollment: previous_enrollment, employee_role: @employee_role, effective_date: enrollment.effective_on)
       sponsored_benefit = benefit_package.sponsored_benefit_for(@coverage_kind)
       set_benefit_information(enrollment, sponsored_benefit, benefit_package)
       copy_member_coverage_dates(previous_enrollment, enrollment)
@@ -208,7 +208,7 @@ module EnrollmentShopping
 
     def check_for_affected_enrollment(enrollment, sponsored_benefit)
       aef = AffectedEnrollmentFinder.new
-      affected_enrollments = aef.for_sponsored_benefit_and_date(enrollment, sponsored_benefit, enrollment.effective_on)
+      affected_enrollments = aef.for_enrollment(enrollment)
       if affected_enrollments.any?
         affected_enrollment = affected_enrollments.first
         enrollment.predecessor_enrollment_id = affected_enrollment.id
@@ -224,6 +224,19 @@ module EnrollmentShopping
           end
         end
       end
+    end
+
+    def benefit_package_for(previous_enrollment: nil, employee_role: nil, effective_date: nil)
+      if employee_role.present?
+        assigned_benefit_package = employee_role.benefit_package_for_date(effective_date)
+      end
+
+      if previous_enrollment.present?
+        possible_benefit_package = previous_enrollment.sponsored_benefit_package
+        return possible_benefit_package if assigned_benefit_package && assigned_benefit_package.start_on != possible_benefit_package.start_on
+      end
+
+      assigned_benefit_package
     end
 
     def benefit_package_for_date(employee_role, start_date)

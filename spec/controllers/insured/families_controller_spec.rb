@@ -48,11 +48,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       "Person",
       id: "test",
       addresses: [],
-      no_dc_address: false,
-      no_dc_address_reason: "",
+      is_homeless: false,
+      is_temporarily_out_of_state: false,
       is_consumer_role_active?: false,
       has_active_employee_role?: true,
-      has_multiple_roles?: false
+      has_multiple_roles?: false,
+      agent?: false
     )
   end
   let(:family) { instance_double(Family, active_household: household, :model_name => "Family", id: 1) }
@@ -177,38 +178,128 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       end
     end
 
+    describe "#init_qle", dbclean: :after_each do
+      let!(:shop_visible_qle)  { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_year, market_kind: 'shop', is_visible: true) }
+      let!(:fehb_visible_qle)  { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_year, market_kind: 'fehb', is_visible: true) }
+      let!(:shop_non_visible_qle)  { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_year, market_kind: 'shop', is_visible: false) }
+      let!(:ivl_visible_qle)  { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_year, market_kind: 'individual', is_visible: true) }
+      let!(:ivl_non_visible_qle)  { FactoryBot.create(:qualifying_life_event_kind, start_on: TimeKeeper.date_of_record.last_year, market_kind: 'individual', is_visible: false) }
+      let(:shop_params)  {{market: "shop_market_events"}}
+      let(:ivl_params)  {{market: "individual_market_events"}}
 
+      context "user with both consumer and employee role", dbclean: :after_each do
+        before :each do
+          @controller = Insured::FamiliesController.new
+          @controller.instance_variable_set(:@person, person)
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+          allow(user).to receive(:has_hbx_staff_role?).and_return false
+          sign_in user
+        end
 
-    context "#init_qle" do
-      before :each do
-        @controller = Insured::FamiliesController.new
-        @qle = FactoryBot.create(:qualifying_life_event_kind)
-        allow(@controller).to receive(:set_family)
-        @controller.instance_variable_set(:@person, person)
-        allow(person).to receive(:user).and_return(user)
-        allow(user).to receive(:identity_verified?).and_return(false)
-        allow(person).to receive(:has_active_employee_role?).and_return(true)
-        allow(person).to receive(:has_active_consumer_role?).and_return(true)
-        allow(person).to receive(:active_employee_roles).and_return([])
-        allow(person).to receive(:employee_roles).and_return([])
-        allow(user).to receive(:get_announcements_by_roles_and_portal).and_return []
-        allow(family).to receive(:check_for_consumer_role).and_return true
-        allow(family).to receive(:active_family_members).and_return(family_members)
-        sign_in user
+        it "should return shop visible qles only" do
+          allow(@controller).to receive(:params).and_return(shop_params)
+          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [shop_visible_qle]
+        end
+
+        it "should return ivl visible qles only" do
+          allow(@controller).to receive(:params).and_return(ivl_params)
+          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [ivl_visible_qle]
+        end
       end
-      after do
-        QualifyingLifeEventKind.destroy_all
+
+      context "user with consumer role", dbclean: :after_each do
+        before :each do
+          @controller = Insured::FamiliesController.new
+          @controller.instance_variable_set(:@person, person)
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(false)
+          allow(person).to receive(:has_multiple_roles?).and_return(false)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:consumer_role).and_return(consumer_role)
+          allow(consumer_role).to receive(:is_a?).with(ConsumerRole).and_return true
+          allow(consumer_role).to receive(:is_a?).with(EmployeeRole).and_return false
+          allow(person).to receive(:active_employee_roles).and_return([])
+          allow(user).to receive(:has_hbx_staff_role?).and_return false
+          sign_in user
+        end
+
+        it "should return ivl visible qles only" do
+          allow(@controller).to receive(:params).and_return(ivl_params)
+          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [ivl_visible_qle]
+        end
       end
 
-      it "should return qles" do
-        allow(@controller).to receive(:params).and_return({})
-        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([@qle])
+      context "user with employee role", dbclean: :after_each do
+        before :each do
+          @controller = Insured::FamiliesController.new
+          @controller.instance_variable_set(:@person, person)
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_multiple_roles?).and_return(false)
+          allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+          allow(user).to receive(:has_hbx_staff_role?).and_return false
+          sign_in user
+        end
+
+        it "should return shop visible qles only" do
+          allow(@controller).to receive(:params).and_return(shop_params)
+          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [shop_visible_qle]
+        end
       end
 
+      context "user with fehb employee role", dbclean: :after_each do
+        before :each do
+          @controller = Insured::FamiliesController.new
+          @controller.instance_variable_set(:@person, person)
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+          allow(person).to receive(:has_active_consumer_role?).and_return(false)
+          allow(person).to receive(:has_multiple_roles?).and_return(false)
+          allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+          allow(employee_roles.first).to receive(:is_a?).with(ConsumerRole).and_return false
+          allow(employee_roles.first).to receive(:is_a?).with(ResidentRole).and_return false
+          allow(employee_roles.first).to receive(:is_a?).with(EmployeeRole).and_return true
+          allow(employee_roles.first).to receive(:employer_profile).and_return abc_profile
+          allow(abc_profile).to receive(:is_a?).with(BenefitSponsors::Organizations::FehbEmployerProfile).and_return true
+          allow(user).to receive(:has_hbx_staff_role?).and_return false
+          sign_in user
+        end
 
-      it "should return qles" do
-        allow(@controller).to receive(:params).and_return({market: "individual_market_events"})
-        expect(@controller.instance_eval { init_qualifying_life_events }).to eq ([])
+        it "should return fehb visible qles only" do
+          allow(@controller).to receive(:params).and_return(shop_params)
+          expect(@controller.instance_eval { init_qualifying_life_events }).to eq [fehb_visible_qle]
+        end
+      end
+
+      context "user with hbx_staff role", dbclean: :after_each do
+        before :each do
+          @controller = Insured::FamiliesController.new
+          @controller.instance_variable_set(:@person, person)
+          allow(person).to receive(:user).and_return(user)
+          allow(person).to receive(:has_active_employee_role?).and_return(true)
+          allow(person).to receive(:has_active_consumer_role?).and_return(true)
+          allow(person).to receive(:has_multiple_roles?).and_return(true)
+          allow(person).to receive(:active_employee_roles).and_return(employee_roles)
+          allow(user).to receive(:has_hbx_staff_role?).and_return true
+          allow(person).to receive(:active_employee_roles).and_return([])
+          sign_in user
+        end
+
+        it "should return all shop qles" do
+          allow(@controller).to receive(:params).and_return(shop_params)
+          @controller.instance_eval { init_qualifying_life_events }
+          expect(@controller.instance_variable_get(:@qualifying_life_events)).to eq [shop_visible_qle, shop_non_visible_qle]
+        end
+
+        it "should return all ivl qles" do
+          allow(@controller).to receive(:params).and_return(ivl_params)
+          @controller.instance_eval { init_qualifying_life_events }
+          expect(@controller.instance_variable_get(:@qualifying_life_events)).to eq [ivl_visible_qle, ivl_non_visible_qle]
+        end
       end
     end
 
@@ -534,7 +625,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     context "with a person with an address" do
-      let(:person) { double("Person", id: "test", addresses: true, no_dc_address: false, no_dc_address_reason: "") }
+      let(:person) { double("Person", id: "test", addresses: true, is_homeless: false, is_temporarily_out_of_state: false, agent?: false) }
 
       it "should be a success" do
         expect(response).to have_http_status(:success)
@@ -660,13 +751,13 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "renders the 'check_qle_date' template" do
-   get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+      get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
       expect(response).to have_http_status(:success)
     end
 
     describe "with valid params" do
       it "returns qualified_date as true" do
-     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record - 10.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(response).to have_http_status(:success)
         expect(assigns['qualified_date']).to eq(true)
       end
@@ -675,12 +766,12 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     describe "with invalid params" do
 
       it "returns qualified_date as false for invalid future date" do
-     get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date',params: {:date_val => (TimeKeeper.date_of_record + 31.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
 
       it "returns qualified_date as false for invalid past date" do
-     get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
+        get 'check_qle_date', params: {:date_val => (TimeKeeper.date_of_record - 61.days).strftime("%m/%d/%Y"), :format => 'js'}, xhr: true
         expect(assigns['qualified_date']).to eq(false)
       end
     end
@@ -700,7 +791,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "future_qualified_date return true/false when qle market kind is shop" do
         date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-     get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
+        get :check_qle_date,params: {date_val: date, qle_id: qle.id, format: :js}
         expect(response).to have_http_status(:success)
         expect(assigns(:future_qualified_date)).to eq(false)
       end
@@ -738,7 +829,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       context "normal qle event" do
         it "should return true" do
           date = TimeKeeper.date_of_record.strftime("%m/%d/%Y")
-       get :check_qle_date,params: {date_val: date, format: :js}
+          get :check_qle_date,params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
@@ -746,9 +837,93 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
         it "should return false" do
           sign_in user
           date = (TimeKeeper.date_of_record + 40.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, format: :js}
+          get :check_qle_date, params: {date_val: date, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
+        end
+      end
+
+      context "QLEK based on event date", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        it "should return event date" do
+          date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+          qle.update_attributes(qle_event_date_kind: :qle_on)
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qle_date)).to eq Date.strptime(date, "%m/%d/%Y")
+        end
+      end
+
+      context "QLEK based on reporting date", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        it "should return reporting date" do
+          date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+          qle.update_attributes(qle_event_date_kind: :submitted_at)
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          expect(response).to have_http_status(:success)
+          expect(assigns(:qle_date)).to eq TimeKeeper.date_of_record
+        end
+      end
+
+      context "QLEK with eligibity start & end dates", dbclean: :after_each do
+        subject { BenefitSponsors::Observers::NoticeObserver.new }
+
+        before(:each) do
+          sign_in(user)
+        end
+
+        context "Event date cover eligibity dates" do
+
+          it "should return true" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.next_month.end_of_month)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq true
+          end
+        end
+
+        context "Event date outside eligibity dates" do
+
+          it "should return false" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :qle_on, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq false
+          end
+        end
+
+        context "Reporting date cover eligibity dates" do
+
+          it "should return true" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :submitted_at, coverage_start_on: TimeKeeper.date_of_record, coverage_end_on: TimeKeeper.date_of_record.end_of_month)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq true
+          end
+        end
+
+        context "Reporting date outside eligibity dates" do
+
+          it "should return false" do
+            date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
+            qle.update_attributes(qle_event_date_kind: :submitted_at, coverage_start_on: TimeKeeper.date_of_record.last_month, coverage_end_on: TimeKeeper.date_of_record - 1.day)
+            get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+            expect(response).to have_http_status(:success)
+            expect(assigns(:qualified_date)).to eq false
+          end
         end
       end
 
@@ -761,21 +936,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
         it "should return true" do
           date = (TimeKeeper.date_of_record + 8.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq true
         end
 
         it "should return false" do
           date = (TimeKeeper.date_of_record - 8.days).strftime("%m/%d/%Y")
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
           expect(assigns(:qualified_date)).to eq false
         end
 
         it "should return false and also notify sep request denied" do
           date = TimeKeeper.date_of_record.prev_month.strftime("%m/%d/%Y")
-       get :check_qle_date, params: {qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js}
+          get :check_qle_date, params: {qle_id: qle.id, date_val: date, qle_title: qle.title, qle_reporting_deadline: date, qle_event_on: date, format: :js}
           expect(assigns(:qualified_date)).to eq false
 
           expect(subject.notifier).to receive(:notify) do |event_name, payload|
@@ -795,9 +970,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
           allow(QualifyingLifeEventKind).to receive(:find).and_return(qle)
           allow(qle).to receive(:is_dependent_loss_of_coverage?).and_return(true)
           allow(qle).to receive(:employee_gaining_medicare).and_return(effective_on_options)
-       get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
+          get :check_qle_date, params: {date_val: date, qle_id: qle.id, format: :js}
           expect(response).to have_http_status(:success)
-          expect(assigns(:effective_on_options)).to eq effective_on_options
         end
       end
     end
@@ -806,6 +980,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
       let(:family) {FactoryBot.build(:family)}
       before :each do
         allow(person).to receive(:hbx_staff_role).and_return(double('hbx_staff_role', permission: double('permission',modify_family: true)))
+        allow(person).to receive(:agent?).and_return(true)
         family.broker_agency_accounts = [
           FactoryBot.build(:broker_agency_account, family: family, employer_profile: nil)
         ]
@@ -829,7 +1004,7 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
     end
 
     it "displays the upload_notice_form view" do
-   get :upload_notice_form
+      get :upload_notice_form
       expect(response).to have_http_status(:success)
       expect(response).to render_template(:upload_notice_form)
     end
@@ -1041,11 +1216,15 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
     let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
     let(:person) { FactoryBot.create(:person) }
+    let!(:spon_cal) { double('HbxEnrollmentSponsoredCostCalculator') }
     let(:ivl_person)       { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
     let(:ivl_family)       { FactoryBot.create(:family, :with_primary_family_member, person: ivl_person) }
     let(:user) { FactoryBot.create(:user, person: person) }
+    let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_year }
     let(:ivl_user) { FactoryBot.create(:user, person: ivl_person) }
     let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+    let!(:hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: family.primary_applicant.id) }
+    let!(:ivl_hbx_enrollment_member) { FactoryBot.build(:hbx_enrollment_member, applicant_id: ivl_family.primary_applicant.id) }
     let(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
                         household: family.active_household,
@@ -1055,7 +1234,8 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         rating_area_id: initial_application.recorded_rating_area_id,
                         sponsored_benefit_id: initial_application.benefit_packages.first.health_sponsored_benefit.id,
                         sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id)
+                        benefit_sponsorship_id: initial_application.benefit_sponsorship.id,
+                        hbx_enrollment_members:[hbx_enrollment_member])
     end
 
     let(:ivl_enrollment) do
@@ -1066,15 +1246,21 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
                         enrollment_kind: "open_enrollment",
                         kind: "individual",
                         product: product,
-                        aasm_state: "coverage_selected")
+                        aasm_state: "coverage_selected",
+                        hbx_enrollment_members:[ivl_hbx_enrollment_member])
     end
 
     context "for shop" do
       before :each do
+        allow(::HbxEnrollmentSponsoredCostCalculator).to receive(:new).with(hbx_enrollment).and_return(spon_cal)
+        allow(spon_cal).to receive(:groups_for_products).with([hbx_enrollment.product]).and_return('')
         allow(person).to receive(:primary_family).and_return(family)
         allow(hbx_enrollment).to receive(:reset_dates_on_previously_covered_members).and_return(true)
         sign_in(user)
-        get :purchase, params: {id: family.id, hbx_enrollment_id: hbx_enrollment.id, terminate: 'terminate'}
+        get :purchase, params: { id: family.id,
+                                 hbx_enrollment_id: hbx_enrollment.id,
+                                 terminate: 'terminate',
+                                 "terminate_date_#{hbx_enrollment.hbx_id}": TimeKeeper.date_of_record.to_s}
       end
 
       it "should get hbx_enrollment" do
@@ -1083,6 +1269,10 @@ RSpec.describe Insured::FamiliesController, dbclean: :after_each do
 
       it "should get terminate" do
         expect(assigns(:terminate)).to eq 'terminate'
+      end
+
+      it 'should assign terminate_date same as params terminate_date' do
+        expect(assigns(:terminate_date)).to eq(TimeKeeper.date_of_record)
       end
 
       it "should get plan" do

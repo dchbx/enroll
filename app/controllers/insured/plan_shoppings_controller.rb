@@ -67,7 +67,8 @@ class Insured::PlanShoppingsController < ApplicationController
     # employee_mid_year_plan_change(@person, @change_plan)
     # @enrollment.ee_plan_selection_confirmation_sep_new_hire #mirror notice
     # @enrollment.mid_year_plan_change_notice #mirror notice
-
+    @kp_pay_now_url = SamlInformation.kp_pay_now_url
+    @kp_relay_state = SamlInformation.kp_pay_now_relay_state
     send_receipt_emails if @person.emails.first
   end
 
@@ -165,7 +166,7 @@ class Insured::PlanShoppingsController < ApplicationController
 
   def terminate
     hbx_enrollment = HbxEnrollment.find(params.require(:id))
-    coverage_end_date = @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
+    coverage_end_date = params[:terminate_date].present? ? Date.strptime(params[:terminate_date], "%m/%d/%Y") : @person.primary_family.terminate_date_for_shop_by_enrollment(hbx_enrollment)
     hbx_enrollment.terminate_enrollment(coverage_end_date, params[:terminate_reason])
     if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_termination_pending? || hbx_enrollment.coverage_canceled?
       hbx_enrollment.update_renewal_coverage
@@ -283,10 +284,15 @@ class Insured::PlanShoppingsController < ApplicationController
   def plan_selection_callback
     year = params[:year]
     hios_id = params[:hios_id]
-    selected_plan = BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
-    # selected_plan = Plan.where(:hios_id => params[:hios_id], active_year: Settings.checkbook_services.current_year).first
+    @enrollment = HbxEnrollment.find(params[:id])
+    market_kind = @enrollment.fehb_profile ? 'fehb' : params[:market_kind]
+    selected_plan = if @enrollment.fehb_profile
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1), benefit_market_kind: :fehb).first
+                    else
+                      BenefitMarkets::Products::Product.where(:hios_id => hios_id, :"application_period.min" => Date.new(year.to_i, 1, 1)).first
+                    end
     if selected_plan.present?
-      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: params[:market_kind], change_plan: params[:change_plan]})
+      redirect_to thankyou_insured_plan_shopping_path({plan_id: selected_plan.id.to_s, id: params[:id],coverage_kind: params[:coverage_kind], market_kind: market_kind, change_plan: params[:change_plan]})
     else
       redirect_to insured_plan_shopping_path(request.params), :flash => "No plan selected"
     end
@@ -307,7 +313,7 @@ class Insured::PlanShoppingsController < ApplicationController
     set_plans_by(hbx_enrollment_id: params.require(:id))
     @tax_household = @person.primary_family.latest_household.latest_active_tax_household_with_year(@hbx_enrollment.effective_on.year) rescue nil
     if @tax_household.present?
-      if is_eligibility_determined_and_not_csr_100?(@person, @tax_household)
+      if is_eligibility_determined_and_not_csr_0?(@person, @tax_household)
         sort_for_csr(@plans)
       else
         sort_by_standard_plans(@plans)
@@ -357,13 +363,14 @@ class Insured::PlanShoppingsController < ApplicationController
     @plans = standard_plans + non_standard_plans + non_silver_plans
   end
 
-  def is_eligibility_determined_and_not_csr_100?(person, tax_household)
+  def is_eligibility_determined_and_not_csr_0?(person, tax_household)
     valid_csr_eligibility_kind = tax_household.valid_csr_kind(@hbx_enrollment)
-    (EligibilityDetermination::CSR_KINDS.include? "#{valid_csr_eligibility_kind}") && ("#{valid_csr_eligibility_kind}" != "csr_100")
+    (EligibilityDetermination::CSR_KINDS.include? valid_csr_eligibility_kind.to_s) && (valid_csr_eligibility_kind.to_s != 'csr_0')
   end
 
   def send_receipt_emails
-    UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, @person.emails.first.address).deliver_now
+    email = @person.work_email_or_best
+    UserMailer.generic_consumer_welcome(@person.first_name, @person.hbx_id, email).deliver_now
     body = render_to_string 'user_mailer/secure_purchase_confirmation.html.erb', layout: false
     from_provider = HbxProfile.current_hbx
     message_params = {
@@ -372,7 +379,7 @@ class Insured::PlanShoppingsController < ApplicationController
       from: from_provider.try(:legal_name),
       to: @person.full_name,
       body: body,
-      subject: 'Your Secure Enrollment Confirmation'
+      subject: 'Your Enrollment Confirmation'
     }
     create_secure_message(message_params, @person, :inbox)
   end

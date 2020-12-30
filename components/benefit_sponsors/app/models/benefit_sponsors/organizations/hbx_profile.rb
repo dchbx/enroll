@@ -21,6 +21,13 @@ module BenefitSponsors
         return if inbox.present?
         build_inbox
       end
+
+      class << self
+        def find(id)
+          org = BenefitSponsors::Organizations::Organization.where("profiles._id" => BSON::ObjectId.from_string(id)).first
+          org.hbx_profile if org.present?
+        end
+      end
     end
   end
 end

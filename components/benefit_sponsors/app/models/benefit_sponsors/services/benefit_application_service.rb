@@ -16,7 +16,7 @@ module BenefitSponsors
         schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         find_benefit_sponsorship(form)
         form.has_active_ba = has_an_active_ba? if form.admin_datatable_action
-        form.start_on_options = schedular.start_on_options_with_schedule(form.admin_datatable_action)
+        form.start_on_options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
       end
 
       def load_form_params_from_resource(form)
@@ -42,59 +42,33 @@ module BenefitSponsors
         bas.active_states_per_dt_action.present? ? true : false
       end
 
-      def can_create_draft_ba?(form)
+      def can_create_draft_ba?
         bas = benefit_sponsorship.benefit_applications
-        term_pending_bas = bas.any_in(aasm_state: :termination_pending)
-        if term_pending_bas.present?
-          can_create_draft_for_tp?(term_pending_bas, form) ? false : true
-        else
-          bas.active_states_per_dt_action.present? || bas.draft.present?
-        end
-      end
-
-      def can_create_draft_for_tp?(bas, form)
-        start_on_date = Date.strptime(form.start_on, "%m/%d/%Y")
-        bas.any? { |ba| ba.effective_period.cover?(start_on_date)}
+        bas.active_states_per_dt_action.present? ? false : true
       end
 
       def create_or_cancel_draft_ba(form, model_attributes)
-        if form.admin_datatable_action && !can_create_draft_ba?(form)
+        if form.admin_datatable_action && !can_create_draft_ba?
           form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
           [false, nil]
         else
+          #build cca/dc application
           benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
           save_result, persisted_object = store(form, benefit_application)
           if save_result
-            if form.admin_datatable_action
-              terminatation_pending_active_applications(persisted_object)
-            elsif benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
-              benefit_sponsorship.revert_to_applicant!
-            end
-            cancel_unwanted_applications(persisted_object, form.admin_datatable_action)
+            cancel_draft_and_ineligible_applications(persisted_object)
+            benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
           end
           [save_result, persisted_object]
         end
       end
 
-      def cancel_unwanted_applications(benefit_application, admin_datatable_action = false)
+      def cancel_draft_and_ineligible_applications(benefit_application)
         applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
         applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a if Settings.aca.shop_market.auto_cancel_ineligible
-        if admin_datatable_action
-          applications_for_cancel += benefit_sponsorship.benefit_applications.enrolling.to_a
-          applications_for_cancel += benefit_sponsorship.benefit_applications.where(aasm_state: :binder_paid)
-        end
+
         applications_for_cancel.each do |application|
           application.cancel! if application.may_cancel?
-        end
-      end
-
-      def terminatation_pending_active_applications(new_ba)
-        termination_date = new_ba.start_on.prev_day
-        applications_for_termination = benefit_sponsorship.benefit_applications.where(aasm_state: :active)
-
-        applications_for_termination.each do |application|
-          enrollment_service = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(application)
-          enrollment_service.schedule_termination(termination_date, TimeKeeper.date_of_record, "voluntary", "Other", false)
         end
       end
 
@@ -135,7 +109,7 @@ module BenefitSponsors
         benefit_application = find_model_by_id(form.id)
         model_attributes = form_params_to_attributes(form)
         benefit_application.assign_attributes(model_attributes)
-        store(form, benefit_application)
+        store(form, benefit_application, true)
       end
 
       # TODO: Test this query for benefit applications cca/dc
@@ -186,11 +160,11 @@ module BenefitSponsors
         date.to_date.to_s
       end
 
-      def store(form, benefit_application)
+      def store(form, benefit_application, update = false)
         valid_according_to_factory = benefit_application_factory.validate(benefit_application)
         if valid_according_to_factory
           benefit_sponsorship = benefit_application.benefit_sponsorship || find_benefit_sponsorship(form)
-          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.resolve_service_areas, benefit_application.effective_period.begin)
+          benefit_application.benefit_sponsor_catalog = benefit_sponsorship.benefit_sponsor_catalog_for(benefit_application.effective_period.begin) unless update
           # assign_rating_and_service_area(benefit_application)
         else
           map_errors_for(benefit_application, onto: form)
@@ -198,9 +172,11 @@ module BenefitSponsors
         end
 
         if save_successful = benefit_application.save
-          catalog = benefit_application.benefit_sponsor_catalog
-          catalog.benefit_application = benefit_application
-          catalog.save
+          unless update
+            catalog = benefit_application.benefit_sponsor_catalog
+            catalog.benefit_application = benefit_application
+            catalog.save
+          end
         else
           map_errors_for(benefit_application, onto: form)
           return [false, nil]

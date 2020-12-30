@@ -23,5 +23,22 @@ module BenefitSponsors
         expect(BenefitSponsors::Organizations::GeneralAgencyProfile.filter_by(status).map(&:aasm_state).uniq).to eq ["is_applicant"]
       end
     end
+
+    context "#primary_staff" do
+      let(:general_agency) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, :with_site) }
+      let(:ga_profile)     { general_agency.general_agency_profile }
+      let(:primary_person) {FactoryBot.create(:person)}
+      let(:staff_person) {FactoryBot.create(:person)}
+
+      before do
+        FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: ga_profile.id, is_primary: true, person: primary_person)
+        FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: ga_profile.id, is_primary: false, person: staff_person)
+      end
+
+
+      it "should return only primary_staff GA" do
+        expect(general_agency.general_agency_profile.primary_staff.is_primary).to eq true
+      end
+    end
   end
 end
