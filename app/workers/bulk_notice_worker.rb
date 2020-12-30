@@ -22,14 +22,16 @@ class BulkNoticeWorker
       #loop through each employee
       results = @org.employer_profile.census_employees.each do |employee|
         Operations::SecureMessageAction.new.call(
-          params: params.merge({ resource_id: employee.employee_profile.person.id.to_s, resource_name: 'Person' })
+          params: params.merge({ resource_id: employee.employee_profile.person.id.to_s, resource_name: 'person' }),
+          user: @bulk_notice.user
         )
       end
       result = results.any?(&:success?)
     else
       # normal profile params here for other audience types
       result = Operations::SecureMessageAction.new.call(
-        params: params.merge({ resource_id: @org.profiles.first.id.to_s, resource_name: 'BenefitSponsors::Organizations::Profile' })
+        params: params.merge({ resource_id: @org.id.to_s, resource_name:  @bulk_notice.audience_type}),
+        user: @bulk_notice.user
       )
     end
 

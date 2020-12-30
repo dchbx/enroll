@@ -9,21 +9,35 @@ RSpec.describe BenefitSponsors::Operations::Profiles::FindProfile, dbclean: :aft
   let(:employer_profile) {organization.employer_profile}
 
   describe 'find profile' do
-    let(:valid_params) { {profile_id: employer_profile.id} }
-    let(:invalid_params) { {profile_id: organization.id} }
 
-    it 'should return ER profile' do
-      result = subject.call(valid_params)
+    context 'when profile id is passed' do
+      let(:valid_params) { {profile_id: employer_profile.id} }
+      let(:invalid_params) { {profile_id: organization.id} }
 
-      expect(result.success?). to be_truthy
-      expect(result.success). to be_a BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+      it 'should return ER profile' do
+        result = subject.call(valid_params)
+
+        expect(result.success?). to be_truthy
+        expect(result.success). to be_a BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+      end
+
+      it 'should throw an error' do
+        result = subject.call(invalid_params)
+
+        expect(result.success?). to be_falsey
+        expect(result.failure[:message]). to eq(["Profile not found"])
+      end
     end
 
-    it 'should throw an error' do
-      result = subject.call(invalid_params)
+    context 'when org id is passed' do
+      let(:valid_params) { {organization_id: organization.id, profile_klass: 'employer'} }
 
-      expect(result.success?). to be_falsey
-      expect(result.failure[:message]). to eq(["Profile not found"])
+      it 'should return ER profile' do
+        result = subject.call(valid_params)
+
+        expect(result.success?). to be_truthy
+        expect(result.success). to be_a BenefitSponsors::Organizations::AcaShopDcEmployerProfile
+      end
     end
   end
 end

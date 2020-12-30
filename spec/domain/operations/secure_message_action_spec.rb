@@ -27,7 +27,7 @@ module Operations
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
       let(:employer_profile) {organization.employer_profile}
 
-      let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: organization.id.to_s, resource_name: organization.class.to_s }}
+      let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: organization.id.to_s, resource_name: 'organization' }}
       let(:error_message) {{:message => ['Profile not found']}}
 
       it "fails" do
@@ -42,7 +42,7 @@ module Operations
       let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
       let(:employer_profile) {organization.employer_profile}
 
-      let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: employer_profile.id.to_s, resource_name: employer_profile.class.to_s }}
+      let(:params) { { subject: 'Hello world', body: 'Hello world', actions_id: '1234', resource_id: organization.id.to_s, resource_name: 'employer' }}
 
       it "should pass" do
         expect(subject).to be_success

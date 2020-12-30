@@ -32,6 +32,10 @@ module Operations
     def fetch_recipient_target
       if is_employer?
         Success(@resource.staff_roles.first)
+      elsif is_broker_agency?
+        Success(@resource.primary_broker_role&.person || @resource.active_broker_roles.first&.person )
+      elsif is_general_agency?
+        Success(@resource.primary_staff&.person)
       elsif is_person?
         Success(@resource)
       end
@@ -69,11 +73,19 @@ module Operations
     end
 
     def is_valid_resource?
-      is_employer? || is_person?
+      is_employer? || is_person? || is_broker_agency? || is_general_agency?
     end
 
     def is_person?
       @resource.is_a?(Person)
+    end
+
+    def is_broker_agency?
+      @resource.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+    end
+
+    def is_general_agency?
+      @resource.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
     end
 
     def is_employer?
@@ -86,6 +98,8 @@ module Operations
       elsif is_person?
         @resource.consumer_role.present? && @resource.consumer_role.can_receive_electronic_communication? ||
           @resource.employee_roles.present? && @resource.employee_roles.any?(&:can_receive_electronic_communication?)
+      elsif is_broker_agency? || is_general_agency?
+        true
       end
     end
 
