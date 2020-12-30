@@ -252,8 +252,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def download_documents # Should be in ER attestations controller
     @employer_profile = EmployerProfile.find(params[:id])
     #begin
-      doc = @employer_profile.documents.find(params[:ids][0])
-    send_file doc.identifier, file_name: doc.title,content_type:doc.format
+    doc = @employer_profile.documents.find(params[:ids][0])
+    doc.present? ? (send_file doc.identifier, file_name: doc.title, content_type: doc.format) : nil
 
       #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
     #rescue => e

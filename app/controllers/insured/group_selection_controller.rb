@@ -78,9 +78,9 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    unless @adapter.is_waiving?(params)
+    unless @adapter.is_waiving?(permitted_group_selection_params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_ids = params.permit(:family_member_ids => {})[:family_member_ids].values.collect do |family_member_id|
+      family_member_ids = params[:family_member_ids].values.collect do |family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
@@ -229,13 +229,13 @@ class Insured::GroupSelectionController < ApplicationController
 
   def permitted_group_selection_params
     params.permit(
-      :change_plan, :consumer_role_id,
-      :employee_role_id, :coverage_kind, :enrollment_kind,
-      :hbx_enrollment_id, :market_kind, :person_id,
-      :controller, :action, :shop_for_plans,
+      :change_plan, :consumer_role_id, :market_kind, :qle_id,
+      :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
+      :employee_role_id, :resident_role_id, :person_id,
+      :market_kind, :shop_for_plans,
+      :controller, :action, :commit,
       :effective_on_option_selected,
-      :resident_role_id,
-      :commit,
+      :is_waiving, :waiver_reason,
       family_member_ids: {}
     )
   end

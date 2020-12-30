@@ -148,7 +148,7 @@ class Insured::ConsumerRolesController < ApplicationController
 
   def create
     begin
-      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params, actual_user)
+      @consumer_role = ::Factories::EnrollmentFactory.construct_consumer_role(params.require(:person).permit(person_parameters_list), actual_user)
       if @consumer_role.present?
         @person = @consumer_role.person
       else
