@@ -100,6 +100,7 @@ module Operations
         latest_max_aptc = base_enrollment.family.active_household.latest_active_tax_household_with_year(base_enrollment.effective_on.year).latest_eligibility_determination.max_aptc.to_f
         available_annual_aggregate = (latest_max_aptc * 12) - consumed_aptc.to_f
         monthly_max = calculated_new_monthly_aggregate(base_enrollment, available_annual_aggregate)
+        base_enrollment.update_attributes(aggregate_aptc_amount: monthly_max)
         Success(monthly_max)
       end
 
