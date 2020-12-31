@@ -120,7 +120,7 @@ def invoke_script(with_params = true)
     ARGV[0] = input_file
     ARGV[1] = 'final_eligibility_notice'
     ARGV[2] = 'aqhp'
-    ARGV[3] = 'spec/test_data/notices/event_report_09_11_2020.csv'
+    ARGV[3] = 'spec/test_data/notices/ivl_fel_aqhp_test_data.csv'
   else
     ARGV[0] = nil
     ARGV[1] = nil
