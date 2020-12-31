@@ -23,6 +23,7 @@ module Operations
       def filter_enrollment(enrollment)
         return Failure('Given enrollment is not IVL by kind') unless enrollment.is_ivl_by_kind?
         return Failure('Given enrollment is a shopping enrollment by aasm_state') if enrollment.shopping?
+        return Failure('Given enrollment not associated with any family') unless enrollment.family?
         return Failure('System is not under open enrollment') unless enrollment.family.is_under_ivl_open_enrollment?
         Success(enrollment)
       end
