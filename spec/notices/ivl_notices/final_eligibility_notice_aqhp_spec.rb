@@ -6,7 +6,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
   RSpec.describe "FinalEligibilityNoticeAqhp", :dbclean => :after_each do
     include_context 'setup benefit market with market catalogs and product packages'
 
-    let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141890", first_name: "John", last_name: "Smith") }
+    let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141892", first_name: "John", last_name: "Smith") }
     let!(:person4) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141891", first_name: "John", last_name: "Smith1") }
 
     let!(:family3) { FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person3) }
@@ -117,7 +117,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       let(:template)    { Notifier::Template.new(data_elements: data_elements) }
 
       let(:data_hash)  { build_data_hash }
-      let(:members)    { data_hash.select { |_k,v| v.any? { |x| x['member_id'] == '141890' } }.first[1] }
+      let(:members)    { data_hash.select { |_k,v| v.any? { |x| x['member_id'] == '141892' } }.first[1] }
       let(:subscriber) { members.detect{ |m| m["dependent"].casecmp('NO').zero? } }
       let(:dependents_array) { members.select{|m| m["dependent"].casecmp('YES').zero? } }
 

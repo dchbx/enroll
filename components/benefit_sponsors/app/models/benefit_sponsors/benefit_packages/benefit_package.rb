@@ -287,7 +287,6 @@ module BenefitSponsors
 
         # family.validate_member_eligibility_policy
         if true #family.is_valid?
-
           enrollments = family.active_household.hbx_enrollments.enrolled_and_waived
           .by_benefit_sponsorship(benefit_sponsorship).by_effective_period(predecessor_application.effective_period)
 
@@ -339,14 +338,17 @@ module BenefitSponsors
       end
 
       def effectuate_member_benefits
+        logger = Logger.new("#{Rails.root}/log/benefit_package_effectuate_member_benefits.log")
         activate_benefit_group_assignments if predecessor_application.present?
 
-        enrolled_families.no_timeout.each do |family|
+        enrolled_families.no_timeout.inject([]) do |_dummy, family|
           enrollments = HbxEnrollment.by_benefit_package(self).where(family_id: family.id).show_enrollments_sans_canceled
 
           sponsored_benefits.each do |sponsored_benefit|
             hbx_enrollment = enrollments.by_coverage_kind(sponsored_benefit.product_kind).first
-            hbx_enrollment.begin_coverage! if hbx_enrollment && hbx_enrollment.may_begin_coverage?
+            hbx_enrollment.begin_coverage!({skip_renewal_coverage_update: true}) if hbx_enrollment&.may_begin_coverage?
+          rescue StandardError => e
+            logger.info "error raised for family: #{family.id}, error: #{e.backtrace}"
           end
         end
       end
@@ -496,12 +498,8 @@ module BenefitSponsors
       end
 
       def activate_benefit_group_assignments
-        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.each do |ce|
-          ce.benefit_group_assignments.each do |bga|
-            if bga.benefit_package_id == self.id
-              bga.make_active
-            end
-          end
+        CensusEmployee.by_benefit_package_and_assignment_on(self, start_on, false).non_terminated.no_timeout.inject([]) do |_dummy, ce|
+          ce.benefit_group_assignments.where(benefit_package_id: self.id).last&.make_active
         end
       end
 

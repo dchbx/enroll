@@ -950,7 +950,8 @@ class HbxEnrollment
     HandleCoverageSelected.call(callback_context)
   end
 
-  def update_renewal_coverage
+  def update_renewal_coverage(options = nil)  # rubocop:disable Metrics/CyclomaticComplexity
+    return if options.is_a?(Hash) && options[:skip_renewal_coverage_update]
     return unless is_shop?
     return if census_employee&.is_employee_in_term_pending?
 
