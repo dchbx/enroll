@@ -172,7 +172,7 @@ module SponsoredBenefits
         broker_agency_profile_id = form.broker_agency_profile_id,
         bump_timestamp = false
       )
-        ts_bump = bump_timestamp ? 3 : 0
+        ts_bump = bump_timestamp ? 1 : 0
         timestamp = (Time.now + ts_bump.seconds).to_i
         plan_design_organization(id).general_agency_accounts.build(
           start_on: start_on,
