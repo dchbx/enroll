@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Exchanges::BrokerApplicantsController < ApplicationController
   include Exchanges::BrokerApplicantsHelper
   layout 'single_column'
@@ -34,9 +36,7 @@ class Exchanges::BrokerApplicantsController < ApplicationController
 
   def update
     broker_role = @broker_applicant.broker_role
-    if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
-      broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason])
-    end
+    broker_role.update_attributes(:reason => params[:person][:broker_role_attributes][:reason]) if params[:person] && params[:person][:broker_role_attributes] && params[:person][:broker_role_attributes][:reason]
     if params['deny']
       broker_role.deny!
       flash[:notice] = "Broker applicant denied."
@@ -57,19 +57,19 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.approve!
       broker_role.reload
 
       if broker_role.is_primary_broker?
-        broker_role.broker_agency_profile.approve! if broker_role.broker_agency_profile.aasm_state !=  "is_approved"
+        broker_role.broker_agency_profile.approve! if broker_role.broker_agency_profile.aasm_state != "is_approved"
         staff_role = broker_role.person.broker_agency_staff_roles[0]
-        staff_role.broker_agency_accept! if staff_role
+        staff_role&.broker_agency_accept!
       end
 
       if broker_role.agency_pending?
@@ -90,14 +90,15 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def broker_carrier_appointments
-    all_carrier_appointment = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
+    all_carrier_appointments = "BrokerRole::#{Settings.site.key.upcase}_BROKER_CARRIER_APPOINTMENTS".constantize.stringify_keys
     broker_carrier_appointments_enabled = Settings.aca.broker_carrier_appointments_enabled
-    unless broker_carrier_appointments_enabled
-      permitted_params =  params[:person][:broker_role_attributes][:carrier_appointments].permit!
-      all_carrier_appointment.merge!(permitted_params) if permitted_params
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment
+    if broker_carrier_appointments_enabled
+      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each{ |key,_str| all_carrier_appointments[key] = "true" }
     else
-      params[:person][:broker_role_attributes][:carrier_appointments]= all_carrier_appointment.each{ |key,str| all_carrier_appointment[key] = "true" }
+      # Fix this
+      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit(all_carrier_appointments.keys)
+      all_carrier_appointments.merge!(permitted_params) if permitted_params
+      params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments
     end
   end
 
@@ -115,8 +116,6 @@ class Exchanges::BrokerApplicantsController < ApplicationController
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" }
-    end
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
   end
 end
