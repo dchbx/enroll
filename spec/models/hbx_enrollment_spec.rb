@@ -2,6 +2,7 @@ require 'rails_helper'
 require 'aasm/rspec'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
+require File.join(Rails.root, 'spec/shared_contexts/dchbx_product_selection')
 
 RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
 
@@ -3859,5 +3860,55 @@ describe 'calculate effective_on' do
 
   it 'effective date on CCHH page should return off_cycle_application effective date' do
     expect(calculated_effective_on).to eq off_cycle_application.effective_period.min
+  end
+end
+
+describe ".propogate_cancel" do
+  include_context 'family with previous enrollment for termination and passive renewal'
+  let(:current_year) { TimeKeeper.date_of_record.year }
+  let(:active_coverage) { expired_enrollment }
+
+  context "individual market" do
+    before do
+      family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
+      active_coverage.update_attributes(aasm_state: :coverage_selected)
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+    end
+
+    context "cancel_coverage" do
+      it 'should cancel renewal enrollment when canceling active enrollment' do
+        active_coverage.cancel_coverage!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+    end
+
+    context "cancel_for_non_payment" do
+      it 'should cancel renewal enrollment when canceling active enrollment' do
+        active_coverage.cancel_for_non_payment!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+    end
+  end
+
+  context "shop market" do
+    before do
+      family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first.update_attributes(aasm_state: "auto_renewing")
+      active_coverage.update_attributes(aasm_state: :coverage_selected, kind: 'employer_sponsored')
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+      active_coverage.cancel_coverage!
+      family.reload
+    end
+
+    it 'should not cancel renewal enrollment when canceling active enrollment' do
+      renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+      expect(renewal_enrollment.aasm_state).to eq "auto_renewing"
+      expect(active_coverage.aasm_state).to eq "coverage_canceled"
+    end
   end
 end

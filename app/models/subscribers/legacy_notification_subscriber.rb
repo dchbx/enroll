@@ -60,9 +60,9 @@ module Subscribers
                       'IvlNotices::ReminderNotice',
                       'RenewalNotice',
                       'IvlNotices::SecondIvlRenewalNotice',
-                      'IvlNotices::VariableIvlRenewalNotice'].find { |x| x.name == notice_type.classify }
+                      'IvlNotices::VariableIvlRenewalNotice'].find { |x| x == notice_type.classify }
       raise "Unable to find the notice_class" if notice_class.nil?
-      notice_class
+      notice_class.camelize.constantize
     end
   end
 end
