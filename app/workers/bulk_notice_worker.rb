@@ -20,7 +20,7 @@ class BulkNoticeWorker
 
     if @bulk_notice.audience_type == 'employee'
       #loop through each employee
-      results = @org.census_employees.each do |employee|
+      results = @org.employer_profile.census_employees.each do |employee|
         Operations::SecureMessageAction.new.call(
           params: params.merge({ resource_id: employee.employee_profile.person.id.to_s, resource_name: 'Person' })
         )
