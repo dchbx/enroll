@@ -130,22 +130,6 @@ describe Household, "given a coverage household with a dependent", :dbclean => :
 
   end
 
-  context "hbx_enrollments_with_consumed_aptc_by_year", dbclean: :after_each do
-    let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
-    let(:household) {FactoryBot.create(:household, family: family)}
-    let(:current_date) {TimeKeeper.date_of_record.beginning_of_month}
-    let!(:hbx1) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: false, effective_on: (current_date + 10.days), applied_aptc_amount: 10)}
-    let!(:hbx2) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: false)}
-    let!(:hbx3) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_terminated', changing: false, effective_on: (current_date + 10.days), applied_aptc_amount: 20)}
-    let!(:hbx4) {FactoryBot.create(:hbx_enrollment, family: family, household: household, is_active: true, aasm_state: 'coverage_enrolled', changing: true)}
-
-    it "should return right hbx_enrollments" do
-      household.reload
-      expect(household.hbx_enrollments.count).to eq 4
-      expect(household.hbx_enrollments.enrolled_and_terminated.with_aptc.by_year(TimeKeeper.date_of_record.year)).to eq [hbx1,hbx3]
-    end
-  end
-
   it "ImmediateFamily should have stepchild" do
     expect(Family::IMMEDIATE_FAMILY.include?('stepchild')).to eq true
   end
