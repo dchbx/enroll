@@ -3,8 +3,8 @@
 module BenefitSponsors
   module Validators
     module Organizations
-      # General Agency Organization Contract is to validate submitted params while persisting General Agency Organization
-      class GeneralAgencyOrganizationContract < Dry::Validation::Contract
+      # General Organization Contract is to validate submitted params while persisting General Organization
+      class GeneralOrganizationContract < Dry::Validation::Contract
 
         params do
           required(:entity_kind).filled(:string)

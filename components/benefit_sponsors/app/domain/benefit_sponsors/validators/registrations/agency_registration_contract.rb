@@ -21,10 +21,10 @@ module BenefitSponsors
         rule(:organization).each do
           if key? && value
             if value[:profile_type] == 'broker_agency'
-              result = BenefitSponsors::Validators::Organizations::BrokerAgencyOrganizationContract.new.call(value)
+              result = BenefitSponsors::Validators::Organizations::ExemptOrganizationContract.new.call(value)
               key.failure(text: "invalid broker agency organization", error: result.errors.to_h) if result&.failure?
             else
-              result = BenefitSponsors::Validators::Organizations::GeneralAgencyOrganizationContract.new.call(value)
+              result = BenefitSponsors::Validators::Organizations::GeneralOrganizationContract.new.call(value)
               key.failure(text: "invalid general agency organization", error: result.errors.to_h) if result&.failure?
             end
           end

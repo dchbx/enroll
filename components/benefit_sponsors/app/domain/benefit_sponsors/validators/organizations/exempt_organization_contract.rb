@@ -3,8 +3,8 @@
 module BenefitSponsors
   module Validators
     module Organizations
-      # Broker Agency Organization Contract is to validate submitted params while persisting Broker Agency Organization
-      class BrokerAgencyOrganizationContract < Dry::Validation::Contract
+      # Exempt Organization Contract is to validate submitted params while persisting Exempt Organization
+      class ExemptOrganizationContract < Dry::Validation::Contract
 
         params do
           required(:entity_kind).filled(:string)
