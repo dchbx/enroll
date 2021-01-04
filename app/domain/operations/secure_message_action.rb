@@ -29,7 +29,8 @@ module Operations
       if validate_params[:resource_name] == 'person'
         ::Operations::People::Find.new.call(person_id: validate_params[:resource_id])
       else
-        profile = BenefitSponsors::Operations::Profiles::FindProfile.new.call({organization_id: validate_params[:resource_id], profile_klass: validate_params[:resource_name]})
+        profile_params = validate_params[:profile_id] ? { profile_id: validate_params[:profile_id] } : { organization_id: validate_params[:resource_id], profile_klass: validate_params[:resource_name] }
+        profile = BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_params)
         return profile unless profile.success?
 
         resource =
