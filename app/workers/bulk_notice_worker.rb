@@ -35,18 +35,12 @@ class BulkNoticeWorker
       )
     end
 
-    if result.success?
-      @bulk_notice.results.create(
-        audience_id: audience_id,
-        result: "Success"
-      )
-    else
-      @bulk_notice.results.create(
-        audience_id: audience_id,
-        result: "Error"
-      )
-      Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}")
-    end
+    Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}") unless result.success?
+
+    @bulk_notice.results.create(
+      audience_id: audience_id,
+      result: result.success? ? 'Success' : 'Error'
+    )
 
     html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @org.attributes.symbolize_keys.slice(:id, :fein, :hbx_id, :legal_name) })
     cable_ready["bulk-notice-processing"].morph(
