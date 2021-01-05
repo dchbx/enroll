@@ -7,7 +7,7 @@ module BenefitSponsors
       class AgencyProfileContract < Dry::Validation::Contract
 
         params do
-          required(:market_kind).filled(:string)
+          optional(:market_kind).filled(:string)
           optional(:languages_spoken).maybe(:array)
           optional(:working_hours).maybe(:bool)
           optional(:accept_new_clients).maybe(:bool)
@@ -16,8 +16,11 @@ module BenefitSponsors
 
         rule(:office_locations).each do
           if key? && value
-            result = BenefitSponsors::Validators::OfficeLocations::OfficeLocationContract.new.call(value)
-            key.failure(text: "invalid office location", error: result.errors.to_h) if result&.failure?
+            symbolized_value = value.deep_symbolize_keys
+            result = Validators::OfficeLocations::OfficeLocationContract.new.call(symbolized_value)
+            if result.failure?
+              key.failure('Invalid office locations')
+            end
           end
         end
       end

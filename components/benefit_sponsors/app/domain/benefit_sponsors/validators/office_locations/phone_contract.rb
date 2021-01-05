@@ -10,6 +10,8 @@ module BenefitSponsors
           required(:kind).filled(:string)
           required(:area_code).filled(:string)
           required(:number).filled(:string)
+          optional(:extension).maybe(:string)
+          optional(:full_phone_number).maybe(:string)
         end
       end
     end

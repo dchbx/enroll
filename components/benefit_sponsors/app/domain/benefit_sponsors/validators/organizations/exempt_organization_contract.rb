@@ -13,7 +13,7 @@ module BenefitSponsors
           required(:profile).filled(:hash)
         end
 
-        rule(:profile).each do
+        rule(:profile) do
           if key? && value
             result = BenefitSponsors::Validators::Profiles::AgencyProfileContract.new.call(value)
             key.failure(text: "invalid profile", error: result.errors.to_h) if result&.failure?

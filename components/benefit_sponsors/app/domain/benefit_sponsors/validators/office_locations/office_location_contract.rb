@@ -7,20 +7,21 @@ module BenefitSponsors
       class OfficeLocationContract < Dry::Validation::Contract
 
         params do
+          optional(:is_primary).filled(:bool)
           required(:address).filled(:hash)
           required(:phone).filled(:hash)
         end
 
-        rule(:address).each do
+        rule(:address) do
           if key? && value
-            result = BenefitSponsors::Validators::AddressContract.new.call(value)
+            result = BenefitSponsors::Validators::OfficeLocations::AddressContract.new.call(value)
             key.failure(text: "invalid office location", error: result.errors.to_h) if result&.failure?
           end
         end
 
-        rule(:phone).each do
+        rule(:phone) do
           if key? && value
-            result = BenefitSponsors::Validators::PhoneContract.new.call(value)
+            result = BenefitSponsors::Validators::OfficeLocations::PhoneContract.new.call(value)
             key.failure(text: "invalid office location", error: result.errors.to_h) if result&.failure?
           end
         end
