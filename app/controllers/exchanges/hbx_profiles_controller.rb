@@ -132,7 +132,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   end
 
   def new_secure_message
-    @resource = get_resource_for_secure_form(params)
+    @resource, @resource_name = get_resource_for_secure_form(params)
     @element_to_replace_id = params[:employer_actions_id] || params[:family_actions_id]
   end
 
@@ -142,7 +142,7 @@ class Exchanges::HbxProfilesController < ApplicationController
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
     result = ::Operations::SecureMessageAction.new.call(
-      params: params.permit(:actions_id, :body, :file, :resource_name, :resource_id, :subject, :controller).to_h,
+      params: params.permit(:actions_id, :body, :file, :resource_id, :resource_name, :subject, :controller).to_h,
       user: current_user
     )
     @error_on_save = result.failure if result.failure?
@@ -864,18 +864,32 @@ def employer_poc
   def get_resource(params)
     return nil if params[:resource_id].blank?
 
-    if params[:resource_name].classify.constantize == Person
+    if params[:resource_name] == 'person'
       Person.find(params[:resource_id])
     else
-      BenefitSponsors::Organizations::Profile.find(params[:resource_id])
+      organization = BenefitSponsors::Organizations::Organization.where(id: params[:resource_id]).first
+      organization&.send("#{params[:resource_name]}_profile")
     end
   end
 
   def get_resource_for_secure_form(params)
     if params[:person_id].present?
-      Person.find(params[:person_id])
+      [Person.find(params[:person_id]), 'person']
     elsif params[:profile_id].present?
-      BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+      profile = BenefitSponsors::Organizations::Profile.find(params[:profile_id])
+      [profile.organization, get_resource_klass(profile)]
+    end
+  end
+
+  def get_resource_klass(profile)
+    return '' unless profile
+
+    if profile.class.to_s.match?(/.*EmployerProfile$/)
+      'employer'
+    elsif profile.class.to_s.match?(/.*BrokerAgencyProfile$/)
+      'broker_agency'
+    elsif profile.class.to_s.match?(/.*GeneralAgencyProfile$/)
+      'general_agency'
     end
   end
 

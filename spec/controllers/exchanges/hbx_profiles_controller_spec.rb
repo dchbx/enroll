@@ -713,10 +713,10 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
-    let(:profile_valid_params) {{resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: employer_profile.class.to_s}}
-    let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: person.class.to_s}}
+    let(:profile_valid_params) {{resource_id: organization.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: 'employer'}}
+    let(:person_valid_params) {{resource_id: person.id, subject: 'test', body: 'test', actions_id: '1234', resource_name: 'person'}}
 
-    let(:invalid_params) {{resource_id: employer_profile.id, subject: '', body: '', actions_id: '1234', resource_name: employer_profile.class.to_s}}
+    let(:invalid_params) {{resource_id: organization.id, subject: '', body: '', actions_id: '1234', resource_name: 'employer'}}
 
     before do
       sign_in(user)
@@ -735,7 +735,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     end
 
     it 'should throw error message if actions id is not passed' do
-      invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+      invalid_params = {resource_id: employer_profile.organization.id, subject: 'test', body: 'test', actions_id: '', resource_name: 'employer'}
       get :create_send_secure_message, xhr:  true, params:  invalid_params
 
       expect(response.body).to have_content('must be filled')
@@ -743,7 +743,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context 'when resource is profile' do
       it 'should set instance variables' do
-        invalid_params = {resource_id: employer_profile.id, subject: 'test', body: 'test', actions_id: '', resource_name: employer_profile.class.to_s}
+        invalid_params = {resource_id: employer_profile.organization.id, subject: 'test', body: 'test', actions_id: '', resource_name: 'employer'}
         get :create_send_secure_message, xhr:  true, params:  invalid_params
 
         expect(assigns(:resource)).to eq employer_profile
@@ -761,7 +761,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context 'when resource is person' do
       it 'should set instance variables' do
-        invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '', resource_name: person.class.to_s}
+        invalid_params = {resource_id: person.id, subject: 'test', body: 'test', actions_id: '', resource_name: 'person'}
         get :create_send_secure_message, xhr:  true, params:  invalid_params
 
         expect(assigns(:resource)).to eq person

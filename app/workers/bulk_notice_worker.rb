@@ -22,29 +22,25 @@ class BulkNoticeWorker
       #loop through each employee
       results = @org.employer_profile.census_employees.each do |employee|
         Operations::SecureMessageAction.new.call(
-          params: params.merge({ resource_id: employee.employee_profile.person.id.to_s, resource_name: 'Person' })
+          params: params.merge({ resource_id: employee.employee_profile.person.id.to_s, resource_name: 'person' }),
+          user: @bulk_notice.user
         )
       end
       result = results.any?(&:success?)
     else
       # normal profile params here for other audience types
       result = Operations::SecureMessageAction.new.call(
-        params: params.merge({ resource_id: @org.profiles.first.id.to_s, resource_name: 'BenefitSponsors::Organizations::Profile' })
+        params: params.merge({ resource_id: @org.id.to_s, resource_name:  @bulk_notice.audience_type}),
+        user: @bulk_notice.user
       )
     end
 
-    if result.success?
-      @bulk_notice.results.create(
-        audience_id: audience_id,
-        result: "Success"
-      )
-    else
-      @bulk_notice.results.create(
-        audience_id: audience_id,
-        result: "Error"
-      )
-      Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}")
-    end
+    Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}") unless result.success?
+
+    @bulk_notice.results.create(
+      audience_id: audience_id,
+      result: result.success? ? 'Success' : 'Error'
+    )
 
     html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @org.attributes.symbolize_keys.slice(:id, :fein, :hbx_id, :legal_name) })
     cable_ready["bulk-notice-processing"].morph(

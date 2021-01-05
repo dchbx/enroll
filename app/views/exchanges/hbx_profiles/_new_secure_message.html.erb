@@ -34,7 +34,7 @@
           </table>
           <% resource = @resource %>
           <%= hidden_field_tag :resource_id, resource.id %>
-          <%= hidden_field_tag :resource_name, resource.class %>
+          <%= hidden_field_tag :resource_name, @resource_name %>
           <%= hidden_field_tag :actions_id, @element_to_replace_id %>
           <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
           <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
