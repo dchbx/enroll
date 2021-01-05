@@ -77,6 +77,8 @@ module Services
     end
 
     def send_enrollment_notice_for_ivl(new_date)
+      @logger.info '*' * 50
+      @logger.info "Started send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin
@@ -86,6 +88,8 @@ module Services
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
       end
+      @logger.info "Ended send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      families
     end
 
     def send_reminder_notices_for_ivl(date)
@@ -119,8 +123,8 @@ module Services
         rescue StandardError => e
           @logger.info "Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"
         end
-        @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
       end
+      @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
     end
   end
 end

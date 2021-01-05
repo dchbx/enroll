@@ -207,7 +207,7 @@ end
 describe FamilyMember, "aptc_benchmark_amount", dbclean: :after_each do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 46.years)}
   let(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person, e_case_id: "family_test#1000")}
-  let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, product: product)}
+  let(:enrollment) {FactoryBot.create(:hbx_enrollment, family: family, product: product, effective_on: TimeKeeper.date_of_record)}
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period) }
   let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
   before do

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+=begin
 
 require 'rails_helper'
 
@@ -79,3 +80,5 @@ describe Fix2020IvlBenefitPackages, dbclean: :after_each do
     Rake::Task['import:create_2020_ivl_packages'].invoke
   end
 end
+
+=end

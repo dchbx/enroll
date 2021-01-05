@@ -213,6 +213,12 @@ class CensusEmployee < CensusMember
     })
   }
 
+  index(
+    {'benefit_group_assignments.benefit_package_id' => 1,
+     'benefit_group_assignments.effective_on' => 1,
+     'benefit_group_assignments.is_active' => 1},
+    {name: 'benefit_package_by_benefit_group_assignments_start_on_index'}
+  )
 
   index(
     {
