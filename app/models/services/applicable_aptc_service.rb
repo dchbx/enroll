@@ -3,11 +3,12 @@
 module Services
   class ApplicableAptcService
 
-    def initialize(enrollment_id, selected_aptc, product_ids, excluding_enrollment_id = nil)
+    def initialize(enrollment_id, effective_on, selected_aptc, product_ids, excluding_enrollment_id = nil)
       @enrollment_id = enrollment_id
       @selected_aptc = selected_aptc
       @product_ids = ids_to_strings(product_ids)
       @excluding_enrollment_id = excluding_enrollment_id
+      @effective_on = effective_on
     end
 
     def applicable_aptcs
@@ -25,7 +26,7 @@ module Services
     private
 
     def factory_instance
-      @factory_instance ||= factory_klass.new(@enrollment_id, @selected_aptc, @product_ids, @excluding_enrollment_id)
+      @factory_instance ||= factory_klass.new(@enrollment_id, @effective_on, @selected_aptc, @product_ids, @excluding_enrollment_id)
     end
 
     def ids_to_strings(product_ids)

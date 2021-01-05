@@ -161,10 +161,10 @@ class TaxHousehold
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
-  def total_aptc_available_amount_for_enrollment(hbx_enrollment, excluding_enrollment = nil)
+  def total_aptc_available_amount_for_enrollment(hbx_enrollment, effective_on, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
-    monthly_available_aptc = monthly_max_aptc(hbx_enrollment)
+    monthly_available_aptc = monthly_max_aptc(hbx_enrollment, effective_on)
     member_aptc_hash = aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
       sum + (member_aptc_hash[member.id.to_s] || 0)
@@ -176,9 +176,9 @@ class TaxHousehold
     (total < 0.00) ? 0.00 : float_fix(total)
   end
 
-  def monthly_max_aptc(hbx_enrollment)
+  def monthly_max_aptc(hbx_enrollment, effective_on)
     monthly_max_aggregate = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
-                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] { {hbx_enrollment: hbx_enrollment} }
+                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] { {hbx_enrollment: hbx_enrollment, effective_on: effective_on} }
                               monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
                             else
                               current_max_aptc.to_f
@@ -213,34 +213,6 @@ class TaxHousehold
       end
     end
     aptc_available_amount_hash
-  end
-
-  # Pass a list of tax_household_members and get amount of APTC available
-  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc)
-    # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
-    aptc_available_amount_hash_for_enrollment = {}
-
-    total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
-    elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
-    decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
-    member_aptc_hash = aptc_available_amount_by_member(monthly_max_aptc(hbx_enrollment))
-    hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
-      given_aptc = (member_aptc_hash[enrollment_member.applicant_id.to_s] || 0) * elected_pct
-      ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
-      if plan.kind == 'dental'
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
-      else
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-      end
-    end
-    aptc_available_amount_hash_for_enrollment
-
-    # premium_total = as_dollars(policy.pre_amt_tot)
-    # given_aptc = as_dollars(policy.applied_aptc)
-    # max_aptc = as_dollars(premium_total * plan.ehb)
-    # correct_aptc = (given_aptc > max_aptc) ? max_aptc : given_aptc
-    # policy.applied_aptc = correct_aptc
-    # $70
   end
 
   # Income sum of all tax filers in this Household for specified year
