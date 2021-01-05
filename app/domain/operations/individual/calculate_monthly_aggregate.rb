@@ -41,13 +41,13 @@ module Operations
         termination_date = calculate_termination_date(enrollment, base_enrollment)
         @effective_on = enrollment.effective_on
         @applied_aptc = enrollment.applied_aptc_amount.to_f
-        first_month_aptc = aptc_consumed_in_effective_month(enrollment, termination_date)
-        full_months_aptc = aptc_consumed_in_full_months(enrollment, termination_date)
-        last_month_aptc  = aptc_consumed_in_terminated_month(enrollment, termination_date)
+        first_month_aptc = aptc_consumed_in_effective_month(termination_date)
+        full_months_aptc = aptc_consumed_in_full_months(termination_date)
+        last_month_aptc  = aptc_consumed_in_terminated_month(termination_date)
         first_month_aptc + full_months_aptc + last_month_aptc
       end
 
-      def aptc_consumed_in_effective_month(enrollment, termination_date)
+      def aptc_consumed_in_effective_month(termination_date)
         total_days = @effective_on.end_of_month.day
         no_of_days_aptc_consumed =
           if @effective_on == @effective_on.beginning_of_month
@@ -64,7 +64,7 @@ module Operations
         no_of_days_aptc_consumed.fdiv(total_days) * @applied_aptc
       end
 
-      def aptc_consumed_in_full_months(enrollment, termination_date)
+      def aptc_consumed_in_full_months(termination_date)
         if (termination_date.month - 1) <= @effective_on.month
           0
         else
@@ -72,7 +72,7 @@ module Operations
         end * @applied_aptc
       end
 
-      def aptc_consumed_in_terminated_month(enrollment, termination_date)
+      def aptc_consumed_in_terminated_month(termination_date)
         total_days = termination_date.end_of_month.day
         if @effective_on.month == termination_date.month
           0
