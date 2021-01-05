@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Entities
     module OfficeLocations
+      # Entity to initialize while persisting Address record.
       class Address < Dry::Struct
         transform_keys(&:to_sym)
 

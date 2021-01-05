@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Validators
     module SponsoredBenefits
+      # PricingDeterminationTierContract  is to validate submitted params while persisting PricingDeterminations
       class PricingDeterminationTierContract < Dry::Validation::Contract
 
         params do

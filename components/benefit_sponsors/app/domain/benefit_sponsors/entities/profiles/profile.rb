@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Entities
     module Profiles
+      # Entity acts a top level profile class
       class Profile < Dry::Struct
         transform_keys(&:to_sym)
 

@@ -2,6 +2,7 @@
 
 module BenefitSponsors
   module Entities
+    # Entity to initialize while persisting ExemptOrganization record.
     class ExemptOrganization < Dry::Struct
       transform_keys(&:to_sym)
 

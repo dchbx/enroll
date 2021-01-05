@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Entities
     module Profiles
+      # Entity to initialize while persisting BrokerAgency/GeneralAgency record, which inherits from profile class.
       class AgencyProfile < Profile
         transform_keys(&:to_sym)
 

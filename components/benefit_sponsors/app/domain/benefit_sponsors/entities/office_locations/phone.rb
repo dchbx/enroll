@@ -3,6 +3,7 @@
 module BenefitSponsors
   module Entities
     module OfficeLocations
+      # Entity to initialize while persisting Phone record.
       class Phone < Dry::Struct
         transform_keys(&:to_sym)
 

@@ -15,13 +15,11 @@ module BenefitSponsors
         end
 
         rule(:office_locations).each do
-          if key? && value
-            symbolized_value = value.deep_symbolize_keys
-            result = Validators::OfficeLocations::OfficeLocationContract.new.call(symbolized_value)
-            if result.failure?
-              key.failure('Invalid office locations')
-            end
-          end
+          next unless key? && value
+
+          symbolized_value = value.deep_symbolize_keys
+          result = Validators::OfficeLocations::OfficeLocationContract.new.call(symbolized_value)
+          key.failure(text: "Invalid Profile", error: result.errors.to_h) if result.failure?
         end
       end
     end
