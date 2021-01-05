@@ -165,8 +165,9 @@ class TaxHousehold
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
     monthly_available_aptc = monthly_max_aptc(hbx_enrollment)
+    member_aptc_hash = aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment)[member.id.to_s] || 0)
+      sum + (member_aptc_hash[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
@@ -200,6 +201,8 @@ class TaxHousehold
     aptc_ratio_by_member.each do |member_id, ratio|
       aptc_available_amount_hash[member_id] = monthly_available_aptc.to_f * ratio
     end
+    return aptc_available_amount_hash if EnrollRegistry.feature_enabled?(:calculate_monthly_aggregate)
+
     # FIXME should get hbx_enrollments by effective_starting_on
     enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
     enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
