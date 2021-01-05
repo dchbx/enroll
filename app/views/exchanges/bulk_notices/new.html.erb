@@ -3,7 +3,8 @@
 <div class="container" data-controller="bulk-notice">
 
   <h4>New Message</h4>
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+  <p><%= l10n("admin_actions.bulk_upload.new.description_text") %></p>
+  <strong>Important:</strong> <p><%= l10n("admin_actions.bulk_upload.new.description_sub_text") %></p>
 
   <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path, html: { multipart: true }) do |f| %>
     <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
