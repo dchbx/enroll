@@ -76,6 +76,8 @@ module Operations
         total_days = termination_date.end_of_month.day
         if @effective_on.month == termination_date.month
           0
+        elsif termination_date < @effective_on
+          0
         else
           termination_date.day.fdiv(total_days) * @applied_aptc
         end
