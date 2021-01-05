@@ -34,7 +34,7 @@ module Services
 
     def applicable_aptc(selected_aptc)
       product_id = @hbx_enrollment.product.id.to_s
-      applicable_aptc_service = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, selected_aptc, [product_id])
+      applicable_aptc_service = ::Services::ApplicableAptcService.new(@hbx_enrollment.id, @hbx_enrollment.effective_on, selected_aptc, [product_id])
       applicable_aptc_service.applicable_aptcs[product_id]
     end
 
