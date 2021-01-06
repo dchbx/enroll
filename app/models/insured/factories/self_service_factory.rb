@@ -79,8 +79,9 @@ module Insured
         eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
       end
 
-      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, excluding_enrollment_id = nil)
-        service = ::Services::ApplicableAptcService.new(new_enrollment.id, new_enrollment.effective_on, selected_aptc, [new_enrollment.product_id], excluding_enrollment_id)
+      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, effective_on = nil, excluding_enrollment_id = nil)
+        effective_on = effective_on || new_enrollment.effective_on
+        service = ::Services::ApplicableAptcService.new(new_enrollment.id, effective_on, selected_aptc, [new_enrollment.product_id], excluding_enrollment_id)
         service.applicable_aptcs[new_enrollment.product_id.to_s]
       end
 
@@ -99,8 +100,8 @@ module Insured
       end
 
       def build_form_params
-        new_effective_on          = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         enrollment                = HbxEnrollment.find(BSON::ObjectId.from_string(enrollment_id))
+        new_effective_on          = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
         family                    = Family.find(BSON::ObjectId.from_string(family_id))
         sep                       = SpecialEnrollmentPeriod.find(BSON::ObjectId.from_string(family.latest_active_sep.id)) if family.latest_active_sep.present?
         qle                       = QualifyingLifeEventKind.find(BSON::ObjectId.from_string(sep.qualifying_life_event_kind_id))  if sep.present?
@@ -122,7 +123,7 @@ module Insured
 
       def calculate_max_applicable_aptc(enrollment, new_effective_on)
         selected_aptc = ::Services::AvailableEligibilityService.new(enrollment.id, new_effective_on, enrollment.id).available_eligibility[:total_available_aptc]
-        Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, enrollment.id)
+        Insured::Factories::SelfServiceFactory.fetch_applicable_aptc(enrollment, selected_aptc, new_effective_on, enrollment.id)
       end
 
       def self.find_enrollment_effective_on_date(hbx_created_datetime, current_enrollment_effective_on)
