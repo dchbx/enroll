@@ -178,7 +178,8 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       let!(:enrollment_member1) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment1, applicant_id: family_member.id) }
 
       before :all do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(2020, 3, 4))
+        current_year = Date.today.year
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year, 3, 4))
         @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
         reset_premium_tuples
         benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship

@@ -145,7 +145,7 @@ module BenefitSponsors
             ba.update_attributes!(effective_period: ba_start_on..current_date.prev_day, terminated_on: current_date.prev_month)
           end
           benefit_application = sponsor.benefit_applications.termination_pending.first
-          service = subject.new(benefit_sponsorship: sponsor)
+          service = subject.new(benefit_sponsorship: sponsor, new_date: benefit_application.effective_period.max.next_day)
           service.terminate_pending_sponsor_benefit
           sponsor.reload
           benefit_application.reload
@@ -175,7 +175,7 @@ module BenefitSponsors
             expect(sponsor.applicant?).to be_truthy
             expect(benefit_application.enrollment_extended?).to be_truthy
 
-            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
+            sponsorship_service = subject.new(benefit_sponsorship: sponsor, new_date: benefit_application.open_enrollment_period.max.next_day)
             sponsorship_service.end_open_enrollment
 
             sponsor.reload
@@ -197,7 +197,7 @@ module BenefitSponsors
             expect(sponsor.active?).to be_truthy
             expect(benefit_application.enrollment_extended?).to be_truthy
 
-            sponsorship_service = subject.new(benefit_sponsorship: sponsor)
+            sponsorship_service = subject.new(benefit_sponsorship: sponsor, new_date: benefit_application.open_enrollment_period.max.next_day)
             sponsorship_service.end_open_enrollment
 
             sponsor.reload

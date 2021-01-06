@@ -139,10 +139,10 @@ module Insured
           offset_month = hbx_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
           year = hbx_created_datetime.year
           month = hbx_created_datetime.month + offset_month
-          if month > 12
-            year += 1
-            month -= 12
-          end
+        end
+        if month > 12
+          year += 1
+          month -= 12
         end
         DateTime.new(year, month, day, hour, min, sec)
       end

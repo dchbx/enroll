@@ -400,8 +400,13 @@ RSpec.describe TaxHousehold, type: :model do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
           let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-          let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, family: family, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member], household: family.active_household, product: product)}
-
+          let(:shopping_hbx_enrollment) do
+            FactoryBot.build(:hbx_enrollment,
+                             family: family, aasm_state: 'shopping',
+                             effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                             hbx_enrollment_members: [shopping_hbx_enrollment_member],
+                             household: family.active_household, product: product)
+          end
           it 'should return available APTC amount' do
             result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
             expect(result).to eq(301.14)
@@ -525,6 +530,7 @@ RSpec.describe TaxHousehold, type: :model do
                               enrollment_kind: 'special_enrollment',
                               coverage_kind: 'health',
                               submitted_at: TimeKeeper.date_of_record - 2.months,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               aasm_state: 'coverage_selected',
                               household: family.active_household,
                               applied_aptc_amount: 32.21)
@@ -544,6 +550,7 @@ RSpec.describe TaxHousehold, type: :model do
                               family: family,
                               waiver_reason: nil,
                               submitted_at: TimeKeeper.date_of_record - 1.month,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               household: family.active_household,
                               enrollment_kind: 'special_enrollment',
                               is_active: true,
@@ -558,7 +565,13 @@ RSpec.describe TaxHousehold, type: :model do
                              applicant_id: family.family_members.last.id,
                              eligibility_date: TimeKeeper.date_of_record + 1.month)
           end
-          let(:shopping_hbx_enrollment1) {FactoryBot.build(:hbx_enrollment, family: family, coverage_kind: 'health', aasm_state: 'shopping', household: family.active_household, hbx_enrollment_members: [shopping_hbx_enrollment_member1])}
+          let(:shopping_hbx_enrollment1) do
+            FactoryBot.build(:hbx_enrollment,
+                             family: family, coverage_kind: 'health',
+                             effective_on: TimeKeeper.date_of_record.beginning_of_month,
+                             household: family.active_household, aasm_state: 'shopping',
+                             hbx_enrollment_members: [shopping_hbx_enrollment_member1])
+          end
 
           before do
             tax_household_member3.update_attributes(is_ia_eligible: true)
