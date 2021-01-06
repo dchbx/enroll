@@ -126,7 +126,7 @@ class UnassistedPlanCostDecorator < SimpleDelegator
       serv_obj = ::Services::ApplicableAptcService.new(hbx_enrollment.id, hbx_enrollment.effective_on, elected_aptc, [__getobj__.id.to_s])
       member_hash = serv_obj.elected_aptc_per_member
     else
-      fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, elected_aptc, [__getobj__.id.to_s])
+      fac_obj = ::Factories::IvlPlanShoppingEligibilityFactory.new(@hbx_enrollment, @hbx_enrollment.effective_on, elected_aptc, [__getobj__.id.to_s])
       member_hash = fac_obj.fetch_elected_aptc_per_member
     end
 
