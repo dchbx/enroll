@@ -116,8 +116,9 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
                                             :benefit_group_assignments => [initial_benefit_group_assignment, renewal_benefit_group_assignment],employee_role_id: employee_role.id)
       end
 
-      let(:sponsored_benefit) { current_benefit_package.sponsored_benefits.first}
-      let(:reference_product) {sponsored_benefit.reference_product}
+      let(:sponsored_benefit) { current_benefit_package.sponsored_benefits.first }
+      let(:reference_product) { sponsored_benefit.reference_product }
+      let(:renewal_product)   { benefit_package.sponsored_benefits.first.reference_product }
       let(:hbx_enrollment_member) do
         FactoryBot.build(:hbx_enrollment_member, is_subscriber: true, coverage_start_on: current_benefit_package.start_on, eligibility_date: current_benefit_package.start_on, applicant_id: family.family_members.first.id)
       end
@@ -130,6 +131,7 @@ describe CreateRenewalPlanYearAndEnrollment, dbclean: :after_each do
       end
 
       before(:each) do
+        reference_product.update!(renewal_product_id: renewal_product.id)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:age_bounding).and_return(20)
         allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).and_return(15)
         ::BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!

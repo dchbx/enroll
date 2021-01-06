@@ -8,7 +8,8 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
     # Overcome any timekeeper weirdness.
     # TODO: Find out who the bad citizen is that isn't resetting timekeeper
     #       after playing with it.
-    TimeKeeper.set_date_of_record_unprotected!(Date.new(2020, 3, 4))
+    current_year = Date.today.year
+    TimeKeeper.set_date_of_record_unprotected!(Date.new(current_year, 3, 4))
   end
 
   def reset_premium_tuples

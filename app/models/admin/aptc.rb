@@ -16,6 +16,7 @@ class Admin::Aptc < ApplicationController
       return { "max_aptc" => max_aptc_vals, "available_aptc" => avalaible_aptc_vals, "csr_percentage" => csr_percentage_vals}
     end
 
+    # TODO: This method name spelles "available" wrong, should look into fixing it
     def build_avalaible_aptc_values(year, family, hbxs, applied_aptc_array=nil, max_aptc=nil,  member_ids=nil)
       available_aptc_hash = Hash.new
       #max_aptc_vals             = build_max_aptc_values(family, max_aptc)

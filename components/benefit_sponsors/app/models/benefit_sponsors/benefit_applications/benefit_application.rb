@@ -1031,7 +1031,12 @@ module BenefitSponsors
     end
 
     def all_waived_member_count
-      active_census_employees_under_py.select { |census_employee| census_employee.is_waived_under?(self)}.count
+      active_census_employees_under_py.select { |census_employee| census_employee.is_waived_under?(self) && !census_employee.is_business_owner}.count
+    end
+
+    def total_enrolled_and_waived_count
+      owner_employees = active_census_employees_under_py.select(&:is_business_owner)
+      filter_enrolled_employees(owner_employees, enrolled_families).count
     end
 
     def eligible_for_export?

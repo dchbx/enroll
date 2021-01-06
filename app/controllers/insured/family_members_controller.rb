@@ -132,7 +132,7 @@ class Insured::FamilyMembersController < ApplicationController
     @address_errors = validate_address_params(params)
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
-      if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent))
+      if @address_errors.blank? && @dependent.update_attributes(params[:dependent])
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
@@ -148,7 +148,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent).permit(params[:dependent].keys)) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
@@ -160,7 +160,7 @@ class Insured::FamilyMembersController < ApplicationController
       if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
         consumer_role.update_attribute(
           :is_applying_coverage,
-          params.require(:dependent).permit(:is_applying_coverage)[:is_applying_coverage]
+          params[:dependent][:is_applying_coverage]
         )
       end
       respond_to do |format|
@@ -231,7 +231,7 @@ class Insured::FamilyMembersController < ApplicationController
   private
 
   def permit_dependent_person_params
-    params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
+    params.permit(:dependent => {})
   end
 
   def set_family
