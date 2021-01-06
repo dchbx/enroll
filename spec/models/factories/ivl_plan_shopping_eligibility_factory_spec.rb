@@ -17,6 +17,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
     p_table.premium_tuples.each { |pt| pt.update_attributes!(cost: pt.age)}
   end
 
+  before :each do
+    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+  end
+
   unless Settings.site.faa_enabled
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
@@ -36,7 +40,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
         context 'for one member enrollment' do
           context 'tax_household exists' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -55,40 +59,16 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
               end
             end
 
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 443.33 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 443.33 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
-
-            context 'With yearly aggregate feature turned OFF' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s]).to eq 443.33
-                expect(@available_eligibility1[:total_available_aptc]).to eq 443.33
-              end
-            end
-
-            context 'With yearly aggregate feature turned ON' do
-              before :each do
-                enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc on yearly aggregate calculations' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s]).to eq 2942.34
-                expect(@available_eligibility1[:total_available_aptc]).to eq 2942.34
-              end
-            end
           end
 
           context 'tax_household does not exists' do
             before :each do
               family.active_household.tax_households = []
               family.active_household.save!
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -118,7 +98,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -137,41 +117,16 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
               end
             end
 
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s]).to eq 225.96711798839456 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s]).to eq 274.0328820116054 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
-
-            context 'With yearly aggregate feature turned OFF' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s]).to eq 225.96711798839456
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s]).to eq 274.0328820116054
-                expect(@available_eligibility1[:total_available_aptc]).to eq 500.00
-              end
-            end
-
-            context 'With yearly aggregate feature turned ON' do
-              before :each do
-                enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s]).to eq 1358.512051622699
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s]).to eq 1641.4879483773013
-                expect(@available_eligibility1[:total_available_aptc]).to eq 3000.0
-              end
-            end
           end
 
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -190,35 +145,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
               end
             end
 
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 500.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0.00 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 500.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
-
-            context 'With yearly aggregate feature turned OFF' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 500.00
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 0.00
-                expect(@available_eligibility1[:total_available_aptc]).to eq 500.00
-              end
-            end
-
-            context 'With yearly aggregate feature turned ON' do
-              before :each do
-                enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 3000.0
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 0.00
-                expect(@available_eligibility1[:total_available_aptc]).to eq 3000.0
-              end
-            end
           end
         end
 
@@ -230,7 +160,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -249,42 +179,16 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
               end
             end
 
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 203.37 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 246.63 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
-
-            context 'With yearly aggregate feature turned OFF' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 203.37
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 246.63
-                expect(@available_eligibility1[:total_available_aptc]).to eq 450.00
-              end
-            end
-
-            context 'With yearly aggregate feature turned ON' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-                enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 1245.3
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 1504.7
-                expect(@available_eligibility1[:total_available_aptc]).to eq 2750.0
-              end
-            end
           end
 
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -303,36 +207,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
               end
             end
 
+            it { expect(@available_eligibility[:aptc][family_member.id.to_s].round(2)).to eq 450.00 }
+            it { expect(@available_eligibility[:aptc][family_member2.id.to_s].round(2)).to eq 0 }
+            it { expect(@available_eligibility[:total_available_aptc]).to eq 450.00 }
             it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
-
-            context 'With yearly aggregate feature turned OFF' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 450.00
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 0
-                expect(@available_eligibility1[:total_available_aptc]).to eq 450.00
-              end
-            end
-
-            context 'With yearly aggregate feature turned ON' do
-              before :each do
-                EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-                enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-                @eligibility_factory1 ||= described_class.new(enrollment1)
-                @available_eligibility1 ||= @eligibility_factory.fetch_available_eligibility
-              end
-
-              it 'should return the calucations for family members and total available aptc' do
-                expect(@available_eligibility1[:aptc][family_member.id.to_s].round(2)).to eq 2750.0
-                expect(@available_eligibility1[:aptc][family_member2.id.to_s].round(2)).to eq 0
-                expect(@available_eligibility1[:total_available_aptc]).to eq 2750.0
-              end
-            end
           end
         end
       end
@@ -347,7 +225,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'where ehb_premium less than selected_aptc and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1, 150.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
               @ehb_premium = @eligibility_factory.send(:total_ehb_premium, enrollment1.product.id)
@@ -378,7 +256,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'where selected_aptc less than ehb_premium and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1, 35.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
@@ -408,7 +286,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
           context 'where available_aptc less than ehb_premium and selected_aptc' do
             before do
               family.active_household.tax_households.first.destroy
-              @eligibility_factory = described_class.new(enrollment1, 100.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 100.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
