@@ -5,124 +5,13 @@ require 'rails_helper'
 RSpec.describe TaxHousehold, type: :model do
   let(:family)  { FactoryBot.create(:family) }
 
-
-
-# describe TaxHousehold do
-=begin
-  describe "validate associations" do
-#    it { should have_and_belong_to_many  :people }
-#    it { should embed_many :special_enrollment_periods }
-    it { should embed_many :eligibilities }
-=end
+  before :each do
+    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+  end
 
   it "should have no people" do
     expect(subject.people).to be_empty
   end
-
-=begin
-
-  it "max_aptc and csr values returned are from the most recent eligibility record" do
-    hh = Household.new(
-        eligibilities: [
-          Eligibility.new({date_determined: Date.today - 100, max_aptc: 101.05, csr_percent: 1.0}),
-          Eligibility.new({date_determined: Date.today - 80, max_aptc: 181.05, csr_percent: 0.80}),
-          Eligibility.new({date_determined: Date.today, max_aptc: 287.95, csr_percent: 0.73}),
-          Eligibility.new({date_determined: Date.today - 50, max_aptc: 101.05, csr_percent: 0.50})
-        ]
-      )
-
-    expect(hh.max_aptc).to eq(287.95)
-    expect(hh.csr_percent).to eq(0.73)
-  end
-  it "returns list of SEPs for specified day and single 'current_sep'" do
-    hh = Household.new(
-        special_enrollment_periods: [
-          SpecialEnrollmentPeriod.new({reason: "marriage", start_date: Date.today - 120, end_date: Date.today - 90}),
-          SpecialEnrollmentPeriod.new({reason: "retirement", start_date: Date.today - 10, end_date: Date.today + 20}),
-          SpecialEnrollmentPeriod.new({reason: "birth", start_date: Date.today - 90, end_date: Date.today - 60}),
-          SpecialEnrollmentPeriod.new({reason: "location_change", start_date: Date.today - 260, end_date: Date.today - 230}),
-          SpecialEnrollmentPeriod.new({reason: "employment_termination", start_date: Date.today - 180, end_date: Date.today - 150})
-        ]
-      )
-
-    past_day = hh.active_seps(Date.today - 500)
-    expect(past_day.count).to eq(0)
-
-    wedding_day = hh.active_seps(Date.today - 120)
-    expect(wedding_day.count).to eq(1)
-    expect(wedding_day.first.reason).to eq("marriage")
-    expect(wedding_day.first.start_date).to eq(Date.today - 120)
-
-    expect(hh.current_sep.reason).to eq("retirement")
-    expect(hh.current_sep.start_date).to eq(Date.today - 10)
-  end
-
-  describe "new SEP effects on enrollment state:" do
-
-    it "should initialize to closed_enrollment state" do
-      hh = Household.new
-      expect(hh.closed_enrollment?).to eq(true)
-    end
-
-    it "should transition to open_enrollment_period from any other enrollment state (including open_enrollment_period)" do
-      hh = Household.new
-      expect(hh.closed_enrollment?).to eq(true)
-      hh.open_enrollment
-      expect(hh.open_enrollment_period?).to eq(true)
-      hh.open_enrollment
-      expect(hh.open_enrollment_period?).to eq(true)
-      hh.special_enrollment
-      expect(hh.special_enrollment_period?).to eq(true)
-      hh.open_enrollment
-      expect(hh.open_enrollment_period?).to eq(true)
-    end
-
-    it "not affect state when system date is outside new SEP date range" do
-      hh = Household.new
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "marriage", start_date: Date.today - 120, end_date: Date.today - 90})
-      expect(hh.closed_enrollment?).to eq(true)
-
-      hh.special_enrollment
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "location_change", start_date: Date.today - 90, end_date: Date.today - 60})
-      expect(hh.special_enrollment_period?).to eq(true)
-    end
-
-    it "set state to special_enrollment_period when system date is within SEP date range" do
-      hh = Household.new(rel: "subscriber")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "birth", start_date: Date.today - 5, end_date: Date.today + 25})
-      hh.save!
-
-      expect(hh.special_enrollment_period?).to eq(true)
-      expect(hh.current_sep.reason).to eq("birth")
-    end
-
-    it "change state from open_enrollment_period to special_enrollment_period when end_date is later" do
-      hh = Household.new(rel: "spouse")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: Date.today - 30, end_date: Date.today + 5})
-      hh.save!
-      expect(hh.open_enrollment_period?).to eq(true)
-
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: Date.today - 15, end_date: Date.today + 15})
-      expect(hh.special_enrollment_period?).to eq(true)
-    end
-
-    it "do not change state from open_enrollment_period to special_enrollment_period when end_date is prior" do
-      hh = Household.new(rel: "spouse")
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "open_enrollment_start", start_date: Date.today - 30, end_date: Date.today + 5})
-      hh.save!
-      expect(hh.open_enrollment_period?).to eq(true)
-
-      hh.special_enrollment_periods << SpecialEnrollmentPeriod.new({reason: "adoption", start_date: Date.today - 29, end_date: Date.today + 1})
-      expect(hh.open_enrollment_period?).to eq(true)
-    end
-
-    it "manually force active enrollment periods to close" do
-    end
-
-    it "change Household state when System date enters or exits current_sep range" do
-    end
-  end
-=end
 
   context "aptc_ratio_by_member" do
     let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
@@ -150,7 +39,6 @@ RSpec.describe TaxHousehold, type: :model do
     let(:hbx_member2) { double(applicant_id: 'member2', applied_aptc_amount: 10) }
     let(:hbx_enrollment) { double(applied_aptc_amount: 30, family: family, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
     # let(:household) { family.active_household }
-    let(:monthly_available_aptc) { 100 }
 
     it "can return result" do
       tax_household = TaxHousehold.new
@@ -159,66 +47,9 @@ RSpec.describe TaxHousehold, type: :model do
       allow(tax_household).to receive(:current_max_aptc).and_return 100
       allow(tax_household).to receive(:effective_starting_on).and_return TimeKeeper.date_of_record
       allow(household).to receive(:hbx_enrollments_with_aptc_by_year).and_return([hbx_enrollment])
-      expect(tax_household.aptc_available_amount_by_member(monthly_available_aptc).class).to eq Hash
+      expect(tax_household.aptc_available_amount_by_member(100.00).class).to eq Hash
       result = {'member1' => 40, 'member2' => 30}
-      expect(tax_household.aptc_available_amount_by_member(monthly_available_aptc)).to eq result
-    end
-  end
-
-  context "aptc_available_amount_for_enrollment" do
-    let!(:family) {create(:family, :with_primary_family_member_and_dependent)}
-    let(:household) {create(:household, family: family)}
-    let(:aptc_available_amount_by_member) { {'member1' => 60, 'member2' => 40} }
-    let(:hbx_member1) { double(applicant_id: 'member1') }
-    let(:hbx_member2) { double(applicant_id: 'member2') }
-    let(:hbx_enrollment) { double(applied_aptc_amount: 30, family: family, hbx_enrollment_members: [hbx_member1, hbx_member2]) }
-    # let(:household) { double }
-    let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-    let(:decorated_plan) {double}
-
-    before :each do
-      @tax_household = TaxHousehold.new
-      allow(plan).to receive(:ehb).and_return 0.9
-      allow(@tax_household).to receive(:aptc_available_amount_by_member).and_return aptc_available_amount_by_member
-      allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 100
-      allow(UnassistedPlanCostDecorator).to receive(:new).and_return(decorated_plan)
-      allow(decorated_plan).to receive(:premium_for).and_return(100)
-      allow(household).to receive(:hbx_enrollments_with_aptc_by_date).and_return([hbx_enrollment])
-    end
-
-    it "can return result when plan is individual" do
-      allow(plan).to receive(:kind).and_return 'individual'
-      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
-      result = {'member1' => 30, 'member2' => 20}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
-    end
-
-    it "when ehb_premium > aptc_amount" do
-      allow(decorated_plan).to receive(:premium_for).and_return(10)
-      allow(plan).to receive(:kind).and_return 'individual'
-      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
-      result = {'member1' => 9, 'member2' => 9}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
-    end
-
-    it "can return result when plan is dental" do
-      allow(plan).to receive(:kind).and_return 'dental'
-      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
-      result = {'member1' => 0, 'member2' => 0}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
-    end
-
-    it "can return result when total_aptc_available_amount is 0" do
-      allow(@tax_household).to receive(:total_aptc_available_amount_for_enrollment).and_return 0
-      allow(decorated_plan).to receive(:premium_for).and_return(10)
-      allow(plan).to receive(:kind).and_return 'individual'
-      #allow(@tax_household).to receive(:deduct_aptc_available_amount_for_unenrolled).and_return 20
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50).class).to eq Hash
-      result = {'member1' => 0, 'member2' => 0}
-      expect(@tax_household.aptc_available_amount_for_enrollment(hbx_enrollment, plan, 50)).to eq result
+      expect(tax_household.aptc_available_amount_by_member(100.00)).to eq result
     end
   end
 
@@ -339,33 +170,20 @@ RSpec.describe TaxHousehold, type: :model do
         allow(tax_household).to receive(:unwanted_family_members).and_return []
       end
 
-      context 'when all family_members are eligible and monthly aggregate feature is turned OFF' do
+      context 'when all family_members are medicaid' do
         before do
           allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
         end
 
         it 'should return all members amount' do
-          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc)
+          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on)
           expect(result).to eq(total_aptc_available_amount)
         end
       end
 
-      context 'when all family_members eligible and monthly aggregate feature is turned ON' do
-        before do
-          allow(tax_household).to receive(:is_all_non_aptc?).and_return false
-          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-        end
-
-        it 'should return all members amount' do
-          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc)
-          expect(result).to eq(monthly_available_aptc)
-        end
-      end
-
-      context 'when all family_members are non eligible members for aptc' do
+      context 'when all family_members are not medicaid' do
         it 'should return 0' do
-          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
+          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on)
           expect(result).to eq(0)
         end
       end
@@ -380,28 +198,29 @@ RSpec.describe TaxHousehold, type: :model do
         allow(tax_household).to receive(:find_aptc_family_members).and_return true
       end
 
-      context 'When calculate_yearly_aggregate feature is turned OFF' do
-        before do
-          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-        end
+      it 'should deduct benchmark cost' do
+        result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on)
+        expect(result).not_to eq(total_aptc_available_amount)
+        expect(result).to eq(total_aptc_available_amount - total_benchmark_amount)
+      end
+    end
 
-        it 'should deduct benchmark cost' do
-          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment)
-          expect(result).not_to eq(total_aptc_available_amount)
-          expect(result).to eq(total_aptc_available_amount - total_benchmark_amount)
+    context 'calculate_monthly_aggregate feature enabled' do
+      let!(:enr_members) do
+        family.active_family_members.each do |fm|
+          FactoryBot.create(:hbx_enrollment_member, applicant_id: fm.id, is_subscriber: fm.is_primary_applicant, hbx_enrollment: hbx_enrollment_aptc)
         end
       end
 
-      context 'When calculate_yearly_aggregate feature is turned ON' do
-        before do
-          EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-        end
+      before do
+        hbx_enrollment_aptc.update_attributes!(effective_on: TimeKeeper.date_of_record.beginning_of_year, applied_aptc_amount: 150.00)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
+        EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
+        @result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc, TimeKeeper.date_of_record)
+      end
 
-        it 'should deduct benchmark cost' do
-          result = tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment_aptc)
-          expect(result).not_to eq(total_aptc_available_amount)
-          expect(result).to eq(monthly_available_aptc - total_benchmark_amount)
-        end
+      it 'should return monthly aggregate amount' do
+        expect(@result).to eq(294)
       end
     end
   end
@@ -428,7 +247,7 @@ RSpec.describe TaxHousehold, type: :model do
                           coverage_kind: 'health', submitted_at: TimeKeeper.date_of_record - 6.months,
                           household: family.active_household, family: family, product: product)
       end
-      let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months, effective_ending_on: nil)}
+      let!(:tax_household) {FactoryBot.create(:tax_household, household: family.active_household, created_at: TimeKeeper.date_of_record - 5.months)}
       let!(:tax_household_member1) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[0].id)}
       let!(:tax_household_member2) {tax_household.tax_household_members.create!(is_ia_eligible: true, applicant_id: person.primary_family.family_members[1].id)}
       let!(:tax_household_member3) {tax_household.tax_household_members.create!(is_ia_eligible: false, is_medicaid_chip_eligible: true, applicant_id: person.primary_family.family_members[2].id)}
@@ -446,7 +265,6 @@ RSpec.describe TaxHousehold, type: :model do
 
           let(:shopping_hbx_enrollment_member) {FactoryBot.build(:hbx_enrollment_member, applicant_id: family.family_members.first.id)}
           let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
-
           let(:shopping_hbx_enrollment) do
             FactoryBot.build(:hbx_enrollment,
                              family: family, aasm_state: 'shopping',
@@ -454,28 +272,9 @@ RSpec.describe TaxHousehold, type: :model do
                              hbx_enrollment_members: [shopping_hbx_enrollment_member],
                              household: family.active_household, product: product)
           end
-
-          context "When yearly aggregate feature is turned OFF" do
-            before do
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(301.14)
-            end
-          end
-
-          context "When yearly aggregate feature is turned ON" do
-            before do
-              shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(2801.14)
-            end
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment, shopping_hbx_enrollment.effective_on)
+            expect(result).to eq(301.14)
           end
         end
 
@@ -486,27 +285,9 @@ RSpec.describe TaxHousehold, type: :model do
           let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product) }
           let(:shopping_hbx_enrollment) {FactoryBot.build(:hbx_enrollment, family: family, aasm_state: 'shopping', hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1], household: family.active_household, product: product)}
 
-          context "When yearly aggregate feature is turned OFF" do
-            before do
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(500.00)
-            end
-          end
-
-          context "When yearly aggregate feature is turned ON" do
-            before do
-              shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(3000.0)
-            end
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment, shopping_hbx_enrollment.effective_on)
+            expect(result).to eq(500.00)
           end
         end
 
@@ -520,27 +301,9 @@ RSpec.describe TaxHousehold, type: :model do
             FactoryBot.build(:hbx_enrollment, aasm_state: 'shopping',family: family, hbx_enrollment_members: [shopping_hbx_enrollment_member, shopping_hbx_enrollment_member1, shopping_hbx_enrollment_member2], household: family.active_household, product: product)
           end
 
-          context "When yearly aggregate feature is turned OFF" do
-            before do
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(500.00)
-            end
-          end
-
-          context "When yearly aggregate feature is turned ON" do
-            before do
-              shopping_hbx_enrollment.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment)
-              expect(result).to eq(3000.0)
-            end
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment, shopping_hbx_enrollment.effective_on)
+            expect(result).to eq(500.00)
           end
         end
 
@@ -608,28 +371,9 @@ RSpec.describe TaxHousehold, type: :model do
             expect(family.active_household.hbx_enrollments.count).to eq(2)
           end
 
-          context "When yearly aggregate feature is turned OFF" do
-            before do
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(500.00)
-            end
-          end
-
-          context "When yearly aggregate feature is turned ON" do
-            before do
-              shopping_hbx_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              aptc_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 10, 1))
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(5250.0)
-            end
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on)
+            expect(result.round(2)).to eq(500.00)
           end
         end
 
@@ -640,7 +384,7 @@ RSpec.describe TaxHousehold, type: :model do
                               eligibility_date: TimeKeeper.date_of_record,
                               coverage_start_on: TimeKeeper.date_of_record,
                               hbx_enrollment: aptc_enrollment1,
-                              applied_aptc_amount: 300)
+                              applied_aptc_amount: 32.21)
           end
 
           let!(:aptc_enrollment1) do
@@ -654,7 +398,7 @@ RSpec.describe TaxHousehold, type: :model do
                               effective_on: TimeKeeper.date_of_record.beginning_of_month,
                               aasm_state: 'coverage_selected',
                               household: family.active_household,
-                              applied_aptc_amount: 300)
+                              applied_aptc_amount: 32.21)
           end
 
           let!(:hbx_enrollment_member2) do
@@ -663,7 +407,7 @@ RSpec.describe TaxHousehold, type: :model do
                               eligibility_date: TimeKeeper.date_of_record,
                               coverage_start_on: TimeKeeper.date_of_record,
                               hbx_enrollment: aptc_enrollment2,
-                              applied_aptc_amount: 300)
+                              applied_aptc_amount: 278.68)
           end
 
           let!(:aptc_enrollment2) do
@@ -678,7 +422,7 @@ RSpec.describe TaxHousehold, type: :model do
                               aasm_state: 'coverage_selected',
                               changing: false,
                               kind: 'individual',
-                              applied_aptc_amount: 300)
+                              applied_aptc_amount: 278.68)
           end
 
           let(:shopping_hbx_enrollment_member1) do
@@ -696,7 +440,7 @@ RSpec.describe TaxHousehold, type: :model do
 
           before do
             tax_household_member3.update_attributes(is_ia_eligible: true)
-            eligibility_determination.update_attributes(max_aptc: 1200.00)
+            eligibility_determination.update_attributes(max_aptc: 500.00)
             aptc_enrollment2.household.reload
             aptc_enrollment1.household.reload
             hbx_enrollment.household.reload
@@ -707,29 +451,9 @@ RSpec.describe TaxHousehold, type: :model do
             expect(family.active_household.hbx_enrollments.count).to eq(3)
           end
 
-          context "When yearly aggregate feature is turned OFF" do
-            before do
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(600.0)
-            end
-          end
-
-          context "When yearly aggregate feature is turned ON" do
-            before do
-              shopping_hbx_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 11, 1))
-              aptc_enrollment1.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 10, 1))
-              aptc_enrollment2.update_attributes(effective_on: Date.new(TimeKeeper.date_of_record.year, 10, 1))
-              EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
-            end
-
-            it 'should return available APTC amount' do
-              result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1)
-              expect(result.round(2)).to eq(5700.00)
-            end
+          it 'should return available APTC amount' do
+            result = tax_household.total_aptc_available_amount_for_enrollment(shopping_hbx_enrollment1, shopping_hbx_enrollment1.effective_on)
+            expect(result.round(2)).to eq(189.11)
           end
         end
 
@@ -770,7 +494,7 @@ RSpec.describe TaxHousehold, type: :model do
                               submitted_at: TimeKeeper.date_of_record - 2.months,
                               aasm_state: 'coverage_selected',
                               household: family.active_household,
-                              applied_aptc_amount: 300)
+                              applied_aptc_amount: 32.21)
           end
 
           let!(:hbx_enrollment_member2) do
