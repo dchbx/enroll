@@ -13,7 +13,7 @@ module Operations
       def call(params)
         values               = yield validate(params)
         amount_consumed      = yield consumed_aptc_amount(values)
-        calculated_aggregate = yield calculate_monthly_aggregate(validated_enrollment, amount_consumed)
+        calculated_aggregate = yield calculate_monthly_aggregate(amount_consumed)
 
         Success(calculated_aggregate)
       end
