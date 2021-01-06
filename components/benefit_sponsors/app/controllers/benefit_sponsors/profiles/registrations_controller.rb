@@ -32,6 +32,7 @@ module BenefitSponsors
               person = current_person
               create_sso_account(current_user, current_person, 15, "employer") do
               end
+              flash[:notice] = "Your employer account has been setup successfully." if params[:manage_portals]
             elsif is_general_agency_profile? || dc_broker_profile?
               flash[:notice] = "Your registration has been submitted. A response will be sent to the email address you provided once your application is reviewed."
             end
