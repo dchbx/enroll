@@ -74,13 +74,12 @@ module Insured
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)
-        applicable_aptc = fetch_applicable_aptc(new_enrollment, applied_aptc_amount)
+        applicable_aptc = fetch_applicable_aptc(new_enrollment, applied_aptc_amount, new_enrollment.effective_on)
         eli_fac_obj = ::Factories::EligibilityFactory.new(new_enrollment.id, new_enrollment.effective_on)
         eli_fac_obj.fetch_member_level_applicable_aptcs(applicable_aptc)
       end
 
-      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, effective_on = nil, excluding_enrollment_id = nil)
-        effective_on = effective_on || new_enrollment.effective_on
+      def self.fetch_applicable_aptc(new_enrollment, selected_aptc, effective_on, excluding_enrollment_id = nil)
         service = ::Services::ApplicableAptcService.new(new_enrollment.id, effective_on, selected_aptc, [new_enrollment.product_id], excluding_enrollment_id)
         service.applicable_aptcs[new_enrollment.product_id.to_s]
       end
