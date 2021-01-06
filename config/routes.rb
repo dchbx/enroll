@@ -2,6 +2,9 @@
 
 Rails.application.routes.draw do
   require 'resque/server'
+
+  require 'sidekiq/web'
+
 #  mount Resque::Server, at: '/jobs'
   mount BenefitSponsors::Engine,      at: "/benefit_sponsors"
   mount BenefitMarkets::Engine,       at: "/benefit_markets"
@@ -13,6 +16,10 @@ Rails.application.routes.draw do
 
   devise_for :users, :controllers => { :registrations => "users/registrations", :sessions => 'users/sessions', :passwords => 'users/passwords' }
 
+  authenticate :user, ->(u) { u.has_hbx_staff_role? } do
+    mount Sidekiq::Web => '/sidekiq'
+  end
+
   namespace :uis do
     resources :bootstrap3_examples do
       collection do
@@ -22,6 +29,7 @@ Rails.application.routes.draw do
       end
     end
   end
+
 
   get 'check_time_until_logout' => 'session_timeout#check_time_until_logout', :constraints => { :only_ajax => true }
   get 'reset_user_clock' => 'session_timeout#reset_user_clock', :constraints => { :only_ajax => true }
@@ -65,6 +73,8 @@ Rails.application.routes.draw do
   get 'payment_transactions/generate_saml_response', to: 'payment_transactions#generate_saml_response'
 
   namespace :exchanges do
+
+    resources :bulk_notices
 
     resources :inboxes, only: [:show, :destroy]
     resources :announcements, only: [:index, :create, :destroy] do
