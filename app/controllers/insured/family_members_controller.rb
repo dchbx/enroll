@@ -148,7 +148,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(params.permit(:dependent=>{})[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
