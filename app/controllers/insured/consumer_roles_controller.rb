@@ -424,7 +424,7 @@ class Insured::ConsumerRolesController < ApplicationController
       @person_params[field] = @person.attributes[field]
     end
 
-    @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
+    @person_params[:dob] = @person.dob&.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
   end
 end
