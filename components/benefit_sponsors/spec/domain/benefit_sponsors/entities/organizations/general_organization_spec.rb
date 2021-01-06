@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe BenefitSponsors::Entities::GeneralOrganization do
+RSpec.describe BenefitSponsors::Entities::Organizations::GeneralOrganization do
 
   context "Given valid required parameters" do
 
@@ -33,14 +33,7 @@ RSpec.describe BenefitSponsors::Entities::GeneralOrganization do
       }
     end
 
-    let(:required_params_for_contract) do
-      {
-        legal_name: 'abc_organization', entity_kind: :limited_liability_corporation, fein: '123456789',
-        dba: nil,  profile: profile
-      }
-    end
-
-    let(:required_params_for_entity) do
+    let(:required_params) do
       {
         legal_name: 'abc_organization', entity_kind: :limited_liability_corporation, fein: '123456789',
         site_id: BSON::ObjectId.new, dba: nil, home_page: nil, profiles: [profile]
@@ -50,11 +43,11 @@ RSpec.describe BenefitSponsors::Entities::GeneralOrganization do
     context "with required only" do
 
       it "contract validation should pass" do
-        expect(contract.call(required_params_for_contract).to_h).to eq required_params_for_contract
+        expect(contract.call(required_params).to_h).to eq required_params
       end
 
       it "should create new Organization instance" do
-        expect(described_class.new(required_params_for_entity)).to be_a BenefitSponsors::Entities::GeneralOrganization
+        expect(described_class.new(required_params)).to be_a BenefitSponsors::Entities::Organizations::GeneralOrganization
       end
     end
   end

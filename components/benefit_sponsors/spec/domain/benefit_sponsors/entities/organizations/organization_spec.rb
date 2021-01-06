@@ -2,11 +2,12 @@
 
 require "rails_helper"
 
-RSpec.describe BenefitSponsors::Entities::Organizations::ExemptOrganization do
+RSpec.describe BenefitSponsors::Entities::Organizations::Organization do
 
   context "Given valid required parameters" do
 
-    let(:contract)      { BenefitSponsors::Validators::Organizations::ExemptOrganizationContract.new }
+    let(:contract)      { BenefitSponsors::Validators::Organizations::OrganizationContract.new }
+
     let(:phone) do
       {
         kind: "work", area_code: "483", number: "7897489", full_phone_number: "4837897489"
@@ -46,7 +47,7 @@ RSpec.describe BenefitSponsors::Entities::Organizations::ExemptOrganization do
       end
 
       it "should create new Organization instance" do
-        expect(described_class.new(required_params)).to be_a BenefitSponsors::Entities::Organizations::ExemptOrganization
+        expect(described_class.new(required_params)).to be_a BenefitSponsors::Entities::Organizations::Organization
       end
     end
   end
