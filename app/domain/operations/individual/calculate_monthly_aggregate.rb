@@ -21,10 +21,10 @@ module Operations
       private
 
       def validate(params)
-        return Failure("Given object is not a valid family object.") unless params[:family].is_a?(Family)
-        return Failure("Given effective_on not a valid Date object.") unless params[:effective_on].is_a?(Date)
-        return Failure("Shopping Enrollment Family Member Ids are not present.") if params[:shopping_fm_ids].blank?
-        return Failure("Subscriber Applicant Id is missing.") if params[:subscriber_applicant_id].blank?
+        return Failure('Given object is not a valid family object.') unless params[:family].is_a?(Family)
+        return Failure('Given effective_on not a valid Date object.') unless params[:effective_on].is_a?(Date)
+        return Failure('Shopping Enrollment Family Member Ids are not present.') if params[:shopping_fm_ids].blank?
+        return Failure('Subscriber Applicant Id is missing.') if params[:subscriber_applicant_id].blank?
 
         Success(params)
       end
