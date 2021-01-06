@@ -178,10 +178,12 @@ class TaxHousehold
 
   def monthly_max_aptc(hbx_enrollment, effective_on)
     monthly_max_aggregate = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
-                              shopping_fm_ids = hbx_enrollment&.hbx_enrollment_members.pluck(:applicant_id)
-                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] { {family: hbx_enrollment.family, effective_on: effective_on,
-                                                                                                         shopping_fm_ids: shopping_fm_ids,
-                                                                                                         subscriber_applicant_id: hbx_enrollment&.subscriber&.applicant_id} }
+                              shopping_fm_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+                              input_params = { family: hbx_enrollment.family,
+                                               effective_on: effective_on,
+                                               shopping_fm_ids: shopping_fm_ids,
+                                               subscriber_applicant_id: hbx_enrollment&.subscriber&.applicant_id }
+                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
                               monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
                             else
                               current_max_aptc.to_f
