@@ -17,21 +17,23 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
   let(:benefit_group) { BenefitGroup.new }
 
   let(:benefit_group_assignment1) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee1) }
-  let(:benefit_group_assignment3) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee3, aasm_state: "coverage_waived") }
+  let(:benefit_group_assignment3) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee3) }
 
-  let(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee2, aasm_state: "coverage_terminated") }
+  let(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee2) }
   let!(:enrollment_with_coverage_selected)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
     family: primary_family,
     employee_role_id: employee_role.id,
-    benefit_group_assignment: benefit_group_assignment1
+    benefit_group_assignment: benefit_group_assignment1,
+    sponsored_benefit_package_id: BSON::ObjectId.new
     )}
   let!(:enrollment_with_coverage_terminated)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
     employee_role_id: employee_role.id,
     family: primary_family,
     benefit_group_assignment: benefit_group_assignment2,
-    aasm_state: "coverage_terminated"
+    aasm_state: "coverage_terminated",
+    sponsored_benefit_package_id: BSON::ObjectId.new
     )}
 
   let!(:enrollment_with_coverage_waived)   { FactoryBot.create( :hbx_enrollment,
@@ -39,6 +41,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     employee_role_id: employee_role.id,
     family: primary_family,
     benefit_group_assignment: benefit_group_assignment3,
+    sponsored_benefit_package_id: BSON::ObjectId.new,
     aasm_state: "inactive"
     )}
 
@@ -166,7 +169,6 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     let(:benefit_group) { FactoryBot.create( :benefit_group, benefit_group_assignment: benefit_group_assignment ) }
 
     before do
-      benefit_group_assignment.select_coverage
       allow(census_employee1).to receive(:renewal_benefit_group_assignment).and_return(benefit_group_assignment)
       allow(employer_profile).to receive(:renewing_published_plan_year).and_return(false)
     end
@@ -175,9 +177,6 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
       assign(:census_employees, [census_employee1])
       render "employers/employer_profiles/my_account/employees_by_status", :status => "all"
       expect(rendered).to_not match(/Renewal Enrollment Status/)
-      expect(rendered).to_not match(/#{benefit_group_assignment.aasm_state.humanize}/)
     end
   end
-
-
 end

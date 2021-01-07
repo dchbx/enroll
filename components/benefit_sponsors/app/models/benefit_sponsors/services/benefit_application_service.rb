@@ -13,10 +13,14 @@ module BenefitSponsors
       end
 
       def load_form_metadata(form)
-        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
         find_benefit_sponsorship(form)
         form.has_active_ba = has_an_active_ba? if form.admin_datatable_action
-        form.start_on_options = schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
+        form.start_on_options = filter_start_on_options(form)
+      end
+
+      def filter_start_on_options(form)
+        schedular = BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new
+        schedular.start_on_options_with_schedule(form.is_renewing?, form.admin_datatable_action)
       end
 
       def load_form_params_from_resource(form)
@@ -47,27 +51,34 @@ module BenefitSponsors
         bas.active_states_per_dt_action.present? ? false : true
       end
 
+      def has_overlap_application?(model_attributes)
+        active_and_terminated_bas = @benefit_sponsorship&.benefit_applications&.active_and_terminated_states || []
+        active_and_terminated_bas.any? {|ba| ba.effective_period.cover?(model_attributes[:effective_period].min)}
+      end
+
       def create_or_cancel_draft_ba(form, model_attributes)
-        if form.admin_datatable_action && !can_create_draft_ba?
+        if form.admin_datatable_action && !can_create_draft_ba? || has_overlap_application?(model_attributes)
           form.errors.add(:base, 'Existing plan year with overlapping coverage exists')
           [false, nil]
         else
           #build cca/dc application
+          applications = applications_for_cancel
           benefit_application = benefit_application_factory.call(benefit_sponsorship, model_attributes)
           save_result, persisted_object = store(form, benefit_application)
           if save_result
-            cancel_draft_and_ineligible_applications(persisted_object)
+            cancel_draft_and_ineligible_applications(applications)
             benefit_sponsorship.revert_to_applicant! if benefit_sponsorship.may_revert_to_applicant? && !benefit_sponsorship.applicant?
           end
           [save_result, persisted_object]
         end
       end
 
-      def cancel_draft_and_ineligible_applications(benefit_application)
-        applications_for_cancel  = benefit_sponsorship.benefit_applications.draft_and_exception.select{|existing_application| existing_application != benefit_application}
-        applications_for_cancel += benefit_sponsorship.benefit_applications.enrollment_ineligible.to_a if Settings.aca.shop_market.auto_cancel_ineligible
+      def applications_for_cancel
+        benefit_sponsorship.benefit_applications.draft_and_exception + benefit_sponsorship.benefit_applications.enrollment_ineligible.reject(&:is_renewing?)
+      end
 
-        applications_for_cancel.each do |application|
+      def cancel_draft_and_ineligible_applications(applications)
+        applications.each do |application|
           application.cancel! if application.may_cancel?
         end
       end

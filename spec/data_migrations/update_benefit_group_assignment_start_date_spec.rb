@@ -39,19 +39,19 @@ describe UpdateBenefitGroupAssignmentStartDate, dbclean: :after_each do
 
     context "updating benefit group assignment start date", dbclean: :after_each do
 
-      it "should update_benefit_group_assignment_start_date" do
-        allow(benefit_group_assignment).to receive(:valid?).and_return(false)
-        allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes!).with(benefit_group_id: benefit_group.id)
-        allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group_id ).and_return(true)
-        benefit_group_assignment.start_on = plan_year.start_on - 1.day
-        benefit_group_assignment.save
+      # it "should update_benefit_group_assignment_start_date" do
+      #   allow(benefit_group_assignment).to receive(:valid?).and_return(false)
+      #   allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes!).with(benefit_group_id: benefit_group.id)
+      #   allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group_id ).and_return(true)
+      #   benefit_group_assignment.start_on = plan_year.start_on - 1.day
+      #   benefit_group_assignment.save
 
-        subject.migrate
-        census_employee.reload
-        census_employee.benefit_group_assignments.each do |benefit_group_assignment|
-          expect(benefit_group_assignment.start_on).to eq(plan_year.start_on)
-        end
-      end
+      #   subject.migrate
+      #   census_employee.reload
+      #   census_employee.benefit_group_assignments.each do |benefit_group_assignment|
+      #     expect(benefit_group_assignment.start_on).to eq(plan_year.start_on)
+      #   end
+      # end
 
     end
   end

@@ -6,14 +6,15 @@ describe DefinePermissions, dbclean: :after_each do
   let(:roles) {%w{hbx_staff hbx_read_only hbx_csr_supervisor hbx_tier3 hbx_csr_tier2 hbx_csr_tier1 developer super_admin} }
   describe 'create permissions' do
     let(:given_task_name) {':initial_hbx'}
+
     before do
-      Person.all.delete
-      person= FactoryBot.create(:person)
+      Person.delete_all
+      person = FactoryBot.create(:person)
       role = FactoryBot.create(:hbx_staff_role, person: person)
       subject.initial_hbx
     end
     it "creates permissions" do
-      expect(Permission.count).to eq(8)
+      expect(Permission.all.to_a.count).to eq(8)
       #expect(Person.first.hbx_staff_role.subrole).to eq 'hbx_staff'
       expect(Permission.all.map(&:name)).to match_array roles
     end
@@ -22,8 +23,8 @@ describe DefinePermissions, dbclean: :after_each do
       let(:given_task_name) {':hbx_admin_can_complete_resident_application'}
 
       before do
-        User.all.delete
-        Person.all.delete
+        User.delete_all
+        Person.delete_all
         person = FactoryBot.create(:person)
         permission = FactoryBot.create(:permission, :hbx_staff)
         role = FactoryBot.create(:hbx_staff_role, person: person, subrole: "hbx_staff", permission_id: permission.id)
@@ -31,7 +32,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_complete_resident_application to true" do
-        expect(Person.all.count).to eq(1)
+        expect(Person.all.to_a.count).to eq(1)
         expect(Person.first.hbx_staff_role.permission.can_complete_resident_application).to be true
       end
     end
@@ -41,8 +42,8 @@ describe DefinePermissions, dbclean: :after_each do
       let(:given_task_name) {':hbx_admin_can_access_pay_now'}
 
       before do
-        User.all.delete
-        Person.all.delete
+        User.destroy_all
+        Person.destroy_all
         @hbx_staff_person = FactoryBot.create(:person)
         @super_admin = FactoryBot.create(:person)
         @hbx_tier3 = FactoryBot.create(:person)
@@ -62,7 +63,7 @@ describe DefinePermissions, dbclean: :after_each do
 
       it "updates can_access_pay_now to true" do
         subject.hbx_admin_can_access_pay_now
-        expect(Person.all.count).to eq(7)
+        expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_access_pay_now).to be true
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_pay_now).to be true
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_pay_now).to be true
@@ -70,7 +71,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_view_username_and_email to true" do
-        expect(Person.all.count).to eq(7)
+        expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@super_admin.hbx_staff_role.permission.can_view_username_and_email).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_view_username_and_email).to be true
@@ -107,7 +108,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_access_user_account_tab to true" do
-        expect(Person.all.count).to eq(7)
+        expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_access_user_account_tab).to be true
         expect(@super_admin.hbx_staff_role.permission.can_access_user_account_tab).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_access_user_account_tab).to be true
@@ -142,7 +143,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_send_secure_message to true" do
-        expect(Person.all.count).to eq(7)
+        expect(Person.all.to_a.count).to eq(7)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_send_secure_message).to be false
         expect(@super_admin.hbx_staff_role.permission.can_send_secure_message).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_send_secure_message).to be true
@@ -562,7 +563,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_view_application_types to true" do
-        expect(Person.all.count).to eq(4)
+        expect(Person.all.to_a.count).to eq(4)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_view_application_types).to be true
         expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_view_application_types).to be false
         expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_view_application_types).to be false
@@ -593,7 +594,7 @@ describe DefinePermissions, dbclean: :after_each do
       end
 
       it "updates can_complete_resident_application to true" do
-        expect(Person.all.count).to eq(5)
+        expect(Person.all.to_a.count).to eq(5)
         expect(@hbx_staff_person.hbx_staff_role.permission.can_add_sep).to be true
         expect(@super_admin.hbx_staff_role.permission.can_add_sep).to be true
         expect(@hbx_tier3.hbx_staff_role.permission.can_add_sep).to be true
@@ -1258,7 +1259,7 @@ describe DefinePermissions, dbclean: :after_each do
       subject.hbx_admin_csr_view_personal_info_page
     end
     it "updates hbx_admin_csr_view_personal_info_page to true" do
-      expect(Person.all.count).to eq(6)
+      expect(Person.all.to_a.count).to eq(6)
       expect(@hbx_staff_person.hbx_staff_role.permission.view_personal_info_page).to be true
       expect(@super_admin.hbx_staff_role.permission.view_personal_info_page).to be true
       expect(@hbx_tier3.hbx_staff_role.permission.view_personal_info_page).to be true
@@ -1310,7 +1311,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "updates hbx_admin_can_access_new_consumer_application_sub_tab to true" do
       subject.hbx_admin_can_access_new_consumer_application_sub_tab
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
       expect(@hbx_csr_tier2_person.hbx_staff_role.permission.can_access_new_consumer_application_sub_tab).to be true
@@ -1319,7 +1320,7 @@ describe DefinePermissions, dbclean: :after_each do
 
     it "updates hbx_admin_can_access_identity_verification_sub_tab to true" do
       subject.hbx_admin_can_access_identity_verification_sub_tab
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_identity_verification_sub_tab).to be true
@@ -1327,24 +1328,24 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "updates hbx_admin_can_access_outstanding_verification_sub_tab to true" do
       subject.hbx_admin_can_access_outstanding_verification_sub_tab
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_outstanding_verification_sub_tab).to be true
     end
     it "updates hbx_admin_can_complete_resident_application to true" do
       subject.hbx_admin_can_complete_resident_application
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_complete_resident_application).to be true
       expect(@super_admin.hbx_staff_role.permission.can_complete_resident_application).to be true
       expect(@hbx_csr_tier3_person.hbx_staff_role.permission.can_complete_resident_application).to be true
     end
     it "updates hbx_admin_can_access_accept_reject_identity_documents to true" do
       subject.hbx_admin_can_access_accept_reject_identity_documents
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_identity_documents).to be true
     end
     it "updates hbx_admin_can_access_accept_reject_paper_application_documents to true" do
       subject.hbx_admin_can_access_accept_reject_paper_application_documents
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_supervisor_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
       expect(@hbx_csr_tier1_person.hbx_staff_role.permission.can_access_accept_reject_paper_application_documents).to be true
@@ -1352,7 +1353,7 @@ describe DefinePermissions, dbclean: :after_each do
     end
     it "updates hbx_admin_can_delete_identity_application_documents to true" do
       subject.hbx_admin_can_delete_identity_application_documents
-      expect(Person.all.count).to eq(7)
+      expect(Person.all.to_a.count).to eq(7)
       expect(@hbx_staff_person.hbx_staff_role.permission.can_delete_identity_application_documents).to be true
     end
   end
@@ -1373,9 +1374,9 @@ describe DefinePermissions, dbclean: :after_each do
       subject.build_test_roles
     end
     it "creates permissions" do
-      expect(User.all.count).to eq(8)
-      expect(Person.all.count).to eq(8)
-      expect(Person.all.map{|p|p.hbx_staff_role.subrole}).to match_array roles
+      expect(User.all.to_a.count).to eq(8)
+      expect(Person.all.to_a.count).to eq(8)
+      expect(Person.all.to_a.map{|p| p.hbx_staff_role.subrole}).to match_array roles
     end
   end
 end

@@ -86,12 +86,20 @@ module BenefitSponsors
         is_converting? && published_benefit_application.is_renewing?
       end
 
+      def off_cycle_benefit_application
+        active_benefit_sponsorship.off_cycle_benefit_application
+      end
+
       def renewal_benefit_application
         active_benefit_sponsorship.renewal_benefit_application
       end
 
       def renewing_published_benefit_application
         active_benefit_sponsorship.renewing_published_benefit_application
+      end
+
+      def published_off_cycle_application
+        active_benefit_sponsorship.published_off_cycle_application
       end
 
       def latest_benefit_application
@@ -211,7 +219,7 @@ module BenefitSponsors
       end
 
       def published_benefit_application
-        renewing_published_benefit_application || current_benefit_application
+        renewing_published_benefit_application || published_off_cycle_application || current_benefit_application
       end
 
       def billing_benefit_application(billing_date=nil)

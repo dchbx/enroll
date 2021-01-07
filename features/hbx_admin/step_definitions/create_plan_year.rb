@@ -24,6 +24,7 @@ And(/^Hbx Admin should see the list of employer accounts and an Action button$/)
 end
 
 And(/^update rating area$/) do
+  renewal_rating_area
   benefit_sponsorship.update_attributes!(rating_area_id: rating_area.id)
 end
 

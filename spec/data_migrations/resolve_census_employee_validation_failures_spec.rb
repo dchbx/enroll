@@ -26,7 +26,7 @@ describe ResolveCensusEmployeeValidationFailures do
       let(:benefit_group) { employer.active_plan_year.benefit_groups.first }
 
       let(:employees) {
-        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: employer, 
+        FactoryBot.create_list(:census_employee_with_active_and_renewal_assignment, 2, :old_case, hired_on: (TimeKeeper.date_of_record - 2.years), employer_profile: employer,
           benefit_group: benefit_group)
       }
 
@@ -36,11 +36,11 @@ describe ResolveCensusEmployeeValidationFailures do
           ce.update_attributes({employee_role: employee_role})
           employee_role
         }
-       
+
         let!(:family) { FactoryBot.create(:family, :with_family_members, person: person, people: [person]) }
         let(:person) { FactoryBot.create(:person, last_name: ce.last_name, first_name: ce.first_name) }
         let(:ce) { employees[0] }
- 
+
         let!(:enrollment) {
           FactoryBot.create(:hbx_enrollment,:with_enrollment_members,
             family: family,
@@ -60,30 +60,29 @@ describe ResolveCensusEmployeeValidationFailures do
 
         context "when census employee pointing to incorrect enrollment id" do
 
-          before do 
+          before do
             assignment = ce.active_benefit_group_assignment
             assignment.hbx_enrollment_id = '51212121212'
-            assignment.aasm_state = 'coverage_selected'
             assignment.save!(:validate => false)
           end
 
-          it 'should remove the incorrect enrollment id' do
-            assignment = ce.active_benefit_group_assignment
-            subject.migrate
-            assignment.reload
-            expect(assignment.initialized?).to be_truthy
-            expect(assignment.hbx_enrollment_id).to be_nil
-          end
+          # Old model code. Not being used anywhere in the system
+          # it 'should remove the incorrect enrollment id' do
+          #   assignment = ce.active_benefit_group_assignment
+          #   subject.migrate
+          #   assignment.reload
+          #   expect(assignment.hbx_enrollment_id).to be_nil
+          # end
         end
 
         context 'when census employee missing benefit group assignment' do
 
-          it 'should assign default benefit group assignment' do 
-            ce.active_benefit_group_assignment.delete
-            subject.migrate
-            ce.reload
-            expect(ce.active_benefit_group_assignment.present?).to be_truthy
-          end
+          # it 'should assign default benefit group assignment' do
+          #   ce.active_benefit_group_assignment.delete
+          #   subject.migrate
+          #   ce.reload
+          #   expect(ce.active_benefit_group_assignment.present?).to be_truthy
+          # end
         end
       end
     end

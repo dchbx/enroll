@@ -16,7 +16,14 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
         end
 
         census_employee.benefit_group_assignments.each do |assignment|
-          next if assignment.valid?
+          enrollment_with_id_exists = nil
+          if assignment.hbx_enrollment_id.present?
+            enrollment_with_id_exists = HbxEnrollment.where(id: assignment.hbx_enrollment_id).first
+            assignment.hbx_enrollment_id = nil
+            assignment.save(:validate => false)
+            assignment.reload
+          end
+          next if assignment.valid? && enrollment_with_id_exists.present?
           puts assignment.errors.messages.to_s +  " -- #{census_employee.full_name}" unless Rails.env.test?
 
           if assignment.errors.messages[:hbx_enrollment].present?
@@ -26,8 +33,6 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
 
               if assignment.hbx_enrollment.present?
                 assignment.update(hbx_enrollment_id: assignment.hbx_enrollment.id)
-              else
-                assignment.delink_coverage! if assignment.may_delink_coverage?
               end
             else
               enrollment = assignment.hbx_enrollment
@@ -49,13 +54,9 @@ class ResolveCensusEmployeeValidationFailures < MongoidMigrationTask
         if active_plan_year.present?
           bg_ids = active_plan_year.benefit_groups.pluck(:_id)
 
-          census_employee.benefit_group_assignments.where(:benefit_group_id.nin => bg_ids, :is_active => true).each do |assignment|
-            assignment.update(is_active: false)
-            puts "Fixed default assignment for CE: #{census_employee.full_name}" unless Rails.env.test?
-          end
 
           if census_employee.active_benefit_group_assignment.blank?
-            census_employee.find_or_create_benefit_group_assignment(active_plan_year.benefit_groups)
+            census_employee.create_benefit_group_assignment(active_plan_year.benefit_groups)
           end
         end
       end

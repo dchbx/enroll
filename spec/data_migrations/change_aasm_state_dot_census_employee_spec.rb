@@ -10,10 +10,14 @@ describe ChangeAasmStateDotCensusEmployee, dbclean: :after_each do
     end
   describe 'census employee not in terminated state' do
     subject {ChangeAasmStateDotCensusEmployee.new('change_aasm_state_dot_census_employee', double(:current_scope => nil)) }
-    let(:benefit_group){ FactoryBot.create(:benefit_group) }
-    let(:plan_year){ FactoryBot.create(:plan_year,benefit_groups:[benefit_group]) }
-    let(:employer_profile_id){ plan_year.employer_profile.id }
-    let(:census_employee){ FactoryBot.create(:census_employee,employer_profile_id:employer_profile_id)}
+
+    let(:site_key)              { Settings.site.key.to_sym }
+    let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+    let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile_initial_application".to_sym, site: site) }
+    let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
+    let(:employer_profile)      { benefit_sponsorship.profile }
+    let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package) }
 
     before :each do
       census_employee.update_attributes!(aasm_state:'employment_terminated',employment_terminated_on:TimeKeeper.date_of_record,coverage_terminated_on:TimeKeeper.date_of_record)

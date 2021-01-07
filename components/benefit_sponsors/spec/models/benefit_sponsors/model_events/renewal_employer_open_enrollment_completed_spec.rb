@@ -19,7 +19,26 @@ RSpec.describe 'BenefitSponsors::ModelEvents::RenewalEmployerOpenEnrollmentCompl
   let!(:family) {person.primary_family}
   let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person, employer_profile: abc_profile, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: abc_profile.id)}
   let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile) }
-  let(:renewal_benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_group_id: nil, benefit_package_id: benefit_package.id, is_active: false, census_employee: census_employee, start_on: benefit_package.start_on) }
+  let(:renewal_benefit_group_assignment) do
+    FactoryBot.create(
+      :benefit_group_assignment,
+      benefit_group_id: nil,
+      benefit_package_id: benefit_package.id,
+      census_employee: census_employee,
+      start_on: benefit_package.start_on,
+      end_on: benefit_package.end_on
+    )
+  end
+  let!(:current_benefit_group_assignment) do
+    FactoryBot.create(
+      :benefit_group_assignment,
+      benefit_group_id: nil,
+      benefit_package_id: current_benefit_package.id,
+      census_employee: census_employee,
+      start_on: current_benefit_package.start_on,
+      end_on: current_benefit_package.end_on
+    )
+  end
 
   let!(:model_instance) {renewal_application}
   let(:enrollment_policy) {instance_double("BenefitMarkets::BusinessRulesEngine::BusinessPolicy", success_results: "Success") }

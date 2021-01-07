@@ -175,3 +175,35 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
     find('.interaction-click-control-go-to-my-account').click
   end
 end
+
+And(/staff role person clicks on employees link$/) do
+  click_link 'Employees'
+end
+
+And(/staff role person clicks on employee (.*?)$/) do |named_person|
+  sleep(5)
+  click_link named_person
+  expect(page.current_path).to include("census_employee")
+end
+
+Given(/census employee (.*?) has a past DOH$/) do |named_person|
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  ce.update_attributes!(created_at: TimeKeeper.date_of_record.prev_year, updated_at: TimeKeeper.date_of_record.prev_year)
+end
+
+Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
+  # Selectric is weird
+  Capybara.ignore_hidden_elements = false
+  sleep(5)
+  expect(page).to have_text("Off Cycle Benefit Package")
+  Capybara.ignore_hidden_elements = true
+end
+
+And(/census employee (.*?) has benefit group assignment of the off cycle benefit application$/) do |named_person|
+  click_button 'Update Employee'
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  benefit_package_id = ce.benefit_sponsorship.off_cycle_benefit_application.benefit_packages[0].id #there's only one benefit package
+  expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
+end

@@ -13,6 +13,7 @@ Feature: Employer can view their employees
   Scenario: Bulk actions dropdown in Employee Roster page is not in DC
     Given ABC Widgets employer is on Employee Roster page
     Then employer should not see bulk actions dropdown in DC
+    Then employer clicks logout
 
   Scenario: Employer views their employees and terminates one employee
     Given employer selects one of their employees on Employee Roster
@@ -51,14 +52,13 @@ Feature: Employer can view their employees
     And employer populates the address field
     And employer clicks on update employee
     And employer should see the address on the roster
-    Then employer logs out
+    Then employer clicks logout
 
   Scenario: Employer adds employee with future hire date
     Given employer selects Add New Employee button on employee roster
     Then fill the form with hired date as future date
     Then employer should see the message Your employee was successfully added to your roster on page
-    And employer logs out
-
+    Then employer clicks logout
 
   Scenario: Employer views their employees and this ER has linked EEs
     Given there is an employer ABC Widgets
@@ -73,4 +73,4 @@ Feature: Employer can view their employees
     Then ABC Widgets employer visit the Employee Roster
     When employer selects Patrick Doe employee on Employee Roster
     Then employer should see enrollment tile
-
+    Then employer clicks logout

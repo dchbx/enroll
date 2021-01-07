@@ -475,7 +475,7 @@ class HbxEnrollment
     begin
       enrollment = BenefitSponsors::Factories::EnrollmentRenewalFactory.call(self, new_benefit_package)
       if enrollment.save
-        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+        assignment = self.employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
         assignment.update_attributes(hbx_enrollment_id: enrollment.id)
       else
         result_reporter.report_enrollment_save_renewal_failure(self, self.errors)
@@ -744,10 +744,16 @@ class HbxEnrollment
 
   def propogate_cancel(term_date = TimeKeeper.date_of_record.end_of_month)
     self.terminated_on = term_date
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
+    term_or_cancel_benefit_group_assignment
+  end
+
+  def term_or_cancel_benefit_group_assignment
+    return unless benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
+
+    termed_date = census_employee.coverage_terminated_on
+    end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
+    benefit_group_assignment.end_benefit(end_date)
+    benefit_group_assignment.save
   end
 
   def propogate_terminate(term_date = TimeKeeper.date_of_record.end_of_month)
@@ -757,10 +763,7 @@ class HbxEnrollment
       self.terminated_on ||= term_date
     end
 
-    if benefit_group_assignment
-      benefit_group_assignment.end_benefit(terminated_on)
-      benefit_group_assignment.save
-    end
+    term_or_cancel_benefit_group_assignment
 
     if should_transmit_update?
       notify(ENROLLMENT_UPDATED_EVENT_NAME, {policy_id: self.hbx_id})
@@ -779,11 +782,6 @@ class HbxEnrollment
     true
   end
 
-  def propagate_renewal
-    if is_shop? && coverage_kind == 'health'
-      benefit_group_assignment.renew_coverage! if benefit_group_assignment.may_renew_coverage?
-    end
-  end
 
   def construct_waiver_enrollment(waiver_reason = nil)
     qle = family.is_under_special_enrollment_period? && (family.earliest_effective_shop_sep.present? || family.earliest_effective_fehb_sep.present?)
@@ -933,6 +931,11 @@ class HbxEnrollment
 
   def propagate_selection
     return unless [:coverage_selected, :renewing_coverage_selected].include?(aasm.to_state)
+
+    if benefit_group_assignment
+      benefit_group_assignment.hbx_enrollment = self
+      benefit_group_assignment.save!
+    end
 
     Operations::ExecuteProductSelectionEffects.call(
       Entities::ProductSelection.new(
@@ -1521,8 +1524,14 @@ class HbxEnrollment
     end
 
     census_employee = employee_role.census_employee
-    benefit_group_assignment = plan_year.is_renewing? ?
-        census_employee.renewal_benefit_group_assignment : (plan_year.aasm_state == "expired" && qle) ? census_employee.benefit_group_assignments.order_by(:'created_at'.desc).detect { |bga| bga.plan_year.aasm_state == "expired"} : census_employee.active_benefit_group_assignment
+    benefit_group_assignment =
+      if plan_year.is_renewing? && census_employee.renewal_benefit_group_assignment
+        census_employee.renewal_benefit_group_assignment
+      elsif plan_year.aasm_state == "expired" && qle
+        census_employee.benefit_group_assignments.order_by(:created_at.desc).detect { |bga| bga.plan_year.aasm_state == "expired"}
+      else
+        census_employee.active_benefit_group_assignment
+      end
 
     if benefit_group_assignment.blank? || benefit_group_assignment.plan_year != plan_year
       raise "Unable to find an active or renewing benefit group assignment for enrollment year #{effective_date.year}"
@@ -1753,7 +1762,7 @@ class HbxEnrollment
     # after_all_transitions :perform_employer_plan_year_count
 
     event :renew_enrollment, :after => :record_transition do
-      transitions from: :shopping, to: :auto_renewing, after: :propagate_renewal
+      transitions from: :shopping, to: :auto_renewing
     end
 
     event :renew_waived, :after => :record_transition do
@@ -1784,7 +1793,7 @@ class HbxEnrollment
 
     event :waive_coverage, :after => :record_transition do
       transitions from: [:shopping, :coverage_selected, :auto_renewing, :renewing_coverage_selected],
-                  to: :inactive, after: :propogate_waiver
+                  to: :inactive
     end
 
     event :begin_coverage, :after => :record_transition do

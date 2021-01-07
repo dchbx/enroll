@@ -1,8 +1,15 @@
 Feature: Employee only user should be able to enroll in IVL market
 
   Scenario: User with only employee role
-    Given a matched Employee exists with only employee role
-    Then Employee sign in to portal
+    Given a CCA site exists with a benefit market
+    Given benefit market catalog exists for enrollment_open renewal employer with health benefits
+    And there is an employer ABC Widgets
+    And renewal employer ABC Widgets has active and renewal enrollment_open benefit applications
+    And this employer offering 0.75 contribution to Employee
+    And this employer ABC Widgets has first_of_month rule
+    Given there exists Patrick Doe employee for employer ABC Widgets
+    And employee Patrick Doe has current hired on date
+    And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     And Employee should see a button to enroll in ivl market
     And Employee clicks on Enroll
     Then Employee redirects to ivl flow

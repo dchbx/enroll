@@ -15,8 +15,8 @@ describe ActivateBenefitGroupAssignment do
 
   describe 'activate benefit group assignment' do
     let!(:census_employee) { FactoryBot.create(:census_employee,ssn:'123456789')}
-    let!(:benefit_group_assignment1)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
-    let!(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, is_active: false, census_employee: census_employee)}
+    let!(:benefit_group_assignment1)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee)}
+    let!(:benefit_group_assignment2)  { FactoryBot.create(:benefit_group_assignment, census_employee: census_employee)}
     let!(:bga_params) {{ce_ssn: census_employee.ssn, bga_id: benefit_group_assignment1.id}}
 
     around do |example|
@@ -27,16 +27,16 @@ describe ActivateBenefitGroupAssignment do
 
     context 'activate_benefit_group_assignment', dbclean: :after_each do
       it 'should activate_related_benefit_group_assignment' do
-        expect(benefit_group_assignment1.is_active).to eq false
+        expect(benefit_group_assignment1.activated_at).to be_falsey
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment1.id).first.is_active).to eq true
+        expect(census_employee.benefit_group_assignments.where(id: benefit_group_assignment1.id).first.activated_at.class).to eq DateTime
       end
       it 'should_not activate_unrelated_benefit_group_assignment' do
-        expect(benefit_group_assignment2.is_active).to eq false
+        expect(benefit_group_assignment2.activated_at).to be_falsey
         subject.migrate
         census_employee.reload
-        expect(census_employee.benefit_group_assignments.where(id:benefit_group_assignment2.id).first.is_active).to eq false
+        expect(census_employee.benefit_group_assignments.where(id: benefit_group_assignment2.id).first.activated_at.class).to eq NilClass
       end
     end
   end

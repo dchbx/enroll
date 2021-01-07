@@ -164,7 +164,7 @@ class ChangeEnrollmentDetails < MongoidMigrationTask
 
         new_enrollment.save!
 
-        assignment = enrollment.employee_role.census_employee.benefit_group_assignment_by_package(new_enrollment.sponsored_benefit_package_id)
+        assignment = enrollment.employee_role.census_employee.benefit_group_assignment_by_package(new_enrollment.sponsored_benefit_package_id, new_enrollment.effective_on)
         assignment.update_attributes(hbx_enrollment_id: new_enrollment.id)
 
         new_enrollment.select_coverage! if new_enrollment.may_select_coverage?

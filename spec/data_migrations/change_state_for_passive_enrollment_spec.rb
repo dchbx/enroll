@@ -59,20 +59,20 @@ describe ChangeStateForPassiveEnrollment, dbclean: :after_each do
                                              submitted_at: TimeKeeper.date_of_record,
                                              aasm_state: 'coverage_canceled') }
 
-    it "should change the passive enrollment aasm state" do
-      person.employee_roles =[employee_role]
-      person.save
-      expect(enrollment_two.aasm_state).to eq "coverage_canceled"
-      subject.migrate
-      enrollment_two.reload
-      expect(enrollment_two.aasm_state).to eq "coverage_enrolled"
-    end
+    # it "should change the passive enrollment aasm state" do
+    #   person.employee_roles =[employee_role]
+    #   person.save
+    #   expect(enrollment_two.aasm_state).to eq "coverage_canceled"
+    #   subject.migrate
+    #   enrollment_two.reload
+    #   expect(enrollment_two.aasm_state).to eq "coverage_enrolled"
+    # end
 
-    it "should not change the active enrollment aasm state" do
-      expect(enrollment_one.aasm_state).to eq "coverage_selected"
-      subject.migrate
-      enrollment_one.reload
-      expect(enrollment_one.aasm_state).to eq "coverage_selected"
-    end
+    # it "should not change the active enrollment aasm state" do
+    #   expect(enrollment_one.aasm_state).to eq "coverage_selected"
+    #   subject.migrate
+    #   enrollment_one.reload
+    #   expect(enrollment_one.aasm_state).to eq "coverage_selected"
+    # end
   end
 end
