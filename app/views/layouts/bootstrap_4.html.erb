@@ -16,6 +16,7 @@
     <title><%= content_for?(:title) ? yield(:title) : "Welcome to #{site_short_name} | #{site_short_name}" %></title>
     <%= javascript_pack_tag 'application' %>
     <%= stylesheet_pack_tag 'application' %>
+    <%= action_cable_meta_tag %>
     <%= csrf_meta_tags %>
 
     <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800">
@@ -45,6 +46,8 @@
     <!-- End Google Tag Manager (noscript) -->
 
     <%= render partial: './ui-components/bs4/v1/navs/header' %>
+
+    <%= yield :horizontal_menu %>
 
     <div class="content <%= controller_name %> content-bottom nm-content">
       <% if aca_security_questions %>

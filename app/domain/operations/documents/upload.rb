@@ -10,11 +10,11 @@ module Operations
 
       include Config::SiteHelper
 
-      def call(resource:, file_params:, user:)
+      def call(resource:, file_params:, user:, subjects: nil)
         return Failure({:message => ['Please find valid resource to create document.']}) if resource.blank?
 
         header = yield construct_headers(resource, user)
-        body = yield construct_body(resource, file_params)
+        body = yield construct_body(resource, file_params, subjects)
         response = yield upload_to_doc_storage(resource, header, body)
         validated_params = yield validate_response(response.transform_keys(&:to_sym))
         file = yield create_document(resource, file_params, validated_params)
@@ -47,14 +47,20 @@ module Operations
                   'X-REQUESTINGIDENTITYSIGNATURE' => Base64.strict_encode64(OpenSSL::HMAC.digest("SHA256", fetch_secret_key, encoded_payload(payload_to_encode))) })
       end
 
-      def construct_body(resource, file_params)
-        Success({ document: { subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}], "document_type": 'notice', 'creator': Settings.site.publisher,
-                              'publisher': Settings.site.publisher,
-                              'type': 'text',
-                              'format': 'application/octet-stream',
-                              'source': 'enroll_system',
-                              'language': 'en',
-                              'date_submitted': TimeKeeper.date_of_record }.to_json,
+      def construct_body(resource, file_params, subjects)
+        document_body = {
+          subjects: [{"id": resource.id.to_s, "type": resource.class.to_s}],
+          'document_type': 'notice',
+          'creator': Settings.site.publisher,
+          'publisher': Settings.site.publisher,
+          'type': 'text',
+          'format': 'application/octet-stream',
+          'source': 'enroll_system',
+          'language': 'en',
+          'date_submitted': TimeKeeper.date_of_record
+        }
+        document_body[:subjects] = subjects unless subjects.nil?
+        Success({ document: document_body.to_json,
                   content: fetch_file(file_params) })
       end
 
