@@ -60,12 +60,12 @@ module BenefitSponsors
 
         def new_staff_member
           authorize User, :add_roles?
-          @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
+          @staff_member = ::Operations::Employers::NewEmployerStaff.new.call(params).value!
         end
 
         def create_staff_member
           authorize User, :add_roles?
-          result = ::Operations::People::Roles::PersistStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
+          result = ::Operations::Employers::AddEmployerStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
           # add redirects
           if result.success?
             redirect_to main_app.show_roles_person_path(id: staff_member_params[:person_id])

@@ -7,7 +7,7 @@ module BenefitSponsors
       class ExemptOrganizationContract < OrganizationContract
 
         params do
-          required(:fein).maybe(:string)
+          optional(:fein).maybe(:string)
         end
       end
     end

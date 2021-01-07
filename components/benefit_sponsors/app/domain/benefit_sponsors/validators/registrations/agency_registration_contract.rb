@@ -11,16 +11,16 @@ module BenefitSponsors
           required(:organization).filled(:hash)
         end
 
-        rule(:staff_roles).each do
+        rule(:staff_roles) do
           if key? && value
             result = BenefitSponsors::Validators::StaffRoles::AgencyStaffRoleContract.new.call(value)
             key.failure(text: "invalid staff roles", error: result.errors.to_h) if result&.failure?
           end
         end
 
-        rule(:organization).each do
+        rule(:organization) do
           if key? && value
-            if value[:profile_type] == 'broker_agency'
+            if values[:profile_type] == 'broker_agency'
               result = BenefitSponsors::Validators::Organizations::ExemptOrganizationContract.new.call(value)
               key.failure(text: "invalid broker agency organization", error: result.errors.to_h) if result&.failure?
             else

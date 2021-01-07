@@ -7,7 +7,7 @@ module BenefitSponsors
       class GeneralOrganization < Organization
         transform_keys(&:to_sym)
 
-        attribute :fein,    Types::Strict::String
+        attribute :fein,      Types::Strict::String
       end
     end
   end

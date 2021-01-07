@@ -7,7 +7,7 @@ module BenefitSponsors
       class OfficeLocation < Dry::Struct
         transform_keys(&:to_sym)
 
-        attribute :is_primary,       Types::Strict::Bool
+        attribute :is_primary,       Types::Strict::Bool.optional.meta(omittable: true)
         attribute :address,          BenefitSponsors::Entities::OfficeLocations::Address
         attribute :phone,            BenefitSponsors::Entities::OfficeLocations::Phone
       end

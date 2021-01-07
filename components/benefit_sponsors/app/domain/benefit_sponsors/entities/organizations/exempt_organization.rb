@@ -7,7 +7,7 @@ module BenefitSponsors
       class ExemptOrganization < Organization
         transform_keys(&:to_sym)
 
-        attribute :fein,  Types::Strict::String.optional.meta(omittable: true)
+        attribute :profiles,  Types::Array.of(BenefitSponsors::Entities::Profiles::Profile)
       end
     end
   end
