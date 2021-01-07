@@ -12,8 +12,7 @@ module BenefitSponsors
 
       def trigger_model_event(event_name, event_options = {})
         if OTHER_EVENTS.include?(event_name)
-          BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.add_observer(BenefitSponsors::Observers::EmployerProfileObserver.new, [:update])
-          BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.add_observer(BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events])
+          # BenefitSponsors::Organizations::AcaShopCcaEmployerProfile.add_observer(BenefitSponsors::Observers::NoticeObserver.new, [:process_employer_profile_events])
           notify_observers(ModelEvent.new(event_name, self, event_options))
         end
       end
