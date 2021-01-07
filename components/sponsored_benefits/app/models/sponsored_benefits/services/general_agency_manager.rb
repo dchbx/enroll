@@ -9,13 +9,25 @@ module SponsoredBenefits
         @form = form
       end
 
-      def assign_general_agency(start_on: TimeKeeper.datetime_of_record)
+      # Assign an agency to a list of organizations, also removing any current
+      # assignments.
+      #
+      # @param start_on [DateTime] the start time for the new assignment
+      # @return [Void]
+      def assign_general_agency(start_on: Time.now)
         form.plan_design_organization_ids.each do |id|
           unless fire_previous_general_agency(id)
             map_failed_assignment_on_form(id)
             next
           end
-          create_general_agency_account(id, broker_agency_profile.primary_broker_role.id, start_on)
+          create_general_agency_account(
+            id,
+            broker_agency_profile.primary_broker_role.id,
+            start_on,
+            form.general_agency_profile_id,
+            form.broker_agency_profile_id,
+            true
+          )
         end
       end
 
@@ -40,32 +52,8 @@ module SponsoredBenefits
                 broker_agency_profile: account.broker_agency_profile,
                 status: 'Terminate'
               })
-              notify("acapi.info.events.employer.general_agent_terminated", {employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
+              notify("acapi.info.events.employer.general_agent_terminated", {timestamp: Time.now.to_i, employer_id: employer_profile.hbx_id, event_name: "general_agent_terminated"})
             end
-          end
-        end
-      end
-
-      def create_general_agency_account(id, broker_role_id, start_on=TimeKeeper.datetime_of_record, general_agency_profile_id=form.general_agency_profile_id, broker_agency_profile_id=form.broker_agency_profile_id)
-        plan_design_organization(id).general_agency_accounts.build(
-          start_on: start_on,
-          broker_role_id: broker_role_id
-        ).tap do |account|
-          account.general_agency_profile = general_agency_profile(general_agency_profile_id)
-          account.broker_agency_profile = broker_agency_profile(broker_agency_profile_id)
-          if account.save
-            employer_profile = account.plan_design_organization.employer_profile
-            if employer_profile
-              send_message({
-                employer_profile: employer_profile,
-                general_agency_profile: general_agency_profile(general_agency_profile_id),
-                broker_agency_profile: broker_agency_profile(broker_agency_profile_id),
-                status: 'Hire'
-              })
-              notify("acapi.info.events.employer.general_agent_added", {employer_id: employer_profile.hbx_id, event_name: "general_agent_added"})
-            end
-          else
-            map_failed_assignment_on_form(id) if form.present?
           end
         end
       end
@@ -155,6 +143,70 @@ module SponsoredBenefits
       def dc?
         Settings.aca.state_abbreviation == "DC"
       end
+
+      protected
+
+      # rubocop:disable Metrics/ParameterLists
+
+      # HACK: Little bit of slight of hand here.
+      #       I have added another parameter, 'bump_timestamp', here.
+      #       This allows the caller of the function to put another second
+      #       The timestamp for when the general agency assignment event is
+      #       fired.
+      #       This is needed because:
+      #         - certain downstream systems have issues if a General Agency
+      #           Account termination event occurs simultaneously with an add
+      #         - our timestamps lack sub-second resolution
+      #
+      #       Thus, I've added the ability to 'bump' the event timestamp when
+      #       desired by the caller, so that one event can occur 'after' the
+      #       other.
+      #
+      #       This impacts only the firing of the event - it has no impact on when
+      #       the account is actually considered 'active' in the database.
+      def create_general_agency_account(
+        id,
+        broker_role_id,
+        start_on = Time.now,
+        general_agency_profile_id = form.general_agency_profile_id,
+        broker_agency_profile_id = form.broker_agency_profile_id,
+        bump_timestamp = false
+      )
+        ts_bump = bump_timestamp ? 1 : 0
+        timestamp = (Time.now + ts_bump.seconds).to_i
+        plan_design_organization(id).general_agency_accounts.build(
+          start_on: start_on,
+          broker_role_id: broker_role_id
+        ).tap do |account|
+          account.general_agency_profile = general_agency_profile(general_agency_profile_id)
+          account.broker_agency_profile = broker_agency_profile(broker_agency_profile_id)
+          if account.save
+            employer_profile = account.plan_design_organization.employer_profile
+            if employer_profile
+              send_message(
+                {
+                  employer_profile: employer_profile,
+                  general_agency_profile: general_agency_profile(general_agency_profile_id),
+                  broker_agency_profile: broker_agency_profile(broker_agency_profile_id),
+                  status: 'Hire'
+                }
+              )
+              notify(
+                "acapi.info.events.employer.general_agent_added",
+                {
+                  employer_id: employer_profile.hbx_id,
+                  event_name: "general_agent_added",
+                  timestamp: timestamp
+                }
+              )
+            end
+          elsif form.present?
+            map_failed_assignment_on_form(id)
+          end
+        end
+      end
+
+      # rubocop:enable Metrics/ParameterLists
     end
   end
 end
