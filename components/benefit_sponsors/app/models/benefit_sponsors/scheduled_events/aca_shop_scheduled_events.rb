@@ -146,7 +146,7 @@ module BenefitSponsors
       end
 
       def initialize_logger
-        @logger = Logger.new("#{Rails.root}/log/aca_shop_scheduled_events.log") unless defined? @logger
+        @logger = Logger.new("#{Rails.root}/log/aca_shop_scheduled_events_#{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}.log") unless defined? @logger
       end
 
       def notify_logger(message)

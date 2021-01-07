@@ -4,8 +4,8 @@ class BrokerAgencies::BrokerRolesController < ApplicationController
 
   def check_ach_routing
     begin
-      @ach_record = AchRecord.find_by(routing_number: params[:ach_record][:routing_number])
-      render 'broker_agencies/applicants/check_ach_routing'
+      @ach_record = AchRecord.find_by(routing_number: Regexp.escape(params[:ach_record][:routing_number]))
+      render @ach_record.present? ? 'broker_agencies/applicants/check_ach_routing' : 'broker_agencies/applicants/invalid_ach'
     rescue Mongoid::Errors::DocumentNotFound => e
       render 'broker_agencies/applicants/invalid_ach'
     end

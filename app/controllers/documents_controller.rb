@@ -248,7 +248,7 @@ class DocumentsController < ApplicationController
   private
 
   def cartafact_download_params
-    params.permit(:user, :relation_id, :model, :model_id)
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 
   def updateable?
