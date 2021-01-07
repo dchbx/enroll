@@ -66,13 +66,13 @@ module BenefitSponsors
 
         def new_staff_member
           authorize User, :add_roles?
-          @staff_member = ::Operations::People::Roles::NewStaff.new.call(params).value!
+          @staff_member = BenefitSponsors::Operations::GeneralAgencies::NewGeneralAgencyStaff.new.call(params).value!
         end
 
         def create_staff_member
           authorize User, :add_roles?
           staff_params = params.permit[:staff_member].to_h
-          result = ::Operations::People::Roles::PersistStaff.new.call(staff_params)
+          result = BenefitSponsors::Operations::GeneralAgencies::AddGeneralAgencyStaff.new.call(staff_params)
           if result.success?
             redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
             flash[:notice] = result.value![:message]

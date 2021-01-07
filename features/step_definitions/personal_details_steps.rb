@@ -192,11 +192,11 @@ And(/that a person with (.*) exists in EA/) do |role|
 end
 
 Then(/person should be able to visit add new employee portal/) do
-  click_button 'Add Portal'
+  find('#employee-portal').click
 end
 
 Then(/person should be able to visit add new consumer portal/) do
-  click_button 'Add New Portal'
+  find('#consumer-portal').click
 end
 
 And(/person with (.*) signs in and visits manage account/) do |role|

@@ -5,7 +5,7 @@ module BenefitSponsors
     module Forms
       module Employers
         module EmployerStaffRoles
-          # Entity to initialize while showing/persisting staff record.
+          # Entity to initialize while showing employer staff record.
           class New < Dry::Struct
             transform_keys(&:to_sym)
 
