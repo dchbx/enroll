@@ -906,7 +906,8 @@ class ConsumerRole
   def mark_residency_denied(*args)
     update_attributes(:residency_determined_at => DateTime.now,
                       :is_state_resident => false)
-    verification_types.by_name("DC Residency").first.fail_type if verification_types.by_name("DC Residency").first
+    type = verification_types.by_name("DC Residency").first
+    verification_types.by_name("DC Residency").first.fail_type if type && type.validation_status != 'review'
   end
 
   def mark_residency_pending(*args)
@@ -1024,7 +1025,8 @@ class ConsumerRole
   end
 
   def fail_ssn(*args)
-    verification_types.by_name("Social Security Number").first.fail_type if verification_types.by_name("Social Security Number").first
+    type = verification_types.by_name("Social Security Number").first
+    verification_types.by_name("Social Security Number").first.fail_type if type && type.validation_status != 'review'
   end
 
   def move_types_to_pending(*args)
@@ -1044,7 +1046,7 @@ class ConsumerRole
 
   def fail_lawful_presence(*args)
     lawful_presence_determination.deny!(*args)
-    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type }
+    verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.fail_type unless type.validation_status == 'review' }
   end
 
   def revert_ssn
