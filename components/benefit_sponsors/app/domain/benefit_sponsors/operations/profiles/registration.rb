@@ -6,9 +6,9 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module Profiles
+      #This operation will create a new organization and profile
       class Registration
         include Dry::Monads[:result, :do]
-
 
         def call(params)
           parsed_params = yield parse_params(params)
@@ -53,13 +53,13 @@ module BenefitSponsors
 
         def create_organization(type, organization_entity)
           profile_type = fetch_org_type(type)
-          organization =  "::BenefitSponsors::Organizations::#{profile_type}".constantize.new(organization_entity.to_h.except(:profiles))
+          organization = "::BenefitSponsors::Organizations::#{profile_type}".constantize.new(organization_entity.to_h.except(:profiles))
           Success(organization)
         end
 
         def create_profile(type, organization, profile_entity)
           profile_type = fetch_profile_type(type)
-          profile =  "::BenefitSponsors::Organizations::#{profile_type}".constantize.new(profile_entity.to_h)
+          profile = "::BenefitSponsors::Organizations::#{profile_type}".constantize.new(profile_entity.to_h)
           organization.profiles << profile
           profile.add_benefit_sponsorship if profile_type == 'AcaShopDcEmployerProfile'
           Success(organization)
@@ -77,12 +77,12 @@ module BenefitSponsors
         end
 
         def fetch_org_type(type)
-         org_type =  case type
-                     when 'benefit_sponsor', 'general_agency'
-                       'GeneralOrganization'
-                     else
-                       'ExemptOrganization'
-                     end
+          org_type =  case type
+                      when 'benefit_sponsor', 'general_agency'
+                        'GeneralOrganization'
+                      else
+                        'ExemptOrganization'
+                      end
           org_type
         end
 

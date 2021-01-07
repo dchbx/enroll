@@ -6,14 +6,14 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module Profiles
+      #This operation will validate and create a new profile entity
       class Build
         include Dry::Monads[:result, :do]
-
 
         def call(profile_type:, profile_attrs:)
           @profile_type = yield fetch_profile_type(profile_type)
           profile_attributes = yield build_profile_params(profile_attrs)
-          validated_params  = yield validate(profile_attributes)
+          validated_params = yield validate(profile_attributes)
           profile_entity = yield create(validated_params)
 
           Success(profile_entity)

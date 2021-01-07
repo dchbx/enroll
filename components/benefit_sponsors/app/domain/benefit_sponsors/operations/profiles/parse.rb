@@ -6,6 +6,9 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module Profiles
+      #This operation is to construct a hash
+      # with all the required params that are needed
+      # for creation of organization
       class Parse
         include Dry::Monads[:result, :do]
 
@@ -15,8 +18,7 @@ module BenefitSponsors
           Success(parsed_params)
         end
 
-
-       private
+        private
 
         def parse(params)
           attrs = {
@@ -32,7 +34,7 @@ module BenefitSponsors
             first_name: staff_role_attrs["first_name"],
             last_name: staff_role_attrs["last_name"],
             dob: Date.strptime(staff_role_attrs["dob"], "%m/%d/%Y"),
-            email: staff_role_attrs["email"],
+            email: staff_role_attrs["email"]
           }
           attrs.merge!(npn: staff_role_attrs["npn"]) if staff_role_attrs["npn"].present?
           attrs
@@ -45,9 +47,7 @@ module BenefitSponsors
             entity_kind: organization_params["entity_kind"],
             legal_name: organization_params["legal_name"],
             dba: organization_params["dba"],
-            profile: {
-                        office_locations: nested_office_locations(office_location_attrs)
-                      }
+            profile: { office_locations: nested_office_locations(office_location_attrs) }
           }
           attrs[:profile].merge!(market_kind: profile_attrs["market_kind"]) if profile_attrs["market_kind"].present?
           attrs[:profile].merge!(languages_spoken: profile_attrs["languages_spoken"]) if profile_attrs["languages_spoken"].present?

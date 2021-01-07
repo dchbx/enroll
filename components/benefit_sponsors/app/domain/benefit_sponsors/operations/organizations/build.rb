@@ -6,14 +6,14 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module Organizations
+      #This operation will validate and create a new organization entity
       class Build
         include Dry::Monads[:result, :do]
-
 
         def call(profile_type:, organization_attrs:)
           @organization_type = yield fetch_organization_type(profile_type)
           profile_attributes = yield build_organization_params(organization_attrs)
-          validated_params  = yield validate(profile_attributes)
+          validated_params = yield validate(profile_attributes)
           organization_entity = yield create(validated_params)
 
           Success(organization_entity)
@@ -44,7 +44,7 @@ module BenefitSponsors
         end
 
         def fetch_site_id
-          BenefitSponsors::ApplicationController::current_site.id
+          BenefitSponsors::ApplicationController.current_site.id
         end
 
         def fetch_organization_type(type)
