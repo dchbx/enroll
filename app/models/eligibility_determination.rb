@@ -5,7 +5,7 @@ class EligibilityDetermination
   include HasFamilyMembers
 
   embedded_in :tax_household
-
+  after_create :calculate_aptc_aggregate
 
   SOURCE_KINDS = %w[Curam Admin Renewals Faa].freeze # TODO change "Renewals" source kind
 
@@ -143,4 +143,7 @@ private
     end
   end
 
+  def calculate_aptc_aggregate
+    Operations::Individual::ApplyAggregateToEnrollment.new.call(eligibility_determinations: self)
+  end
 end
