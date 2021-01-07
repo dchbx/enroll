@@ -9,14 +9,7 @@ class BulkNoticeWorker
     sleep 2
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @org = BenefitSponsors::Organizations::Organization.find(audience_id)
-    params = {
-      subject: @bulk_notice.subject,
-      body: @bulk_notice.body,
-      actions_id: "Bulk Notice",
-      document: @bulk_notice.documents.first,
-      model_id: @bulk_notice.id.to_s,
-      model_klass: @bulk_notice.class.to_s
-    }
+    params = fetch_params(@bulk_notice)
 
     if @bulk_notice.audience_type == 'employee'
       #loop through each employee
@@ -51,6 +44,17 @@ class BulkNoticeWorker
     cable_ready.broadcast
 
     Rails.logger.info("Processing #{audience_id} for Bulk Notice request #{bulk_notice_id}")
+  end
+
+  def fetch_params(bulk_notice)
+    {
+      subject: bulk_notice.subject,
+      body: bulk_notice.body,
+      actions_id: "Bulk Notice",
+      document: bulk_notice.documents.first,
+      model_id: bulk_notice.id.to_s,
+      model_klass: bulk_notice.class.to_s
+    }
   end
 
   def fetch_resource(org, profile_type)
