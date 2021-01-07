@@ -51,7 +51,7 @@ class QhpBuilder
     elsif file_path.include?("united")
       "UnitedHealthcare"
     elsif file_path.include?("kaiser")
-      "Kaiser"
+      "Kaiser Permanente"
     elsif file_path.include?("united")
       "UnitedHealthcare"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
