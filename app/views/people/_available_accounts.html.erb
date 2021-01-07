@@ -108,7 +108,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal"><%= l10n("cancel")%></button>
-        <%= link_to l10n("add_role"), main_app.privacy_insured_consumer_role_index_path(uqhp: true), class: 'btn btn-primary' %>
+        <%= link_to l10n("add_role"), main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-primary' %>
       </div>
     </div>
   </div>
