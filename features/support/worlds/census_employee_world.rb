@@ -445,3 +445,31 @@ And(/^employer (.*?) with employee (.*?) has (.*?) hbx_enrollment with health pr
   attributes[:sponsored_benefit_package_id] = benefit_package.id
   build_enrollment(attributes, :with_health_product)
 end
+
+And(/(.*) has census employee, person record, and active coverage for employee (.*)/) do |legal_name, named_person|
+  person = people[named_person]
+  person_rec = FactoryBot.create(:person,
+                                 :with_family,
+                                 first_name: person[:first_name],
+                                 last_name: person[:last_name])
+  ce = employee_by_legal_name(legal_name, person_rec)
+  benefit_package = ce.active_benefit_group_assignment.benefit_package
+  hbx_enrollment_member = FactoryBot.build(:hbx_enrollment_member, applicant_id: person_rec.primary_family.primary_applicant.id)
+  FactoryBot.create(:hbx_enrollment,
+                    family: person_rec.primary_family,
+                    household: person_rec.primary_family.active_household,
+                    coverage_kind: "health",
+                    effective_on: benefit_package.start_on,
+                    enrollment_kind: "open_enrollment",
+                    kind: "employer_sponsored",
+                    submitted_at: benefit_package.start_on - 20.days,
+                    employee_role_id: person_rec.active_employee_roles.first.id,
+                    benefit_group_assignment_id: ce.active_benefit_group_assignment.id,
+                    benefit_sponsorship_id: ce.benefit_sponsorship.id,
+                    sponsored_benefit_package_id: benefit_package.id,
+                    sponsored_benefit_id: benefit_package.health_sponsored_benefit.id,
+                    rating_area_id: benefit_package.rating_area.id,
+                    product_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.id,
+                    issuer_profile_id: benefit_package.health_sponsored_benefit.products(benefit_package.start_on).first.issuer_profile.id,
+                    hbx_enrollment_members: [hbx_enrollment_member])
+end

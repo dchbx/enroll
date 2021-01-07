@@ -10,6 +10,10 @@ Then(/^Employee should click on the Personal Tab link$/) do
   find('a.interaction-click-control-personal').click
 end
 
+Then(/^Employee should not see the Ageoff Exclusion checkbox$/) do
+  expect(page).not_to have_content(/Ageoff Exclusion/)
+end
+
 Then(/^Employee should click on Change my Password link$/) do
   if aca_security_questions
     wait_for_ajax

@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
       <label class="static_label label-floatlabel" for="name">AGE</label>
-      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(Date.today)}" %></span>
+      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(TimeKeeper.date_of_record)}" %></span>
     </div>
     <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
       <label class="static_label label-floatlabel" for="name">GENDER</label>

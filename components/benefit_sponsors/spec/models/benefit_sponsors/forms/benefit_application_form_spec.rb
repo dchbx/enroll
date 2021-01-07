@@ -89,7 +89,7 @@ module BenefitSponsors
     end
 
     describe ".submit_application" do
-      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_package, benefit_sponsorship:benefit_sponsorship) }
+      let(:benefit_application) { FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_package, benefit_sponsorship: benefit_sponsorship) }
       let(:benefit_application_form) { BenefitSponsors::Forms::BenefitApplicationForm.new(id: benefit_application.id) }
       let!(:service_object) { double("BenefitApplicationService")}
       context "has to submit application and" do
