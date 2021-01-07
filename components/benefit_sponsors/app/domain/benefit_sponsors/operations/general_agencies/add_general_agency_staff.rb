@@ -14,8 +14,8 @@ module BenefitSponsors
           @person = yield fetch_person(values[:person_id])
           _value = yield check_if_ga_staff_role_already_exists?
           terminated_staff = yield check_if_terminated_staff_exists?
-          result =   if terminated_staff.present?
-                    yield  move_staff_to_pending(terminated_staff)
+          result = if terminated_staff.present?
+                     yield  move_staff_to_pending(terminated_staff)
                    else
                      ga_staff_entity = yield create_ga_staff_record
                      yield persist(ga_staff_entity)
@@ -75,15 +75,15 @@ module BenefitSponsors
 
         def persist(ga_entity)
           result = Try do
-              @person.general_agency_staff_roles << GeneralAgencyStaffRole.new(ga_entity.to_h)
-              @person.save!
-              user = @person.user
-              if user && !user.roles.include?("general_agency_staff")
-                user.roles << "general_agency_staff"
-                user.save!
-              end
-              Success({:message => 'Successfully added general agency staff role'})
+            @person.general_agency_staff_roles << GeneralAgencyStaffRole.new(ga_entity.to_h)
+            @person.save!
+            user = @person.user
+            if user && !user.roles.include?("general_agency_staff")
+              user.roles << "general_agency_staff"
+              user.save!
             end
+            Success({:message => 'Successfully added general agency staff role'})
+          end
           result.to_result.failure? ? Failure({:message => 'Failed to create records, contact HBX Admin'}) : result.to_result.value!
         end
       end

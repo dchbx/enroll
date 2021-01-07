@@ -23,7 +23,7 @@ module BenefitSponsors
             Success({
                       benefit_sponsors_general_agency_profile_id: profile.id,
                       npn: profile&.general_agency_primary_staff&.npn,
-                      aasm_state: 'general_agency_pending',
+                      aasm_state: 'general_agency_pending'
                     })
           end
 

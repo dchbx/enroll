@@ -14,12 +14,12 @@ module BenefitSponsors
           @person = yield fetch_person(values[:person_id])
           _value = yield check_if_broker_staff_role_already_exists?
           terminated_staff = yield check_if_terminated_staff_exists?
-          result =   if terminated_staff.present?
-                       yield move_staff_to_pending(terminated_staff)
-                     else
-                       broker_staff_entity = yield create_broker_staff_record
-                       yield persist(broker_staff_entity)
-                     end
+          result = if terminated_staff.present?
+                     yield move_staff_to_pending(terminated_staff)
+                   else
+                     broker_staff_entity = yield create_broker_staff_record
+                     yield persist(broker_staff_entity)
+                   end
 
           Success(result)
         end
@@ -75,15 +75,15 @@ module BenefitSponsors
 
         def persist(broker_entity)
           result = Try do
-              @person.broker_agency_staff_roles << BrokerAgencyStaffRole.new(broker_entity.to_h)
-              @person.save!
-              user = @person.user
-              if user && !user.roles.include?("broker_agency_staff")
-                user.roles << "broker_agency_staff"
-                user.save!
-              end
-              Success({:message => 'Successfully added broker staff role'})
+            @person.broker_agency_staff_roles << BrokerAgencyStaffRole.new(broker_entity.to_h)
+            @person.save!
+            user = @person.user
+            if user && !user.roles.include?("broker_agency_staff")
+              user.roles << "broker_agency_staff"
+              user.save!
             end
+            Success({:message => 'Successfully added broker staff role'})
+          end
           result.to_result.failure? ? Failure({:message => 'Failed to create records, contact HBX Admin'}) : result.to_result.value!
         end
       end

@@ -22,7 +22,7 @@ module BenefitSponsors
           def construct_params(profile)
             Success({
                       benefit_sponsors_broker_agency_profile_id: profile.id,
-                      aasm_state: 'broker_agency_pending',
+                      aasm_state: 'broker_agency_pending'
                     })
           end
 
