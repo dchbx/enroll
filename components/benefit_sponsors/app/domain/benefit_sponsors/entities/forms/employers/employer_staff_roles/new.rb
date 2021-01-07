@@ -6,7 +6,7 @@ module BenefitSponsors
       module Employers
         module EmployerStaffRoles
           # Entity to initialize while showing/persisting staff record.
-          class New< Dry::Struct
+          class New < Dry::Struct
             transform_keys(&:to_sym)
 
             attribute :person_id,            Types::String
@@ -25,7 +25,7 @@ module BenefitSponsors
               attribute :address,                ::Entities::Address.optional.meta(omittable: true)
               attribute :email,                  ::Entities::Email.optional.meta(omittable: true)
             end
-           end
+          end
         end
       end
     end

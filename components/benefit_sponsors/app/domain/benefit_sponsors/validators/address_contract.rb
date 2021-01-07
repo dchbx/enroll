@@ -2,6 +2,7 @@
 
 module BenefitSponsors
   module Validators
+    # Address Contract is to validate submitted params while persisting Address
     class AddressContract < Dry::Validation::Contract
 
       params do
