@@ -112,6 +112,8 @@ RSpec.describe Operations::Shop::DependentAgeOff, type: :model, dbclean: :after_
       expect(shop_family.active_household.hbx_enrollments.count).to eq(2)
       expect(shop_family.active_household.hbx_enrollments.to_a.first.aasm_state).to eq("coverage_canceled")
       expect(shop_family.active_household.hbx_enrollments.to_a.last.hbx_enrollment_members.count).to eq(1)
+      expect(shop_family.active_household.hbx_enrollments.last.aasm_state).to eq("coverage_enrolled")
+      expect(shop_family.active_household.hbx_enrollments.last.workflow_state_transitions.any?{|w| w.from_state == "coverage_reinstated"}).to eq false
     end
   end
 
