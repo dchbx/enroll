@@ -38,7 +38,7 @@ describe BulkNoticeWorker do
       end
 
       it 'should return primary broker person' do
-        expect(subject.fetch_resource(broker_agency_profile.organization, 'broker_agency')).to eq broker_person
+        expect(subject.fetch_resource(broker_agency_profile.organization, 'broker_agency')).to eq broker_agency_profile
       end
     end
   end

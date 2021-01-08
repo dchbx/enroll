@@ -12,17 +12,23 @@ module Operations
       #resource can be a profile or person who has inbox as embedded document
 
       def call(resource:, message_params:, document:)
-        return Failure({:message => ['Please find valid resource to send the message']})  if resource.blank?
-
-        payload = yield construct_message_payload(resource, message_params, document)
+        recipient = yield fetch_recipient(resource)
+        payload = yield construct_message_payload(recipient, message_params, document)
         validated_payload = yield validate_message_payload(payload)
         message_entity = yield create_message_entity(validated_payload)
-        resource = yield create(resource, message_entity.to_h)
+        resource = yield create(recipient, message_entity.to_h)
 
         Success(resource)
       end
 
       private
+
+      def fetch_recipient(resource)
+        recipient = resource.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile) ? resource&.primary_broker_role&.person : resource
+        return Failure({:message => ['Please find valid resource to send the message']}) if recipient.blank?
+
+        Success(recipient)
+      end
 
       def construct_message_payload(resource, message_params, document)
         body = if document.present?
