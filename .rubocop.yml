@@ -162,10 +162,7 @@ require:
 #   Enabled: false
 # AllCops:
 #   RunRailsCops: true
-
-
-require:
- - rubocop-i18n
+  - rubocop-i18n
 # You *must* choose GetText or Rails-i18n style checking
 # If you want GetText-style checking
 #I18n/GetText:
