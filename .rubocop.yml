@@ -158,9 +158,16 @@ Gemspec/OrderedDependencies:
 I18n/RailsI18n:
   Enabled:
     true
+
 I18n/GetText:
   Enabled:
-    true
+    false
+
+Rails/ShortI18n: # (new in 2.7)
+  Enabled: true
+
+I18n/RailsI18n/DecorateString:
+  Enabled: true
 
 require:
   - ./cops/lint/empty_rescue_clause.rb
@@ -170,3 +177,4 @@ require:
 # AllCops:
 #   RunRailsCops: true
   - rubocop-i18n
+  - rubocop-rails
