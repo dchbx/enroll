@@ -15,11 +15,11 @@ class BulkNoticeWorker
       #loop through each employee
       results = @org.employer_profile.census_employees.each do |census_employee|
         Operations::SecureMessageAction.new.call(
-          params: params.merge({ resource_id: census_employee&.employee_role&.person&.id&.to_s, resource_name: 'Person' }),
+          params: params.merge({ resource_id: census_employee.employee_role&.person&.id&.to_s, resource_name: 'Person' }),
           user: @bulk_notice.user
         )
       end
-      result = results&.any?(&:success?)
+      result = results.any?(&:success?)
     else
       # normal profile params here for other audience types
       resource = fetch_resource(@org, @bulk_notice.audience_type)
@@ -58,15 +58,6 @@ class BulkNoticeWorker
   end
 
   def fetch_resource(org, profile_type)
-    return unless org
-
-    case profile_type
-    when 'broker_agency'
-      org.broker_agency_profile&.primary_broker_role&.person
-    when 'general_agency'
-      org.general_agency_profile
-    when 'employer'
-      org.employer_profile
-    end
+    org.send("#{profile_type}_profile") if org && ['employer', 'broker_agency', 'general_agency'].include?(profile_type)
   end
 end
