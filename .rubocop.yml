@@ -72,7 +72,7 @@ Layout/IndentationWidth:
 Layout/LineLength:
   Max: 250
 
-Layout/Tab:
+Layout/IndentationStyle:
   Enabled: true
 
 Layout/TrailingWhitespace:
