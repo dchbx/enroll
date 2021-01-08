@@ -13,6 +13,10 @@ module Operations
     let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile, site: site)}
     let(:employer_profile) {organization.employer_profile}
 
+    let(:general_agency_person) { FactoryBot.create :person }
+    let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: general_agency_person, is_primary: true)}
+    let!(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
+
     let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role)}
     let(:employee_person) {FactoryBot.create(:person, :with_employee_role)}
 
@@ -65,5 +69,15 @@ module Operations
         expect(subject).to be_success
       end
     end
+
+    describe "passing general agency profile as :resource" do
+
+      let(:params) { { resource: general_agency_profile }}
+
+      it "passes" do
+        expect(subject).to be_success
+      end
+    end
+
   end
 end

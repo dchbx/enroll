@@ -1,0 +1,74 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<div class='container mt-5' data-controller='bulk-notice-summary'>
+  <div class='row'>
+    <div class='col-3 pl-0'>
+      <h2>Summary</h2>
+    </div>
+    <div class='col-3 offset-6 text-right pr-0'>
+      <%= link_to 'Back to Messages', main_app.exchanges_bulk_notices_path, class: 'btn btn-alt-blue' %>
+    </div>
+  </div>
+
+  <div class="row bg-white mt-5 p-3 border-top border-left border-right border-bottom">
+    <div class='col-2 p-3'>
+      Audience Type
+    </div>
+    <div class='col-10 p-3'>
+      <%= @bulk_notice.audience_type.humanize.titleize %>
+    </div>
+
+    <div class='col-2 p-3'>
+      Subject
+    </div>
+    <div class='col-10 p-3'>
+      <%= @bulk_notice.subject %>
+    </div>
+
+    <div class='col-2 p-3'>
+      Message
+    </div>
+    <div class='col-10 p-3'>
+      <%= @bulk_notice.body %>
+    </div>
+
+    <% unless @bulk_notice.documents.empty? %>
+      <div class='col-2 p-3'>
+        Attachments
+      </div>
+
+      <div class='col-10 p-3'>
+        <% @bulk_notice.documents.each_with_index do |document, i| %>
+          <div class='py-1'>
+            <span><%= document.title %></span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class='row bg-white mt-5 p-3 font-weight-bold py-3 border-top border-left border-right'>
+    <div class='col-4'>
+      Recipient
+    </div>
+    <div class='col-2 text-right'>
+      Status
+    </div>
+    <div class='col-3 text-right'>
+      FEIN
+    </div>
+    <div class='col-3 text-right'>
+      HBX ID
+    </div>
+  </div>
+
+  <% @bulk_notice.audience_ids.each do |id| %>
+    <%= render partial: 'summary_line', locals: { id: id } %>
+  <% end %>
+
+  <div class='row bg-white border-left border-right border-bottom mb-5'>
+    <div class='col-12'>
+      &nbsp;
+    </div>
+  </div>
+</div>

@@ -32,6 +32,8 @@ module Operations
     def fetch_recipient_target
       if is_employer?
         Success(@resource.staff_roles.first)
+      elsif is_general_agency?
+        Success(@resource.general_agency_primary_staff&.person)
       elsif is_person?
         Success(@resource)
       end
@@ -69,7 +71,7 @@ module Operations
     end
 
     def is_valid_resource?
-      is_employer? || is_person?
+      is_employer? || is_person? || is_general_agency?
     end
 
     def is_person?
@@ -80,12 +82,19 @@ module Operations
       @resource.is_a?("BenefitSponsors::Organizations::AcaShop#{site_key.capitalize}EmployerProfile".constantize) || @resource.is_a?(BenefitSponsors::Organizations::FehbEmployerProfile)
     end
 
+    def is_general_agency?
+      @resource.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+    end
+
+    # TODO: Confirm on what basis we need to send electronic communication to general agency staff
     def can_receive_electronic_communication?
       if is_employer?
         @resource.can_receive_electronic_communication?
       elsif is_person?
         @resource.consumer_role.present? && @resource.consumer_role.can_receive_electronic_communication? ||
           @resource.employee_roles.present? && @resource.employee_roles.any?(&:can_receive_electronic_communication?)
+      elsif is_general_agency?
+        true
       end
     end
 

@@ -1,0 +1,62 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<div class="container" data-controller="bulk-notice"
+                       data-bulk-notice-org-ids="<%= BenefitSponsors::Organizations::Organization.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id } }.to_json %>">
+
+  <h4>Preview</h4>
+  <p><%= l10n("admin_actions.bulk_upload.new.description_text") %></p>
+  <strong>Important:</strong> <p><%= l10n("admin_actions.bulk_upload.new.description_sub_text") %></p>
+
+  <%= form_for(@bulk_notice, url: exchanges_bulk_notice_path(@bulk_notice)) do |f| %>
+    <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { reflex: 'change->BulkNotice#audience_select' } %>
+    <table class='table table-message-wrapper'>
+      <tbody>
+        <tr>
+          <th style="text-transform: capitalize;">Recipients:</th>
+          <td>
+            <div id='recipient-list' class='collapsed float-left' data-target="bulk-notice.recipientList">
+              <% @bulk_notice.audience_ids.each do |identifier| %>
+                <span class="badge badge-secondary mr-1 mb-1 p-2">
+                  <%= f.hidden_field :audience_ids, multiple: true, value: identifier %>
+                  <%= BenefitSponsors::Organizations::Organization.find(identifier).hbx_id %>&nbsp;
+                  <a data-action='bulk-notice#deleteIdentifier' class='text-white' href>
+                    <i class="far fa-times-circle"></i>
+                  </a>
+                </span>
+              <% end %>
+            </div>
+            <div id='more-recipients' class='float-right pr-1'>
+              <a href data-target="bulk-notice.moreRecipients" data-action='bulk-notice#expandRecipients' class='d-none'>0 more...</a>
+              <a href data-target="bulk-notice.lessRecipients" data-action='bulk-notice#collapseRecipients' class='d-none'>Less...</a>
+            </div>
+
+            <%= f.text_area :audience_identifiers, rows: 1, data: { reflex: 'blur->BulkNotice#new_identifier' }, placeholder: 'FEINs or HBX IDs, comma separated', value: '' %>
+          </td>
+        </tr>
+        <tr>
+          <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+          <td><%= f.text_field :subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+          <td><%= f.text_area :body, rows: 5, placeholder: 'Write here...', required: true  %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
+          <td>
+            <% @bulk_notice.documents.each_with_index do |document, i| %>
+              <div class='py-1'>
+                <span><%= document.title %>&nbsp;<a data-action='bulk-notice#deleteFile' href><i class="fas fa-times-circle"></i></a></span>
+                <%= f.hidden_field "documents_attributes][#{i}][id", value: document.id %>
+                <%= f.hidden_field "documents_attributes][#{i}][_destroy", value: 'false' %>
+              </div>
+            <% end %>
+            <%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: @bulk_notice.documents.empty? ? "doc-upload-file" : "doc-upload-file d-none" %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <%= f.submit "Send", class: 'btn btn-alt-blue col-2 offset-10', data: { confirm: 'Are you sure?' } %>
+  <% end %>
+</div>
