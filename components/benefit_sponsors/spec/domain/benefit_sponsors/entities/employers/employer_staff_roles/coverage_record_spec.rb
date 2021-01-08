@@ -6,7 +6,7 @@ RSpec.describe BenefitSponsors::Entities::Employers::EmployerStaffRoles::Coverag
 
   context "Given valid required parameters" do
 
-    let(:contract)                  { BenefitSponsors::Validators::Employers::EmployerStaffRoles::CoverageRecordContract.new }
+    let(:contract)                  { BenefitSponsors::Validators::Employers::CoverageRecordContract.new }
 
     let(:required_params) do
       {
