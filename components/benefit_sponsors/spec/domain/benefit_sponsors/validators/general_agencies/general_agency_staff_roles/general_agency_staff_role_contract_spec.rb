@@ -5,7 +5,7 @@ require "spec_helper"
 RSpec.describe BenefitSponsors::Validators::GeneralAgencies::GeneralAgencyStaffRoles::GeneralAgencyStaffRoleContract do
 
   let(:missing_params)   { {aasm_state: 'general_agency_pending'} }
-  let(:error_message)    { {:benefit_sponsors_general_agency_profile_id => ["is missing"], :npn=>["is missing"]} }
+  let(:error_message)    { {:benefit_sponsors_general_agency_profile_id => ["is missing"], :npn => ["is missing"]} }
 
   describe "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

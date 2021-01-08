@@ -26,7 +26,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::EmployerStaffRoles::Creat
   end
 
   context 'Success case' do
-     it 'should return employer staff entity' do
+    it 'should return employer staff entity' do
       result = subject.call(params: params, profile: employer_profile)
       expect(result.value!).to be_a BenefitSponsors::Entities::Employers::EmployerStaffRoles::EmployerStaffRole
     end

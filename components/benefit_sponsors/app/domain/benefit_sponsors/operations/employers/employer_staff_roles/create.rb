@@ -33,7 +33,7 @@ module BenefitSponsors
                         gender: params[:gender],
                         dob: params[:dob].present? ? params[:dob] : nil,
                         hired_on: params[:hired_on].present? ? params[:hired_on] : nil,
-                        is_applying_coverage: params[:is_applying_coverage] == "true" ? true : false,
+                        is_applying_coverage: params[:is_applying_coverage] == "true",
                         address: {
                           kind: address[:kind],
                           address_1: address[:kind],

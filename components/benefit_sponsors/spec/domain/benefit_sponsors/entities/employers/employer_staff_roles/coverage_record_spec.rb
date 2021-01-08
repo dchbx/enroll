@@ -10,28 +10,28 @@ RSpec.describe BenefitSponsors::Entities::Employers::EmployerStaffRoles::Coverag
 
     let(:required_params) do
       {
-          ssn: nil,
-          gender: nil,
-          dob: nil,
-          hired_on: nil,
-          is_applying_coverage: false,
-          address: {
-            kind: nil,
-            address_1: nil,
-            address_2: nil,
-            address_3: nil,
-            city: nil,
-            county: nil,
-            state: nil,
-            location_state_code: nil,
-            full_text: nil,
-            zip: nil,
-            country_name: nil
-          },
-          email: {
-            kind: nil,
-            address: nil
-          }
+        ssn: nil,
+        gender: nil,
+        dob: nil,
+        hired_on: nil,
+        is_applying_coverage: false,
+        address: {
+          kind: nil,
+          address_1: nil,
+          address_2: nil,
+          address_3: nil,
+          city: nil,
+          county: nil,
+          state: nil,
+          location_state_code: nil,
+          full_text: nil,
+          zip: nil,
+          country_name: nil
+        },
+        email: {
+          kind: nil,
+          address: nil
+        }
       }
     end
 

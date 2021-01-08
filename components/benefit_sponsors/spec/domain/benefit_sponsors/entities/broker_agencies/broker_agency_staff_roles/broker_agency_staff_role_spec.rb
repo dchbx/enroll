@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Entities::BrokerAgencies::BrokerAgencyStaffRoles
 
     let(:required_params) do
       {
-       aasm_state: 'broker_agency_pending', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new
+        aasm_state: 'broker_agency_pending', benefit_sponsors_broker_agency_profile_id: BSON::ObjectId.new
       }
     end
 
