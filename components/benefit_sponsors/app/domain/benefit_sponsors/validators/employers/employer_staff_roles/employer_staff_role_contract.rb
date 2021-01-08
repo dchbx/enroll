@@ -14,21 +14,12 @@ module BenefitSponsors
           end
 
           rule(:coverage_record) do
-            if key? && value && value[:is_applying_coverage]
-              address = value[:address]
-              email = value[:email]
-              if address&.is_a?(Hash)
-                result = BenefitSponsors::Validators::AddressContract.new.call(address)
-                key.failure(text: "invalid address", error: result.errors.to_h) if result&.failure?
+            if key? && value
+              if value&.is_a?(Hash)
+                result = BenefitSponsors::Validators::Employers::CoverageRecordContract.new.call(value)
+                key.failure(text: "invalid coverage_record", error: result.errors.to_h) if result&.failure?
               else
-                key.failure(text: "invalid addresses. Expected a hash.")
-              end
-
-              if email&.is_a?(Hash)
-                result = BenefitSponsors::Validators::EmailContract.new.call(email)
-                key.failure(text: "invalid email", error: result.errors.to_h) if result&.failure?
-              else
-                key.failure(text: "invalid emails. Expected a hash.")
+                key.failure(text: "invalid coverage_record. Expected a hash.")
               end
             end
           end

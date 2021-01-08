@@ -11,8 +11,8 @@ module BenefitSponsors
             required(:person_id).value(:string)
             required(:first_name).value(:string)
             required(:last_name).value(:string)
-            optional(:profile_id).value(:string)
-            optional(:dob).maybe(:date)
+            required(:profile_id).filled(:string)
+            required(:dob).filled(:date)
             optional(:email).maybe(:string)
           end
         end

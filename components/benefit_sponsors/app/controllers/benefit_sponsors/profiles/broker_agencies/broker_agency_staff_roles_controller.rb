@@ -71,7 +71,7 @@ module BenefitSponsors
 
         def new_staff_member
           authorize User, :add_roles?
-          @staff_member = BenefitSponsors::Operations::BrokerAgencies::NewBrokerAgencyStaff.new.call(params).value!
+          @staff_member = BenefitSponsors::Operations::BrokerAgencies::Forms::NewBrokerAgencyStaff.new.call(params).value!
         end
 
         def create_staff_member

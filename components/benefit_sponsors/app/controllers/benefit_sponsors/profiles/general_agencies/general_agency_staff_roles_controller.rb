@@ -66,7 +66,7 @@ module BenefitSponsors
 
         def new_staff_member
           authorize User, :add_roles?
-          @staff_member = BenefitSponsors::Operations::GeneralAgencies::NewGeneralAgencyStaff.new.call(params).value!
+          @staff_member = BenefitSponsors::Operations::GeneralAgencies::Forms::NewGeneralAgencyStaff.new.call(params).value!
         end
 
         def create_staff_member

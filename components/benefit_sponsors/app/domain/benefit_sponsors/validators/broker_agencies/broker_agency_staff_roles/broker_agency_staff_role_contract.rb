@@ -5,7 +5,7 @@ module BenefitSponsors
     module BrokerAgencies
       module BrokerAgencyStaffRoles
         # Staff Contract is to validate broker staff role record
-        class BrokerStaffRoleContract < Dry::Validation::Contract
+        class BrokerAgencyStaffRoleContract < Dry::Validation::Contract
           params do
             required(:aasm_state).filled(:string)
             required(:benefit_sponsors_broker_agency_profile_id).filled(Types::Bson)

@@ -65,8 +65,11 @@ module BenefitSponsors
         end
 
         def move_staff_to_pending(terminated_staff)
-          terminated_staff.broker_agency_pending!
-          Success({:message => 'Successfully moved broker staff role from terminated to pending'})
+          result = Try do
+            terminated_staff.broker_agency_pending!
+            Success({:message => 'Successfully moved broker staff role from terminated to pending'})
+          end
+          result.to_result.failure? ? Failure({:message => 'Unable to move existing staff role from terminated to pending'}) : result.to_result.value!
         end
 
         def create_broker_staff_record

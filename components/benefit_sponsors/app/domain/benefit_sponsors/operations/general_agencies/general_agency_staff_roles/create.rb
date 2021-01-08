@@ -10,6 +10,8 @@ module BenefitSponsors
           include Dry::Monads[:result, :do, :try]
 
           def call(profile:)
+            return Failure({:message => 'Invalid profile'}) if profile.blank? || !profile.is_a?(BenefitSponsors::Organizations::GeneralAgencyProfile)
+
             constructed_params = yield construct_params(profile)
             values = yield validate(constructed_params)
             ga_staff_entity = yield persist(values)
@@ -32,7 +34,7 @@ module BenefitSponsors
             if result.success?
               Success(result.to_h)
             else
-              Failure('Unable to build broker agency staff role')
+              Failure({:message => 'Unable to build general agency staff role'})
             end
           end
 

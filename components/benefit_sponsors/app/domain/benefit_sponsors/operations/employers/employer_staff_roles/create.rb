@@ -10,6 +10,8 @@ module BenefitSponsors
           include Dry::Monads[:result, :do, :try]
 
           def call(params:, profile:)
+            return Failure({:message => 'Invalid profile'}) if profile.blank? || !profile.is_a?(BenefitSponsors::Organizations::AcaShopDcEmployerProfile)
+
             constructed_params = yield construct_params(params[:coverage_record], profile)
             values = yield validate(constructed_params)
             employer_staff_entity = yield persist(values)
@@ -29,9 +31,9 @@ module BenefitSponsors
                       coverage_record: {
                         ssn: params[:ssn],
                         gender: params[:gender],
-                        dob: params[:dob],
-                        hired_on: params[:hired_on],
-                        is_applying_coverage: params[:is_applying_coverage],
+                        dob: params[:dob].present? ? params[:dob] : nil,
+                        hired_on: params[:hired_on].present? ? params[:hired_on] : nil,
+                        is_applying_coverage: params[:is_applying_coverage] == "true" ? true : false,
                         address: {
                           kind: address[:kind],
                           address_1: address[:kind],
