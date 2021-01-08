@@ -102,7 +102,6 @@ gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
 gem 'rubyzip', '>= 1.3.0'
-gem 'rubocop-i18n'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 1.12'
 gem 'sass-rails',               '~> 5'
@@ -128,6 +127,8 @@ group :development do
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
+  # TODO: Next commit up requires higher version of Ruby >= 2.5.8. Remove after upgrade.
+  gem 'rubocop-i18n', :git => 'git://github.com/puppetlabs/rubocop-i18n.git', :ref => "89feec6465eb198e0b1d8eb33a1d2e3e7c4378fd"
 
 
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.

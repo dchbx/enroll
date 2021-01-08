@@ -1,4 +1,12 @@
 GIT
+  remote: git://github.com/puppetlabs/rubocop-i18n.git
+  revision: 89feec6465eb198e0b1d8eb33a1d2e3e7c4378fd
+  ref: 89feec6465eb198e0b1d8eb33a1d2e3e7c4378fd
+  specs:
+    rubocop-i18n (2.0.2)
+      rubocop (~> 1.0)
+
+GIT
   remote: https://github.com/dchbx/acapi.git
   revision: 5c98342197a833b2c8044061dc547d17a706d82b
   branch: master
@@ -278,7 +286,7 @@ GEM
     animate-rails (1.0.10)
       rails
     arel (9.0.0)
-    ast (2.4.0)
+    ast (2.4.1)
     awesome_print (1.8.0)
     aws-sdk (2.2.37)
       aws-sdk-resources (= 2.2.37)
@@ -537,7 +545,6 @@ GEM
     interactor-rails (2.2.1)
       interactor (~> 3.0)
       rails (>= 4.2)
-    jaro_winkler (1.5.4)
     jbuilder (2.10.0)
       activesupport (>= 5.0.0)
     jmespath (1.4.0)
@@ -652,8 +659,8 @@ GEM
     parallel (1.19.1)
     parallel_tests (2.26.2)
       parallel
-    parser (2.7.0.4)
-      ast (~> 2.4.0)
+    parser (3.0.0.0)
+      ast (~> 2.4.1)
     pdf-reader (1.4.1)
       Ascii85 (~> 1.0.0)
       afm (~> 0.2.1)
@@ -735,7 +742,7 @@ GEM
       redis-store (>= 1.2, < 2)
     redis-store (1.8.2)
       redis (>= 4, < 5)
-    regexp_parser (1.7.0)
+    regexp_parser (1.8.2)
     responders (3.0.0)
       actionpack (>= 5.0)
       railties (>= 5.0)
@@ -779,18 +786,19 @@ GEM
     rspec-support (3.9.3)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (0.80.1)
-      jaro_winkler (~> 1.5.1)
+    rubocop (1.8.0)
       parallel (~> 1.10)
-      parser (>= 2.7.0.1)
+      parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 1.8, < 3.0)
       rexml
+      rubocop-ast (>= 1.2.0, < 2.0)
       ruby-progressbar (~> 1.7)
-      unicode-display_width (>= 1.4.0, < 1.7)
+      unicode-display_width (>= 1.4.0, < 3.0)
+    rubocop-ast (1.4.0)
+      parser (>= 2.7.1.5)
     rubocop-git (0.1.3)
       rubocop (>= 0.24.1)
-    rubocop-i18n (2.0.2)
-      rubocop (~> 0.51)
     rubocop-rspec (1.38.1)
       rubocop (>= 0.68.1)
     ruby-progressbar (1.10.1)
@@ -889,7 +897,7 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.2.0)
       execjs (>= 0.3.0, < 3)
-    unicode-display_width (1.6.1)
+    unicode-display_width (2.0.0)
     unicorn (4.9.0)
       kgio (~> 2.6)
       rack
@@ -1033,7 +1041,7 @@ DEPENDENCIES
   rspec_junit_formatter
   rubocop
   rubocop-git
-  rubocop-i18n
+  rubocop-i18n!
   rubocop-rspec
   ruby-progressbar (~> 1)
   ruby-saml (~> 1.3)
