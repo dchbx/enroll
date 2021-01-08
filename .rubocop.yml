@@ -166,29 +166,28 @@ require:
 
 require:
  - rubocop-i18n
-...
 # You *must* choose GetText or Rails-i18n style checking
 # If you want GetText-style checking
-I18n/GetText:
-  Enabled: true
-I18n/RailsI18n:
-  Enabled: false
+#I18n/GetText:
+#  Enabled: true
+#I18n/RailsI18n:
+#  Enabled: false
 # If you want rails-i18n-style checking
 I18n/RailsI18n:
   Enabled: true
 I18n/GetText:
-  Enabled: false
+  Enabled: true
 # If you want custom control of all the cops
-I18n/GetText/DecorateString:
-  Enabled: false
+# I18n/GetText/DecorateString:
+#  Enabled: false
   # Disable the autocorrect
-  AutoCorrect: false
-I18n/GetText/DecorateFunctionMessage:
-  Enabled: false
-I18n/GetText/DecorateStringFormattingUsingInterpolation:
-  Enabled: false
-I18n/GetText/DecorateStringFormattingUsingPercent:
-  Enabled: false
-I18n/RailsI18n/DecorateString:
-  Enabled: false
+#  AutoCorrect: false
+# I18n/GetText/DecorateFunctionMessage:
+#  Enabled: false
+# I18n/GetText/DecorateStringFormattingUsingInterpolation:
+#  Enabled: false
+# I18n/GetText/DecorateStringFormattingUsingPercent:
+#  Enabled: false
+#I18n/RailsI18n/DecorateString:
+#  Enabled: false
 
