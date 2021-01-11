@@ -129,6 +129,28 @@ module Operations
           expect(employer_profile.documents.count).to eq 1
         end
       end
+
+      describe "passing valid broker agency data" do
+        let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+        let(:broker_person) { broker_agency_profile.primary_broker_role.person }
+        let(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
+        let(:params) do
+          {resource: broker_agency_profile,
+           file_params: {subject: 'test', body: 'test', file: Rack::Test::UploadedFile.new(tempfile, "application/pdf")},
+           user: user }
+        end
+        it "success" do
+          validated_params = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
+          file = Operations::Documents::Upload.new.create_document(broker_person, params[:file_params], validated_params.value!)
+          expect(file.success?).to eq true
+        end
+
+        it "should save document ot profile" do
+          validated_params = Operations::Documents::Upload.new.validate_response(doc_storage.transform_keys(&:to_sym))
+          Operations::Documents::Upload.new.create_document(broker_person, params[:file_params], validated_params.value!)
+          expect(broker_person.documents.count).to eq 1
+        end
+      end
     end
   end
 end
