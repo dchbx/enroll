@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.1'
+ruby '2.6.5'
 gem 'rails', '~> 5.2.4.3'
 
 #######################################################
@@ -123,17 +123,18 @@ group :doc do
 end
 
 group :development do
+  gem "better_html"
   gem "certified",              '~> 1'
   # TODO: Error with "Superclass Mismatch Mark" https://github.com/ruby/psych/issues/386
-  # gem 'erb_lint', require: false # For linting ERB files
+  gem 'erb_lint', require: false # For linting ERB files
   gem 'overcommit',             '~> 0.47'
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
   # TODO: Next commit up requires higher version of Ruby >= 2.5.8. Remove after upgrade.
-  gem 'rubocop-i18n', :git => 'git://github.com/puppetlabs/rubocop-i18n.git', :ref => "89feec6465eb198e0b1d8eb33a1d2e3e7c4378fd"
+  gem 'rubocop-i18n'#, :git => 'git://github.com/puppetlabs/rubocop-i18n.git', :ref => "89feec6465eb198e0b1d8eb33a1d2e3e7c4378fd"
   gem 'rubocop-rails', require: false
-  gem 'ruumba'
+  # gem 'ruumba'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
