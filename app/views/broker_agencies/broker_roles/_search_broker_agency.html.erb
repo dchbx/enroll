@@ -1,5 +1,5 @@
 <% @broker_agency_profiles.each do |agency| %>
-  <br />
+  <br>
 
   <div class="row">
     <div class="col-md-9 col-sm-9 col-xs-12">
@@ -7,22 +7,22 @@
         <table class="table table-border">
           <tbody>
             <tr>
-              <th><%= l10n("legal_name")%>:</th>
+              <th><%= l10n("legal_name") %>:</th>
               <td><%= agency.try(:legal_name) %></td>
             </tr>
 
             <tr>
-              <th><%= l10n("fein").to_s.upcase%>:</th>
+              <th><%= l10n("fein").to_s.upcase %>:</th>
               <td><%= agency.try(:fein) %></td>
             </tr>
 
             <tr>
-              <th><%= l10n("primary_broker_name")%>:</th>
+              <th><%= l10n("primary_broker_name") %>:</th>
               <td><%= agency.try(:primary_broker_role).try(:person).try(:full_name) %></td>
             </tr>
 
             <tr>
-              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right' data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("broker_agencies.broker_roles.select_this_broker_agency")%></a></td>
+              <td colspan="2"><a href="javascript:void(0)" class='btn btn-primary select-broker-agency pull-right' data-broker_agency_profile_id="<%= agency._id %>"><%= l10n("broker_agencies.broker_roles.select_this_broker_agency") %></a></td>
             </tr>
           </tbody>
         </table>

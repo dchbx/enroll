@@ -1,7 +1,7 @@
 <%- model_class = Family -%>
-<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+<% t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 <div class="row container">
-    <%= link_to l10n("insured.switch_to_all_families"), family_index_exchanges_hbx_profiles_path, remote: true%>
+    <%= link_to l10n("insured.switch_to_all_families"), family_index_exchanges_hbx_profiles_path, remote: true %>
 </div>
 <div class="row container">
   <h3 class="title-inline">Families with APTC / CSR</h3>

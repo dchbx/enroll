@@ -4,17 +4,17 @@
       <h4>
         <%= find_my_doctor %>
         <% if @market_kind == "individual" && @coverage_kind == "health" %>
-          <%=link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
+          <%= link_to l10n("estimate_your_cost") , "", data: {toggle: "modal", target: "#plan_match_redirection"} %>
           <% # Staging url should be changed with PROD URL before going to production REDMINE #36809 %>
         <% end %>
         <% if @market_kind == "individual" && @coverage_kind == "dental" && @hbx_enrollment.effective_on.year == Settings.checkbook_services.current_year %>
           <%= link_to l10n("estimate_your_cost"), '',data: {toggle: "modal", target: "#plan_match_dental_redirection"} %>
         <% end %>
-        </br>
+        <br>
         <% if plan_match_dc %>
         <%= estimate_your_costs %>
         <% end %>
-      </br>
+      <br>
       </h4>
     </div>
     <div class="modal fade" id="plan_match_redirection" tabindex="-1" role="dialog" role="document">
@@ -32,7 +32,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+              <%= link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
             </center>
             </div>
          </div>
@@ -53,12 +53,12 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary" %>
+              <%= link_to l10n("confirm") , 'https://dc.checkbookhealth.org/sadpi/dc/2019/', class: "btn btn-primary" %>
             </div>
           <div class="modal-footer" style="padding:10px">
             <center>
             <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-            <%=link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
+            <%= link_to l10n("confirm") , @dc_individual_checkbook_url, class: "btn btn-primary checkbook_url" %>
           </center>
          </div>
       </div>
@@ -78,13 +78,12 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank'  %>
+              <%= link_to l10n("confirm") , 'https://dc.checkbookhealth.org/dc/', class: "btn btn-primary  mtz", target: '_blank' %>
             </div>
           </center>
          </div>
       </div>
     </div>
-
 
     <div class="modal fade" id="plan_match_shop" tabindex="-1" role="dialog" role="document">
       <div class="modal-dialog">
@@ -100,7 +99,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary" %>
+              <%= link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary" %>
             </div>
           </center>
          </div>
@@ -121,7 +120,7 @@
             <div class="modal-footer" style="padding:10px">
               <center>
               <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Cancel</button>
-              <%=link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank'%>
+              <%= link_to l10n("confirm") , Rails.application.config.checkbook_services_base_url + '/dcshopnationwide/' , class: "btn btn-primary",target: '_blank' %>
             </div>
           </center>
          </div>
@@ -146,7 +145,7 @@
         <div class="checkbox">
           <label>
             <input id="plan-metal-level-gold" class="plan-metal-level-selection-filter checkbox-custom" name="plan-metal-level-gold" type="checkbox" data-plan-metal-level-filter="gold">
-            <label for="plan-metal-level-gold" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_gold_title_info') %>" ><%= l10n("gold") %></span></label>
+            <label for="plan-metal-level-gold" class="checkbox-custom-label"><span data-toggle="tooltip" data-placement="right" data-container="body" title="<%= l10n('insured.plan_shoppings.plan_filters_gold_title_info') %>"><%= l10n("gold") %></span></label>
           </label>
         </div>
       </li>
@@ -269,8 +268,8 @@
           <input type="text" class="plan-metal-premium-to-selection-filter form-control" placeholder="$<%= @max_total_employee_cost || 2000 %>" value='<%= @max_total_employee_cost || 2000 %>'>
           <%= hidden_field_tag :max_total_employee_cost, (@max_total_employee_cost || 2000) %>
         </div>
-        <br/>
-        <br/>
+        <br>
+        <br>
         <h5><strong><%= l10n("deductible_amount") %></strong></h5>
         <div class="filter-input-block">
           <input type="text" class="plan-metal-deductible-from-selection-filter form-control" placeholder="$0" value='0'>
@@ -281,7 +280,7 @@
       </div>
       <% if @person.is_consumer_role_active? && @tax_household.present? && @market_kind == "individual" %>
       <div class="aptc">
-        <hr />
+        <hr>
         <div class="row">
           <div class="col-xs-6">
             <p class='title'><%= l10n("aptc").to_s.upcase %></p>
@@ -289,9 +288,9 @@
             <p><span><%= number_to_currency(@max_aptc, precision: 2) %></span></p>
           </div>
           <div class="col-xs-6">
-            <p class='title'><br /></p>
+            <p class='title'><br></p>
             <p class='title'><%= l10n("used") %></p>
-            <p>$ <input type="text" id='elected_aptc' value="<%= number_with_precision(@elected_aptc, precision: 2) %>" onchange="setMinMax(this, <%=@max_aptc%>)" /></p>
+            <p>$ <input type="text" id='elected_aptc' value="<%= number_with_precision(@elected_aptc, precision: 2) %>" onchange="setMinMax(this, <%= @max_aptc %>)"></p>
           </div>
         </div>
         <%= hidden_field_tag :max_aptc, @max_aptc %>
@@ -299,7 +298,7 @@
         <%= hidden_field_tag :coverage_kind, @coverage_kind %>
         <%= hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present? %>
         <form onsubmit="return false" oninput="pct.value = (elected_pct.value*100).toFixed(0)">
-          <input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'/>
+          <input name='elected_pct' type="range" min='0' max='1' value="0.85" step='0.05'>
           <span><output name="pct">85</output>%</span>
         </form>
       </div>

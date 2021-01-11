@@ -25,30 +25,30 @@
       <div class="modal-content">
         <div style="margin:1em; border: 1px solid;padding: 1em;">
           <h4>MA DOR FORM-X</h4>
-          <p id="print_<%=doc.id%>">
-            <%begin%>
+          <p id="print_<%= doc.id %>">
+            <% begin %>
               <% reader = PDF::Reader.new(@document.identifier) %>
               <% reader.pages.each do |page| %>
                 <%= page.text %>
               <% end %>
-            <%rescue%>
+            <% rescue %>
               <b> Only we supports PDF</b>
-            <%end%>
+            <% end %>
           </p>
           <p style="text-align: right">
-            <a href="<%=download_employer_document_document_path(doc) + "?path=#{@document.identifier}"%>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
-            <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
+            <a href="<%= download_employer_document_document_path(doc) + "?path=#{@document.identifier}" %>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+            <button class="btn btn-default" onclick='printDoc("<%= doc.id %>")'>Print</button>
           </p>
-          <hr/>
+          <hr>
           <p class="row">
             <span class="col-md-6">Employer Name: <%= doc.legal_name %></span>
             <span class="col-md-6" style="text-align: right">Effective date: <%#= @document.created_at %></span>
           </p>
           <%= form_tag employers_employer_attestation_path(doc.employer_profile), :method => :put do |f| %>
-            <input type="hidden" name="attestation_doc_id" value="<%= doc.employer_profile.employer_attestation.employer_attestation_documents.last.id %>" />
+            <input type="hidden" name="attestation_doc_id" value="<%= doc.employer_profile.employer_attestation.employer_attestation_documents.last.id %>">
             <div class="row">
               <div class="col-md-4">
-                <label><input type="radio" name="status" checked="true" value="accepted"> Approve</label><br/>
+                <label><input type="radio" name="status" checked="true" value="accepted"> Approve</label><br>
                 <label><input type="radio" name="status" value="rejected"> Reject</label>
               </div>
               <div class="col-md-4">

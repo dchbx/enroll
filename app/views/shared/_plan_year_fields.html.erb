@@ -6,7 +6,7 @@
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
         <% plan_year_start_dates = PlanYear.calculate_start_on_options %>
         <% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
-          <% plan_year_start_dates << [f.object.start_on.strftime("%B %Y"), f.object.start_on.try(:to_s, :db)]%>
+          <% plan_year_start_dates << [f.object.start_on.strftime("%B %Y"), f.object.start_on.try(:to_s, :db)] %>
         <% end %>
         <%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, { :class => 'plan-year-start-date', :disabled => (@plan_year.is_renewing? ? true : false) }) %>
       </div>
@@ -14,7 +14,7 @@
         <%= datepicker_control(f, :end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-start_on", :required => true, :placeholder => "END ON", readonly: true}) %>
       </div>
     </div>
-    
+
     <p class="twenty">Select your open enrollment dates <i class="fa fa-question-circle" data-toggle="tooltip" title="Employers offering coverage through <%= site_short_name %> for the first time must have an open enrollment period of no less than 14 days. Employers renewing their <%= site_short_name %> coverage must have an open enrollment period of at least 30 days."></i></p>
     <div class="row row-form-wrapper no-buffer">
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
@@ -24,7 +24,6 @@
         <%= datepicker_control(f, :open_enrollment_end_on, {:class => "floatlabel form-control interaction-field-control-plan_year-open_enrollment_end_on", :required => true, :placeholder => "OPEN ENROLLMENT END DATE"}) %>
       </div>
     </div>
-
 
     <p class="twenty">Add the total number of employees in your workforce</p>
     <div class="row row-form-wrapper no-buffer" style="display: block;">
@@ -42,7 +41,7 @@
   </div>
 </div>
 
-<br/>
+<br>
 
 <a href="#" data-href="<%= recommend_dates_employers_employer_profile_plan_years_path %>" id='generate_recommend_dates' class='btn btn-primary' data-loading-text="Loading..." style='display:none;'> generate  recommend dates by start on</a>
 <div class="recommend">

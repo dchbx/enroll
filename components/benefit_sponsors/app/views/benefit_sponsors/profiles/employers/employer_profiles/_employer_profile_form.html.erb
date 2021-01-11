@@ -9,7 +9,7 @@
   <p class='starter'>
     If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
   </p>
-  <br/>
+  <br>
 </div>
   <%= f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f| %>
     <%= render "benefit_sponsors/shared/organization_staff_search", f: f %>
@@ -19,22 +19,22 @@
   <div class="row">
     <div class="col-md-9 col-sm-9 col-xs-12">
       <h4>
-        <div class="col-md-4 col-sm-12 col-xs-12 col-4" >Employer Information
+        <div class="col-md-4 col-sm-12 col-xs-12 col-4">Employer Information
         </div>
       </h4>
-      <br/> <br/>
+      <br> <br>
 
       <div class="row no-buffer row-form-wrapper">
         <%= f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f| %>
           <%= render "benefit_sponsors/shared/organizations/entity_name_and_type_fields", f: f %>
-        
+
           <%= f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f| %>
             <%= render "benefit_sponsors/shared/organizations/profile_entity_kind", f: f %>
             </div><br>
             <%= render "benefit_sponsors/shared/office_locations", f: f %>
             <%= render "benefit_sponsors/profiles/employers/employer_profiles/employer_contact_preferences", f: f %>
           <% end %>
-          <br/>
+          <br>
           <div class="row no-buffer pull-right sm_full_width">
             <button type="submit" class="btn btn-primary pull-right sm_full_width">Confirm</button>
           </div>
@@ -42,4 +42,4 @@
     </div>
   </div><br>
 </div>
-<input type="hidden" name="employer_id" id="employer_id" />
+<input type="hidden" name="employer_id" id="employer_id">

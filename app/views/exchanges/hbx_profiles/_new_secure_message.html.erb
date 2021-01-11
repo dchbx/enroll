@@ -1,12 +1,12 @@
-<%if @error_on_save %>
+<% if @error_on_save %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%@error_on_save.each do |err|%>
-      <li><%=err[1][0]%></li>
-    <%end%>
+    <% @error_on_save.each do |err| %>
+      <li><%= err[1][0] %></li>
+    <% end %>
   </div>
-<%end%>
+<% end %>
 
-<form id="secure_message_form" onsubmit="return false;" >
+<form id="secure_message_form" onsubmit="return false;">
   <div>
     <div class="bottom-pd">
       <div class="row no-buffer">
@@ -16,7 +16,7 @@
             <tbody>
             <tr>
               <th style="text-transform: capitalize;">Recipient:</th>
-              <td>&nbsp; &nbsp;<b><%=  @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
+              <td>&nbsp; &nbsp;<b><%= @resource.try(:full_name) ||  @resource.try(:legal_name) %></b></td>
             </tr>
             <tr>
               <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
@@ -24,11 +24,11 @@
             </tr>
             <tr>
               <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
-              <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true  %></td>
+              <td><%= text_area_tag 'body', @body , rows: 5, cols: 50, placeholder: 'Write here...', include_blank: false, required: true %></td>
             </tr>
             <tr>
               <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
-              <td><%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+              <td><%= file_field_tag "file", type: :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file" %></td>
             </tr>
             </tbody>
           </table>
@@ -36,7 +36,7 @@
           <%= hidden_field_tag :resource_id, resource.id %>
           <%= hidden_field_tag :resource_name, resource.class %>
           <%= hidden_field_tag :actions_id, @element_to_replace_id %>
-          <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message"%>
+          <%= button_tag 'Send', class: "btn btn-primary interaction-control-send", id: "send_secure_message" %>
           <button type="button" class="btn btn-default" id="secureMessageFormClose" onclick="closeRow(this)">Cancel</button>
         </div>
       </div>
@@ -56,7 +56,6 @@
     </div>
   </div>
 </form>
-
 
 <script type="text/javascript">
 

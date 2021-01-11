@@ -120,7 +120,6 @@
 
 <% end %>
 
-
 <% if notice.citizenship_unverified.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents of Citizenship or Immigration Status</i></strong>. We need proof of the U.S. citizenship or immigration status for the following applicant household members is correct:"} %>
@@ -186,7 +185,6 @@
 
 <% end %>
 
-
 <% if notice.residency_unverified.any? %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong><i>Documents Showing D.C. Residency</i></strong>. A document that shows that the following household members live in the #{Settings.aca.state_name}:"} %>
@@ -205,7 +203,6 @@
     "Current Letter from Landlord"] } %>
 
 <% end %>
-
 
 <% if notice.indian_conflict.any? %>
 
@@ -230,7 +227,6 @@
         "A Tribal Record or document certifying at least 50% American Indian blood, as required by Section 289 of the Immigration and Nationality Act (INA); and satisfactory evidence of birth in Canada, such as the following: Birth certificate or Baptismal; Certificate issued on a reservation; Letter from Canadian Department of Indian Affairs; or School Records."]]] } %>
 
 <% end %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You can send the necessary documents either online, through U.S. Postal mail, or in-person."], heading: 'How to Send the Documents Requested', sub_heading: ''} %>
 

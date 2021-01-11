@@ -1,10 +1,10 @@
 <html>
 <head>
   <title><%= Settings.site.short_name %> Confirmation</title>
-  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-  <meta content="telephone=no" name="format-detection" />
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="telephone=no" name="format-detection">
 
   <style type="text/css">
 
@@ -44,7 +44,7 @@
 
 <body onload="subst()">
   <% if notice.is_a?(Notifier::NoticeKind) %>
-    <br />
+    <br>
   <% end %>
   <table class="footer-section" style="color: #333333;" width="100%" border="0">
     <tr>
@@ -52,7 +52,7 @@
     </tr>
     <tr>
       <td style="padding:3px 10px; font-size:8px;" align="center">Questions?
-        Call DC Health Link at <%= notice.is_a?(Notifier::NoticeKind) ? Settings.contact_center.short_number : notice.hbe.phone%>, or go to www.dchealthlink.com.
+        Call DC Health Link at <%= notice.is_a?(Notifier::NoticeKind) ? Settings.contact_center.short_number : notice.hbe.phone %>, or go to www.dchealthlink.com.
       </td>
     </tr>
   </table>

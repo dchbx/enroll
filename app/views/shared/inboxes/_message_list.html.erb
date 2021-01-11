@@ -22,7 +22,7 @@
             &nbsp;|&nbsp;
           </span>
           <%- if @sent_box == true %>
-          <%= link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do%>
+          <%= link_to(retrieve_inbox_path(provider, folder: 'Sent'), remote: true) do %>
           <% if @folder == 'Sent' %>
           <strong>
             Sent
@@ -34,7 +34,7 @@
           <span class="">
             &nbsp;|&nbsp;
           </span>
-          <%= link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do%>
+          <%= link_to(retrieve_inbox_path(provider, folder: 'Deleted'), remote: true) do %>
           <% if @folder == 'Deleted' %>
           <strong>
             Deleted

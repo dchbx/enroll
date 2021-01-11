@@ -16,12 +16,12 @@
     <div class="text-center">
       <i aria-hidden="true" class="fa fa-user fa-3x"></i>
       <% if current_broker_agency %>
-        <br/>
+        <br>
         <span class="word-break">
-          <%=  current_broker_agency&.broker_agency_profile&.legal_name&.capitalize %>
+          <%= current_broker_agency&.broker_agency_profile&.legal_name&.capitalize %>
         </span>
       <% else %>
-        <br/>
+        <br>
           <%= l10n(".no_selection") %>
       <% end %>
     </div>
@@ -32,10 +32,10 @@
             <%= writing_agent&.person&.first_name&.capitalize %>
             <%= writing_agent&.person&.last_name&.capitalize %>
         </span>
-        <br/>
+        <br>
         <a href="tel:1-<%= @person.primary_family.current_broker_agency.writing_agent.phone %>">1
           <%= writing_agent&.phone %></a>
-        <br/>
+        <br>
         <span class="word-break">
           <%= mail_to writing_agent&.email&.address, writing_agent&.email&.address %>
         </span>
@@ -47,7 +47,7 @@
           <%= link_to l10n("insured.what_is_an_assister?"), '', data: { target: '#read_only_modal_what_is_an_assister', toggle: 'modal' } %>
         </small>
         <%= render partial: 'shared/modals/read_only_modal', locals: { modal_id: 'what_is_an_assister', header_icon: "<i class='fa fa-life-ring' aria-hidden='true'></i>", title: l10n("insured.what_is_an_assister?"), body: l10n("insured.answer_for_assister", site_short_name: site_short_name ) } %>
-        <br/>
+        <br>
         <small>
           <%= link_to l10n("insured.what_is_a_broker?"), '', data: { target: '#read_only_modal_what_is_a_broker', toggle: 'modal' } %>
         </small>

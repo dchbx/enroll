@@ -14,7 +14,7 @@
     <%= render 'member_fields', f: f %>
     <%#= render 'shared/census_employee_fields', {f: f} %>
     <%#= render 'cobra_fields', f: f if show_cobra_fields?(@employer_profile, current_user) %>
-  
+
     <div class="row">
       <%= render 'dependents_fields', f:f %>
     </div>
@@ -43,10 +43,9 @@ $(function(){
     var $parent_row = containing_row;
     if ( $('tr.child-row:visible').length > 0 ) {
         $("li>a:contains('Collapse Form')").eq(containing_row.index()).addClass('disabled');
-        $('tr.child-row:visible').remove();  
+        $('tr.child-row:visible').remove();
         $('.dropdown.pull-right').removeClass('open');
     }
   }
 })
 </script>
-

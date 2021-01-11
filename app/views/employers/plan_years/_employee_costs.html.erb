@@ -7,11 +7,11 @@
         <%= number_to_currency(@benefit_group_costs[census_employee.id][:lowest_plan_cost]) %>
      </td>
      <% end %>
-     <td class="text-right"> 
+     <td class="text-right">
         <%= number_to_currency(@benefit_group_costs[census_employee.id][:ref_plan_cost]) %>
      </td>
      <% if !@benefit_group.single_plan_type? || @coverage_type == '.dental' %>
-     <td class="text-right"> 
+     <td class="text-right">
         <%= number_to_currency(@benefit_group_costs[census_employee.id][:highest_plan_cost]) %>
      </td>
      <% end %>

@@ -13,7 +13,7 @@
       </tr>
       </thead>
       <tbody>
-      <% @family_members.each do |member|%>
+      <% @family_members.each do |member| %>
           <tr class="<%= cycle("odd top", "even top") %>">
             <td><%= member.person.first_name.capitalize %>
               <%= member.person.last_name.capitalize %></td>

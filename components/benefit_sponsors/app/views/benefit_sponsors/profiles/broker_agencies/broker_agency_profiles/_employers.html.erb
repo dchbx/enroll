@@ -2,7 +2,7 @@
   <%= form_tag(main_app.update_assign_broker_agencies_profile_path(id: @broker_agency_profile.id), method: :post, remote: true) do %>
     <div class="tab-content" id="myTabContent">
       <div class="row">
-        <div id= 'message_form'></div>
+        <div id='message_form'></div>
         <div class="top-pd" id="inbox_provider_form">
           <span class="flash_message"></span>
         </div>
@@ -18,14 +18,14 @@
 
     <% if general_agency_enabled? and @general_agency_profiles %>
       <div class="col-md-4">
-        <h3><%= l10n("general_agencies")%></h3>
+        <h3><%= l10n("general_agencies") %></h3>
         <%= select_tag "employers_general_agency_id", options_from_collection_for_select(@general_agency_profiles, :id, :legal_name), include_blank: 'Select General Agency' %>
         <%= hidden_field_tag :from_assign, false %>
         <%= submit_tag l10n("assign"), class: 'btn btn-primary', id: 'assign_general_agency', disabled: true %>
         <%= submit_tag l10n("clear_assignment"), class: 'btn btn-primary', id: 'unassign_general_agency', disabled: true %>
       </div>
     <% end %>
-  <%end%>
+  <% end %>
 </div>
 <script>
   initializeDataTables();

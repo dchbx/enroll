@@ -5,7 +5,7 @@
     </p>
   </div>
 
-  <%if employer_attestation_is_enabled? %>
+  <% if employer_attestation_is_enabled? %>
     <div class="left-icon-section section">
       <div class="row">
         <div class="col-md-1">
@@ -14,16 +14,16 @@
           </div>
         </div>
         <div class="col-md-11">
-          <h3 class="heading-text"><%=l10n("employers.employer_profiles.my_account.important_documents_needed")%></h3>
+          <h3 class="heading-text"><%= l10n("employers.employer_profiles.my_account.important_documents_needed") %></h3>
           <p class="twenty">
-            <%=l10n("employers.employer_profiles.my_account.eligibility_documents_needed")%>
+            <%= l10n("employers.employer_profiles.my_account.eligibility_documents_needed") %>
           </p>
         </div>
       </div>
     </div>
-  <%end%>
+  <% end %>
 
-  <% unless @employer_profile.broker_agency_profile.present?  %>
+  <% unless @employer_profile.broker_agency_profile.present? %>
     <div class="left-icon-section section">
       <div class="row">
         <div class="col-md-1">
@@ -96,7 +96,7 @@
               Download Step-by-Step Instructions for New Employers
             <% end %>
           </div>
-        <%else%>
+        <% else %>
           <div class="icon-left-download">
             <%= link_to "https://www.mahealthconnector.org/help-center-answers/how-to-enroll-new-employees-in-health-coverage", target: '_blank' do %>
               <i class="fa fa-download">
@@ -106,13 +106,13 @@
           </div>
         <% end %>
       </div>
-      <%if individual_market_is_enabled? %>
+      <% if individual_market_is_enabled? %>
         <div class="col-xs-2 pdf-image full-width">
           <%= link_to 'https://dchealthlink.com/sites/default/files/v2/forms/Initial-Employers-Creating-an-Account.pdf', target: '_blank' do %>
           <%= image_tag('images/guidanceforsmallbusinessowners_214.jpg', class: 'pull-right') %>
           <% end %>
         </div>
-      <%end%>
+      <% end %>
     </div>
   </div>
 </div>

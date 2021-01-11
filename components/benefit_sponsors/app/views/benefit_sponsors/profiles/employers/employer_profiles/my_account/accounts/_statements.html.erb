@@ -34,7 +34,7 @@
             <td><%= invoice_formated_date(invoice.date) %></td>
             <td><%= invoice_coverage_date(invoice.date) %></td>
             <td><%= link_to "<i class='fas fa-cloud-download-alt' aria-hidden='false' title='Download' data-toggle='tooltip'></i>".html_safe, download_invoice_profiles_employers_employer_profile_path(@employer_profile.id, :invoice_id => invoice.id), :target => "_blank" , :type => "pdf", :disposition =>  "inline" %></td>
-            <td><%= link_to "<i class='fas fa-file-pdf' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_profiles_employers_employer_profile_path(@employer_profile.id, :invoice_id => invoice.id), :target => "_blank"%></td>
+            <td><%= link_to "<i class='fas fa-file-pdf' aria-hidden='true' data-toggle='tooltip'></i>".html_safe, show_invoice_profiles_employers_employer_profile_path(@employer_profile.id, :invoice_id => invoice.id), :target => "_blank" %></td>
           </tr>
         <% end %>
       <% end %>

@@ -29,7 +29,7 @@
 
 <%= render 'employees' %>
 
-<br />
+<br>
 <div class="row">
   <div class="col-md-12">
 
@@ -37,7 +37,7 @@
     <%= link_to 'Return to Quote Management', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(@plan_design_proposal.plan_design_organization, profile_id: params[:profile_id]), class:'btn btn-primary' %>
   </div>
     <div class="pull-right">
-      <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id, profile_id: params[:profile_id]), class:'btn btn-primary', disabled: can_employee_shop?(f.object.effective_date.try(:to_date))%>
+      <%= link_to "Select Health Benefits", new_organizations_plan_design_proposal_plan_selection_path(@plan_design_proposal.proposal.id, profile_id: params[:profile_id]), class:'btn btn-primary', disabled: can_employee_shop?(f.object.effective_date.try(:to_date)) %>
     </div>
 </div>
 </div>

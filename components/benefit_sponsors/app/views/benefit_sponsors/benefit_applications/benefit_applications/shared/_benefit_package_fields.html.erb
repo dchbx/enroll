@@ -35,8 +35,8 @@
           </div>
         </div>
       </div>
-      <br/>
-      <br/>
+      <br>
+      <br>
     </div>
   </div>
 
@@ -61,8 +61,8 @@
   </div>
     </div>
       <% end %>
-    <br class="clear"/>
-    <br/>
+    <br class="clear">
+    <br>
     <div class="col-xs-12 offerings">
       <div class="row row-form-wrapper no-buffer heading">
         <div class="col-xs-12" id="offering_slider_header">
@@ -71,7 +71,7 @@
         </div>
       </div>
       <div class="col-xs-12 benefits-fields">
-        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb| %>
         <%= render "shared/relationship_benefit_fields", f: rb %>
         <% end %>
       </div>
@@ -89,8 +89,8 @@
     </div>
     <% i = f.index %>
     <span class="dent plan-count" style="display: none;"><% if i < 50 %><% if @benefit_application.benefit_groups[i].elected_dental_plan_ids.count == 13 %>All<% else %><%= @benefit_application.benefit_groups[i].elected_dental_plan_ids.count %><% end %><% end %></span>
-      <br/>
-      <br/>
+      <br>
+      <br>
       <div class="row">
         <div class="col-xs-12 edit-add-dental b bt-n vertically-aligned-row" style="<% if (@benefit_application.new_record? == false && @benefit_application.benefit_groups[i].try(:dental_reference_plan_id).present?) || @benefit_application.new_record == true %>display: none;<% else %>display: block;<% end %>">
           <div class="col-xs-9 text-center">
@@ -102,9 +102,9 @@
         </div>
       </div>
     <div class="select-dental-plan dental row" style="display: none;">
-      <br/>
-      <br/>
-      <br/>
+      <br>
+      <br>
+      <br>
       <div class="row">
         <div class="col-xs-12">
           <h1>
@@ -128,7 +128,7 @@
           </div>
         </div>
       </div>
-      <br/>
+      <br>
       <div class="dental-benefits-fields">
         <div class="row row-form-wrapper no-buffer heading">
           <div class="col-xs-6">
@@ -142,7 +142,7 @@
             </i>
           </div>
         </div>
-        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |f|  %>
+        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |f| %>
           <%= render "shared/relationship_benefit_fields", f: f %>
         <% end %>
       </div>

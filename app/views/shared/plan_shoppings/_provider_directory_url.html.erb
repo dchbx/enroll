@@ -2,7 +2,7 @@
   <% if qhps.map(&:plan).map(&:nationwide).compact.uniq.include?(true) %>
     <tr>
       <th></th>
-      <% qhps.each do |qhp|%>
+      <% qhps.each do |qhp| %>
         <th colspan="2">
           <% if qhp.plan.nationwide %>
             <%= link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
@@ -11,10 +11,10 @@
       <% end %>
     </tr>
   <% end %>
-<% else%>
+<% else %>
   <tr>
     <th></th>
-    <% qhps.each do |qhp|%>
+    <% qhps.each do |qhp| %>
       <th colspan="2">
         <%= link_to "DOCTOR DIRECTORY", qhp.plan.provider_directory_url, target: "_blank" %>
       </th>

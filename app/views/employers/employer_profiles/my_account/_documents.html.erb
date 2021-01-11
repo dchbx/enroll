@@ -1,4 +1,4 @@
-<% if employer_attestation_is_enabled?  %>
+<% if employer_attestation_is_enabled? %>
   <div class="row">
 
   <div class="col-xs-12">
@@ -15,7 +15,7 @@
   </div>
   </div>
 
-  <div class= "row effectivedatatable">
+  <div class="row effectivedatatable">
     <%= render_datatable(@datatable) %>
     <% @documents.each do |doc| %>
       <div class="modal fade" id="employeeModal_<%= doc.id %>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -25,11 +25,11 @@
               <h4>MA DOR FORM-X</h4>
               <p class='document-modal-buttons'>
                  <% key, bucket = get_key_and_bucket(doc.identifier) %>
-                 <a href="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>" ><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
-                <button class="btn btn-default" onclick='printDoc("<%=doc.id%>")'>Print</button>
+                 <a href="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}" %>"><button class="btn btn-default"><span class="glyphicons glyphicons-cloud-download"></span> Download</button></a>
+                <button class="btn btn-default" onclick='printDoc("<%= doc.id %>")'>Print</button>
               </p>
-              <p id="print_<%=doc.id%>">
-                <iframe src="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id%>"></iframe>
+              <p id="print_<%= doc.id %>">
+                <iframe src="<%= document_download_path(bucket, key) + "?id=#{@employer_profile.id}&content_type=#{doc.format}&filename=#{doc.title.gsub(/[^0-9a-z]/i,'')}&disposition=inline" %>" width="100%" height="600" frameborder="0" scrolling="no" name="iframe_<%= doc.id %>"></iframe>
               </p>
             </div>
           </div>
@@ -58,7 +58,7 @@
           });
       })
   </script>
-<%else%> 
+<% else %>
   <div class="documents-tab">
     <h1>Documents</h1>
     <h4 class="starter">

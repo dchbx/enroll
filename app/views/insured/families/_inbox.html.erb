@@ -25,10 +25,10 @@
         <span class="badge message-badge"><%= @provider.inbox.unread_messages.size %></span>
         <% end %>
         <%- if @sent_box == true %>
-        <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do%>
+        <%= link_to(inbox_insured_families_path(@provider, folder: 'Sent')) do %>
         <% if @folder == 'Sent' %>
         <strong>
-          <%= l10n("sent") %>          
+          <%= l10n("sent") %>
         </strong>
         <% else %>
           <%= l10n("sent") %>
@@ -37,7 +37,7 @@
         <% end %>
       </div>
     </div>
-    <br/>
+    <br>
   </div>
   <div class="row">
     <%- @folder = (@folder||'Inbox').capitalize %>

@@ -6,20 +6,20 @@
     <div class="row row-form-wrapper no-buffer heading">
       <div class="col-xs-12" id="offering_slider_header">
         <div class="col-xs-6">Offered
-          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%=l10n("employers.plan_years.benefit_package.contributions.offered")%>"></i>
+          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%= l10n("employers.plan_years.benefit_package.contributions.offered") %>"></i>
         </div>
         <div class="col-xs-6">Employer Contribution
-          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%=l10n("employers.plan_years.benefit_package.contributions.employer_contribution", aca_shop_market_employer_contribution_percent_minimum: aca_shop_market_employer_contribution_percent_minimum, aca_shop_market_employer_family_contribution_percent_minimum: aca_shop_market_employer_family_contribution_percent_minimum)%>"></i>
+          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%= l10n("employers.plan_years.benefit_package.contributions.employer_contribution", aca_shop_market_employer_contribution_percent_minimum: aca_shop_market_employer_contribution_percent_minimum, aca_shop_market_employer_family_contribution_percent_minimum: aca_shop_market_employer_family_contribution_percent_minimum) %>"></i>
         </div>
       </div>
     </div>
     <div class="col-xs-12 benefits-fields benefits-adjustmets">
       <% if kind == "dental" %>
-        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= f.fields_for :dental_relationship_benefits, errors: {}, fieldset: false do |rb| %>
           <%= render "sponsored_benefits/organizations/plan_design_proposals/contributions/relationship_benefit_fields", f: rb %>
         <% end %>
       <% else %>
-        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb|  %>
+        <%= f.fields_for :relationship_benefits, errors: {}, fieldset: false do |rb| %>
           <%= render "sponsored_benefits/organizations/plan_design_proposals/contributions/relationship_benefit_fields", f: rb %>
         <% end %>
       <% end %>
@@ -29,13 +29,13 @@
     <div class="row row-form-wrapper no-buffer heading">
       <div class="col-xs-12 composite_offering_slider_header">
         <div class="col-xs-12">Employer Contribution
-          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%=l10n("employers.plan_years.benefit_package.contributions.employer_contribution", aca_shop_market_employer_contribution_percent_minimum: aca_shop_market_employer_contribution_percent_minimum, aca_shop_market_employer_family_contribution_percent_minimum: aca_shop_market_employer_family_contribution_percent_minimum)%>"></i>
+          <i class="fa fa-question-circle" data-toggle="tooltip" title="<%= l10n("employers.plan_years.benefit_package.contributions.employer_contribution", aca_shop_market_employer_contribution_percent_minimum: aca_shop_market_employer_contribution_percent_minimum, aca_shop_market_employer_family_contribution_percent_minimum: aca_shop_market_employer_family_contribution_percent_minimum) %>"></i>
         </div>
       </div>
     </div>
     <% if f.object.sole_source? %>
     <div class="col-xs-12 benefits-fields">
-      <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb|  %>
+      <%= f.fields_for :composite_tier_contributions, errors: {}, fieldset: false do |rb| %>
         <%= render "shared/composite_tier_contribution_fields", f: rb %>
       <% end %>
     </div>

@@ -36,9 +36,9 @@
         </div>
       <% end %>
 
-      <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?)%>">
+      <div class="module employer-staff-table <%= pundit_class(EmployerProfile, :updateable?) %>">
         <h3>Employer Staff Points-of-Contact</h3>
-        <div class='table-responsive col-12' >
+        <div class='table-responsive col-12'>
           <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5'>
             <thead style='height: 40px;'>
              <th style='width: 18%; height: 40px; padding: 10px'>First Name </th>
@@ -62,20 +62,20 @@
                   <% role = staff.employer_staff_roles.detect{|role| role.employer_profile_id == @employer_profile.id && !role.is_closed?} %>
                   <%= role && role.current_state %>
                   <% if role.is_applicant? %>
-                    <%=  link_to(approve_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
+                    <%= link_to(approve_employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), id: 'approve_' + staff.id.to_s) do %>
                        approve
                      <% end %>
                   <% end %>
-                  <br/>
+                  <br>
                   <%= staff.user_id ? 'Linked' : 'Unlinked' %>
                 </td>
                 <td>
                   <%= link_to(employers_employer_staff_role_path(id: @employer_profile.id, staff_id: staff.id), method: 'delete', id: 'delete_' + staff.id.to_s, data: {confirm: 'Delete this role?'}) do %>
                     <i class="fa fa-trash-o fa-2x role-trashcan"></i>
-                  <%end%>
+                  <% end %>
                 </td>
               </tr>
-            <% end if @staff%>
+            <% end if @staff %>
           </table>
         </div>
 
@@ -96,11 +96,10 @@
           </div>
         </div>
 
-        <br/>
+        <br>
         <button type="submit" class="btn btn-primary"> <%= "Save".html_safe %></button>
         <%= link_to 'Cancel', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'no'), class:'btn btn-default btn-sm' %>
       <% end %>
-
 
     <% else %>
 
@@ -109,9 +108,9 @@
           <%= link_to 'Add Employer Contact', edit_employers_employer_profile_path(@employer_profile.organization, add_staff: 'yes'), class: 'btn btn-default btn-sm' %>
         </div>
 
-        <br/>
+        <br>
         <h3> Employer Information</h3>
-        <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp|  %>
+        <%= f.fields_for :employer_profile, errors: {}, fieldset: false do |emp| %>
           <%= render "shared/employer_profile_fields", f: emp %><br>
         <% end %>
 
@@ -133,7 +132,7 @@
           <%= render "employer_contact_preferences", f: f %><br>
         <% end %>
 
-        <br/>
+        <br>
         <p>
           <% button_name = @organization.persisted? ? 'Save' : 'Create' %>
           <button type="submit" class="btn btn-primary btn-lg pull-right">

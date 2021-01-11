@@ -17,15 +17,15 @@
 
               <div class="row row-form-wrapper no-buffer">
                 <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 fa-text-color margin-tb-10">
-                  <span class="fa-text-color" >Do you want to apply for <span href="#" class="run-glossary" >Medicaid</span>, <span href="#" class="run-glossary">tax credit</span> savings, and <span href="#" class="run-glossary">cost-sharing reduction</span>s? *</span>
+                  <span class="fa-text-color">Do you want to apply for <span href="#" class="run-glossary">Medicaid</span>, <span href="#" class="run-glossary">tax credit</span> savings, and <span href="#" class="run-glossary">cost-sharing reduction</span>s? *</span>
                 </div>
 
                 <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2" style="margin-top: 14px">
-                  <input class=" " id="radio1"  type="radio" value="true" name="is_applying_for_assistance" <%='checked' if @person&.is_applying_for_assistance %>>
+                  <input class=" " id="radio1" type="radio" value="true" name="is_applying_for_assistance" <%= 'checked' if @person&.is_applying_for_assistance %>>
                   <label class="radio-label" for="radio1"><span>Yes</span></label>
                 </div>
                 <div class="col-lg-2 col-md-2 col-sm-1 col-xs-1" style="margin-top: 14px">
-                  <input class=" " id="radio2"  type="radio" value="false" name="is_applying_for_assistance" <%='checked'if @person&.is_applying_for_assistance == false%>>
+                  <input class=" " id="radio2" type="radio" value="false" name="is_applying_for_assistance" <%= 'checked'if @person&.is_applying_for_assistance == false %>>
                   <label class="radio-label" for="radio2"><span>No</span></label>
                 </div>
                 <div class="col-md-2 not-sure-margin left-seprator">
@@ -47,4 +47,4 @@
       </div>
     </div>
   </div>
-<%end%>
+<% end %>

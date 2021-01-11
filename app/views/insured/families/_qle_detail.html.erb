@@ -14,7 +14,7 @@
     <div class="panel-body no-vertical-padding">
       <div class="row">
         <% url, http_method = '/insured/family_members', :get %>
-        <% if action_name == 'find_sep'%>
+        <% if action_name == 'find_sep' %>
         <% url, http_method = record_sep_insured_families_path, :post %>
         <% end %>
         <div class="alert alert-danger hidden" id='qle_effective_on_kind_alert-4' role="alert">Please Select Effective Date</div>
@@ -52,8 +52,8 @@
               </div>
               <div class="text-center <%= pundit_class Family,:updateable? %>">
                 <%= submit_tag l10n('.continue'), class: 'btn btn-primary', data: { disable_with: false } %>
-                <br/>
-                <br/>
+                <br>
+                <br>
               </div>
             </div>
             <div class="error-info hidden">
@@ -63,7 +63,7 @@
                   <%= l10n("insured.qle_detail.error_text", contact_center_phone_number: contact_center_phone_number) %>
                 </p>
               </div>
-              <br/>
+              <br>
             </div>
           </div>
         </div>

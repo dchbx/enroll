@@ -7,7 +7,7 @@ $(document).ready(function(){
 });
 </script>
 
-<div id= 'message_form'></div>
+<div id='message_form'></div>
 <div id="inbox_provider_form" class="table-responsive">
   <table class="table table-condensed">
     <thead>
@@ -20,9 +20,9 @@ $(document).ready(function(){
         <th><%= l10n("first_name") %></th>
         <th><%= l10n("dob") %></th>
         <th><%= l10n("ssn") %></th>
-        <th><%= l10n("family") %><br /><%= l10n("count") %></th>
-        <th><%= l10n("active") %><br /><%= l10n("enrollments") %>?</th>
-        <th><%= l10n("edit") %><br /><%= l10n("insured.aptc_or_csr") %></th>
+        <th><%= l10n("family") %><br><%= l10n("count") %></th>
+        <th><%= l10n("active") %><br><%= l10n("enrollments") %>?</th>
+        <th><%= l10n("edit") %><br><%= l10n("insured.aptc_or_csr") %></th>
       </tr>
     </thead>
     <tbody>
@@ -33,37 +33,36 @@ $(document).ready(function(){
         <tr id="family_<%= family.id %>">
 
           <td><%#= pp.hbx_id %> <%= link_to pp.hbx_id, resume_enrollment_exchanges_agents_path(person_id: pp.id) %></td>
-          <td><%= pp.last_name%></td>
-          <td><%= pp.first_name%></td>
+          <td><%= pp.last_name %></td>
+          <td><%= pp.first_name %></td>
           <td><%= format_date(pp.dob) %></td>
           <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
           <td><%= family.active_family_members.size %></td>
           <td>
-              <% if all_active_enrollment_with_aptc(family).present?%>
+              <% if all_active_enrollment_with_aptc(family).present? %>
                 <span class="glyphicon glyphicon-check">&nbsp;</span>
-                <a href="#" class="toggler" data-prod-cat="<%=ind%>">+ <%= l10n("enrollments") %></a>
-              <%else%>
+                <a href="#" class="toggler" data-prod-cat="<%= ind %>">+ <%= l10n("enrollments") %></a>
+              <% else %>
                 <span class="glyphicon glyphicon-unchecked">
-              <%end%> 
+              <% end %>
           </td>
           <td>
-                <%if all_active_enrollment_with_aptc(family).blank?%>
-                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
-                <%else%>
-                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true%>
-                <%end%>
+                <% if all_active_enrollment_with_aptc(family).blank? %>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true %>
+                <% else %>
+                    <%= link_to l10n("edit"), edit_aptc_csr_path(family_id: family.id, person_id: pp.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-info btn-sm", remote: true %>
+                <% end %>
           </td>
         </tr>
 
-        <%all_active_enrollment_with_aptc(family).each do |hbx|%>
-        <tr class="cat<%=ind%>" style="display:none">
-          <td colspan = "1"></td>
-          <td colspan = "6">(<b><%= l10n("members") %>:</b> <%=hbx_member_names(hbx.hbx_enrollment_members)%>),  <b>Plan:</b> <%=hbx.plan.name%></td>
+        <% all_active_enrollment_with_aptc(family).each do |hbx| %>
+        <tr class="cat<%= ind %>" style="display:none">
+          <td colspan="1"></td>
+          <td colspan="6">(<b><%= l10n("members") %>:</b> <%= hbx_member_names(hbx.hbx_enrollment_members) %>),  <b>Plan:</b> <%= hbx.plan.name %></td>
         </tr>
-        <%end%>
+        <% end %>
       <% end %>
-      
+
     </tbody>
   </table>
 </div>
-

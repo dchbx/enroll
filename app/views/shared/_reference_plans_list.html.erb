@@ -8,7 +8,7 @@
 <% else %>
 <div class="edit-offering health">
 
-  <h4 class="currently-offered"  style="display: inline-block;">
+  <h4 class="currently-offered" style="display: inline-block;">
   </h4>
     <div class="offered-plan">
     </div>
@@ -17,18 +17,18 @@
 
   <div class="reference-steps">
     <% if @plan_year.new_record == false %>
-    <br/>
+    <br>
     <h2>Edit Your Plan Offering</h2>
     <p class="currently-offering twenty" style="display: inline-block;">
     </p>
 
-    <br/><br/>
+    <br><br>
     <% end %>
 
   <div class="health">
     <ul class="nav nav-tabs row">
       <% if offers_single_carrier? %>
-  	    <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= f.object.id %>">
+        <li role="presentation" class="col-xs-4 single-carrier-tab" data-offering-id="<%= f.object.id %>">
           <%= f.radio_button :plan_option_kind, "single_carrier" %>
           <%= f.label :plan_option_kind_single_carrier, class: "elected_plan" do %>
             <i class="fa fa-circle-o"></i>
@@ -81,7 +81,7 @@
     <div class="col-xs-12 carriers-tab tab-container" style="display: none;">
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. Your plan participants will be able to choose any Platinum, Gold, or Silver plan offered by the carrier you select. Your costs will be fixed to a specific plan you’ll choose in a minute.</p>
-      <br/><br/>
+      <br><br>
       <div id="singleCarrierCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
@@ -89,7 +89,7 @@
     <div class="col-xs-12 metals-tab tab-container" style="display: none;">
       <br><br>
       <p class="twenty">Select your preferred metal level. Your plan participants will be able to choose any plan by any carrier within the metal level you select. Your costs will be fixed to a specific plan you’ll choose in a minute. <%= metal_levels_explained %></p>
-      <br/>
+      <br>
       <% metal_levels = Plan::REFERENCE_PLAN_METAL_LEVELS %>
       <% if check_plan_options_title %>
           <% metal_levels = enabled_metal_levels_for_single_carrier %>
@@ -128,7 +128,7 @@
     <div class="col-xs-12 single-plan-tab tab-container" style="display: none;">
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose. It'll never cost you more to let your plan participants choose by carrier or by metal level. Are you sure you only want to offer a single plan?</p>
-      <br/>
+      <br>
       <div id="singlePlanCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>
@@ -136,7 +136,7 @@
     <div class="col-xs-12 sole-source-plan-tab tab-container" style="display: none;">
       <br><br>
       <p class="twenty">Select your preferred insurance company carrier. You will then select one plan and it'll be the only plan your participants can choose.</p>
-      <br/>
+      <br>
       <div id="soleSourceCarrierList_<%= f.object.id %>" class="carrier-list-container">
         <div class='col-xs-12 loading'><i class='fa fa-spinner fa-spin fa-2x'></i><h5>Searching for Carriers in your area...</h5></div>
       </div>

@@ -3,7 +3,7 @@
   <div class="input-group">
     <%= label_tag :q, "Search term", {class: "sr-only"} %>
     <%= text_field_tag :q, q, {placeholder: placeholder, class: "form-control"} %>
-    <% opts.each do |k,v|%>
+    <% opts.each do |k,v| %>
       <%= hidden_field_tag k, v %>
     <% end %>
     <span class="input-group-btn">

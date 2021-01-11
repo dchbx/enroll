@@ -5,9 +5,9 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <% if employer_attestation_is_enabled? %>
           <h4 class="modal-title"><%= benefit_application.no_documents_uploaded? ? "Document Upload Required to Proceed" : "Application may be ineligible!" %></h4>
-        <%else%>
+        <% else %>
           <h4 class="modal-title">Confirm Publish Plan Year</h4>
-        <%end%>
+        <% end %>
       </div>
       <% warnings = BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).application_eligibility_warnings %>
       <% if employer_attestation_is_enabled? %>
@@ -37,7 +37,7 @@
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
             <% else %>
               <%= link_to 'Cancel', benefit_sponsors.profiles_employers_employer_profile_path(benefit_application.benefit_sponsorship.profile.id, :tab=>'benefits'), :class => 'btn btn-default' %>
-            <%end %>
+            <% end %>
           <% else %>
             <% if defined?(admin_override) %>
               <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
@@ -49,7 +49,7 @@
           <% end %>
           <% error_page = warnings[:primary_office_location].present? ? benefit_sponsors.edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile.id) : benefit_sponsors.edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
         </div>
-      <%else%>
+      <% else %>
         <div class="modal-body">
           <p>
             As submitted, this application is ineligible for coverage under the <%= Settings.site.short_name %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= Settings.site.short_name %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
@@ -61,7 +61,7 @@
           <% error_page = warnings[:primary_office_location].present? ? benefit_sponsors.edit_profiles_registration_path(benefit_application.benefit_sponsorship.profile) : benefit_sponsors.edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application) %>
           <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
         </div>
-      <%end%>
+      <% end %>
     </div>
   </div>
 </div>

@@ -5,9 +5,9 @@
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <% if employer_attestation_is_enabled? %>
           <h4 class="modal-title"><%= plan_year.no_documents_uploaded?? "Document Upload Required to Proceed" : "Application may be ineligible!" %></h4>
-        <%else%>
+        <% else %>
           <h4 class="modal-title">Confirm Publish Plan Year</h4>
-        <%end%>
+        <% end %>
       </div>
       <% if employer_attestation_is_enabled? %>
         <div class="modal-body">
@@ -39,7 +39,7 @@
           <% end %>
           <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
         </div>
-      <%else%>
+      <% else %>
         <div class="modal-body">
           <p>
             As submitted, this application is ineligible for coverage under the <%= Settings.site.short_name %> exchange for reasons identified below. Click Cancel to go back and correct inaccurate information. If the information provided is accurate, you may click Publish to proceed. However, if you choose to proceed and the eligibility determination is deemed correct by <%= Settings.site.short_name %> officials, this organization may not again apply for coverage for 90 days, or until the reason for ineligibility changes, whichever is later.
@@ -51,7 +51,7 @@
           <% error_page = plan_year.application_eligibility_warnings[:primary_office_location].present? ? edit_employers_employer_profile_path(@employer_profile.organization, plan_year_id: plan_year.id) : edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year, publish: true) %>
           <%= link_to 'Cancel', error_page, method: :get, :class => 'btn btn-default' %>
         </div>
-      <%end%>
+      <% end %>
     </div>
   </div>
 </div>

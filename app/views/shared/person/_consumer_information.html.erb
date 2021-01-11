@@ -1,6 +1,6 @@
 <div id="personal_info" class="focus_effect module">
   <%= hidden_field "people","id" %>
-  <%= f.hidden_field :dob_check  %>
+  <%= f.hidden_field :dob_check %>
 
   <div class="row row-form-wrapper no-buffer">
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
@@ -21,7 +21,7 @@
   </div>
 
   <div class="row row-form-wrapper no-buffer">
-    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer" >
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
       <label id="is_applying_coverage_value">Does <%= @person.first_name.present? ? @person.first_name : "this person" %> need coverage? *</label>
     </div>
     <% first_checked, second_checked = is_applying_coverage_value_consumer(@use_person, @person, @consumer_role) %>
@@ -38,12 +38,12 @@
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>
 
-    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+    <div class="col-lg-3 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer">
       <%= f.check_box :no_ssn %>
       <%= f.label :no_ssn, :value => true do %>
         <span class='no_ssn'>&nbsp;I don't have an SSN</span>
       <% end %>
-      <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
+      <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%= l10n("insured.consumer_roles.search.no_ssn_tooltip") %>"></i></span>
     </div>
 
     <div class="col-lg-1 col-md-2 col-sm-2 col-xs-2 form-group form-group-lg no-pd border_bottom_zero">
@@ -59,13 +59,12 @@
       </div>
     </div>
     <span>
-      <i class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+      <i class='fa fa-question-circle no-pd pull-right' id="gender-tooltip" data-toggle="tooltip" title="<%= l10n("insured.consumer_roles.search.gender_tooltip") %>"></i>
     </span>
   </div>
 </div>
 
 <%= render 'shared/ssn_coverage_msg' %>
-
 
 <script type="text/javascript">
   $(document).ready(function(){

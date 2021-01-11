@@ -1,10 +1,10 @@
 <% insured = (current_user.try(:has_consumer_role?) && current_user.consumer_identity_verified?) || current_user.try(:has_employee_role?) %>
-<% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || []%>
+<% employer_staff =  (current_user.person && current_user.person.active_employer_staff_roles) || [] %>
 <% employer = employer_staff.first %>
-<% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || []%>
-<% ga_staff_roles =  (current_user.person && current_user.person.active_general_agency_staff_roles) || []%>
+<% broker_staff_roles =  (current_user.person && current_user.person.active_broker_staff_roles) || [] %>
+<% ga_staff_roles =  (current_user.person && current_user.person.active_general_agency_staff_roles) || [] %>
 <% roles = [insured] %>
-<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count%>
+<% portal_count = roles.select{|role|role}.count + employer_staff.count + broker_staff_roles.count + ga_staff_roles.count %>
 
   <% if portal_count == 1 %>
     <span>
@@ -14,7 +14,7 @@
       <%= link_to l10n('.my_general_agency_portal'), benefit_sponsors.profiles_general_agencies_general_agency_profile_path(ga_staff_roles.first.general_agency_profile, tab:'home'), class: 'header-text' if ga_staff_roles.any? %>
       <span> | </span>
     </span>
-    <%elsif portal_count > 1 %>
+    <% elsif portal_count > 1 %>
       <span>
         <a href="#" class="dropdown-toggle header-text" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">My Portals <span class="caret"></span></a>
         <ul class="dropdown-menu">
@@ -30,13 +30,13 @@
           <% if insured %>
             <li><%= link_to l10n('.my_insured_portal'), main_app.family_account_path(tab: 'home'), class: 'header-text' %></li>
           <% end %>
-          <% employer_staff.each do |employer_staff_role|  %>
+          <% employer_staff.each do |employer_staff_role| %>
             <% id = employer_staff_role.benefit_sponsor_employer_profile_id %>
               <% employer = BenefitSponsors::Organizations::Profile.find(id) %>
               <li><%= link_to employer.organization.legal_name, benefit_sponsors.profiles_employers_employer_profile_path(employer, tab: 'home'), class: 'header-text' %></li>
           <% end %>
           <% broker_staff_roles.each do |broker_staff_role| %>
-            <%profile = broker_staff_role.broker_agency_profile%>
+            <% profile = broker_staff_role.broker_agency_profile %>
 
             <% if profile.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile %>
               <% broker_link = benefit_sponsors.profiles_broker_agencies_broker_agency_profile_path(profile, tab:'home') %>
@@ -48,7 +48,7 @@
             <li style="text-align:left"><%= link_to profile.legal_name, broker_link, class: 'header-text' %></li>
           <% end %>
           <% ga_staff_roles.each do |ga_staff_role| %>
-            <%profile = ga_staff_role.general_agency_profile%>
+            <% profile = ga_staff_role.general_agency_profile %>
 
             <% if profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile %>
               <% ga_link = benefit_sponsors.profiles_general_agencies_general_agency_profile_path(profile, tab:'home') %>

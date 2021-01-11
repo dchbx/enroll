@@ -23,11 +23,11 @@
     <div class="col-xs-6 form-group form-group-lg">
       <div class="col-xs-12 row">
         <div class="col-xs-3">
-          <%= f.number_field :premium_pct, class: "hidden-param contribution_handler premium-storage-input", value: f.object.premium_pct.try(:to_i), onblur:"updateSliderValue(this)"%>
+          <%= f.number_field :premium_pct, class: "hidden-param contribution_handler premium-storage-input", value: f.object.premium_pct.try(:to_i), onblur:"updateSliderValue(this)" %>
 
         </div>
         <div class="col-xs-9" style="padding-top: 10px;">
-          <input type="range" class="contribution_slide_handler premium-storage-input nm-slider" data-slider-max="100" data-slider-min="0" data-slider-step="5" data-slider-value="0" data-toggle="tooltip" data-placement="top" title="Contribution Percentage: 0%" value="<%=f.object.premium_pct.try(:to_i)%>" oninput="updateSlider(this)"/>
+          <input type="range" class="contribution_slide_handler premium-storage-input nm-slider" data-slider-max="100" data-slider-min="0" data-slider-step="5" data-slider-value="0" data-toggle="tooltip" data-placement="top" title="Contribution Percentage: 0%" value="<%= f.object.premium_pct.try(:to_i) %>" oninput="updateSlider(this)">
           &nbsp;&nbsp;&nbsp;
           <span class="slide-label sl-1">0%</span>
           <!--<i class="fa fa-question-circle fa-lg"></i>-->

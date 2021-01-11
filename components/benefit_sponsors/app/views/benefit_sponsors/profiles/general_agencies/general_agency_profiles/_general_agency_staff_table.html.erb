@@ -4,12 +4,12 @@
   <div class="table-border">
     <table class="table">
       <thead>
-        <th><%= l10n("first_name")%></th>
-        <th><%= l10n("last_name")%></th>
-        <th><%= l10n("email")%></th>
-        <th><%= l10n("phone")%></th>
-        <th><%= l10n("status")%></th>
-        <th><%= l10n("remove_role")%></th>
+        <th><%= l10n("first_name") %></th>
+        <th><%= l10n("last_name") %></th>
+        <th><%= l10n("email") %></th>
+        <th><%= l10n("phone") %></th>
+        <th><%= l10n("status") %></th>
+        <th><%= l10n("remove_role") %></th>
       </thead>
       <% ga_staff.each do |staff_member| %>
             <tbody>
@@ -18,7 +18,7 @@
               <td><%= staff_member.work_email_or_best %></td>
               <td><%= staff_member.work_phone %></td>
               <td>
-                <%= staff_member.has_pending_ga_staff_role?(@general_agency_profile.id) ? "Pending" : "Active"%>
+                <%= staff_member.has_pending_ga_staff_role?(@general_agency_profile.id) ? "Pending" : "Active" %>
                 <%= staff_member.user_id ? ' Linked  ' : ' Unlinked  ' %>
                 <% if staff_member.has_pending_ga_staff_role?(@general_agency_profile.id) %>
                   <%= render "staff_approval_modal", staff: staff_member %>
@@ -28,7 +28,7 @@
 
               <td>
                 <% if current_user.has_hbx_staff_role? || current_user.person.general_agency_primary_staff.present? %>
-                  <%=  link_to(
+                  <%= link_to(
                           profiles_general_agencies_general_agency_staff_role_path(
                           profile_id: @general_agency_profile.id, person_id: staff_member.id
                       ),

@@ -1,8 +1,8 @@
 <td colspan="90%">
   <%= form_tag transition_family_members_update_insured_families_path, :method => :post, remote: true do %>
     <h3 class='title'>Transition Family Members</h3>
-    <br />
-    <table  class="table table-striped">
+    <br>
+    <table class="table table-striped">
       <tr>
         <th>Name</th>
         <th>SSN</th>
@@ -24,15 +24,15 @@
         <td><%= label_tag "current_market_kind_#{person.id}", "#{ current_market_kind(person)}" %></td>
         <td><%= label_tag "transition_market_kind_#{person.id}", "#{new_market_kind(person)}" %></td>
         <td><%= label_tag "transition_reason_#{person.id}", "#{transition_reason(person).keys.first}" %></td>
-        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "floatlabel date-field date-picker", placeholder: 'EFFECTIVE ON  *'%></td>
-        <td><%= check_box_tag "transition_user_#{person.id}",  person.id, false, id: "transition_user"%></td>
+        <td><%= text_field_tag "transition_effective_date_#{person.id}", nil, readonly: true, id: "transition-date-picker_#{person.id}", class: "floatlabel date-field date-picker", placeholder: 'EFFECTIVE ON  *' %></td>
+        <td><%= check_box_tag "transition_user_#{person.id}",  person.id, false, id: "transition_user" %></td>
         <%= hidden_field_tag  "transition_market_kind_#{person.id}", "#{new_market_kind(person)}" %>
         <%= hidden_field_tag "transition_reason_#{person.id}", "#{transition_reason(person).values.first}" %>
       </tr>
       <% end %>
-      <tr><td colspan = "12"><br /></td></tr>
+      <tr><td colspan="12"><br></td></tr>
       <tr>
-        <td colspan = "12">
+        <td colspan="12">
           <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
           <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
           <%= hidden_field_tag :family, params[:family] %>

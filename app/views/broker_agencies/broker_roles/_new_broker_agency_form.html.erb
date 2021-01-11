@@ -11,7 +11,7 @@
           <%= render "shared/organizations/entity_name_and_type_fields", f: f, entity_kinds: Organization::ENTITY_KINDS[0..3] %>
         </div>
         <div class="row no-buffer row-form-wrapper" style="border-top: 0;">
-          <%= render "shared/broker_agency_profile_fields", f: f%>
+          <%= render "shared/broker_agency_profile_fields", f: f %>
         </div><br>
 
         <div class="action-group">
@@ -27,13 +27,13 @@
         <div class="action-group">
           <%= render "shared/office_locations", f: f %>
           <div class="row no-buffer">
-            <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency")%></button>
+            <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n("broker_agencies.broker_roles.new_broker_agency_form.create_broker_agency") %></button>
           </div>
         </div>
         <div class="row">
           <div class="col-xs-12">
             <% if aca_broker_routing_information %>
-              <h5><%= l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path)%></h5>
+              <h5><%= l10n("broker_agencies.broker_roles.broker_registration_text", site_short_name: site_short_name, site_brokers_agreement_path: site_brokers_agreement_path) %></h5>
             <% end %>
           </div>
         </div>

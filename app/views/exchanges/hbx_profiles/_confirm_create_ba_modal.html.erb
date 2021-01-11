@@ -3,22 +3,22 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title"><%= l10n("hbx_profiles.confirm_create_ba")%></h4>
+        <h4 class="modal-title"><%= l10n("hbx_profiles.confirm_create_ba") %></h4>
       </div>
       <div class="modal-body">
         <p>
-          <%= l10n("hbx_profiles.confirm_create_ba_message")%>
-          <br/><br/>
+          <%= l10n("hbx_profiles.confirm_create_ba_message") %>
+          <br><br>
           <strong>
-            <%= l10n("hbx_profiles.warning")%>
+            <%= l10n("hbx_profiles.warning") %>
           </strong>
-          <%= l10n("hbx_profiles.confirm_create_ba_warning")%>
+          <%= l10n("hbx_profiles.confirm_create_ba_warning") %>
         </p>
         <ul class="application-warnings"></ul>
       </div>
       <div class="modal-footer">
         <%= link_to "#{l10n('hbx_profiles.confirm')}", "#", class: "btn btn-primary mtz  btn-small", onclick: 'submitForm(); return false' %>
-        <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("hbx_profiles.cancel")%></span>
+        <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("hbx_profiles.cancel") %></span>
       </div>
     </div>
   </div>

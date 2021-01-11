@@ -1,7 +1,7 @@
 <% if @person.ridp_verification_types.present? %>
 <div class="table table-sm">
   <div class="module verification-process col-md-12">
-    <% @person%>
+    <% @person %>
         <div class="row">
           <div class="family-member col-md-12">
             <div class="person">
@@ -15,7 +15,7 @@
                         <%= ridp_type %>
                       </div>
                       <div class="v-type-status col-md-3">
-                      <span class="label lb-md label-<%=ridp_type_class(ridp_type, @person)%>" id="status">
+                      <span class="label lb-md label-<%= ridp_type_class(ridp_type, @person) %>" id="status">
                         <%= show_ridp_type(ridp_type, @person) %>
                       </span>&nbsp;
                         <%= pundit_span Family, :updateable? %>
@@ -23,19 +23,19 @@
                       <div class="v-type-upload col-md-4">
                         <% if ridp_type_unverified?(ridp_type, @person) %>
                           <% if ridp_type == 'Identity' %>
-                              <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id ="upload_identity">
+                              <span class="btn btn-default btn-file" data-toggle="modal" data-target="#insured_ridp_modal" id="upload_identity">
                                 <i class="fa fa-upload" aria-hidden="true"></i>
                                 Upload Documents
                               </span>
                               <%= render partial: 'insured/interactive_identity_verifications/insured_ridp_modal', :locals => {:ridp_type => ridp_type} %>
                           <% else %>
                                 <%= form_tag insured_ridp_documents_upload_path, multipart: true, method: :post do %>
-                                    <span class="btn btn-default btn-file" id ="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
+                                    <span class="btn btn-default btn-file" id="upload_<%= ridp_type.downcase.gsub(' ', ' _') %>">
                                       <i class="fa fa-upload" aria-hidden="true"></i>
                                       Upload Documents
                                       <%= file_field_tag "file[]", type: :file, accept: 'image/png,image/gif,image/jpeg,application/pdf', class: "doc-upload-file",  :multiple => true, value: "Upload Documents" %>
                                     </span>
-                                    <%= hidden_field_tag 'ridp_verification_type', ridp_type  %>
+                                    <%= hidden_field_tag 'ridp_verification_type', ridp_type %>
                                 <% end %>
                             <% end %>
                         <% end %>
@@ -47,7 +47,7 @@
                       <% end %>
                     </div>
                   </div>
-                  
+
                   <% if ridp_type == "Identity" && pundit_allow(HbxProfile, :can_access_accept_reject_identity_documents?) %>
                       <%= render :partial => "insured/interactive_identity_verifications/admin_ridp_verification_actions", locals: { person: @person, ridp_type: ridp_type} %>
                   <% elsif ridp_type == "Application" &&  pundit_allow(HbxProfile, :can_access_accept_reject_paper_application_documents?) %>
@@ -56,8 +56,8 @@
                   <div class="row">
                     <% if ridp_documents_list(@person, ridp_type).any? %>
                         <div class="ridp-doc-list col-md-12">
-                          <% ridp_documents_list(@person, ridp_type).each do |ridp_doc|%>
-                              <div class="row" id="doc_table_row_<%=ridp_doc.id%>">
+                          <% ridp_documents_list(@person, ridp_type).each do |ridp_doc| %>
+                              <div class="row" id="doc_table_row_<%= ridp_doc.id %>">
                                 <div class="ridp-doc-elem col-md-12">
                                   <div class="v-doc col-md-11">
                                     <% if ridp_doc.identifier.present? %>
@@ -67,12 +67,12 @@
                                   </div>
                                   <div class="v-doc col-md-1">
                                     <% if pundit_allow(HbxProfile, :can_delete_identity_application_documents?) %>
-                                      <span class="<%=pundit_class(Family, :updateable?)%>" >
+                                      <span class="<%= pundit_class(Family, :updateable?) %>">
                                           <%= link_to insured_ridp_document_path(ridp_doc, :person_id => @person.id), method: :delete, remote: true do %>
                                             <i class="far fa-trash-alt fa-lg role-trashcan" title="Delete"></i>
                                         <% end %>
                                       </span>
-                                    <% end %>  
+                                    <% end %>
                                   </div>
                                 </div>
                               </div>

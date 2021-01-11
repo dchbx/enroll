@@ -33,15 +33,11 @@
 
   filters =
    [
-	   ['all', 'All'],
-	   ['individual_enrolled', 'Individual Enrolled', ivl_state],
-	   ['employer_sponsored', 'Employer Sponsored Coverage', ee_state],
-	   ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
-   ]
-
-
-
-     %>
+     ['all', 'All'],
+     ['individual_enrolled', 'Individual Enrolled', ivl_state],
+     ['employer_sponsored', 'Employer Sponsored Coverage', ee_state],
+     ['non_enrolled', 'Non-Enrolled',  ]  #maybe no sub menu?
+   ] %>
 <div class='custom_filter'>
    <%= render partial: '/datatables/shared/filter', locals: {filters: filters} %>
  </div>

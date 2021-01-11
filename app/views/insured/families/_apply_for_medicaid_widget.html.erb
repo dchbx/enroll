@@ -3,7 +3,7 @@
     <% if @person.consumer_role.blank? %>
       <div class="panel-body">
         <div class="row flex">
-          <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
+          <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%= pundit_class Family, :updateable? %>">
             <strong><%= l10n("enroll_in_health_or_dental_dc", aca_state_name: aca_state_name) %></strong>
           </div>
           <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
@@ -15,8 +15,8 @@
     <% end %>
     <div class="panel-body">
       <div class="row flex">
-        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-          <strong><%= l10n('insured.families.apply_for_medicaid_widget')%></strong>
+        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 <%= pundit_class Family, :updateable? %>">
+          <strong><%= l10n('insured.families.apply_for_medicaid_widget') %></strong>
         </div>
         <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12">
           <div class='image-area'></div>

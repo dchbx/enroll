@@ -35,7 +35,7 @@
         </div>
       </div>
     </div>
-    <br />
+    <br>
 
     <!--Deduction Kinds-->
     <div class='deduction-kinds'>
@@ -52,13 +52,13 @@
         </div>
       </div>
 
-      <br />
+      <br>
 
       <% FinancialAssistance::Deduction::KINDS.each do |deduction_kind| %>
-        <div id="<%= deduction_kind %>"class="deduction-kind">
+        <div id="<%= deduction_kind %>" class="deduction-kind">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1 checkbox-mr">
-              <%=check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
+              <%= check_box_tag "deduction_kind", deduction_kind, @applicant.deductions.of_kind(deduction_kind).present?, class: "deduction-checkbox-#{deduction_kind}" %>
             </div>
 
             <div class="col-md-9 no-pd <%= deduction_kind %> run-glossary">
@@ -75,7 +75,7 @@
           <div class='new-deduction-form hidden <%= deduction_kind %>'>
             <%= render partial: 'financial_assistance/deductions/deduction_form', locals: { deduction: FinancialAssistance::Deduction.new, kind: deduction_kind} %>
           </div>
-          <div class="col-md-12 add-more-link-<%=deduction_kind%>" id="add-more-link">
+          <div class="col-md-12 add-more-link-<%= deduction_kind %>" id="add-more-link">
              <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{FinancialAssistance::Deduction::DEDUCTION_TYPE[deduction_kind.to_sym]}".html_safe, "javascript:void(0);", :id => "add_new_deduction_kind", :class => "#{'hidden' unless @applicant.deductions.of_kind(deduction_kind).present? }" %>
           </div>
         </div>
@@ -91,8 +91,6 @@
     </div>
   </div>
 
-
-
   <!-- Hidden destroy deduction modal -->
   <div class="modal fade" id="destroyDeduction" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
@@ -102,7 +100,7 @@
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to remove this info?<br /><strong>This cannot be undone.</strong>
+          Are you sure you want to remove this info?<br><strong>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button" data-dismiss="modal">DON'T REMOVE</button>
@@ -122,7 +120,7 @@
         </div>
         <div class="modal-body">
           Are you sure you want to remove everything you have entered <strong>for <span id='deduction_kind_modal'></span>?
-          <br />
+          <br>
           This cannot be undone.
           </strong>
         </div>
@@ -143,7 +141,7 @@
           <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
         </div>
         <div class="modal-body">
-          If you leave without saving, you will lose all your changes.<br />
+          If you leave without saving, you will lose all your changes.<br>
           <strong>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">

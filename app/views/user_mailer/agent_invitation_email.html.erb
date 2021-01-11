@@ -1,8 +1,8 @@
 <html>
 <body>
 Congratulations <%= person_name %>,
-<br />
-<div>You have been invited to join <%= site_short_name %> as <%=invitation.role %>.</div>
+<br>
+<div>You have been invited to join <%= site_short_name %> as <%= invitation.role %>.</div>
 <div>Please visit <%= link_to "#{site_short_name}", claim_invitation_url(invitation.id, person_id: person_id) %> to get started.</div>
 </body>
 </html>

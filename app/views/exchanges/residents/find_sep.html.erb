@@ -51,7 +51,7 @@
         <h4 class="modal-title">Outside Open Enrollment</h4>
       </div>
       <div class="modal-body">
-        <p>Open enrollment starts on <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y")%>. To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e")%>.</p>
+        <p>Open enrollment starts on <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e, %Y") %>. To enroll before open enrollment, you must qualify for a special enrollment period. If none of the circumstances listed apply to you, you will not be able to enroll until <%= @next_ivl_open_enrollment_date.try(:strftime, "%B %e") %>.</p>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

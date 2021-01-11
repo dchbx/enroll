@@ -38,7 +38,7 @@
         </div>
       </div>
 
-  <%= f.fields_for :addresses, errors: {}, fieldset: true, :include_id => false do |address|  %>
+  <%= f.fields_for :addresses, errors: {}, fieldset: true, :include_id => false do |address| %>
      <% kind = address.object.kind %>
 
      <% style = "" %>
@@ -61,7 +61,6 @@
       </div>
     </div>
 
-
     <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
           <%= address.text_field :city, placeholder: "CITY", class: "floatlabel form-control #{required}" %>
@@ -73,7 +72,7 @@
           <%= address.text_field :zip, placeholder: "ZIP", class: "number floatlabel form-control zip #{required}" %>
         </div>
     </div>
-    <% end%>
+    <% end %>
       <%= render 'shared/error_warning' %>
       <div class="new-address-flow">
         <div class="col-md-offset-3 col-md-6 col-sm-4 col-xs-12 text-center">

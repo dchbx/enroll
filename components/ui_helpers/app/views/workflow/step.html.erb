@@ -18,7 +18,7 @@
           </div>
           <% if !@current_step.heading_text.nil? %>
             <% if @current_step.heading_text.present? %>
-              <p><%= @current_step.heading_text%></p>
+              <p><%= @current_step.heading_text %></p>
               <p class="memo">* = required field</p>
             <% end %>
           <% end %>
@@ -44,7 +44,7 @@
 
     <div class="col-md-3">
       <% if @model.class.name == "FinancialAssistance::Application" and @steps.last_step?(@current_step) %>
-          <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary"  %>
+          <%= submit_tag 'Submit Application', :class => "btn btn-lg btn-primary" %>
       <% else %>
         <% if  @steps.last_step?(@current_step) %>
           <%= hidden_field_tag 'last_step', true %>
@@ -90,7 +90,7 @@
       <div class="btn btn-default btn-block help-me-sign-up" data-target="#help_with_plan_shopping" data-toggle="modal">
         Help me sign up
       </div>
-      <%= render partial: './ui-components/v1/modals/help_with_plan'  %>
+      <%= render partial: './ui-components/v1/modals/help_with_plan' %>
     </div>
   </div>
 <% end %>

@@ -1,8 +1,8 @@
 <%- model_class = Family -%>
-<%t '.title', :default => model_class.model_name.human.pluralize.titleize %>
+<% t '.title', :default => model_class.model_name.human.pluralize.titleize %>
 
 <div class="row container">
-    <%= link_to l10n("insured.switch_to_aptc_or_csr_families"), aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
+    <%= link_to l10n("insured.switch_to_aptc_or_csr_families"), aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true %>
 </div>
 
 <div class="row container">
@@ -30,7 +30,7 @@
   </div>
 </div>
 <div class="row container">
-  <%=render 'exchanges/agents/consumer_application_links' %>
+  <%= render 'exchanges/agents/consumer_application_links' %>
 </div>
 <div class="row container">
   <%= render 'exchanges/residents/resident_application_link' %>

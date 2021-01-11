@@ -1,40 +1,40 @@
 <div class="container bottom-pd">
 
-  <%if !@dont_allow_change && !@dont_update_ssn %>
+  <% if !@dont_allow_change && !@dont_update_ssn %>
 
     <h4 class="title">DOB / SSN Update Successful</h4>
       <table class="table table-border">
         <thead></thead>
         <tbody>
           <tr>
-            <td><h5> <b>Name:</b> <%=@person.first_name%> <%=@person.last_name%></h5></td>
-            <td><h5> <b>HBX ID:</b> <%=@person.hbx_id%></h5></tb>
+            <td><h5> <b>Name:</b> <%= @person.first_name %> <%= @person.last_name %></h5></td>
+            <td><h5> <b>HBX ID:</b> <%= @person.hbx_id %></h5></tb>
           </tr>
           <tr>
-            <td><h5> <b>DOB:</b> <%=@person.dob%> </h5></td>
-            <td><h5> <b>SSN:</b> <%=@person.ssn%></h5></tb>
+            <td><h5> <b>DOB:</b> <%= @person.dob %> </h5></td>
+            <td><h5> <b>SSN:</b> <%= @person.ssn %></h5></tb>
           </tr>
         </tbody>
       </table>
     </div>
 
-  <%elsif  @dont_update_ssn %>
+  <% elsif  @dont_update_ssn %>
     <h4 class="title">SSN cannot be removed from this person as they are linked to at least one employer roster that requires and SSN</h4>
 
-  <%else%>
+  <% else %>
 
     <div class="row"> <h3 class="title-inline">DOB / SSN Update Failed</h3> </div>
     <h5>
       <h4>SSN matches with the following user:</h4>
-      First Name :<b><%=@ssn_match.first_name%></b> <br />
-      Last Name:  <b><%=@ssn_match.last_name%></b>  <br />
-      HBX ID:     <b><%=@ssn_match.hbx_id%></b>     <br />
-      Date of Birth: <b><%=@ssn_match.dob%></b>     <br />
-      SSN: <b><%=@ssn_match.ssn%></b>     <br />
+      First Name :<b><%= @ssn_match.first_name %></b> <br>
+      Last Name:  <b><%= @ssn_match.last_name %></b>  <br>
+      HBX ID:     <b><%= @ssn_match.hbx_id %></b>     <br>
+      Date of Birth: <b><%= @ssn_match.dob %></b>     <br>
+      SSN: <b><%= @ssn_match.ssn %></b>     <br>
     </h5>
     <h5>Please resolve the match issue.</h5>
 
-  <%end%>
+  <% end %>
 
 </div>
 

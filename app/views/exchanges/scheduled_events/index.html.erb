@@ -5,9 +5,9 @@
       <%= link_to 'Create Event' , new_exchanges_scheduled_event_path , remote: true, class: "btn btn-default" %>
       <%= link_to 'List Of Events' , list_exchanges_scheduled_events_path , remote: true, class: "btn btn-default" %>
     </div>
-  	<div class="row">
-  		<h1 class="heading-text">Calendar</h1>
-  	</div>
+    <div class="row">
+      <h1 class="heading-text">Calendar</h1>
+    </div>
     <%= month_calendar events: @calendar_events do |day, events| %>
       <div><strong><%= day.to_s(:long) %></strong></div>
       <% events.each do |event| %>

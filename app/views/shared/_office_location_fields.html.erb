@@ -60,7 +60,7 @@
                    <% @counties = RatingArea.find_counties_for(zip_code: address.object.try(:zip)) %>
                    <% @empty_message = address.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                    <% @counties = [@empty_message] if @counties.empty? %>
-                 <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{}, required: true, onchange: 'validateCounty(this)')%>
+                 <%= address.select(:county, options_for_select(@counties, selected: (address.object.try(:county) || @counties.first)),{}, required: true, onchange: 'validateCounty(this)') %>
                 </div>
               <% end %>
           </div>

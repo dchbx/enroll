@@ -3,7 +3,7 @@
 <% end %>
 <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) && @person.has_consumer_role? && @person.primary_family &&has_writing_agent?(@person) %>
 <h1 class="darkblue no-buffer"><%= l10n('my_brokers') %></h1>
-<br/>
+<br>
 <%= render 'consumer_broker', title: l10n(".your_broker_or_assister") %>
 <%= render 'employee_broker', title: l10n(".employer_assigned_broker") %>
 <% else %>
@@ -11,7 +11,7 @@
 
 <% if @person.has_active_employee_role? && has_writing_agent?(@employee_role) %>
 <%= render 'employee_broker', title: nil %>
-<% elsif @person.has_consumer_role? && has_writing_agent?(@person)%>
+<% elsif @person.has_consumer_role? && has_writing_agent?(@person) %>
 
 <%= render 'consumer_broker', title: nil %>
 <% end %>

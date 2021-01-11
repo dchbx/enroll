@@ -1,4 +1,4 @@
-<%if quote.aasm_state == "draft" %>
+<% if quote.aasm_state == "draft" %>
   <%= form_tag("/broker_agencies/broker_roles/#{@broker.id}/quotes/publish_quote", method: "post") do %>
     <%= hidden_field_tag(:id, quote.id) %>
     <%= submit_tag l10n("broker_agencies.quotes.publish_quote"), class: 'btn btn-primary', id: 'publish_quote' %>
@@ -9,12 +9,12 @@
 <!--
 <script type="text/javascript">
 
-	$('#publish_quote').on('click', function(){
-		"<% if quote.may_publish? %>"
-		$('form').submit()
-		"<% else %>"
-		alert("Please add all selected benefit groups, before you publish quote.")
-		"<% end %>"
-	})
+  $('#publish_quote').on('click', function(){
+    "<% if quote.may_publish? %>"
+    $('form').submit()
+    "<% else %>"
+    alert("Please add all selected benefit groups, before you publish quote.")
+    "<% end %>"
+  })
 
 </script> -->

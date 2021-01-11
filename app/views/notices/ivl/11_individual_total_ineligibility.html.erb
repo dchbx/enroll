@@ -7,8 +7,6 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -71,7 +69,6 @@
 } %>
 
 <% end %>
-
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
   content: "<strong>Because the above individual(s) are not eligible for enrollment in coverage through #{Settings.site.short_name},

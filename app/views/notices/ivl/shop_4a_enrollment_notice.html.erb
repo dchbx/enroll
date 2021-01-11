@@ -25,7 +25,7 @@
     </tr>
   </tbody>
 </table>
-<br/>
+<br>
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "This is a reminder that you have until <OE End Date> to enroll into health coverage offered by <Employer Name> through #{Settings.site.short_name}. ".html_safe} %>
 
   <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong>To See Plan Options and Enroll:</strong><br>
@@ -58,7 +58,6 @@
       </tbody>
      </table>
    </p>".html_safe} %>
-
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "<strong style='color:#ff0000;'>[If ER has a Broker/Assister, include contact info below]</strong><br>
   <p style='display:flex'><strong>Broker:</strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

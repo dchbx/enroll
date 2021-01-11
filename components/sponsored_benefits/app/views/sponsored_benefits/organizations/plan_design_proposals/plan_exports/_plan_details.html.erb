@@ -66,7 +66,7 @@
       <% else %>
         <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group %>
       <% end %>
-      <br />
+      <br>
       <!--Health Estimated Cost: start-->
       <div class="panel benefitgroup col-xs-12 referenceplan home est">
         <div class="plan-details">
@@ -99,7 +99,7 @@
   <% if sbc_included %>
     <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/export', qhps: @qhps, single_plan_displayed: true %>
   <% end %>
-  <br/>
+  <br>
   <% if @dental_plan = @benefit_group.dental_reference_plan %>
   <div class="row">
     <div class="panel col-xs-12">
@@ -127,7 +127,7 @@
   <div class="row">
     <div class="panel col-xs-12">
       <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.dental_relationship_benefits, coverage_kind: :dental %>
-      <br />
+      <br>
       <div class="panel benefitgroup col-xs-12 referenceplan home est">
         <div class="plan-details">
           <div class="col-xs-4">

@@ -4,17 +4,17 @@
   <% if plan.network_information.present? %>
     <span>
     Network Notes
-      <% plans = plans.present? ? plans :[]  %>
+      <% plans = plans.present? ? plans :[] %>
       <% if plans[0] == plan %>
-     	 <i class='fa fa-question-circle' data-placement="right" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+        <i class='fa fa-question-circle' data-placement="right" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
      <% elsif plans[1] == plan %>
-     	 <i class='fa fa-question-circle' data-placement="right" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+        <i class='fa fa-question-circle' data-placement="right" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
      <% elsif plans[2] == plan %>
-     	 <i class='fa fa-question-circle' data-placement="left" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+        <i class='fa fa-question-circle' data-placement="left" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
      <% elsif plans[5] == plan %>
-     	 <i class='fa fa-question-circle' data-placement="left" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+        <i class='fa fa-question-circle' data-placement="left" data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
      <% else %>
-     	 <i class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
+        <i class='fa fa-question-circle' data-toggle="tooltip" data-container="body" title="<%= plan.network_information %>"></i>
      <% end %>
     </span>
   <% end %>

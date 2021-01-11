@@ -14,7 +14,7 @@
 
   </div>
   <% end %>
-<% elsif selected_carrier_level == 'single_carrier'  %>
+<% elsif selected_carrier_level == 'single_carrier' %>
   <% carrier_names.each_pair do |ck, cv| %>
   <div class="col-xs-4 carriers">
 
@@ -30,10 +30,9 @@
         <label for="single_carrier_<%= ck %>"><h3 class="pdp-titles-class"><%= cv %></h3></label>
     </div>
 
-
   </div>
 <% end %>
-<% elsif selected_carrier_level == 'single_plan'  %>
+<% elsif selected_carrier_level == 'single_plan' %>
   <% carrier_names.each_pair do |ck, cv| %>
   <div class="col-xs-4 carriers">
     <div class="col-xs-3">
@@ -70,14 +69,14 @@
       </div>
     </div>
   <% end %>
-  <br />
-  <br />
+  <br>
+  <br>
   <div class="row cc-footer">
     <div class="col-xs-8">
       <h4 class="di">After selecting offered plans, click "Select Reference Plan"</h4>
     </div>
     <div class="col-xs-3 text-center">
-      <span class="btn btn-default btn-sm" onclick = "fetchDentalCustom();" >Select Reference Plan</span>
+      <span class="btn btn-default btn-sm" onclick="fetchDentalCustom();">Select Reference Plan</span>
     </div>
   </div>
 <% else %>

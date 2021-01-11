@@ -1,7 +1,7 @@
 <div class="container bottom-pd">
   <% active_household = @person.primary_family.active_household %>
   <%= form_for @person, remote: true, url: create_eligibility_path, method: "post", class: "form" do |f| %>
-    <%= f.hidden_field :person_id, value: f.object.id  %>
+    <%= f.hidden_field :person_id, value: f.object.id %>
     <%= f.hidden_field :family_actions_id, value: "family_actions_#{f.object.primary_family.id.to_s}" %>
     <table class="table table-border">
       <thead>
@@ -37,7 +37,7 @@
       <tbody>
         <% f.object.primary_family.active_family_members.each do |family_member| %>
           <tr>
-            <td><h5><%= family_member.person.first_name%> <%= family_member.person.last_name %></h5></td>
+            <td><h5><%= family_member.person.first_name %> <%= family_member.person.last_name %></h5></td>
             <td><h5><%= truncate(number_to_obscured_ssn(family_member.person.ssn)) %></h5></td>
             <td><h5><%= family_member.person.dob %> </h5></td>
             <td><h5><%= family_member.person.hbx_id %></h5></td>

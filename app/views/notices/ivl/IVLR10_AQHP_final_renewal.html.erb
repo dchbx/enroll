@@ -2,8 +2,8 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-<style type="text/css" media="screen,print"> 
-.break{ 
+<style type="text/css" media="screen,print">
+.break{
    display: block;
    clear: both;
    page-break-after: always;
@@ -34,14 +34,14 @@
       <tr><td><%= notice.current_health_enrollment.enrollees[1] %></td><td><%= notice.current_health_enrollment.enrollees[5] %></td></tr>
       <tr><td><%= notice.current_health_enrollment.enrollees[2] %></td><td><%= notice.current_health_enrollment.enrollees[6] %></td></tr>
       <tr><td><%= notice.current_health_enrollment.enrollees[3] %></td><td><%= notice.current_health_enrollment.enrollees[7] %></td></tr>
-    </table>  
+    </table>
   <% elsif notice.current_dental_enrollment.present? && notice.current_health_enrollment.blank? %>
     <table width=75% align=center>
       <tr><td><%= notice.current_dental_enrollment.enrollees[0] %></td><td><%= notice.current_dental_enrollment.enrollees[4] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[1] %></td><td><%= notice.current_dental_enrollment.enrollees[5] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[2] %></td><td><%= notice.current_dental_enrollment.enrollees[6] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[3] %></td><td><%= notice.current_dental_enrollment.enrollees[7] %></td></tr>
-    </table>  
+    </table>
   <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {

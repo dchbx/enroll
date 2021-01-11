@@ -44,7 +44,6 @@
       heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 <% end %>
 
-
 <% notice.individuals.each do |member| %>
   <%= render partial: 'notices/shared/unordered_list', :locals => {listings: [
       ["#{member.first_name} #{member.last_name}, Age #{member.age} is not eligible for private insurance through DC Health Link because of one of these reasons:",
@@ -53,7 +52,6 @@
           "You did not submit the documents we requested to verify this person's eligibility by the deadline.  "]]]} %>
 <% end %>
 
-
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "We moved the enrollment for the people listed above to a program called Cover All DC."} %>
 
@@ -61,7 +59,7 @@
     contents: [""],
     heading: "What's Different About Cover All DC Plans", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 
-<% if notice.assisted_enrollments.present? && notice.csr_enrollments.present?  %>
+<% if notice.assisted_enrollments.present? && notice.csr_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
       content: "The Cover All DC plan is the same plan the people listed enrolled in through DC Health Link. It offers the same covered services."} %>
   <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -83,7 +81,6 @@
     contents: [""],
     heading: 'Here’s What You Need to Do Now',sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
 
-
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "The people listed may be eligible to enroll in a plan through DC Health Link again if they submit the documents needed to verify eligibility. The list of documents we would need is included in this letter."} %>
 
@@ -102,7 +99,6 @@
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>

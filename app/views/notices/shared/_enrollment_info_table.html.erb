@@ -13,19 +13,19 @@
       <tr valign="top">
         <td style="width: 25%;">
           <% rows[0].each do |enrollee| %>
-            <p><%= enrollee.full_name%></p>
-            <p style="margin-top: -3px; margin-bottom: 15px;">Age: <%= enrollee.age%></p>
-          <%end%>
+            <p><%= enrollee.full_name %></p>
+            <p style="margin-top: -3px; margin-bottom: 15px;">Age: <%= enrollee.age %></p>
+          <% end %>
         </td>
         <td class="small">
-          <p class="plan_info_margin"><b>Insurance Company: </b><%= rows[1]%></p>
-          <p class="plan_info_margin"><b>Phone: </b><%= rows[2]%></p>
-          <p class="plan_info_margin"><b>Plan Name: </b><%= rows[3]%></p>
-          <p class="plan_info_margin"><b>Your Monthly Premium Payment: </b><%= rows[4]%></p>
+          <p class="plan_info_margin"><b>Insurance Company: </b><%= rows[1] %></p>
+          <p class="plan_info_margin"><b>Phone: </b><%= rows[2] %></p>
+          <p class="plan_info_margin"><b>Plan Name: </b><%= rows[3] %></p>
+          <p class="plan_info_margin"><b>Your Monthly Premium Payment: </b><%= rows[4] %></p>
           <% if rows[8] == "health" %>
-            <p class="plan_info_margin"><b>Annual Deductible: </b><%= rows[0].size > 1 ? rows[6] : rows[5]%></p>
+            <p class="plan_info_margin"><b>Annual Deductible: </b><%= rows[0].size > 1 ? rows[6] : rows[5] %></p>
           <% end %>
-          <p class="plan_info_margin" style="margin-bottom: 5px;"><b>Start Date: </b><%= rows[7]%></p>
+          <p class="plan_info_margin" style="margin-bottom: 5px;"><b>Start Date: </b><%= rows[7] %></p>
         </td>
       </tr>
     </tbody>

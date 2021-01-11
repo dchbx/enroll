@@ -409,7 +409,7 @@
           </tr>
         </tbody>
       </table>
-      <hr />
+      <hr>
       <p>Effective Datatables example</p>
       <%= render_datatable(@family_data_table) %>
     </div>
@@ -445,7 +445,7 @@
                <input type="text" value="An error feedback has class 'has-error'" class="form-control">
                <span class="form-control-feedback fa fa-check-circle"></span>
              </div>
-             <hr />
+             <hr>
              <div class="form-group has-feedback">
                <input type="text" value="An input can also be disabled" disabled="disabled" class="form-control">
                <span class="form-control-feedback fa fa-lock"></span>
@@ -481,7 +481,7 @@
                <input type="text" class="form-control" id="usr">
              </div>
            </form>
-           <hr />
+           <hr>
          </div>
 
          <div class="demo-row">
@@ -504,7 +504,7 @@
                  </optgroup>
                </select>
              </div>
-             <br />
+             <br>
              <p>Multiselect</p>
              <div class="mbl">
                <select multiple="multiple" class="form-control multiselect multiselect-info" data-toggle="select">
@@ -526,7 +526,7 @@
           </label>
           <h3>Text Area</h3>
 
-           <h3><%= l10n('.check_box') %></h3> 
+           <h3><%= l10n('.check_box') %></h3>
 
           <div class="container">
             <form>
@@ -540,7 +540,7 @@
                 <label><input type="checkbox" value="" disabled><%= l10n('.disabled_unchecked') %></label>
               </div>
               <div class="checkbox checked">
-                <label><input type="checkbox" value="" disabled checked ><%= l10n('.disabled_checked') %></label>
+                <label><input type="checkbox" value="" disabled checked><%= l10n('.disabled_checked') %></label>
               </div>
             </form>
           </div>
@@ -577,7 +577,7 @@
                 <label><input type="checkbox" value="" disabled><%= l10n('.disabled_unchecked') %></label>
               </div>
               <div class="checkbox checked">
-                <label><input type="checkbox" value="" disabled checked ><%= l10n('.disabled_checked') %></label>
+                <label><input type="checkbox" value="" disabled checked><%= l10n('.disabled_checked') %></label>
               </div>
             </form>
           </div>
@@ -642,13 +642,11 @@
          <nav aria-label="Page navigation">
           <ul class="pagination">
           <li class="disabled"><a href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
-          <li class="active"><a href="#"><%= l10n('.1') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
-          <li class="disabled"><a href="#"><%= l10n('.2') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
-          <li class="disabled"><a href="#"><%= l10n('.3') %><span class="sr-only"><%=l10n('.current')%></span></a></li>
+          <li class="active"><a href="#"><%= l10n('.1') %><span class="sr-only"><%= l10n('.current') %></span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.2') %><span class="sr-only"><%= l10n('.current') %></span></a></li>
+          <li class="disabled"><a href="#"><%= l10n('.3') %><span class="sr-only"><%= l10n('.current') %></span></a></li>
           </ul>
         </nav>
-
-
 
         <p><%= l10n('.large_sizing') %></p>
          <nav aria-label="Page navigation">
@@ -689,7 +687,6 @@
           </ul>
         </nav>
 
-
      <h3><%= l10n('.pager') %></h3>
       <p><%= l10n('.default') %></p>
         <nav aria-label="Page navigation">
@@ -716,7 +713,7 @@
         </nav>
 
     <h3>Navigation</h3>
-    
+
       <nav class="navbar navbar-inverse">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -887,8 +884,6 @@
      <h3><%= l10n('.progress_bar_and_sliders') %></h3>
 <div>
 
-
-
 <h3><%= l10n('.default_progress_bar') %></h3>
   <div class="progress">
     <div class="progress-bar" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;">
@@ -973,8 +968,6 @@
   </div>
   </div>
   </div>
-
-
 
 <h3><%= l10n('.tooltips_and_popovers') %></h3>
     <div>
@@ -1133,7 +1126,7 @@
           </div>
         </div>
       </div>
-      
+
     <h3><%= l10n('.tabs') %></h3>
 
     <h3><%= l10n('.Wells') %></h3>
@@ -1244,7 +1237,6 @@
           </div>
         </div>
       </div>
-
 
     <div>
     <div class="demo-row">
@@ -1416,7 +1408,7 @@
       </div>
       <div class="demo-col">
         <div class="form-group">
-          <input class="form-control" type="text" id="typeahead-demo-01" />
+          <input class="form-control" type="text" id="typeahead-demo-01">
         </div>
       </div>
     </div><!-- /row -->
@@ -1502,7 +1494,7 @@
           <textarea class="form-control" rows="3" placeholder="Add comment..."></textarea>
         </div>
         <div class="demo-col">
-          <textarea  class="form-control" rows="3">Some text inside small textarea. This is only for paddings and line-height sample.</textarea>
+          <textarea class="form-control" rows="3">Some text inside small textarea. This is only for paddings and line-height sample.</textarea>
         </div>
         <div class="demo-content ptl">
           <textarea rows="3" placeholder="Add comment..." class="form-control"></textarea>
@@ -1515,9 +1507,9 @@
         <h3 class="demo-panel-title">Tags Input</h3>
       </div>
       <div class="demo-content">
-        <input type="input" name="tagsinput-01" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique" />
+        <input type="input" name="tagsinput-01" class="tagsinput" data-role="tagsinput" value="Clean, Fresh, Modern, Unique">
         <div class="tagsinput-primary">
-          <input type="text" name="tagsinput-02" class="tagsinput" data-role="tagsinput" value="School, Teacher, Colleague" />
+          <input type="text" name="tagsinput-02" class="tagsinput" data-role="tagsinput" value="School, Teacher, Colleague">
         </div>
       </div> <!-- /tags -->
     </div><!-- /row -->
@@ -1542,7 +1534,7 @@
     </div> <!-- /row -->
 
     <div class="demo-row">
-      <h3 class="demo-title">Checkboxes &<br /> Radio-buttons</h3>
+      <h3 class="demo-title">Checkboxes &<br> Radio-buttons</h3>
       <div class="demo-col">
         <label class="checkbox" for="checkbox1">
           <input type="checkbox" value="" id="checkbox1" data-toggle="checkbox">
@@ -1627,31 +1619,31 @@
       <h3 class="demo-title">Switches</h3>
       <div class="last-col">
         <div class="demo-col">
-          <input type="checkbox" checked data-toggle="switch" id="custom-switch-01" />
+          <input type="checkbox" checked data-toggle="switch" id="custom-switch-01">
         </div><!-- /.demo-col -->
 
         <div class="demo-col">
-          <input type="checkbox" data-toggle="switch" id="custom-switch-02" />
+          <input type="checkbox" data-toggle="switch" id="custom-switch-02">
         </div><!-- /.demo-col -->
 
         <div class="demo-col ptl">
           <div class="bootstrap-switch-square">
-            <input type="checkbox" checked data-toggle="switch" id="custom-switch-03" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>" />
+            <input type="checkbox" checked data-toggle="switch" id="custom-switch-03" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>">
           </div>
         </div><!-- /.demo-col -->
 
         <div class="demo-col ptl">
           <div class="bootstrap-switch-square">
-            <input type="checkbox" data-toggle="switch" id="custom-switch-04" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>" />
+            <input type="checkbox" data-toggle="switch" id="custom-switch-04" data-on-text="<i class='fa fa-check'></i>" data-off-text="<i class='fa fa-cross'></i>">
           </div>
         </div><!-- /.demo-col -->
 
         <div class="demo-col ptl">
-          <input type="checkbox" checked disabled data-toggle="switch" id="custom-switch-05" />
+          <input type="checkbox" checked disabled data-toggle="switch" id="custom-switch-05">
         </div><!-- /.demo-col -->
 
         <div class="demo-col ptl">
-          <input type="checkbox" disabled data-toggle="switch" id="custom-switch-06" />
+          <input type="checkbox" disabled data-toggle="switch" id="custom-switch-06">
         </div><!-- /.demo-col -->
       </div><!-- /.demo-row -->
     </div>
@@ -2066,7 +2058,7 @@
         <div class="progress">
           <div class="progress-bar" style="width: 45%;"></div>
         </div>
-        <br/>
+        <br>
         <div class="progress">
           <div class="progress-bar" style="width: 40%;"></div>
           <div class="progress-bar progress-bar-warning" style="width: 10%;"></div>
@@ -2074,9 +2066,9 @@
           <div class="progress-bar progress-bar-success" style="width: 10%;"></div>
           <div class="progress-bar progress-bar-info" style="width: 10%;"></div>
         </div>
-        <br/>
+        <br>
         <div id="slider" class="ui-slider"></div>
-        <br/>
+        <br>
         <div id="slider2" class="ui-slider"></div>
         <div id="slider3" class="ui-slider">
           <span class="ui-slider-value first">$500</span>
@@ -2098,7 +2090,7 @@
             <div class="arrow"></div>
             <h3 class="popover-title">Smooth Title</h3>
             <div class="popover-content">
-              <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              <p>And here's some amazing content. It's very engaging. <br>Right?</p>
             </div>
           </div>
         </div>
@@ -2113,7 +2105,7 @@
             <div class="arrow"></div>
             <h3 class="popover-title">Smooth Title</h3>
             <div class="popover-content">
-              <p>And here's some amazing content. It's very engaging. <br/>Right?</p>
+              <p>And here's some amazing content. It's very engaging. <br>Right?</p>
             </div>
           </div>
         </div>
@@ -2723,7 +2715,9 @@
 <% end %>
 
 <% content_for :additional_scripts do %>
-  <% javascript_tag do %>
+  <script>
+//<![CDATA[
+
     $(document).ready(function(){
       // start carousels
       $("#carouselExampleControls").carousel();
@@ -2737,5 +2731,7 @@
       $('body').scrollspy({ target: '#spy', offset:80});
 
     });
-  <% end %>
+
+//]]>
+</script>
 <% end %>

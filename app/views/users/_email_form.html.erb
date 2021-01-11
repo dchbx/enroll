@@ -1,116 +1,116 @@
 <%= form_tag(confirm_change_email_user_path, method: :put, id: "changeEmailForm", class:"form-horizontal", remote: true) do %>
-	<%= hidden_field_tag :authenticity_token, form_authenticity_token %>
-	<% if user.email.present? %>
-	<%= hidden_field_tag :current_email, user.email %>
-	<% end %>
-	<div class="form-group">
-		<%= label_tag(:new_email, "New Email", class:"col-sm-5 control-label") %>
-		<div class="col-sm-6">
-			<%= text_field_tag :new_email, user.email, {class:"form-control", onblur:'validateFields()', id:'inputNewEmail'} %>
-			<span id="helpBlock2" class="help-block email-block hidden"></span>
-		</div>
-	</div>
-	<br />
-	<br />
-	<div class="form-group">
-		<%= label_tag(:redmine_ticket_number, "Redmine Ticket Number", class:"col-sm-5 control-label") %>
-		<div class="col-sm-6">
-			<%= text_field_tag :redmine_ticket_number, nil, {class:"form-control", onblur:'validateFields()', id:'inputTicketNumber'} %>
-		</div>
-	</div>
-	<br />
-	<br />
-	<div class="form-group">
-		<%= label_tag(:reason, "Reason For Change", class:"col-sm-5 control-label") %>
-		<div class="col-sm-6">
-			<%= text_area_tag :reason, nil, {class:"form-control", rows:"3", onblur:'validateFields()', id:'inputReason'} %>
-		</div>
-	</div>
-	<br />
-	<br />
-	<div class="form-group">
-		<div class="row">
-			<%= submit_tag "Submit", class:'btn btn-primary', id:'submitEmailChange', data: { confirm: 'Are you sure you want to make changes?' } %>
-		</div>
+  <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+  <% if user.email.present? %>
+  <%= hidden_field_tag :current_email, user.email %>
+  <% end %>
+  <div class="form-group">
+    <%= label_tag(:new_email, "New Email", class:"col-sm-5 control-label") %>
+    <div class="col-sm-6">
+      <%= text_field_tag :new_email, user.email, {class:"form-control", onblur:'validateFields()', id:'inputNewEmail'} %>
+      <span id="helpBlock2" class="help-block email-block hidden"></span>
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class="form-group">
+    <%= label_tag(:redmine_ticket_number, "Redmine Ticket Number", class:"col-sm-5 control-label") %>
+    <div class="col-sm-6">
+      <%= text_field_tag :redmine_ticket_number, nil, {class:"form-control", onblur:'validateFields()', id:'inputTicketNumber'} %>
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class="form-group">
+    <%= label_tag(:reason, "Reason For Change", class:"col-sm-5 control-label") %>
+    <div class="col-sm-6">
+      <%= text_area_tag :reason, nil, {class:"form-control", rows:"3", onblur:'validateFields()', id:'inputReason'} %>
+    </div>
+  </div>
+  <br>
+  <br>
+  <div class="form-group">
+    <div class="row">
+      <%= submit_tag "Submit", class:'btn btn-primary', id:'submitEmailChange', data: { confirm: 'Are you sure you want to make changes?' } %>
+    </div>
 <% end %>
 
 <script>
-	var validEmailAddress = false;
-	
-	(function() {
-		document.getElementById('submitEmailChange').classList.add('blocking');
-	})();
-	
-	var currentOptions = {
-		email:String,
-		reason:String,
-		ticketNumber:String,
-		validEmailPresent:Boolean
-	}
-	
-	function validateFields() {
-		redmineTicketNumber = document.getElementById('inputTicketNumber');
-		email = document.getElementById('inputNewEmail');
-		reason = document.getElementById('inputReason');
-		
-		currentOptions.email = email.value;
-		currentOptions.reason = reason.value;
-		currentOptions.ticketNumber = redmineTicketNumber.value;
-	
-		if (email.value.length) {
-			validateEmail(email.value)
-		}
-		
-		if (currentOptions.reason.length && currentOptions.ticketNumber.length && currentOptions.validEmailPresent == true) {
-			enableSubmit()
-		} else {
-			disableSubmit()
-		}
-	}
-	
-	function validateEmail(email) {
-		var properFormat = /\S+@\S+\.\S+/;
-		if (!properFormat.test(email)) {
-			invalidEmail();
-			document.getElementsByClassName('email-block')[0].innerHTML = "Invalid Email format detected";
-			currentOptions.validEmailPresent = false;
-		} else {
-			fetch('/users/<%=user.id %>/check_for_existing_username_or_email?email='+email.toLowerCase(),{
-				mode: "no-cors",
-				method: 'GET',
-				credentials: "same-origin"
-			})
-			.then((resp) => resp.json())
-			.then(function(data) {
-				if (data.available) {
-					currentOptions.validEmailPresent = false;
-					document.getElementsByClassName('email-block')[0].innerHTML = "Email is in use by another user";
-					invalidEmail()
-				} else {
-					validEmail();
-					currentOptions.validEmailPresent = true;
-				}
-			})
-		}
-	}
-	
-	function enableSubmit() {
-		document.getElementById('submitEmailChange').classList.remove('blocking');
-	}
-	
-	function disableSubmit() {
-		document.getElementById('submitEmailChange').classList.add('blocking');
-	}
-	
-	function invalidEmail() {
-		document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
-		document.getElementsByClassName('email-block')[0].classList.remove('hidden')
-		validEmailAddress = false;
-	}
-	
-	function validEmail() {
-		document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
-		document.getElementsByClassName('email-block')[0].classList.add('hidden');
-		validEmailAddress = true;
-	}
+  var validEmailAddress = false;
+
+  (function() {
+    document.getElementById('submitEmailChange').classList.add('blocking');
+  })();
+
+  var currentOptions = {
+    email:String,
+    reason:String,
+    ticketNumber:String,
+    validEmailPresent:Boolean
+  }
+
+  function validateFields() {
+    redmineTicketNumber = document.getElementById('inputTicketNumber');
+    email = document.getElementById('inputNewEmail');
+    reason = document.getElementById('inputReason');
+
+    currentOptions.email = email.value;
+    currentOptions.reason = reason.value;
+    currentOptions.ticketNumber = redmineTicketNumber.value;
+
+    if (email.value.length) {
+      validateEmail(email.value)
+    }
+
+    if (currentOptions.reason.length && currentOptions.ticketNumber.length && currentOptions.validEmailPresent == true) {
+      enableSubmit()
+    } else {
+      disableSubmit()
+    }
+  }
+
+  function validateEmail(email) {
+    var properFormat = /\S+@\S+\.\S+/;
+    if (!properFormat.test(email)) {
+      invalidEmail();
+      document.getElementsByClassName('email-block')[0].innerHTML = "Invalid Email format detected";
+      currentOptions.validEmailPresent = false;
+    } else {
+      fetch('/users/<%= user.id %>/check_for_existing_username_or_email?email='+email.toLowerCase(),{
+        mode: "no-cors",
+        method: 'GET',
+        credentials: "same-origin"
+      })
+      .then((resp) => resp.json())
+      .then(function(data) {
+        if (data.available) {
+          currentOptions.validEmailPresent = false;
+          document.getElementsByClassName('email-block')[0].innerHTML = "Email is in use by another user";
+          invalidEmail()
+        } else {
+          validEmail();
+          currentOptions.validEmailPresent = true;
+        }
+      })
+    }
+  }
+
+  function enableSubmit() {
+    document.getElementById('submitEmailChange').classList.remove('blocking');
+  }
+
+  function disableSubmit() {
+    document.getElementById('submitEmailChange').classList.add('blocking');
+  }
+
+  function invalidEmail() {
+    document.getElementById('inputNewEmail').closest('.form-group').classList.add('has-error');
+    document.getElementsByClassName('email-block')[0].classList.remove('hidden')
+    validEmailAddress = false;
+  }
+
+  function validEmail() {
+    document.getElementById('inputNewEmail').closest('.form-group').classList.remove('has-error');
+    document.getElementsByClassName('email-block')[0].classList.add('hidden');
+    validEmailAddress = true;
+  }
 </script>

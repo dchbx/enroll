@@ -3,7 +3,7 @@
     <div class="container">
       <ul role="tablist" class="list-unstyled list-inline" id="myTab">
         <li role="presentation"<%= menu_tab_class(active_tab, "hbx-profile-tab") %>>
-          <%= link_to(exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do  %>
+          <%= link_to(exchanges_hbx_profiles_path, "aria-expanded" => "true", "aria-controls" => "hbx_profile", "role" => "tab" ) do %>
             <span title="HBX Profile" aria-hidden="true" class="glyphicon glyphicon-home"></span>
           <% end %>
         </li>
@@ -58,45 +58,45 @@
           </ul>
         </li>
         <!-- <li role="presentation"<%= menu_tab_class(active_tab, "employers-tab") %>>
-         <%= link_to(employer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do  %>
+         <%= link_to(employer_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers", "role" => "tab" ) do %>
             <span class="hidden-xs">Employers</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
          <% end %>
         </li> -->
         <li role="presentation"<%= menu_tab_class(active_tab, "employers-invoice") %>>
-          <%= link_to(employer_invoice_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do  %>
+          <%= link_to(employer_invoice_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "employers-invoices", "role" => "tab" ) do %>
               <span class="hidden-xs">Employers</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Employers"></span>
           <% end %>
         </li>
 
         <li role="presentation"<%= menu_tab_class(active_tab, "user-accounts") %>>
-          <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "user-accounts", "role" => "tab" ) do  %>
+          <%= link_to(user_account_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "user-accounts", "role" => "tab" ) do %>
               <span class="hidden-xs">User Accounts</span>
               <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="User Account"></span>
           <% end %>
         </li>
 
         <li role="presentation"<%= menu_tab_class(active_tab, "broker-agencies-tab") %>>
-         <%= link_to(broker_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "broker_agencies", "role" => "tab" ) do  %>
+         <%= link_to(broker_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "broker_agencies", "role" => "tab" ) do %>
             <span class="hidden-xs">Broker Agencies</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>
         </li>
         <li role="presentation"<%= menu_tab_class(active_tab, "brokers-tab") %>>
-         <%= link_to(exchanges_broker_applicants_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do  %>
+         <%= link_to(exchanges_broker_applicants_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "brokers", "role" => "tab" ) do %>
             <span class="hidden-xs">Brokers</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Brokers"></span>
          <% end %>
         </li>
         <li role="presentation"<%= menu_tab_class(active_tab, "general-agencies-tab") %>>
-         <%= link_to(general_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "general_agencies", "role" => "tab" ) do  %>
+         <%= link_to(general_agency_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "general_agencies", "role" => "tab" ) do %>
             <span class="hidden-xs">General Agencies</span>
             <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Broker Agencies"></span>
          <% end %>
         </li>
 
-      <%if individual_market_is_enabled? %>
+      <% if individual_market_is_enabled? %>
         <li class="brokers-dropdown dropdown">
           <a href="#" class="families dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Families<span class="caret"></span></a>
           <ul class="dropdown-menu">
@@ -130,11 +130,8 @@
           display_name: 'Families',
           active_tab: active_tab,
           glyphicon_class: 'glyphicon-heart'
-        }
-      %>
+        } %>
       <% end %>
-
-
 
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
                   locals: {
@@ -146,8 +143,7 @@
                     remote: false,
                     pundit_object: nil,
                     pundit_method: nil
-                  }
-                  %>
+                  } %>
 
     <% if aca_user_accounts_enabled %>
       <%= render partial: 'exchanges/hbx_profiles/shared/nav_link',
@@ -160,8 +156,7 @@
                     remote: false,
                     pundit_object: nil,
                     pundit_method: nil
-                  }
-                  %>
+                  } %>
 
     <% end %>
 
@@ -175,8 +170,7 @@
                     remote: false,
                     pundit_object: nil,
                     pundit_method: nil
-                  }
-                  %>
+                  } %>
       %>
 
       <li class="brokers-dropdown dropdown">
@@ -239,8 +233,7 @@
                                                                           remote: false,
                                                                           pundit_object: nil,
                                                                           pundit_method: nil
-                                                                        }
-                                                                        %>
+                                                                        } %>
         <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                         tab_name: 'staff',
                                                                         link_path: main_app.staff_index_exchanges_hbx_profiles_path,
@@ -250,8 +243,7 @@
                                                                         remote: false,
                                                                         pundit_object: nil,
                                                                         pundit_method: nil
-                                                                      }
-                                                                      %>
+                                                                      } %>
 
         <%= render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {
                                                                         tab_name: 'users-orphans',
@@ -266,28 +258,27 @@
         </ul>
     </li>
 
-
-      <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %>  class="<%=pundit_class HbxProfile, :view_admin_tabs?%>">
-        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
+      <li role="presentation"<%= menu_tab_class(active_tab, "inbox-tab") %> class="<%= pundit_class HbxProfile, :view_admin_tabs? %>">
+        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do %>
         <span class="badge message-unread"><%= @unread_messages %></span>
         Inbox
         <% end %>
-        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+        <%= link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do %>
         <span class="hidden-xs">Inbox</span>
         <span class="glyphicon glyphicon-envelope hidden-md hidden-sm hidden-lg" title="Inbox"></span>
         <% end %>
       </li>
 
-      <li role="presentation"<%= menu_tab_class(active_tab, "notices-tab") %> class="tab-second <%=pundit_class HbxProfile, :view_admin_tabs?%>">
+      <li role="presentation"<%= menu_tab_class(active_tab, "notices-tab") %> class="tab-second <%= pundit_class HbxProfile, :view_admin_tabs? %>">
 
-        <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do  %>
+        <%= link_to(notifier.notice_kinds_path, "aria-expanded" => "true", "aria-controls" => "notices", "role" => "tab" ) do %>
           <span class="hidden-xs">Notices</span>
           <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Notices"></span>
         <% end %>
       </li>
 
       <!-- <li role="presentation"<%= menu_tab_class(active_tab, "binder-tab") %> class="tab-second">
-       <%= link_to(main_app.binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do  %>
+       <%= link_to(main_app.binder_index_exchanges_hbx_profiles_path, :remote => true, "aria-expanded" => "true", "aria-controls" => "binder", "role" => "tab" ) do %>
         <span class="hidden-xs">Binder Transition</span>
         <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title="Binder"></span>
        <% end %>

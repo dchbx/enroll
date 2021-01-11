@@ -15,10 +15,10 @@
     <div class="text-center">
       <i aria-hidden="true" class="fa fa-user fa-3x"></i>
       <% if broker_and_agency_present %>
-      <br/>
+      <br>
       <%= @employer_profile.broker_agency_profile.legal_name.titleize %>
       <% else %>
-      <br/>
+      <br>
       No Broker
       <% end %>
     </div>
@@ -27,10 +27,10 @@
       <div class="broker-information">
         <% active_broker = @broker_agency_accounts[0].writing_agent %>
         <%= active_broker.person.full_name.titleize %>
-        <br/>
+        <br>
         <a href="tel:1-<%= active_broker.phone %>">1
           <%= active_broker.person.main_phone.to_s if active_broker.person.main_phone.present? %></a>
-        <br/>
+        <br>
         <%= mail_to active_broker.email.address, active_broker.email.address %>
       </div>
       <% else %>

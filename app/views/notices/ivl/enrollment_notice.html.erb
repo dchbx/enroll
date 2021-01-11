@@ -23,7 +23,7 @@
 <% if notice.aqhp_enrollments.present? %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "You recently signed up for insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance and cost savings. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year."} %>
-<% else%>
+<% else %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "You recently signed up for insurance through #{Settings.site.short_name}. This letter tells you what you need to do next to keep your insurance. You’ll want to keep this letter in case you have questions during the #{notice.coverage_year} coverage year."} %>
 <% end %>
@@ -63,7 +63,7 @@
       col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
 <% end %>
 
-<% notice.current_health_enrollments.each do |enrollment|%>
+<% notice.current_health_enrollments.each do |enrollment| %>
   <% if enrollment.aptc_amount > 0 %>
     <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
       contents: ["You’re getting savings on your health insurance called an advance premium tax credit."],

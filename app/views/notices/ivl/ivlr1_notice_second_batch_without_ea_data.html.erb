@@ -28,7 +28,6 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
  contents: ["We are renewing coverage for the following people:"],
    heading: 'Review Your Information', sub_heading: ''} %>
 
-
 <%= render partial: 'notices/shared/list_with_padding', :locals => { listings: notice.individuals.map{|member| member.full_name } } %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {

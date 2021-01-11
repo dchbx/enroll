@@ -9,9 +9,9 @@
         <p>You previously answered this question when creating your account. If you need assistance contact <%= contact_center_phone_number %></p>
         <div class="modal-questions-container">
           <h5><%= security_question.original_question %></h5>
-          <input type="text" id="questionAnswer" name="security_question_response[question_answer]" />
-          <input type="hidden" id="userId" name="user[id]" value=<%= user.id %> />
-          <input type="hidden" id="questionId" name="security_question_response[question_answer][security_question_id]" value=<%= security_question.security_question_id %> />
+          <input type="text" id="questionAnswer" name="security_question_response[question_answer]">
+          <input type="hidden" id="userId" name="user[id]" value=<%= user.id %>>
+          <input type="hidden" id="questionId" name="security_question_response[question_answer][security_question_id]" value=<%= security_question.security_question_id %>>
         </div>
       </div>
       <div class="modal-footer">

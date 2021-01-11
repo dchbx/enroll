@@ -36,11 +36,9 @@
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If someone else in your household has private insurance through Cover All DC, and their name is not listed above, they're still enrolled through Cover All DC."} %>
 
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: ["Based on the documents you submitted to DC Health Link, the people listed are eligible to enroll in a plan through DC Health Link."],
     heading: "Why this Change Occurred", sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: [""],
@@ -52,11 +50,9 @@
     previous: "Some things are different:",
     listings: ["<strong>Your premium may be higher.</strong> While the people listed will still have the same plan, we have to re-start the plan. If any of the people listed had a birthday since the start of the plan they enrolled in through Cover All DC, the premium may increase to reflect the age change.", "<strong>You may be eligible for help paying for coverage</strong> The people listed can apply for tax credits and other savings that lower the costs of paying for private health insurance, along with Medicaid at <a href='https://www.dchealthlink.com'>dchealthlink.com</a>.", "<strong> You'll now get a Form 1095-A</strong> at tax time for those listed."]} %>
 
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
     contents: [""],
     heading: 'Here’s What You Need to Do Now', sub_heading: '', top_margin: '5px', bottom_margin: '5px'} %>
-
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: " 	If the people listed like the plan they have, they don't need to do anything right now. Just keep paying the monthly premiums on time."} %>
@@ -73,7 +69,6 @@
 
 <%= render partial: 'notices/shared/custom_listing', :locals => {
     listing: "<strong>The deadline to request an appeal is #{(TimeKeeper.date_of_record + 95.days).strftime("%B %d, %Y")}.</strong> Your case will be referred to an independent administrative law judge at the Office of Administrative Hearings (OAH). OAH will work to resolve your appeal quickly, but appeals can take 30 to 90 days."} %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "If you have questions or concerns, we’re here to help.<br></br>The #{Settings.site.short_name} Team <br></br> _____________________________________________________________________________________________________________"} %>

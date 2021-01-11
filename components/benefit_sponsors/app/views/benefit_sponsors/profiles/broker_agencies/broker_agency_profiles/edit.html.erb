@@ -4,7 +4,7 @@
     <div class="tab-content" id="myTabContent">
       <div id="broker_agency_form" class="container">
         <%= form_for @form_broker_agency_profile, as: :organization, url: profiles_broker_agencies_broker_agency_profile_path(@broker_agency_profile), method: :patch do |f| %>
-       
+
           <%= f.hidden_field :id %>
           <%= render 'benefit_sponsors/shared/error_messages', :object => @form_broker_agency_profile %>
           <div class="row">
@@ -28,7 +28,7 @@
                 <div class="action-group">
                   <%= render "benefit_sponsors/shared/office_locations", f: f %>
                   <div class="row no-buffer">
-                    <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
+                    <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency") %></button>
                   </div>
                 </div>
               </div>

@@ -1,12 +1,12 @@
 <!-- SIC codes helper -->
-<br />
-<br />
+<br>
+<br>
 <div id="sicHelperContent">
       <div class="header">
         <h4 class="modal-title mb-2">Search for your matching SIC Code</h4>
         <p>SIC (Standard Industrial Classifications) codes are used to categorize your business into the appropriate rating group</p>
         <p>You can use browse or search through all the available codes -- click a SIC code to make a selection</p>
-        <input id="sic_search" type="text" value="" alt="Provide a keyword related to your business"/>
+        <input id="sic_search" type="text" value="" alt="Provide a keyword related to your business">
         <button type="button" class="btn btn-success" id="btn-search">Search</button>
       </div>
       <div id="sictree">
@@ -40,9 +40,9 @@
                             });
     function assignSelectionAndCloseModal(event, data) {
       $("#sicHelperWrapper").toggleClass('hidden');
-      $('#<%=sicFieldId%>').val(data.sic_code);
-      $('#<%=sicFieldId%>').trigger('chosen:updated');
-			document.getElementById('agency_organization_profile_attributes_sic_code').value = data.sic_code;
+      $('#<%= sicFieldId %>').val(data.sic_code);
+      $('#<%= sicFieldId %>').trigger('chosen:updated');
+      document.getElementById('agency_organization_profile_attributes_sic_code').value = data.sic_code;
     }
     var search = function(e) {
       var pattern = $('#sic_search').val();

@@ -4,7 +4,7 @@
     <div class="col-md-11 col-sm-12 col-xs-12">
       <strong>
         You are eligible to enroll or change coverage through <%= @active_sep.end_on %>.
-        <!-- <i class="fa fa-lg fa-info-circle" data-toggle="tooltip" title="Your ‘<%=@active_sep.title%>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%=@active_sep.start_on%>"></i>-->
+        <!-- <i class="fa fa-lg fa-info-circle" data-toggle="tooltip" title="Your ‘<%= @active_sep.title %>’ Qualifying Life Event resulted in a Special Enrollment Period starting <%= @active_sep.start_on %>"></i>-->
         &nbsp;&nbsp;&nbsp;
         <%= build_link_for_sep_type(@active_sep) %>
       </strong>

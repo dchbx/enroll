@@ -1,7 +1,6 @@
 <div id="address_info" class="row no-buffer focus_effect personal-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
 
-
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
 
@@ -14,7 +13,7 @@
           <% style="display:block;" %>
         <% end %>
       <% end %>
-      
+
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
         <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
           <button class="btn btn-new-address">NEW ADDRESS</button>
@@ -37,7 +36,7 @@
         </div>
 
         <% if kind == 'home' %>
-          <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+          <div style="<%= style %>" class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer">
             <% target = f.object.class.to_s.downcase %>
           </div>
         <% end %>
@@ -88,13 +87,13 @@
           </div>
         </div>
       <% end %>
-    <% end%>
+    <% end %>
   </div>
 
 </div>
 
 <% if f.object.addresses[1].present? %>
-<span class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Remove Mailing Address</span>
+<span class="form-action btn btn-default <%= pundit_class Family, :updateable? %>">Remove Mailing Address</span>
 <% else %>
-<span class="form-action btn btn-default <%= pundit_class Family, :updateable?%>">Add Mailing Address</span>
+<span class="form-action btn btn-default <%= pundit_class Family, :updateable? %>">Add Mailing Address</span>
 <% end %>

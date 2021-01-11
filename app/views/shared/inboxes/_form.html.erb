@@ -1,3 +1,3 @@
-<%= form_for @new_message, url: {action: "create", id: @inbox_provider.id, profile_id: @profile._id} do |f|%>
+<%= form_for @new_message, url: {action: "create", id: @inbox_provider.id, profile_id: @profile._id} do |f| %>
   <%= render "shared/inboxes/compose_message", f: f %>
 <% end %>

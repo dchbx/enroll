@@ -14,11 +14,11 @@
     <%= render 'member_fields', f: f %>
     <%= render 'shared/census_employee_fields', {f: f} %>
     <%= render 'cobra_fields', f: f if show_cobra_fields?(@employer_profile, current_user) %>
-    <br/>
+    <br>
     <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
         <%= render 'address_fields', f: address %>
     <% end %>
-    <br/>
+    <br>
 
     <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
         <%= render 'email_fields', f: email %>

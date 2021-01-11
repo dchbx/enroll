@@ -2,13 +2,9 @@
 <% @style_text_indent = "style='margin-left:30px;'" %>
 <% @style_color_indent = "style='color:#ff0000; margin-left:30px;'" %>
 
-
-
 <%= render partial: 'notices/shared/logo' %>
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
-
-
 
 <table class="total_table" border="0">
   <tbody>
@@ -156,7 +152,6 @@
     identification (ID) is required for verification. Secondary documentation must be accompanied with an identification
     card containing a recent photo and other identifying information."} %>
 
-
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "<span #{@style_underline}>Primary documentation:</span> (Only One (1) is needed)",
       listings: [["U.S. Passport", ["<i>Note:</i> Expired passports are acceptable."]], "Certificate of Naturalization",
@@ -185,7 +180,6 @@
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
       content: "<strong>The document that you may be able to use to verify your immigration status includes, but is not limited to:</strong>"} %>
-
 
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "Permanent Resident Card (I-551, also known as Green Card)",
@@ -274,7 +268,6 @@
       and” [followed by]</span>
       [Last First Name of First Inconsistent member’s household][Last Name of First Inconsistent member’s household]."} %>
 
-
     <%= render partial: 'notices/shared/unordered_list', locals: {
       previous: "These documents can include:",
       listings: ["Copies of the most recent paystubs. If you think this income is going to change over the year, we also need an explanation in writing of the change; ",
@@ -310,11 +303,9 @@
                  "Self-attestation of residency without paper documentation in exceptional circumstances, including homelessness and in cases of domestic violence."]
       } %>
 
-
     <%= render partial: 'notices/shared/paragraph', :locals => {
       content: "<span #{@style_color_text}>[IF MEC Conflict]</span><br> <strong><i>Access to Other Insurance Coverage.</i></strong>
       Our records indicate that the following individual(s) have access to [MEC Data Match]."} %>
-
 
     <%= render partial: 'notices/shared/paragraph', :locals => {
       content: "<span #{@style_text_indent}>[MEC Type 1 Inconsistent First Name 1] [MEC Type 1 Inconsistent Last Name 1]</span><br>

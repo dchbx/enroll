@@ -12,17 +12,17 @@
       <% rows[0].each do |member| %>
         <tr valign="top">
           <td class="small" style="width: 60%;">
-            <%= member.full_name%> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= member.age %>
+            <%= member.full_name %> &nbsp;&nbsp;&nbsp;&nbsp; Age: <%= member.age %>
           </td>
           <td class="small">
             <% if member.past_due_text.present? %>
-              <%= member.past_due_text  %>
+              <%= member.past_due_text %>
             <% else %>
               <%= member.documents_due_date.strftime("%B %d, %Y") rescue "" %>
             <% end %>
           </td>
         </tr>
-      <%end%>
+      <% end %>
     </tbody>
   </table>
 </div>

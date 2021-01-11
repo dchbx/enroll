@@ -1,5 +1,5 @@
 <div class="container">
-  <h3><%= l10n("broker_messages")%></h3>
+  <h3><%= l10n("broker_messages") %></h3>
   <%= render 'inbox' %>
 
   <%= link_to l10n('broker_agencies.profiles.send_secure_message', site_short_name: site_short_name), broker_agencies_inbox_msg_to_portal_path(inbox_id: @provider.id,

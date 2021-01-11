@@ -40,7 +40,7 @@
   <h2 class="text-center <%= kind %>-kind employer-cost-text">Estimated Maximum Monthly Employer Cost</h2>
   <h2 class="employer-monthly-cost text-center"></h2>
   <div class="text-center">
-    <a class="btn btn-default <%= plan_export_default_class %> downloadReferencePlanDetailsButton" data-kind=<%= plan.coverage_kind %> onclick="downloadPdf(event, this)" onmouseenter="setSBC(this, '<%= sponsored_benefits.organizations_plan_design_proposal_plan_exports_path(@plan_design_proposal) %>')">Download PDF</a>
+    <a class="btn btn-default <%= plan_export_default_class %> downloadReferencePlanDetailsButton" data-kind=<%= plan.coverage_kind %> <%= sponsored_benefits.organizations_plan_design_proposal_plan_exports_path(@plan_design_proposal) %> ')">Download PDF</a>
     <% if plan.coverage_kind == 'health' %>
     <label class="sbc-download-label" for="sbc-checkbox"><%= check_box_tag "include_sbc", true, true, class: "sbc-download-checkbox" %> Include SBC</label>
     <% end %>

@@ -18,7 +18,7 @@
         <div class="col-md-8 col-sm-8 col-xs-12 no-pd-right">
             <%= render 'people/landing_pages/personal' %>
         </div>
-      
+
         <div class="col-md-4 col-sm-4 col-xs-12">
           <div class="life-event-tip">
             <h4>Life Events Tip #3</h4>
@@ -34,16 +34,16 @@
       <div class="emp-info">
        <div class="col-md-8 no-pd col-sm-8 col-xs-12">
           <div class="landing_personal_tab">
-            <%= render 'people/landing_pages/employer' %> 
+            <%= render 'people/landing_pages/employer' %>
           </div>
         </div>
       </div>
     </div>
-    
+
     <div aria-labelledby="family-tab" id="family" class="tab-pane fade landing-row" role="tabpanel">
-      <%= render 'people/landing_pages/family_members' %> 
+      <%= render 'people/landing_pages/family_members' %>
     </div>
-    
+
     <div aria-labelledby="contact-tab" id="contact" class="tab-pane fade landing_contact_information" role="tabpanel">
       <div class="col-md-8 col-sm-8 col-xs-12 no-pd">
         <%= form_for(@person) do |f| %>
@@ -51,7 +51,7 @@
           <%= render 'shared/phone_fields', f: f %><br>
 
           <div id="email_info" class="focus_effect personal-info-row">
-            <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+            <%= f.fields_for :emails, errors: {}, fieldset: true do |email| %>
               <%= render 'shared/email_fields', f: email %>
             <% end %>
             <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>

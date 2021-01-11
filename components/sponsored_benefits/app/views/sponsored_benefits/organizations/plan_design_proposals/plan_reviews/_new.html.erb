@@ -40,12 +40,12 @@
         </table>
         <div class="col-md-12 no-pd">
           <% if @benefit_group.sole_source? %>
-            <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group  %>
+            <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_composite_costs', benefit_group: @benefit_group %>
           <% else %>
             <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.relationship_benefits, coverage_kind: :health %>
           <% end %>
         </div>
-        <br />
+        <br>
         <div class="col-md-4 no-pd">
           <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
           <h3 class="text-center"><%= number_to_currency(@employer_contribution_amount) %></h3>
@@ -73,7 +73,7 @@
   <div class="col-md-12 no-pd">
     <a><i class="fa fa-info-circle" aria-hidden="true"></i> Note: Your monthly cost is based on final employee enrollment.</a>
   </div>
-  <br /><br />
+  <br><br>
   <% unless @benefit_group.sole_source? %>
     <div class="col-md-12 no-pd">
       <div class="panel panel-default">
@@ -95,8 +95,8 @@
         <%= render 'sponsored_benefits/organizations/plan_design_proposals/plan_comparisons/comparison_table', qhps: @qhps, single_plan_displayed: true %>
       </div>
     </div>
-    <br />
-		<% if @benefit_group.dental_reference_plan.present? %>
+    <br>
+    <% if @benefit_group.dental_reference_plan.present? %>
     <div class="panel panel-default">
       <div class="panel-body">
         <div class="col-md-2">
@@ -139,7 +139,7 @@
           <div class="col-md-12 no-pd">
             <%= render 'sponsored_benefits/organizations/plan_design_proposals/shared/employee_traditional_costs', relationship_benefits: @benefit_group.dental_relationship_benefits, coverage_kind: :dental %>
           </div>
-          <br />
+          <br>
           <div class="col-md-4 no-pd">
             <p class="th-gray">Employer Estimated Maximum Monthly Cost</p>
             <h3 class="text-center"><%= number_to_currency(@employer_dental_contribution_amount) %></h3>
@@ -165,29 +165,29 @@
     </div>
     </div>
 
-		<div class="panel panel-default">
-			<div class="panel-heading custom-heading">
-				<h3 class="panel-title">Employee Costs - Dental Benefits</h3>
-			</div>
-			<div class="panel-body">
-				<label>Plan Offerings - <%= @benefit_group.dental_reference_plan.name %></label><br />
-        <!-- For dental we allow single_plan choice only. lowest cost plan and highest cost plan are same -->        
+    <div class="panel panel-default">
+      <div class="panel-heading custom-heading">
+        <h3 class="panel-title">Employee Costs - Dental Benefits</h3>
+      </div>
+      <div class="panel-body">
+        <label>Plan Offerings - <%= @benefit_group.dental_reference_plan.name %></label><br>
+        <!-- For dental we allow single_plan choice only. lowest cost plan and highest cost plan are same -->
         <label>Employer Lowest/Reference/Highest - <%= number_to_currency(@benefit_group_dental_costs[:lowest_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_dental_costs[:ref_plan_employer_cost]) %>/<%= number_to_currency(@benefit_group_dental_costs[:highest_plan_employer_cost]) %></label>
-		    <table class="table table-bg-white table-employee-2">
-		      <thead>
-		        <tr>
-		          <th class="text-left">Employee</th>
-		          <th class="text-center">Dependent Count</th>
+        <table class="table table-bg-white table-employee-2">
+          <thead>
+            <tr>
+              <th class="text-left">Employee</th>
+              <th class="text-center">Dependent Count</th>
               <% if @benefit_group.dental_plan_option_kind != "single_plan" %>
                 <th class="text-right">Lowest Cost Available Plan</th>
               <% end %>
-		          <th class="text-right">Reference Plan</th>
+              <th class="text-right">Reference Plan</th>
               <% if @benefit_group.dental_plan_option_kind != "single_plan" %>
                 <th class="text-right">Highest Cost Available Plan</th>
               <% end %>
-		        </tr>
-		      </thead>
-		      <tbody id="employee_index_scroll">
+            </tr>
+          </thead>
+          <tbody id="employee_index_scroll">
             <% @benefit_group.census_employees.active.each do |census_employee| %>
               <tr>
                 <td class="text-left"> <%= census_employee.full_name %></td>
@@ -202,10 +202,10 @@
               </tr>
             <% end %>
           </tbody>
-		    </table>
-			</div>
-		</div>
-		<% end %>
+        </table>
+      </div>
+    </div>
+    <% end %>
   </div>
   <div class="col-md-6 col-md-offset-5">
     To finalize your quote and make it available to your client, click publish Quote.  Once you publish your quote, you cannot make edits to it.  If you want to make edits to your qupte now, click Update Roster or Select Benefits.

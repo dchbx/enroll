@@ -10,13 +10,12 @@
     <%= select_tag :naturalization_doc_type, options_for_select([['Certificate of citizenship','Certificate of Citizenship'], ['Naturalization certificate', 'Naturalization Certificate']], selected: vlp_doc_subject), {id: 'naturalization_doc_type', prompt: l10n("insured.consumer_roles.select_doc_type")} %>
   </div>
 
-  <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden' />
-  <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden' />
+  <input id="vlp_doc_target_id" value='<%= f.object.id %>' type='hidden'>
+  <input id="vlp_doc_target_type" value='<%= f.object.class %>' type='hidden'>
 
   <div class="vlp_doc_area col-md-12">
   </div>
 </div>
-
 
 <% if vlp_doc_subject.present? %>
   <script type="text/javascript">

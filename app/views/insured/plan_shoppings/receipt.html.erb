@@ -37,7 +37,7 @@
 
           <% if @enrollment.employee_role.present? %>
             <%= render "insured/plan_shoppings/coverage_information" %>
-          <%else%>
+          <% else %>
             <%= render partial: "insured/plan_shoppings/individual_coverage_information", locals: {calculate:false} %>
           <% end %>
 
@@ -59,8 +59,8 @@
         <% end %>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
         <% if show_pay_now? %>
-          <br/>
-          <br/>
+          <br>
+          <br>
           <strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without
             selecting PAY NOW, you’ll have to wait until Kaiser Permanente sends you an invoice to make your first
             month’s payment and activate your coverage.</strong>
@@ -68,8 +68,8 @@
       </div>
 
       <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;"
-         <% if @enrollment.employee_role.present? %>data-employee-role="true"
-      <% else %>data-employee-role="false"
+         <% if @enrollment.employee_role.present? %> data-employee-role="true"
+      <% else %> data-employee-role="false"
       <% end %>>
         <div class="modal-dialog">
           <div class="modal-content">
@@ -83,15 +83,15 @@
               <% if @plan.coverage_kind == 'health' %>
 
                 <h4><strong><%= @plan.name %></strong></h4>
-                <br/>
+                <br>
                 <ol>
                   <li>
                     <% if show_pay_now? %>
                       You must pay your first month’s premium directly to Kaiser Permanente to activate your
-                      coverage. DC Health Link does not collect premium payments.<br/><br/>
+                      coverage. DC Health Link does not collect premium payments.<br><br>
                       There are two ways to pay your first month’s premium and activate your coverage:
-                      <br/>
-                      <br/>
+                      <br>
+                      <br>
                       <ul style="padding-left: 18px;list-style-type: disc;/* padding-left: 18px; */">
                         <li>
                           <strong>Select PAY NOW to make your first premium payment directly to Kaiser
@@ -103,7 +103,7 @@
                           invoice within 2 weeks, call Kaiser Permanente at (844) 524-7370 to make your payment.
                         </li>
                       </ul>
-                      <br/>
+                      <br>
                       Once your coverage is activated, Kaiser Permanente will send you your insurance cards and
                       member number. You can start using your benefits on the day your coverage begins.
                     <% else %>
@@ -114,7 +114,7 @@
                         as of the effective date once you have paid the first month’s premium for coverage. You must
                         make this payment directly to <%= @plan.carrier_profile.legal_name %>. <%= Settings.site.short_name %> doesn’t collect your premium payments.
                     <% end %>
-                    <br/>
+                    <br>
                   </li>
                   <br>
                   <div class="carrier-numbers">
@@ -128,21 +128,21 @@
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "Aetna" %>
                       <div>
-                        <strong>For Customers Enrolled in Individual and Family Plans</strong><br/>
-                        Call: <strong>1-855-586-6959</strong><br/>
+                        <strong>For Customers Enrolled in Individual and Family Plans</strong><br>
+                        Call: <strong>1-855-586-6959</strong><br>
                         from 8am-6pm EST, Monday - Friday
-                        <br/>
-                        <br/>
-                        <strong>For Brokers and Employers</strong><br/>
-                        Call: <strong>1-888-422-2128</strong><br/>
+                        <br>
+                        <br>
+                        <strong>For Brokers and Employers</strong><br>
+                        Call: <strong>1-888-422-2128</strong><br>
                         from 8am-5pm EST, Monday - Friday
-                        <br/>
-                        <br/>
+                        <br>
+                        <br>
 
-                        <strong>For Small Business Employees</strong><br/>
-                        Call: <strong>Call 1-855-885-3289</strong><br/>
+                        <strong>For Small Business Employees</strong><br>
+                        Call: <strong>Call 1-855-885-3289</strong><br>
                         from 8am-6pm EST, Monday - Friday
-                        <br/>
+                        <br>
                         <!-- comment out congressional phone numbers
                         <br/>
                         <strong>For Congressional Employees</strong><br/>
@@ -164,22 +164,22 @@
                       <% end %>
                     <% elsif @plan.carrier_profile.legal_name == "UnitedHealthcare" %>
                       <div>
-                        Call: <strong>1-877-856-2430</strong><br/>
+                        Call: <strong>1-877-856-2430</strong><br>
                       </div>
                     <% end %>
                   </div>
 
-                <br/>
-                <br/>
-								<% unless show_pay_now? %>
+                <br>
+                <br>
+                <% unless show_pay_now? %>
                 <li>
-                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
+                  <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br>
                 </li>
-								<% end %>
+                <% end %>
               </ol>
               <% else %>
                 <h4><strong><%= @plan.name %></strong></h4>
-                <br/>
+                <br>
                 <ol>
                   <li>
                     <strong>Make your first premium payment directly
@@ -189,49 +189,49 @@
                     within two weeks, please call <%= @plan.carrier_profile.legal_name %> at the number below. Your
                     dental coverage will be active once you have paid the premium for your first month of coverage.
                     You must make this payment directly to <%= @plan.carrier_profile.legal_name %>.<%= Settings.site.short_name %> does not collect premiums.
-                    <br/>
+                    <br>
                   </li>
                   <div class="carrier-numbers">
                     <% if @plan.carrier_profile.legal_name == "CareFirst" %>
-                      <div><br/>
-                        Call: <strong>1-855-444-3119</strong><br/>
+                      <div><br>
+                        Call: <strong>1-855-444-3119</strong><br>
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "Delta Dental" %>
-                      <div><br/>
+                      <div><br>
                         Call: <strong>1-800-471-0236</strong> or <strong>1-800-471-0275</strong>
-                        <br/>
+                        <br>
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "MetLife" %>
-                      <div><br/>
-                        Call: <strong>1-855-638-2221</strong><br/>
+                      <div><br>
+                        Call: <strong>1-855-638-2221</strong><br>
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "Dentegra" %>
-                      <div><br/>
-                        Call: <strong>1-800-471-0284</strong><br/>
+                      <div><br>
+                        Call: <strong>1-800-471-0284</strong><br>
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "Dominion" %>
-                      <div><br/>
-                        Call: <strong>1-855-224-3016</strong><br/>
+                      <div><br>
+                        Call: <strong>1-855-224-3016</strong><br>
                       </div>
                     <% elsif @plan.carrier_profile.legal_name == "BestLife" %>
-                      <div><br/>
-                        Call: <strong>1-800-433-0088</strong><br/>
+                      <div><br>
+                        Call: <strong>1-800-433-0088</strong><br>
                       </div>
                     <% end %>
                   </div>
-                  <br/>
-                  <br/>
+                  <br>
+                  <br>
 
                   <li>
                     <strong>Start using your benefits.</strong> Once <%= @plan.carrier_profile.legal_name %> receives
                     your first payment, they can provide the information you’ll need to start using your benefits
-                    (such as member number). They’ll also mail your insurance cards to you.<br/>
+                    (such as member number). They’ll also mail your insurance cards to you.<br>
                   </li>
                 </ol>
               <% end %>
             </div>
-            <br/>
-            <br/>
+            <br>
+            <br>
           </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
       </div>
@@ -271,7 +271,7 @@
       <div class="modal-body">
         <p>
           You are leaving the <%= Settings.site.short_name %> website and entering a privately-owned website created,
-          operated and maintained by Kaiser Permanente.<br/>
+          operated and maintained by Kaiser Permanente.<br>
         <ul>
           <li>This link is provided for your convenience to allow you to pay your first month’s insurance premium now.
             It’s only available to make your first payment.
@@ -282,7 +282,7 @@
           <li>DC Health Link cannot help you with any information regarding this website, including your username or
             password, or other technical issues.
           </li>
-          <br/>
+          <br>
         </ul>
         By linking to this private business, DC Health Link is not endorsing its products, services, or privacy or
         security policies. We recommend you review the business's information collection policy or terms and conditions

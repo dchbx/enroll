@@ -54,7 +54,7 @@
   <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["Contact your employer for further assistance.".html_safe], heading: 'For Questions or Assistance:', sub_heading: ''} %>
 <% end %>
 
-<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %> 
+<%= render partial: 'notices/shared/paragraph', :locals => { content: "You can also contact #{Settings.site.short_name} with any questions:".html_safe} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
   ["Online at #{Settings.site.website_name};".html_safe,

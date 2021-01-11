@@ -27,7 +27,7 @@
             </div>
           </div>
           <% if kind == 'home' && show_no_dc_address %>
-            <div style="<%= style %>"class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+            <div style="<%= style %>" class="col-lg-3 col-md-3 col-sm-3 col-xs-5 form-group form-group-lg no-pd top-buffer">
               <% target = f.object.class.to_s.downcase %>
             </div>
           <% end %>
@@ -76,7 +76,7 @@
             </div>
           </div>
         <% end %>
-      <% end%>
+      <% end %>
     <%= render 'shared/error_warning' %>
   </div>
   <div class="col-md-2 key col-sm-3 col-xs-12"></div>

@@ -16,13 +16,13 @@
     <div class="col-md-12 no-pd col-sm-12 col-xs-12 first employee-info">
       <h4>HBX Information</h4>
       <div class="row top-row">
-        <%= f.fields_for :organization, errors: {}, fieldset: false do |org|  %>
+        <%= f.fields_for :organization, errors: {}, fieldset: false do |org| %>
           <%= render "shared/organizations/entity_name_and_type_fields.html.erb", f: org, entity_kinds: Organization::ENTITY_KINDS[0..3] %>
         <% end %>
       </div>
       <h4>Office Locations</h4>
       <div class="row top-row">
-        <%= f.fields_for :organization, errors: {}, fieldset: false do |org|  %>
+        <%= f.fields_for :organization, errors: {}, fieldset: false do |org| %>
           <%= render "shared/organizations/office_location_fields.html.erb", f: org %>
         <% end %>
       </div>

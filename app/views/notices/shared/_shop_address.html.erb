@@ -1,8 +1,8 @@
 <table class="total_table address" border="0">
   <tbody>
-  </br>
+  <br>
     <tr>
-      <td><br></br></td>
+      <td><br><br></td>
     </tr>
     <tr>
       <td><%= notice.primary_fullname %></td>
@@ -23,7 +23,7 @@
     <% end %>
     <tr>
     <td><%= notice.primary_address.city %>, <%= notice.primary_address.state %> <%= notice.primary_address.zip %></td>
-    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator%>
+    <% display_mpi_indicator =  show_mpi_indicator if defined? show_mpi_indicator %>
     <% if display_mpi_indicator.nil? %>
       <td style="text-align: right;"><%= notice.mpi_indicator %></td>
     <% end %>
@@ -40,7 +40,7 @@
     <% end %>
     <tr>
       <td>
-        <br></br>
+        <br><br>
       </td>
     </tr>
   </tbody>

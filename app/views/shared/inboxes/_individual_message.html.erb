@@ -1,17 +1,17 @@
-<tr class='<%=message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread"%>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
+<tr class='<%= message.message_read==true ? "msg-inbox-read" : "msg-inbox-unread" %>' onclick="showMessage('<%= retrieve_show_path(provider, message) %>');">
   <td style="font-weight:bold">
     <%= message.try(:from) if @folder == 'Inbox' %>
-    <%= message.try(:to)   if @folder == 'Sent'%>
+    <%= message.try(:to)   if @folder == 'Sent' %>
   </td>
   <td>
-    <%=message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y") %>
+    <%= message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y") %>
     <td>
       <%= message.try(:subject) %>
     </td>
     <%- if @folder != 'Deleted' %>
-    <td class="  <%=pundit_class(Family, :updateable?)%>">
-      <span onclick='event.stopPropagation();deleteMessage("<%=retrieve_show_path(provider, message) %>&url=<%=retrieve_inbox_path(provider)%>");' class='pull-right'>
-        <i aria-hidden="true" class="far fa-trash-alt fa-lg <%=pundit_class Family, :updateable?%>" title="Delete" data-toggle="tooltip"></i>
+    <td class="  <%= pundit_class(Family, :updateable?) %>">
+      <span onclick='event.stopPropagation();deleteMessage("<%= retrieve_show_path(provider, message) %>&url=<%= retrieve_inbox_path(provider) %>");' class='pull-right'>
+        <i aria-hidden="true" class="far fa-trash-alt fa-lg <%= pundit_class Family, :updateable? %>" title="Delete" data-toggle="tooltip"></i>
       </span>
     </td>
     <% end %>

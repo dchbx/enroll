@@ -1,8 +1,8 @@
-<tr class='<%=message.message_read==true ? "msg-inbox-read" : ""%>'>
+<tr class='<%= message.message_read==true ? "msg-inbox-read" : "" %>'>
   <td> <%= message.try(:from) if ['Inbox','Deleted'].include?(@folder) %>
-   <%= message.try(:to)   if @folder == 'Sent'%>
+   <%= message.try(:to)   if @folder == 'Sent' %>
  </td>
- <td> <%=message.created_at %>
+ <td> <%= message.created_at %>
   <td> <%= message.try(:subject) %> </td>
   <td> <%#= link_to "show", polymorphic_path([:insured, :family, provider.inbox, message]), class: "btn btn-primary", remote: true %>
     <%= link_to "show", exchanges_agents_inbox_path(provider, message_id: message.id), class: "btn btn-primary show_msg", remote: true %>

@@ -56,7 +56,7 @@
       <% @benefit_sponsorship_account.adjustments_since_last_invoice.each do |adjustment| %>
         <tr class="adjustments">
           <td></td>
-          <td><%= adjustment.name%> <%= adjustment.coverage_month.strftime("%m/%Y") %> coverage</td>
+          <td><%= adjustment.name %> <%= adjustment.coverage_month.strftime("%m/%Y") %> coverage</td>
           <td><%= number_to_currency(adjustment.amount) %></td>
         </tr>
       <% end %>

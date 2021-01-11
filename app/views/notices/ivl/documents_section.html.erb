@@ -1,9 +1,9 @@
 <table class="total_table" border="0">
   <tbody>
     <tr>
-      <td colspan="2" align="right"><a href= "#{Settings.site.home_url}"
-                                       target= "_blank">
-        <%= image_tag "#{Rails.root}/app/assets/images/#{Settings.site.mailer_logo_file_name}", style: "height: auto; vertical-align: top;", width: "100"  %>
+      <td colspan="2" align="right"><a href="#{Settings.site.home_url}"
+                                       target="_blank">
+        <%= image_tag "#{Rails.root}/app/assets/images/#{Settings.site.mailer_logo_file_name}", style: "height: auto; vertical-align: top;", width: "100" %>
       </a></td>
     </tr>
   </tbody>
@@ -34,7 +34,7 @@
 <% end %>
 <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
  content: "<strong>When is the deadline to submit documents?</strong>", top_margin: '8px'} %>
-<% if notice.notification_type == "ivl_to_coverall_transition_notice"%>
+<% if notice.notification_type == "ivl_to_coverall_transition_notice" %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "The first deadline is #{notice.past_due_text}. Different people may have different deadlines. You should submit all your documents as soon as possible. If you do not return the documents by the deadline, you could lose your insurance or cost savings.", top_margin: '5px', bottom_margin: '5px'} %>
 <% else %>
@@ -61,17 +61,17 @@
   </tr>
   <tr valign="top">
     <td>
-      Login to your account at <a href= <%= Settings.site.home_url %> > <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
+      Login to your account at <a href=<%= Settings.site.home_url %>> <%= notice.hbe.short_url %></a>. You can upload scanned copies of the documents directly to your account.
     </td>
     <td>
-      <p><%= Settings.site.short_name%></p>
+      <p><%= Settings.site.short_name %></p>
       <p style="margin-top: -10px;">Exchange Contact Center</p>
       <p style="margin-top: -10px;">PO Box 44018</p>
       <p style="margin-top: -10px;">Washington, DC 20026</p>
-      <p><i>Be sure to write your <%= Settings.site.short_name%> ID (<%= notice.primary_identifier %>) on each of the documents.</i></p>
+      <p><i>Be sure to write your <%= Settings.site.short_name %> ID (<%= notice.primary_identifier %>) on each of the documents.</i></p>
     </td>
     <td>
-      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name%> at <%= notice.hbe.phone %> to find a location near you.
+      Bring the document(s) to any Economic Security Administration Office for help. You can call <%= Settings.site.short_name %> at <%= notice.hbe.phone %> to find a location near you.
     </td>
   </tr>
 </table>
@@ -187,7 +187,6 @@
   <%= render partial: 'notices/shared/household_member_details', :locals => {
     rows: [notice.income_unverified], top_margin: '5px', bottom_margin: '5px'} %>
 
-
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "You must submit a copy of your most recent tax return, including all forms and schedules. If you expect your income for #{notice.coverage_year} to be the same as the income on your most recent tax return, we only need your tax return.", top_margin: '10px'} %>
 
@@ -232,11 +231,11 @@
 
   <%= render partial: 'notices/shared/household_member_details', :locals => {
     rows: [notice.mec_conflict], top_margin: '5px', bottom_margin: '5px'} %>
-<%end%>
+<% end %>
 
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
     content: "This would make the people listed above ineligible for help paying for health insurance with advance premium tax credits or cost-sharing reductions.  Please provide documentation that this health insurance has ended.", top_margin: '5px', bottom_margin: '7px'} %>
-<%end %>
+<% end %>
 <!-- MEC Conflict -->
 
 <!-- Indian Inconsistency/American Indian or Alaskan Native-->

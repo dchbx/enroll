@@ -11,7 +11,7 @@
           </span>
         </div>
 
-        <% if individual_market_is_enabled?%>
+        <% if individual_market_is_enabled? %>
           <div class="btn-group">
             <span type="button" class="btn btn-primary<% if @manually_picked_role == 'individual_market_events' %> active <% end %>">
               <% if controller.action_name == "find_sep" %>
@@ -35,7 +35,7 @@
         <div class="item <%= 'active' if count == 0 %>">
           <ul class="list-qle">
             <% qles.each_with_index do |qle, index| %>
-              <p class="<%=pundit_class Family, :updateable?%>"><%= qle_link_generater(qle, index) %></p>
+              <p class="<%= pundit_class Family, :updateable? %>"><%= qle_link_generater(qle, index) %></p>
             <% end %>
           </ul>
         </div>

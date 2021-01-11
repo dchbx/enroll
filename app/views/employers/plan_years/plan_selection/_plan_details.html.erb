@@ -1,5 +1,5 @@
 <div class="row">
-  <br/><br/>
+  <br><br>
 
 <div class="col-xs-6">
   <h1>Your Reference Plan</h1>
@@ -90,10 +90,9 @@
     </div>
 <% end %>
 
-
 <div class="dental-config-links" style="display: none;">
-  <br class="clear"/>
-  <br/>
+  <br class="clear">
+  <br>
   <% if @is_edit == 'true' && calc_offered == true %>
   <h4 class="dental-view-summary">
     <%= link_to 'View Plan Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: @plan.id, hios_id: @plan.hios_id, coverage_kind: @plan.coverage_kind), remote: true %>

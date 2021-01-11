@@ -11,7 +11,7 @@
     <tr>
       <td style="padding: 3px"><%= staff.first_name + " " + staff.last_name %></td>
       <td style="padding: 3px"><%= staff.try(:user).try(:email) %></td>
-      <td style="padding: 3px"><a href='JavaScript:Void(0);' data-assister='<%=staff.id%>' class='help_button'> Request Help </a></td>
+      <td style="padding: 3px"><a href='JavaScript:Void(0);' data-assister='<%= staff.id %>' class='help_button'> Request Help </a></td>
     </tr>
   <% end %>
 </tbody>

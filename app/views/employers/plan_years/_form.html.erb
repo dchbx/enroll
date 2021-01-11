@@ -2,11 +2,11 @@
     <div class="alert alert-info hide" role="alert">
       <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> <%= Settings.site.late_rates_message %></strong>
     </div>
-    
-    <input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>" />
-    <input type="hidden" id="employerMinFamilyContribution" data-value="<%= aca_shop_market_employer_family_contribution_percent_minimum %>" />
-    <input type="hidden" id="employerProfileId" data-value="<%= @employer_profile.id %>" />
-    <input type="hidden" id="benefitGroupId" data-value="<%= f.object.id %>" />
+
+    <input type="hidden" id="employerMinEmployeeContribution" data-value="<%= aca_shop_market_employer_contribution_percent_minimum %>">
+    <input type="hidden" id="employerMinFamilyContribution" data-value="<%= aca_shop_market_employer_family_contribution_percent_minimum %>">
+    <input type="hidden" id="employerProfileId" data-value="<%= @employer_profile.id %>">
+    <input type="hidden" id="benefitGroupId" data-value="<%= f.object.id %>">
       <div class="row">
         <div class="col-xs-12 planyear-add-tab">
           <div id="choose-coverage">
@@ -45,14 +45,13 @@
             <a href="#" data-href="<%= search_reference_plan_employers_employer_profile_plan_years_path %>" id='search_reference_plan_link' style='display:none;'></a>
             <a href="#" data-href="<%= calc_employer_contributions_employers_employer_profile_plan_years_path %>" id='calc_employer_contributions_link' style='display:none;'></a>
             <a href="#" data-href="<%= reference_plan_options_employers_employer_profile_plan_years_path %>" id='reference_plan_options_link' style='display:none;'></a>
-            <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg|  %>
+            <%= f.fields_for :benefit_groups, errors: {}, fieldset: false do |bg| %>
               <%= render "shared/benefit_group_fields", f: bg, p: @plan_year %><br>
             <% end %>
 
-
             <div class="row no-buffer controls module" style="display: none;">
-              <br/>
-              <br/>
+              <br>
+              <br>
 
               <div class="vertically-aligned-row">
                 <div class="text-left">
@@ -77,7 +76,6 @@
       </div>
     </div>
   </div><br>
-  
 
 <script>
   <% flag = rates_available?(@employer_profile) %>
@@ -126,4 +124,3 @@
     });
   }
 </script>
-

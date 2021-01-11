@@ -35,7 +35,7 @@
     <label for="noticeDescription">Recipient *</label>
     <%= f.select(:recipient, options_for_select(recipients.inject([]) {|options, (k, v)| options << [k, v]}, selected: notice_kind.recipient), { :class => 'form-control'}, required: true ) %>
   </div>
- 
+
   <div class="form-group col-xs-12">
     <%= f.fields_for :template do |template_form| %>
     <label for="noticeBody">NoticeBody *</label>
@@ -58,8 +58,8 @@
 $(function() {
 
   function updateCkEditor() {
-    for (instance in CKEDITOR.instances){ 
-      CKEDITOR.instances[instance].destroy(true); 
+    for (instance in CKEDITOR.instances){
+      CKEDITOR.instances[instance].destroy(true);
     }
     CKEDITOR.replace('notice_kind_template_raw_body', {});
   }
@@ -89,4 +89,3 @@ $(function() {
 })
 
 </script>
-

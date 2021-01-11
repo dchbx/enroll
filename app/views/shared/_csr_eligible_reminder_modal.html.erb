@@ -1,4 +1,4 @@
-<div class="modal" id="csrEligibleReminder-<%= plan.id%>" tabindex="-1" role="dialog" role="document">
+<div class="modal" id="csrEligibleReminder-<%= plan.id %>" tabindex="-1" role="dialog" role="document">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
@@ -6,16 +6,16 @@
         <h4 class="modal-title">You are Eligible for Lower Costs</h4>
       </div>
       <div class="modal-body">
-				<p>
+        <p>
           You are eligible for cost-sharing reductions, but can only use this benefit if you enroll in a silver plan.
-				</p>
-				Cost-sharing reductions lower costs such as deductibles, copayments, and coinsurance. Are you sure you don't want to use this benefit?
+        </p>
+        Cost-sharing reductions lower costs such as deductibles, copayments, and coinsurance. Are you sure you don't want to use this benefit?
 
         <ul class="application-warnings"></ul>
       </div>
       <div class="modal-footer">
-				<%= link_to 'Cancel', "", class: 'btn btn-default', data: {'dismiss': 'modal' } %>
-  				<%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right  mtz plan-select select', onclick: "$(\'.panel[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-default.dn\').trigger(\'click\')"}) %> &nbsp;
+        <%= link_to 'Cancel', "", class: 'btn btn-default', data: {'dismiss': 'modal' } %>
+          <%= link_to("Select Plan", "javascript:void(0)", {class: 'btn btn-primary pull-right btn-right  mtz plan-select select', onclick: "$(\'.panel[data-plan-id=\"#{plan.id}\"]\').find(\'.btn-default.dn\').trigger(\'click\')"}) %> &nbsp;
       </div>
     </div>
   </div>

@@ -10,16 +10,15 @@
         <h4 class="modal-title" id="myModalLabel">Please fix the following validation error(s)</h4>
       </div>
       <div class="modal-body">
-        <%@aptc_errors.each do |key, val|%>
-          <li><%=val%></li>
-        <%end%>
+        <% @aptc_errors.each do |key, val| %>
+          <li><%= val %></li>
+        <% end %>
 
-        <hr />
-        
+        <hr>
+
           <div class="warning">
             <i class="fa fa-info-circle"> &nbsp; You may reset your changes by clicking on the 'Reset' button. It will revert to the values strored in the database.</i>
           </div>
-
 
       </div>
     </div>

@@ -3,12 +3,12 @@
     <div>
       Dear <%= person.full_name.titleize %>,
     </div>
-    <br />
+    <br>
     <% if Settings.site.key == :dc %>
       <div>Thank you for submitting your broker application to <%= Settings.site.short_name %>. Please allow 7-10 business days for <%= Settings.site.short_name %> to review your application.</div>
-      <br />
+      <br>
       <div>If there are any unsatisfied requirements you will receive an email notification detailing any outstanding requirements that must be satisfied before your application can be approved. Upon approval of your registration, you will receive an email from noreply@dchealthlink.com with important information about how to access your broker portal and how your clients can assign you as their broker.</div>
-      <br />
+      <br>
       <div>Brokers need to fulfill the following requirements as detailed in the broker registration guide:
         <ul>
           <li><%= Settings.site.short_name %> Broker training course (worth 4 C.E. credits)</li>
@@ -16,39 +16,39 @@
           <li>DC resident or non-resident health insurance producer license that is active and in good standing</li>
         </ul>
       </div>
-      <br />
-      <div>More information about these requirements is included in the <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf">Broker Registration Guide<a/></div>
-      <br />
+      <br>
+      <div>More information about these requirements is included in the <a href="https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf">Broker Registration Guide<a /></div>
+      <br>
       <div>Please reach out to DC Health Link at dchl.producer@dc.gov with any questions.</div>
     <% else %>
       <div>
         Thank you for submitting your application to become a certified broker through the Health Connector for Business. We'll review your application to make sure that you meet all of the requirements for our certified brokers.
       </div>
-      <br />
+      <br>
       <div>
         <strong>You should expect to receive another email from us about your next steps within 7-10 business days.</strong>
       </div>
-      <br />
+      <br>
       <div>
         If you meet all of our requirements for certified brokers, your next email will include information on how to access the broker portal, including creating a username and password.
       </div>
-      <br />
+      <br>
       <div>
         If you do not appear to meet all of our requirements, we will let you know which steps you will need to take before you can become a Health Connector-certified broker.
       </div>
-      <br />
+      <br>
       <div>
         If you have questions, please visit the <a href="<%= certification_url %>">broker certification section of our website</a>, or call us at <%= contact_center_phone_number %> (TTY: <%= contact_center_tty_number %>).
       </div>
-      <br />
+      <br>
       <div>
         Thank you,
       </div>
-      <br />
+      <br>
       <div>
         <%= site_title %>
       </div>
-      <br />
+      <br>
     <% end %>
   </body>
 </html>

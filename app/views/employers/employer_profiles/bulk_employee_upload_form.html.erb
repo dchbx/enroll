@@ -1,11 +1,11 @@
 THIS IS A DEMO FORM. WILL BE REPLACED BY A MODAL.
-<br/>
+<br>
 BULK UPLOAD/TERMINATE FOR CENCUS EMPLOYEES
-<br/>
-<br/>
-<br/>
+<br>
+<br>
+<br>
 <form action="/employers/employer_profiles/<%= @employer_profile.id %>/bulk_employee_upload" method="post" enctype="multipart/form-data">
   <input name="authenticity_token" value="<%= form_authenticity_token %>" type="hidden">
-  <input type="file" name="file"> Upload A Valid CSV (Better error handling coming later)<br/>
+  <input type="file" name="file"> Upload A Valid CSV (Better error handling coming later)<br>
   <input type="submit">
 </form>

@@ -11,11 +11,11 @@
 </script>
 
 <td colspan="90%">
-  <%if @hbxs.present?%>
+  <% if @hbxs.present? %>
     <%= form_tag update_cancel_enrollment_exchanges_hbx_profiles_path, :method => :post, remote: true do %>
       <h3 class='title'>Cancel Enrollment</h3>
-      <br />
-      <table  class="table table-striped">
+      <br>
+      <table class="table table-striped">
         <tr>
           <th>HBX ID</th>
           <th>Plan</th>
@@ -31,12 +31,12 @@
           <td><%= hbx.effective_on %></td>
           <td><%= hbx.effective_on %></td>
           <td><%= check_box_tag "cancel_hbx_#{hbx.id}", hbx.id %></td>
-          <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true%></td>
+          <td><%= check_box_tag "transmit_hbx_#{hbx.id}", hbx.id, false,  disabled: true %></td>
         </tr>
         <% end %>
-        <tr><td colspan = "6"><br /></td></tr>
+        <tr><td colspan="6"><br></td></tr>
         <tr>
-          <td colspan = "6">
+          <td colspan="6">
             <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
             <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
             <%= hidden_field_tag :family_id, params[:family] %>
@@ -45,7 +45,7 @@
         </tr>
       </table>
     <% end %>
-  <%else%>
+  <% else %>
     <h4 class='title'>No Enrollments to cancel</h3>
-  <%end%>
+  <% end %>
 </td>

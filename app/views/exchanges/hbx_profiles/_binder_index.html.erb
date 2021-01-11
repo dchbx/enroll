@@ -6,7 +6,7 @@
 
 <%= form_tag binder_paid_exchanges_hbx_profiles_path, method: :post, id: 'binder_paid_index' do %>
   <div class="module">
-    <table id="binder-transition-dataTable" class="table table-striped table-hover table-sm display select  <%=pundit_class(HbxProfile, :modify_admin_tabs?)%>">
+    <table id="binder-transition-dataTable" class="table table-striped table-hover table-sm display select  <%= pundit_class(HbxProfile, :modify_admin_tabs?) %>">
       <thead class="thead-default">
         <tr>
          <th>

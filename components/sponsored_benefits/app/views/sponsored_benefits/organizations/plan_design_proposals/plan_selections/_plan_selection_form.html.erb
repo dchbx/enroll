@@ -57,7 +57,7 @@
               <%= ba.fields_for :benefit_group, ba.object.benefit_groups.first do |bg| %>
                 <%= render 'sponsored_benefits/organizations/plan_design_proposals/contributions/contribution_sliders', f: bg %>
               <% end %>
-            <% end%>
+            <% end %>
           <% end %>
         <% end %>
       </div>
@@ -72,7 +72,7 @@
         <h3 class="panel-title">Benefit Package Selection</h3>
       </div>
       <div class="panel-body">
-        <p>Select the plan you wish to offer to all enrollees.  Your maximum monthly cost will be based on the benefit cost, contribution amount and expected participation as specified on the employee roster.</p><br />
+        <p>Select the plan you wish to offer to all enrollees.  Your maximum monthly cost will be based on the benefit cost, contribution amount and expected participation as specified on the employee roster.</p><br>
         <div class="col-md-10">
           <div class="reference-plans"></div>
         </div>
@@ -115,12 +115,12 @@
           <h3>Employee Costs</h3>
         </div>
         <div class="col-md-7">
-          <br />
+          <br>
           <p>Details of the minimum, maximum and reference costs for your members are shown below.  Values are based on the Benefit Package Type, Contribution Amounts and Reference Plan you have chosen above.</p>
         </div>
         <div class="col-md-2">
-          <br />
-          <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true" >Show Details</a>
+          <br>
+          <a class="text-center employee-details-text" data-toggle="collapse" href="#collapseExample" aria-expanded="true">Show Details</a>
         </div>
         <div class="collapse" id="collapseExample">
           <div class="employee-costs"></div>
@@ -138,11 +138,11 @@
         $(this).text("Show Details");
     };
   });
-	$(function() {
-		a = document.querySelectorAll('.fa-dot-circle');
-		a.forEach((icon)=> icon.classList.add('hidden'))
-		b = document.querySelectorAll('.fa-square');
-		b.forEach((icon)=> icon.classList.add('hidden'))
-	})
-	
+  $(function() {
+    a = document.querySelectorAll('.fa-dot-circle');
+    a.forEach((icon)=> icon.classList.add('hidden'))
+    b = document.querySelectorAll('.fa-square');
+    b.forEach((icon)=> icon.classList.add('hidden'))
+  })
+
 </script>

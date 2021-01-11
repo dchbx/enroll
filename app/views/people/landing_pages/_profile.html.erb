@@ -22,20 +22,20 @@
     <div role="tabpanel" class="tab-pane" id="employer">
 
       <p>
-		<span> Employer Information.</span>
-	</p>
+    <span> Employer Information.</span>
+  </p>
   <div class="row top-row">
     <div class="col-md-7 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
-       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
-       Social Security:  <%= @employee.ssn %><br/>
+      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br>
+       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br>
+       Social Security:  <%= @employee.ssn %><br>
        <% if @employer.present? %>
         <h4> <%= @employer.legal_name %> </h4>
-        <% address = @employer.office_locations.first.address%>
+        <% address = @employer.office_locations.first.address %>
         <% if address.present? %>
-          <spa><%= address.full_address%></span>
+          <spa><%= address.full_address %></span>
         <% end %>
-        </br>
+        <br>
         Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %>
        <% end %>
     </div>
@@ -46,7 +46,7 @@
     <div role="tabpanel" class="tab-pane" id="family">
       Family Info
       <a href='#' class='btn btn-save person_landing_continue'> Add Family Member </a>
-      <br/>
+      <br>
       <table class="table">
        <tr>
         <th>
@@ -91,7 +91,7 @@
       <%= render 'shared/phone_fields', f: f %><br>
 
       <div id="email_info" class="focus_effect personal-info-row">
-        <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <%= f.fields_for :emails, errors: {}, fieldset: true do |email| %>
           <%= render 'shared/email_fields', f: email %>
         <% end %>
         <div class="col-md-10 col-sm-10"><div id="email_error"></div></div>

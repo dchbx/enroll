@@ -10,7 +10,7 @@
       </div>
     </div>
     <p>Tell us about other health coverage options for this person. When you're finished, select CONTINUE.</p>
-    <br/>
+    <br>
 
     <!--is enrolled driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer fa-align-elements">
@@ -32,12 +32,11 @@
         </div>
       </div>
     </div>
-    <br />
+    <br>
 
-    <div class='benefit-kinds', id='enrolled-benefit-kinds'>
-      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>
-    </div>
-    <br/>
+    <div class='benefit-kinds'
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_enrolled", text: "What type of coverage is this person currently enrolled in? *"} %>>
+    <br>
 
     <!--is eligible driver question-->
     <div class="driver-question row row-form-wrapper radio-align no-buffer row-height fa-align-elements">
@@ -59,11 +58,10 @@
         </div>
       </div>
     </div>
-    <br />
+    <br>
 
-    <div class='benefit-kinds', id='eligible-benefit-kinds'>
-      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>
-    </div>
+    <div class='benefit-kinds'
+      <%= render partial: 'financial_assistance/benefits/insurance_kinds', locals: { insurance_kinds: FinancialAssistance::Benefit::INSURANCE_KINDS, kind: "is_eligible", text: "What type of coverage does this person have access to?"} %>>
 
     <div class="col-md-4 col-sm-4 col-xs-4">
     <%#= link_to "Add Health Coverage", new_application_applicant_benefit_path(@application, @applicant), class: "btn btn-default center-block" %>
@@ -89,7 +87,7 @@
         </div>
         <div class="modal-body">
           Are you sure you want to remove everything you have entered <strong>for this Benefit?
-          <br />
+          <br>
            This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
@@ -109,7 +107,7 @@
           <h4 class="modal-title darkblue" id="myModalLabel">Permanently Remove This Info?</h4>
         </div>
         <div class="modal-body">
-          Are you sure you want to delete all of these benefits?<strong>Are you sure you want to continue?<br />This cannot be undone.</strong>
+          Are you sure you want to delete all of these benefits?<strong>Are you sure you want to continue?<br>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
@@ -128,7 +126,7 @@
           <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
         </div>
         <div class="modal-body">
-          If you leave without saving, you will lose all your changes.<br />
+          If you leave without saving, you will lose all your changes.<br>
           <strong>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">

@@ -8,57 +8,57 @@
     </h2>
   </div>
   <div class="panel-body">
-    
-    <%= render 'household_header.html.erb', :max_aptc => @max_aptc, :csr_percent_as_integer => @csr_percent_as_integer%>
-    <hr style="margin:  2px 1px;"/>
+
+    <%= render 'household_header.html.erb', :max_aptc => @max_aptc, :csr_percent_as_integer => @csr_percent_as_integer %>
+    <hr style="margin:  2px 1px;">
 
     <table class="table table-border module edit-aptc-csr-table">
       <thead>
         <th></th>
         <% $months_array.each do |month| %>
-          <th style="text-align:center"><%=month.capitalize%></th>
-        <%end%>
-      </thead>  
+          <th style="text-align:center"><%= month.capitalize %></th>
+        <% end %>
+      </thead>
       <tbody>
-        <%@household_info.keys.each do |attribute|%>
+        <% @household_info.keys.each do |attribute| %>
           <tr>
-            <td width="140px;" ><%=if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end%></td>
+            <td width="140px;"><%= if attribute == "csr_percentage"; "CSR % AS INTEGER"; else; attribute.titleize.upcase; end %></td>
             <% @household_info[attribute].each do |month, val| %>  <!-- month and the corresponding values -->
-              <td class="<%=aptc_csr_data_type(@current_year, month)%>">
-                <%if attribute == "available_aptc" && val.to_i < 0 %> <!--If this is an available APTC with a negative value ?-->
+              <td class="<%= aptc_csr_data_type(@current_year, month) %>">
+                <% if attribute == "available_aptc" && val.to_i < 0 %> <!--If this is an available APTC with a negative value ?-->
                   <i data-toggle="tooltip" title="Available APTC is less than 0.">
-                    <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels-negative', readonly: true, disabled: true, style: "text-align:right;"%>
+                    <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels-negative', readonly: true, disabled: true, style: "text-align:right;" %>
                   </i>
-                <%else%>
-                  <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
-                <%end%>
+                <% else %>
+                  <%= label_tag "#{attribute.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;' %>
+                <% end %>
               </td>
-            <%end%>
+            <% end %>
           </tr>
           <tr></tr>
-        <%end%>
-        <tr><td colspan = "13" class="aptc-csr-grid-separator"></td></tr>
+        <% end %>
+        <tr><td colspan="13" class="aptc-csr-grid-separator"></td></tr>
         <tr>
-          <th colspan = "4">Household Member(s)</th>
-          <th colspan = "9">APTC Amount / Percent Ratio</th>
+          <th colspan="4">Household Member(s)</th>
+          <th colspan="9">APTC Amount / Percent Ratio</th>
         </tr>
         <% @household_members.each do |person_id| %>
           <tr>
-            <td colspan = "4">
+            <td colspan="4">
               <span class="glyphicon glyphicon-user"></span>
-                &nbsp;&nbsp;&nbsp;<%=full_name_of_person(person_id.keys.first)%>
-              <%if primary_member(person_id.keys.first)%> 
+                &nbsp;&nbsp;&nbsp;<%= full_name_of_person(person_id.keys.first) %>
+              <% if primary_member(person_id.keys.first) %>
                 &nbsp;&nbsp;&nbsp;
                 <i class="fa fa-asterisk" aria-hidden="true" data-toggle="tooltip" title="Primary Family Member"></i>
-              <%end%>
+              <% end %>
             </td>
-            <td colspan = "9"> <%='%.2f' % person_id[person_id.keys[0]]%>  &nbsp;&nbsp; ( <%=(person_id[person_id.keys[0]][0]/person_id[person_id.keys[0]][1]*100).round(2)%> % ) </td>
+            <td colspan="9"> <%= '%.2f' % person_id[person_id.keys[0]] %>  &nbsp;&nbsp; ( <%= (person_id[person_id.keys[0]][0]/person_id[person_id.keys[0]][1]*100).round(2) %> % ) </td>
           </tr>
-        <%end%>
-      </tbody> 
+        <% end %>
+      </tbody>
     </table>
 
   </div>
 </div>
 
-<%if @active_tax_household_for_current_year.nil? %><span class="glyphicon glyphicon-info-sign"> </span> No Active Tax Household for <%=@current_year%><br /><%end%>
+<% if @active_tax_household_for_current_year.nil? %><span class="glyphicon glyphicon-info-sign"> </span> No Active Tax Household for <%= @current_year %><br><% end %>

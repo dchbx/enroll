@@ -2,54 +2,54 @@
   td#firstcol {max-width:67%;}
 </style>
 
-<div class="panel panel-info">  
+<div class="panel panel-info">
   <div class="panel-heading">
     <h2 class="panel-title">
-      <a href="#enrollment_<%=hbx_id.to_s%>" data-toggle="collapse">    <i class="fa fa-users" aria-hidden="true"></i>   </a>
-      &nbsp;<b>Active Enrollment <%=enrollment_count%></b>&nbsp;&nbsp;&nbsp; <small>Effective On: <%=find_enrollment(hbx_id).effective_on%></small>
+      <a href="#enrollment_<%= hbx_id.to_s %>" data-toggle="collapse">    <i class="fa fa-users" aria-hidden="true"></i>   </a>
+      &nbsp;<b>Active Enrollment <%= enrollment_count %></b>&nbsp;&nbsp;&nbsp; <small>Effective On: <%= find_enrollment(hbx_id).effective_on %></small>
       <div style="float:right">
-        <div id="loading-<%=hbx_id%>-aptc"></div>
+        <div id="loading-<%= hbx_id %>-aptc"></div>
       </div>
     </h2>
   </div>
-  <div id="<%='enrollment_' + hbx_id.to_s%>" class="collapse in">
+  <div id="<%= 'enrollment_' + hbx_id.to_s %>" class="collapse in">
 
     <div class="panel-body">
-      <%= render 'enrollment_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count%>
+      <%= render 'enrollment_header.html.erb', :hbx_id => hbx_id, :hbx_values => hbx_values, :enrollment_count => enrollment_count %>
 
-      <hr style="margin:  2px 2px;"/>
+      <hr style="margin:  2px 2px;">
       <table class="table table-border module edit-aptc-csr-table">
         <thead>
           <th>Member APTC</th>
           <% $months_array.each do |month| %>
-            <th style="text-align:center"><%=month.capitalize%></th>
-          <%end%>
-        </thead>  
+            <th style="text-align:center"><%= month.capitalize %></th>
+          <% end %>
+        </thead>
         <tbody>
-          
+
           <!-- BREAKDOWN OF APTC APPLIED PER MEMBER FOR THE ABOVE ENROLLMENT -->
-          <%hbx_values["aptc_applied_per_member"].each do |member_id, aptc_values|%>
+          <% hbx_values["aptc_applied_per_member"].each do |member_id, aptc_values| %>
             <tr>
-              <td width="140px;"><%= full_name_of_person(member_id)%></td>
+              <td width="140px;"><%= full_name_of_person(member_id) %></td>
               <% aptc_values.each do |month, val| %>  <!-- month and the corresponding values -->
-                <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
-                  <%= label_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+                <td class="<%= aptc_csr_data_type(@current_year, month) %>">
+                  <%= label_tag "#{member_id.to_s+"_"+month.to_s}", val, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;' %>
                 </td>
-              <%end%>
+              <% end %>
             </tr>
 
-          <%end%>
+          <% end %>
           <!--Total from all members / for Enrollment-->
 
             <tr>
               <td width="140px;">Totals</td>
-                <%hbx_values["aptc_applied"].each do |month, aptc_value|%>
-                <td class="<%=aptc_csr_data_type(@current_year, month)%>"> 
-                  <%= label_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;'%>
+                <% hbx_values["aptc_applied"].each do |month, aptc_value| %>
+                <td class="<%= aptc_csr_data_type(@current_year, month) %>">
+                  <%= label_tag "aptc_month_#{hbx_id.to_s+"_"+month.to_s}", aptc_value, placeholder: '', class: 'form-control month-labels', readonly: true, disabled: true, style: 'text-align:right;' %>
                 </td>
-              <%end%>
+              <% end %>
             </tr>
-           
+
           <!--
           <tr>
             <th colspan = "4">Member(s) Enrolled</th>
@@ -62,12 +62,11 @@
             </tr>
           <%#end%>
           -->
-          
-        </tbody> 
+
+        </tbody>
       </table>
 
     </div>
 
   </div> <!--collapse div-->
 </div>
-

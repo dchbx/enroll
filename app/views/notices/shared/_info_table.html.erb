@@ -8,7 +8,7 @@
               <% if row[i].instance_of? Array %>
                 <% row[i].size.times do |j| %>
                   <p><%= row[i][j] %></p>
-                <%end%>
+                <% end %>
               <% else %>
                 <%= row[i] %>
               <% end %>

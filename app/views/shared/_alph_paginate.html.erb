@@ -1,9 +1,9 @@
 <% remote = remote.blank? ? false : remote %>
 <ul class='pagination'>
   <%- if defined?(full_index_url) && full_index_url.present? %>
-	  <li class="<%= 'active' if params[:page].nil? %>">
-	  	<%= link_to '&nbsp;ALL&nbsp;'.html_safe, full_index_url, remote: true %>
-	  </li>
+    <li class="<%= 'active' if params[:page].nil? %>">
+      <%= link_to '&nbsp;ALL&nbsp;'.html_safe, full_index_url, remote: true %>
+    </li>
   <% end %>
   <% alphs.each do |alph| %>
     <% alph_url = url + "?page=#{alph}" %>

@@ -22,7 +22,7 @@
       </div>
       <% broker_or_staff_role = @broker_applicant.broker_role.nil? ? @broker_applicant.broker_agency_staff_roles[0] : @broker_applicant.broker_role %>
       <%= render partial: "shared/brokers/broker_fields", :locals => {f: f, broker_or_staff_role: broker_or_staff_role} %>
-      <br/>
+      <br>
        <div class="row top-row no-border">
         <div class="col-xs-12 text-center broker_approve_deny_btn">
           <%= pundit_span HbxProfile, :approve_broker? %>

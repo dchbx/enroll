@@ -1,5 +1,5 @@
 <div class="container">
-  <%if @matches != true %>
+  <% if @matches != true %>
     <h4 class="title text-center">User Account Updated Successfully</h4>
     <table class="table table-border">
       <thead></thead>
@@ -23,20 +23,20 @@
       </tbody>
     </table>
     </div>
-  <%else%>
+  <% else %>
     <h3 class="title text-center">User Account Update Failed</h3>
     <% if @username_taken.present? %>
       <h4>The username matches with the following user:</h4>
-      First Name :<b><%= @username_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @username_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br />
+      First Name :<b><%= @username_taken.person.first_name %></b> <br>
+      Last Name:  <b><%= @username_taken.person.last_name %></b>  <br>
+      HBX ID:     <b><%= @username_taken.person.hbx_id %></b>     <br>
     <% end %>
     <% if @email_taken.present? %>
       <h4>The email matches with the following user:</h4>
-      First Name :<b><%= @email_taken.person.first_name %></b> <br />
-      Last Name:  <b><%= @email_taken.person.last_name %></b>  <br />
-      HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br />
+      First Name :<b><%= @email_taken.person.first_name %></b> <br>
+      Last Name:  <b><%= @email_taken.person.last_name %></b>  <br>
+      HBX ID:     <b><%= @email_taken.person.hbx_id %></b>     <br>
     <% end %>
     <h5>Please resolve the match issue.</h5>
-  <%end%>
+  <% end %>
   </div>

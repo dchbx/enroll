@@ -5,7 +5,7 @@
   <div id="plan-summary"></div>
 </div>
 <div id='account-detail'>
-  <% @person.active_employee_roles.each do |employee_role|%>
+  <% @person.active_employee_roles.each do |employee_role| %>
     <%= render 'employer_panel', employee_role: employee_role if newhire_enrollment_eligible?(employee_role) %>
   <% end %>
   <%= render 'sep_message' if @active_sep.present? %>

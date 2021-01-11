@@ -40,19 +40,18 @@
               <div class="row">
                 <div class="col-sm-12">
                    <div class="form-group pull-right">
-                      <%= submit_tag l10n("hbx_profiles.extend_oe"), class: "btn btn-primary #{pundit_class HbxProfile, :can_extend_open_enrollment? }" %> 
+                      <%= submit_tag l10n("hbx_profiles.extend_oe"), class: "btn btn-primary #{pundit_class HbxProfile, :can_extend_open_enrollment? }" %>
                       <button type="button" class="btn btn-default" id="reviewClose">Cancel</button>
                   </div>
                 </div>
               </div>
               <% end %>
-            </div> 
+            </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-
 
 <script>
   $(".uidatepicker").datepicker({minDate: "<%= @benefit_application.open_enrollment_date_bounds[:min] %>", maxDate: "<%= @benefit_application.open_enrollment_date_bounds[:max] %>", changeMonth: true, changeYear: true, yearRange: (new Date).getFullYear() + ":" + (new Date).getFullYear()+1 });

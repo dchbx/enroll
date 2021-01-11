@@ -1,38 +1,38 @@
 <div class="container-fluid">
     <div class='plan_selectors'>
-        <div  id='carriers' style='width: 200px;'>
-            <b><%= l10n("carriers")%></b><br/>
+        <div id='carriers' style='width: 200px;'>
+            <b><%= l10n("carriers") %></b><br>
             <%- @health_selectors[:carriers].each do |carrier| %>
                 <div class='criteria_style' style='width:200px'>
                     <%- if carrier[1] == 'any' %>
-                    <input type='checkbox' id="<%=carrier[1]%>" class='criteria interaction-choice-control-value-any' checked> <%=carrier[0].rstrip %> </input>
+                    <input type='checkbox' id="<%= carrier[1] %>" class='criteria interaction-choice-control-value-any' checked> <%= carrier[0].rstrip %> <input>
                     <%- else %>
-                    <input type='checkbox' id="<%=carrier[1]%>" class='criteria' > <%=carrier[0].rstrip %> </input>
+                    <input type='checkbox' id="<%= carrier[1] %>" class='criteria'> <%= carrier[0].rstrip %> <input>
                     <%- end %>
                 </div>
              <% end %>
         </div>
         <div id='metals'>
-            <b><%= l10n("metal_levels")%></b> </br>
+            <b><%= l10n("metal_levels") %></b> <br>
             <%- @health_selectors[:metals].each do |metal| %>
                 <div class='criteria_style'>
                     <%- if metal == 'any' %>
-                    <input type='checkbox' id="<%=metal%>"  class='criteria interaction-choice-control-value-any' checked="checked"> <%= metal %> </input>
+                    <input type='checkbox' id="<%= metal %>" class='criteria interaction-choice-control-value-any' checked="checked"> <%= metal %> <input>
                     <%- else %>
-                    <input type='checkbox' id="<%=metal%>"  class='criteria ' > <%= metal %> </input>
+                    <input type='checkbox' id="<%= metal %>" class='criteria '> <%= metal %> <input>
                     <%- end %>
                 </div>
             <% end %>
         </div>
         <div id='plan_types'>
-            <b><%= l10n("plan_types")%></b> <br>
+            <b><%= l10n("plan_types") %></b> <br>
             <%- @health_selectors[:plan_types].each do |type| %>
             <div class='criteria_style'>
 
                 <%- if type == 'any' %>
-                <input type='checkbox' id="<%=type%>" class='criteria interaction-choice-control-value-any' checked> <%= type %> </input>
+                <input type='checkbox' id="<%= type %>" class='criteria interaction-choice-control-value-any' checked> <%= type %> <input>
                 <%- else %>
-                <input type='checkbox' id="<%=type%>" class='criteria' > <%= type %> </input>
+                <input type='checkbox' id="<%= type %>" class='criteria'> <%= type %> <input>
                 <%- end %>
               </div>
             <% end %>
@@ -42,9 +42,9 @@
              <%- @health_selectors[:dc_network].each do |choice| %>
                  <div class='criteria_style'>
                      <%- if choice == 'any' %>
-                     <input type='checkbox'  id="<%=choice%>" class='criteria interaction-choice-control-value-any' checked> <%= choice %> </input>
+                     <input type='checkbox' id="<%= choice %>" class='criteria interaction-choice-control-value-any' checked> <%= choice %> <input>
                      <%- else %>
-                     <input type='checkbox'  id="<%=choice%>" class='criteria'> <%= choice %> </input>
+                     <input type='checkbox' id="<%= choice %>" class='criteria'> <%= choice %> <input>
                      <%- end %>
                  </div>
             <% end %>
@@ -54,24 +54,23 @@
             <%- @health_selectors[:nationwide].each do |choice| %>
                 <div class='criteria_style'>
                     <%- if choice == 'any' %>
-                    <input type='checkbox' id="<%=choice%>"  class='criteria interaction-choice-control-value-any' checked><%= choice %> </input>
+                    <input type='checkbox' id="<%= choice %>" class='criteria interaction-choice-control-value-any' checked><%= choice %> <input>
                     <%- else %>
-                    <input type='checkbox' id="<%=choice%>"  class='criteria'><%= choice %> </input>
+                    <input type='checkbox' id="<%= choice %>" class='criteria'><%= choice %> <input>
                     <%- end %>
                 </div>
             <% end %>
         </div>
     </div>
 
-
       <div class='left'>
-      <b><%= l10n("broker_agencies.quotes.limit_maximum")%></b>
+      <b><%= l10n("broker_agencies.quotes.limit_maximum") %></b>
         <div class='row'>
           <div class='col-sm-1'>
             <%= number_field_tag 'ex1_input', '6000', {  class: "slider_input hidden-param", style: 'margin-top:3%;min-width:75px;' } %>
           </div>
           <div class='col-sm-4' style='margin-top:1%;'>
-            <input id="ex1" data-slider-id='ex1Slider' class='slider' type="text" data-slider-min="0" data-slider-max="6000" data-slider-step="1" data-slider-value="6000" style='width:350px;'/>
+            <input id="ex1" data-slider-id='ex1Slider' class='slider' type="text" data-slider-min="0" data-slider-max="6000" data-slider-step="1" data-slider-value="6000" style='width:350px;'>
           </div>
             <div style='margin-top:1%;'><span id='ex1_label' class="slide-label" style='margin-left:2%;'>$6000</span></div>
         </div>

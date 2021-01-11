@@ -1,10 +1,10 @@
 <div class="container">
   <div class="row">
     <div class="col-md-2">
-      <br class="clear"/>
+      <br class="clear">
       <%= link_to l10n("back_to_my_account"),  family_account_path, class: 'btn btn-default btn-default' %>
-      <br class="clear"/>
-      <br class="clear"/>
+      <br class="clear">
+      <br class="clear">
     </div>
   </div>
   <div class="row">
@@ -28,11 +28,11 @@
           <div class="panel-body">
             <div class="row">
               <div class="col-xs-8">
-                <div><%=h product[:display_carrier_logo] %></div>
+                <div><%= h product[:display_carrier_logo] %></div>
                 <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
                 </h4>
                 <div>
-                  <p><%=h render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
+                  <p><%= h render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
                 </div>
                 <div>
                   <p>
@@ -71,7 +71,7 @@
                 <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
               </div>
               <div class="col-md-6 margin-top-15px">
-                <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>" data-toggle="modal">
+                <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id %>" data-toggle="modal">
                   <i class="fa fa-phone fa-2x margin-right-15px"></i>
                   <span><%= l10n(".plan_contact_info") %></span>
                 </a>
@@ -100,8 +100,7 @@
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
           term_or_cancel: @self_term_or_cancel_form.enrollment.should_term_or_cancel_ivl,
           family_id: @self_term_or_cancel_form.family.id
-        }
-    %>
+        } %>
     <!-- Placeholder APTC Form - work functionality in later -->
     <!-- TODO: add terminate-calendar id -->
     <!-- Calendar form functionality only necessary for terminate -->
@@ -110,7 +109,6 @@
           hbx_enrollment: @self_term_or_cancel_form.hbx_enrollment,
           available_aptc: @self_term_or_cancel_form.available_aptc,
           new_effective_on_date: @self_term_or_cancel_form.new_effective_on
-        }
-    %>
+        } %>
   </div>
 </div>

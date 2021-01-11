@@ -1,6 +1,6 @@
 <div class="container">
   <div class="row">
-    <div class="col-md-12 col-sm-12 col-xs-12  <%= pundit_class Family, :updateable?%>">
+    <div class="col-md-12 col-sm-12 col-xs-12  <%= pundit_class Family, :updateable? %>">
       <div class="row landing-row">
         <div class="col-md-6 col-sm-6 col-xs-12 left-side">
 
@@ -17,7 +17,7 @@
                     <i class='glyphicon glyphicon-menu-down'></i>
                   </a>
                   <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                    <% get_dependents(@family, @person).each do |dependents |%>
+                    <% get_dependents(@family, @person).each do |dependents | %>
                       <li><%= link_to dependents.full_name, 'javascript:;', class: "member_address_links", data: { id: dependents.id.to_s } %></li>
                     <% end %>
                   </ul>

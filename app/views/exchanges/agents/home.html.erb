@@ -16,17 +16,17 @@
 
 <div class='content'>
    <div class='container top-pd'>
-       <h4> <%= @title%> </h4>
-       <br/>
+       <h4> <%= @title %> </h4>
+       <br>
        <div class='col-md-12 col-lg-12'>
          <p> After working on an enrollment return to this page via the person icon in the header </p>
-         <br/>
+         <br>
        </div>
-        <br/>
+        <br>
         <div>
             <div id='inbox'>
             <div class="row col-md-10">
-               <%=render 'message_list', provider: current_user.person %>
+               <%= render 'message_list', provider: current_user.person %>
             </div>
            </div>
         </div>

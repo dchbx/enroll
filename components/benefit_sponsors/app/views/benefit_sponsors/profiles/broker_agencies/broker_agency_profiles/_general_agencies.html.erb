@@ -1,7 +1,7 @@
 <div class="container" id="inbox_provider_form">
   <div class="row">
     <div class="col-md-12">
-      <h3 class="title-inline"><%= l10n("general_agencies")%></h3>
+      <h3 class="title-inline"><%= l10n("general_agencies") %></h3>
       <%= pundit_span @broker_agency_profile, :set_default_ga? %>
         <%= link_to "CLEAR DEFAULT GA", sponsored_benefits.clear_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, type: 'clear'), method: :post, remote: true, class: "btn btn-min pull-right" %>
       </span>
@@ -14,9 +14,9 @@
         </div>
       <% end %>
       <% if @broker_agency_profile.default_general_agency_profile.present? %>
-        <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - <%= l10n("broker_agencies.profiles.default_general_agency_profile")%></p>
+        <p><%= @broker_agency_profile.default_general_agency_profile.try(:legal_name) %> - <%= l10n("broker_agencies.profiles.default_general_agency_profile") %></p>
       <% else %>
-        <p><%= l10n("broker_agencies.profiles.no_default_general_agency_profile")%></p>
+        <p><%= l10n("broker_agencies.profiles.no_default_general_agency_profile") %></p>
       <% end %>
     </div>
   </div>
@@ -26,12 +26,12 @@
       <table class="table">
       <% if @general_agency_profiles.present? %>
         <thead>
-          <th><%= l10n("legal_name")%></th>
-          <th><%= l10n("dba")%></th>
-          <th><%= l10n("fein")%></th>
-          <th><%= l10n("entity_kind")%></th>
-          <th><%= l10n("market_kind")%></th>
-          <th><%= l10n("state")%></th>
+          <th><%= l10n("legal_name") %></th>
+          <th><%= l10n("dba") %></th>
+          <th><%= l10n("fein") %></th>
+          <th><%= l10n("entity_kind") %></th>
+          <th><%= l10n("market_kind") %></th>
+          <th><%= l10n("state") %></th>
           <th></th>
         </thead>
         <% @general_agency_profiles.each do |general_agency_profile| %>
@@ -40,7 +40,7 @@
               <%= general_agency_profile.legal_name %>
               <% if @broker_role.present? %>
                 <%= link_to main_app.favorite_broker_agencies_broker_role_path(id: @broker_role.id, general_agency_profile_id: general_agency_profile.id), remote: true do %>
-                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title= "<%= l10n('broker_agencies.profiles.favorite_general_agency_title') %>"></span>
+                  <span class="glyphicon <%= favorite_class(@broker_role, general_agency_profile) %>" aria-hidden="true" data-toggle="tooltip" title="<%= l10n('broker_agencies.profiles.favorite_general_agency_title') %>"></span>
                 <% end %>
               <% end %>
             </td>
@@ -51,7 +51,7 @@
             <td><%= general_agency_profile.current_state %></td>
             <td>
               <% if show_default_ga?(general_agency_profile, @broker_agency_profile) %>
-                <div class="ga_status"><%= l10n("broker_agencies.profiles.default_ga")%></div>
+                <div class="ga_status"><%= l10n("broker_agencies.profiles.default_ga") %></div>
               <% else %>
                 <%= pundit_span @broker_agency_profile, :set_default_ga? %>
                   <%= link_to "#{l10n('broker_agencies.profiles.select_default_ga')}", sponsored_benefits.set_default_organizations_general_agency_profiles_path(broker_agency_profile_id: @broker_agency_profile.id, general_agency_profile_id: general_agency_profile.id), method: :post, remote: true, class: 'btn btn-min' %>
@@ -61,7 +61,7 @@
           </tbody>
         <% end %>
       <% else %>
-        <tr><td><%= l10n("broker_agencies.profiles.no_general_agency_profiles_found")%></td></tr>
+        <tr><td><%= l10n("broker_agencies.profiles.no_general_agency_profiles_found") %></td></tr>
       <% end %>
       </table>
     </div>

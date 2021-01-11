@@ -2,14 +2,14 @@
   <body>
     <% if Settings.site.key == :dc %>
       <%= person_name %>,
-      <br />
+      <br>
       <div>Thank you for registering as a broker through <%= Settings.site.short_name %>.</div>
       <div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation) %> to create your broker account and manage your clients.</div>
     <% else %>
       <div>
         Dear <%= person_name %>,
       </div>
-      <br />
+      <br>
       <div>
         Congratulations-- we've reviewed your application and you are now approved as a certified broker through the Health Connector for Business.
       </div>
@@ -18,7 +18,7 @@
       </div>
       <div>
         <p>
-          <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(id: invitation.id.to_s) %><br />
+          <strong>1.</strong> Click on this personalized link to set up your new broker account: <%= link_to "#{site_short_name}", claim_invitation_url(id: invitation.id.to_s) %><br>
           <strong>Important:</strong> You must use this link to set up your account. If you don't use your personalized link when creating your account, the account won't be connected to your existing broker profile.
         </p>
       </div>
@@ -29,7 +29,7 @@
       </div>
 
       <div>
-        <p>If you have questions or need help, please call us at <%= contact_center_phone_number %> (TTY: <%=contact_center_tty_number %>).</p>
+        <p>If you have questions or need help, please call us at <%= contact_center_phone_number %> (TTY: <%= contact_center_tty_number %>).</p>
       </div>
 
       <div>

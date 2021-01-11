@@ -1,13 +1,13 @@
 <div class="container">
   <div class="tab-content" id="myTabContent">
     <div class="row">
-      <div id= 'message_form'></div>
+      <div id='message_form'></div>
       <div class="top-pd" id="inbox_provider_form">
         <% if flash[:notice].present? %>
           <p class='alert alert-success'><%= flash[:notice] %></p>
         <% elsif flash[:error].present? %>
           <p class='alert alert-danger'><%= flash[:error] %></p>
-        <%end%>
+        <% end %>
         <span class="flash_message"></span>
       </div>
       <div class='hide' id='collection_scope'><%= @profile._id %> </div>

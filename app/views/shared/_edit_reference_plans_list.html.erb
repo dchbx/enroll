@@ -22,7 +22,7 @@
   <div class="carrier-select reference-plan-content" style="<%= 'display:block;' if (selected_kind_carrier or selected_kind_plan) %>">
     <% @carrier_names.each_key do |carrier_id| %>
       <% show_this_carrier = (f.object.carrier_for_elected_plan.to_s == carrier_id.to_s) && (selected_kind_carrier or selected_kind_plan) %>
-	    <% carrier_plans = show_this_carrier ? @plan_year.carrier_plans_for(carrier_id) : [] %>
+      <% carrier_plans = show_this_carrier ? @plan_year.carrier_plans_for(carrier_id) : [] %>
       <div class="hidden_second_field carrier-<%= carrier_id %> carrier-content" style="<%= 'display:block;' if show_this_carrier %>">
         <%= select_tag "reference_plan", options_for_select(carrier_plans, selected: f.object.reference_plan_id), class: "carrier-#{carrier_id}", include_blank: (show_this_carrier ? "SELECT REFERENCE PLAN" : "LOADING...") %>
       </div>

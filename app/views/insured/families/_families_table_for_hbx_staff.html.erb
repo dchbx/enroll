@@ -1,4 +1,4 @@
-<div id= 'message_form'></div>
+<div id='message_form'></div>
 <div id="inbox_provider_form" class="table-responsive">
   <table class="table table-condensed">
     <thead>
@@ -24,8 +24,8 @@
       <% pp = family.primary_applicant.person %>
 
       <tr id="family_<%= family.id %>">
-        <td >
-          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %> <br/>
+        <td>
+          <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id) %> <br>
           <%= pundit_span Family, :updateable? %>
             <%= link_to l10n('paper'), resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'paper') %>
             <%= link_to l10n('phone'), resume_enrollment_exchanges_agents_path(person_id: pp.id, original_application_type: 'phone') %>
@@ -39,7 +39,7 @@
         <td><%= pp.consumer_role.present?  ? l10n("yes") : l10n("no") %></td>
         <td><%= pp.active_employee_roles.present?  ? l10n("yes") : l10n("no") %></td>
         <td>
-          <%= link_to l10n("insured.edit_DOB_or_SSN"), edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true%>
+          <%= link_to l10n("insured.edit_DOB_or_SSN"), edit_dob_ssn_path(id: family.primary_applicant.person.id, search_query: @q, pg_no: params[:families_page]), class: "btn btn-default btn-xs" + pundit_class(Family, :can_update_ssn?) , remote: true %>
         </td>
         <% if (pp.user.present? || pp.emails.present?) && current_user.person.hbx_staff_role %>
           <td>

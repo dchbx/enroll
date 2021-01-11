@@ -13,21 +13,21 @@
       </div>
       <div class="col-xs-3">
         <span class="icon-calendar-large icon-calendar-large-dims">
-          <%if individual_market_is_enabled? %>
+          <% if individual_market_is_enabled? %>
             <h3 class="day">
               <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%e") %>
             </h3>
             <span class="month">
               <%= @schedule[:employer_initial_application_latest_submit_on].strftime("%B") %>
             </span>
-          <%else%>
+          <% else %>
             <h3 class="day">
               <%= @schedule[:advertised_due_date_of_month].strftime("%e") %>
             </h3>
             <span class="month">
               <%= @schedule[:advertised_due_date_of_month].strftime("%B") %>
             </span>
-          <%end%>
+          <% end %>
         </span>
       </div>
 
@@ -60,7 +60,7 @@
   <div class="row <%= pundit_class EmployerProfile,:updateable? %>">
     <a class="btn btn-primary btn-lg btn-block  pull-right interaction-click-control-continue" onclick="$('#choose-coverage').hide();$('.benefits-setup-tab').fadeIn();$('#plan_year_benefit_groups_attributes_0_title').focus();$(window).scrollTop(0);">Continue</a>
   </div>
-  <br/><br/><br/>
+  <br><br><br>
 </div>
 
 <div class="table-responsive" style="display: none;">

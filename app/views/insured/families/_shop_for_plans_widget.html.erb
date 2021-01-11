@@ -3,8 +3,7 @@
      options.merge!(person_id: @person.id) if @person.present?
      options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
      options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
-     options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
-  %>
+     options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present? %>
   <div class="panel panel-default module" id='shop-for-plans-widget'>
     <div class="panel-body">
       <div class="row flex">
@@ -14,14 +13,14 @@
           </div>
           <strong><%= l10n("insured.shop_for_health_and_dental_plans") %></strong>
         </div>
-        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%=pundit_class Family, :updateable?%>">
-          <% if !person_has_any_roles?%>
+        <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12 <%= pundit_class Family, :updateable? %>">
+          <% if !person_has_any_roles? %>
             <%= render 'no_role_navigation' %>
           <% elsif is_strictly_open_enrollment_case? %>
             <%= link_to 'Shop for Plans', new_insured_group_selection_path(options), class: "btn btn-default" %>
-          <%else%>
+          <% else %>
             <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
-              <%=  l10n("insured.shop_for_plans") %>
+              <%= l10n("insured.shop_for_plans") %>
             </button>
           <% end %>
         </div>
@@ -29,7 +28,7 @@
     </div>
   </div>
 <% else %>
-  <% action_path = find_sep_insured_families_path  %>
+  <% action_path = find_sep_insured_families_path %>
   <% if @employee_role.try(:is_eligible_to_enroll_without_qle?) || ((@person.consumer_role.present? || @person.resident_role.present?) &&is_under_open_enrollment?) %>
     <% action_path = new_insured_group_selection_path %>
   <% end %>
@@ -50,16 +49,16 @@
             <div class='image-area'>
               <%= image_tag 'icons/shop_for_plan.png', style: 'width: 45px;' %>
             </div>
-            <strong><%= l10n("insured.shop_for_health_and_dental_plans")%></strong>
+            <strong><%= l10n("insured.shop_for_health_and_dental_plans") %></strong>
           </div>
-          <% if (@family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)) || (@employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending?)%>
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%> ">
+          <% if (@family.active_seps.present? && !newhire_enrollment_eligible?(@employee_role)) || (@employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending?) %>
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%= pundit_class Family, :updateable? %> ">
               <button class="btn btn-default pull-right" data-target="#choose_flow" data-toggle="modal" type="button">
-                <%= l10n("insured.shop_for_plans")%>
+                <%= l10n("insured.shop_for_plans") %>
               </button>
             </div>
           <% else %>
-            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%=pundit_class Family, :updateable?%>">
+            <div class="col-lg-3 col-md-3 col-sm-12 col-xs-12  <%= pundit_class Family, :updateable? %>">
               <%= submit_tag l10n("insured.shop_for_plans"), class: "btn btn-default pull-right" %>
             </div>
           <% end %>
@@ -85,12 +84,11 @@
                 options.merge!(person_id: @person.id) if @person.present?
                 options.merge!(employee_role_id: @employee_role.id) if @employee_role.present?
                 options.merge!(change_plan: 'change_plan') if @hbx_enrollments.present?
-                options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present?
-              %>
+                options.merge!(resident_role_id: @person.resident_role.id) if @person.resident_role.present? %>
 
-              <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?)  %>
+              <% if !is_under_open_enrollment? && !@employee_role.try(:is_under_open_enrollment?) %>
                 <%#= l10n("insured.you_are_not_under_open_enrollment_period") %>
-              <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank?  %>
+              <% elsif @employee_role&.is_under_open_enrollment? && @employee_role&.census_employee.is_employee_in_term_pending? && @family.active_seps.blank? %>
                 <p><%= "You have been terminated by your employer" %> "<%= @employee_role.employer_profile.legal_name %>"
                   <%= "with an effective date of" %> <%= format_date @employee_role.census_employee.employment_terminated_on.end_of_month %> </p>
               <% else %>
@@ -98,7 +96,7 @@
                 <% else %>
                   <% if @employee_role.present? && @employee_role.try(:is_under_open_enrollment?) %>
                     <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date @employee_role.benefit_begin_date %>.</p>
-                  <%elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
+                  <% elsif (@person.consumer_role.present? || @person.resident_role.present?) && is_under_open_enrollment? %>
                     <p>If you <%= link_to 'enroll today', new_insured_group_selection_path(options) %>, coverage will begin <%= format_date ivl_enrollment_effective_date %>.</p>
                   <% end %>
                 <% end %>
@@ -106,18 +104,18 @@
 
               <% if @family.latest_active_sep %>
                 <p><%= l10n('insured.qualify_for_special_enrollment') %> "<%= @family.latest_active_sep.qualifying_life_event_kind.title %>"
-                  <br/>
+                  <br>
                   <%#= link_to 'Shop with existing SEP', insured_family_members_path(sep_id: existing_sep.id) %>
-                  <%= build_link_for_sep_type(@active_sep, 'Shop Now')%>
+                  <%= build_link_for_sep_type(@active_sep, 'Shop Now') %>
                 </p>
                 <p> <%= l10n('insured.start_your_coverage') %> </p>
-                  <br/>
+                  <br>
                   <%= link_to 'Qualify for a new SEP', find_sep_insured_families_path(options), class: "btn btn-default pull-left" %></p>
               <% elsif !is_under_open_enrollment? %>
                 <p> <%= l10n('insured.open_enrollment_is_over') %> <%= link_to "Continue ", find_sep_insured_families_path(options), class: "btn btn-default pull-right" %></p>
               <% end %>
             <% else %>
-              <% msg = 'You have no Employer Sponsored Insurance.'%>
+              <% msg = 'You have no Employer Sponsored Insurance.' %>
               <% unless individual_market_is_enabled? %>
                 <%= msg %>
               <% else %>

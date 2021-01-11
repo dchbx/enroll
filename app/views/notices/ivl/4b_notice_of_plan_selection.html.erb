@@ -26,16 +26,12 @@
         content: "As we previously notified you, you and/or members of your household are eligible to enroll in a
   health insurance plan through #{Settings.site.short_name} and receive tax credits to help pay for the cost of your insurance."} %>
 
-
-
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["On #{notice.enrollments[0].selected_on.strftime('%m/%d/%Y')}, the following individual(s) selected the #{notice.enrollments[0].plan_name} health insurance plan."], heading: 'Your Health Plan Selection', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: notice.enrollments[0].enrollees.join("<br>")} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
         content: "<span #{@style_text_indent}>[#{notice.enrollments[0].plan_name} #{notice.first_name} #{notice.last_name}]</span> "} %>
-
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
         content: "You will start getting insurance benefits through #{notice.enrollments[0].plan_name} on[#{notice.enrollments[0].effective_on.strftime('%m/%d/%Y')}],
@@ -70,10 +66,7 @@
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["<div style='text-decoration: underline;'>#{notice.enrollments[0].plan_name}</div>"], heading: 'What You Must Pay Each Month', sub_heading: ''} %>
 
-
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings: ["You qualified for a maximum monthly premium tax credit of:&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;#{number_to_currency(notice.enrollments[0].premium)}"] } %>
-
-
 
 <% notice.other_enrollments.each do |enrollment| %>
     <%= render partial: 'notices/shared/paragraph', :locals => { content: "<div style='text-decoration: underline;'>#{enrollment.plan_name}</div>" } %>
@@ -106,7 +99,6 @@
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. § 155.330(b)"} %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on #{Settings.site.website_name} or call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}."} %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to #{Settings.site.website_name} or calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}. If you have a change in circumstances during #{notice.enrollments[0].effective_on.year}, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
 

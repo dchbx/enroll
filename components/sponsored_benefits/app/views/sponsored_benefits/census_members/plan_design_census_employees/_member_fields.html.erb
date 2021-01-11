@@ -29,7 +29,7 @@
   </a>
 </div>
 <div class="collapse" id="<%= collapsable_id %>">
-<br/>
+<br>
 <div class="row module forms" id="employer_info">
   <div class="col-md-12 col-sm-12 col-xs-12">
 
@@ -77,17 +77,17 @@
     </div>
   </div>
 </div>
-<br/>
+<br>
 <%= render 'census_employee_fields', f: f, required: false %>
-<br/>
+<br>
 <%= f.fields_for :address, @census_employee.address, errors: {}, fieldset: false do |address| %>
   <%= render 'sponsored_benefits/census_members/shared/address_fields', f: address, required: false %>
 <% end %>
-<br/>
+<br>
 <%= f.fields_for :email, @census_employee.email, errors: {}, fieldset: false do |email| %>
   <%= render 'sponsored_benefits/census_members/shared/email_fields', f: email, required: false %>
 <% end %>
-<br/>
+<br>
 
 </div>
 

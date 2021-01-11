@@ -3,7 +3,7 @@
       <ul class="list-group">
         <li class="list-group-item">
           Sent By:
-          <%= "System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}"%>
+          <%= "System Admin on #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%m/%d/%Y")} at #{message.created_at.in_time_zone("Eastern Time (US & Canada)").strftime("%I:%M%p")}" %>
           <br></li>
         <li class="list-group-item">
           Subject:
@@ -13,7 +13,7 @@
           <%= message.try(:body).html_safe %>
           <br></li>
       </ul>
-      <br class="clear"/>
+      <br class="clear">
       <%= link_to "<i aria-hidden='true' class='fa fa-caret-left'></i>&nbsp;Back</a>".html_safe, :back, class: 'btn btn-default' %>
     </div>
 <% end %>

@@ -39,7 +39,7 @@
         </strong>
         – Once you select 'Publish Plan Year', your employees will receive a notification and open enrollment will begin according to the timeline you selected for your plan year.
       </p>
-      <br/>
+      <br>
     </div>
     <% end %>
     <% end %>
@@ -59,7 +59,7 @@
             <i class="fa fa-users"></i>
             <% end %>
           </span>
-          <%= plan_year.start_on.to_date.year%>
+          <%= plan_year.start_on.to_date.year %>
           Plan Year (<%= plan_year.aasm_state.to_s.humanize.titleize %>)
       </h3>
     </div>
@@ -71,12 +71,12 @@
                     <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, employers_employer_profile_plan_year_publish_path(@employer_profile,plan_year), method: :post, remote: true, class: "btn btn-default pull-right #{rates_available?(@employer_profile, plan_year.start_on)}" %>
 
                 <% end %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz"%>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_employers_employer_profile_plan_year_path(@employer_profile,plan_year), class: "btn btn-default pull-right mrz" %>
             <% end %>
             <%= pundit_span(EmployerProfile, :revert_application?) %>
                 <% if current_user.has_hbx_staff_role? && ( plan_year.may_revert_application? || plan_year.may_revert_renewal? ) %>
                   <span class="btn btn-default pull-right" data-target="#revertPlanYear_<%= plan_year.id %>" data-toggle="modal">Revert Application</span>
-                  <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right"%> -->
+                  <!-- <%= link_to "Revert Application", employers_employer_profile_plan_year_revert_path(@employer_profile, plan_year_id: plan_year.id ), method: :post, remote: true, class: "btn btn-default pull-right" %> -->
                 <% end %>
             </span>
         </span>
@@ -92,7 +92,7 @@
           <section class="col-xs-10">
             <header class="row">
               <h3 class="title">
-                <%= plan_year.start_on.to_date.year%>
+                <%= plan_year.start_on.to_date.year %>
                 Plan Year (<%= plan_year.aasm_state.to_s.humanize.titleize %>)
               </h3>
             </header>
@@ -119,13 +119,13 @@
                       <%= plan_year.terminated_on.to_date.to_formatted_s :long_ordinal %>
                    </p>
                 </td>
-              <%end%>
+              <% end %>
             </tr>
           </table>
         </div>
       </div>
     <% end %>
-    
+
     <% plan_year.benefit_groups.each_with_index do |bg, bi| %>
     <% bg.build_estimated_composite_rates %>
     <div class="benefit-group">
@@ -176,7 +176,7 @@
                         <%= plan_year.terminated_on.to_date.to_formatted_s :long_ordinal %>
                      </p>
                   </td>
-                <%end%>
+                <% end %>
               </tr>
               <tr>
                 <td>
@@ -214,10 +214,10 @@
                 <h5 class="title no-buffer">Health</h5>
                 <% else %>
                 <h5 class="title no-buffer">&nbsp;</h5>
-                <% end%>
+                <% end %>
               </div>
             </div>
-            <% end%>
+            <% end %>
 
             <table>
               <tr>
@@ -314,14 +314,14 @@
                 <% else %>
                 <div class="row">
                   <p class="twenty">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</p>
+                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees') %>.</p>
                 </div>
                 <% end %>
                 <% if bg.is_offering_dental? %>
-                <br/>
-                <br/>
+                <br>
+                <br>
                 <div class="row">
-                  <hr/>
+                  <hr>
                 </div>
                 <% end %>
               </div>
@@ -388,7 +388,7 @@
                       <% elsif bg.dental_plan_option_kind == "single_plan" %>
                         <% if bg.elected_dental_plan_ids.count < 13 %>
                             Custom (<%= bg.elected_dental_plans.count %> Plans)
-                            <br/>
+                            <br>
                         <%= link_to "View Plans", "", data: {toggle: "modal", target: "#electedDentalPlans_#{bg.id}"} %>
                         <% else %>
                           All Plans
@@ -406,7 +406,7 @@
           <% end %>
           <!--Dental Plan Summary: end -->
 
-          <br class="clear"/>
+          <br class="clear">
 
           <!--Dental plan collapsible: start -->
           <% if bg.is_offering_dental? %>
@@ -474,7 +474,7 @@
                 <% else %>
                 <div class="row">
                   <h4 class="starter">You need to add an employee to a benefit group before you can view your estimated monthly costs. To add a new employee,
-                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees')%>.</h4>
+                    <%= link_to 'click here', new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees') %>.</h4>
                 </div>
                 <% end %>
               </div>
@@ -482,11 +482,11 @@
             <!-- Dental plan Estimated Cost: end -->
 
           </div>
-          <%end%>
+          <% end %>
           <!--Dental plan collapsible: end -->
 
         </div>
-        <br class="clear"/>
+        <br class="clear">
       </div>
         <%= pundit_span EmployerProfile, :updateable? %>
             <div class="below clear">
@@ -496,8 +496,8 @@
         </span>
       <% end %>
     </div>
-    <br/>
-    <br/>
+    <br>
+    <br>
 
     <div class="col-xs-12"></div>
 
@@ -510,7 +510,7 @@
         It's time to create a benefits package. Select 'Add Plan Year' to create your first one. Most employers only create one benefits package but you'll have the opportunity to create more than one if you want to offer different benefits to different
         groups of employees.
       </p>
-      <%=pundit_span EmployerProfile, :updateable?%>
+      <%= pundit_span EmployerProfile, :updateable? %>
         <%= link_to "Add Plan Year", new_employers_employer_profile_plan_year_path(@employer_profile, tab: 'benefits'), class: "btn btn-primary btn-lg #{flag}", data: {loading_text: "Loading..."} %>
       </span>
     <% end %>

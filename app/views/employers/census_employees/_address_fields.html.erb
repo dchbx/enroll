@@ -13,7 +13,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12 no-pd">
               <div class="dropdown">
                 <button class="form-control floatlabel adderess-select-box form_group_lg dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">
-                  <label><%= address_kind.humanize%> Address</label>
+                  <label><%= address_kind.humanize %> Address</label>
                 </button>
               </div>
             </div>
@@ -33,22 +33,21 @@
         <%= f.text_field :address_1, placeholder: "ADDRESS LINE 1", class: "floatlabel form-control border-bottom-none border-right-none", required: true,:readonly => flag %>
       </div>
       <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none",:readonly => flag  %>
+        <%= f.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control border-bottom-none",:readonly => flag %>
       </div>
     </div>
 
     <div class="row row-form-wrapper no-buffer address-row">
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control", required: true, :readonly => flag  %>
+        <%= f.text_field :city, placeholder: "CITY", class: "floatlabel form-control", required: true, :readonly => flag %>
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.state), {include_blank: "SELECT STATE"}, {:disabled => flag})  %>
+        <%= f.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: f.object.state), {include_blank: "SELECT STATE"}, {:disabled => flag}) %>
       </div>
       <div class="col-md-4 col-sm-4 col-xs-12 form-group form-group-lg no-pd">
-        <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip", required: true, :readonly => flag  %>
+        <%= f.text_field :zip, placeholder: "ZIP", class: "floatlabel form-control zip", required: true, :readonly => flag %>
       </div>
     </div>
-
 
       </div>
 </div>

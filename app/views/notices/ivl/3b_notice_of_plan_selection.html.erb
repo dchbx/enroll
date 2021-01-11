@@ -7,8 +7,6 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-
-
 <table class="total_table" border="0">
   <tbody>
     <tr>
@@ -204,7 +202,6 @@
     or calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}. If you have a change in circumstances during [coverage year], you may also
     qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include: "],
     heading: 'Changing Plans', sub_heading: ''} %>
-
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",

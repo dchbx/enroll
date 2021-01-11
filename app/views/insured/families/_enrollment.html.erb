@@ -7,7 +7,7 @@
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
 <% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
-<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
+<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : "" %>
 
 <div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
   <div class="panel-heading vertically-aligned-row">
@@ -128,11 +128,11 @@
           <%= show_market_name_by_enrollment hbx_enrollment %>
         </p>
       </div>
-      <% if hbx_enrollment.is_reinstated_enrollment?%>
+      <% if hbx_enrollment.is_reinstated_enrollment? %>
           <div class="enrollment-effective info vertical-align-top">
             <strong> Reinstated Enrollment</strong>
           </div>
-      <%end%>
+      <% end %>
     </div>
     <div class="col-xs-12 vertically-aligned-row">
       <div class="enrollment-type info vertical-align-top">
@@ -172,7 +172,7 @@
   </div>
   <% if read_only == true %>
     <% if !hbx_enrollment.is_coverage_waived? %>
-    <br/>
+    <br>
     <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
     <% end %>
   <% end %>
@@ -184,7 +184,7 @@
       <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
     </div>
     <div>
-      <a class="vertically-aligned-row" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
+      <a class="vertically-aligned-row" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id %>">
         <i class="fa fa-phone fa-2x"></i>
         <span class="col-xs-11 enrollment-tile-summary"><%= l10n(".plan_contact_info") %></span>
       </a>
@@ -192,8 +192,8 @@
     </div>
     <% if !read_only == true %>
       <div class="col-lg-3">
-        <div class="row <%if !can_make_changes_for_enrollment %>cna<%end%>">
-         <% if can_make_changes_for_enrollment && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop?%>
+        <div class="row <% if !can_make_changes_for_enrollment %>cna<% end %>">
+         <% if can_make_changes_for_enrollment && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop? %>
             <%= pundit_span Family, :updateable? %>
                <!-- Use turbolinks: false, to avoid calling controller action twice-->
               <%= link_to l10n('make_changes'), new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, coverage_kind: hbx_enrollment.coverage_kind), class: 'btn btn-default btn-block ee-make-changes', disabled: !can_make_changes_for_enrollment,  data: { turbolinks: false } %>
@@ -212,7 +212,6 @@
 </div>
 </div>
 <% end %>
-
 
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");

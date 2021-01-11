@@ -1,7 +1,7 @@
 <% if @single_plan.present? %>
 <br><br>
-<h4>Let your plan participants choose any plan they would like.<br/>It will not cost you more to let them choose.</h4>
-<br/><br/>
+<h4>Let your plan participants choose any plan they would like.<br>It will not cost you more to let them choose.</h4>
+<br><br>
 <% end %>
 <% @plans.each do |plan| %>
 <div class="col-xs-4">
@@ -28,7 +28,7 @@
           <span>
             <%= render partial: "shared/network_data", locals: {plan: plan, plans: @plans} %>
           </span>
-          <br/>
+          <br>
           <%= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
         </div>
       </div>

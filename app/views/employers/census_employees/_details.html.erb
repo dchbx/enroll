@@ -9,13 +9,13 @@
         <p>
           Name:
           <%= name_to_listing(@census_employee) %>
-          <br/>
+          <br>
           DOB:
           <%= format_date @census_employee.dob %>
-          <br/>
+          <br>
           Hired On:
           <%= format_date @census_employee.hired_on %>
-          <br/>
+          <br>
           Owner:
           <%= @census_employee.try(:is_business_owner) ? "Yes" : "No" %>
         </p>
@@ -31,7 +31,6 @@
     </div>
   </div>
   <div class="row">
-
 
     <div class="col-xs-6">
       <h4>Medical Plan</h4>
@@ -134,6 +133,6 @@
 </div>
 <br><br>
 <div class="col-xs-12">
-  <br/>
+  <br>
 <%= link_to 'Back'.html_safe, 'javascript:;', class: 'btn btn-default return_to_employee_roster' %>
 </div>

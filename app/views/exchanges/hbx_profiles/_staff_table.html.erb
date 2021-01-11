@@ -13,16 +13,16 @@
 <tbody>
   <% @staff.each do |staff| %>
     <tr>
-      <td><%= staff.first_name%></td>
+      <td><%= staff.first_name %></td>
       <td><%= staff.last_name %></td>
       <td><%= staff.user.try(:email) %></td>
       <td><%= staff.assister_role.try(:organization) || staff.csr_role.try(:organization) %>
       <td><%= staff.csr_role.try(:shift) %></td>
-      <td><%= if staff.csr_role 
+      <td><%= if staff.csr_role
                 staff.csr_role.cac ? 'CAC' : 'CSR'
               else
                 'Assister'
-              end   %>
+              end %>
       </td>
     </tr>
   <% end %>

@@ -4,12 +4,12 @@
   <div class="table-border">
     <table class="table">
       <thead>
-        <th><%= l10n("first_name")%></th>
-        <th><%= l10n("last_name")%></th>
-        <th><%= l10n("email")%></th>
-        <th><%= l10n("phone")%></th>
-        <th><%= l10n("status")%></th>
-        <th><%= l10n("remove_role")%></th>
+        <th><%= l10n("first_name") %></th>
+        <th><%= l10n("last_name") %></th>
+        <th><%= l10n("email") %></th>
+        <th><%= l10n("phone") %></th>
+        <th><%= l10n("status") %></th>
+        <th><%= l10n("remove_role") %></th>
       </thead>
       <% broker_staff.each do |staff_member| %>
             <tbody>
@@ -18,10 +18,10 @@
               <td><%= staff_member.work_email_or_best %></td>
               <td><%= staff_member.work_phone %></td>
               <td>
-                <%= staff_member.has_pending_broker_staff_role?(@broker_agency_profile.id) ? "Pending" : "Active"%>
+                <%= staff_member.has_pending_broker_staff_role?(@broker_agency_profile.id) ? "Pending" : "Active" %>
                 <%= staff_member.user_id ? ' Linked  ' : ' Unlinked  ' %>
                  <% if staff_member.has_pending_broker_staff_role?(@broker_agency_profile.id) %>
-                  <%=  link_to(
+                  <%= link_to(
                           approve_profiles_broker_agencies_broker_agency_staff_role_path(
                               profile_id: @broker_agency_profile.id,
                               person_id: staff_member.id
@@ -51,6 +51,5 @@
     </table>
   </div>
 <% end %>
-
 
 <%= link_to 'Add Broker Staff Role', new_profiles_broker_agencies_broker_agency_staff_role_path(profile_id:@broker_agency_profile.id), id: "add_staff", remote: true, class: 'btn btn-default pull-left col-12' %>

@@ -27,7 +27,7 @@
     </li>
     <li>Pay by Phone
       <div class="row col-md-offset-1">
-        <%=  Settings.contact_center.alt_phone_number %>, select "Small Business Employer" then "Make a Payment"
+        <%= Settings.contact_center.alt_phone_number %>, select "Small Business Employer" then "Make a Payment"
       </div>
     </li>
     <li>Pay by Mail <i class="fa fa-info-circle" data-toggle="tooltip" data-placement="right" title="Slowest payment option – takes up to 2 weeks to process."></i>
@@ -46,4 +46,4 @@
 <h4>**Please include your account number on your check.</h4>
 <h4>Check that your mailing address is up to date - click on
   <%= link_to 'Update Business Info', edit_profiles_registration_path(@employer_profile.id, :tab=>'profile', add_staff: 'no') %>.
-</h4> 
+</h4>

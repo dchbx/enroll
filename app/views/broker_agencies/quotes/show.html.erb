@@ -1,24 +1,24 @@
 <div class="module container broker_quote_tool" style="border: 1; solid">
   <br> <br>
-  <h2><%= l10n("quote_calculator")%></h2>
-  <div  role="tab" id="feature-mgmt-header" style="margin-left: 10px;">
+  <h2><%= l10n("quote_calculator") %></h2>
+  <div role="tab" id="feature-mgmt-header" style="margin-left: 10px;">
     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group-mgmt">
-    <b><%= l10n("quote_benefit_group_selection")%></b>
+    <b><%= l10n("quote_benefit_group_selection") %></b>
     </a>
   </div>
-  <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true)%>">
+  <div id="quote-roster" data-url="<%= broker_agencies_broker_role_quote_path(broker_role_id: @broker.id,id: @q.id, section: true) %>">
     <% @benefit_groups.each_with_index do |benefit_group, index| %>
     <% if index == 0 %>
-    <h3><%= benefit_group.title%></h3>
+    <h3><%= benefit_group.title %></h3>
     <section>
-      <div class="step_section_<%= index%>">
-        <%= render partial: 'quote_calculate', locals: {benefit_group: benefit_group }%>
+      <div class="step_section_<%= index %>">
+        <%= render partial: 'quote_calculate', locals: {benefit_group: benefit_group } %>
       </div>
     </section>
     <% else %>
     <h3><%= benefit_group.title %></h3>
     <section>
-      <div id='second_div' class="step_section_<%= index%>">
+      <div id='second_div' class="step_section_<%= index %>">
       </div>
     </section>
     <% end %>
@@ -30,8 +30,8 @@
 <script type="text/javascript">
 
   $(document).on('ready page:load', function () {
-    QuotePageLoad.set_select_health_plans(<%=raw @health_plan_quote_criteria %>)
-    Quote.show_benefit_group("<%= @q.id%>", "<%= @quote_benefit_group.id%>")
+    QuotePageLoad.set_select_health_plans(<%= raw @health_plan_quote_criteria %>)
+    Quote.show_benefit_group("<%= @q.id %>", "<%= @quote_benefit_group.id %>")
   });
 
   $("#quote-roster").steps({

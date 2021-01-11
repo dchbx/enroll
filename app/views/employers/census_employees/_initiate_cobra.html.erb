@@ -2,10 +2,10 @@
   <table class="table table-striped table-bordered border-override" style="table-layout: fixed;">
     <td class="confirm-cobra-wrapper show_confirm_<%= @census_employee.id %>" colspan="10" id="enter-date">
       <tr>
-        <td class="confirm-cobra-wrapper show_confirm_<%= @census_employee.id %>"  colspan="10"  id="cobra-enter-date">
-          <div class="confirm-cobra <%=pundit_class EmployerProfile, :updateable?%>">
+        <td class="confirm-cobra-wrapper show_confirm_<%= @census_employee.id %>" colspan="10" id="cobra-enter-date">
+          <div class="confirm-cobra <%= pundit_class EmployerProfile, :updateable? %>">
             <h5 style="margin-top: 0; margin-bottom: 0;"><strong>Enter effective date for COBRA coverage to begin</strong>
-              <br/>
+              <br>
               <span class="lg fourteen">(Cobra effective date must be within the past 6 months)</span>
             </h5>
             <div class="pull-right" style="margin-top: 2px;">

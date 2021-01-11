@@ -44,7 +44,7 @@
   <%= render partial: 'notices/shared/unordered_family_listing', locals: {
     previous: "<strong>Qualify for Private Health Insurance with Savings:</strong>",
     listings: notice.aqhp_individuals} %>
-  <% notice.tax_households.each do |thh|%>
+  <% notice.tax_households.each do |thh| %>
     <% if thh.max_aptc > 0 %>
       <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
        contents: ["This tax credit is used to help pay the monthly premium – the amount you pay each month to the insurance company to have a health plan."],
@@ -58,7 +58,7 @@
 <% end %>
 
 <% if notice.tax_hh_with_csr.present? %>
-  <% notice.tax_hh_with_csr.each do |hh_csr|%>
+  <% notice.tax_hh_with_csr.each do |hh_csr| %>
     <% case hh_csr.csr_percent_as_integer %>
     <% when 73 %>
       <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
@@ -150,7 +150,7 @@
  contents: ["We reviewed what you told us on your application about your household, and each person who needs health coverage. We checked to see who qualifies for coverage, and if they qualify for savings. The results below tell you how we made our decision."],
    heading: 'How We Made Our Decision', sub_heading: '', top_margin: '8px'} %>
 
-<% notice.individuals.each do |ivl|%>
+<% notice.individuals.each do |ivl| %>
   <%= render partial: 'notices/ivl/eligibility_notice_household_information', :locals => { notice: notice, ivl: ivl } %>
 <% end %>
 

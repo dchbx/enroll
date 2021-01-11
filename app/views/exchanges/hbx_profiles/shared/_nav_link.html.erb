@@ -1,6 +1,6 @@
-<li role="presentation"<%= menu_tab_class(active_tab, "#{tab_name}-tab") %> id="<%= tab_name %>" class="tab-second <%= pundit_class(pundit_object, pundit_method) unless pundit_object.nil?%>">
-	<%= link_to(link_path, :remote => remote, "aria-expanded" => "true", "aria-controls" => "#{tab_name}", "role" => "tab", data: { turbolinks: false } ) do  %>
-	<span class="hidden-xs"><%= display_name %></span>
-	<span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title=<%= display_name %>></span>
-	<% end %>
+<li role="presentation"<%= menu_tab_class(active_tab, "#{tab_name}-tab") %> id="<%= tab_name %>" class="tab-second <%= pundit_class(pundit_object, pundit_method) unless pundit_object.nil? %>">
+  <%= link_to(link_path, :remote => remote, "aria-expanded" => "true", "aria-controls" => "#{tab_name}", "role" => "tab", data: { turbolinks: false } ) do %>
+  <span class="hidden-xs"><%= display_name %></span>
+  <span class="glyphicon glyphicon-th-list hidden-md hidden-sm hidden-lg" title=<%= display_name %>></span>
+  <% end %>
 </li>

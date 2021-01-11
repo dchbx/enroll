@@ -1,7 +1,7 @@
 <div class="employee-upload">
   <i class="fa fa-times fa-3x pull-right modal-close"></i>
-  <h2><%= l10n("upload_employee_roster")%></h2>
-  <h4><%= l10n("broker_agencies.quotes.template_upload")%></h4>
+  <h2><%= l10n("upload_employee_roster") %></h2>
+  <h4><%= l10n("broker_agencies.quotes.template_upload") %></h4>
   <%= link_to(document_download_path(env_bucket_name("templates"), s3_template_bucket_key) + "?contenttype=application/vnd.ms-excel&filename=Health Connector - Employee Census Template.xlsx", class: "download") do %>
     <h4>Need the template? <i class="fa fa-arrow-circle-o-down fa-lg"></i>
       Download it now.
@@ -12,6 +12,6 @@
   <%= form_tag({action: :build_employee_roster}, multipart: true, class: "upload_csv") do %>
     <%= file_field_tag :employee_roster_file %>
     <%= label_tag :employee_roster_file, 'Select File To Upload', class: 'select btn btn-primary btn-br' %>
-    <%= submit_tag l10n("upload"), class: 'btn btn-primary btn-br'%>
-  <%end%>
+    <%= submit_tag l10n("upload"), class: 'btn btn-primary btn-br' %>
+  <% end %>
 </div>

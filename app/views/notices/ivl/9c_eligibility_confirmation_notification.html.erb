@@ -71,7 +71,6 @@
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "To report changes, you can log in to your account on #{Settings.site.website_name} or call #{Settings.contact_center.name} toll free at #{Settings.contact_center.phone_number}."} %>
 
-
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => { contents: ["You will be able to change plans during the annual open enrollment period at the end of each year.  45 C.F.R. §155.410(e). You can get the date of the next open enrollment period by going to #{Settings.site.website_name} or calling #{Settings.contact_center.name} at #{Settings.contact_center.phone_number}. If you have a change in circumstances during #{notice.enrollments[0].effective_on.year}, you may also qualify for a special enrollment period during which you can change your plan.  Changes in circumstances include:"], heading: 'Changing Plans', sub_heading: ''} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:

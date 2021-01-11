@@ -1,7 +1,7 @@
 <div class="" id="inbox_provider_form">
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
-      <h3 class="title-inline"><%= l10n("broker_agencies.profiles.broker_agencies")%></h3>
+      <h3 class="title-inline"><%= l10n("broker_agencies.profiles.broker_agencies") %></h3>
       <div class="form-inline button-group-wrapper">
         <div class="col-xs-12 input-group search-wp">
           <!--TODO: Need to verify the implementation around DataTables -->
@@ -16,11 +16,11 @@
         <table class="table">
           <% if @broker_agency_profiles.present? %>
             <thead>
-              <th><%= l10n("legal_name")%></th>
-              <th><%= l10n("dba")%></th>
-              <th><%= l10n("fein")%></th>
-              <th><%= l10n("entity_kind")%></th>
-              <th><%= l10n("market_kind")%></th>
+              <th><%= l10n("legal_name") %></th>
+              <th><%= l10n("dba") %></th>
+              <th><%= l10n("fein") %></th>
+              <th><%= l10n("entity_kind") %></th>
+              <th><%= l10n("market_kind") %></th>
               <th></th>
             </thead>
 
@@ -39,7 +39,7 @@
               </tbody>
               <% end %>
               <% else %>
-                <tr><td><%= l10n("broker_agencies.profiles.no_broker_agency_profiles_found")%></td></tr>
+                <tr><td><%= l10n("broker_agencies.profiles.no_broker_agency_profiles_found") %></td></tr>
               <% end %>
         </table>
       </div>

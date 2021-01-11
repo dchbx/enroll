@@ -1,24 +1,24 @@
 <div class="container content-bottom">
 
-	<div class="row">
+  <div class="row">
     <div class="col-xs-12 col-sm-9">
-	  <h1>
-		  Thank you for logging into your <%= site_short_name %> employer account.
-	  </h1>
+    <h1>
+      Thank you for logging into your <%= site_short_name %> employer account.
+    </h1>
     <p class="twenty">
       Before we get started, we need to confirm the primary point of contact for your business. Please confirm that the name and email address listed below are correct, update the information or provide the name and email address for your primary point of contact. When you're finished, select 'Save'.
     </p>
-	  <p class='twenty'>
-	    If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
-	  </p>
+    <p class='twenty'>
+      If the organization already has a staff role you will will be placed in applicant status for an additional staff role.
+    </p>
    </div>
   </div>
 
-	<%= render "shared/organization_staff_search", f: f %>
-	<%= render "shared/person_contact", f:f %>
+  <%= render "shared/organization_staff_search", f: f %>
+  <%= render "shared/person_contact", f:f %>
 
-	<div class="row">
-		<div class="col-md-9 col-sm-9 col-xs-12">
+  <div class="row">
+    <div class="col-md-9 col-sm-9 col-xs-12">
       <h3>Employer Information</h3>
 
       <div class="row">
@@ -31,16 +31,15 @@
         <div class="col-sm-12">
           <%= render "employer_contact_preferences", f: f %>
         </div>
-		  </div>
+      </div>
 
       <div class="row">
         <div class="col-sm-12 pull-right mrg-top">
           <button type="submit" class="btn btn-primary pull-right">Save</button>
         </div>
       </div>
-	  </div>
+    </div>
   </div>
 
-<input type="hidden" name="employer_id" id="employer_id" />
+<input type="hidden" name="employer_id" id="employer_id">
 </div>
-

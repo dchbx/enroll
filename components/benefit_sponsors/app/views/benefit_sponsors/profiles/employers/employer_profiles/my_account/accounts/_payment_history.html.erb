@@ -50,7 +50,7 @@
       <% num_of_payments = @benefit_sponsorship_account.try(:financial_transactions).size %>
       <% if num_of_payments > 10 %>
         <% num_of_pages = (1..paginate_upper_bound(num_of_payments)).to_a %>
-        <% num_of_pages.each do |page_num|%>
+        <% num_of_pages.each do |page_num| %>
           <div class="btn-group" role="group">
             <% if @page_num.nil? && page_num == 1 %>
               <%= link_to "<button class='btn btn-default active' id='page-num-1'>1</button>".html_safe, profiles_employers_employer_profile_path(@employer_profile, tab: "accounts", page_num: "1"), :remote => true %>

@@ -4,8 +4,8 @@
       <br>
       <%= link_to l10n("back_to_my_account"),  family_account_path, class: 'btn btn-default btn-default' %>
     </div>
-    <br class="clear"/>
-    <br/>
+    <br class="clear">
+    <br>
     <div class="col-md-12 row">
       <div class="container">
         <div class="row">
@@ -88,7 +88,7 @@
                 <%= radio_button_tag :agreement, "terminate-confirm-yes" %><%= l10n("yes") %><br>
                 <%= radio_button_tag :agreement, "terminate_confirm_no" %><%= l10n("no") %>
               </div>
-              <br/>
+              <br>
 
               <%= form_tag terminate_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id), method: :post %>
                 <div id="term-date-confirm-date" hidden='true'>

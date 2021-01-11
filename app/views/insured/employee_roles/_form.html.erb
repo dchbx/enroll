@@ -10,7 +10,7 @@
 <%= render 'shared/phone_fields', f: f %><br>
 
 <div id="email_info" class="row row-form-wrapper no-buffer">
-  <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+  <%= f.fields_for :emails, errors: {}, fieldset: true do |email| %>
     <%= render 'shared/email_fields', f: email %>
   <% end %>
 </div>

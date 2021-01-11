@@ -22,7 +22,6 @@
       <%= scheduled_event.recurring_rules %>
     </p>
 
-
     <%= link_to 'Back', exchanges_scheduled_events_path, class: "btn btn-default", remote: true %>
     <%= link_to "Edit", edit_exchanges_scheduled_event_path(scheduled_event), class: "btn btn-default", remote: true %>
     <% if scheduled_event.one_time == false %>

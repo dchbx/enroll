@@ -1,9 +1,9 @@
-<div class="container" >
+<div class="container">
   <h3>PY Cost Impact</h3>
   <ul class="nav nav-tabs">
     <% @plan_year.benefit_groups.each do |benefit_group| %>
     <li id="<%= benefit_group.id %>" class=<%= @plan_year.benefit_groups.index(benefit_group).zero? ? "active" : "" %>>
-      <%= link_to benefit_group.title, employers_employer_profile_plan_year_cost_analysis_path(@employer_profile,@plan_year,benefit_group_id: benefit_group.id), data: { toggle: "tab", remote: true}  %>
+      <%= link_to benefit_group.title, employers_employer_profile_plan_year_cost_analysis_path(@employer_profile,@plan_year,benefit_group_id: benefit_group.id), data: { toggle: "tab", remote: true} %>
     </li>
     <% end %>
   </ul>

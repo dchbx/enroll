@@ -74,7 +74,7 @@
           <% end %>
         </div>
       </div>
-      <div class="col-md-2 not-sure-margin left-seprator" >
+      <div class="col-md-2 not-sure-margin left-seprator">
         <a href="#eligible_immigration_status" data-toggle="modal" data-target="#eligible_immigration_status">Not sure?</a>
         <%= render partial: 'shared/modal_support_text_household', locals: {key: "eligible_immigration_status"} %>
       </div>
@@ -136,7 +136,7 @@
       </div>
     </div>
   </div>
-<%end%>
+<% end %>
 
 <%= render "shared/race_and_ethnicity_options", f: f %>
 <%= hidden_field_tag :form_for_consumer_role, f.object.is_a?(Person) %>

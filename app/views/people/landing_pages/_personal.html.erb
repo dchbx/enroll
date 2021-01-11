@@ -1,16 +1,16 @@
-<%= form_for @person do |f|%>
+<%= form_for @person do |f| %>
   <div class="row no-buffer">
     <div id="personal_info" class="module">
       <div class="col-md-12 no-pd col-sm-12 col-xs-12">
         <div class="row row-form-wrapper no-buffer">
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
+            <%= f.text_field :first_name, id: "first-name", class: "floatlabel form-control", placeholder: "FIRST NAME", autocomplete: :off %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
+            <%= f.text_field :middle_name, class: "floatlabel form-control", placeholder: "MIDDLE NAME", autocomplete: :off %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
+            <%= f.text_field :last_name, class: "floatlabel form-control", placeholder: "LAST NAME", autocomplete: :off %>
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
               <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], :include_blank => 'NONE', class: "floatlabel form-control", autocomplete: :off %>
@@ -22,17 +22,17 @@
                                              :'data-date-min' => "-110y", :'data-date-max' => "+0", :'data-date-format' => 'mm/dd/yy', disabled: 'disabled'} %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-            <%=f.text_field :ssn, class: "person_ssn number floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
+            <%= f.text_field :ssn, class: "person_ssn number floatlabel form-control", placeholder: "SOCIAL SECURITY", id: "", title: "8 digits", disabled: 'disabled' %>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
             <div class="radio skinned-form-controls skinned-form-controls-mac">
-              <%= f.radio_button :gender, "male", class: "required floatlabel"  %>
+              <%= f.radio_button :gender, "male", class: "required floatlabel" %>
               <label for="person_gender_male"><span>MALE</span></label>
             </div>
           </div>
           <div class="col-md-3 col-sm-3 col-xs-6 form-group form-group-lg no-pd">
             <div class="radio skinned-form-controls skinned-form-controls-mac">
-              <%= f.radio_button :gender, "female", class: "required floatlabel"  %>
+              <%= f.radio_button :gender, "female", class: "required floatlabel" %>
               <label for="person_gender_female"><span>FEMALE</span></label>
             </div>
           </div>
@@ -40,7 +40,7 @@
 
         <% if can_shop_individual?(@person) %>
         <div class="row row-form-wrapper no-buffer">
-          <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer" >
+          <div class="col-lg-5 col-md-2 col-sm-2 col-xs-5 form-group form-group-lg no-pd top-buffer">
             <span>Does <%= @person.first_name %> need coverage? *</span>
           </div>
             <% first_checked, second_checked = is_applying_coverage_value_personal(@person) %>
@@ -60,7 +60,7 @@
   </div>
     </div>
     <% end %>
-  <br />
+  <br>
   <% if @person.is_consumer_role_active? %>
   <div id="consumer_fields_sets">
     <%= render 'shared/consumer_fields', f: f %><br>
@@ -84,10 +84,9 @@
          ["home","work"].each do |kind|
            f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
          end
-       end
-    %>
+       end %>
 
-    <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+    <%= f.fields_for :emails, errors: {}, fieldset: true do |email| %>
       <div id="email_info" class="row row-form-wrapper no-buffer">
       <%= render 'shared/email_fields', f: email %>
         </div><br>
@@ -96,11 +95,11 @@
 
      <div>
       <% if @person.is_consumer_role_active? %>
-        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %></br>
+        <%= render 'shared/contact_preferences', {f: f, role: :consumer_role} %><br>
       <% elsif @person.is_resident_role_active? %>
-        <%= render 'shared/contact_preferences', {f: f, role: :resident_role} %></br>
+        <%= render 'shared/contact_preferences', {f: f, role: :resident_role} %><br>
       <% else %>
-        <%= render 'shared/contact_preferences', {f: f, role: :employee_roles} %></br>
+        <%= render 'shared/contact_preferences', {f: f, role: :employee_roles} %><br>
       <% end %>
     </div>
 
@@ -116,8 +115,8 @@
       </div>
     </div>
 
-  <%if @tab.nil?%>
-    <%= hidden_field_tag :page, "from_registration"%>
+  <% if @tab.nil? %>
+    <%= hidden_field_tag :page, "from_registration" %>
   <% end %>
 
   <div class="row no-buffer <%= pundit_class Family, :updateable? %> ">

@@ -1,9 +1,9 @@
 <div class="container-fluid">
-  <h2><%= l10n("quote_employer_dental_cost_comparison_results")%></h2>
+  <h2><%= l10n("quote_employer_dental_cost_comparison_results") %></h2>
 
-  <p><%= l10n("your_results_are_based_on_your_quote")%><strong><%= @qbg.quote_name %></strong> <%= l10n("effective_on")%> <strong><%= @qbg.start_on %></strong></p>
+  <p><%= l10n("your_results_are_based_on_your_quote") %><strong><%= @qbg.quote_name %></strong> <%= l10n("effective_on") %> <strong><%= @qbg.start_on %></strong></p>
 
-  <p><%= l10n("employer_dental_percentage_contributions")%></p>
+  <p><%= l10n("employer_dental_percentage_contributions") %></p>
 
   <ul>
     <% @qbg.quote_dental_relationship_benefits.each do |qrb|
@@ -11,23 +11,24 @@
       <ul style="padding-left: 18px;"><li><%= @employee_relationship_map[qrb.relationship] %> - <%= qrb.premium_pct.to_i %>%</li></ul>
     <%
   end
-      end %>
+      end
+    %>
   </ul>
 
-  <h3><%= l10n("click_to_quote")%></h3>
+  <h3><%= l10n("click_to_quote") %></h3>
 
   <table class="quote-detail-cost">
     <tr>
-      <td class="quote_detail_plan_header"><%= l10n("offering_option")%>: </td>
-      <td class="quote_detail_plan_header"><%= l10n("by_single_plan")%></td>
-      <td class="quote_detail_plan_header"><%= l10n("by_single_carrier")%></td>
-      <td class="quote_detail_plan_header"><%= l10n("custom")%><br><%=@quote_results.keys.count %> <%= l10n("plan_options")%></td>
+      <td class="quote_detail_plan_header"><%= l10n("offering_option") %>: </td>
+      <td class="quote_detail_plan_header"><%= l10n("by_single_plan") %></td>
+      <td class="quote_detail_plan_header"><%= l10n("by_single_carrier") %></td>
+      <td class="quote_detail_plan_header"><%= l10n("custom") %><br><%= @quote_results.keys.count %> <%= l10n("plan_options") %></td>
     </tr>
     <tr>
-      <td class="quote_detail_results_header" ><%= l10n("plan")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
-      <td class="quote_detail_results_header text-center"><%= l10n("reference")%></td>
+      <td class="quote_detail_results_header"><%= l10n("plan") %></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference") %></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference") %></td>
+      <td class="quote_detail_results_header text-center"><%= l10n("reference") %></td>
     </tr>
     <% i = 0 %>
    <% @quote_results.each do |k,v| %>
@@ -38,12 +39,11 @@
           metal_low = @roster_elected_plan_bounds[:metal_low][plan.metal_level]
           metal_high = @roster_elected_plan_bounds[:metal_high][plan.metal_level]
           carrier_low = @roster_elected_plan_bounds[:carrier_low][abbrev]
-          carrier_high = @roster_elected_plan_bounds[:carrier_high][abbrev]
-       %>
-       <tr class='publish' id='publish_<%=@quote_results[k][:plan_id]%>'>
+          carrier_high = @roster_elected_plan_bounds[:carrier_high][abbrev] %>
+       <tr class='publish' id='publish_<%= @quote_results[k][:plan_id] %>'>
          <td class="quote_detail_results" style='white-space:nowrap'><%= k %></td>
          <td class="quote_detail_results text-center dental_publish">
-            <div class='btn' id="single_dental_plan_<%= i%>">
+            <div class='btn' id="single_dental_plan_<%= i %>">
              $<%= cost %>
              </div>
          </td>
@@ -62,7 +62,7 @@
     <% end %>
   </table>
 
-  <h3><%= l10n("detailed_employer_cost_breakdown_for_selected_plans")%>:</h3>
+  <h3><%= l10n("detailed_employer_cost_breakdown_for_selected_plans") %>:</h3>
   <div class="mygrid-wrapper-div">
     <table class="quote-detail-cost">
     <tr>
@@ -73,11 +73,11 @@
       <td colspan="1" class="quote_detail_plan_header">
         <div style='width: 300px'>
         <b><%= qr[0] %></b><br>
-        <sm><%= l10n("employee")%>:
+        <sm><%= l10n("employee") %>:
         $<%= qr[1][:total_employee_cost].ceil %>,
-        <%= l10n("employer")%>:
+        <%= l10n("employer") %>:
 
-       <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+       <span>$<%= qr[1][:total_employer_cost].ceil %></span>
        <br>
         </sm>
    </div>
@@ -86,12 +86,12 @@
     </tr>
 
     <tr style="font-weight: bolder; ">
-      <td class="quote_detail_results_header"><%= l10n("name")%></td>
-      <td class="quote_detail_results_header"><%= l10n("relationship")%> (%)</td>
-      <td class="quote_detail_results_header"><%= l10n("age")%></td>
+      <td class="quote_detail_results_header"><%= l10n("name") %></td>
+      <td class="quote_detail_results_header"><%= l10n("relationship") %> (%)</td>
+      <td class="quote_detail_results_header"><%= l10n("age") %></td>
       <% @quote_results.keys.each do |de| %>
 
-        <td class="quote_detail_results_header" style='padding-left: 100px'><%= l10n("employer_cost")%></td>
+        <td class="quote_detail_results_header" style='padding-left: 100px'><%= l10n("employer_cost") %></td>
       <% end %>
 
     </tr>
@@ -105,13 +105,13 @@
           <%= qr[:first_name] %>
         </td>
         <td class="quote_detail_results">
-          <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>)</small>
+          <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i %>)</small>
         </td>
         <td class="quote_detail_results">
           <%= qr[:age] %>
         </td>
         <% @quote_results.keys.each do |de| %>
-          <td class="quote_detail_results"  style='padding-left: 100px'>
+          <td class="quote_detail_results" style='padding-left: 100px'>
             <b><%= @quote_results[de][:detail].flatten[index][:employer_contribution].round(2) %></b></td>
         <% end %>
       </tr>

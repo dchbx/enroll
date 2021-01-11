@@ -6,36 +6,36 @@
     <p>
     <span> Employee Information.</span>
   </p>
-<% end %>  
+<% end %>
   <div class="row top-row">
     <div class="col-md-7 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br/>
-       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br/>
-       Social Security:  <%= @employee.ssn %><br/>
+      <%= @employee.first_name %> <%= @employee.middle_name %> <%= @employee.last_name %><br>
+       Born: <%= @employee.dob.strftime("%b %d, %Y") %><br>
+       Social Security:  <%= @employee.ssn %><br>
        <% if @employer.present? %>
        <h4> <%= @employer.legal_name %> </h4>
-       <% address = @employer.addresses.last%>
+       <% address = @employer.addresses.last %>
        <% if address.present? %>
-          <spa><%= address.full_address%></span>
-       <% end %> 
-       </br>
-       Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %></br>
+          <spa><%= address.full_address %></span>
+       <% end %>
+       <br>
+       Hired : <%= @employee.hired_on.strftime("%b %d, %Y") %><br>
        Coverage : <%= @coverage %>
        <% end %>
-       </br>
-       
-      <div style="float:right;padding-top: 20px;"> 
+       <br>
+
+      <div style="float:right;padding-top: 20px;">
        <% if @employee.present? %>
         <% url = dependent_details_people_path(person_id: @person.id, employer_id: @employer.id) %>
        <% else %>
         <% url = plan_details_people_path()person_id: @person.id, employer_id: @employer.id %>
        <% end %>
-        <a href="<% url %>" class="btn btn-save person_landing_continue <%= pundit_class Family, :updateable?%>" >Continue</a>   
+        <a href="<% url %>" class="btn btn-save person_landing_continue <%= pundit_class Family, :updateable? %>">Continue</a>
      </div>
     </div>
   </div>
   <script>
-  // $(".save-btn").removeAttr("disabled");  
+  // $(".save-btn").removeAttr("disabled");
    //$(".submit_section").html("<a href='#' data-person-id='"+person_id+"' data-employer-id='"+employer_id+"' class='btn btn-save person_landing_continue'> Save </a>")
    /*$('.person_landing_continue').on('click',function(){
       person_id = $(this).data("person-id");

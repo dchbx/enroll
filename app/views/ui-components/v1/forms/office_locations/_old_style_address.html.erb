@@ -62,7 +62,7 @@
                    <% @counties = BenefitMarkets::Locations::CountyZip.where(zip: f.object.try(:zip)).pluck(:county_name).uniq %>
                    <% @empty_message = f.object.try(:zip).nil? ? 'Please provide a zip code' : "Zip code outside supported area" %>
                    <% @counties = [@empty_message] if @counties.empty? %>
-                   <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq })%>
+                   <%= f.select(:county, options_for_select(@counties, selected: (f.object.try(:county) || @counties.first)),{},class:'form-control form-group-lg', data: { target: 'zip-check.countySelect', options: BenefitMarkets::Locations::CountyZip.all.map(&:county_name).uniq }) %>
                 </div>
               <% end %>
           </div>
@@ -83,12 +83,12 @@
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
         <%= phone.text_field :number, class: "floatlabel form-control phone_number7 interaction-field-control-office-location-phone-number", required: true, placeholder: 'NUMBER', oninvalid:"checkPhone(this);", oninput:"checkPhone(this);" %>
       </div>
-      
+
     <% unless Settings.site.key.to_s == "dc" %>
       <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd border_bottom_zero">
-        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION'%>
+        <%= phone.text_field :extension, class: "floatlabel form-control interaction-field-control-office-location-phone-extension", placeholder: 'EXTENSION' %>
       </div>
-    <% end %>  
+    <% end %>
     </div><br>
   <% end %>
 </fieldset>

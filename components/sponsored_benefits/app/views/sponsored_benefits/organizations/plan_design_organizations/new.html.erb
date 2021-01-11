@@ -6,13 +6,13 @@
       </div>
       <div class="row">
         <% if aca_state_abbreviation == 'DC' %>
-          <p>Fill in the information below to create an employer record for this prospect.You only need to provide a legal name at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote. In addition, the 'State' drop down field defaults to DC, but should allow brokers to select from the normal state list if they choose. <br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.</p>
+          <p>Fill in the information below to create an employer record for this prospect.You only need to provide a legal name at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote. In addition, the 'State' drop down field defaults to DC, but should allow brokers to select from the normal state list if they choose. <br><br>Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.</p>
 
         <% else %>
-          <p>Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br /><br />Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.</p>
+          <p>Fill in the information below to create an employer record for this prospect.  You only need to provide a legal name, SIC, Zip and County at this point, however any information you do not enter here will need to be populated later, or by the employer prior to claiming a quote.<br><br>Once you have created the Prospective Employer record, you can create and manage quotes for this prospect from your Employers page.</p>
         <% end %>
       </div>
-      <br />
+      <br>
       <%= form_for @organization, as: :organization, url: {action: "create"} do |f| %>
         <%= hidden_field_tag :broker_agency_id, @broker_agency_profile.id.to_s %>
         <%= render 'shared/error_messages', :object => @organization %>

@@ -7,7 +7,7 @@
   </div>
 
   <div class="col-xs-12 benefits-fields">
-    <%= f.fields_for :contribution_levels, errors: {}, fieldset: false do |cl|  %>
+    <%= f.fields_for :contribution_levels, errors: {}, fieldset: false do |cl| %>
       <%= render "contribution_level", f: cl %>
     <% end %>
   </div>

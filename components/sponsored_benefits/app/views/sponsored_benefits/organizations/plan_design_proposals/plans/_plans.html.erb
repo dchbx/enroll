@@ -6,8 +6,7 @@
     data-plan-hsa="<%= plan.plan_hsa %>"
     data-metal-level="<%= plan.metal_level %>"
     data-plan-deductible="<%= plan.plan_deductible %>"
-    data-family-deductible="<%= plan.family_deductible %>"
-  >
+    data-family-deductible="<%= plan.family_deductible %>">
     <div class="col-xs-2">
       <%= radio_button_tag :reference_plan, "#{plan.id}", false, onclick:"setMyPlans(this)", data:{planId:plan.id} %>
     </div>
@@ -27,11 +26,11 @@
           <span>
             <%= render partial: "shared/network_data", locals: {plan: plan} %>
           </span>
-          <br />
+          <br>
           <% if !(kind == "dental") %>
             <span><%= check_box_tag "#{@location_id}", plan.id, false, id:'plan-comparison' %> </span><span>Include in comparison</span>
           <% end %>
-          <br/>
+          <br>
         </div>
 
       </div>
@@ -43,21 +42,21 @@
 <% end %>
 
 <script>
-	function setRadioButtons(element) {
-		var plans = document.querySelectorAll('.reference-plan');
-		plans.forEach(function(plan) {
-			var icons = plan.querySelectorAll('.fa-circle');
-			icons.forEach(function(icon) {
-				if (icon.dataset.tempid == element.dataset.tempid) {
-					icon.classList.add('fa-dot-circle')
-				}
-			});
-			var dotIcons = plan.querySelectorAll('.fa-dot-circle');
-			dotIcons.forEach(function(icon) {
-				if (icon.dataset.tempid != element.dataset.tempid) {
-					icon.classList.add('fa-circle')
-				}
-			});
-		});
-	}
+  function setRadioButtons(element) {
+    var plans = document.querySelectorAll('.reference-plan');
+    plans.forEach(function(plan) {
+      var icons = plan.querySelectorAll('.fa-circle');
+      icons.forEach(function(icon) {
+        if (icon.dataset.tempid == element.dataset.tempid) {
+          icon.classList.add('fa-dot-circle')
+        }
+      });
+      var dotIcons = plan.querySelectorAll('.fa-dot-circle');
+      dotIcons.forEach(function(icon) {
+        if (icon.dataset.tempid != element.dataset.tempid) {
+          icon.classList.add('fa-circle')
+        }
+      });
+    });
+  }
 </script>

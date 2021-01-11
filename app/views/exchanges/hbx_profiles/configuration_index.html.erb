@@ -8,22 +8,22 @@
         <%= link_to 'Security Questions', exchanges_security_questions_path, {class: 'btn btn-default'} %>
       <% end %>
 
-      <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f|%>
-        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
+      <%= form_for @time_keeper, url: set_date_exchanges_hbx_profiles_path, method: "post", class: "form" do |f| %>
+        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %> ">
           <tbody>
           <td width="50%" style="padding: 18px;font-weight: bold;">Current Date: <%= @time_keeper.date_of_record %>
           </td>
           <td>
             <%= datepicker_control f, :date_of_record, {:class => "form-control", :placeholder => "DATE OF RECORD",
                                              :'data-date-min' => "0d", required: true } %>
-            <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%=  policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
+            <button type="submit" class="btn btn-primary pull-right display-on-mobile" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button>
           </td>
           <td class="hide-on-mobile"><button type="submit" class="btn btn-primary pull-right" <%= policy_helper(HbxProfile).can_submit_time_travel_request? ? "" : "disabled" %>>Set Current Date</button></td>
         </table>
     <% end %>
 
       <%= form_for Setting.get_individual_market_monthly_enrollment_due_on, {url: update_setting_exchanges_hbx_profiles_path, method: :post, class: 'form'} do |f| %>
-        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs?%> ">
+        <table class="table table-border <%= pundit_class HbxProfile, :modify_admin_tabs? %> ">
           <tbody>
             <td width="50%" style="padding: 18px;font-weight: bold;">individual_market_monthly_enrollment_due_on: <%= Setting.individual_market_monthly_enrollment_due_on %>
             </td>

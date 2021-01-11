@@ -1,5 +1,5 @@
 <% any_enrollments = employer_profile.active_benefit_application.blank? ? false :
-        employer_profile.active_benefit_application.benefit_packages.any?{|benefit_package| HbxEnrollment.enrolled_and_renewal.by_benefit_package(benefit_package).any?}%>
+        employer_profile.active_benefit_application.benefit_packages.any?{|benefit_package| HbxEnrollment.enrolled_and_renewal.by_benefit_package(benefit_package).any?} %>
 <button type="button" class="btn btn-default <%= 'disabled' unless any_enrollments %>"
         data-toggle="modal" data-target="#terminate_employee_enrollments_modal">Terminate Employee Roster Enrollments</button>
 <% if employer_profile.active_benefit_application %>
@@ -14,7 +14,7 @@
           <div class="modal-body">
             <%= form_tag(profiles_employers_employer_profile_terminate_employee_roster_enrollments_path(employer_profile.id)) do %>
                 <strong>Please select reason for termination: <br></strong>
-                <%= select_tag('termination_reason',options_for_select([["Non Payment", "non_payment"]]), class: "form-control")%>
+                <%= select_tag('termination_reason',options_for_select([["Non Payment", "non_payment"]]), class: "form-control") %>
                 <strong>Please select date of termination: <br></strong>
                 <%= text_field_tag "termination_date", nil, required: true, id: "termination-date-picker_#{employer_profile.id}", class: "form-control date-field date-picker", "data-date-min" =>  employer_profile.active_plan_year.start_on + 1.day, "data-date-max" => employer_profile.active_plan_year.end_on %>
                 <strong>Transmit to Carrier?</strong>

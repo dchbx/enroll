@@ -1,22 +1,22 @@
-<br/>
+<br>
 <div class="row">
-  <div class = "col-sm-11 table-responsive" id="terminated_enrollemnts">
+  <div class="col-sm-11 table-responsive" id="terminated_enrollemnts">
     <h3 class='title'></h3>
     <% if @enrollments.present? %>
         <%= form_tag reinstate_enrollment_exchanges_hbx_profiles_path, method: :post, id: 'reinstate-form' do %>
 
-            <table class = "table table-striped table-bordered">
+            <table class="table table-striped table-bordered">
               <thead>
               <tr>
                 <th></th>
-                <th>Medical/Dental <br/> Plans</th>
+                <th>Medical/Dental <br> Plans</th>
                 <th>Market</th>
-                <th>Coverage <br/> Year</th>
-                <th>Effective <br/> Date</th>
-                <th>Termination <br/> Date</th>
-                <th>Reinstate Effective<br/> Date</th>
-                <th>Transmit <br /> Carrier EDI?</th>
-                <th>DC Health<br/> Link ID</th>
+                <th>Coverage <br> Year</th>
+                <th>Effective <br> Date</th>
+                <th>Termination <br> Date</th>
+                <th>Reinstate Effective<br> Date</th>
+                <th>Transmit <br> Carrier EDI?</th>
+                <th>DC Health<br> Link ID</th>
                 <th></th>
               </tr>
               </thead>
@@ -37,16 +37,16 @@
                     <td><%= enrollment.terminated_on %></td>
                     <td id="reinstate"><%= enrollment.terminated_on.next_day %></td>
                     <td>
-                      <input type="checkbox" name="edi_required" value="checked" checked />
+                      <input type="checkbox" name="edi_required" value="checked" checked>
                     </td>
                     <td id="hbx_id"><%= enrollment.hbx_id %></td>
                   </tr>
-              <%end%>
+              <% end %>
             </table>
             <%= hidden_field_tag 'comments' %>
-        <%end%>
+        <% end %>
         <%= submit_tag "Submit" , onclick: "ReinstateModal()", class: 'btn btn-primary' %>
-    <%end%>
+    <% end %>
 
   </div>
 </div>
@@ -67,7 +67,7 @@
           <div id="show_reinstate">
             <div>
               <h4 class="modal-title" style="display:inline;">
-                You are about to reinstate the following enrollment </br> on behalf of
+                You are about to reinstate the following enrollment <br> on behalf of
               </h4>
               <p style="display:inline;font-size:15px;">
                 <%= @person.first_name %>

@@ -6,9 +6,9 @@
     <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg">
       <div class="owner checkbox">
         <label>
-					<strong style="color: #838780;font-size: 10px;text-transform: uppercase;">
-          	Is Owner?
-					</strong>
+          <strong style="color: #838780;font-size: 10px;text-transform: uppercase;">
+            Is Owner?
+          </strong>
         </label>
         <label class="vertically-aligned-row pl-2">
           <span>
@@ -26,7 +26,7 @@
           <strong>Benefit Package</strong>
         </span>
         <%= f.fields_for :benefit_group_assignments, @census_employee.active_benefit_group_assignment, errors: {}, fieldset: false do |benefit_group_assignment| %>
-        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_packages, current_option: current_option_for_initial_benefit_package, prompt: "SELECT BENEFIT PACKAGE"  %>
+        <%= render 'shared/benefit_group_assignment_fields', f: benefit_group_assignment, benefit_groups: current_benefit_packages, current_option: current_option_for_initial_benefit_package, prompt: "SELECT BENEFIT PACKAGE" %>
         <% end %>
       </div>
     </div>
@@ -59,7 +59,7 @@
 <script>
   var disableSelectric = false;
 </script>
-  
+
 <style>
   .n-radio-group .n-radio-row:first-of-type {
     border:none !important;

@@ -11,11 +11,11 @@
         </p>
         <%= form_for :employer_profile, url: sponsored_benefits.organizations_plan_design_proposal_claim_path(@employer_profile), method: "get", class: "form-inline" do |f| %>
           <label>
-            <%= text_field_tag :claim_code, nil, placeholder: 'X X X X - X X X X', maxlength: 9 %>    
+            <%= text_field_tag :claim_code, nil, placeholder: 'X X X X - X X X X', maxlength: 9 %>
           </label>
-          </br></br>
+          <br><br>
           <%= submit_tag "Claim Code", 'data-disable-with' => "Please wait...", class: 'btn btn-primary' %>
-        <%end%>
+        <% end %>
 
         <ul class="application-warnings"></ul>
       </div>

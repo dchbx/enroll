@@ -1,7 +1,7 @@
 <% if @single_plan.present? %>
 <br><br>
-<h4>Let your plan participants choose any plan they would like.<br/>It will not cost you more to let them choose.</h4>
-<br/><br/>
+<h4>Let your plan participants choose any plan they would like.<br>It will not cost you more to let them choose.</h4>
+<br><br>
 <% end %>
 <% @benefit_package_form.catalog.plan_options.each do |plan| %>
 <div class="col-xs-4">
@@ -24,7 +24,7 @@
           <!-- <span class="plan-label">Type: </span><span><%#= plan.health_plan_kind %></span><br> -->
           <span class="plan-label">Carrier: </span><span><%= plan.carrier_name %></span><br>
           <span class="plan-label">Level: </span><span><%= plan.metal_level_kind %></span><br>
-          <span class="plan-label">Network: </span><span><%= plan ? 'Nationwide' : 'DC Metro' %></span><br/>
+          <span class="plan-label">Network: </span><span><%= plan ? 'Nationwide' : 'DC Metro' %></span><br>
           <%#= link_to 'View Summary', reference_plan_summary_employers_employer_profile_plan_years_path(ref_plan_id: plan.id, hios_id: plan.hios_id, coverage_kind: plan.coverage_kind), remote: 'true', class: "view-summary fourteen" %>
         </div>
       </div>

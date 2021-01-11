@@ -29,7 +29,7 @@
         <div class="col-md-8">
           <center><strong><%= l10n("insured.families.add_or_remove_family_html") %></strong></center>
         </div>
-        <div class="col-md-4 <%=pundit_class Family,:updateable?%>">
+        <div class="col-md-4 <%= pundit_class Family,:updateable? %>">
           <%= button_tag l10n(".continue"), class: 'btn btn-default', id: 'qle_continue_button' %>
         </div>
       </div>
@@ -47,11 +47,10 @@
   </div>
 </div>
 
-<div id="dependent_buttons" class="focus_effect personal-info-row <%= pundit_class Family, :updateable?%>">
+<div id="dependent_buttons" class="focus_effect personal-info-row <%= pundit_class Family, :updateable? %>">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12" id="add-member-btn">
     <%= link_to new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-primary " do
       "<i class='fa fa-user-plus'></i> #{l10n('add_member')}".html_safe
-    end
-    %>
+    end %>
   </div>
 </div>

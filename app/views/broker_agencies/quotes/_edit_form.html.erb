@@ -1,85 +1,84 @@
 <div class="wrapper">
-	<div>&nbsp;</div>
-	<!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">-->
-		<div class="panel panel-default">
-			<div class="panel-heading" role="tab" id="headingOne">
-				<h3 class="panel-title">
-					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-group" aria-expanded="true" aria-controls="quote-group">
-						<%= l10n("broker_agencies.quotes.quote_information")%>
-					</a>
-				</h3>
-			</div>
-			<div id="quote-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
-				<div class="panel-body" id="quote-info">
-					<div class="row form-inline">
-						<div class="form-group col-sm-6"><%= l10n("quote_name")%>: <%= f.text_field :quote_name, {required: true, :placeholder => "#{l10n('quote_name')}"}%> </div>
-						<div class="form-group col-sm-6"><%= l10n("quote_effective_date")%>:
-							<% plan_year_start_dates = PlanYear.calculate_start_on_options %>
-							<% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
-								<% plan_year_start_dates << [f.object.start_on.strftime("%m/%d/%Y"), f.object.start_on.try(:to_s, :db)]%>
-							<% end %>
-							<%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, {:class => "floatlabel custom_selectric form-control", :prompt => true, required: true}) %>
+  <div>&nbsp;</div>
+  <!--<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">-->
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingOne">
+        <h3 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-group" aria-expanded="true" aria-controls="quote-group">
+            <%= l10n("broker_agencies.quotes.quote_information") %>
+          </a>
+        </h3>
+      </div>
+      <div id="quote-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
+        <div class="panel-body" id="quote-info">
+          <div class="row form-inline">
+            <div class="form-group col-sm-6"><%= l10n("quote_name") %>: <%= f.text_field :quote_name, {required: true, :placeholder => "#{l10n('quote_name')}"} %> </div>
+            <div class="form-group col-sm-6"><%= l10n("quote_effective_date") %>:
+              <% plan_year_start_dates = PlanYear.calculate_start_on_options %>
+              <% if f.object.start_on.present? && !plan_year_start_dates.any?{|set| set[1] == f.object.start_on.try(:to_s, :db) } %>
+                <% plan_year_start_dates << [f.object.start_on.strftime("%m/%d/%Y"), f.object.start_on.try(:to_s, :db)] %>
+              <% end %>
+              <%= f.select(:start_on, options_for_select(plan_year_start_dates, selected: f.object.start_on.try(:to_s, :db)), {:include_blank => "SELECT START ON"}, {:class => "floatlabel custom_selectric form-control", :prompt => true, required: true}) %>
 
-						</div>
-					</div>
-				</div>
-				<div class="panel-body" id="quote-info">
-					<div class="row form-inline">
+            </div>
+          </div>
+        </div>
+        <div class="panel-body" id="quote-info">
+          <div class="row form-inline">
           <!-- Disabling client for now as per business request -->
-						<div class="form-group col-sm-6">Type:
-							<%= f.select(:employer_type, options_for_select([["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
-						</div>
-						<div class="form-group col-sm-6">Employer Name:
-							<div class="type">
-								<%= render 'families', type: @quote.employer_type %>
-							</div>
-						</div>
-					</div>
-				</div>
+            <div class="form-group col-sm-6">Type:
+              <%= f.select(:employer_type, options_for_select([["Prospect","prospect"]],selected: @quote.employer_type), {:include_blank => "SELECT TYPE"}, {:class => "floatlabel custom_selectric form-control employer_type", :prompt => true, required: true}) %>
+            </div>
+            <div class="form-group col-sm-6">Employer Name:
+              <div class="type">
+                <%= render 'families', type: @quote.employer_type %>
+              </div>
+            </div>
+          </div>
+        </div>
 
-			</div>
-		</div>
+      </div>
+    </div>
 
-
-		<div class="panel panel-default">
-			<div class="panel-heading" role="tab" id="headingTwo">
-				<h3 class="panel-title">
-					<a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group" aria-expanded="true" aria-controls="quote-benefit-group">
-						<%= l10n("broker_agencies.quote_benefit_group_selection")%>
-					</a>
-				</h3>
-			</div>
-			<div id="quote-benefit-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
-				<div class="panel-body" id="quote-info">
-          <% count = 1%>
-					<%= f.fields_for :quote_benefit_groups do |benefit_group| %>
-          <div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden"%>>
-            <div class="form-group col-sm-12">Benefit Group #<%= "#{count}"%>: <%= benefit_group.text_field :title , {size: 40, placeholder: 'Enter Benefit Group Name', benefit_group_state: benefit_group.object.persisted? } %>&nbsp;
-              <button type="button" data-quote-id="<%=@quote.id%>" data-broker-role-id="<%=@broker.id%>" data-benefit-group-id="<%=benefit_group.object.id%>" id="remove_benefit_group_button"  class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="panel panel-default">
+      <div class="panel-heading" role="tab" id="headingTwo">
+        <h3 class="panel-title">
+          <a role="button" data-toggle="collapse" data-parent="#accordion" href="#quote-benefit-group" aria-expanded="true" aria-controls="quote-benefit-group">
+            <%= l10n("broker_agencies.quote_benefit_group_selection") %>
+          </a>
+        </h3>
+      </div>
+      <div id="quote-benefit-group" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingQuoteGroup">
+        <div class="panel-body" id="quote-info">
+          <% count = 1 %>
+          <%= f.fields_for :quote_benefit_groups do |benefit_group| %>
+          <div class=<%= benefit_group.object.persisted? ? "row form-inline"  : "row form-inline hidden" %>>
+            <div class="form-group col-sm-12">Benefit Group #<%= "#{count}" %>: <%= benefit_group.text_field :title , {size: 40, placeholder: 'Enter Benefit Group Name', benefit_group_state: benefit_group.object.persisted? } %>&nbsp;
+              <button type="button" data-quote-id="<%= @quote.id %>" data-broker-role-id="<%= @broker.id %>" data-benefit-group-id="<%= benefit_group.object.id %>" id="remove_benefit_group_button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div>&nbsp;</div>
           </div>
-          <% count += 1%>
+          <% count += 1 %>
           <% end %>
           <div class="form-group col-sm-12" style="margin-left:105px">
-            <%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br"%>
+            <%= submit_tag "Save", id: "save_benefit_group_submit", class: "select btn btn-primary btn-br" %>
             <%= submit_tag "Add benefit Group", id: "add_benefit_group",type: 'button', onclick: "addBenefitGroup()", class: "select btn btn-primary btn-br" %>
           </div>
-				</div>
-			</div>
-		</div>
+        </div>
+      </div>
+    </div>
 
-		<div>&nbsp;</div>
+    <div>&nbsp;</div>
 
-    <h3><%= l10n("broker_agencies.quotes.quote_roster")%></h3>
+    <h3><%= l10n("broker_agencies.quotes.quote_roster") %></h3>
 
-    <p><%= l10n("broker_agencies.quotes.roster_build_to_estimate_employee_and_employer_costs")%></p>
+    <p><%= l10n("broker_agencies.quotes.roster_build_to_estimate_employee_and_employer_costs") %></p>
 
-		<div id="family-container">
-		<%= f.fields_for :quote_households do |qhh| %>
-			 <%= render "quote_household", qhh:qhh %>
-		<% end %>
-		</div>
+    <div id="family-container">
+    <%= f.fields_for :quote_households do |qhh| %>
+       <%= render "quote_household", qhh:qhh %>
+    <% end %>
+    </div>
 </div>
 
 <script>
@@ -141,7 +140,6 @@ else {
 
   $('button#remove_household_button').click(remove_household_handler);
 
-
   var remove_benefit_group_handler = function(){
     var $quote_benefit_group_id = $(this);
     if(this.getAttribute("data-benefit-group-id") != undefined){
@@ -166,26 +164,26 @@ else {
 $('button#remove_benefit_group_button').click(remove_benefit_group_handler);
 
 function addEmployeeRowToFamily(family, idx) {
-	var emp_option = $('#family-' + family).find('option:selected').text().includes('Employee')
-	var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]">'+isEmpSelected(emp_option)+'<option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
-	table_row = $('<div class="row form-inline">'
-								+ '<div class="form-group col-sm-3">DOB: <input type="text" class="uidatepicker" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]" placeholder="Date of Birth (DOB)"/></div><div class="form-group col-sm-5">Name: <input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]" placeholder="First Name"/>&nbsp;<input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][last_name]" placeholder="Last Name"/></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
-									'<div class="form-group col-sm-1"><button type="button" id="remove_member_button" data-quote-id="" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
-								   + '</div>');
-									counter += 1 ;
-									$('#family-' + family).append(table_row);
-									$(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
-									$(".uidatepicker").focus(date_handler);
-									$('button#remove_member_button').click(remove_member_handler);
-									//$('select').selectric('refresh');
+  var emp_option = $('#family-' + family).find('option:selected').text().includes('Employee')
+  var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]">'+isEmpSelected(emp_option)+'<option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
+  table_row = $('<div class="row form-inline">'
+                + '<div class="form-group col-sm-3">DOB: <input type="text" class="uidatepicker" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]" placeholder="Date of Birth (DOB)"/></div><div class="form-group col-sm-5">Name: <input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]" placeholder="First Name"/>&nbsp;<input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][last_name]" placeholder="Last Name"/></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
+                  '<div class="form-group col-sm-1"><button type="button" id="remove_member_button" data-quote-id="" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+                   + '</div>');
+                  counter += 1 ;
+                  $('#family-' + family).append(table_row);
+                  $(".uidatepicker").datepicker({maxDate: "-1D", changeMonth: true, changeYear: true, dateFormat: 'mm/dd/yy',  yearRange: (new Date).getFullYear()-110 + ":" + (new Date).getFullYear()});
+                  $(".uidatepicker").focus(date_handler);
+                  $('button#remove_member_button').click(remove_member_handler);
+                  //$('select').selectric('refresh');
 }
 
 function isEmpSelected(emp_option){
-	if(emp_option){
-		return ''
-	}else{
-		return '<option value="employee">Employee</option>'
-	}
+  if(emp_option){
+    return ''
+  }else{
+    return '<option value="employee">Employee</option>'
+  }
   var relation_options = '<select class="custom_selectric" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][employee_relationship]"><option value="employee">Employee</option><option value="spouse">Spouse</option><option value="domestic_partner">Domestic partner</option><option value="child_under_26">Child</option></select>';
   table_row = $('<div class="row form-inline">'
     + '<div class="form-group col-sm-3">DOB: <input type="text" class="uidatepicker" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][dob]" placeholder="Date of Birth (DOB)"/></div><div class="form-group col-sm-5">Name: <input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][first_name]" placeholder="First Name"/>&nbsp;<input type="text" name="quote[quote_households_attributes]['+idx+'][quote_members_attributes]['+counter+'][last_name]" placeholder="Last Name"/></div><div class="form-group col-sm-3">' + relation_options + '</div>' +
@@ -209,20 +207,20 @@ var addBenefitGroup = function () {
 }
 
 var duplicate_household = function() {
-	if(confirm("Duplicate this family?")) {
-		$('<input>').attr({
-			type: 'hidden',
-			name: 'duplicate_household',
-			value: this.getAttribute("data-family-id")
-		}).appendTo('form');
-		$('<input>').attr({
-			type: 'hidden',
-			name: 'num_of_dup',
-			value: $(this).find("option").filter(":selected").text()
-		}).appendTo('form');
-		// $("input[class*='btn btn-primary  interaction-click-control-add-family']").click()
+  if(confirm("Duplicate this family?")) {
+    $('<input>').attr({
+      type: 'hidden',
+      name: 'duplicate_household',
+      value: this.getAttribute("data-family-id")
+    }).appendTo('form');
+    $('<input>').attr({
+      type: 'hidden',
+      name: 'num_of_dup',
+      value: $(this).find("option").filter(":selected").text()
+    }).appendTo('form');
+    // $("input[class*='btn btn-primary  interaction-click-control-add-family']").click()
     $("input[class*='btn btn-primary  interaction-click-control-add-employee']").click()
-	}
+  }
 };
 
 var save_benefit_group_button = function() {
@@ -236,7 +234,6 @@ var save_benefit_group_button = function() {
 // $("[id^=duplicate-family-id]").change(duplicate_household);
  $(document).on('change', "[id^='duplicate-family-id']", duplicate_household );
 
-
 $("input[benefit_group_state=false]").keyup(save_benefit_group_button)
 
 <% if @scrollTo == 1 %>
@@ -245,10 +242,9 @@ $(document).ready(function() {
 });
 <% end %>
 
-
 $(document).on('change','.employer_profile' ,function() {
-  var quote_id = '<%=@quote.id%>'
-  var broker_id = '<%= @broker.id%>'
+  var quote_id = '<%= @quote.id %>'
+  var broker_id = '<%= @broker.id %>'
   // if(this.value != undefined){
     $.ajax({
       type: "GET",
@@ -264,6 +260,5 @@ $(document).on('change','.employer_profile' ,function() {
     });
   // }
 });
-
 
 </script>

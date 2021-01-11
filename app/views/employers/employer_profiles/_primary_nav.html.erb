@@ -25,12 +25,12 @@
     </li>
     <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
-      <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
+      <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do %>
       Messages
       <span class="badge message-unread"><%= @employer_profile.inbox.unread_messages.try(:count) || 0 %></span>
 
       <% end %>
-      <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
+      <%= link_to(employers_employer_profile_path(@employer_profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do %>
       <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
       <small>Messages</small>
       <% end %>
@@ -41,7 +41,7 @@
     <div class="panel-heading">
       <h4><%= @employer_profile.organization.legal_name %></h4>
       <%= link_to 'Update Business Info', edit_employers_employer_profile_path(@employer_profile.organization, :tab=>'profile', add_staff: 'no') %>
-      <br/>
+      <br>
       <%= pundit_span @employer_profile, :list_enrollments? %>
         <%= link_to 'View Enrollment Reports', employers_premium_statement_path(@employer_profile, :tab=>'profile') %>
       </span>

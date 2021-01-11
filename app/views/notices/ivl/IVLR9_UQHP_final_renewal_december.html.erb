@@ -2,8 +2,8 @@
 <%= render partial: 'notices/shared/date', :locals => {notice: notice} %>
 <%= render partial: "notices/shared/address", :locals => {notice: notice} %>
 
-<style type="text/css" media="screen,print"> 
-.break{ 
+<style type="text/css" media="screen,print">
+.break{
    display: block;
    clear: both;
    page-break-after: always;
@@ -34,14 +34,14 @@
       <tr><td><%= notice.current_health_enrollment.enrollees[1] %></td><td><%= notice.current_health_enrollment.enrollees[5] %></td></tr>
       <tr><td><%= notice.current_health_enrollment.enrollees[2] %></td><td><%= notice.current_health_enrollment.enrollees[6] %></td></tr>
       <tr><td><%= notice.current_health_enrollment.enrollees[3] %></td><td><%= notice.current_health_enrollment.enrollees[7] %></td></tr>
-    </table>  
+    </table>
   <% elsif notice.current_dental_enrollment.present? && notice.current_health_enrollment.blank? %>
     <table width=75% align=center>
       <tr><td><%= notice.current_dental_enrollment.enrollees[0] %></td><td><%= notice.current_dental_enrollment.enrollees[4] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[1] %></td><td><%= notice.current_dental_enrollment.enrollees[5] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[2] %></td><td><%= notice.current_dental_enrollment.enrollees[6] %></td></tr>
       <tr><td><%= notice.current_dental_enrollment.enrollees[3] %></td><td><%= notice.current_dental_enrollment.enrollees[7] %></td></tr>
-    </table>  
+    </table>
   <% end %>
 
 <%= render partial: 'notices/shared/unordered_list', locals: {
@@ -56,7 +56,6 @@
 <%= render partial: 'notices/shared/unordered_list', locals: {
   previous: "",
   listings: ["<strong>Update your payment information:</strong> Your premium amount for 2017 has changed. If you have autopay set up through your insurance plan(s) or bank, you must contact your insurance plan(s) or bank to update the amount that will be withdrawn each month. <u>If you do not make an update, your insurance company may terminate your plan and you will be unable to sign up for a new plan for 2017 unless you experience another life event (like getting married or having a baby) that qualifies you to re-enroll</u>.","<strong>Provide proof:</strong> If you received an earlier notice from #{Settings.site.short_name} indicating that we need documentation of certain information, please be sure to submit those documents if you haven’t already. An outstanding document request will not impact your renewal. However, failing to submit the document(s) by the date indicated on the request may cause your coverage to be terminated in the future."]} %>
-
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
  contents: [""],

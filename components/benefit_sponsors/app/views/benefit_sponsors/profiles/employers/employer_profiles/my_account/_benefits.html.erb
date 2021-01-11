@@ -41,7 +41,7 @@
       <h4>
         <%= l10n("employers.plan_years.benefits_with_plan.important") %>
       </h4>
-      <br/>
+      <br>
     </div>
     <% end %>
     <% end %>
@@ -72,9 +72,9 @@
               <%= link_to "Publish Plan Year &nbsp;<i class='fa fa-users' aria-hidden='true'></i>".html_safe, benefit_sponsorship_benefit_application_submit_application_path(benefit_application.benefit_sponsorship, benefit_application), method: :post, remote: true, class: "btn btn-default pull-right", disabled: product_rates_available?(benefit_application.benefit_sponsorship, benefit_application.start_on.to_date) %>
               <%# end %>
               <% if benefit_application.benefit_packages.empty? || benefit_application.benefit_packages.count > 1 %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1"%>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_path(benefit_application.benefit_sponsorship, benefit_application), class: "btn btn-default pull-right mrz mr-1" %>
               <% else %>
-                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_benefit_package_path(benefit_application.benefit_sponsorship, benefit_application, benefit_application.benefit_packages.first, :show_benefit_application_tile => true), method: :get, class: "btn btn-default pull-right mrz mr-1"%>
+                <%= link_to "Edit Plan Year &nbsp;<i class='fas fa-pencil-alt' aria-hidden='true'></i>".html_safe, edit_benefit_sponsorship_benefit_application_benefit_package_path(benefit_application.benefit_sponsorship, benefit_application, benefit_application.benefit_packages.first, :show_benefit_application_tile => true), method: :get, class: "btn btn-default pull-right mrz mr-1" %>
               <% end %>
           <% end %>
           <%#= pundit_span(EmployerProfile, :revert_application?) %>
@@ -109,7 +109,7 @@
                             <%= benefit_application.terminated_on.to_date.to_formatted_s :long_ordinal %>
                          </p>
                       </td>
-                    <%end%>
+                    <% end %>
 
                   </tr>
 
@@ -212,7 +212,7 @@
                             <%= benefit_application.terminated_on.to_date.to_formatted_s :long_ordinal %>
                          </p>
                       </td>
-                    <%end%>
+                    <% end %>
                   </tr>
                   <tr>
                     <td>
@@ -230,7 +230,7 @@
             <% package.sponsored_benefits.each do |sponsored_benefit| %>
               <%= render 'sponsored_benefit', sponsored_benefit: sponsored_benefit, skip_calcs: can_skip_calculations_for(benefit_application) %>
             <% end %>
-            <br class="clear"/>
+            <br class="clear">
           </div>
             <%= pundit_span @employer_profile, :updateable? %>
                 <div class="below clear">
@@ -240,8 +240,8 @@
             </span>
           <% end %>
         </div>
-        <br/>
-        <br/>
+        <br>
+        <br>
         <div class="col-xs-12"></div>
         <%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: benefit_application %>
         <%= render "benefit_sponsors/benefit_applications/benefit_applications/revert_application_modal", benefit_application: benefit_application %>
@@ -251,8 +251,8 @@
       <h4>
         <%= l10n("employers.plan_years.benefits_without_plan") %>
       </h4>
-      <br/>
-      <%= pundit_span @employer_profile, :updateable?%>
+      <br>
+      <%= pundit_span @employer_profile, :updateable? %>
         <%= link_to "Add Plan Year", new_benefit_sponsorship_benefit_application_path(@benefit_sponsorship, tab: 'benefits'), class: "btn btn-primary btn-br", data: {loading_text: "Loading..."}, id:'AddPlanYearBtn' %>
       </span>
   <% end %>

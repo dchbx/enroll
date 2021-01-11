@@ -1,5 +1,5 @@
 <div class="container" id="extendable_applications_table">
-  <div class = "table-responsive table-override">
+  <div class="table-responsive table-override">
     <div class="pull-right">
       <a href="javascript:void(0);" onclick="$('tr.child-row:visible').remove();">
         <span aria-hidden="true"> <i class="fa fa-times fa-lg"></i> </span>
@@ -7,15 +7,15 @@
     </div>
     <h4 class="text-center heading-text"> <%= l10n("hbx_profiles.publish_application") %> </h4>
     <%= form_tag force_publish_exchanges_hbx_profiles_path(id: @benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{@benefit_sponsorship.organization.employer_profile.id}", publish_with_warnings: false),:method => :post, :remote => true do %>
-      <table class = "table" style="table-layout: fixed;">
+      <table class="table" style="table-layout: fixed;">
         <thead>
           <tr>
-           <th><%= l10n("hbx_profiles.application_type")%></th>
-           <th><%= l10n("hbx_profiles.effective_date")%></th>
-           <th><%= l10n("hbx_profiles.oe_end_date")%></th>
-           <th><%= l10n("hbx_profiles.application_status")%></th>
-           <th><%= l10n("hbx_profiles.submitted_at")%></th>
-           <th><%= l10n("hbx_profiles.last_updated_at")%></th>
+           <th><%= l10n("hbx_profiles.application_type") %></th>
+           <th><%= l10n("hbx_profiles.effective_date") %></th>
+           <th><%= l10n("hbx_profiles.oe_end_date") %></th>
+           <th><%= l10n("hbx_profiles.application_status") %></th>
+           <th><%= l10n("hbx_profiles.submitted_at") %></th>
+           <th><%= l10n("hbx_profiles.last_updated_at") %></th>
            <th></th>
           </tr>
         </thead>
@@ -41,4 +41,3 @@
 </div>
 
 <%= render "benefit_sponsors/benefit_applications/benefit_applications/submit_application_modal", benefit_application: @benefit_application, admin_override: true, publish_url: force_publish_exchanges_hbx_profiles_path(id: @benefit_sponsorship.id.to_s, :employer_actions_id => "employer_actions_#{@benefit_sponsorship.organization.employer_profile.id}", publish_with_warnings: true) %>
-

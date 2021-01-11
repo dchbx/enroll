@@ -1,42 +1,41 @@
 <div class="container-fluid">
-  <h3 style='text-align:center'><%= l10n("plan_comparison_chart")%></h3>
+  <h3 style='text-align:center'><%= l10n("plan_comparison_chart") %></h3>
   <div class="mygrid-wrapper-div">
-   <table class="table bordered compare-table", border = "1", style="font-size:11px;" id="compare_plans_table">
-        <tr>
-          <th class="row-title"><%= l10n("plans")%></th>
-          <% qhps.each do |qhp|%>
+   <table class="table bordered compare-table"
+          <th class="row-title"><%= l10n("plans") %>>
+          <% qhps.each do |qhp| %>
             <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class='movable'><%= display_carrier_logo(Maybe.new(qhp.plan), { width: 80, pdf: true }) %></th>
           <% end %>
         </tr>
         <tr>
           <th></th>
-          <% qhps.each do |qhp|%>
+          <% qhps.each do |qhp| %>
             <th colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;" class="ttc fourteen blue"><%= qhp.plan.name %></th>
           <% end %>
         </tr>
         <tr>
           <th></th>
-          <% qhps.each do |qhp|%>
+          <% qhps.each do |qhp| %>
             <th class="fourteen lg" colspan="2" style="text-align: center; vertical-align:middle; border: none; padding: 0;"><span class="<%= qhp.plan.metal_level.humanize.downcase %>-icon"><%= display_dental_metal_level qhp.plan %></span> &nbsp;&#149;&nbsp;
             <%= qhp.plan.plan_type.upcase %>
             </th>
           <% end %>
         </tr>
         <tr>
-          <th><%= l10n("provider_network")%></th>
-          <% qhps.each do |qhp|%>
+          <th><%= l10n("provider_network") %></th>
+          <% qhps.each do |qhp| %>
             <th colspan="2">
               <%= render partial: "shared/network_data", locals: {plan: qhp.plan} %>
             </th>
           <% end %>
         </tr>
 
-        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps}%>
+        <%= render partial: "shared/plan_shoppings/provider_directory_url", locals: {qhps: qhps} %>
 
         <% if qhps.map(&:plan).map(&:rx_formulary_url).compact.present? %>
           <tr>
             <th></th>
-            <% qhps.each do |qhp|%>
+            <% qhps.each do |qhp| %>
               <th colspan="2">
                 <% if qhp.plan.coverage_kind == "health" && qhp.plan.rx_formulary_url.present? %>
                   <%= link_to "#{l10n('broker_agencies.quotes.rx_formulary_url')}", qhp.plan.rx_formulary_url, target: "_blank" %>
@@ -47,15 +46,15 @@
         <% end %>
         <tr>
           <th>PLAN BENEFITS <br> (In Network)</th>
-          <% qhps.each do |qhp|%>
-            <th colspan="1"> <%= l10n("co_pay")%> </th>
-            <th colspan="1"> <%= l10n("coinsurance")%> </th>
+          <% qhps.each do |qhp| %>
+            <th colspan="1"> <%= l10n("co_pay") %> </th>
+            <th colspan="1"> <%= l10n("coinsurance") %> </th>
           <% end %>
         </tr>
         <%= render partial: "plan_visit_types", locals: {qhps: qhps} %>
         <tr>
           <th></th>
-          <% qhps.each do |qhp|%>
+          <% qhps.each do |qhp| %>
            <% if qhp.plan.sbc_document.present? %>
             <th colspan="2">
               <div class="plan_comparison">
@@ -66,7 +65,7 @@
                                                   pdf&disposition=inline" %>
               </div>
             </th>
-            <%end%>
+            <% end %>
           <% end %>
         </tr>
     </table>

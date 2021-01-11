@@ -1,7 +1,7 @@
 <% if @plan.premium_tables.present? %>
   <h5><%= @plan.name %></h5>
   <div class='row'>
-    <% num = (@premium_tables.count + 3) / 4  %>
+    <% num = (@premium_tables.count + 3) / 4 %>
     <% @premium_tables.each_slice(num).with_index do |premiums, index| %>
       <div class="col-md-3 col-sm-3 col-xs-12">
         <table class="table table-bordered">
@@ -19,4 +19,4 @@
       </div>
     <% end %>
   </div>
-<% end  %>
+<% end %>

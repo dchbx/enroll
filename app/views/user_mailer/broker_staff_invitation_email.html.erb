@@ -1,7 +1,7 @@
 <html>
 <body>
 <%= person_name %>,
-<br />
+<br>
 <div>Thank you for registering as a broker staff through <%= Settings.site.short_name %>.</div>
 <div>Please visit <%= link_to "#{Settings.site.short_name}", claim_invitation_url(invitation, person_id: person_id) %> to create your broker staff account and manage your clients.</div>
 </body>

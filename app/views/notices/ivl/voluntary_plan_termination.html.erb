@@ -19,9 +19,9 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "On [Termination Request Date], you asked us to terminate health insurance coverage for the following individual(s) from [plan name]: <br><br>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Termination 1 First Name] [Termination 1 Last Name] <br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Termination 1 First Name] [Termination 1 Last Name] <br><br>
 [IF More than One Terminating Person] <br><br>
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Termination N First Name] [ Termination N Last Name] <br><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[Termination N First Name] [ Termination N Last Name] <br><br>
 
 This coverage will end on [Termination Effective Date].  <u>You must still pay all premiums due until that date.</u>
 "} %>
@@ -29,8 +29,8 @@ This coverage will end on [Termination Effective Date].  <u>You must still pay a
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "The coverage termination dates listed above are based on federal regulations, which require the following termination dates for voluntary terminations when the request is made to #{Settings.site.short_name}:"} %>
 
 <%= render partial: 'notices/shared/unordered_list', :locals => { listings:
-	["The date requested by the customer if the request is made at least 14 days in advance.",
-		"Fourteen days following the date of the request if the request is not made 14 days in advance."] } %>
+  ["The date requested by the customer if the request is made at least 14 days in advance.",
+    "Fourteen days following the date of the request if the request is not made 14 days in advance."] } %>
 
 <%= render partial: 'notices/shared/paragraph', :locals => { content: "45 C.F.R. §155.430(d)(2)"} %>
 

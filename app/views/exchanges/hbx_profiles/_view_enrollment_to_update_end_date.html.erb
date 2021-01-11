@@ -44,18 +44,18 @@
                 }
             }
         });
-    } 
+    }
     jQuery("a.modal_confirm").click(function() {
         jQuery("#termiante_with_earlier_date-form").submit();
     });
 </script>
 
 <td colspan="90%">
-  <%if @enrollments.present?%>
+  <% if @enrollments.present? %>
       <%= form_tag update_enrollment_termianted_on_date_exchanges_hbx_profiles_path, :method => :post, remote: true, id: 'termiante_with_earlier_date-form' do %>
           <h3 class='title'>Terminated Enrollment To Update End Date</h3>
-          <br />
-          <table  class="table table-striped">
+          <br>
+          <table class="table table-striped">
             <tr>
               <th></th>
               <th>HBX ID</th>
@@ -73,22 +73,19 @@
                   <td id="enrollment_effective_on"><%= hbx.effective_on %></td>
                   <td><%= hbx.terminated_on %></td>
                   <td><%= text_field_tag "new_termination_date", nil, readonly: true, disabled: true, value:  hbx.terminated_on, id: "termination-date-picker_#{hbx.id}", class: "form-control date-field date-picker", "data-date-min" =>  hbx.effective_on, "data-date-max" =>  hbx.terminated_on %></td>
-                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true%></td>
+                  <td><%= check_box_tag "edi_required", hbx.id, false,  disabled: true %></td>
                 </tr>
             <% end %>
-            <tr><td colspan = "7"><br /></td></tr>
+            <tr><td colspan="7"><br></td></tr>
             <tr>
-              <td colspan = "6">
+              <td colspan="6">
                 <span class="btn btn-default" onclick="$('tr.child-row:visible').remove();">Cancel</span>&nbsp;&nbsp;&nbsp;
                 <%= hidden_field_tag :family_actions_id, params[:family_actions_id] %>
-                <button class='btn btn-primary', type="button", onclick = "TerminateWithEarlierDate()" > Submit </button>
-              </td>
-            </tr>
-          </table>
+                <button class='btn btn-primary'
       <% end %>
-  <%else%>
+  <% else %>
       <h4 class='title'>No Enrollments to terminate</h4>
-  <%end%>
+  <% end %>
 
   <div class="modal fade" id="termiante_with_earlier_date" tabindex="-1" role="dialog" aria-labelledby="RetermConfirm" role="document">
     <div class="modal-dialog">

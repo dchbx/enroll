@@ -11,7 +11,7 @@
 
 <div class="content landing">
   <%= render "./ui-components/v1/navs/primary_nav", :active_tab => "home-tab" %>
-  
+
   <div class="home">
 
     <div class="tab-row">
@@ -23,7 +23,6 @@
             <div class="col-xs-12">
               <div class="notices_index_list">
                 <h1 class="heading-text">Notices</h1>
-
 
                   <span class="pull-right">
                     <%= link_to 'Add Notice', new_notice_kind_path, class: "btn btn-primary notice-preview", remote: true %>
@@ -64,18 +63,15 @@
   </div>
 </div>
 
-
-
-
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();
 
   $(document).ajaxComplete(function() {
     if ($('.alert-notice')[0]) {
-      $('.alert-notice').hide() 
+      $('.alert-notice').hide()
     }
     if ($('.alert-error')[0]) {
-      $('.alert-error').hide() 
+      $('.alert-error').hide()
     }
     if ($.isEmptyObject(CKEDITOR.instances)) {
       CKEDITOR.replace('notice_kind_template_raw_body', {});

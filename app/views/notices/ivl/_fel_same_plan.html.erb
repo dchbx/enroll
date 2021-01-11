@@ -9,4 +9,4 @@
     <%= render partial: 'notices/shared/enrollment_info_table', locals: {
                                    rows: [enrollment.enrollees, "#{enrollment.plan.plan_carrier}",number_to_phone(enrollment.phone, area_code: true), "#{enrollment.plan.plan_name}", "#{enrollment.responsible_amount}", "#{enrollment.plan.deductible}", "#{enrollment.plan.family_deductible}", "#{enrollment.effective_on.strftime("%B %d, %Y")}", "#{enrollment.coverage_kind}"],
           col_styles: ['width: 25%;', 'width: 75%; text-align: left;'], table_width: '100%'} %>
-  <% end%>
+  <% end %>

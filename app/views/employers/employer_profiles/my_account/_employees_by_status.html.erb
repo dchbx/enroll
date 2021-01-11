@@ -4,15 +4,15 @@
   <% end %>
 <% end %>
 
-<div class="col-xs-10" style="text-align: right; top: 80px; margin-left: 15%;" >
+<div class="col-xs-10" style="text-align: right; top: 80px; margin-left: 15%;">
   <div class="row">
     <%= pundit_span(EmployerProfile, :updateable?) %>
     <%= link_to "<i class='fa fa-user-plus' aria-hidden='true'></i> Add Employee".html_safe, main_app.new_employers_employer_profile_census_employee_path(@employer_profile, tab: 'employees'), class: "btn btn-default" %>
   </div>
 </div>
 
-  <div class= "effectivedatatable">
-    <%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-6'B> <'col-sm-6'f> >" + "<'row'<'col-sm-12'tr>>"+ "<<'col-sm-11'i> <'col-sm-1'l>>"+ "<'row'<'col-sm-10'p>>"})  %>
+  <div class="effectivedatatable">
+    <%= raw render_datatable(@datatable,{ sDom: "<'row'<'col-sm-6'B> <'col-sm-6'f> >" + "<'row'<'col-sm-12'tr>>"+ "<<'col-sm-11'i> <'col-sm-1'l>>"+ "<'row'<'col-sm-10'p>>"}) %>
   </div>
 
 <script type="text/javascript" charset="utf-8">

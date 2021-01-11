@@ -25,11 +25,11 @@
     </li>
     <%# unless current_user.try(:has_broker_agency_staff_role?)%>
     <li <%= menu_tab_class(active_tab, "inbox") %>>
-      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do  %>
+      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'hidden-xs', "aria-expanded" => "true" ) do %>
         Messages
         <span class="badge message-unread"><%= profile.inbox.unread_messages.try(:count) || 0 %></span>
       <% end %>
-      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do  %>
+      <%= link_to(profiles_employers_employer_profile_path(profile.id, :tab=>'inbox'), class: 'visible-xs', "aria-expanded" => "true" ) do %>
       <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
       <small>Messages</small>
       <% end %>
@@ -40,7 +40,7 @@
     <div class="panel-heading">
       <h4><%= organization.legal_name %></h4>
       <%= link_to 'Update Business Info', edit_profiles_registration_path(profile.id) %>
-      <br/>
+      <br>
       <!-- TODO fix this when implementing Pundit -->
       <%#= pundit_span profile, :list_enrollments? %>
         <%= link_to 'View Enrollment Reports', profiles_employers_employer_profile_premium_statements_path(profile.id) %>

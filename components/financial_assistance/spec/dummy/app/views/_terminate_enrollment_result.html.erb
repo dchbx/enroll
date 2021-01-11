@@ -1,5 +1,5 @@
 <table class="table table-striped">
-  <%if @result[:success].present?%>
+  <% if @result[:success].present? %>
 
     <h4>Enrollments terminated sucessfully</h4>
     <tr>
@@ -19,7 +19,7 @@
       </tr>
     <% end %>
 
-  <%elsif @result[:failure].present? %>
+  <% elsif @result[:failure].present? %>
 
     <tr>
       <th>HBX ID</th>

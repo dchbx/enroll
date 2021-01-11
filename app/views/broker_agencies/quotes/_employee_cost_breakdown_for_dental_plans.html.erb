@@ -8,11 +8,11 @@
           <td colspan="1" class="quote_detail_plan_header">
             <div style='width: 300px'>
               <b><%= qr[0] %></b><br>
-              <sm>Employee: 
+              <sm>Employee:
               $<%= qr[1][:total_employee_cost].ceil %>,
-              Employer: 
+              Employer:
 
-              <span >$<%= qr[1][:total_employer_cost].ceil %></span>
+              <span>$<%= qr[1][:total_employer_cost].ceil %></span>
               <br>
               </sm>
             </div>
@@ -33,13 +33,13 @@
             <%= qr[:first_name] %>
           </td>
           <td class="quote_detail_results">
-            <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i%>)</small>
+            <%= @employee_relationship_map[qr[:employee_relationship]] %> <small>(<%= qr[:employer_contribution_percent].to_i %>)</small>
           </td>
           <td class="quote_detail_results">
             <%= qr[:age] %>
           </td>
           <% quote_results.keys.each do |de| %>
-            <td class="quote_detail_results"  style='padding-left: 100px'>
+            <td class="quote_detail_results" style='padding-left: 100px'>
             <b><%= quote_results[de][:detail].flatten[index][:employee_cost].round(2) %></b></td>
           <% end %>
         </tr>

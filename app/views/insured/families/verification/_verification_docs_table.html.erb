@@ -4,7 +4,7 @@
     <div class="table-responsive">
       <table class="table table-sm">
         <% person.consumer_role.vlp_documents.each_with_index do |vlp_doc, i | %>
-          <tr class="<% if i == 0 %>bt-n<% elsif i+1 == person.consumer_role.vlp_documents.count %>bb<% end %>" id="doc_table_row_<%=vlp_doc.id%>">
+          <tr class="<% if i == 0 %>bt-n<% elsif i+1 == person.consumer_role.vlp_documents.count %>bb<% end %>" id="doc_table_row_<%= vlp_doc.id %>">
             <% if vlp_doc.identifier.present? %>
               <td>
                 <% key = vlp_doc.identifier.split('#').last %>
@@ -16,12 +16,12 @@
                     </span>
                 <% end %>
                   <% if show_doc_status(vlp_doc.status) %>
-                    <span class="label label-<%=doc_status_label(vlp_doc)%>"><%= vlp_doc.status.titleize %></span>
+                    <span class="label label-<%= doc_status_label(vlp_doc) %>"><%= vlp_doc.status.titleize %></span>
                   <% end %>
               </td>
           <!-- HBX admin inclusion -->
           <!-- >>>> hbx admin inclusion -->
-              <td class="table-functions  <%=pundit_class(Family, :updateable?)%>" >
+              <td class="table-functions  <%= pundit_class(Family, :updateable?) %>">
                 <% if vlp_doc.status != "verified" %>
                   <%= link_to document_path(vlp_doc, :person_id => person.id), method: :delete, remote: true do %>
                       <i class="fa fa-trash-o fa-lg pull-right" data-toggle="tooltip" title="<%= l10n('delete') %>"></i>

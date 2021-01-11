@@ -23,7 +23,7 @@
                 <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                   <div class="col-md-6 col-sm-6 col-xs-12 no-pd plan_design_office_kind_select">
                     <% kinds = Address::OFFICE_KINDS; kinds = kinds.rotate if params[:child_index] %>
-										<%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, f.object.address.kind),{required: true},class:"form-control" %>
+                    <%= address.select :kind, options_for_select(kinds.map {|a| [a.to_s.humanize, a.to_s]}, f.object.address.kind),{required: true},class:"form-control" %>
                   </div>
                   <div class="col-md-3 col-sm-3 col-xs-0 floatlabel"></div>
                 </div>
@@ -49,11 +49,11 @@
                 <%= address.text_field :city, class: "floatlabel form-control interaction-field-control-office-location-address-city", placeholder: 'CITY' %>
               </div>
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
-                <%if individual_market_is_enabled? %>
+                <% if individual_market_is_enabled? %>
                   <%= address.select :state, options_for_select(State::NAME_IDS.map(&:last), selected: "DC"),{},class:'form-control', required: true %>
-                <%else%>
+                <% else %>
                   <%= address.select(:state, options_for_select(State::NAME_IDS.map(&:last), selected: address.object.state), {include_blank: "SELECT STATE"},class:'form-control', required: true) %>
-                <%end%>
+                <% end %>
               </div>
               <div class="col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
                  <%= address.text_field :zip, class: "floatlabel form-control zip interaction-field-control-office-location-address-zip", required: true, placeholder: 'ZIP', data: { action: 'change->zip-check#zipChange', 'child-index': "#{f.index.to_s}" } %>
@@ -91,5 +91,5 @@
 </fieldset>
 
 <script>
-	var disableSelectric = true;
+  var disableSelectric = true;
 </script>

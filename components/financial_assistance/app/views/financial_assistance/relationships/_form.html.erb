@@ -16,7 +16,7 @@
               <div class="col-lg-5">
                 <div class="select-positioning"> is</div>
                 <div class="select-relation rs_selection">
-                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant], "data-relative": er[:relative]%>
+                  <%= select_tag :kind, er[:relation].present? ? options_for_select(humanize_relationships, er[:relation]) : options_for_select(humanize_relationships), :prompt => 'choose', required: true, class: 'selected_relationship', "data-applicant": er[:applicant], "data-relative": er[:relative] %>
                 </div>
                 <div style="float:left; margin-right: 10px;"> of</div>
                 <div class="icon-rel">
@@ -31,12 +31,12 @@
             </div>
           </div>
         </div>
-        <br/>
+        <br>
     <% end %>
 <% end %>
 <%= submit_tag "", class: "" , :style => "display: none;" %>
 
-<script >
+<script>
   $(function() {
     if(<%= missing_relationships.present? %>){
       $('#btn-continue').addClass('disabled');

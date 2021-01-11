@@ -64,21 +64,21 @@
         </a>
       </li>
       <li role="presentation">
-        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do  %>
+        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'hidden-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab", "data-toggle" => "tab", 'id'=>'inbox-tab' ) do %>
           <span class="badge message-unread"><%= @employer_profile.inbox.unread_messages.try(:count) || 0 %></span>
           Inbox
         <% end %>
 
-        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do  %>
+        <%= link_to(inbox_employers_employer_profiles_path(id: @employer_profile.id), :remote => true, class: 'visible-xs', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do %>
           <span class="glyphicon glyphicon-comment" aria-hidden="true"></span>
           <small>Inbox</small>
         <% end %>
       </li>
      <li role="presentation">
-        <a  id="override-tab">
+        <a id="override-tab">
           <span class="visible-xs">
             <span class="glyphicon glyphicon-duplicate" title="Override Backlink"></span>
-            <small> <%=override_backlink%></small>
+            <small> <%= override_backlink %></small>
           </span>
 
         </a>

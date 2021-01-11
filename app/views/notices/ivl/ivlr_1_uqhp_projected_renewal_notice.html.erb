@@ -34,8 +34,7 @@ content: "<strong>Note: If this notice was sent to you in error, and your health
                                 ['Citizenship/Lawful Presence', "#{member.citizen_status}"],
                                 ['Incarcerated',"#{member.incarcerated}"]],
     col_styles: ['width: 50%;', 'width: 50%; text-align: left;'], table_width: '100%'} %>
-<%end%>
-
+<% end %>
 
  <%= render partial: 'notices/shared/paragraph', :locals => {
 content: "<strong>If any of this information is incorrect, or if you need to add or remove anyone from your household please let us know by #{(TimeKeeper.date_of_record + 35.days).strftime("%m/%d/%Y")}.  </strong>"} %>

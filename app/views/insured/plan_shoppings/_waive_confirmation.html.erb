@@ -10,7 +10,7 @@
           <div class="modal-body">
             <%= select_tag "waiver_reason", options_for_select(HbxEnrollment::WAIVER_REASONS), include_blank: l10n("please_select_waive_reason") %>
           </div>
-          <div class="modal-footer <%= pundit_class Family, :updateable?%>">
+          <div class="modal-footer <%= pundit_class Family, :updateable? %>">
             <button type="button" class="btn btn-default" data-dismiss="modal"><%= l10n("close") %></button>
             <%= submit_tag l10n("submit"), class: 'btn btn-primary', id: 'waiver_reason_submit', disabled: true %>
           </div>

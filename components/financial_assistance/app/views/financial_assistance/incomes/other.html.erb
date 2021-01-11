@@ -26,7 +26,7 @@
           <label class="radio-yml" for="has_other_income_yes">Yes</label>
         </div>
         <div class='col-md-3 no-padding'>
-          <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "radio-yml", required: true)%>
+          <%= radio_button_tag("has_other_income", false, @applicant.has_other_income == false, class: "radio-yml", required: true) %>
           <label class="radio-yml" for="has_other_income_no">No</label>
         </div>
         <div class='col-md-6 left-seprator'>
@@ -54,7 +54,7 @@
         <div id="<%= other_income_kind %>" class="other-income-kind">
           <div class="row row-form-wrapper lightgray radio-align fa-text-color no-buffer row-height">
             <div class="col-md-1 checkbox-mr">
-              <%=check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
+              <%= check_box_tag "other_income_kind", other_income_kind, @applicant.incomes.of_kind(other_income_kind).present?, class: "other-income-checkbox-#{other_income_kind}" %>
             </div>
             <div class="col-md-9 no-pd run-glossary">
               <%= label %>
@@ -65,7 +65,7 @@
               <%= render partial: 'other_income', locals: { other_income: other_income } %>
             <% end %>
           </div>
-          <div class="col-md-12 add-more-link-<%=other_income_kind%>" id="add-more-link">
+          <div class="col-md-12 add-more-link-<%= other_income_kind %>" id="add-more-link">
              <%= link_to "<span class='fa-icon fa-stack plus-mr' aria-hidden='true'><i class= 'fa fa-circle-thin fa-stack-2x'></i> <i class='fa fa-plus fa-stack-1x'></i></span> <b>Add More</b> #{ label }".html_safe, "javascript:void(0);", :id => "add_new_other_income_kind", :class => "#{'hidden' unless @applicant.incomes.of_kind(other_income_kind).present? }" %>
           </div>
 
@@ -94,7 +94,7 @@
             <h4 class="modal-title darkblue" id="myModalLabel">You Have Unsaved Changes</h4>
           </div>
           <div class="modal-body">
-            If you leave without saving, you will lose all your changes.<br />
+            If you leave without saving, you will lose all your changes.<br>
             <strong>This cannot be undone.</strong>
           </div>
           <div class="modal-footer">
@@ -116,7 +116,7 @@
         </div>
         <div class="modal-body">
           Are you sure you want to remove everything you have entered <strong>for Other Income?
-          <br />This cannot be undone.</strong>
+          <br>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>
@@ -136,7 +136,7 @@
         </div>
         <div class="modal-body">
           You are going to delete all exsting Other Incomes. <strong>Are you sure you want to continue?
-          <br />This cannot be undone.</strong>
+          <br>This cannot be undone.</strong>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default modal-cancel-button">DON'T REMOVE</button>

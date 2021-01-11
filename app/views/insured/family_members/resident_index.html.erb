@@ -10,7 +10,7 @@
            <h3 class="blue-text"><%= params[:change_plan] %>, on: <%= @change_plan_date %></h3>
         <% end %>
 
-        <h1 class="darkblue"><%= l10n("family_information")%></h1>
+        <h1 class="darkblue"><%= l10n("family_information") %></h1>
         <h4><%= l10n("insured.family_members.index.continue_to_get_insurance") %></h4>
         <p class='memo'>* = <%= l10n("required_field") %></p>
 
@@ -27,12 +27,12 @@
           </div>
         </div>
 
-        <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
+        <div class="row no-buffer <%= pundit_class Family, :updateable? %>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
               <p class="fail"><%= l10n("family_members.index.add_member_info_html") %></p>
               <br>
-              <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
+              <div class="form-inline text-center <%= pundit_class Family, :updateable? %>">
                 <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
                   &nbsp; &nbsp;
                 <a class="text-center btn btn-success"><%= l10n("continue") %></a>
@@ -51,7 +51,7 @@
         </div>
 
         <div id="dependent_buttons" class="focus_effect personal-info-row <%= 'hidden' if @family.active_family_members.empty? %>">
-          <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable?%>">
+          <div class="col-md-12 no-pd col-sm-12 col-xs-12 <%= pundit_class Family, :updateable? %>">
             <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
             <% group_selection_url = new_insured_group_selection_path(person_id: @person.id, resident_role_id: @resident_role.try(:id), change_plan: @change_plan, market_kind: @market_kind) %>
             <input type="hidden" value="<%= group_selection_url %>" id="btn_household_continue">
@@ -67,7 +67,7 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 col-md-offset-1 col-sm-offset-1 right-section">
-        <% find_sep_url = find_sep_insured_families_path(resident_role_id: @resident_role.try(:id), change_plan: @change_plan)%>
+        <% find_sep_url = find_sep_insured_families_path(resident_role_id: @resident_role.try(:id), change_plan: @change_plan) %>
         <% if @change_plan.present? %>
           <%= render partial: 'shared/qle_progress', locals: {step: '1'} %>
         <% else %>

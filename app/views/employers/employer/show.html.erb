@@ -1,30 +1,22 @@
 <h3>Employer Details </h3>
 
-Name: <%= @employer.legal_name %> </br>
-FEIN: <%= @employer.fein %> </br>
+Name: <%= @employer.legal_name %> <br>
+FEIN: <%= @employer.fein %> <br>
 Entity Kind: <%= @employer.entity_kind %>
 
-</br>
-</br>
+<br>
+<br>
 
 <%= link_to "Back", employers_employer_index_path %> &nbsp;&nbsp;
-<%= link_to 'Destroy',  @employers_employer,  method: :delete, confirm: 'Are you sure?'  %>
+<%= link_to 'Destroy',  @employers_employer,  method: :delete, confirm: 'Are you sure?' %>
 
-<hr/>
+<hr>
 
 <%= link_to "Add Employer Census Family", new_employers_employer_family_path(@employer), class: "btn btn-primary" %> &nbsp;&nbsp;
 
 <h3>Employer Roster </h3>
-<table border = "1", width = "400">
-  <tr>
-    <th> Employee Name </th>
-    <th> DOB </th>
-    <th> Hire Date </th>
-    <th>  </th>
-  </tr>
-
-<% @employer.employee_families.each do |family| %>
-  <tr>
+<table border="1"
+<% @employer.employee_families.each do |family| %>>
     <td> <%= link_to name_to_listing(family.census_employee), employers_employer_family_path(@employer.id, family.id) %> </td>
     <td> <%= format_date family.census_employee.dob %> </td>
     <td> <%= format_date family.census_employee.hired_on %> </td>

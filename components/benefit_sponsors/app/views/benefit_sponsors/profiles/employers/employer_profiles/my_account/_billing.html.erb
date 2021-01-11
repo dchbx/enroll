@@ -17,17 +17,17 @@
     <ol class="twenty">
       <li>
         <% if invoice_bill_url_helper.present? %>
-          <%= link_to 'Pay Online', invoice_bill_url_helper, target: "_blank"%> -
+          <%= link_to 'Pay Online', invoice_bill_url_helper, target: "_blank" %> -
         <% else %>
           Pay Online
         <% end %>
-        <%= link_to 'How to Pay Online', payment_pdf_helper, target: "_blank"%>
+        <%= link_to 'How to Pay Online', payment_pdf_helper, target: "_blank" %>
       </li>
-      <br/>
+      <br>
       <li>Pay by Phone
         <div class="row col-md-offset-1">
           <%= payment_phone_number %>, select "Small Business Employer" then "Make a Payment"</li>
-        <br/>
+        <br>
         <li>Pay by Mail
           <div class="row col-md-offset-1">
             <%= contact_center_mailing_address_name %></div>

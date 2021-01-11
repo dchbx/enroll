@@ -1,10 +1,10 @@
-<%if @errors && @errors.any? %>
+<% if @errors && @errors.any? %>
   <div class='alert alert-error'><a class='close' data-dismiss='alert'>x</a>
-    <%@errors.each do |err|%>
+    <% @errors.each do |err| %>
       <li><%= err[0].to_s == "oim_id" ? "Username" : "Email" %> <%= err[1][0] %></li>
-    <%end%>
+    <% end %>
   </div>
-<%end%>
+<% end %>
 
 <h3 class="text-center">Edit User Credentials</h3>
 <div id="credentials-matches" class="hidden">
@@ -12,7 +12,7 @@
   <div id="credentials-error-message"></div>
   <h5>Please resolve the match issue.</h5>
 </div>
-<br/>
+<br>
 <%= form_tag(confirm_change_username_and_email_user_path, method: :put, id: "changeUsernameEmailForm", class:"form-horizontal", remote: true) do %>
   <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
   <% if @user.oim_id.present? %>
@@ -35,8 +35,8 @@
       <span class="help-block email-block hidden"></span>
     </div>
   </div>
-  <br />
-  <br />
+  <br>
+  <br>
   <div class="row" style="padding-left: 150px;">
     <div class="col-sm-1 col-sm-offset-4">
       <%= button_tag "Reset", class:'btn btn-info', id: 'resetUsernameEmailFields' %>

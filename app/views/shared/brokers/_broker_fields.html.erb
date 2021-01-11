@@ -105,12 +105,12 @@
                           <%# Show currently saved broker role carrier appointments as selected, and non saved broker role carrier appointments as not selected %>
                           <% current_carrier_appointments = @broker_applicant.broker_role.carrier_appointments || [] %>
                           <% broker_role_appointed_to_carrier = current_carrier_appointments.include?(name) %>
-                          <%unless broker_carrier_appointments_enabled?%>
+                          <% unless broker_carrier_appointments_enabled? %>
                             <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true", broker_role_appointed_to_carrier ? true : false %>
-                          <%else%>
+                          <% else %>
                             <%= check_box_tag "person[broker_role_attributes][carrier_appointments][#{name}]", "true",
                                 broker_role_appointed_to_carrier ? true : false, disabled: false %>
-                          <%end%>
+                          <% end %>
                             <%= label_tag "person[broker_role_attributes][carrier_appointments][#{name}]" do %>
                               <i class="far fa-check-square fa-2x"></i>
                               <i class="far fa-square fa-2x"></i>
@@ -130,10 +130,10 @@
                     </div>
                   </div>
                 <% end %>
-                <%if broker_carrier_appointments_enabled?%>
+                <% if broker_carrier_appointments_enabled? %>
                   <p class="text-info"><span class="fa fa-info-circle"></span>
                   <%= l10n("broker_carrier_appointments_enabled_note", site_long_name: site_long_name) %></p>
-                <%end%>
+                <% end %>
               </td>
             </tr>
             <% disabled = (broker_or_staff_role.active? || broker_or_staff_role.agency_pending?) ? true : false %>

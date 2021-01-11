@@ -11,9 +11,7 @@
       <% if @plan.coverage_kind == "health" %>
         <% if @details %>
           <div class="modal-body-swap">
-            <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
-              <tr>
-                <th><%= l10n("employers.plan_years.plan_benefits") %></th>
+            <table class="table bordered compare-table"><%= l10n("employers.plan_years.plan_benefits") %>>
                 <th><%= l10n("employers.plan_years.co_pay") %></th>
                 <th><%= l10n("employers.plan_years.coinsurance") %></th>
               </tr>
@@ -22,9 +20,7 @@
           </div>
         <% else %>
           <div class="modal-body">
-            <table class="table bordered compare-table", border = "1", style="font-size:11px;" >
-              <tr>
-                <th><%= l10n("employers.plan_years.plan_benefits") %></th>
+            <table class="table bordered compare-table"><%= l10n("employers.plan_years.plan_benefits") %>>
                 <th><%= l10n("employers.plan_years.co_pay") %></th>
                 <th><%= l10n("employers.plan_years.coinsurance") %></th>
               </tr>

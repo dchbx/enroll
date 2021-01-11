@@ -7,7 +7,7 @@
       <%= f.hidden_field :reset_password_token %>
 
       <div class="form-group">
-        <%= f.label :password, "New Password" %><br />
+        <%= f.label :password, "New Password" %><br>
         <%= f.password_field :password, autofocus: true, class: "form-control" %>
       </div>
       <div id="pswd_info" class="tooltip_box" style="display: none;">
@@ -25,10 +25,10 @@
        </div>
 
       <div class="form-group">
-        <br />
+        <br>
          <%= f.label :password_confirmation, "Confirm New Password" %>
             <span class="pull-right con-pass"></span>
-            <br />
+            <br>
         <%= f.password_field :password_confirmation, autofocus: true, class: "form-control" %>
       </div>
 

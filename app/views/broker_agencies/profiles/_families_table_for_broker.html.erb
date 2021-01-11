@@ -1,19 +1,19 @@
-<div id= 'message_form'></div>
+<div id='message_form'></div>
 <div id="inbox_provider_form" class="table-responsive">
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th colspan="6"><%= l10n("primary_applicant")%></th>
+        <th colspan="6"><%= l10n("primary_applicant") %></th>
       </tr>
       <tr>
-        <th><%= l10n("name")%></th>
-        <th><%= l10n("ssn")%></th>
-        <th><%= l10n("dob")%></th>
-        <th><%= l10n("hbx_id")%></th>
-        <th><%= l10n("family_ct")%></th>
-        <th><%= l10n("registered?")%></th>
-        <th><%= l10n("consumer?")%></th>
-        <th><%= l10n("employee?")%></th>
+        <th><%= l10n("name") %></th>
+        <th><%= l10n("ssn") %></th>
+        <th><%= l10n("dob") %></th>
+        <th><%= l10n("hbx_id") %></th>
+        <th><%= l10n("family_ct") %></th>
+        <th><%= l10n("registered?") %></th>
+        <th><%= l10n("consumer?") %></th>
+        <th><%= l10n("employee?") %></th>
         <th></th>
       </tr>
     </thead>
@@ -23,8 +23,8 @@
         <% pp = family.primary_applicant.person %>
 
         <tr id="family_<%= family.id %>">
-          <td >
-            <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal'%> <br/>
+          <td>
+            <%= link_to pp.full_name, resume_enrollment_exchanges_agents_path(person_id: pp.id), class: 'btn btn-normal' %> <br>
           </td>
           <td><%= begin; number_to_obscured_ssn(pp.ssn); rescue; end %></td>
           <td><%= format_date(pp.dob) %></td>

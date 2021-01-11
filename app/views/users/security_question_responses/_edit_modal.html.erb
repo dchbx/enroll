@@ -12,10 +12,10 @@
              <% 3.times do |num| %>
                <div class="question-wrapper" data-question-index=<%= num %>>
 
-                 <select class="security-question-select form-control" id="sec-<%= num %>" name="security_question_responses[][security_question_id]" required="true" >
+                 <select class="security-question-select form-control" id="sec-<%= num %>" name="security_question_responses[][security_question_id]" required="true">
                    <option name="id" value="">Please Select A Question</option>
                    <% SecurityQuestion.visible.each_with_index do |question, i| %>
-                     <option name="id" value="<%= question.id %>" data-question-number="<%= num %>" id="sec-answer-<%= i %>-<%= num%>"><%= question.title %></option>
+                     <option name="id" value="<%= question.id %>" data-question-number="<%= num %>" id="sec-answer-<%= i %>-<%= num %>"><%= question.title %></option>
                    <% end %>
                  </select>
 

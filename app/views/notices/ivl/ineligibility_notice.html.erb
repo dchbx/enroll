@@ -23,7 +23,7 @@
 <% if ((notice.has_applied_for_assistance == true) && (notice.is_family_totally_ineligibile == true)) %>
   <%= render partial: 'notices/shared/paragraph_with_margins', :locals => {
    content: "You recently applied for help paying for coverage through #{Settings.site.short_name} on #{(TimeKeeper.date_of_record).strftime("%B %d, %Y")}. Based on the information you told us about who needs coverage, your results are listed below."} %>
-  <% notice.individuals.each do |ivl|%>
+  <% notice.individuals.each do |ivl| %>
     <%= render partial: 'notices/shared/info_table', locals: {
                                  rows: [['Household Member:', "#{ivl.full_name} Age: #{ivl.age}"],
                                     ['Does not qualify for Medicaid or private health insurance', "#{ivl.first_name} likely doesn’t qualify for Medicaid. #{ivl.first_name} also does not qualify for private insurance (with or without savings) through #{Settings.site.short_name}. The reason is #{ivl.reason_for_ineligibility.join(' In addition, ')} If #{ivl.first_name}’s status changes, we encourage you to update your application, or call #{Settings.site.short_name} at #{notice.hbe.phone}."]],

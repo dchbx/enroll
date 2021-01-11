@@ -1,5 +1,5 @@
 <div class="module shopping-data">
-  <br/>
+  <br>
   <div class="pull-left">
     <span class="ttu lg twelve">Coverage For:</span>
     &nbsp;
@@ -13,11 +13,11 @@
     <span class="ttu lg twelve">Plans:</span>
     &nbsp;
     <% products = (['shop','employer_sponsored','fehb'].include?(@market_kind)) ? @member_groups : @plans %>
-    <strong id='plans-count'><%= products_count(products)%></strong>
+    <strong id='plans-count'><%= products_count(products) %></strong>
     &nbsp;&nbsp;
     <span class="ttu lg twelve">Effective Date:</span>
     &nbsp;
     <strong id='effective_date'><%= @hbx_enrollment.effective_on %></strong>
   </div>
-  <br/>
+  <br>
 </div>

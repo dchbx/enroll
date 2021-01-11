@@ -1,23 +1,23 @@
 <div class="container">
-	<div class="panel panel-default">
-    	<div class="panel-body left" id="select-plan-container">
-    		<%#= render 'people/sidebar' %>
-    		
-    		<div class="col-md-10 col-sm-12">
+  <div class="panel panel-default">
+      <div class="panel-body left" id="select-plan-container">
+        <%#= render 'people/sidebar' %>
+
+        <div class="col-md-10 col-sm-12">
           <div class="col-md-10 col-sm-9 col-xs-12 no-pd">
 
             <div class="row select-plan">
-      				<div class="col-md-12 col-md-sm-12 col-xs-12">
+              <div class="col-md-12 col-md-sm-12 col-xs-12">
                 <h3>Select a Plan.</h3>
                 <p class="detail">
-                  <span>Selecting a plan can feel tricky.</span> 
+                  <span>Selecting a plan can feel tricky.</span>
                   If you need help don't be afraid to ask for help. You can reach DCHBX support at 555-555-5555 ext 1. Click continue to see the covergae options your employer has available.
                 </p>
                 <a id="select-plan-btn1" class="text-center btn btn-save">Continue</a>
               </div>
-                    
-    				  <div class="col-md-12 col-sm-12 col-xs-12 select-plan-details">
-    				          <section>
+
+              <div class="col-md-12 col-sm-12 col-xs-12 select-plan-details">
+                      <section>
                         <div role="tabpanel">
 
                           <!-- Nav tabs -->
@@ -78,8 +78,6 @@
                             <button class="btn default-btn outline-btn">Compare</button>
                           </div><!-- Selected Plans section end -->
 
-
-
                           <!-- Tab panes -->
                           <div class="tab-content">
                             <div role="tabpanel" class="tab-pane active" id="all-plans">
@@ -135,7 +133,6 @@
                                   </div>
                                 </div>
                               </div><!-- Plan details row end -->
-
 
                               <!-- Plan first row start -->
                               <div class="plan-row">
@@ -243,8 +240,8 @@
                                     <button class="btn btn-primary select-btn">Select</button>
                                   </div>
                                 </div>
-                              </div><!-- Plan details row end --> 
-                              
+                              </div><!-- Plan details row end -->
+
                             </div>
                             <div role="tabpanel" class="tab-pane" id="ppo-plans">
 
@@ -302,7 +299,7 @@
 
                             </div>
                             <div role="tabpanel" class="tab-pane" id="high-deduc-plans">
-                              
+
                               <!-- Plan first row start -->
                               <div class="plan-row">
                                 <div class="row">
@@ -353,21 +350,21 @@
                                     <button class="btn btn-primary select-btn">Select</button>
                                   </div>
                                 </div>
-                              </div><!-- Plan details row end --> 
+                              </div><!-- Plan details row end -->
 
                             </div>
                           </div>
 
                         </div>
                       </section>
-    				    </div>
+                </div>
               </div>
-    		    </div>
+            </div>
             <div class="col-md-2 col-sm-3 col-xs-12 key no-pd-right" id="key-section">
               <%= submit_tag "Save & Exit", class: 'btn btn-save' %>
               <%= render 'shared/signup_progress' %>
             </div>
-    	</div>
+      </div>
     </div>
   </div>
 </div>

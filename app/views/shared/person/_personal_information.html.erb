@@ -28,10 +28,10 @@
     <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd">
       <%= f.text_field :ssn, placeholder: "SOCIAL SECURITY", class: "required floatlabel form-control", required: f.object.no_ssn == "1" ? false : true, :disabled => f.object.no_ssn == "1" ? true : false, readonly: f.object.is_a?(Forms::EmployeeRole) %>
     </div>
-    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd top-buffer" >
+    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-12 form-group form-group-lg no-pd top-buffer">
       <%= f.check_box :no_ssn,  :value => false, :onclick=>"$('#person_ssn').prop('disabled', !$('#person_ssn').prop('disabled')); $('#person_ssn').prop('required', !$('#person_ssn').prop('required'))" %>
       <label for="person_no_ssn"><span class='no_ssn'>&nbsp;I don't have an SSN</span></label>
-      <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.no_ssn_tooltip")%>"></i></span>
+      <span><i class='fa fa-question-circle' id="no_ssn_tooltip" data-toggle="tooltip" title="<%= l10n("insured.consumer_roles.search.no_ssn_tooltip") %>"></i></span>
     </div>
     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd border_bottom_zero">
       <div class="radio">
@@ -42,11 +42,11 @@
     <div class="col-lg-1 col-md-1 col-sm-1 col-xs-6 form-group form-group-lg no-pd">
       <div class="radio">
         <%= f.radio_button :gender, "female", class: "required floatlabel", id: 'radio_female', required: true %>
-        <label  class="female" for="radio_female"><span>FEMALE</span></label>
+        <label class="female" for="radio_female"><span>FEMALE</span></label>
       </div>
     </div>
     <span>
-      <i id="gender-tooltip" class='fa fa-question-circle no-pd pull-right'  data-toggle="tooltip" title="<%=l10n("insured.consumer_roles.search.gender_tooltip")%>"></i>
+      <i id="gender-tooltip" class='fa fa-question-circle no-pd pull-right' data-toggle="tooltip" title="<%= l10n("insured.consumer_roles.search.gender_tooltip") %>"></i>
     </span>
   </div>
 </div>

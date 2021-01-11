@@ -25,7 +25,7 @@
             <span class="header-text">
               <%= l10n(".call_customer_service") %>
             </span>
-            <br/>
+            <br>
             <span>
               <i class="fa fa-phone fa-lg"></i>
               <strong>
@@ -37,7 +37,7 @@
           <% if signed_in? %>
             <li>
               <span class="my-portal-links">
-                <%= render partial: "shared/my_portal_links"%>
+                <%= render partial: "shared/my_portal_links" %>
                 <span>
                   <%= link_to l10n(".help"), site_help_url, target: '_blank', class: 'header-text' %>
                 </span>
@@ -45,7 +45,7 @@
                 <span>
                   <%= link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text" %>
                 </span>
-                <br/>
+                <br>
                 <strong class="users-name"><%= user_first_name_last_name_and_suffix %></strong>
                 <% unless current_user.try(:person).try(:hbx_id).nil? %>
                   &nbsp;

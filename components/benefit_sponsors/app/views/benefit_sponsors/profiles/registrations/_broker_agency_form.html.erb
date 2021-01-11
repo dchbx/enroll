@@ -44,15 +44,15 @@
 
                           <div data-target="<%= 'office-locations.officeLocation' if office_fields.object.is_primary? %>" class="js-office-location">
                             <%= office_fields.hidden_field '_destroy', value: false, id: 'delete_location' %>
-                            <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f.object.profile_type}  %>
+                            <%= render partial: './ui-components/v1/forms/office_locations/old_style_address', locals: {office_fields: office_fields, profile_type: f.object.profile_type} %>
                           </div>
                         <% end %>
                       </div>
                       <a class="btn btn-default pull-left col-12" data-action="click->office-locations#addLocation">Add Office Location</a>
                     </div>
-                    <br/>
+                    <br>
                     <div class="row no-buffer">
-                      <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency")%></button>
+                      <button type="submit" class="btn btn-primary pull-right create_broker_agency_btn interaction-click-control-create-broker-agency"><%= l10n(".update_broker_agency") %></button>
                     </div>
                   </div>
                 <% end %>

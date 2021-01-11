@@ -3,8 +3,8 @@
   <select required=required" name="scheduled_event[event_name]" tabindex="-1">
       <option value="">SELECT EVENT</option>
       <% events.each do |event| %>
-        <option value="<%=event%>"><%=event.humanize%></option>
-      <%end%>
+        <option value="<%= event %>"><%= event.humanize %></option>
+      <% end %>
   </select>
 <% else %>
   <div>
