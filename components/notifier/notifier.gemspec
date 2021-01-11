@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.add_dependency "slim", "3.0.9"
   s.add_dependency "mongoid", "~> 7.0.2"
   s.add_dependency "virtus", "~> 1.0.5"
-  s.add_dependency "redcarpet", "~> 3.4.0"
+  s.add_dependency "redcarpet", ">= 3.4", "< 3.6"
   s.add_dependency "wkhtmltopdf-binary-edge", "~> 0.12.3.0"
   s.add_dependency "wicked_pdf", "1.1.0"
   s.add_dependency "combine_pdf"
