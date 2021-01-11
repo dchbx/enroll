@@ -479,6 +479,56 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     context "and employer is renewing" do
     end
+
+    context 'When there are two active benefit applications' do
+      let(:current_year) {TimeKeeper.date_of_record.year}
+      let(:effective_period) {current_effective_date..current_effective_date.next_year.prev_day}
+      let(:open_enrollment_period) {effective_period.min.prev_month..(effective_period.min - 10.days)}
+      let!(:service_areas2) {benefit_sponsorship.service_areas_on(effective_period.min)}
+      let!(:benefit_sponsor_catalog2) {benefit_sponsorship.benefit_sponsor_catalog_for(effective_period.min)}
+      let!(:initial_application2) do
+        BenefitSponsors::BenefitApplications::BenefitApplication.new(
+          benefit_sponsor_catalog: benefit_sponsor_catalog2,
+          effective_period: effective_period,
+          aasm_state: :active,
+          open_enrollment_period: open_enrollment_period,
+          recorded_rating_area: rating_area,
+          recorded_service_areas: service_areas2,
+          fte_count: 5,
+          pte_count: 0,
+          msp_count: 0
+        )
+      end
+      let(:product_package2) {initial_application.benefit_sponsor_catalog.product_packages.detect {|package| package.package_kind == package_kind}}
+      let(:current_benefit_package2) {build(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package2, title: "second benefit package", benefit_application: initial_application2)}
+
+
+      before do
+        FactoryBot.create(:benefit_sponsors_benefit_group_assignment, benefit_group: current_benefit_package2, census_employee: initial_census_employee)
+        initial_application2.benefit_packages = [current_benefit_package2]
+        benefit_sponsorship.benefit_applications = [initial_application2]
+        benefit_sponsorship.save!
+        initial_census_employee.save
+      end
+
+      it 'should only pick active benefit group assignment - first benefit package' do
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year, 2, 21))
+        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: true, created_at: Date.new(current_year - 1, 2, 21))
+        expect(initial_census_employee.published_benefit_group.title).to eq 'first benefit package'
+      end
+
+      it 'should pick latest benefit group assignment if all the assignments are inactive' do
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: false, created_at: Date.new(current_year, 2, 21))
+        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
+        expect(initial_census_employee.published_benefit_group.title).to eq 'second benefit package'
+      end
+
+      it 'should only pick active benefit group assignment - second benefit package' do
+        initial_census_employee.benefit_group_assignments[0].update_attributes(is_active: true, created_at: Date.new(current_year, 2, 21))
+        initial_census_employee.benefit_group_assignments[1].update_attributes(is_active: false, created_at: Date.new(current_year - 1, 2, 21))
+        expect(initial_census_employee.published_benefit_group.title).to eq 'second benefit package'
+      end
+    end
   end
 
   context "multiple employers have active, terminated and rehired employees" do

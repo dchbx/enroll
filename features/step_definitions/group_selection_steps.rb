@@ -664,6 +664,7 @@ And(/the metal level is (.*)/) do |metal_level|
 end
 
 Then(/the Change Tax Credit button should be available/) do
+  sleep(2)
   expect(page).to have_content("Change Tax Credit")
 end
 
