@@ -40,7 +40,7 @@
 
         <div class="col-md-3">
           <label for="inputGender" class="personal-info-label"><%= l10n("gender")%></label>
-          <%= f.select :gender, [ 'Choose *','Male', 'Female' ], { :prompt => 'Choose one...' }, { :class => 'form-control'} %>
+          <%= f.select :gender, ['Male', 'Female' ], { :prompt => 'Choose one...', :selected => @person.gender&.capitalize, }, { :class => 'form-control'} %>
         </div>
       </div>
     </div>
@@ -80,13 +80,8 @@
       <% end %>
     <% end %>
 
-    <div class="col-md-12 no-pd">
-      <button class="col-md-6 btn btn-outline-primary" onclick="return false;"> Add Contact Method</button>
-    </div>
-
     <div class="col-md-12 no-pd mt-3">
-      <button class="col-md-2 btn btn-outline-primary" onclick="return false;"> Cancel </button>
-
+      <%= link_to 'Cancel', main_app.show_roles_person_path(id: @person.id), class: 'col-md-2 btn btn-outline-primary', id: 'save-person' %>
         <button id="save-person" class="col-md-2 btn btn-primary pull-right"  type="submit"> Save Changes </button>
     </div>
 
