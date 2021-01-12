@@ -104,6 +104,10 @@ Rails.application.configure do
   config.ga_tracking_id = ENV['GA_TRACKING_ID'] || "dummy"
   config.ga_tagmanager_id = ENV['GA_TAGMANAGER_ID'] || "dummy"
 
+  # websockets url
+  config.action_cable.disable_request_forgery_protection = true
+  config.action_cable.url = "wss://localhost:3000/cable"
+
   #Queue adapter
   config.active_job.queue_adapter = :resque
 

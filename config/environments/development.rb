@@ -78,7 +78,9 @@ Rails.application.configure do
   config.cartafact_document_base_url = 'http://localhost:3004/api/v1/documents'
 
 
-
+  # websockets url
+  config.action_cable.url = "ws://localhost:3000/cable"
+  
   #Queue adapter
   config.active_job.queue_adapter = :resque
 
