@@ -523,6 +523,10 @@ end
 #   click_link 'Edit Plan'
 # end
 
+Given(/^the automatic application of aptc on enrollment feature configuration is disabled$/) do
+  disable_feature :apply_aggregate_to_enrollment
+end
+
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button
   click_link('Make Changes')
