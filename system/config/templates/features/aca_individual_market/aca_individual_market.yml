@@ -34,3 +34,6 @@ registry:
       - key: :calculate_monthly_aggregate
         item: Operations::Individual::CalculateMonthlyAggregate.new
         is_enabled: true
+      - key: :apply_aggregate_to_enrollment
+        item: Operations::Individual::ApplyAggregateToEnrollment.new
+        is_enabled: true
