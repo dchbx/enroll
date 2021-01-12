@@ -144,6 +144,8 @@ private
   end
 
   def calculate_aptc_aggregate
-    EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
+    # EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
+    # TODO: Refactor below code to make use of updated Operation call pattern.
+    Operations::Individual::ApplyAggregateToEnrollment.new.call({eligibility_determination: self}) if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
   end
 end
