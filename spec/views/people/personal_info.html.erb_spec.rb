@@ -24,7 +24,7 @@ RSpec.describe "people/personal_info.html.erb", :type => :view, dbclean: :after_
   end
 
   it 'should display gender options dropdown' do
-    expect(rendered).to have_select("person_gender", :options => ['Choose *', 'Male', 'Female'])
+    expect(rendered).to have_select("person_gender", :options => ['Male', 'Female'])
   end
 
   it 'should display contact type options dropdown' do
@@ -35,7 +35,7 @@ RSpec.describe "people/personal_info.html.erb", :type => :view, dbclean: :after_
     expect(rendered).to have_button('Save Changes')
   end
 
-  it 'should display cancel changes button' do
-    expect(rendered).to have_button('Cancel')
+  it 'should display cancel changes link' do
+    expect(rendered).to have_link('Cancel')
   end
 end
