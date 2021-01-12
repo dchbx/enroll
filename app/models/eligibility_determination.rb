@@ -144,6 +144,6 @@ private
   end
 
   def calculate_aptc_aggregate
-    Operations::Individual::ApplyAggregateToEnrollment.new.call(eligibility_determinations: self)
+    EnrollRegistry[:apply_aggregate_to_enrollment] {{eligibility_determination: self}}
   end
 end
