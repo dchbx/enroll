@@ -35,6 +35,15 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
       DatabaseCleaner.clean
     end
 
+    describe "#update_vlp_for_consumer_role" do
+      let(:fam_app_completed) { Subscribers::FamilyApplicationCompleted.new }
+      let(:consumer_role) { double(:fully_verified? => true) }
+      let(:verified_primary_family_member) { nil }
+      it "does not run import if consumer role is fully verified" do
+        expect(fam_app_completed.update_vlp_for_consumer_role(consumer_role, verified_primary_family_member)).to eq(nil)
+      end
+    end
+
     describe "errors logged given a payload" do
       let(:message) { { "body" => xml } }
 
