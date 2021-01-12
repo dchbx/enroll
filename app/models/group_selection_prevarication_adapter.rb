@@ -12,7 +12,7 @@ class GroupSelectionPrevaricationAdapter
   include ActiveModel::Model
 
   def self.initialize_for_common_vars(params)
-    person_id = params[:person_id]
+    person_id = params.require(:person_id)
     person = Person.find(person_id)
     family = person.primary_family
     coverage_household = family.active_household.immediate_family_coverage_household
@@ -41,7 +41,7 @@ class GroupSelectionPrevaricationAdapter
 
   def check_shopping_roles(params)
     if params[:employee_role_id].present?
-      emp_role_id = params[:employee_role_id]
+      emp_role_id = params.require(:employee_role_id)
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     elsif params[:resident_role_id].present?
       @resident_role = @person.resident_role
