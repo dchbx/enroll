@@ -8,6 +8,10 @@ require "#{BenefitSponsors::Engine.root}/spec/support/benefit_sponsors_product_s
 RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean: :after_each do
     #include_context "setup benefit market with market catalogs and product packages"
 
+  before :each do
+    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+  end
+
   let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
   let(:benefit_market) { site.benefit_markets.first }
   let!(:current_benefit_market_catalog) do
@@ -670,12 +674,6 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   context 'POST edit_aptc', dbclean: :after_each do
 
     before do
-      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
-      date = TimeKeeper.date_of_record
-      product = FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver)
-      benefit_sponsorship = HbxProfile.current_hbx.benefit_sponsorship
-      benefit_coverage_period = benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(date)}
-      benefit_coverage_period.update_attributes(slcsp_id: product.id)
       current_year = TimeKeeper.date_of_record.year
       is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
       unless is_tax_credit_btn_enabled
