@@ -1,0 +1,764 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "00d1d72ecb08946b193000f8183baca7e5bf6d0b22b298917e1b0875377fb139",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.kp_pay_now_x509_cert_location)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
+      },
+      "user_input": "SamlInformation.kp_pay_now_x509_cert_location",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "027e1b865e57d500ae530a007eadff18fb57aadb2c5ddb6a43ed26fa17bda050",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/family_members_controller.rb",
+      "line": 234,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:dependent).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::FamilyMembersController",
+        "method": "permit_dependent_person_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "0565754b8cc588469e0e02abcf8d894f9ceaa0c9971281fde053bb44cbda716a",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.kp_pay_now_private_key_location)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
+      },
+      "user_input": "SamlInformation.kp_pay_now_private_key_location",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "05b9f7197cf77ea722a607bde251beaadf07db2053d1f39d0875d9d3eba1894e",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/group_selection_controller.rb",
+      "line": 231,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::GroupSelectionController",
+        "method": "permit_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "0836891a672e78c9c2a5cb8f0c7933fdd622f2e3c7dcd4953075d73dbe061ee0",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/views/simple_calendar/_month_calendar.html.erb",
+      "line": 4,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.merge(:start_date => (date_range.last + 1.day)).permit!",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "simple_calendar/_month_calendar"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "1e2db508ef220037a1f73f88356cda49ed8ae266005acbde7396b5cfc371a5ab",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/consumer_roles_controller.rb",
+      "line": 151,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::ConsumerRolesController",
+        "method": "create"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "1f78369e94999a4f7c15ee5d10f2067089b4fe4d656a71cd5c3ad776df66e5ea",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/concerns/vlp_doc.rb",
+      "line": 96,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "VlpDoc",
+        "method": "native_status_changed?"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "233b2d24abee916a0ad3ef43ce978e49f20cd1d5f75197b57a2e51879c02ddc2",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/families_controller.rb",
+      "line": 307,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::FamiliesController",
+        "method": "transition_family_members_update"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "27ea8a4dced3fb2cd9ba37904b0f50e57a2fc4f025b7f6b3ddea4b4f97d482e3",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/views/simple_calendar/_month_calendar.html.erb",
+      "line": 2,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.merge(:start_date => (date_range.first - 1.day)).permit!",
+      "render_path": null,
+      "location": {
+        "type": "template",
+        "template": "simple_calendar/_month_calendar"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "305c9267a075fabe5e7b9aa4d144d4f18a8faef9295618a000278edb51334a27",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/inboxes_controller.rb",
+      "line": 64,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:message).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "InboxesController",
+        "method": "set_inbox_and_assign_message"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "34574b045c9cea16b2bc0768a413ecf147264f59b8c7c80eef6dfdab8364d401",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 18,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "download_employer_document"
+      },
+      "user_input": "params[:path]",
+      "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "3a011fae12dad6be9867045b9be69d5baa81b72d1e01f8e0d357628c0085e4af",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/broker_applicants_controller.rb",
+      "line": 60,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).require(:broker_role_attributes).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::BrokerApplicantsController",
+        "method": "update"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "3a011fae12dad6be9867045b9be69d5baa81b72d1e01f8e0d357628c0085e4af",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/broker_applicants_controller.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).require(:broker_role_attributes).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::BrokerApplicantsController",
+        "method": "update"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "3b5a5425417a12f6496ef4ec7a15f2eea19b3ac77d53a4569d2fd4e8eda1db8e",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/consumer_roles_controller.rb",
+      "line": 61,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).merge(:user_id => current_user.id).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::ConsumerRolesController",
+        "method": "match"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "3fe92a32f7b3ba0c88cf9de02ee5ed60e8ca61951812bba8ab87afddb255ea5b",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/residents_controller.rb",
+      "line": 164,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::ResidentsController",
+        "method": "permit_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "4243890c7c690911cacafb308eca106115ab436f2a73a756bf6c099273447c69",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/broker_applicants_controller.rb",
+      "line": 99,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params[:person][:broker_role_attributes][:carrier_appointments].permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::BrokerApplicantsController",
+        "method": "broker_carrier_appointments"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "49f890491d7c2afee6adea867d0d98443cdb5c3b778e2830afb39614ce7362c7",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "lib/transcript_generator.rb",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(\"#{TRANSCRIPT_PATH}/#{@count}_#{Transcripts::PersonTranscript.new.transcript[:identifier]}_#{Time.now.to_i}.bin\", \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "TranscriptGenerator",
+        "method": "build_transcript"
+      },
+      "user_input": "Transcripts::PersonTranscript.new.transcript[:identifier]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "56568179965f83b6748d313bd0b2578a9dbfa282a0b7bd81440dd7a41aaef2f5",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/application_controller.rb",
+      "line": 89,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ApplicationController",
+        "method": "strong_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "5c6d6f9b8ec32a8cc04ea091f5733748ac2299a21e0b60686eca26bef6f6dc9f",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/invitations_controller.rb",
+      "line": 45,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "InvitationsController",
+        "method": "require_login_and_allow_new_account"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "5dfcf453f1a9d8714483dcbc72a5f3b568aa1ec5919c0fa4124022b85e86cbeb",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/concerns/vlp_doc.rb",
+      "line": 88,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "VlpDoc",
+        "method": "sensitive_info_changed?"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "66641281ab94a441074632175a6432d3e03269b9a693bd7588e0d3f11738abb0",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/employers/people_controller.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Employers::PeopleController",
+        "method": "match"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "6b9c9b86158c4507fcad4856c8e13e902dfc6050c6aa61e5dcf89f98f05af238",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/manage_sep_types_controller.rb",
+      "line": 34,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::ManageSepTypesController",
+        "method": "edit"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "6e197d419416ef96df46eb4c44a1d959d014bffae12c6938b9d7705b1e466b4d",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/users_controller.rb",
+      "line": 14,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "confirm_lock"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "7c1ff7cac21fb03113e1b05b3ba23ed9160cf3411cc041086ac59e258e387c75",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/consumer_roles_controller.rb",
+      "line": 20,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::ConsumerRolesController",
+        "method": "privacy"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "7f9540a8547157eb0c498cd092bb4cd87314efa9a3cb3f26d04a9aa76d2054c4",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/broker_agencies/profiles_controller.rb",
+      "line": 34,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BrokerAgencies::ProfilesController",
+        "method": "create"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "82b13791cf85bfa05460e8b5a1fccf926f429a5aecf6b35f07c1744e71638f1f",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/interactive_identity_verifications_controller.rb",
+      "line": 42,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:interactive_verification).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::InteractiveIdentityVerificationsController",
+        "method": "create"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "8fa8f8d3829c4e7ab62859b6efe57439f2d4d32507ee3fe599d7969aa5c7925b",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called with model attribute",
+      "file": "app/jobs/ivl_notices_notifier_job.rb",
+      "line": 10,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "ApplicationEventKind.where(:event_name => event).first.notice_triggers.first.notice_builder.camelize.constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "IvlNoticesNotifierJob",
+        "method": "perform"
+      },
+      "user_input": "ApplicationEventKind.where(:event_name => event).first",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "922931d5e802c3c34208068ff880430bd240a287d19279959bc611b5b61f905b",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 51,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "cartafact_download"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "9c9944b459fc5ed3d4fb17fa2d95f7c0a27d796c3c9dca4ea114ea3a96f92a24",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/manage_sep_types_controller.rb",
+      "line": 93,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::ManageSepTypesController",
+        "method": "sort"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "a190af4f2b4639703cecf90c681817db54138a27acec5c4a093ecf9f156f5be3",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/employee_roles_controller.rb",
+      "line": 25,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).merge(:user_id => current_user.id).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::EmployeeRolesController",
+        "method": "match"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "aa0d1185f959cb9a48e841c2374b21e4c22622c300ea47c08953e5989fb8ab43",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/broker_agencies/profiles_controller.rb",
+      "line": 61,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "BrokerAgencies::ProfilesController",
+        "method": "update"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "bafc06c301ba8b32e471ec2186e94e537fac6bcbc058f06291df92d6176fa290",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/employers/people_controller.rb",
+      "line": 147,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Employers::PeopleController",
+        "method": "person_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "c46c6660b98103ae61c730c871de49f3d3023a068cf28e78456cdf7d3118b9b0",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/consumer_roles_controller.rb",
+      "line": 95,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::ConsumerRolesController",
+        "method": "match"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "d3d5540bd631e346613b7f6be0aa45ce87f9f761099105ed3204f04acfe2675f",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/families_controller.rb",
+      "line": 231,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::FamiliesController",
+        "method": "upload_notice"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "d3d5540bd631e346613b7f6be0aa45ce87f9f761099105ed3204f04acfe2675f",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/insured/families_controller.rb",
+      "line": 249,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Insured::FamiliesController",
+        "method": "upload_notice"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "e1050cea9e9b04347d6a0783c0255755dfc22472ea348e154d921f6d57e1f0ca",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/exchanges/residents_controller.rb",
+      "line": 93,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:person).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Exchanges::ResidentsController",
+        "method": "create"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "e3fdd4b0bf22f1082fb3f61be43301af431bedeb89b5ef751bae8153ada2d5f1",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/general_agencies/profiles_controller.rb",
+      "line": 30,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GeneralAgencies::ProfilesController",
+        "method": "update"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/employers/employer_profiles_controller.rb",
+      "line": 256,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier, :file_name => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).title, :content_type => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).format)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Employers::EmployerProfilesController",
+        "method": "download_documents"
+      },
+      "user_input": "EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier",
+      "confidence": "Medium",
+      "note": ""
+    }
+  ],
+  "updated": "2021-01-11 14:35:56 -0500",
+  "brakeman_version": "4.10.0"
+}

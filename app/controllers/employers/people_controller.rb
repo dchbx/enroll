@@ -30,8 +30,9 @@ class Employers::PeopleController < ApplicationController
           end
         end
       else # when create person button clicked
+        params.permit!
         @person = current_user.instantiate_person
-        @person.attributes = params.permit(person_params)
+        @person.attributes = params[:person]
         @person.save
         build_nested_models
         respond_to do |format|
@@ -143,7 +144,7 @@ class Employers::PeopleController < ApplicationController
   end
 
   def person_params
-    params.require(:person).permit(*person_parameters_list)
+    params.require(:person).permit!
   end
 
   def person_parameters_list
