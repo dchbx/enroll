@@ -1815,17 +1815,17 @@ class HbxEnrollment
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
                          :transmitted_to_carrier, :coverage_renewed, :unverified,
                          :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
-                   to: :coverage_canceled, after: :propogate_cancel
+                  to: :coverage_canceled, after: :propogate_cancel
       transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?
     end
 
     event :cancel_for_non_payment, :after => :record_transition do
-          transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
-                             :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
-                             :transmitted_to_carrier, :coverage_renewed, :unverified,
-                             :coverage_enrolled, :renewing_waived, :inactive],
-                       to: :coverage_canceled, after: :propogate_cancel
-          transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?
+      transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
+                         :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
+                         :transmitted_to_carrier, :coverage_renewed, :unverified,
+                         :coverage_enrolled, :renewing_waived, :inactive],
+                  to: :coverage_canceled, after: :propogate_cancel
+      transitions from: :coverage_expired, to: :coverage_canceled, :guard => :is_ivl_by_kind?
     end
 
     event :terminate_coverage, :after => :record_transition do
