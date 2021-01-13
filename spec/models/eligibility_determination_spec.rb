@@ -92,11 +92,6 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
         expect(eligibility_determination.premium_credit_strategy_kind).to eq premium_credit_strategy_kind
       end
 
-      it 'should call operation' do
-        expect(EnrollRegistry[:apply_aggregate_to_enrollment]).to receive(:item).and_return Operations::Individual::ApplyAggregateToEnrollment.new
-        eligibility_determination.save
-      end
-
       context "and it is saved" do
         before { eligibility_determination.save }
 
