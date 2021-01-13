@@ -23,11 +23,11 @@ class Insured::ConsumerRolesController < ApplicationController
     @person = Person.find(params[:person_id]) if params[:person_id].present?
     @search_path = {@key => @val, person_id: @person&.id}
     if @person.try(:resident_role?)
-      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
-      redirect_to URI.parse(bookmark_url) || family_account_path
+      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? URI.parse(@person.resident_role.bookmark_url).to_s : nil
+      redirect_to bookmark_url || family_account_path
     elsif @person.try(:consumer_role?)
-      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s : nil
-      redirect_to URI.parse(bookmark_url) || family_account_path
+      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? URI.parse(@person.consumer_role.bookmark_url).to_s : nil
+      redirect_to bookmark_url || family_account_path
     end
   end
 
