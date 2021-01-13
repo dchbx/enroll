@@ -7,14 +7,16 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
   it { should validate_presence_of :csr_percent_as_integer }
 
   let(:family)                        { FactoryBot.create(:family, :with_primary_family_member) }
+  let(:family_member) {FactoryBot.create(:family_member, family: household.family)}
   let(:household)                     { family.households.first }
-  let(:tax_household)                 { FactoryBot.create(:tax_household, household: household) }
+  let(:tax_household)                 { FactoryBot.create(:tax_household, household: household, effective_starting_on: start_on, effective_ending_on: nil) }
   let(:determined_at)                 { TimeKeeper.datetime_of_record }
   let(:max_aptc)                      { 217.85 }
   let(:csr_percent_as_integer)        { 94 }
   let(:csr_eligibility_kind)          { "csr_94" }
   let(:e_pdc_id)                      { "3110344" }
   let(:premium_credit_strategy_kind)  { "allocated_lump_sum_credit" }
+  let!(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
 
   let(:max_aptc_default)                { 0.00 }
   let(:csr_percent_as_integer_default)  { 0 }
@@ -31,6 +33,35 @@ RSpec.describe EligibilityDetermination, type: :model, dbclean: :after_each do
         source: 'Admin'
       }
     }
+
+  context 'for after create' do
+    let(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01', metal_level_kind: :silver)}
+    let(:hbx_with_aptc_1) do
+      enr = FactoryBot.create(:hbx_enrollment,
+                              product: product1,
+                              family: family,
+                              household: household,
+                              is_active: true,
+                              aasm_state: 'coverage_selected',
+                              changing: false,
+                              effective_on: start_on,
+                              kind: "individual",
+                              applied_aptc_amount: 100,
+                              elected_aptc_pct: 0.7)
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: family_member.id, hbx_enrollment: enr)
+      enr
+    end
+    let!(:hbx_enrollments) {[hbx_with_aptc_1]}
+    before do
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+      FactoryBot.create(:eligibility_determination, tax_household: tax_household)
+      @enrollments = family.reload.hbx_enrollments
+    end
+
+    it 'should call after create' do
+      expect(@enrollments.count).to eq(2)
+    end
+  end
 
   context "a new instance" do
     context "with no arguments" do
