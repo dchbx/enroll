@@ -1039,6 +1039,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         hbx_enrollment.cancel_coverage!
         expect(hbx_enrollment.terminated_on).to eq nil
       end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq true
+        hbx_enrollment.cancel_coverage!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
+      end
     end
 
     context "cancel_for_non_payment!" do
@@ -1053,6 +1066,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       it "should not populate the terminated on" do
         hbx_enrollment.cancel_for_non_payment!
         expect(hbx_enrollment.terminated_on).to eq nil
+      end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq true
+        hbx_enrollment.cancel_for_non_payment!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
       end
     end
 
