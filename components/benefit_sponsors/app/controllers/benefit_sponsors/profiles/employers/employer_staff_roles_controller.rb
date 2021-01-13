@@ -65,21 +65,21 @@ module BenefitSponsors
 
         def create_staff_member
           authorize User, :add_roles?
-          staff_params = params.permit!["staff_member"].to_h
+          staff_params = params.permit[:staff_member].to_h
           staff_params['dob'] = parse_date(staff_params['dob'])
           result = ::Operations::People::Roles::PersistStaff.new.call(staff_params)
           # add redirects
           if result.success?
-            redirect_to main_app.show_roles_person_path(id: staff_params["person_id"])
+            redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
             flash[:notice] = result.value![:message]
           else
-            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params["person_id"])
+            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params[:person_id])
             flash[:error] = result.failure[:message]
           end
         end
 
         def employer_search
-          @search_value = params.permit!.to_h["q"]
+          @search_value = params["q"]
 
           return [] if @search_value.blank?
 
