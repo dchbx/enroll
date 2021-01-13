@@ -16,4 +16,5 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.submit" => "Submit",
   "en.exchange.employer_applications.no_valid_pys" => "No valid plan years present for",
   "en.exchange.employer_applications.select_term_reason" => "Please select terminate reason",
+  "en.exchange.hub.add_account_description" => "To create a new account, select 'Add Account'. You'll be able to access any new accounts you create using your current MA Health Connector username and password. To go to one of your existing accounts, select it from the list below."
 }

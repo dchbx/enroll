@@ -69,8 +69,19 @@ module Operations
             link: link,
             kind: kind,
             date: created_at,
-            status: status
+            status: status,
+            description: get_role_desc(kind.downcase)
           }
+        end
+
+        def get_role_desc(kind)
+          if ['consumer', 'resident', 'employee'].include?(kind)
+            'My Insurance Coverage'
+          elsif kind == 'employer staff'
+            "Point Of Contact - #{kind.humanize}"
+          else
+            kind.humanize
+          end
         end
 
         def fetch_hbx_admin_details(person)
