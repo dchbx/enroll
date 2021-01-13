@@ -7,6 +7,7 @@ RSpec.describe TaxHousehold, type: :model do
 
   before :each do
     EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
   end
 
   it "should have no people" do

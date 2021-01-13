@@ -8,6 +8,7 @@ module Insured
     before :each do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
       DatabaseCleaner.clean
+      EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
     end
 
     let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
