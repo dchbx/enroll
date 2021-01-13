@@ -1,0 +1,106 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "00d1d72ecb08946b193000f8183baca7e5bf6d0b22b298917e1b0875377fb139",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 36,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.kp_pay_now_x509_cert_location)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
+      },
+      "user_input": "SamlInformation.kp_pay_now_x509_cert_location",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "0565754b8cc588469e0e02abcf8d894f9ceaa0c9971281fde053bb44cbda716a",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "app/models/one_login/ruby_saml/saml_generator.rb",
+      "line": 35,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(SamlInformation.kp_pay_now_private_key_location)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OneLogin::RubySaml::SamlGenerator",
+        "method": "initialize"
+      },
+      "user_input": "SamlInformation.kp_pay_now_private_key_location",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "34574b045c9cea16b2bc0768a413ecf147264f59b8c7c80eef6dfdab8364d401",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/documents_controller.rb",
+      "line": 19,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(BenefitSponsors::Documents::EmployerAttestationDocument.find_by(:identifier => params[:path]).identifier)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DocumentsController",
+        "method": "download_employer_document"
+      },
+      "user_input": "params[:path]",
+      "confidence": "Weak",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "49f890491d7c2afee6adea867d0d98443cdb5c3b778e2830afb39614ce7362c7",
+      "check_name": "FileAccess",
+      "message": "Model attribute used in file name",
+      "file": "lib/transcript_generator.rb",
+      "line": 47,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.open(\"#{TRANSCRIPT_PATH}/#{@count}_#{Transcripts::PersonTranscript.new.transcript[:identifier]}_#{Time.now.to_i}.bin\", \"wb\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "TranscriptGenerator",
+        "method": "build_transcript"
+      },
+      "user_input": "Transcripts::PersonTranscript.new.transcript[:identifier]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ef486a2f648e540d2eb04ea78e5c6ba243cbaf21350fdec96467367fb1632736",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/employers/employer_profiles_controller.rb",
+      "line": 256,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier, :file_name => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).title, :content_type => EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).format)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Employers::EmployerProfilesController",
+        "method": "download_documents"
+      },
+      "user_input": "EmployerProfile.find(params[:id]).documents.find(params[:ids][0]).identifier",
+      "confidence": "Medium",
+      "note": ""
+    }
+  ],
+  "updated": "2020-12-30 12:51:29 -0500",
+  "brakeman_version": "4.10.0"
+}

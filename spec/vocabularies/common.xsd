@@ -850,7 +850,7 @@
 		</xs:annotation>
 		<xs:restriction base="xs:integer">
 			<xs:minInclusive value="2013"/>
-			<xs:maxInclusive value="2020"/>
+			<xs:maxInclusive value="2030"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:simpleType name="CurrencyType">
