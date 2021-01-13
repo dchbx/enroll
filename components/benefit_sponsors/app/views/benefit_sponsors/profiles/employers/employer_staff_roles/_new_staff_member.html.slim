@@ -1,7 +1,7 @@
 .broker-agency-staff-registration-container
   h1.mb-4.heading-text#loaded = l10n("Employer_staff")
   
-  = form_for @staff_member, as: :staff_member, url: {action: "create_staff_member"},  html: { class: "needs-validation s508", novalidate:true } do |f|
+  = form_for @staff_member, as: :staff_member, url: {action: "create_staff_member"},  html: { class: "needs-ajax-validation s508", novalidate:true } do |f|
     div#employer_staff
     = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
 
@@ -29,12 +29,12 @@ javascript:
 
   function isApplyingCoverage(element) {
     var result = document.querySelectorAll('.optional');
-   var ssn =  document.getElementById("inputSsn")
+    var ssn =  document.getElementById("inputSsn")
     var gender =  document.getElementById("inputGender")
     var hiredOn =  document.getElementById("inputHiredOn")
     if (element.value === "true") {
       result.forEach(function (ele) {
-      ele.classList.remove("hidden");
+        ele.classList.remove("hidden");
       });
 
       ssn.setAttribute("required", "true");
