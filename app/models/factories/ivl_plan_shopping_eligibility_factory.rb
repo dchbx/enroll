@@ -8,7 +8,7 @@ module Factories
   class IvlPlanShoppingEligibilityFactory < ::Factories::EligibilityFactory
 
     def initialize(enrollment, effective_on, selected_aptc = nil, product_ids = [])
-      super
+      super(enrollment.id, effective_on, selected_aptc, product_ids)
       raise "Given enrollment object is not a valid enrollment." unless enrollment.is_a?(::HbxEnrollment)
 
       @enrollment = enrollment
