@@ -43,10 +43,10 @@
         <%= bulk_notice.sent_at || bulk_notice.aasm_state.capitalize %>
       </div>
       <div class='col-2 text-right'>
-        <%= bulk_notice.audience_type.humanize.titleize %>
+        <%= bulk_notice.audience_type&.humanize&.titleize %>
       </div>
       <div class='col-2 text-right'>
-        <%= bulk_notice.user.person.full_name %>
+        <%= bulk_notice.user&.person&.full_name %>
       </div>
     </div>
   <% end %>
