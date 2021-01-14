@@ -16,6 +16,7 @@ RSpec.describe HbxAdminController, :type => :controller do
   before :each do
     allow(user).to receive(:has_hbx_staff_role?).and_return(true)
     sign_in(user)
+    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
   end
 
   describe "POST edit_aptc_csr" do
