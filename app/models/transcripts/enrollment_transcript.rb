@@ -113,7 +113,7 @@ module Transcripts
 
       add_plan_information
 
-      @transcript[:source]  = {'_id' => @transcript[:source].id} 
+      @transcript[:source]  = {'_id' => @transcript[:source].id}
       @transcript[:other]   = nil
 
       # @transcript[:source].serializable_hash
@@ -244,21 +244,21 @@ module Transcripts
     end
 
     # 1) Match by hbx_id
-    #   Match found: 
+    #   Match found:
     #     - Verify active state
     #       - True
-    #          - Compare 
+    #          - Compare
     #            (if multiple active enrollments present with primary_applicant, make them as enrollment:remove )
     #            # (if multiple active responsible party enrollments with same subscriber, mark them as enrollment:remove)
     #       - False
     #          - Look for active enrollments with same coverage_kind & market, coverage year.
-    #             - Found 
+    #             - Found
     #               (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
     #               - Compare
     #             - New Enrollment
     #   Match not found:
     #     - Look for active enrollments with same coverage_kind & market, coverage year.
-    #       - Found 
+    #       - Found
     #         (if multiple found, pick one with max effective date. make other as enrollment:remove in transcript)
     #         - Compare
     #       - New Enrollment
@@ -268,18 +268,16 @@ module Transcripts
 
       if match.blank? || !(HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::TERMINATED_STATUSES).include?(match.aasm_state) || match.hbx_enrollment_members.blank?
         matched_people = match_person_instance(enrollment.family.primary_applicant.person)
-        if matched_people.present?       
+        if matched_people.present?
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
           matched_person = matched_people.first
-
-          if family = matched_person.families.first
-            raise 'matched person has multiple families' if matched_person.families.size > 1
-            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))          
-            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first ||  enrollments.last)
-            enrollments = enrollments.select{|en| en.hbx_id != exact_match.hbx_id}
-            @enrollment = exact_match
-            @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
-          end
+          family = matched_person.families.where(id: enrollment.family.id).first || matched_person.families.first
+          return if family.blank?
+          enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
+          exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first || enrollments.last)
+          enrollments = enrollments.reject { |en| en.hbx_id == exact_match.hbx_id }
+          @enrollment = exact_match
+          @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
         end
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match)).uniq

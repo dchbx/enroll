@@ -298,6 +298,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.8)
       msgpack (~> 1.0)
+    brakeman (4.10.1)
     browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
@@ -951,6 +952,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  brakeman
   browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
