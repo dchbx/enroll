@@ -13,7 +13,7 @@
       </div>
     </div>
   </div>
-  <%if @person.consumer_role.blank?%>
+  <%if @person.consumer_role.blank? && @person.resident_role.blank? %>
     <div class="col-12 mt-3 no-pd">
       <div class="d-flex flex-row bg-white rounded flex-shadow">
         <div class="col-10 p-3">
