@@ -9,16 +9,18 @@
           <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
             <div class="col-8">
               <div class="ml-25"><span class="hub-label"><strong><%= link_to active_role.name.humanize, active_role.link %></strong></span></div>
-              <div class="ml-25">Point Of Contact - <%= active_role.kind %></div>
+              <div class="ml-25">Point Of Contact - <%= active_role.kind.humanize %></div>
             </div>
-            <div class="col-4 p-2">
-              <div class="dropdown pull-right">
-                <button class="btn btn-default dropdown-toggle interaction-click-control-actions" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Actions
-                  <span class="caret"></span>
-                </button>
+            <% if active_role.kind.downcase === 'employer staff'  %>
+              <div class="col-4 p-2">
+                <div class="dropdown pull-right">
+                  <button class="btn btn-default dropdown-toggle interaction-click-control-actions" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Actions
+                    <span class="caret"></span>
+                  </button>
+                </div>
               </div>
-            </div>
+            <% end %>
           </div>
         </div>
       <% end %>
