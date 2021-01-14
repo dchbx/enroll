@@ -1,55 +1,3 @@
-<script type="text/javascript">
-    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
-    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=text]").prop('disabled', false);
-    jQuery('[id^="terminate_hbx_"]').click(function($) {
-        jQuery('[id^="terminate_hbx_"]').each(function($) {
-            if (this.checked) {
-                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', false);
-                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', false);
-            }else{
-                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', true);
-                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('checked', false);
-                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', true);
-            }
-        });
-    });
-
-    var TerminateWithEarlierDate = function () {
-        $('#termiante_with_earlier_date').modal('show');
-        jQuery('[id^="terminate_hbx_"]').each(function($) {
-            if (this.checked) {
-
-                var dup_enr_ids = <%= h @dup_enr_ids %>;
-                var input_id = this.value;
-                var output = dup_enr_ids.includes(input_id);
-                var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
-                var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
-                if(new_term_date == enrollment_effective && !output){
-                    jQuery('#cancel_message').show();
-                    jQuery('#termination_message').hide();
-                    jQuery('#no_termination_message').show();
-                    jQuery("a.modal_confirm").show();
-                }
-                else if(new_term_date !== enrollment_effective && output ){
-                  jQuery('#cancel_message').hide();
-                  jQuery('#termination_message').hide();
-                  jQuery('#no_termination_message').show();
-                  jQuery("a.modal_confirm").hide();
-                }
-                else{
-                    jQuery('#cancel_message').hide();
-                    jQuery('#termination_message').show();
-                    jQuery('#no_termination_message').hide();
-                    jQuery("a.modal_confirm").show();
-                }
-            }
-        });
-    } 
-    jQuery("a.modal_confirm").click(function() {
-        jQuery("#termiante_with_earlier_date-form").submit();
-    });
-</script>
-
 <td colspan="90%">
   <%if @enrollments.present?%>
       <%= form_tag update_enrollment_termianted_on_date_exchanges_hbx_profiles_path, :method => :post, remote: true, id: 'termiante_with_earlier_date-form' do %>
@@ -142,3 +90,55 @@
 </td>
 
 <style>.date-picker { width:90px !important;font-size: 12px;} </style>
+
+<script type="text/javascript">
+    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=checkbox]").prop('disabled', false);
+    jQuery('[id^="terminate_hbx_"]:checked').closest('tr').find("input[type=text]").prop('disabled', false);
+    jQuery('[id^="terminate_hbx_"]').click(function($) {
+        jQuery('[id^="terminate_hbx_"]').each(function($) {
+            if (this.checked) {
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', false);
+                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', false);
+            }else{
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('disabled', true);
+                jQuery(jQuery(this).closest('tr').find('[type=checkbox]')[0]).prop('checked', false);
+                jQuery(jQuery(this).closest('tr').find('[type=text]')[0]).prop('disabled', true);
+            }
+        });
+    });
+
+    var TerminateWithEarlierDate = function () {
+        $('#termiante_with_earlier_date').modal('show');
+        jQuery('[id^="terminate_hbx_"]').each(function($) {
+            if (this.checked) {
+
+                var dup_enr_ids = <%= h @dup_enr_ids %>;
+                var input_id = this.value;
+                var output = dup_enr_ids.includes(input_id);
+                var new_term_date = jQuery(this).closest('tr').find("input[name=new_termination_date]")[0].value
+                var enrollment_effective = jQuery(this).closest('tr').find("td#enrollment_effective_on").html();
+                if(new_term_date == enrollment_effective && !output){
+                    jQuery('#cancel_message').show();
+                    jQuery('#termination_message').hide();
+                    jQuery('#no_termination_message').show();
+                    jQuery("a.modal_confirm").show();
+                }
+                else if(new_term_date !== enrollment_effective && output ){
+                    jQuery('#cancel_message').hide();
+                    jQuery('#termination_message').hide();
+                    jQuery('#no_termination_message').show();
+                    jQuery("a.modal_confirm").hide();
+                }
+                else{
+                    jQuery('#cancel_message').hide();
+                    jQuery('#termination_message').show();
+                    jQuery('#no_termination_message').hide();
+                    jQuery("a.modal_confirm").show();
+                }
+            }
+        });
+    }
+    jQuery("a.modal_confirm").click(function() {
+        jQuery("#termiante_with_earlier_date-form").submit();
+    });
+</script>
