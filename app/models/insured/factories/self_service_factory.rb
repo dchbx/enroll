@@ -68,7 +68,13 @@ module Insured
           enrollment_member.update_attributes!(applied_aptc_amount: member_aptc_value)
         end
 
-        max_applicable_aptc = applicable_aptc_by_member.values.sum
+        eli_fac_obj = ::Factories::EligibilityFactory.new(reinstatement.id, reinstatement.effective_on)
+        max_applicable_aptc = if EnrollRegistry[:apply_aggregate_to_enrollment].feature.is_enabled
+                                applicable_aptc_by_member.values.sum
+                              else
+                                eli_fac_obj.fetch_max_aptc
+                              end
+
         reinstatement.update_attributes!(elected_aptc_pct: (applied_aptc_amount / max_applicable_aptc), applied_aptc_amount: cost_decorator.total_aptc_amount, aggregate_aptc_amount: max_applicable_aptc)
       end
 
