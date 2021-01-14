@@ -7,6 +7,7 @@ module Insured
 
     before do
       DatabaseCleaner.clean
+      EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
     end
 
     subject { Insured::Forms::SelfTermOrCancelForm.new }
