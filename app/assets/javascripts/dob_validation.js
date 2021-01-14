@@ -3,7 +3,7 @@ $(document).on('change', '#jq_datepicker_ignore_person_dob, #family_member_dob_,
   var entered_date = $(this).val();
   var entered_dob = new Date($(this).val());
   var entered_year =  entered_date.substring(entered_date.length -4);
-  var todays_date = dchbx_enroll_date_of_record();
+  var todays_date = new Date($('#dchbx_enroll_date_of_record').text() +"T00:00");
   if (entered_date.value == '') {
     this.setCustomValidity('Please fill out this date of birth field.');
   }
