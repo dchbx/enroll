@@ -5,7 +5,7 @@
                                                                           effective_on: hbx_enrollment.effective_on,
                                                                           shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id),
                                                                           subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}} %>
-  <% max_for_hbx = @family.active_household.latest_active_tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on)
+  <% max_for_hbx = @family.active_household.latest_active_tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on) %>
 <% else %>
   <% max_aptc = @max_aptc %>
   <% max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc) %>
