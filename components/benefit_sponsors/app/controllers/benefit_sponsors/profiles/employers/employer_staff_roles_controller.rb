@@ -65,7 +65,7 @@ module BenefitSponsors
 
         def create_staff_member
           authorize User, :add_roles?
-          staff_params = params.permit[:staff_member].to_h
+          staff_params = params[:staff_member].permit!.to_h
           staff_params['dob'] = parse_date(staff_params['dob'])
           result = ::Operations::People::Roles::PersistStaff.new.call(staff_params)
           # add redirects
@@ -96,7 +96,7 @@ module BenefitSponsors
         private
 
         def staff_params
-          params[:staff].present? ? params[:staff] :  params[:staff] = {}
+          params[:staff] ||= {}
           params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"]})
           params[:staff].permit!
         end
