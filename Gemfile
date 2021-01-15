@@ -142,6 +142,7 @@ end
 group :development, :test do
   gem 'action-cable-testing'
   # gem 'bundler-audit',          '~> 0.6'
+  gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'

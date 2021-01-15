@@ -97,8 +97,12 @@ module Subscribers
           consumer_role.person.user.ridp_by_payload!
         end
       rescue => e
-        errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
-        throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
+        if consumer_role&.errors.present?
+          errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
+          throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
+        else
+          throw(:processing_issue, "Consumer Role is not present") unless consumer_role.present?
+        end
       end
     end
 
