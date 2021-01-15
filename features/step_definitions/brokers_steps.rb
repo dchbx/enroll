@@ -12,7 +12,7 @@ When(/^.+ visits the HBX Broker Registration form$/) do
 end
 
 When(/^Primary Broker should see the New Broker Agency form$/) do
-  find('#broker_registration_form', wait: 10)
+  find('#broker_registration_form', wait: 20)
   expect(page).to have_css("#broker_registration_form")
   # Agency fields are part of the broker registration form
   expect(page).to have_content("Broker Agency Information")
