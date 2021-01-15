@@ -65,15 +65,13 @@ module BenefitSponsors
 
         def create_staff_member
           authorize User, :add_roles?
-          staff_params = params[:staff_member].permit!.to_h
-          staff_params['dob'] = parse_date(staff_params['dob'])
-          result = ::Operations::People::Roles::PersistStaff.new.call(staff_params)
+          result = ::Operations::People::Roles::PersistStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
           # add redirects
           if result.success?
-            redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
+            redirect_to main_app.show_roles_person_path(id: staff_member_params[:person_id])
             flash[:notice] = result.value![:message]
           else
-            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_params[:person_id])
+            redirect_to new_staff_member_profiles_employers_employer_staff_roles_path(id: staff_member_params[:person_id])
             flash[:error] = result.failure[:message]
           end
         end
@@ -99,6 +97,25 @@ module BenefitSponsors
           params[:staff] ||= {}
           params[:staff].merge!({profile_id: params["profile_id"] || params["id"], person_id: params["person_id"]})
           params[:staff].permit!
+        end
+
+        def staff_member_params
+          params.require(:staff_member).permit(
+            :first_name,
+            :last_name,
+            :dob,
+            :email,
+            :person_id,
+            :profile_id,
+            :coverage_record => [
+              :is_applying_coverage,
+              :ssn,
+              :gender,
+              :hired_on,
+              :address => [:kind, :address_1, :address_2, :city, :state, :zip],
+              :email => [:kind, :address]
+            ]
+          ).to_h
         end
 
         def parse_date(date)
