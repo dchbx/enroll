@@ -439,6 +439,47 @@
       "note": ""
     },
     {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "6c26117cb8a16470d6e0cf73d4e2183c08714a1346985e7f9d7632dec54d26ee",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/exchanges/hbx_profiles/_view_enrollment_to_update_end_date.html.erb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "fetch_duplicate_enrollment_ids(Person.find(params[:person_id]).primary_family.hbx_enrollments.where(:aasm_state.in => ([\"coverage_terminated\", \"coverage_termination_pending\", \"coverage_expired\"]))).map(&:to_s)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "Exchanges::HbxProfilesController",
+          "method": "view_enrollment_to_update_end_date",
+          "line": 483,
+          "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
+          "rendered": {
+            "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
+            "file": "app/views/exchanges/hbx_profiles/view_enrollment_to_update_end_date.js.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
+          "line": 9,
+          "file": "app/views/exchanges/hbx_profiles/view_enrollment_to_update_end_date.js.erb",
+          "rendered": {
+            "name": "exchanges/hbx_profiles/_view_enrollment_to_update_end_date",
+            "file": "app/views/exchanges/hbx_profiles/_view_enrollment_to_update_end_date.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "exchanges/hbx_profiles/_view_enrollment_to_update_end_date"
+      },
+      "user_input": "Person.find(params[:person_id]).primary_family",
+      "confidence": "Weak",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "6e197d419416ef96df46eb4c44a1d959d014bffae12c6938b9d7705b1e466b4d",
@@ -565,7 +606,7 @@
       "check_name": "MassAssignment",
       "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
       "file": "app/controllers/exchanges/manage_sep_types_controller.rb",
-      "line": 93,
+      "line": 94,
       "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
       "code": "params.permit!",
       "render_path": null,
@@ -759,6 +800,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-01-11 14:35:56 -0500",
-  "brakeman_version": "4.10.0"
+  "updated": "2021-01-15 15:51:12 -0500",
+  "brakeman_version": "4.10.1"
 }
