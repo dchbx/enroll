@@ -109,7 +109,6 @@ module Operations
         def fetch_employee_details(ee_role)
           link = ee_role.is_active? ? "/families/home" : nil
           created_at = ee_role.created_at.to_date
-          name = ee_role.person.full_name
           status = ee_role.is_active? ? :active : :inactive
           role_params('My Coverage', link, "Employee", created_at, status)
         end
