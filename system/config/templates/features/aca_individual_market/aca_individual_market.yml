@@ -34,6 +34,9 @@ registry:
       - key: :calculate_monthly_aggregate
         item: Operations::Individual::CalculateMonthlyAggregate.new
         is_enabled: true
+        settings:
+          - key: :termination_date
+            item: end_of_month
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
