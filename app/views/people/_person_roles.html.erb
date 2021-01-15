@@ -9,7 +9,7 @@
           <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
             <div class="col-8">
               <div class="ml-25"><span class="hub-label"><strong><%= link_to active_role.name.humanize, active_role.link %></strong></span></div>
-              <div class="ml-25">Point Of Contact - <%= active_role.kind.humanize %></div>
+              <div class="ml-25"><%= active_role.description.humanize %></div>
             </div>
             <% if active_role.kind.downcase === 'employer staff'  %>
               <div class="col-4 p-2">
