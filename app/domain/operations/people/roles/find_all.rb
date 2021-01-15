@@ -95,7 +95,7 @@ module Operations
 
           link = person.consumer_role.bookmark_url
 
-          role_params(person.full_name, link, "consumer", person.consumer_role.created_at.to_date, :active)
+          role_params('My Coverage', link, "consumer", person.consumer_role.created_at.to_date, :active)
         end
 
         def fetch_resident_details(person)
@@ -103,7 +103,7 @@ module Operations
 
           link = person.resident_role.bookmark_url
 
-          role_params(person.full_name, link, "resident", person.resident_role.created_at.to_date, :active)
+          role_params('My Coverage', link, "resident", person.resident_role.created_at.to_date, :active)
         end
 
         def fetch_employee_details(ee_role)
@@ -111,7 +111,7 @@ module Operations
           created_at = ee_role.created_at.to_date
           name = ee_role.person.full_name
           status = ee_role.is_active? ? :active : :inactive
-          role_params(name, link, "Employee", created_at, status)
+          role_params('My Coverage', link, "Employee", created_at, status)
         end
 
         def fetch_employer_staff_details(er_role)
