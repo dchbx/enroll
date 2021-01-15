@@ -9,22 +9,22 @@ module Operations
     include Config::SiteConcern
     include Dry::Monads[:result, :do]
 
-    def call(effective_on:, dob:, market_key:, relationship_kind:)
-      _values        = yield validate(effective_on, dob, market_key)
+    def call(effective_on:, family_member:, market_key:, relationship_kind:)
+      _values        = yield validate(effective_on, family_member, market_key)
       age_off_period = yield fetch_age_off_period(market_key)
       cut_off_age    = yield fetch_cut_off_age(market_key)
       _relation      = yield validate_relationship(market_key, relationship_kind)
-      result         = yield is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
+      result         = yield is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, family_member, market_key)
 
       Success(result)
     end
 
     private
 
-    def validate(effective_on, dob, market_key)
+    def validate(effective_on, family_member, market_key)
       market_keys = [:aca_shop_dependent_age_off, :aca_fehb_dependent_age_off, :aca_individual_dependent_age_off]
       return Failure('Invalid effective_on') unless effective_on.is_a?(Date)
-      return Failure('Invalid dob') unless dob.is_a?(Date)
+      return Failure('Invalid family_member') unless family_member.is_a?(FamilyMember)
       return Failure('Invalid market_key') unless market_keys.include?(market_key)
 
       Success('Valid params')
@@ -43,10 +43,31 @@ module Operations
       value ? Success('Valid relationship kind') : Failure('Invalid relationship kind')
     end
 
-    def is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, dob)
-      comparision_date = (age_off_period == :annual) ? effective_on.beginning_of_year : effective_on.beginning_of_month
-      true_or_false = (dob + cut_off_age.years) >= comparision_date
-      true_or_false ? Success('Eligible') : Failure('Not eligible')
+    def is_person_eligible_on_enrollment?(age_off_period, cut_off_age, effective_on, family_member, market_key)
+      person = family_member.person
+      comparision_date = (age_off_period == :annual) ? effective_on.end_of_year : effective_on.end_of_month
+      compare_26_old = (age_off_period == :annual) ? effective_on.beginning_of_year : effective_on.beginning_of_month
+      age_on = person.age_on(comparision_date)
+      if age_on > cut_off_age
+        Failure('Not eligible')
+      elsif age_on < cut_off_age
+        Success('Eligible')
+      elsif age_on == cut_off_age
+        dob = person.dob
+        if (dob + cut_off_age.years) < compare_26_old
+          Failure('Not Eligible')
+        else
+          has_continuous_coverage?(family_member, market_key, effective_on) ? Success('Eligible') : Failure('Not eligible')
+        end
+      end
+    end
+
+    # Checks to see if the family member has a continuous coverage until new effective_on
+    def has_continuous_coverage?(family_member, market_key, effective_on)
+      kind = (market_key == :aca_individual_dependent_age_off) ? :individual_market : :shop_market
+      enr = family_member.family.hbx_enrollments.enrolled_and_terminated.send(kind).where(:"hbx_enrollment_members.applicant_id" => family_member.id).effective_asc.last
+      return false if enr.blank?
+      enr.terminated_on.nil? || enr.terminated_on.next_day == effective_on
     end
   end
 end

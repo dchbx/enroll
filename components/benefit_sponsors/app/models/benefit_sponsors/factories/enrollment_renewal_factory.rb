@@ -94,7 +94,7 @@ module BenefitSponsors
         ::EnrollRegistry[:age_off_relaxed_eligibility] do
           {
             effective_on: effective_on,
-            dob: hbx_enr_member.person.dob,
+            family_member: hbx_enr_member&.family_member,
             market_key: market_key,
             relationship_kind: dep_relationship
           }

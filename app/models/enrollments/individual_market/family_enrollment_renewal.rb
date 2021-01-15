@@ -167,7 +167,7 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
       dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
         {
           effective_on: renewal_coverage_start,
-          dob: member.person.dob,
+          family_member: member&.family_member,
           market_key: :aca_individual_dependent_age_off,
           relationship_kind: member.family_member.relationship
         }

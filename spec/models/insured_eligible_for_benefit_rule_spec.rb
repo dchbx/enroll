@@ -283,7 +283,7 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
         allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
         allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
         consumer_role.update_attributes(dob: Date.new(1994,1,1))
-        expect(rule.is_child_age_satisfied?).to eq true
+        expect(rule.is_child_age_satisfied?).to eq false
       end
     end
   end
