@@ -8,21 +8,33 @@ class BulkNoticeWorker
   def perform(audience_id, bulk_notice_id)
     sleep 2
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
-    @org = BenefitSponsors::Organizations::Organization.find(audience_id)
+    @entity = nil
+    begin
+      @entity = BenefitSponsors::Organizations::Organization.find(audience_id)
+    rescue StandardError
+      @entity = Person.find(audience_id)
+    end
+
     params = fetch_params(@bulk_notice)
 
     if @bulk_notice.audience_type == 'employee'
       #loop through each employee
-      results = @org.employer_profile.census_employees.each do |census_employee|
+      results = @entity.employer_profile.census_employees.each do |census_employee|
         Operations::SecureMessageAction.new.call(
           params: params.merge({ resource_id: census_employee.employee_role&.person&.id&.to_s, resource_name: 'Person' }),
           user: @bulk_notice.user
         )
       end
       result = results.any?(&:success?)
+    elsif @bulk_notice.audience_type == 'consumer' || @bulk_notice.audience_type == 'resident'
+      resource = @entity
+      result = Operations::SecureMessageAction.new.call(
+        params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),
+        user: @bulk_notice.user
+      )
     else
       # normal profile params here for other audience types
-      resource = fetch_resource(@org, @bulk_notice.audience_type)
+      resource = fetch_resource(@entity, @bulk_notice.audience_type)
       result = Operations::SecureMessageAction.new.call(
         params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),
         user: @bulk_notice.user
@@ -36,7 +48,7 @@ class BulkNoticeWorker
       result: result.success? ? 'Success' : 'Error'
     )
 
-    html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @org.attributes.symbolize_keys.slice(:id, :fein, :hbx_id, :legal_name) })
+    html = ApplicationController.render(partial: "exchanges/bulk_notices/summary_line", locals: { bulk_notice: @bulk_notice, id: audience_id, org: @entity.attributes.symbolize_keys.slice(:id, :fein, :hbx_id, :legal_name) })
     cable_ready["bulk-notice-processing"].morph(
       selector: "#bulk-notice-#{@bulk_notice.id}-audience-#{audience_id}",
       html: html

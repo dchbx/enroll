@@ -51,7 +51,7 @@ export default class extends Controller {
       this.moreRecipientsTarget.classList.remove('d-none')
       this.moreRecipientsTarget.innerText = this.moreRecipientsTarget.innerText.replace(/\d+/, hidden.length)
     } else
-      this.moreRecipientsTarget.classList.add('d-none')
+        this.moreRecipientsTarget.classList.add('d-none')
   }
 
   identifierErrorCheck() {
