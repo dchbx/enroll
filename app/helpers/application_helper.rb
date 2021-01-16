@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   include FloatHelper
 
@@ -7,14 +9,14 @@ module ApplicationHelper
     Plan.has_rates_for_all_carriers?(date) == false
   end
 
-  def rates_available?(employer, date=nil)
+  def rates_available?(employer, date = nil)
     employer.applicant? && !Plan.has_rates_for_all_carriers?(date) ? "blocking" : ""
   end
 
-  def product_rates_available?(benefit_sponsorship, date=nil)
+  def product_rates_available?(benefit_sponsorship, date = nil)
     date = Date.strptime(date.to_s, '%m/%d/%Y') if date.present?
     return false if benefit_sponsorship.present? && benefit_sponsorship.active_benefit_application.present?
-    date = date || BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
+    date ||= BenefitSponsors::BenefitApplications::BenefitApplicationSchedular.new.calculate_start_on_dates[0]
     benefit_sponsorship.applicant? && BenefitMarkets::Forms::ProductForm.for_new(date).fetch_results.is_late_rate
   end
 
@@ -27,31 +29,23 @@ module ApplicationHelper
   end
 
   def draft_plan_year?(plan_year)
-    if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
-      plan_year
-    end
+    plan_year if plan_year.aasm_state == "draft" && plan_year.try(:benefit_groups).empty?
   end
 
   def get_portals_text(insured, employer, broker)
     my_portals = []
-    if insured == true
-      my_portals << "<strong>Insured</strong>"
-    end
-    if employer == true
-      my_portals << "<strong>Employer</strong>"
-    end
-    if broker == true
-      my_portals << "<strong>Broker</strong>"
-    end
+    my_portals << "<strong>Insured</strong>" if insured == true
+    my_portals << "<strong>Employer</strong>" if employer == true
+    my_portals << "<strong>Broker</strong>" if broker == true
     my_portals.to_sentence
   end
 
   def copyright_notice
-    if TimeKeeper.date_of_record.year.to_s == site_copyright_period_start.to_s
-      copyright_attribution = "#{site_copyright_period_start} #{Settings.site.long_name}"
-    else
-      copyright_attribution = "#{site_copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
-    end
+    copyright_attribution = if TimeKeeper.date_of_record.year.to_s == site_copyright_period_start.to_s
+                              "#{site_copyright_period_start} #{Settings.site.long_name}"
+                            else
+                              "#{site_copyright_period_start}-#{TimeKeeper.date_of_record.year} #{Settings.site.long_name}"
+                            end
     raw("<span class='copyright'><i class='far fa-copyright fa-lg' aria-hidden='true'></i> #{copyright_attribution}. All Rights Reserved. </span>")
   end
 
@@ -68,7 +62,7 @@ module ApplicationHelper
   end
 
   #Shopping enrollment family premium (plan shopping page)
-  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc=true)
+  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc = true)
     return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
 
     aptc_amount = session['elected_aptc'].to_f
@@ -82,18 +76,16 @@ module ApplicationHelper
     obj_name = f.object_name
     obj_val = f.object.send(field_name.to_sym)
     current_value = obj_val.blank? ? value : obj_val.is_a?(DateTime) ? obj_val.strftime("%m/%d/%Y") : obj_val
-    html_class_list = opts.delete(:class) { |k| "" }
+    html_class_list = opts.delete(:class) { |_k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
     provided_id = options[:id] || options["id"]
     generate_target_id = nil
-    if !provided_id.blank?
-      generated_target_id = "#{provided_id}_jq_datepicker_plain_field"
-    end
+    generated_target_id = "#{provided_id}_jq_datepicker_plain_field" unless provided_id.blank?
     sanitized_object_name = "#{obj_name}_#{sanitized_field_name}".delete(']').tr('^-a-zA-Z0-9:.', "_")
     generated_target_id ||= "#{sanitized_object_name}_jq_datepicker_plain_field"
     capture do
-      concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value=> obj_val.try(:to_s, :db)))
+      concat f.text_field(field_name, opts.merge(:class => html_class_list, :id => generated_target_id, :value => obj_val.try(:to_s, :db)))
       concat text_field_tag(generated_field_name, current_value, opts.merge(:class => jq_tag_classes, :start_date => "07/01/2016", :style => "display: none;", "data-submission-field" => "##{generated_target_id}"))
     end
   end
@@ -103,23 +95,23 @@ module ApplicationHelper
     breadcrumbs.each_with_index do |breadcrumb, index|
       if breadcrumb[:path]
         html += "<li>".html_safe + link_to(breadcrumb[:name], breadcrumb[:path], data: breadcrumb[:data])
-        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length-1
+        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length - 1
         html += "</li>".html_safe
       else
         html += "<li class='active #{breadcrumb[:class]}'>".html_safe + breadcrumb[:name]
-        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length-1
+        html += "<span class='divider'></span>".html_safe if index < breadcrumbs.length - 1
         html += "</li>".html_safe
       end
     end
     html += "</ul>".html_safe
-    return html
+    html
   end
 
   # Formats version information in HTML string for the referenced object instance
   def version_for_record(obj)
     ver  = "version: #{obj.version}" if obj.respond_to?('version')
     date = "updated: #{format_date(obj.updated_at)}" if obj.respond_to?('updated_at')
-    who  = "by: #{obj.updated_by}"if obj.respond_to?('updated_by')
+    who  = "by: #{obj.updated_by}" if obj.respond_to?('updated_by')
     [ver, date, who].reject(&:nil? || empty?).join(' | ')
   end
 
@@ -143,12 +135,12 @@ module ApplicationHelper
   def select_dropdown(input_id, list)
     return unless list.is_a? Array
     content_tag(:select, class: "form-control", id: input_id) do
-      concat(content_tag :option, "Select", value: "")
+      concat(content_tag(:option, "Select", value: ""))
       list.each do |item|
         if item.is_a? Array
-          concat(content_tag :option, item[0], value: item[1])
+          concat(content_tag(:option, item[0], value: item[1]))
         else
-          concat(content_tag :option, item.humanize, value: item)
+          concat(content_tag(:option, item.humanize, value: item))
         end
       end
     end
@@ -156,29 +148,29 @@ module ApplicationHelper
 
   # Formats first data row in a table indicating an empty set
   def table_empty_to_human
-    content_tag(:tr, (content_tag(:td, "None given")))
+    content_tag(:tr, content_tag(:td, "None given"))
   end
 
   def transaction_status_to_label(ed)
     if ed.open?
-      content_tag(:span, "#{ed.aasm_state}", class: "label label-warning")
+      content_tag(:span, ed.aasm_state.to_s, class: "label label-warning")
     elsif ed.assigned?
-      content_tag(:span, "#{ed.aasm_state}", class: "label label-info")
+      content_tag(:span, ed.aasm_state.to_s, class: "label label-info")
     else
-      content_tag(:span, "#{ed.aasm_state}", class: "label label-success")
+      content_tag(:span, ed.aasm_state.to_s, class: "label label-success")
     end
   end
 
   # Formats a full name into upper/lower case with last name wrapped in HTML <strong> tag
   def name_to_listing(person)
     given_name = [person.first_name, person.middle_name].reject(&:nil? || empty?).join(' ')
-    sir_name  = content_tag(:strong, mixed_case(person.last_name))
+    sir_name = content_tag(:strong, mixed_case(person.last_name))
     raw([mixed_case(given_name), sir_name, person.name_sfx].reject(&:nil? || empty?).join(' '))
   end
 
   # Formats each word in a string to capital first character and lower case for all other characters
   def mixed_case(str)
-    (str.downcase.gsub(/\b\w/) {|first| first.upcase }) unless str.nil?
+    str&.downcase&.gsub(/\b\w/, &:upcase)
   end
 
   # Formats a boolean value into 'Yes' or 'No' string
@@ -258,24 +250,24 @@ module ApplicationHelper
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
 
-  def link_to_add_fields(name, f, association, classes='')
-    new_object = f.object.send(association).klass.new
+  def link_to_add_fields(name, form, association, classes = '')
+    new_object = form.object.send(association).klass.new
     id = new_object.object_id
 
-    # TODO add ability to build nested attributes dynamically
-    if f.object.send(association).klass == OfficeLocation
+    # TODO: add ability to build nested attributes dynamically
+    if form.object.send(association).klass == OfficeLocation
       new_object.build_address
       new_object.build_phone
     end
 
-    if f.object.send(association).klass == BenefitGroup
+    if form.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
       new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 
 
-    fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
+    fields = form.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end
     link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,
@@ -305,7 +297,7 @@ module ApplicationHelper
     title ||= column.titleize
     css_class = (column == sort_column) ? "fui-triangle-#{fui}-small" : nil
     direction = (column == params[:sort] && params[:direction] == "desc") ? "asc" : "desc"
-    ((link_to title, params.merge(:sort => column, :direction => direction, :page => nil) ) + content_tag(:sort, raw("&nbsp;"), class: css_class))
+    ((link_to title, params.merge(:sort => column, :direction => direction, :page => nil)) + content_tag(:sort, raw("&nbsp;"), class: css_class))
   end
 
   def extract_phone_number(phones, type)
@@ -316,7 +308,7 @@ module ApplicationHelper
     else
       phone = nil
     end
-    return phone
+    phone
   end
 
 # the following methods are used when we are embedding devise signin and signup pages in views other than devise.
@@ -332,11 +324,11 @@ module ApplicationHelper
     @devise_mapping ||= Devise.mappings[:user]
   end
 
-  def get_dependents(family, person)
+  def get_dependents(family, _person)
     members_list = []
     family_members = family.family_members
     family_members.each {|f| members_list << f.person } if family_members.present?
-    return members_list
+    members_list
   end
 
   def add_progress_class(element_number, step)
@@ -355,13 +347,13 @@ module ApplicationHelper
 
   def user_first_name_last_name_and_suffix
     if signed_in?
-      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : (current_user.oim_id).downcase
+      current_user.person.try(:first_name_last_name_and_suffix) ? current_user.person.first_name_last_name_and_suffix : current_user.oim_id.downcase
     end
   end
 
   def retrieve_show_path(provider, message)
     return broker_agencies_inbox_path(provider, message_id: message.id) if provider.try(:broker_role)
-    case(provider.model_name.name)
+    case provider.model_name.name
     when "Person"
       insured_inbox_path(provider, message_id: message.id)
     when "EmployerProfile"
@@ -378,7 +370,7 @@ module ApplicationHelper
   def retrieve_inbox_path(provider, folder: 'inbox')
     broker_agency_mailbox =  broker_agencies_profile_inbox_path(profile_id: provider.id, folder: folder)
     return broker_agency_mailbox if provider.try(:broker_role)
-    case(provider.model_name.name)
+    case provider.model_name.name
     when "EmployerProfile"
       inbox_employers_employer_profiles_path(id: provider.id, folder: folder)
     when "HbxProfile"
@@ -393,7 +385,7 @@ module ApplicationHelper
   end
 
   def get_header_text(controller_name)
-      portal_display_name(controller_name)
+    portal_display_name(controller_name)
   end
 
   def can_register_new_account
@@ -403,18 +395,18 @@ module ApplicationHelper
   end
 
   def override_backlink
-    link=''
+    link = ''
     if current_user.try(:has_hbx_staff_role?)
       link = link_to 'HBX Portal', exchanges_hbx_profile_path(id: 1)
     elsif current_user.try(:has_broker_agency_staff_role?)
       link = link_to 'Broker Agency Portal',broker_agencies_profile_path(id: current_user.person.broker_role.broker_agency_profile_id)
     end
-    return link
+    link
   end
 
   def carrier_logo(plan)
     if plan.extract_value.class.to_s == "Plan"
-      return "" if !plan.carrier_profile.legal_name.extract_value.present?
+      return "" unless plan.carrier_profile.legal_name.extract_value.present?
       issuer_hios_id = plan.hios_id[0..4].extract_value
       Settings.aca.carrier_hios_logo_variant[issuer_hios_id] || plan.carrier_profile.legal_name.extract_value
     else
@@ -431,7 +423,7 @@ module ApplicationHelper
   end
 
   def digest_logos
-    carrier_logo_hash = Hash.new(carriers:{})
+    carrier_logo_hash = Hash.new(carriers: {})
     carriers = ::BenefitSponsors::Organizations::Organization.issuer_profiles
     carriers.each do |car|
       if Rails.env == "production"
@@ -465,7 +457,6 @@ module ApplicationHelper
         'Terminated Date'
       when 'broker_agency_declined'
         'Declined Date'
-      else
       end
     else
       case @status
@@ -479,7 +470,6 @@ module ApplicationHelper
         'Denied Date'
       when 'extended'
         'Extended Date'
-      else
       end
     end
   end
@@ -503,32 +493,32 @@ module ApplicationHelper
     covered = plan_year.progressbar_covered_count
     waived = plan_year.waived_count
     p_min = 0 if p_min.nil?
-    
+
     unless eligible.zero?
       condition = enrolled >= p_min && non_owner > 0
       condition = false if covered == 0 && waived > 0
       progress_bar_class = condition ? 'progress-bar-success' : 'progress-bar-danger'
-      progress_bar_width = (enrolled * 100)/eligible
+      progress_bar_width = (enrolled * 100) / eligible
     end
 
     content_tag(:div, class: 'progress-wrapper employer-dummy') do
       content_tag(:div, class: 'progress') do
-        concat(content_tag(:div, class: "progress-bar #{progress_bar_class} progress-bar-striped", style: "width: #{progress_bar_width}%;", role: 'progressbar', aria: {valuenow: "#{enrolled}", valuemin: "0", valuemax: "#{eligible}"}, data: {value: "#{enrolled}"}) do
-          concat content_tag(:span, '', class: 'sr-only')
-        end)
+        concat(content_tag(:div, class: "progress-bar #{progress_bar_class} progress-bar-striped",
+                                 style: "width: #{progress_bar_width}%;",
+                                 role: 'progressbar', aria: {valuenow: enrolled.to_s, valuemin: "0", valuemax: eligible.to_s}, data: {value: enrolled.to_s}) do
+                 concat content_tag(:span, '', class: 'sr-only')
+               end)
 
-        if eligible > 1
-          concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;")
-        end
+        concat content_tag(:small, enrolled, class: 'progress-current', style: "left: #{progress_bar_width - 2}%;") if eligible > 1
 
         if eligible >= 2 && plan_year.employee_participation_ratio_minimum != 0
           eligible_text = (options[:minimum] == false) ? "#{p_min}<br>(Minimum)" : "<i class='fa fa-circle manual' data-toggle='tooltip' title='Minimum Requirement' aria-hidden='true'></i>".html_safe
-          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: "#{p_min}"}) 
+          concat content_tag(:p, eligible_text.html_safe, class: 'divider-progress', data: {value: p_min.to_s})
         end
 
         concat(content_tag(:div, class: 'progress-val') do
-          concat content_tag(:strong, '0', class: 'pull-left') if (options[:minimum] == false)
-          concat content_tag(:strong, (options[:minimum] == false) ? eligible : '', data: {value: "#{eligible}"}, class: 'pull-right')
+          concat content_tag(:strong, '0', class: 'pull-left') if options[:minimum] == false
+          concat content_tag(:strong, (options[:minimum] == false) ? eligible : '', data: {value: eligible.to_s}, class: 'pull-right')
         end)
       end
     end
@@ -537,7 +527,7 @@ module ApplicationHelper
   def is_readonly(object)
     return false if current_user.roles.include?("hbx_staff") # can edit, employer census roster
     return true if object.try(:linked?)  # cannot edit, employer census roster
-    return !(object.new_record? or object.try(:eligible?)) # employer census roster
+    !(object.new_record? || object.try(:eligible?)) # employer census roster
   end
 
   def may_update_census_employee?(census_employee)
@@ -585,13 +575,13 @@ module ApplicationHelper
 
   def parse_ethnicity(value)
     return "" unless value.present?
-    value = value.select{|a| a.present? }  if value.present?
+    value = value.select(&:present?)  if value.present?
     value.present? ? value.join(", ") : ""
   end
 
   def incarceration_cannot_purchase(family_member)
-    pronoun = family_member.try(:gender)=='male' ? ' he ':' she '
-    name=family_member.try(:first_name) || ''
+    pronoun = family_member.try(:gender) == 'male' ? ' he ' : ' she '
+    name = family_member.try(:first_name) || ''
     "Since " + name + " is currently incarcerated," + pronoun + "is not eligible to purchase a plan on #{Settings.site.short_name}.<br/> Other family members may still be eligible to enroll."
   end
 
@@ -607,7 +597,7 @@ module ApplicationHelper
     end
   end
 
-  def trigger_notice_observer(recipient, event_object, notice_event, params={})
+  def trigger_notice_observer(recipient, event_object, notice_event, params = {})
     observer = BenefitSponsors::Observers::NoticeObserver.new
     observer.deliver(recipient: recipient, event_object: event_object, notice_event: notice_event, notice_params: params)
   end
@@ -619,7 +609,7 @@ module ApplicationHelper
   def get_key_and_bucket(uri)
     splits = uri.split('#')
     key = splits.last
-    bucket =splits.first.split(':').last
+    bucket = splits.first.split(':').last
     [key, bucket]
   end
 
@@ -788,7 +778,7 @@ module ApplicationHelper
     person&.active_employee_roles&.any?{ |employee_role| employee_role.market_kind == 'shop'}
   end
 
-  def transition_family_members_link_type row, allow
+  def transition_family_members_link_type(row, allow)
     if Settings.aca.individual_market.transition_family_members_link
       allow && row.primary_applicant.person.has_consumer_or_resident_role? ? 'ajax' : 'disabled'
     else
@@ -797,8 +787,8 @@ module ApplicationHelper
   end
 
   def convert_to_bool(val)
-    return true if val == true || val == 1  || val =~ (/^(true|t|yes|y|1)$/i)
-    return false if val == false || val == 0 || val =~ (/^(false|f|no|n|0)$/i)
+    return true if val == true || val == 1 || val =~ /^(true|t|yes|y|1)$/i
+    return false if val == false || val == 0 || val =~ /^(false|f|no|n|0)$/i
     raise(ArgumentError, "invalid value for Boolean: \"#{val}\"")
   end
 
@@ -808,7 +798,7 @@ module ApplicationHelper
 
   def exchange_icon_path(icon)
     site_key = Settings.site.key
-      "icons/#{site_key}-#{icon}"
+    "icons/#{site_key}-#{icon}"
   end
 
   def benefit_application_summarized_state(benefit_application)
@@ -825,7 +815,7 @@ module ApplicationHelper
     renewing = benefit_application.predecessor_id.present? && [:active, :terminated, :termination_pending].exclude?(benefit_application.aasm_state) ? "Renewing" : ""
     summary_text = aasm_map[benefit_application.aasm_state] || benefit_application.aasm_state
     summary_text = "#{renewing} #{summary_text.to_s.humanize.titleize}"
-    return summary_text.strip
+    summary_text.strip
   end
 
   def json_for_plan_shopping_member_groups(member_groups)
@@ -847,11 +837,11 @@ module ApplicationHelper
   end
 
   def float_fix(float_number)
-    BigDecimal((float_number).to_s).round(8).to_f
+    BigDecimal(float_number.to_s).round(8).to_f
   end
 
   def round_down_float_two_decimals(float_number)
-    BigDecimal((float_number).to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
+    BigDecimal(float_number.to_s).round(8).round(2, BigDecimal::ROUND_DOWN).to_f
   end
 
   def external_application_configured?(application_name)
@@ -880,5 +870,10 @@ module ApplicationHelper
     else
       true
     end
+  end
+
+  def bulk_notice_id_discovery(id)
+    BenefitSponsors::Organizations::Organization.where(_id: id)&.hbx_id ||
+      Person.find(id)&.hbx_id
   end
 end
