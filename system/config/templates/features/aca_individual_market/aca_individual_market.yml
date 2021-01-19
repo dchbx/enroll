@@ -36,7 +36,7 @@ registry:
         is_enabled: true
         settings:
           - key: :termination_date
-            item: end_of_month
+            item: :end_of_month
       - key: :apply_aggregate_to_enrollment
         item: Operations::Individual::ApplyAggregateToEnrollment.new
         is_enabled: true
