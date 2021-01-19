@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::Forms::NewEmployerStaff, 
   context 'for failure case' do
     it 'should fail if person not found with given id' do
       result = subject.call({})
-      expect(result.failure).to eq({:message => ['Person not found']})
+      expect(result.failure).to eq({:message => ['person_id is expected']})
     end
 
   end

@@ -72,7 +72,7 @@ module BenefitSponsors
         def create_staff_member
           authorize User, :add_roles?
           staff_params = params.permit[:staff_member].to_h
-          result = BenefitSponsors::Operations::GeneralAgencies::AddGeneralAgencyStaff.new.call(staff_params)
+          result = BenefitSponsors::Operations::GeneralAgencies::AddGeneralAgencyStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
           if result.success?
             redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
             flash[:notice] = result.value![:message]
@@ -94,6 +94,21 @@ module BenefitSponsors
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "general_agency_staff",
                                   filter_criteria: params.permit(:q), is_general_agency_registration_page: params[:general_agency_registration_page] || params["staff"]["is_general_agency_registration_page"]})
           params[:staff].permit!
+        end
+
+        def staff_member_params
+          params.require(:staff_member).permit(
+            :first_name,
+            :last_name,
+            :dob,
+            :email,
+            :person_id,
+            :profile_id
+          ).to_h
+        end
+
+        def parse_date(date)
+          Date.strptime(date, "%m/%d/%Y") if date
         end
       end
     end

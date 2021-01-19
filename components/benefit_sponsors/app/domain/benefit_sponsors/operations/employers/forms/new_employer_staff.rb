@@ -10,7 +10,8 @@ module BenefitSponsors
           include Dry::Monads[:result, :do, :try]
 
           def call(params)
-            person = yield find_person(params[:id])
+            validated_params = yield validate(params)
+            person = yield find_person(validated_params[:id])
             employer_staff_params = yield construct_employer_staff_params(person)
             staff_entity = yield get_staff_entity(employer_staff_params)
 
@@ -18,6 +19,14 @@ module BenefitSponsors
           end
 
           private
+
+          def validate(params)
+            if params[:id].present?
+              Success(params)
+            else
+              Failure({:message => ['person_id is expected']})
+            end
+          end
 
           def find_person(id)
             ::Operations::People::Find.new.call({person_id: id})
