@@ -5,7 +5,7 @@ class BulkNoticeWorker
   include Sidekiq::Worker
   include CableReady::Broadcaster
 
-  def perform(audience_id, bulk_notice_id)
+  def perform(audience_id, bulk_notice_id) # rubocop:disable Metrics/AbcSize
     sleep 2
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @entity = nil
