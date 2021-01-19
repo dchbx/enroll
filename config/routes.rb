@@ -150,6 +150,7 @@ Rails.application.routes.draw do
         put :update_feature
         get :catalogs_new
         get :catalogs
+        get :settings
         get :find_feature
         get :find_catalogs
         post :set_date

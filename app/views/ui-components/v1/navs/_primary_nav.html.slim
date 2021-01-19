@@ -77,6 +77,8 @@
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'market-catalogs', link_path: main_app.catalogs_exchanges_hbx_profiles_path, display_name: 'Benefit Market Catalogs', active_tab: 'market-catalogs', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }               
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'market-catalogs', link_path: main_app.catalogs_new_exchanges_hbx_profiles_path, display_name: 'Benefit Market Catalogs New', active_tab: 'market-catalogs', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: { tab_name: 'market-catalogs', link_path: main_app.settings_new_exchanges_hbx_profiles_path, display_name: 'Settings', active_tab: 'market-catalogs', remote: false, pundit_object: HbxProfile, pundit_method: :view_admin_tabs? }
           li.pl-1 role="presentation" class="#{pundit_class HbxProfile, :view_admin_tabs?}"
             = link_to(main_app.inbox_exchanges_hbx_profile_path(1), :remote => false, class: 'visible', "aria-expanded" => "true", "aria-controls" => "inbox", "role" => "tab" ) do
               | Inbox

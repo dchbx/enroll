@@ -588,6 +588,14 @@ def employer_poc
     end
   end
 
+  def settings
+    @benefit_markets = BenefitMarkets::BenefitMarket.all
+
+    respond_to do |format|
+      format.html { render '/exchanges/hbx_profiles/settings.html.erb', layout: 'bootstrap_4' }
+    end
+  end
+
   def find_catalogs
     @benefit_market_catlogs = BenefitMarkets::Operations::BenefitMarketCatalogs::FindAll.new.call(params).success
 
