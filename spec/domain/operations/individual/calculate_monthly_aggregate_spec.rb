@@ -119,7 +119,6 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
 
       it 'should return monthly aggregate amount' do
         expect(@result.success).to eq(540.00)
-
       end
     end
 
