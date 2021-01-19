@@ -177,4 +177,32 @@ RSpec.describe Operations::Individual::CalculateMonthlyAggregate do
       expect(@result.success).to eq(1500.00)
     end
   end
+
+  context 'for termination on set to end of year' do
+    let(:prev_year_start_date) {year_start_date.prev_year}
+    let!(:old_tax_household) {FactoryBot.create(:tax_household, household: household, effective_starting_on: prev_year_start_date, effective_ending_on: nil)}
+    let!(:old_ed) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: old_tax_household)}
+    let(:hbx_enrollment) do
+      enr = FactoryBot.create(:hbx_enrollment,
+                              family: family,
+                              household: household,
+                              is_active: true,
+                              aasm_state: 'coverage_expired',
+                              changing: false,
+                              effective_on: prev_year_start_date,
+                              terminated_on: nil,
+                              applied_aptc_amount: 300.00)
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr)
+      enr
+    end
+    before do
+      EnrollRegistry[:calculate_monthly_aggregate].feature.settings.first.stub(:item).and_return("end_of_year")
+      input_params = {family: family, effective_on: Date.new(prev_year_start_date.year, 11, 1), shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id), subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}
+      @result = subject.call(input_params)
+    end
+
+    it 'should return monthly aggregate amount' do
+      expect(@result.success).to eq(1200.00)
+    end
+  end
 end
