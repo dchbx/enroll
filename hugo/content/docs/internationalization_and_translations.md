@@ -115,9 +115,9 @@ end
 
 If the `l10n` is invoked, it will look into the [translation model](https://github.com/dchbx/enroll/blob/master/app/models/translation.rb) to find a record matching the keys from the YML file added and then loaded.
 
-## Translation locations
+## Translation Location
 
-Translations are specified in the YML files in the [config/locales](https://github.com/dchbx/enroll/tree/master/config/locales) as well as the [db/seedfiles/translations](https://github.com/dchbx/enroll/tree/master/db/seedfiles/translations) directories.
+Translations are specified in .rb files in constants in the [db/seedfiles/translations](https://github.com/dchbx/enroll/tree/master/db/seedfiles/translations) directory.
 
 ### CCA vs DC
 
@@ -133,29 +133,6 @@ site_key = if Rails.env.test?
 
 So, if the key is "cca", the translations will be pulled from `db/seedfiles/translations/en/cca`, and so on.
 
-### config/locales vs db/seedfiles/translations
-
-The folder `config/locales` contains _generic translations_ for the Enroll platform as a whole, or gem plugins. They are not intended to be changed on a *per client basis*.. The folder `db/seedfiles/translations/**` is intended to contain *client* specific translations, such as verbage needed by the client for specific requested features.
-
-_Example:_
-
-`config/locales/` should contain the Devise login text, which will be the same for every client:
-
-```
-en:
-  devise:
-    confirmations:
-      confirmed: "Your email address has been successfully confirmed."
-```
-
-`db/seedfiles/translations/en/dc` should contain client specific language such as this:
-
-```
-:'en.insured.answer_for_broker' => "Brokers are licensed professionals with health insurance expertise and long-standing relationships with Small Business owners, Individuals and Families. Brokers help clients identify their options and make choices that are in their best interest and meet their needs and budget. In the District of Columbia, Brokers must have an active DC license in good standing, complete training on %{site_short_name}, and have contractual relationships with each carrier in %{site_short_name} for the market in which he/she intends to sell. There is no cost to use an insurance Broker.",
-
-```
-
-Since the above text 
 
 ## Translation Seeding Process
 
