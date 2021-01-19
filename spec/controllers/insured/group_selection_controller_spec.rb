@@ -733,10 +733,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     let(:params) do
       {
-          'effective_on_date' => fetch_effective_date_of_new_enrollment.to_date,
-          'applied_pct_1' => new_aptc_pct,
-          'aptc_applied_total' => new_aptc_amount,
-          'hbx_enrollment_id' => hbx_enrollment.id.to_s
+        'effective_on_date' => fetch_effective_date_of_new_enrollment.to_date,
+        'applied_pct_1' => new_aptc_pct,
+        'aptc_applied_total' => new_aptc_amount,
+        'hbx_enrollment_id' => hbx_enrollment.id.to_s
       }
     end
 
