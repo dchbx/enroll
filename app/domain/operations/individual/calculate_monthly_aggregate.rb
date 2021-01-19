@@ -96,7 +96,7 @@ module Operations
       def new_temination_date(enrollment)
         if enrollment.subscriber.applicant_id.to_s == @subscriber_applicant_id.to_s
           end_date = EnrollRegistry[:calculate_monthly_aggregate].settings(:termination_date).item
-          end_date == "end_of_month" ? @effective_on - 1.day : enrollment.effective_on.end_of_year
+          end_date == :end_of_month ? @effective_on - 1.day : enrollment.effective_on.end_of_year
         else
           enrollment.effective_on.end_of_year
         end
