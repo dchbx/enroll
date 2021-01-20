@@ -1,10 +1,20 @@
 <!-- APTC APPLIED PER ENROLLMENT -->
-<%max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc)%>
+<% if ::EnrollRegistry.feature_enabled?(:calculate_monthly_aggregate) %>
+  <% hbx_enrollment = HbxEnrollment.find(hbx_id) %>
+  <% max_aptc = ::EnrollRegistry[:calculate_monthly_aggregate] {{family: @family,
+                                                                          effective_on: hbx_enrollment.effective_on,
+                                                                          shopping_fm_ids: hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id),
+                                                                          subscriber_applicant_id: hbx_enrollment.subscriber.applicant_id}} %>
+  <% max_for_hbx = @family.active_household.latest_active_tax_household.total_aptc_available_amount_for_enrollment(hbx_enrollment, hbx_enrollment.effective_on) %>
+<% else %>
+  <% max_aptc = @max_aptc %>
+  <% max_for_hbx = max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc) %>
+<% end %>
 <div class = "module enrollment-header" align = "right">
   <table>
    <head>
     <tr>
-      
+
       <th colspan ="2" style="text-align:center"></a>&nbsp;</span> <b>Plan <br /> Name </b></th>
       <th style="padding:38px;"></th>
       <th>&nbsp;&nbsp;&nbsp;&nbsp;Plan <br /> Premium</th>
@@ -13,12 +23,12 @@
       <th style="padding:38px;"></th>
       <th>Max Applied <br /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; APTC</th>
       <th style="padding:38px;"></th>
-      <th>Applied APTC Ratio &nbsp;&nbsp;</th> 
+      <th>Applied APTC Ratio &nbsp;&nbsp;</th>
       <th>
-       <span align= "center"><output id = "aptc_applied_pct_<%=hbx_id%>" name="aptc_applied_pct"><%=find_applied_aptc_percent(@current_aptc_applied_hash[hbx_id].to_f, max_for_hbx)%>%</output></span>
-        <input id = "applied_pct_<%=hbx_id%>" name='applied_pct_<%=hbx_id%>' type="range" min="0" max="1" step="0.025" value="<%=(@current_aptc_applied_hash[hbx_id].to_f/max_for_hbx)%>" onchange="APTCModule.computeAppliedAPTC('<%=hbx_id%>', this.value, <%=@max_aptc.to_f%>, <%=max_for_hbx%>);APTCModule.calculateAvailableAPTC('<%=hbx_id%>')" style = "padding: 0px;">
+        <span align= "center"><output id = "aptc_applied_pct_<%=hbx_id%>" name="aptc_applied_pct"><%=find_applied_aptc_percent(@current_aptc_applied_hash[hbx_id].to_f, max_for_hbx)%>%</output></span>
+        <input id = "applied_pct_<%=hbx_id%>" name='applied_pct_<%=hbx_id%>' type="range" min="0" max="1" step="0.025" value="<%=(@current_aptc_applied_hash[hbx_id].to_f/max_for_hbx)%>" onchange="APTCModule.computeAppliedAPTC('<%=hbx_id%>', this.value, <%=max_aptc%>, <%=max_for_hbx%>);APTCModule.calculateAvailableAPTC('<%=hbx_id%>')" style = "padding: 0px;">
       </th>
-    </tr> 
+    </tr>
     <tr>
       <td colspan = "2" style="text-align:center"><%=HbxEnrollment.find(hbx_id).product.name%></td>
       <th></th>
@@ -26,14 +36,14 @@
       <th></th>
       <td style="text-align:center"><%=ehb_percent_for_enrollment(hbx_id)%>%</th>
       <th></th>
-      <td style="text-align:center"><%= '%.2f' %  max_aptc_that_can_be_applied_for_this_enrollment(hbx_id, @max_aptc)%></td>
+      <td style="text-align:center"><%= '%.2f' %  max_for_hbx %></td>
       <th></th>
       <th>Applied APTC &nbsp;&nbsp;</th>
 
       <th><%= text_field_tag "#{"aptc_applied"+"_"+hbx_id}", @current_aptc_applied_hash[hbx_id], placeholder: 'APTC Applied', class: 'form-control', size: '8px', onkeyup: "APTCModule.computePercentageAndSliderRatio('#{hbx_id}', this.value, #{@max_aptc}, #{max_for_hbx})", onchange: "APTCModule.calculateAvailableAPTC('#{hbx_id}')"%></th>
     </tr>
-   </head> 
+   </head>
   <tr>
   <tr>
-  </table>  
+  </table>
 </div>

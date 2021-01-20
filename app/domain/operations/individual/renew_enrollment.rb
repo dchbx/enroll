@@ -53,7 +53,7 @@ module Operations
         family = enrollment.family
         tax_household = family.active_household.latest_active_thh_with_year(effective_on.year)
         if tax_household
-          max_aptc = tax_household.current_max_aptc.to_f
+          max_aptc = tax_household.total_aptc_available_amount_for_enrollment(enrollment, effective_on)
           default_percentage = EnrollRegistry[:aca_individual_assistance_benefits].setting(:default_applied_aptc_percentage).item
           applied_percentage = enrollment.elected_aptc_pct > 0 ? enrollment.elected_aptc_pct : default_percentage
           applied_aptc = float_fix(max_aptc * applied_percentage)
