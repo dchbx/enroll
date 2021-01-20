@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -34,114 +33,105 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     ).first
   end
 
-  let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
-  let!(:family) {FactoryBot.create(:family, :with_primary_family_member, :person => person)}
-  let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
-  let!(:sep) do
-    sep = family.special_enrollment_periods.new
-    sep.effective_on_kind = 'date_of_event'
-    sep.qualifying_life_event_kind = qle_kind
-    sep.qle_on = TimeKeeper.date_of_record - 7.days
-    sep.save
-    sep
-  end
+    let!(:person) {FactoryBot.create(:person, :with_consumer_role)}
+    let!(:family) {FactoryBot.create(:family, :with_primary_family_member, :person => person)}
+    let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
+    let!(:sep){
+      sep = family.special_enrollment_periods.new
+      sep.effective_on_kind = 'date_of_event'
+      sep.qualifying_life_event_kind= qle_kind
+      sep.qle_on= TimeKeeper.date_of_record - 7.days
+      sep.save
+      sep
+    }
 
-  let!(:household) {FactoryBot.create(:household, family: family)}
-  let!(:user) { FactoryBot.create(:user, :person => person)}
-  let!(:coverage_household) {household.add_household_coverage_member(family.primary_family_member)}
-  let!(:consumer_role) {person.consumer_role}
-  let(:plan_year) {initial_application}
-  let(:plan_year_start_on) {TimeKeeper.date_of_record.next_month.end_of_month + 1.day}
-  let(:plan_year_end_on) {(plan_year_start_on + 1.month) - 1.day}
-  let(:blue_collar_benefit_group) {plan_year.benefit_groups[0]}
-  let!(:update_plan_year) do
-    plan_year.update_attributes(:effective_period => plan_year_start_on..plan_year_end_on, aasm_state: :enrollment_open)
-    plan_year.save!
-    plan_year.reload
-  end
-  def blue_collar_benefit_group_assignment
-    BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: plan_year_start_on)
-  end
-
-  let!(:blue_collar_census_employees) do
-    ees = FactoryBot.build_list(:census_employee, 1, employer_profile: benefit_sponsorship.profile, benefit_sponsorship: benefit_sponsorship)
-    ees.each do |ee|
-      ee.benefit_group_assignments = [blue_collar_benefit_group_assignment]
-      ee.save
-      ee.save!
+    let!(:household) {FactoryBot.create(:household, family: family)}
+    let!(:user) { FactoryBot.create(:user, :person => person)}
+    let!(:coverage_household) {household.add_household_coverage_member(family.primary_family_member)}
+    let!(:consumer_role) {person.consumer_role}
+    let(:plan_year) {initial_application}
+    let(:plan_year_start_on) {TimeKeeper.date_of_record.next_month.end_of_month + 1.day}
+    let(:plan_year_end_on) {(plan_year_start_on + 1.month) - 1.day}
+    let(:blue_collar_benefit_group) {plan_year.benefit_groups[0]}
+    let!(:update_plan_year) {
+      plan_year.update_attributes(:"effective_period" => plan_year_start_on..plan_year_end_on, aasm_state: :enrollment_open)
+      plan_year.save!
+      plan_year.reload
+    }
+    def blue_collar_benefit_group_assignment
+      BenefitGroupAssignment.new(benefit_group: blue_collar_benefit_group, start_on: plan_year_start_on)
     end
-    ees
-  end
-  let!(:census_employee) {CensusEmployee.all[0]}
 
-  let!(:employee_role) do
-    person.employee_roles.create(employer_profile: abc_profile, census_employee: census_employee,
-                                 hired_on: census_employee.hired_on)
-  end
-  let(:blue_collar_benefit_group) {initial_application.benefit_groups[0]}
-  let(:plan_year_start_on) {TimeKeeper.date_of_record.next_month.end_of_month + 1.day}
-  let(:plan_year_end_on) {(plan_year_start_on + 1.month) - 1.day}
-  let!(:update_plan_year) do
-    plan_year.update_attributes(:effective_period => plan_year_start_on..plan_year_end_on, aasm_state: :enrollment_open)
-    plan_year.save!
-    plan_year.reload
-  end
+    let!(:blue_collar_census_employees) {ees = FactoryBot.build_list(:census_employee, 1, employer_profile: benefit_sponsorship.profile, benefit_sponsorship: benefit_sponsorship)
+      ees.each() do |ee|
+        ee.benefit_group_assignments = [blue_collar_benefit_group_assignment]
+        ee.save
+        ee.save!
+      end
+      ees
+    }
+    let!(:census_employee) {CensusEmployee.all[0]}
 
-  let!(:update_person) do
-    person.employee_roles.first.census_employee = census_employee
-    person.employee_roles.first.hired_on = census_employee.hired_on
-    person.employee_roles.first.save
-    person.save
-  end
-  let(:sbc_document) { FactoryBot.build(:document,subject: "SBC",identifier: "urn:openhbx#123") }
-  let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
-  let!(:hbx_enrollment) do
-    FactoryBot.create(:hbx_enrollment,
-                      family: family,
-                      household: family.active_household,
-                      sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
-                      product: product)
-  end
+    let!(:employee_role) {person.employee_roles.create( employer_profile: abc_profile, census_employee: census_employee,
+    hired_on: census_employee.hired_on)}
+    let(:blue_collar_benefit_group) {initial_application.benefit_groups[0]}
+    let(:plan_year_start_on) {TimeKeeper.date_of_record.next_month.end_of_month + 1.day}
+    let(:plan_year_end_on) {(plan_year_start_on + 1.month) - 1.day}
+    let!(:update_plan_year) {
+      plan_year.update_attributes(:"effective_period" => plan_year_start_on..plan_year_end_on, aasm_state: :enrollment_open)
+      plan_year.save!
+      plan_year.reload
+    }
 
-  let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
-  let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
-  let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
-  let(:benefit_group) { FactoryBot.create(:benefit_group)}
-  let(:benefit_package) do
-    FactoryBot.build(:benefit_package,
-                     benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,
-                     title: "individual_health_benefits_2015",
-                     elected_premium_credit_strategy: "unassisted",
-                     benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
-                       market_places: ["individual"],
-                       enrollment_periods: ["open_enrollment", "special_enrollment"],
-                       family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
-                       benefit_categories: ["health"],
-                       incarceration_status: ["unincarcerated"],
-                       age_range: 0..0,
-                       citizenship_status: ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
-                       residency_status: ["state_resident"],
-                       ethnicity: ["any"]
-                     ))
-  end
-  let(:bcp) { double }
+    let!(:update_person) {person.employee_roles.first.census_employee = census_employee
+                        person.employee_roles.first.hired_on =  census_employee.hired_on
+                        person.employee_roles.first.save
+                        person.save}
+    let(:sbc_document) { FactoryBot.build(:document,subject: "SBC",identifier: "urn:openhbx#123") }
+    let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile, title: "AAA", sbc_document: sbc_document) }
+    let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
+                                              family: family,
+                                              household: family.active_household,
+                                              sponsored_benefit_package_id: initial_application.benefit_packages.first.id,
+                                              product: product)
+                                            }
+
+    let(:hbx_enrollments) {double(:enrolled => [hbx_enrollment], :where => collectiondouble)}
+    let!(:collectiondouble) { double(where: double(order_by: [hbx_enrollment]))}
+    let!(:hbx_profile) {FactoryBot.create(:hbx_profile)}
+    let(:benefit_group) { FactoryBot.create(:benefit_group)}
+    let(:benefit_package) { FactoryBot.build(:benefit_package,
+        benefit_coverage_period: hbx_profile.benefit_sponsorship.benefit_coverage_periods.first,
+        title: "individual_health_benefits_2015",
+        elected_premium_credit_strategy: "unassisted",
+        benefit_eligibility_element_group: BenefitEligibilityElementGroup.new(
+          market_places:        ["individual"],
+          enrollment_periods:   ["open_enrollment", "special_enrollment"],
+          family_relationships: BenefitEligibilityElementGroup::INDIVIDUAL_MARKET_RELATIONSHIP_CATEGORY_KINDS,
+          benefit_categories:   ["health"],
+          incarceration_status: ["unincarcerated"],
+          age_range:            0..0,
+          citizenship_status:   ["us_citizen", "naturalized_citizen", "alien_lawfully_present", "lawful_permanent_resident"],
+          residency_status:     ["state_resident"],
+          ethnicity:            ["any"]
+      ))}
+      let(:bcp) { double }
   let(:individual_market_transition) {double('IndividualMarketTransition')}
-  let(:sponsored_benefit_package) do
-    instance_double(
-      ::BenefitSponsors::BenefitPackages::BenefitPackage,
-      :id => sponsored_benefit_package_id,
-      :recorded_rating_area => double(:id => rating_area_id),
-      benefit_sponsorship: double(:id => benefit_sponsorship_id),
-      sponsored_benefits: [sponsored_benefit]
-    )
-  end
-  let(:existing_product_id) { BSON::ObjectId.new }
-  let(:benefit_sponsorship_id) { BSON::ObjectId.new }
-  let(:rating_area_id) { BSON::ObjectId.new }
-  let(:sponsored_benefit_package_id) { BSON::ObjectId.new }
-  let(:coverage_household_id) { BSON::ObjectId.new }
-  let(:sponsored_benefit) { instance_double(::BenefitSponsors::BenefitPackages::BenefitPackage, :id => sponsored_benefit_id) }
-  let(:sponsored_benefit_id) { BSON::ObjectId.new }
+      let(:sponsored_benefit_package) do
+        instance_double(
+          ::BenefitSponsors::BenefitPackages::BenefitPackage,
+          :id => sponsored_benefit_package_id,
+          :recorded_rating_area => double(:id => rating_area_id),
+          benefit_sponsorship: double(:id => benefit_sponsorship_id),
+          sponsored_benefits: [sponsored_benefit])
+      end
+      let(:existing_product_id) { BSON::ObjectId.new }
+      let(:benefit_sponsorship_id) { BSON::ObjectId.new }
+      let(:rating_area_id) { BSON::ObjectId.new }
+      let(:sponsored_benefit_package_id) { BSON::ObjectId.new }
+      let(:coverage_household_id) { BSON::ObjectId.new }
+      let(:sponsored_benefit) { instance_double(::BenefitSponsors::BenefitPackages::BenefitPackage, :id => sponsored_benefit_id) }
+      let(:sponsored_benefit_id) { BSON::ObjectId.new }
 
   before do
     hbx_enrollment.hbx_enrollment_members.build(applicant_id: family.family_members.first.id, is_subscriber: true, coverage_start_on: "2018-10-23 19:32:05 UTC", eligibility_date: "2018-10-23 19:32:05 UTC")
@@ -221,7 +211,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       allow(hbx_enrollment).to receive(:may_terminate_coverage?).and_return true
       allow(hbx_enrollment).to receive(:can_complete_shopping?).and_return true
       allow(person.employee_roles.first).to receive(:is_cobra_status?).and_return true
-      person.employee_roles.first.census_employee.aasm_state = 'cobra_eligible'
+      person.employee_roles.first.census_employee.aasm_state ='cobra_eligible'
       person.employee_roles.first.census_employee.cobra_begin_date = TimeKeeper.date_of_record
       person.employee_roles.first.census_employee.save
       person.employee_roles.first.save
@@ -311,10 +301,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
     #TODO: fix me when group selection controller is refactored per IVL new model.
     context "individual" do
-      let(:family_member_ids) {{"0" => family.family_members.first.id}}
+      let(:family_member_ids) {{"0"=>family.family_members.first.id}}
       let!(:person1) {FactoryBot.create(:person, :with_consumer_role)}
       let!(:consumer_role) {person.consumer_role}
-      let!(:new_household) {family.households.where(:id => {"$ne" => family.households.first.id.to_s}).first}
+      let!(:new_household) {family.households.where(:id => {"$ne"=>"#{family.households.first.id}"}).first}
       let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
 
       before :each do
@@ -526,12 +516,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let!(:consumer_role) {person.consumer_role}
       let!(:new_household) {family.households.where(:id => {'$ne' => '#{family.households.first.id}'}).first}
       let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
-      let!(:ivl_hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
-                          family: family,
-                          household: family.active_household,
-                          enrollment_kind: 'special_enrollment')
-      end
+      let!(:ivl_hbx_enrollment) {FactoryBot.create(:hbx_enrollment,
+                                                   family: family,
+                                                   household: family.active_household,
+                                                   enrollment_kind: 'special_enrollment')}
 
       before :each do
         allow(HbxEnrollment).to receive(:find).with('123').and_return(ivl_hbx_enrollment)
@@ -541,14 +529,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
       it 'should create an hbx enrollment' do
         params = {
-          person_id: person.id,
-          consumer_role_id: consumer_role.id,
-          market_kind: "individual",
-          change_plan: "change",
-          hbx_enrollment_id: "123",
-          family_member_ids: family_member_ids,
-          enrollment_kind: 'special_enrollment',
-          coverage_kind: ivl_hbx_enrollment.coverage_kind
+            person_id: person.id,
+            consumer_role_id: consumer_role.id,
+            market_kind: "individual",
+            change_plan: "change",
+            hbx_enrollment_id: "123",
+            family_member_ids: family_member_ids,
+            enrollment_kind: 'special_enrollment',
+            coverage_kind: ivl_hbx_enrollment.coverage_kind
         }
         sign_in user
         post :create, params: params
@@ -562,12 +550,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       let!(:resident_role) {person.resident_role}
       let!(:new_household) {family.households.where(:id => {'$ne ' => '#{family.households.first.id}'}).first}
       let(:benefit_coverage_period) {FactoryBot.build(:benefit_coverage_period)}
-      let!(:coverall_hbx_enrollment) do
-        FactoryBot.create(:hbx_enrollment,
-                          family: family,
-                          household: family.active_household,
-                          enrollment_kind: 'special_enrollment')
-      end
+      let!(:coverall_hbx_enrollment) {FactoryBot.create(:hbx_enrollment,
+                                                        family: family,
+                                                        household: family.active_household,
+                                                        enrollment_kind: 'special_enrollment')}
 
       before :each do
         allow(HbxEnrollment).to receive(:find).with('123').and_return(coverall_hbx_enrollment)
@@ -577,14 +563,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       end
       it 'should create an hbx enrollment' do
         params = {
-          person_id: person.id,
-          consumer_role_id: consumer_role.id,
-          market_kind: "coverall",
-          change_plan: "change",
-          hbx_enrollment_id: "123",
-          family_member_ids: family_member_ids,
-          enrollment_kind: 'special_enrollment',
-          coverage_kind: coverall_hbx_enrollment.coverage_kind
+            person_id: person.id,
+            consumer_role_id: consumer_role.id,
+            market_kind: "coverall",
+            change_plan: "change",
+            hbx_enrollment_id: "123",
+            family_member_ids: family_member_ids,
+            enrollment_kind: 'special_enrollment',
+            coverage_kind: coverall_hbx_enrollment.coverage_kind
         }
         sign_in user
         post :create, params: params
@@ -607,20 +593,20 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       let(:ivl_qle) do
         QualifyingLifeEventKind.create(
-          title: "Married",
-          tool_tip: "Enroll or add a family member because of marriage",
-          action_kind: "add_benefit",
-          event_kind_label: "Date of married",
-          market_kind: "individual",
-          ordinal_position: 15,
-          reason: "marriage",
-          edi_code: "32-MARRIAGE",
-          effective_on_kinds: ["first_of_next_month"],
-          pre_event_sep_in_days: 0,
-          post_event_sep_in_days: 30,
-          is_self_attested: true,
-          is_visible: true,
-          is_active: true
+            title: "Married",
+            tool_tip: "Enroll or add a family member because of marriage",
+            action_kind: "add_benefit",
+            event_kind_label: "Date of married",
+            market_kind: "individual",
+            ordinal_position: 15,
+            reason: "marriage",
+            edi_code: "32-MARRIAGE",
+            effective_on_kinds: ["first_of_next_month"],
+            pre_event_sep_in_days: 0,
+            post_event_sep_in_days: 30,
+            is_self_attested: true,
+            is_visible: true,
+            is_active: true
         )
       end
 
@@ -638,14 +624,14 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it 'should create an hbx enrollment' do
         params = {
-          person_id: person.id,
-          consumer_role_id: consumer_role.id,
-          market_kind: "individual",
-          change_plan: "change",
-          hbx_enrollment_id: "123",
-          family_member_ids: family_member_ids,
-          enrollment_kind: 'special_enrollment',
-          coverage_kind: ivl_hbx_enrollment.coverage_kind
+            person_id: person.id,
+            consumer_role_id: consumer_role.id,
+            market_kind: "individual",
+            change_plan: "change",
+            hbx_enrollment_id: "123",
+            family_member_ids: family_member_ids,
+            enrollment_kind: 'special_enrollment',
+            coverage_kind: ivl_hbx_enrollment.coverage_kind
         }
         sign_in user
         post :create, params: params
@@ -686,7 +672,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     before do
       current_year = TimeKeeper.date_of_record.year
       is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+      unless is_tax_credit_btn_enabled
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5))
+        hbx_enrollment.update!(effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month)
+      end
     end
 
     after do
@@ -709,7 +698,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household)}
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
     let(:current_year) { TimeKeeper.date_of_record.year }
-    let(:effective_on) { Date.new(current_year, 11, 1) }
+    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -741,14 +730,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:new_aptc_amount) {250.0}
     let(:new_aptc_pct) {'0.5'}
 
-    let(:params) do
-      {
-        'effective_on_date' => fetch_effective_date_of_new_enrollment.to_date,
-        'applied_pct_1' => new_aptc_pct,
-        'aptc_applied_total' => new_aptc_amount,
-        'hbx_enrollment_id' => hbx_enrollment.id.to_s
-      }
-    end
+    let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s}}
 
     before :each do
       BenefitMarkets::Products::Product.all.each do |prod|
@@ -761,10 +743,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       silver_product.update_attributes(metal_level_kind: 'silver')
       benefit_coverage_period = HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods[0]
       benefit_coverage_period.update_attributes(
-        start_on: effective_on.beginning_of_year,
-        end_on: effective_on.end_of_year,
-        open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
-        open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
+          start_on: effective_on.beginning_of_year,
+          end_on: effective_on.end_of_year,
+          open_enrollment_start_on: Date.new(effective_on.prev_year.year, 11, 1),
+          open_enrollment_end_on: Date.new(effective_on.year, 1, 31)
       )
       benefit_coverage_period.second_lowest_cost_silver_plan = silver_product
       benefit_coverage_period.save!
@@ -772,27 +754,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       post :edit_aptc, params: params
     end
 
-    def fetch_effective_date_of_new_enrollment
-      enr_created_datetime = DateTime.now.in_time_zone('Eastern Time (US & Canada)')
-      offset_month = enr_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
-      year = enr_created_datetime.year
-      month = enr_created_datetime.month + offset_month
-      if month > 12
-        year += 1
-        month -= 12
-      end
-      day = 1
-      hour = enr_created_datetime.hour
-      min = enr_created_datetime.min
-      sec = enr_created_datetime.sec
-      DateTime.new(year, month, day, hour, min, sec).in_time_zone
-    end
-
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment.reload
       if TimeKeeper.date_of_record.day > HbxProfile::IndividualEnrollmentDueDayOfMonth
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
-        expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
+        new_enrollment = family.hbx_enrollments.coverage_selected.first
+        expect(hbx_enrollment.terminated_on.to_date).to eq new_enrollment.effective_on.prev_day.to_date
       else
         expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
       end
@@ -900,7 +867,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
   end
 
   context "POST CREATE" do
-    let(:family_member_ids) {{"0" => family.family_members.first.id}}
+    let(:family_member_ids) {{"0"=>family.family_members.first.id}}
 
     before do
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
@@ -952,7 +919,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should redirect" do
         expect(response).to have_http_status(:redirect)
-        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan: 'change', coverage_kind: 'health', market_kind: 'shop', hbx_enrollment_id: old_hbx.id))
+        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop', hbx_enrollment_id: old_hbx.id))
       end
 
       it "should get special_enrollment_period_id" do
@@ -1025,7 +992,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
 
       it "should redirect" do
         expect(response).to have_http_status(:redirect)
-        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan: 'change', coverage_kind: 'health', market_kind: 'shop', hbx_enrollment_id: old_hbx.id))
+        expect(response).not_to redirect_to(purchase_insured_families_path(change_plan:'change', coverage_kind: 'health', market_kind:'shop', hbx_enrollment_id: old_hbx.id))
       end
 
       it "should get special enrollment id as nil" do
