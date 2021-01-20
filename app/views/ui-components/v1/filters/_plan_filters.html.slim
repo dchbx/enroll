@@ -126,28 +126,27 @@
       a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Your Tax Credit"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
     .aptc.panel.panel-default
-      .panel-body
+      .panel-body style="padding:10px;"
         .row style="margin:0;"
-          .col-xs-6
-            p.text-left = l10n('available').to_s
-          .col-xs-6
-            p.text-right = number_to_currency(@max_aptc, precision: 2)
+          .col-xs-6 style="padding:0;"
+            p.text-left style="font-size:12px;" = l10n('available').to_s
+          .col-xs-6 style="padding:0;"
+            p.text-right style="font-size:12px;" = number_to_currency(@max_aptc, precision: 2)
         .row style="margin:0;"
-          .col-xs-6
-            p.text-left = l10n('apply_monthly')
-          .col-xs-6
-            p.text-right
-              | $
-              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}"
+          .col-xs-6 style="padding:0;"
+            p.text-left style="line-height:16px; font-size:12px;" = l10n('apply_monthly')
+          .col-xs-6 style="padding:0;"
+            p
+              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}" style="width:100%;"
         = hidden_field_tag :max_aptc, @max_aptc
         = hidden_field_tag :market_kind, @market_kind
         = hidden_field_tag :coverage_kind, @coverage_kind
         = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
         form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
-          input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85"
-          span 0%
-          span.pull-right 85%
-        h6 = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
+          input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85" style="padding:0;"
+          span style="font-size:12px;" 0%
+          span.pull-right style="font-size:12px;" 85%
+        h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
   - if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
     .checkbox-filter-wrapper-uc
       h5
