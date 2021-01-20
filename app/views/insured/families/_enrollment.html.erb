@@ -197,7 +197,7 @@
 
           <div class="dropdown pull-right">
             <button class="btn btn-default dropdown-toggle interaction-click-control-actions" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              Actions
+              <%= l10n("actions")%>
               <span class="caret"></span>
             </button>
             <div class="dropdown-menu" role="menu" aria-labelledby="dropdownmenuButton">
@@ -219,7 +219,7 @@
               <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year, source: 'account'}), {class: 'btn-link btn-block dropdown-item', style: 'padding: 6px 12px; margin: 4px 0;', remote: true} %>
 
               <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-              <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>">Make a first Payment for a new plan</button>
+              <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("make_your_first_payment")%></button>
             </div>
           </div>
         </div>
@@ -256,10 +256,10 @@
           <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
           <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
           <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
-            Leave DC Health LINK
+            <%= l10n("leave_dc_health_link")%>
           </button>
         </form>
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><%= l10n("go_back")%></button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
