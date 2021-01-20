@@ -122,7 +122,7 @@ module Transcripts
     end
 
     def add_plan_information
-      if @transcript[:compare]['base'] && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present?
+      if @transcript[:compare]['base'] && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present? # rubocop:disable Style/GuardClause
         plan = @transcript[:other].product
 
         @transcript[:compare]['base']['update']['plan_id'] = {
@@ -268,7 +268,6 @@ module Transcripts
         if matched_people.present?
           raise 'multiple person records match with enrollment primary applicant' if matched_people.size > 1
           matched_person = matched_people.first
-<<<<<<< HEAD
           family = matched_person.families.where(id: enrollment.family.id).first || matched_person.families.first
           return if family.blank?
           enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
@@ -276,17 +275,6 @@ module Transcripts
           enrollments = enrollments.reject { |en| en.hbx_id == exact_match.hbx_id }
           @enrollment = exact_match
           @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
-=======
-
-          if family = matched_person.families.first
-            raise 'matched person has multiple families' if matched_person.families.size > 1
-            enrollments = (@shop ? matching_shop_coverages(enrollment, family) : matching_ivl_coverages(enrollment, family))
-            exact_match = (find_exact_enrollment_matches(enrollment, enrollments.dup).first || enrollments.last)
-            enrollments = enrollments.reject{|en| en.hbx_id == exact_match.hbx_id}
-            @enrollment = exact_match
-            @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
-          end
->>>>>>> 4c84ba9460... Fix rubocop
         end
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match)).uniq

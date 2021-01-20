@@ -250,24 +250,24 @@ module ApplicationHelper
     args.map(&:to_s).include?(params[:controller].to_s) ? "dropdown active" : "dropdown"
   end
 
-  def link_to_add_fields(name, f, association, classes = '')
-    new_object = f.object.send(association).klass.new
+  def link_to_add_fields(name, form, association, classes = '')
+    new_object = form.object.send(association).klass.new
     id = new_object.object_id
 
     # TODO: add ability to build nested attributes dynamically
-    if f.object.send(association).klass == OfficeLocation
+    if form.object.send(association).klass == OfficeLocation
       new_object.build_address
       new_object.build_phone
     end
 
-    if f.object.send(association).klass == BenefitGroup
+    if form.object.send(association).klass == BenefitGroup
       new_object.build_relationship_benefits
       new_object.build_composite_tier_contributions
       new_object.build_dental_relationship_benefits
     end
 
 
-    fields = f.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
+    fields = form.fields_for(association, new_object, fieldset: false, child_index: id) do |builder|
       render("shared/" + association.to_s.singularize + "_fields", f: builder)
     end
     link_to(content_tag(:span, raw("&nbsp;"), class: 'fui-plus-circle') + name,

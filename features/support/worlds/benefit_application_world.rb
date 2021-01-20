@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module BenefitApplicationWorld # rubocop:disable Metrics/ModuleLength
+module BenefitApplicationWorld # rubocop:disable Metrics/ModuleLength, Style/Documentation
   def aasm_state(key = nil)
     @aasm_state ||= key
   end
