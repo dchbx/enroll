@@ -786,7 +786,7 @@ When(/^.+ filters plans by Carrier/) do
   carrier_option = find('li .interaction-choice-control-carrier-1', wait: 5)
   @carrier_selected = carrier_option.text
   carrier_option.click
-  find(".interaction-click-control-apply", wait: 5).click
+  find(".interaction-click-control-apply", match: :first, wait: 5).click
 end
 
 Then(/^.+ should see plans filtered by Carrier/) do

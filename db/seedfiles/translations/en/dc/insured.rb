@@ -416,6 +416,16 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.modal_onscreen' => "We're sending you to DC Health Link's Plan Match tool powered by Consumers'",
   :'en.modal_onscreen1' => "CHECKBOOK. For security reasons, you'll need to login to your DC Health Link",
   :'en.modal_onscreen2' => "account again after 15 minutes.",
+  :'en.modal_how_is_this_calculated' => "How are Tax Credits calculated?",
+  :'en.modal_how_is_this_calculated1' => "We calculate your tax credits based on the information you give us about your household and your income. The ‘Available’ amount is how much you can apply if you update your plan now.",
+  :'en.modal_how_is_this_calculated2' => "You can decide to take all of it now, or just part. When you file your taxes for the year, the IRS will compare the amount you took to the amount you qualified for based on your final income. If you took more than you qualified for, you’ll need to repay it on your taxes. If you took less than you qualified for, you will get that back on your taxes. You might want to take just part of your premium reductions if your income might end up being higher than what you predicted for this year.",
+  :'en.modal_how_is_this_calculated3' => "Your ‘Available’ amount is also based on:",
+  :'en.modal_how_is_this_calculated4' => "Income changes",
+  :'en.modal_how_is_this_calculated5' => "If you told us about an income change in the middle of the year, we update your available amount to reflect what you qualify for over the whole year.",
+  :'en.modal_how_is_this_calculated6' => "Who is enrolling",
+  :'en.modal_how_is_this_calculated7' => "If some of your household members who qualify for premium reductions are not included on this plan, we adjust your premium reductions accordingly.",
+  :'en.modal_how_is_this_calculated8' => "Current plan",
+  :'en.modal_how_is_this_calculated9' => "If you are already using your premium reductions on a different plan, you won’t see them here. You’ll need to let us know when you’re ending your current plan before you can use them for a new plan.",
   :'en.select_waive_reason' => "Select Waive Reason",
   :'en.please_select_waive_reason' => "Please select waive reason",
   :'en.unable_to_waive_coverage' => "Unable to Waive Coverage",
@@ -436,4 +446,3 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.plan_shoppings.thankyou.you_must_complete_steps_to_enroll' => "You must complete these steps to enroll.",
   :'en.insured.plan_shoppings.thankyou.additional_administration_msg' => "* Your employer may charge an additional administration fee for your COBRA/Continuation coverage. If you have any questions, please direct them to the Employer."
 }.freeze
-
