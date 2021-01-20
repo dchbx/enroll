@@ -97,9 +97,22 @@ module Forms
 
     private
 
+    def eligible_to_transmit(hbx)
+      return true unless hbx.is_shop? || hbx.sponsored_benefit_package_id.present?
+
+      benefit_package = hbx.sponsored_benefit_package
+      benefit_application = benefit_package.benefit_application
+      quiet_period = benefit_application.enrollment_quiet_period
+      transition_at = hbx.workflow_state_transitions.where(:to_state.in => ["coverage_terminated","coverage_canceled", "coverage_termination_pending"]).last.transition_at
+      ["enrollment_eligible", "active", "terminated","expired", "termination_pending"].include?(benefit_application.aasm_state.to_s) && transition_at.in_time_zone("UTC") >= quiet_period.max
+    end
+
     def handle_edi_transmissions(hbx_id, transmit_flag) #transmit_flag = true/false based on wheather the user elected to transmit.
       hbx = HbxEnrollment.find(hbx_id)
       ### Handle EDI transmission here ###
+
+      return true unless eligible_to_transmit(hbx)
+
       notify(
         "acapi.info.events.hbx_enrollment.terminated",
         {
