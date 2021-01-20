@@ -87,15 +87,15 @@
   #how_is_this_calculated.modal.fade role="document" tabindex="-1"
     .modal-dialog
       .modal-content
-        .modal-header style="height:50px;border-bottom:0;"
+        .modal-header style="height:0;border-bottom:0;"
           button.close aria-label="Close" data-dismiss="modal" type="button"
             span aria-hidden="true" &times;
-        div style="margin-left:20px;"
-          p style="margin-bottom:0px"
+        .modal-body style="margin-right:20px;"
+          p style="margin-bottom:0px;font-weight:400;"
             strong = l10n("modal_how_is_this_calculated")
-          p style="margin-bottom:0px" = l10n("modal_how_is_this_calculated1")
-          p style="margin-bottom:0px" = l10n("modal_how_is_this_calculated2")
-          p style="margin-bottom:0px" = l10n("modal_how_is_this_calculated3")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated1")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated2")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated3")
           ul
             li
               strong = l10n("modal_how_is_this_calculated4") + ": "
