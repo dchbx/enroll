@@ -17,14 +17,23 @@
       </div>
       <div class="modal-body">
         <p>
-          <%= l10n('.kaiser.pay_now.redirection_message', site_short_name: Settings.site.short_name) %><br/>
-          <ul>
-            <li><%= l10n('.kaiser.pay_now.link_info')%></li>
-            <li><%= l10n('.kaiser.pay_now.collecting_info')%></li>
-            <li><%= l10n('.kaiser.pay_now.exchange_disclaimer_for_auth') %></li>
-            <br/>
-          </ul>
-          <%= l10n('.kaiser.pay_now.exchange_disclaimer') %>
+          You are leaving the <%= Settings.site.short_name %> website and entering a privately-owned website created,
+          operated and maintained by Kaiser Permanente.<br/>
+        <ul>
+          <li>This link is provided for your convenience to allow you to pay your first month’s insurance premium now.
+            It’s only available to make your first payment.
+          </li>
+          <li>The information that Kaiser Permanente collects and maintains as a result of your visit to its website is
+            different from the information that DC Health Link collects and maintains.
+          </li>
+          <li>DC Health Link cannot help you with any information regarding this website, including your username or
+            password, or other technical issues.
+          </li>
+          <br/>
+        </ul>
+        By linking to this private business, DC Health Link is not endorsing its products, services, or privacy or
+        security policies. We recommend you review the business's information collection policy or terms and conditions
+        to fully understand what information is collected by Kaiser Permanente.
         </p>
       </div>
       <div class="modal-footer">
