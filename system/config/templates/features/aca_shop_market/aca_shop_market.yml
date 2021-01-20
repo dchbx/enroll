@@ -9,3 +9,11 @@ registry:
       - key: :send_secure_message_employer
         item: :send_secure_message
         is_enabled: true
+      - key: :add_deductible_display
+        item: :add_deductible_display
+        is_enabled: true
+        settings:
+          - key: :employee_enabled
+            item: true
+          - key: :employer_enabled
+            item: true
