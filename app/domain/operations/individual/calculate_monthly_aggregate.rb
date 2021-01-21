@@ -104,7 +104,8 @@ module Operations
 
       #logic to calculate the monthly Aggregate
       def calculate_monthly_aggregate(consumed_aptc)
-        latest_max_aptc = @family.active_household.latest_active_tax_household_with_year(@effective_on.year).latest_eligibility_determination.max_aptc.to_f
+        latest_max_aptc = @family.active_household.latest_active_tax_household_with_year(@effective_on.year)&.latest_eligibility_determination&.max_aptc&.to_f
+        return Success(0.00) unless latest_max_aptc
         available_annual_aggregate = (latest_max_aptc * 12) - consumed_aptc.to_f
         monthly_max = calculated_new_monthly_aggregate(available_annual_aggregate)
         # base_enrollment.update_attributes(aggregate_aptc_amount: monthly_max)
