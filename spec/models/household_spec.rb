@@ -320,7 +320,7 @@ describe "financial assistance eligibiltiy for a family", type: :model, dbclean:
 end
 
 describe Household, "for creating a new taxhousehold using create eligibility", type: :model, dbclean: :after_each do
-  let!(:person100)      { FactoryBot.create(:person) }
+  let!(:person100)      { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
   let!(:family100)      { FactoryBot.create(:family, :with_primary_family_member, person: person100) }
   let(:household100)    { family100.active_household }
   let!(:hbx_profile100) { FactoryBot.create(:hbx_profile) }
@@ -361,6 +361,38 @@ describe Household, "for creating a new taxhousehold using create eligibility", 
 
     it 'should match with expected csr eligibility kind' do
       expect(@determination.csr_eligibility_kind).to eq('csr_limited')
+    end
+  end
+
+  context 'for apply_aggregate_to_enrollment' do
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, :silver)}
+    let!(:current_enr) do
+      enr = FactoryBot.create(:hbx_enrollment,
+                              :individual_assisted,
+                              coverage_kind: 'health',
+                              household: household100,
+                              family: family100,
+                              effective_on: TimeKeeper.date_of_record.beginning_of_year,
+                              product: product,
+                              consumer_role_id: person100.consumer_role.id)
+      FactoryBot.create(:hbx_enrollment_member, applicant_id: family100.primary_applicant.id, hbx_enrollment: enr)
+      enr
+    end
+
+    before do
+      allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+      year = TimeKeeper.date_of_record.year
+      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(year, 8, 4))
+      HbxProfile.current_hbx.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: current_enr.product.id)
+      household100.create_new_tax_household(params.merge({'max_aptc' => '1000.00'}))
+      @new_enr = family100.reload.hbx_enrollments.last
+    end
+
+    it 'expect to auto generate enrollment' do
+      if EnrollRegistry.feature_enabled?(:apply_aggregate_to_enrollment)
+        expect(@new_enr.applied_aptc_amount.to_f).not_to eq(0.00)
+        expect(@new_enr.id).not_to eq(current_enr.id)
+      end
     end
   end
 end
