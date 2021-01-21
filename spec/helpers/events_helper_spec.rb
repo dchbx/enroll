@@ -385,3 +385,113 @@ describe EventsHelper, "employer_plan_years", dbclean: :after_each do
     end
   end
 end
+
+describe EventsHelper, "#order_ga_accounts_for_employer_xml" do
+  describe "given an overlapping set of accounts with no end date on one" do
+    let(:helper) { EventsHelperSlug.new }
+
+    let(:start_date_1) { Date.new(2017, 12, 19) }
+    let(:start_date_2) { Date.new(2016, 6, 8) }
+
+    let(:end_date_1) { nil }
+    let(:end_date_2) { start_date_1 }
+
+    let(:account_1) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_1,
+          end_on: end_date_1
+        }
+      )
+    end
+
+    let(:account_2) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_2,
+          end_on: end_date_2
+        }
+      )
+    end
+
+    it "puts them in the correct order" do
+      ordered_results = helper.order_ga_accounts_for_employer_xml([account_1, account_2])
+      expect(ordered_results.first).to eq account_2
+      expect(ordered_results.last).to eq account_1
+    end
+  end
+
+  describe "with the same start date but one has not yet ended" do
+    let(:helper) { EventsHelperSlug.new }
+
+    let(:start_date_1) { Date.new(2017, 12, 19) }
+    let(:start_date_2) { Date.new(2017, 12, 19) }
+
+    let(:end_date_1) { nil }
+    let(:end_date_2) { Date.new(2017, 12, 19) }
+
+    let(:account_1) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_1,
+          end_on: end_date_1
+        }
+      )
+    end
+
+    let(:account_2) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_2,
+          end_on: end_date_2
+        }
+      )
+    end
+
+    it "puts them in the correct order" do
+      ordered_results = helper.order_ga_accounts_for_employer_xml([account_1, account_2])
+      expect(ordered_results.first).to eq account_2
+      expect(ordered_results.last).to eq account_1
+    end
+  end
+
+  describe "with the same start date but one has ends later" do
+    let(:helper) { EventsHelperSlug.new }
+
+    let(:start_date_1) { Date.new(2017, 12, 19) }
+    let(:start_date_2) { Date.new(2017, 12, 19) }
+
+    let(:end_date_1) { Date.new(2017, 12, 20) }
+    let(:end_date_2) { Date.new(2017, 12, 19) }
+
+    let(:account_1) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_1,
+          end_on: end_date_1
+        }
+      )
+    end
+
+    let(:account_2) do
+      instance_double(
+        SponsoredBenefits::Accounts::GeneralAgencyAccount,
+        {
+          start_on: start_date_2,
+          end_on: end_date_2
+        }
+      )
+    end
+
+    it "puts them in the correct order" do
+      ordered_results = helper.order_ga_accounts_for_employer_xml([account_1, account_2])
+      expect(ordered_results.first).to eq account_2
+      expect(ordered_results.last).to eq account_1
+    end
+  end
+end

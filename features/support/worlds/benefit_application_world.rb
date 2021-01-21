@@ -61,7 +61,7 @@ module BenefitApplicationWorld
     }
   end
 
-  def create_application(new_application_status: new_application_status)
+  def create_application(new_application_status:)
     application_dates = application_dates_for(current_effective_date, new_application_status)
 
     @new_application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,

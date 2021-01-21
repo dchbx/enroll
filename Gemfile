@@ -31,7 +31,7 @@ gem 'database_cleaner',       '~> 1.7'
 #######################################################
 # Local components/engines
 #######################################################
-gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'master'
+gem 'acapi',              git: "https://github.com/dchbx/acapi.git", branch: 'amqp_proc_title'
 gem "benefit_markets",    path: "components/benefit_markets"
 gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
@@ -140,6 +140,7 @@ end
 
 group :development, :test do
   # gem 'bundler-audit',          '~> 0.6'
+  gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'

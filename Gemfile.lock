@@ -1,9 +1,9 @@
 GIT
   remote: https://github.com/dchbx/acapi.git
-  revision: 5c98342197a833b2c8044061dc547d17a706d82b
-  branch: master
+  revision: fe6ddbb9904e0992cba01e689e1c97098e1ec9cb
+  branch: amqp_proc_title
   specs:
-    acapi (1.3.2)
+    acapi (1.3.3)
       activesupport (> 4.2.0)
       bunny (~> 1.7.0)
       sneakers
@@ -298,6 +298,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.4.8)
       msgpack (~> 1.0)
+    brakeman (4.10.1)
     browser (2.7.0)
     bson (4.8.2)
     builder (3.2.4)
@@ -951,6 +952,7 @@ DEPENDENCIES
   benefit_markets!
   benefit_sponsors!
   bootsnap (>= 1.1)
+  brakeman
   browser (= 2.7.0)
   bson (~> 4.3)
   capistrano (~> 3.1)
