@@ -62,7 +62,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
     end
 
     it 'should return monthly aggregate amount' do
-      expect(@result.failure).to eq('Cannot find Non-Catastrophic Plans')
+      expect(@result.failure).to eq('Cannot find any enrollments with Non-Catastrophic Plan.')
     end
   end
 
