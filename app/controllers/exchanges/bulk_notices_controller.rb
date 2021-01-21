@@ -55,7 +55,7 @@ module Exchanges
     private
 
     def bulk_notice_params
-      params.require(:admin_bulk_notice).except(:audience_identifiers, :user_id).permit!
+      params.require(:admin_bulk_notice).permit(:audience_type, :subject, :body)
     end
 
     def unread_messages
