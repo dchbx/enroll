@@ -31,7 +31,7 @@ registry:
         - :contribution_model_criteria
       meta:
         label: Contribution Model Criteria 2019
-        content_type: :nav
+        content_type: :feature_list
         description: 'Configuration settings for 2019 Contribution models'
         is_required: true
         is_visible: true
@@ -41,7 +41,7 @@ registry:
         is_enabled: true
         meta:
           label: 2019 Initial Sponsor January Default
-          content_type: :legend
+          content_type: :feature_enabled
           default: true
           description: Contribution Criteria for January 2019 Initial Sponsors
           is_required: true
@@ -91,7 +91,7 @@ registry:
         item: :contribution_model_criterion
         meta:
           label: 2019 Renewal Sponsor January Default
-          content_type: :legend
+          content_type: :feature_enabled
           default: true
           description: Contribution Criteria for January 2019 Renewal Sponsors
           is_required: true
@@ -190,9 +190,22 @@ registry:
       - key: :initial_sponsor_default_2020
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2020 Initial Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for 2020 Initial Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :initial
           - key: :effective_period
@@ -235,9 +248,22 @@ registry:
       - key: :renewal_sponsor_default_2020
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2020 Renewal Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for 2020 Renewal Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :fifty_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period
@@ -258,9 +284,22 @@ registry:
       - key: :initial_sponsor_jan_default_2021
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2021 Initial Sponsor January Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2021 Initial Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :initial
           - key: :effective_period
@@ -274,9 +313,22 @@ registry:
       - key: :initial_sponsor_default_2021
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2021 Initial Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for 2021 Initial Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :initial
           - key: :effective_period
@@ -290,9 +342,22 @@ registry:
       - key: :renewal_sponsor_jan_default_2021
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2021 Renewal January Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for January 2021 Renewal Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period
@@ -306,9 +371,22 @@ registry:
       - key: :renewal_sponsor_default_2021
         item: :contribution_model_criterion
         is_enabled: true
+        meta:
+          label: 2021 Renewal Sponsor Default
+          content_type: :legend
+          default: true
+          description: Contribution Criteria for 2021 Renewal Sponsors
+          is_required: true
+          is_visible: true
         settings:
           - key: :contribution_model_key
             item: :zero_percent_sponsor_fixed_percent_contribution_model
+            meta:
+              label: Contribution Model Key
+              content_type: :text_field
+              description: Enter contribution model key
+              is_required: false
+              is_visible: true
           - key: :benefit_application_kind
             item: :renewal
           - key: :effective_period

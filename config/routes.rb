@@ -112,7 +112,17 @@ Rails.application.routes.draw do
       resources :products, only: [:index]
     end
 
-    resources :configurations
+    resources :configurations do
+      member do
+        get :namespace_edit
+        post :update_feature
+        patch :toggle_feature
+      end
+
+      collection do
+        post :update_namespace
+      end
+    end
 
     resources :hbx_profiles do
       root 'hbx_profiles#show'

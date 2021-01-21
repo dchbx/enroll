@@ -1,4 +1,4 @@
-<%= feature_panel(params[:id], EnrollRegistry) %>
+<%= namespace_panel(@namespace, EnrollRegistry) if @namespace.features.present? %>
 
 <style>
 	label {

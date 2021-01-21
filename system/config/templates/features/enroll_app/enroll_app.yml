@@ -54,6 +54,28 @@ registry:
             item: "https://www.dchealthlink.com/nondiscrimination"
           - key: :submit_docs_url
             item: "https://www.dchealthlink.com/submit-docs"
+          - key: :health
+            item: true
+            meta:
+              label: Active
+              content_type: :slider_switch
+              description: Enable/Disable Health Products
+              value:
+                key: :health_products
+                class_name: "ResourceRegistry::Mongoid::Feature"
+              is_required: false
+              is_visible: true
+          - key: :dental
+            item: false
+            meta:
+              label: Active
+              content_type: :slider_switch
+              description: Enable/Disable Dental Products
+              value:
+                key: :dental_products
+                class_name: "ResourceRegistry::Mongoid::Feature"
+              is_required: false
+              is_visible: true
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true
@@ -63,10 +85,45 @@ registry:
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
-
       - key: :sep_carousel_message
         item: :sep_carousel
         is_enabled: true
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+      - key: :health_products
+        is_enabled: true
+        meta:
+          label: Health Products
+          content_type: :legend
+          default: true
+          description: Health Products
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :faqs_url
+            item: "https://dchealthlink.com/help"
+            meta:
+              label: FAQ's Url
+              content_type: :text_field
+              description: Enter Frequently Asked Questions link
+              is_required: false
+              is_visible: true
+      - key: :dental_products
+        is_enabled: true
+        meta:
+          label: Dental Products
+          content_type: :legend
+          default: true
+          description: Dental Products
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"
+            meta:
+              label: Help Url
+              content_type: :text_field
+              description: Enter Help link
+              is_required: false
+              is_visible: true
