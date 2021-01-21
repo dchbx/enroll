@@ -26,12 +26,12 @@ module Operations
 
       def fetch_enrollments_to_renew(eligibility_determination)
         enrollments = eligibility_determination.family.active_household.hbx_enrollments.enrolled.individual_market.by_health
-        return Failure("Cannot find Non-Catastrophic Plans") if enrollments.blank?
+        return Failure('Cannot find any IVL health enrollments in any of the active states.') if enrollments.blank?
         enrollment_list = enrollments.reject do |enr|
           next if enr.product.blank?
           enr.product.metal_level_kind == :catastrophic
         end
-        enrollment_list.present? ? Success(enrollment_list) : Failure("Cannot find Non-Catastrophic Plans")
+        enrollment_list.present? ? Success(enrollment_list) : Failure('Cannot find any enrollments with Non-Catastrophic Plan.')
       end
 
       def generate_enrollments(enrollments, eligibility_determination)
