@@ -279,14 +279,6 @@ class Admin::Aptc < ApplicationController
       thh = household.tax_households.build(thh_params)
       thh.save!
 
-      ed_params = {source: 'Admin',
-                   benchmark_plan_id: current_ed.benchmark_plan_id,
-                   max_aptc: max_aptc,
-                   csr_percent_as_integer: csr_percentage,
-                   determined_at: date,
-                   determined_on: date}
-      thh.eligibility_determinations.build(ed_params).save!
-
       current_thh.tax_household_members.each do |thh_member|
         thh_member_params = thh_member.attributes.slice('applicant_id',
                                                         'is_subscriber',
@@ -297,6 +289,15 @@ class Admin::Aptc < ApplicationController
         thh.tax_household_members.build(thh_member_params).save!
       end
       thh.save!
+
+      ed_params = {source: 'Admin',
+                   benchmark_plan_id: current_ed.benchmark_plan_id,
+                   max_aptc: max_aptc,
+                   csr_percent_as_integer: csr_percentage,
+                   determined_at: date,
+                   determined_on: date}
+      thh.eligibility_determinations.build(ed_params).save!
+
       household.end_multiple_thh
     end
 
