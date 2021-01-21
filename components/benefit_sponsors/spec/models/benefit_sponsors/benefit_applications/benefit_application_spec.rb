@@ -458,7 +458,28 @@ module BenefitSponsors
 
     end
 
+    describe '.is_off_cycle' do
+      let(:current_date1)                  { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+      let!(:effective_period)              { (current_date1)..(current_date1.next_year.prev_day) }
+      let!(:renewal_effective_period)      { (current_date1.next_year)..(current_date1.prev_day + 2.years) }
+      let(:termination_date)               {renewal_effective_period.min + 65.days}
+      let(:offcycle_effective_period) do
+        date = termination_date.end_of_month.next_day
+        date..date.next_year.prev_day
+      end
+      let!(:initial_application) do
+        application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :termination_pending, effective_period: effective_period, benefit_sponsorship: benefit_sponsorship)
+        terminated_period = effective_period.min..termination_date
+        application.update_attributes!(effective_period: terminated_period)
+        application
+      end
+      let!(:offcycle_application) do
+        FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :draft, effective_period: offcycle_effective_period, benefit_sponsorship: benefit_sponsorship)
+      end
 
+      it { expect(initial_application.is_off_cycle?).to be_falsey }
+      it { expect(offcycle_application.is_off_cycle?).to be_truthy }
+    end
 
     ## TODO: Refactor for BenefitApplication
     # context "#to_plan_year", dbclean: :after_each do

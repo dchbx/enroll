@@ -13,8 +13,6 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
   let(:start_on)          { benefit_package.start_on }
   let(:hbx_enrollment)  { HbxEnrollment.new(sponsored_benefit_package: benefit_package, employee_role: census_employee.employee_role) }
 
-
-
   describe ".new" do
     let(:valid_params) do
       {
@@ -288,7 +286,10 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
 
   describe '#hbx_enrollments', dbclean: :after_each do
 
-    let(:household) { FactoryBot.create(:household, family: family)}
+    let!(:census_employee) { FactoryBot.create :census_employee, employer_profile: employer_profile, employee_role_id: employee_role.id }
+    let!(:employee_role) { FactoryBot.create(:employee_role, person: person, employer_profile: employer_profile)}
+    let(:person) { family.primary_person }
+    let!(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, end_on: benefit_package.end_on, benefit_package: benefit_package, census_employee: census_employee) }
 
@@ -355,6 +356,26 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, household: household, family: family, aasm_state: 'coverage_selected', sponsored_benefit_package_id: benefit_package.id) }
     let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee, hbx_enrollment: hbx_enrollment)}
+    let!(:employee_role) do
+      ee = FactoryBot.create(:employee_role, person: family.primary_person, employer_profile: employer_profile, census_employee: census_employee)
+      census_employee.update_attributes!(employee_role_id: ee.id)
+      ee
+    end
+
+    let(:census_employee2)   { FactoryBot.create(:census_employee, employer_profile: employer_profile) }
+    let(:household2) { FactoryBot.create(:household, family: family2)}
+    let(:family2) { FactoryBot.create(:family, :with_primary_family_member)}
+    let!(:benefit_group_assignment2) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee2, end_on: benefit_package.end_on)}
+    let!(:enrollment_family2) do
+      FactoryBot.create(
+        :hbx_enrollment,
+        household: household2,
+        family: family2,
+        benefit_group_assignment_id: census_employee2.active_benefit_group_assignment.id,
+        sponsored_benefit_package_id: census_employee2.active_benefit_group_assignment.benefit_package_id,
+        aasm_state: 'coverage_selected'
+      )
+    end
 
     shared_examples_for "active enrollments" do |state, status, result, match_with_package_id, match_with_assignment_id|
       let!(:enrollment) do

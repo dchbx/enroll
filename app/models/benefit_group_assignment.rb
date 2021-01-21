@@ -188,7 +188,7 @@ class BenefitGroupAssignment
     Family.where(:"_id".in => HbxEnrollment.where(
       :"$or" => [
         {:benefit_group_assignment_id => BSON::ObjectId.from_string(self.id)},
-        {:sponsored_benefit_package_id => self.benefit_package_id }
+        {:family_id => census_employee&.family&.id}
       ]
     ).pluck(:family_id)
   )

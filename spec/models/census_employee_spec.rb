@@ -935,7 +935,7 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
     end
 
     let(:person) {double}
-    let(:family) {double(active_household: double(hbx_enrollments: double(shop_market: double(enrolled_and_renewing: double(open_enrollments: [@enrollment])))))}
+    let(:family) {double(id: '1', active_household: double(hbx_enrollments: double(shop_market: double(enrolled_and_renewing: double(open_enrollments: [@enrollment])))))}
 
     let(:benefit_group) {double}
 
@@ -2740,17 +2740,20 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
 
     it "should return true if employee role present & no enrollment present" do
       allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee).to receive(:family).and_return double("Family", id: '1')
       expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
     end
 
     it "should return true if employee role present & no active enrollment present" do
       allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee).to receive(:family).and_return double("Family", id: '1')
       allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_canceled")
       expect(census_employee.send(:has_no_hbx_enrollments?)).to eq true
     end
 
     it "should return false if employee role present & active enrollment present" do
       allow(census_employee).to receive(:employee_role).and_return double("EmployeeRole")
+      allow(census_employee).to receive(:family).and_return double("Family", id: '1')
       allow(census_employee.active_benefit_group_assignment).to receive(:hbx_enrollment).and_return double("HbxEnrollment", aasm_state: "coverage_selected")
       expect(census_employee.send(:has_no_hbx_enrollments?)).to eq false
     end

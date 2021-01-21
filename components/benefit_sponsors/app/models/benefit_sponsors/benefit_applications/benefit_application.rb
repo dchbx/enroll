@@ -342,6 +342,10 @@ module BenefitSponsors
       termination_pending? || terminated? || enrollment_ineligible?
     end
 
+    def is_off_cycle?
+      self == benefit_sponsorship.off_cycle_benefit_application
+    end
+
     def recorded_rating_area
       return nil if recorded_rating_area_id.blank?
       return @recorded_rating_area if defined? @recorded_rating_area
