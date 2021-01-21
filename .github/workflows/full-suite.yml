@@ -33,8 +33,32 @@ jobs:
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
-  build-assets:
+  brakeman:
     needs: [rubocop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: Install project gems
+        run: gem install brakeman
+      - name: Run Brakeman
+        run: brakeman -i config/brakeman.ignore
+      - name: Run Brakeman In Components
+        run: |
+          for test_dir in `ls -1 components`; do
+            cd components/$test_dir
+            brakeman -i config/brakeman.ignore
+            cd ../..
+          done
+  build-assets:
+    needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -73,7 +97,7 @@ jobs:
       - name: compile assets
         run: bundle exec rake assets:precompile
   engines:
-    needs: [rubocop]
+    needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -138,7 +162,7 @@ jobs:
           bundle config path ../../vendor/bundle
           bundle exec rspec --fail-fast
   benefit-sponsors:
-    needs: [rubocop]
+    needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -192,7 +216,7 @@ jobs:
           bundle config path ../../vendor/bundle
           rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   rspec:
-    needs: [rubocop]
+    needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -235,7 +259,7 @@ jobs:
       - name: Run tests
         run: rspec_booster --job ${{ matrix.group }}/${{ strategy.job-total }}
   cucumber:
-    needs: [rubocop]
+    needs: [rubocop, brakeman]
     runs-on: ubuntu-latest
     strategy:
       matrix:
