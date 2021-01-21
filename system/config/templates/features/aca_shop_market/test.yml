@@ -1,0 +1,66 @@
+---
+registry:
+  - namespace:
+      path:
+        - :shop
+        - :2021
+      meta:
+        label: 'Shop 2021'
+        content_type: :feature_list
+        description: 'Configuration settings for 2019 Contribution models'
+        is_required: true
+        is_visible: true
+    features:
+      - key: :health
+        is_enabled: true
+        meta:
+          label: 'Health'
+          content_type: :feature_enabled
+          description: Health Products Offered
+          is_required: true
+          is_visible: true
+      - key: :dental
+        is_enabled: true
+        meta:
+          label: 'Dental'
+          content_type: :feature_enabled
+          description: Dental Products Offered
+          is_required: true
+          is_visible: true
+      - key: :benefit_market_catalog
+        is_enabled: true
+        item:
+          class_name: "BenefitMarkets::BenefitMarketCatalog"
+          scope:
+            name: :by_kind_and_application_date
+            arguments:
+              - :aca_shop
+              - <%= Date.new(2020,1,1) %>
+          # where:
+          #   arguments:
+          #     "application_period.min":
+          #       "$lte": <%#= Date.new(2020,1,1) %>
+        meta:
+          label: 'Health'
+          content_type: :model_attributes
+        settings:
+          - key: :title
+            item:
+              attribute: :title
+              constraints: {max_length: 20}
+            meta:
+              label: Catalog Title
+              content_type: :text_field
+              description: Enter market catalog title
+              is_required: false
+              is_visible: true
+          - key: :description
+            item:
+              attribute: :description
+              constraints: {max_length: 200}
+            meta:
+              label: Catalog Description
+              content_type: :text_field
+              description: Enter market catalog description
+              is_required: false
+              is_visible: true
