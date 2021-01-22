@@ -65,6 +65,26 @@ RSpec.describe SamlController do
         end
       end
 
+      context "With a new user with existing email" do
+        sample_xml = File.read("spec/saml/invalid_saml_response.xml")
+        let!(:user3) { FactoryBot.create(:user, last_portal_visited: family_account_path)}
+        let!(:user4) { FactoryBot.create(:user, last_portal_visited: family_account_path)}
+        let!(:person4) { FactoryBot.create :person, :with_family, :user => user4}
+        let(:valid_saml_response) { double(is_valid?: true, name_id: 'Testing@test.com', :"settings=" => true, attributes: attributes_double)}
+        let(:attributes_double) { { 'mail' => user4.email} }
+        let(:relay_state_url) { "/employers/employer_profiles/new" }
+
+        before do
+          allow(OneLogin::RubySaml::Response).to receive(:new).with(sample_xml, :allowed_clock_drift => 5.seconds).and_return(valid_saml_response)
+        end
+
+        it "should redirect to login page with error flash" do
+          post :login, params: {SAMLResponse: sample_xml, RelayState: relay_state_url}
+          expect(response).to redirect_to(SamlInformation.iam_login_url)
+          expect(flash[:error]).to eq "Invalid User Details."
+        end
+      end
+
       describe "with a new user", dbclean: :after_each do
         let(:name_id) { attributes_double['mail'] }
         let(:attributes_double) { { 'mail' => "new@user.com"} }

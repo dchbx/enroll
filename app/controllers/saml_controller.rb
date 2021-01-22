@@ -43,6 +43,12 @@ class SamlController < ApplicationController
         headless = User.where(email: /^#{Regexp.escape(new_email)}$/i).first
         headless.destroy if headless.present? && !headless.person.present?
         new_user = User.new(email: new_email, password: new_password, idp_verified: true, oim_id: response.name_id)
+
+        unless new_user.valid?
+          log("ERROR: #{new_user.errors.messages}", {:severity => "error"})
+          return redirect_to URI.parse(SamlInformation.iam_login_url).to_s, flash: {error: "Invalid User Details."}
+        end
+
         new_user.save!
         ::IdpAccountManager.update_navigation_flag(
           response.name_id,
