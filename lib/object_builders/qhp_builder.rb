@@ -45,7 +45,7 @@ class QhpBuilder
     elsif file_path.include?("guardian")
       "Guardian"
     elsif file_path.include?("best life")
-      "BestLife"
+      "BEST Life"
     elsif file_path.include?("metlife")
       "MetLife"
     elsif file_path.include?("united")

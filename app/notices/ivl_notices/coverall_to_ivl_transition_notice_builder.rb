@@ -80,7 +80,7 @@ class IvlNotices::CoverallToIvlTransitionNoticeBuilder < IvlNotice
 
   def phone_number(legal_name)
     case legal_name
-    when "BestLife"
+    when "BEST Life"
       "(800) 433-0088"
     when "CareFirst"
       "(855) 444-3119"

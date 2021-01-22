@@ -35,7 +35,7 @@ module BenefitSponsors
         def retrieve_info(legal_name)
           {
             "Aetna" => ['1-855-586-6959', '', 'from 8am-6pm EST, Monday - Friday'],
-            "BestLife" => ['1-800-433-0088', '', ''],
+            "BEST Life" => ['1-800-433-0088', '', ''],
             "CareFirst" => ['1-855-444-3119', '', ''],
             "Delta Dental" => ['1-800-872-0500', '', ''],
             "Dentegra" => ['1-800-471-0284', '', ''],
