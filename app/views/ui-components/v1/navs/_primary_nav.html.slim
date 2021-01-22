@@ -22,9 +22,12 @@
               li
                 = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'dc-resident-application', link_path: main_app.begin_resident_enrollment_exchanges_residents_path(original_application_type: 'paper'), display_name: 'DC Resident Application', active_tab: "dc-resident-application", remote: false, pundit_object: ResidentRole, pundit_method: :begin_resident_enrollment?}
 
-          li role="presentation"
-            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
-              = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers-invoice", remote: false, pundit_object: nil, pundit_method: nil}
+          li.dropdown.pl-1 role="presentation"
+            a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" Employers
+            i.fas.fa-caret-down
+            ul.dropdown-menu aria-labelledby="dropdownMenu1"
+              li
+                = render partial: 'exchanges/hbx_profiles/shared/nav_link', locals: {tab_name: 'employers-invoice', link_path: main_app.employer_datatable_exchanges_hbx_profiles_path, display_name: 'Employers', active_tab: "employers-invoice", remote: false, pundit_object: nil, pundit_method: nil}
         - else
           li role="presentation"
             a.dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"
