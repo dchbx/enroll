@@ -19,6 +19,7 @@ class Insured::FamiliesController < FamiliesController
       set_bookmark_url
       set_admin_bookmark_url(home_insured_families_path)
       @active_sep = @family.latest_active_sep
+      @source = "enrollment_tile"
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
@@ -39,6 +40,8 @@ class Insured::FamiliesController < FamiliesController
       @employee_role = @person.active_employee_roles.first
       @tab = params['tab']
       @family_members = @family.active_family_members
+      @kp_pay_now_url = SamlInformation.kp_pay_now_url
+      @kp_relay_state = SamlInformation.kp_pay_now_relay_state
 
       respond_to do |format|
         format.html
