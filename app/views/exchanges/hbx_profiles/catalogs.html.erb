@@ -10,11 +10,11 @@
       <h1 class="heading-text">Enroll Configurations</h1>
 
 	  <div class="row mt-4" id="configurations">
-	  	<div class="col-md-3" style="overflow: scroll; background-color: #e6e6e6; height: 100%;">
+	  	<div class="col-md-3 sidebar">
 	  		<%= render_configuration_navigation_menu %>
 	  	</div>
 
-	  	<div class="col-md-9">
+	  	<div class="col-md-9 main">
 	  		<div id="data_container"></div>
 	  	</div>
 	  </div>
@@ -24,6 +24,12 @@
 <script>
   $(function(){
     $('#configurations #namespace-link').click(function(e) {
+      hasClass = $(this).hasClass('highlight');
+      $('.highlight').removeClass('highlight');
+      if (!hasClass) {
+        $(this).addClass('highlight')
+      }
+
       const feature = $(this).data()['feature'];
       if (feature) {
         $.ajax({
@@ -48,6 +54,8 @@
 
   #configurations {
     height: 100%;
+    background-color: #e6e6e6;
+    width: 100%
   }
 
    #configurations .list-group {
@@ -118,5 +126,19 @@
 
   .bottom-pd {
     height: 100%;
+  }
+
+  .highlight {
+    border-left: #007bc4 solid 5px;
+  }
+
+  .sidebar {
+    overflow: scroll;
+    height: 100%;
+    padding-top: 5px;
+  }
+
+  .main {
+    background-color: white;
   }
 </style>
