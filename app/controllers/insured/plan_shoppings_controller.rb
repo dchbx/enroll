@@ -47,6 +47,7 @@ class Insured::PlanShoppingsController < ApplicationController
   def receipt
     @enrollment = HbxEnrollment.find(params.require(:id))
     @plan = @enrollment.product
+    @source = "plan_shopping"
 
     if @enrollment.is_shop?
       @employer_profile = @enrollment.employer_profile

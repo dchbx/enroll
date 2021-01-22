@@ -12,7 +12,7 @@
           <p>Please print this page for your records. A copy of this confirmation has also been emailed to you.</p>
           <% if @enrollment.employee_role.present? %>
           <% else %>
-            <% if show_pay_now? %>
+            <% if show_pay_now?(@source, @enrollment) %>
               <p><strong>Important:</strong> You must pay your first month’s premium directly to Kaiser Permanente
                 to activate your coverage. Select PAY NOW to make your first premium payment online. To learn about
                 other payment options, select ‘How to Pay’.</p>
@@ -51,16 +51,10 @@
         <% else %>
           <span class="btn btn-default" data-target="#how_to_pay" data-toggle="modal">How to Pay</span>
         <% end %>
-        <% if show_pay_now? %>
-          <% if can_access_pay_now_button %>
-            <button class="btn btn-primary" data-toggle="modal" data-target="#payNowModal" data-enrollment="<%= @enrollment.hbx_id %>">Pay Now</button>
-          <% else %>
-            <button class="btn btn-primary disabled">Pay Now</button>
-          <% end %>
-        <% end %>
+        <%= render partial: "insured/plan_shoppings/pay_now_information", locals: { source: @source, hbx_enrollment: @enrollment }%>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
 
-        <% if show_pay_now? %>
+        <% if show_pay_now?(@source, @enrollment) %>
           <br/>
           <br/>
           <strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without selecting PAY NOW,
@@ -85,7 +79,7 @@
               <br/>
               <ol>
                 <li>
-                  <% if show_pay_now? %>
+                  <% if show_pay_now?(@source, @enrollment) %>
                     You must pay your first month’s premium directly to Kaiser Permanente to activate your
                     coverage. DC Health Link does not collect premium payments.<br/><br/>
                     There are two ways to pay your first month’s premium and activate your coverage:
@@ -154,7 +148,7 @@
                   </div>
 
                   <% elsif @plan.issuer_profile.legal_name == "Kaiser" %>
-                  <% unless show_pay_now? %>
+                  <% unless show_pay_now?(@source, @enrollment) %>
                     <div>
                       Call: <strong>1-844-524-7370</strong>
                       <!-- comment out congressional phone numbers
@@ -173,7 +167,7 @@
 
                 <br/>
                 <br/>
-                <% unless show_pay_now? %>
+                <% unless show_pay_now?(@source, @enrollment) %>
                   <li>
                     <strong>Start using your benefits.</strong> Once <%= @plan.issuer_profile.legal_name %> receives your first payment, they can provide the information you'll need to start using your benefits (such as member number). They'll also mail your insurance cards to you.<br/>
                   </li>
@@ -260,71 +254,3 @@
     </div>
   </div>
 </div><br>
-
-<!-- Payment confitmation modal-->
-<div class="modal fade" tabindex="-1" role="dialog" id="payNowModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title text-center text-uppercase"></h4>
-      </div>
-      <div class="modal-body">
-        <p>
-          You are leaving the <%= Settings.site.short_name %> website and entering a privately-owned website created,
-          operated and maintained by Kaiser Permanente.<br/>
-        <ul>
-          <li>This link is provided for your convenience to allow you to pay your first month’s insurance premium now.
-            It’s only available to make your first payment.
-          </li>
-          <li>The information that Kaiser Permanente collects and maintains as a result of your visit to its website is
-            different from the information that DC Health Link collects and maintains.
-          </li>
-          <li>DC Health Link cannot help you with any information regarding this website, including your username or
-            password, or other technical issues.
-          </li>
-          <br/>
-        </ul>
-        By linking to this private business, DC Health Link is not endorsing its products, services, or privacy or
-        security policies. We recommend you review the business's information collection policy or terms and conditions
-        to fully understand what information is collected by Kaiser Permanente.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
-          <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
-          <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= @enrollment.hbx_id %>">
-            Leave DC Health LINK
-          </button>
-        </form>
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-
-<script>
-$("#pay-now").on('click', function (e) {
-    e.preventDefault();
-    $.ajax({
-        type: "GET",
-        url: "/payment_transactions/generate_saml_response",
-        data: {enrollment_id: $("#pay-now").val()},
-        success: function (response) {
-          if (response["error"] != null){
-            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
-          else if (response["status"] == 404){
-            alert("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")}
-          else{
-            document.getElementById("sp").value = response["SAMLResponse"];
-            $("#pay_now_form").submit();
-          }
-        },
-        error: function (response) {
-            // error handling
-        }
-    });
-  });
-</script>
