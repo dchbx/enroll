@@ -5,12 +5,12 @@
   <%#= stylesheet_link_tag 'standalone_effective_datatables' %>
 <% end %>
 
-<div class="container">
+<div class="container" style="height: 100%;">
   <div class="bottom-pd">
       <h1 class="heading-text">Enroll Configurations</h1>
 
 	  <div class="row mt-4" id="configurations">
-	  	<div class="col-md-3" style="overflow: scroll;">
+	  	<div class="col-md-3" style="overflow: scroll; background-color: #e6e6e6; height: 100%;">
 	  		<%= render_configuration_navigation_menu %>
 	  	</div>
 
@@ -45,6 +45,10 @@
 		font-weight: 500;
 		line-height: 1.2;
 	}
+
+  #configurations {
+    height: 100%;
+  }
 
    #configurations .list-group {
      color: black;
@@ -110,5 +114,9 @@
   }
   .switch > input:checked + .slider {
       box-shadow:0 0 0 2px limeGreen,0 0 2px limeGreen;
+  }
+
+  .bottom-pd {
+    height: 100%;
   }
 </style>
