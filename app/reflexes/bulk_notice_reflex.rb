@@ -92,10 +92,10 @@ class BulkNoticeReflex < ApplicationReflex
                                                              types: 'resident' }
     elsif census_employee
       session[:bulk_notice][:audience][census_employee.id.to_s] = { id: census_employee.id,
-                                                             legal_name: census_employee.full_name,
-                                                             fein: "",
-                                                             hbx_id: census_employee.hbx_id,
-                                                             types: 'census_employee' }
+                                                                    legal_name: census_employee.full_name,
+                                                                    fein: "",
+                                                                    hbx_id: census_employee.hbx_id,
+                                                                    types: 'census_employee' }
     else
       session[:bulk_notice][:audience][entity_identifier] = { id: entity_identifier, error: 'Not found' }
     end

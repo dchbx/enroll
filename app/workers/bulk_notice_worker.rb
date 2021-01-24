@@ -10,7 +10,7 @@ class BulkNoticeWorker
 
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @entity = BenefitSponsors::Organizations::Organization.where(_id: audience_id) ||
-      Person.find(_id: audience_id)
+              Person.find(_id: audience_id)
 
     params = fetch_params(@bulk_notice)
 
