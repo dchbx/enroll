@@ -7,7 +7,7 @@ class BulkNoticeWorker
 
   def perform(audience_id, bulk_notice_id) # rubocop:disable Metrics/AbcSize
     sleep 2
-    
+
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
     @entity = BenefitSponsors::Organizations::Organization.where(_id: audience_id) ||
       Person.find(_id: audience_id)
@@ -23,7 +23,7 @@ class BulkNoticeWorker
         )
       end
       result = results.any?(&:success?)
-    elsif @bulk_notice.audience_type == 'consumer' || @bulk_notice.audience_type == 'resident'
+    elsif @bulk_notice.audience_type == 'consumer' || @bulk_notice.audience_type == 'resident' || @bulk_notice.audience_type == 'census_employee'
       resource = @entity
       result = Operations::SecureMessageAction.new.call(
         params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),

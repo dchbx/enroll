@@ -8,7 +8,7 @@
   <strong>Important:</strong> <p><%= l10n("admin_actions.bulk_upload.new.description_sub_text") %></p>
 
   <%= form_for(@bulk_notice, url: exchanges_bulk_notice_path(@bulk_notice)) do |f| %>
-    <%= f.select :audience_type, { 'Resident' => :resident, 'Consumer' => :consumer, 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { reflex: 'change->BulkNotice#audience_select' } %>
+    <%= f.select :audience_type, { 'Resident' => :resident, 'Consumer' => :consumer, 'Census Employee' => :census_employee, 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { reflex: 'change->BulkNotice#audience_select' } %>
     <table class='table table-message-wrapper'>
       <tbody>
         <tr>

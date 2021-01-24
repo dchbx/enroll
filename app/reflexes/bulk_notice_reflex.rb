@@ -70,7 +70,7 @@ class BulkNoticeReflex < ApplicationReflex
                    BenefitSponsors::Organizations::Organization.where(id: entity_identifier).first
     consumer = Person.all_consumer_roles.by_hbx_id(entity_identifier).first
     resident = Person.all_resident_roles.by_hbx_id(entity_identifier).first
-    employee = Person.all_employee_roles.by_hbx_id(entity_identifier).first
+    census_employee = Person.all_employee_roles.by_hbx_id(entity_identifier).first
 
     if organization
       session[:bulk_notice][:audience][organization.id.to_s] = { id: organization.id,
@@ -90,6 +90,12 @@ class BulkNoticeReflex < ApplicationReflex
                                                              fein: "",
                                                              hbx_id: resident.hbx_id,
                                                              types: 'resident' }
+    elsif census_employee
+      session[:bulk_notice][:audience][census_employee.id.to_s] = { id: census_employee.id,
+                                                             legal_name: census_employee.full_name,
+                                                             fein: "",
+                                                             hbx_id: census_employee.hbx_id,
+                                                             types: 'census_employee' }
     else
       session[:bulk_notice][:audience][entity_identifier] = { id: entity_identifier, error: 'Not found' }
     end
