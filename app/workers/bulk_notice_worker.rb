@@ -7,13 +7,10 @@ class BulkNoticeWorker
 
   def perform(audience_id, bulk_notice_id) # rubocop:disable Metrics/AbcSize
     sleep 2
+    
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
-    @entity = nil
-    begin
-      @entity = BenefitSponsors::Organizations::Organization.find(audience_id)
-    rescue StandardError
-      @entity = Person.find(audience_id)
-    end
+    @entity = BenefitSponsors::Organizations::Organization.where(_id: audience_id) ||
+      Person.find(_id: audience_id)
 
     params = fetch_params(@bulk_notice)
 

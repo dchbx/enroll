@@ -42,6 +42,8 @@ module Exchanges
 
     def update
       @bulk_notice = Admin::BulkNotice.find(params[:id])
+      byebug
+
       if @bulk_notice.update_attributes(bulk_notice_params)
         @bulk_notice.upload_document(params, current_user) if params[:file].present?
         @bulk_notice.process! unless params[:commit] == "Preview"

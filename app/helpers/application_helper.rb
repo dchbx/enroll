@@ -873,12 +873,7 @@ module ApplicationHelper
   end
 
   def bulk_notice_id_discovery(id)
-    hbx_id = nil
-    begin
-      hbx_id = BenefitSponsors::Organizations::Organization.find(id)&.hbx_id
-    rescue StandardError
-      hbx_id = Person.find(id)&.hbx_id
-    end
-    hbx_id
+      hbx_id = BenefitSponsors::Organizations::Organization.where(_id: id)&.hbx_id ||
+        Person.find(id)&.hbx_id
   end
 end
