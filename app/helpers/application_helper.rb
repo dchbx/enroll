@@ -873,7 +873,7 @@ module ApplicationHelper
   end
 
   def bulk_notice_id_discovery(id)
-    BenefitSponsors::Organizations::Organization.where(_id: id)&.hbx_id ||
-      Person.find(id)&.hbx_id
+    BenefitSponsors::Organizations::Organization.where(_id: id).first&.hbx_id ||
+      Person.where(_id: id).first&.hbx_id
   end
 end
