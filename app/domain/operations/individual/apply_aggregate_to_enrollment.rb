@@ -38,9 +38,10 @@ module Operations
         current_max_aptc = eligibility_determination.max_aptc.to_f
         enrollments.each do |enrollment|
           max_aptc = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
+                       date = Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), enrollment.effective_on).to_date
                        shopping_fm_ids = enrollment.hbx_enrollment_members.pluck(:applicant_id)
                        input_params = { family: enrollment.family,
-                                        effective_on: enrollment.effective_on,
+                                        effective_on: date,
                                         shopping_fm_ids: shopping_fm_ids,
                                         subscriber_applicant_id: enrollment&.subscriber&.applicant_id }
                        monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
