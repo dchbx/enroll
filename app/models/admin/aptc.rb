@@ -362,6 +362,8 @@ class Admin::Aptc < ApplicationController
             # Update elected_aptc_pct to the correct value based on the new applied_amount
             duplicate_hbx.elected_aptc_pct = actual_aptc_value/max_aptc
 
+            duplicate_hbx.aggregate_aptc_amount = max_aptc
+
             # Reset aasm_state
             duplicate_hbx.aasm_state = "shopping"
 
