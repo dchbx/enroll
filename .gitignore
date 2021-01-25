@@ -102,3 +102,4 @@ coverage
 # Ignore HUGO output dirs
 hugo/public
 hugo/static
+.DS_Store
