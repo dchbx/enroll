@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir["spec/**/*"]
 
   spec.add_dependency "rails",                     "~> 5.2.3"
-  spec.add_dependency "mongoid",                   "~> 7.0.2"
+  spec.add_dependency "mongoid",                   "~> 7.2"
   spec.add_dependency 'mongoid-autoinc',           '~> 6.0'
   spec.add_dependency "aasm",                      "~> 4.8"
   spec.add_dependency 'config',                    '~> 2.0'
@@ -40,7 +40,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'factory_bot_rails',         '~> 4'
   spec.add_development_dependency 'forgery',                   '~> 0.7.0'
   spec.add_development_dependency 'mongoid_rails_migrations',  '~> 1.2.0'
-  spec.add_development_dependency "mongoid-rspec",             '~> 4.0.1'
+  spec.add_development_dependency "mongoid-rspec",             '~> 4.1'
   spec.add_development_dependency 'rails-perftest',            '~> 0.0.7'
   spec.add_development_dependency "rspec-rails",               '~> 3.8'
   spec.add_development_dependency 'rubocop-rspec',             '~> 1.31'

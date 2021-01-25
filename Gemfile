@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.5.1'
+ruby '2.7.1'
 gem 'rails', '~> 5.2.4.3'
 
 #######################################################
@@ -49,7 +49,7 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '~> 7.0.2'
+gem 'mongoid',                  '~> 7.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
@@ -163,7 +163,7 @@ group :test do
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
+  gem 'mongoid-rspec',                '~> 4.1'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
@@ -177,7 +177,7 @@ group :test do
 end
 
 group :production do
-  gem 'eye',          '0.8'
+  gem 'eye',          '0.10.0'
   gem 'newrelic_rpm', '~> 5.0'
   gem 'unicorn',      '~> 4.8'
 end

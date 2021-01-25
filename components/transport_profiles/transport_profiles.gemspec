@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.files = Dir["{app,config,db,lib}/**/*", "MIT-LICENSE", "Rakefile", "README.rdoc"]
 
   s.add_dependency "rails", "~> 5.2.4.3"
-  s.add_dependency 'mongoid', "~> 7.0.2"
+  s.add_dependency 'mongoid', "~> 7.2"
   s.add_dependency 'transport_gateway'
   s.add_dependency 'symmetric-encryption', '~> 3.9.1'
   s.add_dependency 'rubyzip', '>= 1.3.0'
