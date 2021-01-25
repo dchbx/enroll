@@ -48,7 +48,8 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
+    # result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
+    result = ::Operations::Documents::Download.call({params: params.permit!.to_h, user: current_user})
     if result.success?
       response_data = result.value!
       send_data response_data, get_options(params)

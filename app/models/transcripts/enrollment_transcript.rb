@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Transcripts
   class EnrollmentTranscriptError < StandardError; end
 
@@ -11,16 +13,16 @@ module Transcripts
       @transcript = transcript_template
 
       @logger = Logger.new("#{Rails.root}/log/family_transcript_logfile.log")
-      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'updated_by', 'updated_by_id', 'published_to_bus_at', 'aasm_state', 
-        'consumer_role_id', 'carrier_profile_id', 'changing', 'is_active', 'plan_id', 'submitted_at', 'termination_submitted_on', 'enrollment_kind', 'elected_aptc_pct', 
-        'review_status', 'enrollment_signature', 'special_verification_period', 'special_enrollment_period_id','employee_role_id', 'benefit_group_id', 
-        'benefit_group_assignment_id',
-        'broker_agency_profile_id',
-        'original_application_type',
-        'terminate_reason',
-        'waiver_reason',
-        'writing_agent_id',
-        'coverage_end_on']
+      @fields_to_ignore ||= ['_id', 'user_id', 'version', 'created_at', 'updated_at', 'updated_by', 'updated_by_id', 'published_to_bus_at', 'aasm_state',
+                             'consumer_role_id', 'carrier_profile_id', 'changing', 'is_active', 'plan_id', 'submitted_at', 'termination_submitted_on', 'enrollment_kind', 'elected_aptc_pct',
+                             'review_status', 'enrollment_signature', 'special_verification_period', 'special_enrollment_period_id','employee_role_id', 'benefit_group_id',
+                             'benefit_group_assignment_id',
+                             'broker_agency_profile_id',
+                             'original_application_type',
+                             'terminate_reason',
+                             'waiver_reason',
+                             'writing_agent_id',
+                             'coverage_end_on']
 
       @custom_templates = ['HbxEnrollmentMember', 'Plan']
 
@@ -65,14 +67,13 @@ module Transcripts
     end
 
     def enrollment_members_not_matched?(enrollment)
-      (@enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) != 0 ? true : false
+      (@enrollment.hbx_enrollment_members <=> enrollment.hbx_enrollment_members) != 0
     end
 
     def find_or_build(enrollment)
-
       if @shop
       else
-        
+
         # if !(TimeKeeper.date_of_record.beginning_of_year..TimeKeeper.date_of_record.end_of_year).cover?(enrollment.effective_on)
         #   raise "enrollment has #{enrollment.effective_on} effective date."
         # end
@@ -88,8 +89,8 @@ module Transcripts
       match_instance(enrollment)
 
       if @enrollment.present?
-        if (enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on)
-          @duplicate_coverages << @enrollment if (HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state) || @enrollment.coverage_terminated?)
+        if enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on
+          @duplicate_coverages << @enrollment if HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state) || @enrollment.coverage_terminated?
           @enrollment = nil
         end
       end
@@ -121,7 +122,7 @@ module Transcripts
     end
 
     def add_plan_information
-      if @transcript[:compare]['base']  && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present?
+      if @transcript[:compare]['base'] && @transcript[:compare]['base']['update'] && @transcript[:compare]['base']['update']['plan_id'].present? # rubocop:disable Style/GuardClause
         plan = @transcript[:other].product
 
         @transcript[:compare]['base']['update']['plan_id'] = {
@@ -145,7 +146,7 @@ module Transcripts
 
     def compare_instance
       return if @transcript[:other].blank?
-      differences    = HashWithIndifferentAccess.new
+      differences = HashWithIndifferentAccess.new
 
       if @transcript[:source_is_new]
         differences[:new] = {:new => {:hbx_id => @transcript[:other].hbx_id}}
@@ -179,13 +180,9 @@ module Transcripts
           differences[:update] ||= {}
 
           if assoc_class == 'EmployerProfile'
-            if source[:fein] != other[:fein]
-              differences[:update][key || attr_val] = other
-            end
+            differences[:update][key || attr_val] = other if source[:fein] != other[:fein] # rubocop:disable Metrics/BlockNesting
           elsif assoc_class == 'Plan'
-            if source[:hios_id] != other[:hios_id]
-              differences[:update][key || attr_val] = other
-            end
+            differences[:update][key || attr_val] = other if source[:hios_id] != other[:hios_id] # rubocop:disable Metrics/BlockNesting
           else
             if attr_val.to_s.match(/_id$/).present?
               identifer_val = source[attr_val.to_sym] || other[attr_val.to_sym]
@@ -201,12 +198,12 @@ module Transcripts
 
     def self.enumerated_associations
       associations = [
-        {association: "plan", enumeration_field: "hios_id", cardinality: "one", enumeration: [ ]},
-        {association: "hbx_enrollment_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: [ ]}
+        {association: "plan", enumeration_field: "hios_id", cardinality: "one", enumeration: []},
+        {association: "hbx_enrollment_members", enumeration_field: "hbx_id", cardinality: "one", enumeration: []}
         # {association: "broker", enumeration_field: "npn", cardinality: "one", enumeration: [ ]}
       ]
 
-      associations << {association: "employer_profile", enumeration_field: "fein", cardinality: "one", enumeration: [ ]} if @shop
+      associations << {association: "employer_profile", enumeration_field: "fein", cardinality: "one", enumeration: []} if @shop
       associations
     end
 
@@ -222,15 +219,15 @@ module Transcripts
         @transcript[:plan_details] = {
           plan_name: "#{@enrollment.product.hios_id}:#{@enrollment.product.name}",
           other_effective_on: enrollment.effective_on.strftime("%m/%d/%Y"),
-          effective_on:  @enrollment.effective_on.strftime("%m/%d/%Y"),
+          effective_on: @enrollment.effective_on.strftime("%m/%d/%Y"),
           aasm_state: @enrollment.aasm_state.camelcase,
-          terminated_on: (@enrollment.terminated_on.blank? ? nil : @enrollment.terminated_on.strftime("%m/%d/%Y")),
+          terminated_on: (@enrollment.terminated_on.blank? ? nil : @enrollment.terminated_on.strftime("%m/%d/%Y"))
         }
 
         if @shop && employer = @enrollment.employer_profile
           @transcript[:employer_details] = {
             fein: employer.fein,
-            legal_name:  employer.legal_name
+            legal_name: employer.legal_name
           }
         end
       end
@@ -282,12 +279,12 @@ module Transcripts
       else
         enrollments = (@shop ? matching_shop_coverages(match) : matching_ivl_coverages(match)).uniq
         exact_matches = find_exact_enrollment_matches(enrollment, enrollments)
-        if exact_matches.present?
-          exact_match = exact_matches.detect{|en| en.hbx_id = match.hbx_id } || exact_matches.first
-        else
-          exact_match = ((enrollments.last.effective_on == match.effective_on) ? match : enrollments.last)
-        end
-        enrollments = enrollments.select{|en| en.hbx_id != exact_match.hbx_id}
+        exact_match = if exact_matches.present?
+                        exact_matches.detect{|en| en.hbx_id = match.hbx_id } || exact_matches.first
+                      else
+                        ((enrollments.last.effective_on == match.effective_on) ? match : enrollments.last)
+                      end
+        enrollments = enrollments.reject{|en| en.hbx_id == exact_match.hbx_id}
         @enrollment = exact_match
         @duplicate_coverages = enrollments.select{|en| HbxEnrollment::ENROLLED_STATUSES.include?(en.aasm_state)}
       end
