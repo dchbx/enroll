@@ -11,7 +11,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
   end
 
   let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
-  let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
+  # let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
   let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -47,6 +47,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
 
   before(:each) do
     allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate) {|_id, _start, age| age * 1.0}
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(start_on)}.update_attributes!(slcsp_id: plan.id)
   end
 
   context 'return failure with no active tax household' do
@@ -75,12 +76,10 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
 
   context 'apply aggregate on eligible enrollments' do
     before(:each) do
-      allow(TimeKeeper).to receive(:date_of_record).and_return (Date.new(2021, 1, 26))
-      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
-      tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
+      allow(TimeKeeper).to receive(:date_of_record).and_return Date.new(start_on.year, 1, 26)
       input_params = {eligibility_determination: eligibility_determination}
-      @result = subject.call(input_params)
       allow(family).to receive(:active_household).and_return(household)
+      @result = subject.call(input_params)
     end
 
     it 'returns monthly aggregate amount' do
