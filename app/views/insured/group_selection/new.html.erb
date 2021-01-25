@@ -1,6 +1,7 @@
 <% content_for :horizontal_status do %>
   <%= render :partial => 'insured/families/horizontal_status.html.erb', locals: {step: 1} %>
 <% end %>
+<% effective_date_for_display = @effective_on_date || @new_effective_on %>
 <div class="container group-selection">
   <div class="row">
     <%= form_tag(:insured_group_selections, :id => "group-selection-form") do %>
@@ -9,7 +10,7 @@
         <p class="twenty">Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.</p>
         <div id="effective_date" style="font-size :24px">
         <%if @effective_on_date.present? || @new_effective_on%>
-          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= format_date(@effective_on_date || @new_effective_on) %></span>
+          <%= l10n("insured.group_selection.new.effective_date") %>: <span style="color: red;"><%= format_date(effective_date_for_display) %></span>
         <%end%>
         </div>
         <h3><%= l10n("insured.group_selection.new.who_needs_coverage") %></h3>
@@ -96,7 +97,7 @@
         <% end %>
 
         <% if @adapter.can_shop_shop?(@person) %>
-          <%= render 'select_employer' %>
+          <%= render partial: 'select_employer', locals: {effective_date: effective_date_for_display} %>
         <% end %>
 
         <div id="coverage_kinds" class='row no-buffer'>
@@ -112,7 +113,7 @@
               </label>
             </div>
 
-            <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment) %>">
+            <div id="dental-radio-button" class="n-radio-row <%= 'dn' if @adapter.can_shop_shop?(@person) && !@adapter.is_eligible_for_dental?(@employee_role, @change_plan, @hbx_enrollment, effective_date_for_display) %>">
               <label class="n-radio" for="coverage_kind_dental">
                 <%= radio_button_tag 'coverage_kind', 'dental', is_coverage_kind_checked?("dental"), disabled: is_coverage_kind_disabled?("dental"), id: 'coverage_kind_dental', class: 'n-radio' %>
                 <span class="n-radio">
