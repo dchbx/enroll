@@ -10,13 +10,20 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
     end
   end
 
+  let!(:plan) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}
+  let(:benefit_coverage_period) {double(contains?: true, second_lowest_cost_silver_plan: plan)}
+  let!(:hbx_profile) {FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period)}
   let!(:person) {FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role)}
   let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
   let!(:primary_fm) {family.primary_applicant}
   let!(:household) {family.active_household}
   let!(:start_on) {TimeKeeper.date_of_record.beginning_of_year}
   let(:family_member1) {FactoryBot.create(:family_member, family: household.family)}
-  let!(:tax_household) {FactoryBot.create(:tax_household, effective_ending_on: nil, household: family.households.first)}
+  let!(:tax_household) do
+    tax_household = FactoryBot.create(:tax_household, effective_ending_on: nil, household: family.households.first)
+    FactoryBot.create(:tax_household_member, tax_household: tax_household, applicant_id: family_member1.id, is_ia_eligible: true)
+    tax_household
+  end
   let(:sample_max_aptc_1) {1200}
   let(:sample_csr_percent_1) {87}
   let!(:eligibility_determination) {FactoryBot.create(:eligibility_determination, tax_household: tax_household, max_aptc: sample_max_aptc_1, csr_percent_as_integer: sample_csr_percent_1)}
@@ -68,6 +75,9 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
 
   context 'apply aggregate on eligible enrollments' do
     before(:each) do
+      allow(TimeKeeper).to receive(:date_of_record).and_return (Date.new(2021, 1, 26))
+      hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect {|bcp| bcp.contains?(TimeKeeper.datetime_of_record)}.update_attributes!(slcsp_id: plan.id)
+      tax_household = TaxHousehold.new(effective_starting_on: TimeKeeper.date_of_record)
       input_params = {eligibility_determination: eligibility_determination}
       @result = subject.call(input_params)
       allow(family).to receive(:active_household).and_return(household)
@@ -75,6 +85,7 @@ RSpec.describe Operations::Individual::ApplyAggregateToEnrollment do
 
     it 'returns monthly aggregate amount' do
       expect(@result.success).to eq "Aggregate amount applied on to enrollments"
+      expect(family.hbx_enrollments.to_a.first.applied_aptc_amount).not_to eq family.hbx_enrollments.last.applied_aptc_amount
     end
   end
 end
