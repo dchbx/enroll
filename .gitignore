@@ -103,3 +103,4 @@ coverage
 hugo/public
 hugo/static
 .DS_Store
+_DS_Store
