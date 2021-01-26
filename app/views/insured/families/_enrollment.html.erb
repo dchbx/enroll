@@ -205,7 +205,7 @@
             </span>
           <% end %>
           <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
-          <%= render partial: "insured/plan_shoppings/pay_now_information", locals: { source: "enrollment_tile", hbx_enrollment: hbx_enrollment } %>
+          <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Enrollment Tile", hbx_enrollment: hbx_enrollment } %>
         </div>
       </div>
     <% end %>
