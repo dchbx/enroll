@@ -80,9 +80,7 @@ module Operations
 
       def aptc_consumed_in_terminated_month(termination_date)
         total_days = termination_date.end_of_month.day
-        if @old_enr_effective_on.month == termination_date.month
-          0
-        elsif termination_date < @old_enr_effective_on
+        if @old_enr_effective_on.month == termination_date.month || termination_date < @old_enr_effective_on
           0
         else
           termination_date.day.fdiv(total_days) * @applied_aptc
