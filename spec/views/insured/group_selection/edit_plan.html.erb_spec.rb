@@ -40,6 +40,10 @@ RSpec.describe "app/views/insured/group_selection/edit_plan.html.erb" do
       render :template =>"insured/group_selection/edit_plan.html.erb"
     end
 
+    it "should show Plan Contact Info translation" do
+      expect(rendered).to match(/Plan Contact Info/)
+    end
+
     it "should show the DCHL ID as hbx_enrollment.hbx_id" do
       expect(rendered).to match(/ID/)
       expect(rendered).to match /#{enrollment.hbx_id}/

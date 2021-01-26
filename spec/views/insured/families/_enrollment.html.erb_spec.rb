@@ -98,6 +98,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+      expect(rendered).to match(/Plan Contact Info/)
       expect(rendered).to have_content(employer_legal_name)
       expect(rendered).to have_selector('strong', text: "#{HbxProfile::ShortName}")
       expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)

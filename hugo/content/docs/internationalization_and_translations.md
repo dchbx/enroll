@@ -104,11 +104,9 @@ More information on lazy loading can be viewed here: https://guides.rubyonrails.
 In the past we have used own `l10n` helper. This will soon be *deprecated*  in order to better conform to Rails conventions:
 
 ```
-module DryL10nHelper
-  def l10n(translation_key, interpolated_keys = {})
-    I18n.t(translation_key, interpolated_keys.merge(raise: true)).html_safe
-  rescue I18n::MissingTranslationData
-    translation_key.gsub(/\W+/, '').titleize
+module L10nHelper
+  def l10n(translation_key, interpolated_keys={})
+    I18n.t(translation_key, interpolated_keys.merge(default: translation_key.gsub(/\W+/, ''))).html_safe
   end
 end
 ```
