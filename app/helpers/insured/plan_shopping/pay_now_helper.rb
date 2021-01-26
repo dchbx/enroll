@@ -1,17 +1,21 @@
+#frozen_string_literal: true
+
 module Insured
   module PlanShopping
-    module ReceiptHelper
-      #rubocop:disable Metrics/CyclomaticComplexity
+    #helper related to paynow feature
+    module PayNowHelper
       def show_pay_now?(source, hbx_enrollment)
         return false unless EnrollRegistry[:pay_now_functionality].feature.is_enabled
-        condition = (carrier_with_payment_option?(hbx_enrollment) && individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_kaiser_enrollments?(hbx_enrollment)))
-        if source == "plan_shopping"
-          condition && !pay_now_button_timed_out?(hbx_enrollment) ? true : false
+        if source == "Plan Shopping"
+          pay_now_validation?(hbx_enrollment) && !pay_now_button_timed_out?(hbx_enrollment) ? true : false
         else
-          condition && past_effective_on?(hbx_enrollment) ? true : false
+          pay_now_validation?(hbx_enrollment) && past_effective_on?(hbx_enrollment) ? true : false
         end
       end
-      #rubocop:enable Metrics/CyclomaticComplexity
+
+      def pay_now_validation?(hbx_enrollment)
+        return true if carrier_with_payment_option?(hbx_enrollment) && individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_kaiser_enrollments?(hbx_enrollment))
+      end
 
       def carrier_with_payment_option?(hbx_enrollment)
         hbx_enrollment.product.issuer_profile.legal_name == EnrollRegistry[:pay_now_functionality].setting(:carriers).item

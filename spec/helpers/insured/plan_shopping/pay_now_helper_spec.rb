@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
+RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
   let(:person) { FactoryBot.create(:person, :with_consumer_role, :with_family) }
   let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
   let(:family) { person.primary_family }
@@ -38,7 +38,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
           allow(helper).to receive(:has_any_previous_kaiser_enrollments?).with(hbx_enrollment).and_return false
-          expect(helper.show_pay_now?("plan_shopping", hbx_enrollment)).to eq false
+          expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
         end
       end
     end
@@ -70,7 +70,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
       assign(:enrollment, hbx_enrollment)
     end
     it "returns false for not Kaiser" do
-      expect(helper.show_pay_now?("plan_shopping", hbx_enrollment)).to eq false
+      expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
     end
   end
 
@@ -335,12 +335,12 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
     end
 
     it 'should return true if current date is less than enrollment effective date' do
-      expect(helper.show_pay_now?("enrollment_tile", hbx_enrollment)).to eq true
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq true
     end
 
     it 'should return true if current date is equal to enrollment effective date' do
       allow(TimeKeeper).to receive(:date_of_record).and_return(hbx_enrollment.effective_on)
-      expect(helper.show_pay_now?("enrollment_tile", hbx_enrollment)).to eq false
+      expect(helper.show_pay_now?("Enrollment Tile", hbx_enrollment)).to eq false
     end
   end
 end
