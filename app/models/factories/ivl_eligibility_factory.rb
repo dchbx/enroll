@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 module Factories
-  module IvlEligibilityFactory
+  # This module is for fetching IVL Eligibility for a shopping group.
+  module IvlEligibilityFactory # rubocop:disable Metrics/ModuleLength
     include FloatHelper
 
     # returns hash of total_aptc, aptc_breakdown_by_member and csr_value

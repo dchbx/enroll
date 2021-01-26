@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
-# This factory's scope is just for Plan Shopping.
-# This factory specifically deals with the non-persisted
-# enrollments that are generated during plan shopping.
-
 module Factories
+  # This factory's scope is just for Plan Shopping.
+  # This factory specifically deals with the non-persisted
+  # enrollments that are generated during plan shopping.
   class IvlPlanShoppingEligibilityFactory
     include IvlEligibilityFactory
 
