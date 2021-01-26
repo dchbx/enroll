@@ -13,6 +13,14 @@ module BenefitSponsors
           optional(:extension).maybe(:string)
           optional(:full_phone_number).maybe(:string)
         end
+
+        rule(:number) do
+          key.failure("Invalid Phones: Number can't be blank") unless /\A[0-9][0-9][0-9][0-9][0-9][0-9][0-9]\z/.match?(value)
+        end
+
+        rule(:kind) do
+          key.failure('Invalid Phones: kind not valid') unless %w(home work).include?(value)
+        end
       end
     end
   end

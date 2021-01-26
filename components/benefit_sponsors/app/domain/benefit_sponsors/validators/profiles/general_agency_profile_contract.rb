@@ -7,14 +7,14 @@ module BenefitSponsors
       class GeneralAgencyProfileContract < ProfileContract
 
         params do
-          optional(:market_kind).filled(:symbol)
+          required(:market_kind).filled(:symbol)
           optional(:languages_spoken).maybe(:array)
           optional(:working_hours).maybe(:bool)
           optional(:accept_new_clients).maybe(:bool)
 
           before(:value_coercer) do |result|
             result_hash = result.to_h
-            result_hash[:market_kind] = result_hash[:ordinal_position].to_sym
+            result_hash[:market_kind] = result_hash[:market_kind]&.to_sym
             result_hash
           end
         end

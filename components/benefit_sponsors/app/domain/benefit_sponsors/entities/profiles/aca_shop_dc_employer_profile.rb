@@ -5,7 +5,9 @@ module BenefitSponsors
     module Profiles
       # Entity acts a top level profile class
       class AcaShopDcEmployerProfile < Profile
-        transform_keys(&:to_sym)
+        include Dry::StructExtended
+
+        attribute :is_benefit_sponsorship_eligible,    Types::Strict::Bool
       end
     end
   end

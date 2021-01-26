@@ -72,15 +72,6 @@ module BenefitSponsors
             )
           end
 
-          # def validate_employer_staff_params(params)
-          #   result = BenefitSponsors::Validators::Employers::EmployerStaffRoles::Add.new.call(params)
-          #   if result.success?
-          #     Success(result.to_h)
-          #   else
-          #     Failure(result.errors.to_h)
-          #   end
-          # end
-
           def get_staff_entity(params)
             Try do
               Success(BenefitSponsors::Entities::Forms::Employers::EmployerStaffRoles::New.new(params))

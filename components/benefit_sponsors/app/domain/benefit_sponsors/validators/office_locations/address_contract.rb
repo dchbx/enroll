@@ -16,22 +16,22 @@ module BenefitSponsors
         end
 
         rule(:zip) do
-          key.failure("#{values[:kind].capitalize} Addresses: zip can't be blank") if values[:zip].to_s.empty?
-          key.failure("#{values[:kind].capitalize} Addresses: zip should be in the form: 12345 or 12345-1234") if values[:zip].to_s.present? && !/\A\d{5}(-\d{4})?\z/.match?(value)
+          key.failure("#{values[:kind].capitalize} Addresses: zip can't be blank") if value.empty?
+          key.failure("#{values[:kind].capitalize} Addresses: zip should be in the form: 12345") if value.present? && !/\A[0-9][0-9][0-9][0-9][0-9]\z/.match?(value) && rule_error?
         end
 
         rule(:address_1) do
-          key.failure("#{values[:kind].capitalize} Addresses: address 1 can't be blank") if values[:address_1].to_s.empty?
+          key.failure("#{values[:kind].capitalize} Addresses: address 1 can't be blank") if value.empty?
         end
 
         rule(:city) do
-          key.failure("#{values[:kind].capitalize} Addresses: city can't be blank") if values[:city].to_s.empty?
+          key.failure("#{values[:kind].capitalize} Addresses: city can't be blank") if value.empty?
         end
 
         rule(:state) do
-          key.failure("#{values[:kind].capitalize} Addresses: state can't be blank") if values[:state].to_s.empty?
+          key.failure("#{values[:kind].capitalize} Addresses: state can't be blank") if value.empty?
+          key.failure('Invalid state') unless State::NAME_IDS.map(&:last).include?(value) && !rule_error?
         end
-
       end
     end
   end

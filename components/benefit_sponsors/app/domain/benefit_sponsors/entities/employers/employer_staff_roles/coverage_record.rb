@@ -6,15 +6,15 @@ module BenefitSponsors
       module EmployerStaffRoles
         # Create a object with coverage record values
         class CoverageRecord < Dry::Struct
-          transform_keys(&:to_sym)
+          include Dry::StructExtended
 
           attribute :ssn, Types::String.optional
           attribute :dob, Types::Date.optional
           attribute :hired_on, Types::Date.optional
           attribute :gender, Types::String.optional
           attribute :is_applying_coverage, Types::Bool
-          attribute :address, BenefitSponsors::Entities::Address.optional
-          attribute :email, BenefitSponsors::Entities::Email.optional
+          attribute :address, BenefitSponsors::Entities::Address
+          attribute :email, BenefitSponsors::Entities::Email
         end
       end
     end

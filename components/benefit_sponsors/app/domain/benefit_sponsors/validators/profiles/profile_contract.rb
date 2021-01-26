@@ -7,7 +7,6 @@ module BenefitSponsors
       class ProfileContract < Dry::Validation::Contract
 
         params do
-          required(:is_benefit_sponsorship_eligible).filled(:bool)
           required(:contact_method).filled(:symbol)
           required(:office_locations).array(:hash)
         end

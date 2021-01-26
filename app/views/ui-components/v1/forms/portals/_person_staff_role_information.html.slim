@@ -15,7 +15,7 @@ legend Personal Information
         Please provide a last name.
   .col-md-4
     label for="inputDob"  Date of Birth *
-    = f.text_field :dob, {:class => "form-control", :placeholder => "MM/DD/YYYY", id:'inputDOB', value: f.object.dob, required: true, readonly: true, maxlength:10, minlength:10, onblur:'validDob(this)'}
+    = f.text_field :dob, placeholder: 'MM/DD/YYYY', id: 'inputStaffDOB', required: true, class: 'form-control',  maxlength:10, minlength:10, readonly: true
     .invalid-feedback
       |
         Please provide a date of birth.

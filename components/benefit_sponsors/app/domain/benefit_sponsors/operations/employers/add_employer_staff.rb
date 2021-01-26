@@ -13,6 +13,7 @@ module BenefitSponsors
           @profile = yield fetch_profile(values[:profile_id])
           @person = yield fetch_person(values[:person_id])
           _value = yield check_if_employer_staff_role_already_exists?
+          _contact_info = yield update_contact_info(values)
           employer_staff_entity = yield create_employer_staff_record(values)
           result = yield persist(employer_staff_entity)
 
@@ -55,6 +56,14 @@ module BenefitSponsors
           end
         end
 
+        def update_contact_info(values)
+          if values[:area_code].present?
+            Success(@person.contact_info(values[:email], values[:area_code], values[:number], nil))
+          else
+            Success(@person.add_work_email(values[:email]))
+          end
+        end
+
         def create_employer_staff_record(values)
           BenefitSponsors::Operations::Employers::EmployerStaffRoles::Create.new.call(params: values, profile: @profile)
         end
@@ -68,7 +77,7 @@ module BenefitSponsors
               user.roles << "employer_staff"
               user.save!
             end
-            Success({:message => 'Successfully added employer staff role'})
+            Success({:message => 'Successfully added employer staff role', :person => @person})
           end
           result.to_result.failure? ? Failure({:message => 'Failed to create records, contact HBX Admin'}) : result.to_result.value!
         end

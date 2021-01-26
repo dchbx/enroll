@@ -7,7 +7,7 @@ module BenefitSponsors
       class BrokerAgencyProfile < Profile
         transform_keys(&:to_sym)
 
-        attribute :market_kind,                        Types::Strict::Symbol.optional
+        attribute :market_kind,                        Types::Strict::Symbol
         attribute :corporate_npn,                      Types::Strict::String.optional.meta(omittable: true)
         attribute :languages_spoken,                   Types::Array.optional.meta(omittable: true)
         attribute :working_hours,                      Types::Strict::Bool.optional.meta(omittable: true)

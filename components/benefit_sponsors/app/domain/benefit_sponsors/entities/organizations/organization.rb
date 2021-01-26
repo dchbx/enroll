@@ -5,7 +5,7 @@ module BenefitSponsors
     module Organizations
       # Entity to initialize while persisting Organization record.
       class Organization < Dry::Struct
-        transform_keys(&:to_sym)
+        include Dry::StructExtended
 
         attribute :home_page,             Types::String.optional.meta(omittable: true)
         attribute :legal_name,            Types::Strict::String
