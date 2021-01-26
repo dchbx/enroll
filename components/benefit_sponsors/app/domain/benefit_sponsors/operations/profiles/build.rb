@@ -33,13 +33,13 @@ module BenefitSponsors
 
         def create(validated_params)
           entity_class = "::BenefitSponsors::Entities::Profiles::#{@profile_type}".constantize
-          profile_entity = entity_class.new(validated_params)
+          profile_entity = entity_class.new(validated_params.deep_symbolize_keys!)
 
           Success(profile_entity)
         end
 
         def build_profile_params(profile_attrs)
-          if @profile_type == 'benefit_sponsor'
+          if @profile_type == 'AcaShopDcEmployerProfile'
             profile_attrs.merge!(is_benefit_sponsorship_eligible: true)
           else
             profile_attrs.merge!(is_benefit_sponsorship_eligible: false, contact_method: :paper_and_electronic)
