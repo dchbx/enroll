@@ -20,7 +20,6 @@ class Insured::FamiliesController < FamiliesController
       set_bookmark_url
       set_admin_bookmark_url(home_insured_families_path)
       @active_sep = @family.latest_active_sep
-      @source = "enrollment_tile"
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
