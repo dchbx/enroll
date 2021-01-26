@@ -41,7 +41,7 @@ class QhpBuilder
     elsif file_path.include?("delta")
       "Delta Dental"
     elsif file_path.include?("dominion")
-      "Dominion"
+      "Dominion National"
     elsif file_path.include?("guardian")
       "Guardian"
     elsif file_path.include?("best life")

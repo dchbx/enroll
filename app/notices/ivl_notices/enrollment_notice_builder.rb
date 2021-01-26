@@ -182,7 +182,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
       "(855) 444-3119"
     when "Delta Dental"
       "(800) 471-0236"
-    when "Dominion"
+    when "Dominion National"
       "(855) 224-3016"
     when "Kaiser"
       "(844) 524-7370"
