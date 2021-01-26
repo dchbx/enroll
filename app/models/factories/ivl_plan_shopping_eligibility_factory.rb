@@ -5,7 +5,8 @@
 # enrollments that are generated during plan shopping.
 
 module Factories
-  class IvlPlanShoppingEligibilityFactory < ::Factories::EligibilityFactory
+  class IvlPlanShoppingEligibilityFactory
+    include IvlEligibilityFactory
 
     def initialize(enrollment, effective_on, selected_aptc = nil, product_ids = [])
       raise "Given enrollment object is not a valid enrollment." unless enrollment.is_a?(::HbxEnrollment)
