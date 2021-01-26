@@ -73,7 +73,7 @@
               <div class="col-md-6 margin-top-15px">
                 <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>" data-toggle="modal">
                   <i class="fa fa-phone fa-2x margin-right-15px"></i>
-                  <span><%= l10n(".plan_contact_info") %></span>
+                  <span><%= l10n("plan_contact_info") %></span>
                 </a>
                 <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
                 </a>
