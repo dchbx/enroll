@@ -30,7 +30,7 @@
         <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
           <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
             <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-              <p class="fail"><%= l10n("family_members.index.add_member_info_html") %></p>
+              <p class="fail"><%= l10n("insured.family_members.index.add_member_info_html") %></p>
               <br>
               <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
                 <%= link_to l10n("add_member"), new_resident_dependent_insured_family_members_path(:family_id => @family.id), :remote => true, :class => "btn btn-default" %>
