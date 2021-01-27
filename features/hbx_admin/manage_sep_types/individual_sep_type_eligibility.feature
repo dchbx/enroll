@@ -24,6 +24,7 @@ Feature: Individual Qualifying life of event kind based on eligibity dates
     Then Individual should not see sucess confirmation text
     And I click on log out link
 
+  @flaky
   Scenario: Admin can view consumer qualified for special enrollment period based on eligibity dates
     Given Individual creates account and on home page
     And I click on log out link
