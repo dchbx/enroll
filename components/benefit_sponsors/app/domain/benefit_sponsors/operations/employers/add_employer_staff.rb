@@ -59,7 +59,7 @@ module BenefitSponsors
         def update_contact_info(values)
           if values[:area_code].present?
             Success(@person.contact_info(values[:email], values[:area_code], values[:number], nil))
-          else
+          elsif values[:email]
             Success(@person.add_work_email(values[:email]))
           end
         end

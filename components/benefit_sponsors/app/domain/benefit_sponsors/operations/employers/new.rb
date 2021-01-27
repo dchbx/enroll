@@ -11,9 +11,8 @@ module BenefitSponsors
           validated_params = yield validate(params)
           @person = yield find_person(validated_params[:person_id]) if validated_params[:person_id].present?
 
-          employer = yield build_employer(validated_params[:profile_type]) #get_employer_form_entity
-          new_er_profile = yield new_employer(employer)
-          Success(new_er_profile)
+          employer = yield build_employer(validated_params[:profile_type])
+          Success(employer)
         end
 
         private
@@ -33,13 +32,13 @@ module BenefitSponsors
         end
 
         def build_employer(profile_type)
-          Success(
-            {
-              profile_type: profile_type,
-              staff_roles: [construct_staff_role_params],
-              organization: construct_organization_params
-            }
-          )
+          params_hash = { profile_type: profile_type,
+                          staff_roles: [construct_staff_role_params],
+                          organization: construct_organization_params }
+
+          obj = JSON.parse(params_hash.to_json, object_class: OpenStruct)
+          result = add_custom_methods_on_struct(obj)
+          Success(result)
         end
 
         def construct_staff_role_params
@@ -106,12 +105,6 @@ module BenefitSponsors
           email = @person&.work_email || @person&.home_email
           Email.new(kind: email&.kind,
                     address: email&.address)
-        end
-
-        def new_employer(profile_params)
-          obj = JSON.parse(profile_params.to_json, object_class: OpenStruct)
-          result = add_custom_methods_on_struct(obj)
-          Success(result)
         end
 
         def add_custom_methods_on_struct(obj)

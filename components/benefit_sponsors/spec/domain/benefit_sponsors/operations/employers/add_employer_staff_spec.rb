@@ -13,6 +13,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::AddEmployerStaff, dbclean
       last_name: person.last_name,
       profile_id: profile.id.to_s,
       person_id: person.id.to_s,
+      email: 'test@test.com',
       dob: TimeKeeper.date_of_record,
       coverage_record: {
         is_applying_coverage: false,
@@ -34,7 +35,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::AddEmployerStaff, dbclean
     end
 
     context 'existing staff with employer' do
-      let!(:employer_staff_role) {FactoryBot.create(:employer_staff_role, person: person, benefit_sponsor_employer_profile_id: profile.id)}
+      let!(:employer_staff_role) {FactoryBot.create(:benefit_sponsor_employer_staff_role, person: person, benefit_sponsor_employer_profile_id: profile.id)}
 
       it 'should fail if person is already associated as a staff with the employer' do
         result = subject.call(params)
@@ -44,8 +45,13 @@ RSpec.describe BenefitSponsors::Operations::Employers::AddEmployerStaff, dbclean
   end
 
   context 'for success case' do
+
+    let(:address) { {kind: 'test', address_1: 'test', city: 'test', state: 'DC', zip: '12345'} }
+    let(:email) { { kind: 'primary', address: 'test@test.com' } }
+    let(:coverage_record) { { is_applying_coverage: false, address: address, email: email }}
+
     it 'should return new staff entity' do
-      result = subject.call(params)
+      result = subject.call(params.merge(coverage_record: coverage_record))
       expect(result.value![:message]).to eq "Successfully added employer staff role"
     end
 

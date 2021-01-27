@@ -13,6 +13,8 @@ module BenefitSponsors
         attribute :entity_kind,           Types::Strict::Symbol.optional.meta(omittable: true)
         attribute :site_id,               Types::Bson
         attribute :site_owner_id,         Types::Bson.optional.meta(omittable: true)
+        attribute :agency_id,             Types::Bson.optional.meta(omittable: true)
+        attribute :divisions,             Types::Array.of(BenefitSponsors::Entities::Organizations::Organization).optional.meta(omittable: true)
         attribute :profiles,              Types::Array.of(BenefitSponsors::Entities::Profiles::Profile)
       end
     end

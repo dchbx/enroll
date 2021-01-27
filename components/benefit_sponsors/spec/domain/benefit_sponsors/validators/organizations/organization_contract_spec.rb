@@ -15,7 +15,7 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationContract 
 
   let(:address) do
     {
-      kind: 'primary', address_1: "dc", address_2: "dc", city: "dc", state: "dc", zip: "12345"
+      kind: 'primary', address_1: "dc", address_2: "dc", city: "dc", state: "DC", zip: "12345"
     }
   end
 
