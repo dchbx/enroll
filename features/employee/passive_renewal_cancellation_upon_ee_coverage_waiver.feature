@@ -1,5 +1,5 @@
+@flaky
 Feature:  Employee passive renewal should be canceled when Employee waived coverage
-  @flaky
   Background: Setup site, employer, and benefit application
     Given a CCA site exists with a benefit market
     Given benefit market catalog exists for enrollment_open renewal employer with health benefits
