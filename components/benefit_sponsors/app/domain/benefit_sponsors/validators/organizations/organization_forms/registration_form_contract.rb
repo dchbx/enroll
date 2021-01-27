@@ -26,9 +26,7 @@ module BenefitSponsors
           end
 
           rule(:profile_type) do
-            if key? && value
-              key.failure('Invalid profile type') unless %w[benefit_sponsor broker_agency general_agency].include?(value)
-            end
+            key.failure('Invalid profile type') if key? && value && !%w[benefit_sponsor broker_agency general_agency].include?(value)
           end
 
           rule(:staff_roles_attributes).each do

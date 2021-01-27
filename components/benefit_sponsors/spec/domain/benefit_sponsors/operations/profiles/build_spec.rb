@@ -12,7 +12,7 @@ RSpec.describe BenefitSponsors::Operations::Profiles::Build, dbclean: :after_eac
     end
 
     let(:profile_params) do
-      {:office_locations=>
+      {:office_locations =>
          [{:address => {address_1: 'dc', kind: 'primary', address_2: 'dc', city: 'dc', state: 'DC', zip: '22302'},
            :phone => {kind: 'work', area_code: '893', number: '8302840'}}],
        :contact_method => 'electronic_only'}
@@ -33,11 +33,11 @@ RSpec.describe BenefitSponsors::Operations::Profiles::Build, dbclean: :after_eac
     context 'profile type broker_agency' do
       let(:profile_type) { 'broker_agency' }
       let(:profile_params) do
-        {:office_locations=>
+        {:office_locations =>
            [{:address => {address_1: 'dc', kind: 'primary', address_2: 'dc', city: 'dc', state: 'DC', zip: '22302'},
              :phone => {kind: 'work', area_code: '893', number: '8302840'}}],
          :contact_method => 'electronic_only',
-        :market_kind => 'individual_only'}
+         :market_kind => 'individual_only'}
       end
 
       it 'should be success' do
@@ -52,7 +52,7 @@ RSpec.describe BenefitSponsors::Operations::Profiles::Build, dbclean: :after_eac
     context 'profile type general_agency' do
       let(:profile_type) { 'general_agency' }
       let(:profile_params) do
-        {:office_locations=>
+        {:office_locations =>
            [{:address => {address_1: 'dc', kind: 'primary', address_2: 'dc', city: 'dc', state: 'DC', zip: '22302'},
              :phone => {kind: 'work', area_code: '893', number: '8302840'}}],
          :contact_method => 'electronic_only',

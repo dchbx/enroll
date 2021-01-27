@@ -10,9 +10,7 @@ module BenefitSponsors
         end
 
         rule(:is_benefit_sponsorship_eligible) do
-          if key?
-            key.failure("Benefit Sponsorship should be true") unless value
-          end
+          key.failure("Benefit Sponsorship should be true") if key? && !value
         end
       end
     end

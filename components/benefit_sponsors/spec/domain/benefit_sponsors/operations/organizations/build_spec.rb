@@ -15,11 +15,10 @@ RSpec.describe BenefitSponsors::Operations::Organizations::Build, dbclean: :afte
 
     let(:profile_entity) do
       BenefitSponsors::Entities::Profiles::AcaShopDcEmployerProfile.new({ office_locations: [{address: {address_1: 'dc', kind: 'primary', address_2: 'dc', city: 'dc', state: 'DC', zip: '22302'},
-                                                                                                                  phone: {kind: 'work', area_code: '893', number: '8302840'}}],
-                                                                          contact_method: :electronic_only
-                                                                        })
-      end
-    
+                                                                                              phone: {kind: 'work', area_code: '893', number: '8302840'}}],
+                                                                          contact_method: :electronic_only})
+    end
+
     let(:organization_params) do
       {
         entity_kind: 'tax_exempt_organization',

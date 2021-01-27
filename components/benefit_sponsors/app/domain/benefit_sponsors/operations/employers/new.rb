@@ -81,14 +81,13 @@ module BenefitSponsors
         end
 
         def build_coverage_record
-          result = CoverageRecord.new(ssn: @person&.ssn,
-                                      gender: @person&.gender,
-                                      dob: @person&.dob&.strftime("%m/%d/%Y"),
-                                      hired_on: nil,
-                                      is_applying_coverage: false,
-                                      address: build_address_for_coverage_record,
-                                      email: build_email_for_coverage_record)
-          result
+          CoverageRecord.new(ssn: @person&.ssn,
+                             gender: @person&.gender,
+                             dob: @person&.dob&.strftime("%m/%d/%Y"),
+                             hired_on: nil,
+                             is_applying_coverage: false,
+                             address: build_address_for_coverage_record,
+                             email: build_email_for_coverage_record)
         end
 
         def build_address_for_coverage_record

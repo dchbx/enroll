@@ -22,7 +22,7 @@ module BenefitSponsors
 
           rule(:coverage_record) do
             if key? && value
-              if value&.is_a?(Hash)
+              if value.is_a?(Hash)
                 result = BenefitSponsors::Validators::Employers::CoverageRecordContract.new.call(value)
                 key.failure(text: "invalid coverage_record", error: result.errors.to_h) if result&.failure?
               else

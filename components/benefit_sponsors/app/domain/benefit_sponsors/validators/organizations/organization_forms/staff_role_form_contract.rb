@@ -24,9 +24,7 @@ module BenefitSponsors
           end
 
           rule(:coverage_record) do
-            if key? && value
-              return unless values[:profile_type] == 'benefit_sponsor'
-
+            if key? && value && values[:profile_type] == 'benefit_sponsor'
               result = BenefitSponsors::Validators::Organizations::OrganizationForms::CoverageRecordFormContract.new.call(value)
               key.failure(text: "invalid coverage record params", error: result.errors.to_h) if result&.failure?
             end

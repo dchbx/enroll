@@ -19,7 +19,7 @@ module BenefitSponsors
         rule(:address) do
           if key? && value && values[:is_applying_coverage]
             address = value[:address] || value
-            if address&.is_a?(Hash)
+            if address.is_a?(Hash)
               result = BenefitSponsors::Validators::AddressContract.new.call(address)
               key.failure(text: "invalid address", error: result.errors.to_h) if result&.failure?
             else
@@ -31,7 +31,7 @@ module BenefitSponsors
         rule(:email) do
           if key? && value && values[:is_applying_coverage]
             email = value[:email] || value
-            if email&.is_a?(Hash)
+            if email.is_a?(Hash)
               result = BenefitSponsors::Validators::EmailContract.new.call(email)
               key.failure(text: "invalid email", error: result.errors.to_h) if result&.failure?
             else

@@ -19,7 +19,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::New, dbclean: :after_each
         let(:params)  { {} }
         it 'should raise error if profile type is not passed' do
           expect(subject).to be_failure
-          expect(subject.failure).to eq({:message=>["Missing profile type"]})
+          expect(subject.failure).to eq({:message => ["Missing profile type"]})
         end
       end
 
@@ -27,7 +27,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::New, dbclean: :after_each
         let(:params)  { {profile_type: 'test'} }
         it 'should raise error if profile type is not passed' do
           expect(subject).to be_failure
-          expect(subject.failure).to eq({:message=>['Invalid profile type']})
+          expect(subject.failure).to eq({:message => ['Invalid profile type']})
         end
       end
     end
@@ -46,7 +46,7 @@ RSpec.describe BenefitSponsors::Operations::Employers::New, dbclean: :after_each
     end
 
     context 'when person id is passed' do
-      let(:params)  { {profile_type: 'benefit_sponsor', person_id: "#{person.id.to_s}"} }
+      let(:params)  { {profile_type: 'benefit_sponsor', person_id: person.id.to_s} }
 
       it 'should create new open struct object with keys' do
         expect(subject).to be_success
