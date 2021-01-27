@@ -14,7 +14,7 @@ logger_field_names = %w[Enrollment_ID Backtrace]
 
 file_name = "#{Rails.root}/enrollment_list_for_pay_now.csv"
 report_file_name = "#{Rails.root}/kaiser_enrollment_list_for_pay_now_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
-logger_file_name = "#{Rails.root}/kaiser_enrollment_list_for_pay_now_logger#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
+logger_file_name = "#{Rails.root}/kaiser_enrollment_list_for_pay_now_logger_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
 CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
