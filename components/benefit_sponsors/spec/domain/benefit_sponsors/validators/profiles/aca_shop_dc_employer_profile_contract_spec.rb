@@ -6,7 +6,7 @@ RSpec.describe BenefitSponsors::Validators::Profiles::AcaShopDcEmployerProfileCo
 
   let(:address) { {kind: 'primary', address_1: 'test', city: 'fair', state: 'DC', zip: '22001'} }
   let(:phone) { {kind: 'home', area_code: '123', number: '1234567'} }
-  let(:error_message)    { {:contact_method => ['is missing'], :is_benefit_sponsorship_eligible =>["is missing"]} }
+  let(:error_message)    { {:contact_method => ['is missing'], :is_benefit_sponsorship_eligible => ["is missing"]} }
   let(:params)   { {office_locations: [address: address, phone: phone]} }
 
 

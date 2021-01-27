@@ -6,22 +6,21 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module Employers
-      #This operation will create a new organization and profile for existing person
+      #This operation will create a new organization and profile
       class Create
         include Dry::Monads[:result, :do]
 
         def call(params)
-          validated_params =      yield validate(params)
-          constructed_params =    yield construct_params(validated_params)
-          organization, profile = if organization_exists?(constructed_params[:organization][:fein])
-                                    yield create_employer_profile_for_existing_organization(constructed_params)
+          validated_params =    yield validate(params)
+          sanitized_params =    yield sanitize_params(validated_params)
+          organization, profile = if organization_exists?(sanitized_params[:organization][:fein])
+                                    yield create_employer_profile_for_existing_organization(sanitized_params)
                                   else
-                                    yield create_new_organization_and_profile(constructed_params)
+                                    yield create_new_organization_and_profile(sanitized_params)
                                   end
 
           _status = yield persist_organization!(organization)
-
-          _staff_role = yield create_employer_staff_role(constructed_params[:staff_roles], profile, validated_params[:person_id])
+          _staff_role = yield create_employer_staff_role(sanitized_params[:staff_roles], profile, validated_params[:person_id])
 
           Success(organization)
         end
@@ -30,15 +29,13 @@ module BenefitSponsors
 
         def validate(params)
           result = BenefitSponsors::Validators::Organizations::OrganizationForms::RegistrationFormContract.new.call(params)
-          if result.success?
-            Success(params)
-          else
-            Failure(text: "Invalid params", error: result.errors.to_h) if result&.failure?
-          end
+          return Failure(text: "Invalid params", error: result.errors.to_h) if result&.failure?
+
+          Success(params)
         end
 
-        def construct_params(params)
-          result = BenefitSponsors::Operations::Profiles::Construct.new.call(params)
+        def sanitize_params(params)
+          result = BenefitSponsors::Operations::Profiles::Sanitize.new.call(params)
           if result.success?
             result
           else
@@ -120,11 +117,12 @@ module BenefitSponsors
 
         def create_employer_staff_role(staff_role_params, profile, person_id)
           if person_id.blank?
-            #TODO - Create or match person
+            #TODO: Create or match person
+            Success(true)
           else
             result = BenefitSponsors::Operations::Employers::AddEmployerStaff.new.call(staff_role_params.merge!(profile_id: profile.id.to_s, person_id: person_id))
             if result.success?
-              person =  result.value![:person]
+              person = result.value![:person]
               approve_employer_staff_role(person, profile)
               Success(true)
             else

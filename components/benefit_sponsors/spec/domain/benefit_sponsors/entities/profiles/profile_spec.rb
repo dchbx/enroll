@@ -28,7 +28,7 @@ RSpec.describe BenefitSponsors::Entities::Profiles::Profile do
 
     let(:params) do
       {
-        contact_method: :electronic_only, office_locations: [office_location],
+        contact_method: :electronic_only, office_locations: [office_location]
       }
     end
 

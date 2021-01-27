@@ -19,7 +19,7 @@ module BenefitSponsors
         end
 
         rule(:kind) do
-          key.failure('Invalid Phones: kind not valid') unless %w(home work).include?(value)
+          key.failure('Invalid Phones: kind not valid') unless %w[home work].include?(value)
         end
       end
     end

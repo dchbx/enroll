@@ -42,7 +42,7 @@ module BenefitSponsors
           if @profile_type == 'AcaShopDcEmployerProfile'
             profile_attrs.merge!(is_benefit_sponsorship_eligible: true)
           else
-            profile_attrs.merge!(is_benefit_sponsorship_eligible: false, contact_method: :paper_and_electronic)
+            profile_attrs.merge!(contact_method: :paper_and_electronic)
           end
           Success(profile_attrs)
         end

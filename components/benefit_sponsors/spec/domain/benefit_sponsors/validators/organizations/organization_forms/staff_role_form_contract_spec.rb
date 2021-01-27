@@ -24,13 +24,13 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationForms::St
       it 'should throw an error if broker agency' do
         missing_params = params.merge({:profile_type => 'broker_agency', email: 'test@test.com'})
         expect(subject.call(missing_params).failure?).to be_truthy
-        expect(subject.call(missing_params).errors.to_h).to eq({:npn=>["Please enter NPN"]})
+        expect(subject.call(missing_params).errors.to_h).to eq({:npn => ["Please enter NPN"]})
       end
 
       it 'should throw an error if general agency' do
         missing_params = params.merge({:profile_type => 'general_agency', email: 'test@test.com'})
         expect(subject.call(missing_params).failure?).to be_truthy
-        expect(subject.call(missing_params).errors.to_h).to eq({:npn=>["Please enter NPN"]})
+        expect(subject.call(missing_params).errors.to_h).to eq({:npn => ["Please enter NPN"]})
       end
     end
   end

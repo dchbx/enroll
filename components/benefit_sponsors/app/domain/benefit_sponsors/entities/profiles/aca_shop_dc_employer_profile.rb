@@ -7,7 +7,7 @@ module BenefitSponsors
       class AcaShopDcEmployerProfile < Profile
         include Dry::StructExtended
 
-        attribute :is_benefit_sponsorship_eligible,    Types::Strict::Bool
+        attribute :is_benefit_sponsorship_eligible,    Types::Strict::Bool.default(true)
       end
     end
   end

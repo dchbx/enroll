@@ -17,9 +17,9 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationForms::Or
   end
 
   let(:office_location) do
-     {
-       is_primary: true, address: address, phone: phone
-     }
+    {
+      is_primary: true, address: address, phone: phone
+    }
   end
 
   let(:profile) do

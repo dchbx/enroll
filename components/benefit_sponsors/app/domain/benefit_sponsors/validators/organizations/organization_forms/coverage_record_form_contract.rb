@@ -9,7 +9,7 @@ module BenefitSponsors
 
           params do
             optional(:ssn).maybe(:string)
-            optional(:dob).filter(format?: /\d{2}\/\d{2}\/\d{4}/).maybe(:string)
+            optional(:dob).filter(format?: %r{\d{2}/\d{2}/\d{4}}).maybe(:string)
             optional(:gender).maybe(:string)
             optional(:hired_on).maybe(:string)
             required(:is_applying_coverage).filled(:bool)

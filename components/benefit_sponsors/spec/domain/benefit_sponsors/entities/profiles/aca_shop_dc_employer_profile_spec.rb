@@ -30,7 +30,7 @@ RSpec.describe BenefitSponsors::Entities::Profiles::AcaShopDcEmployerProfile do
     let(:params) do
       {
         is_benefit_sponsorship_eligible: false,
-        contact_method: :electronic_only, office_locations: [office_location],
+        contact_method: :electronic_only, office_locations: [office_location]
       }
     end
 

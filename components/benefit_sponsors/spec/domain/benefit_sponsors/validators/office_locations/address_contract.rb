@@ -21,7 +21,7 @@ RSpec.describe BenefitSponsors::Validators::OfficeLocations::AddressContract do
       let(:invalid_params) { params.merge({kind: 'primary', state: '123'})}
 
       it { expect(subject.call(invalid_params).failure?).to be_truthy }
-      it { expect(subject.call(invalid_params).errors.to_h).to eq({:state=>["Invalid state"]}) }
+      it { expect(subject.call(invalid_params).errors.to_h).to eq({:state => ["Invalid state"]}) }
     end
   end
 

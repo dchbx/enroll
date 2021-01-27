@@ -79,13 +79,9 @@ module BenefitSponsors
       end
 
       def new_employer_profile_form
+        authorize User, :add_roles?
         @person_id = params[:person_id]
-        @agency = BenefitSponsors::Organizations::OrganizationForms::RegistrationForm.for_new(profile_type: profile_type, person_id: @person_id)
-        authorize @agency, :new?
-        set_ie_flash_by_announcement unless is_employer_profile?
-        respond_to do |format|
-          format.html
-        end
+        @agency = BenefitSponsors::Operations::Employers::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type]}).value!
       end
 
       private

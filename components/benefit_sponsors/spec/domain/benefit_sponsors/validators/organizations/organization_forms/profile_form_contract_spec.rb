@@ -29,7 +29,7 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationForms::Pr
   end
 
 
-  let(:error_message)    { {:market_kind=>["Please enter market kind"], :profile_type=>["is missing"]} }
+  let(:error_message)    { {:market_kind => ["Please enter market kind"], :profile_type => ["is missing"]} }
 
   describe "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
@@ -41,13 +41,13 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationForms::Pr
       it 'should throw an error if broker agency' do
         missing_params = {:profile_type => 'broker_agency', office_locations_attributes: {"0" => office_location}}
         expect(subject.call(missing_params).failure?).to be_truthy
-        expect(subject.call(missing_params).errors.to_h).to eq({:market_kind=>["Please enter market kind"]})
+        expect(subject.call(missing_params).errors.to_h).to eq({:market_kind => ["Please enter market kind"]})
       end
 
       it 'should throw an error if general agency' do
         missing_params = {:profile_type => 'general_agency', office_locations_attributes: {"0" => office_location}}
         expect(subject.call(missing_params).failure?).to be_truthy
-        expect(subject.call(missing_params).errors.to_h).to eq({:market_kind=>["Please enter market kind"]})
+        expect(subject.call(missing_params).errors.to_h).to eq({:market_kind => ["Please enter market kind"]})
       end
     end
   end

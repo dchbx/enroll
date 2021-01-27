@@ -25,6 +25,12 @@ module BenefitSponsors
             end
           end
 
+          rule(:profile_type) do
+            if key? && value
+              key.failure('Invalid profile type') unless %w[benefit_sponsor broker_agency general_agency].include?(value)
+            end
+          end
+
           rule(:staff_roles_attributes).each do
             if key? && value
               result = BenefitSponsors::Validators::Organizations::OrganizationForms::StaffRoleFormContract.new.call(value.merge!(profile_type: values[:profile_type]))

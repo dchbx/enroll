@@ -1,13 +1,18 @@
 # frozen_string_literal: true
 
 module Dry
+  #This mixin is used to serialize data of an object
+  # Include this mixin wherever necessary
   module StructExtended
-
     def self.included(base)
       base.extend ClassMethods
     end
 
+    #Methods used for converting object into a hash with matching dry struct
     module ClassMethods
+      #This method takes object and dry struct class, which then
+      # serialize the object and return the hash with the matching
+      # dry struct schema. And this is a recursive function
       def to_hash(object, type = self)
         type.schema.each_with_object({}) do |key, res|
           name = key.name

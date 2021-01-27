@@ -30,7 +30,7 @@ RSpec.describe BenefitSponsors::Entities::Profiles::BrokerAgencyProfile do
     let(:params) do
       {
         market_kind: :individual_only,
-        contact_method: :electronic_only, office_locations: [office_location],
+        contact_method: :electronic_only, office_locations: [office_location]
       }
     end
 

@@ -18,7 +18,7 @@ RSpec.describe BenefitSponsors::Validators::OfficeLocations::PhoneContract do
 
       it { expect(subject.call(invalid_params).failure?).to be_truthy }
       it {
-        expect(subject.call(invalid_params).errors.to_h).to eq({:number=>["Invalid Phones: Number can't be blank"], :kind=>["Invalid Phones: kind not valid"]})
+        expect(subject.call(invalid_params).errors.to_h).to eq({:number => ["Invalid Phones: Number can't be blank"], :kind => ["Invalid Phones: kind not valid"]})
       }
     end
 

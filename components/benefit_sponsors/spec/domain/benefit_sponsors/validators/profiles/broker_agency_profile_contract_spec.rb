@@ -6,7 +6,7 @@ RSpec.describe BenefitSponsors::Validators::Profiles::BrokerAgencyProfileContrac
 
   let(:address) { {kind: 'primary', address_1: 'test', city: 'fair', state: 'DC', zip: '22001'} }
   let(:phone) { {kind: 'home', area_code: '123', number: '1234567'} }
-  let(:error_message)    { {:contact_method => ['is missing'], :market_kind =>["must be filled"]} }
+  let(:error_message)    { {:contact_method => ['is missing'], :market_kind => ["must be filled"]} }
   let(:params)   { {office_locations: [address: address, phone: phone]} }
 
 

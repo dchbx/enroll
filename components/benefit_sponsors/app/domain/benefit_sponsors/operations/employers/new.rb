@@ -20,8 +20,8 @@ module BenefitSponsors
 
         def validate(params)
           if params[:profile_type].blank?
-            Failure({:message => ['Missing params']})
-          elsif !%w(benefit_sponsor).include?(params[:profile_type])
+            Failure({:message => ['Missing profile type']})
+          elsif !%w[benefit_sponsor].include?(params[:profile_type])
             Failure({:message => ['Invalid profile type']})
           else
             Success(params)
@@ -43,14 +43,13 @@ module BenefitSponsors
         end
 
         def construct_staff_role_params
-          staff_role_hash = {  person_id: @person&.id.to_s,
-                               first_name: @person&.first_name,
-                               last_name: @person&.last_name,
-                               email: @person&.work_email_or_best,
-                               dob: @person&.dob.strftime("%m/%d/%Y"),
-                               area_code: nil,
-                               number: nil
-          }
+          staff_role_hash = { person_id: @person&.id.to_s,
+                              first_name: @person&.first_name,
+                              last_name: @person&.last_name,
+                              email: @person&.work_email_or_best,
+                              dob: @person&.dob&.strftime("%m/%d/%Y"),
+                              area_code: nil,
+                              number: nil }
           staff_role_hash.merge!(coverage_record: construct_coverage_record)
           staff_role_hash
         end
@@ -84,14 +83,12 @@ module BenefitSponsors
         def build_coverage_record
           result = CoverageRecord.new(ssn: @person&.ssn,
                                       gender: @person&.gender,
-                                      dob: @person&.dob.strftime("%m/%d/%Y"),
+                                      dob: @person&.dob&.strftime("%m/%d/%Y"),
                                       hired_on: nil,
                                       is_applying_coverage: false,
                                       address: build_address_for_coverage_record,
-                                      email: build_email_for_coverage_record
-          )
+                                      email: build_email_for_coverage_record)
           result
-
         end
 
         def build_address_for_coverage_record
@@ -114,11 +111,11 @@ module BenefitSponsors
 
         def new_employer(profile_params)
           obj = JSON.parse(profile_params.to_json, object_class: OpenStruct)
-          result = set_custom_methods_on_struct(obj)
+          result = add_custom_methods_on_struct(obj)
           Success(result)
         end
 
-        def set_custom_methods_on_struct(obj)
+        def add_custom_methods_on_struct(obj)
           obj[:staff_roles_attributes] = nil
           obj.staff_roles.first[:persisted?] = false
           obj.organization.profile[:office_locations_attributes] = nil
