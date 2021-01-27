@@ -572,22 +572,6 @@ def employer_poc
     end
   end
 
-  def catalogs_new
-    @benefit_markets = BenefitMarkets::BenefitMarket.all
-
-    respond_to do |format|
-      format.html { render '/exchanges/hbx_profiles/catalogs_new.html.erb', layout: 'bootstrap_4' }
-    end
-  end
-
-  def catalogs
-    @benefit_markets = BenefitMarkets::BenefitMarket.all
-
-    respond_to do |format|
-      format.html { render '/exchanges/hbx_profiles/catalogs.html.erb', layout: 'bootstrap_4' }
-    end
-  end
-
   def settings
     @benefit_markets = BenefitMarkets::BenefitMarket.all
 

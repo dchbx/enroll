@@ -4,7 +4,6 @@ $(function(){
   $('.switch > input:checkbox').click(function(e) {
     const spinner = $(this).parent('.switch').siblings('.spinner-border');
     spinner.removeClass('d-none');
-
     const feature_key = $(this).siblings("input[name='feature_key']").val();
 	  $.ajax({
 	    url: ("/exchanges/configurations/"+ feature_key +"/toggle_feature"),
@@ -14,5 +13,21 @@ $(function(){
 	    spinner.addClass('d-none');
 	  });
   });
-});
 
+  $('.new_feature .feature-filter').change(function(){
+		const target_feature   = $(this).siblings('#target_feature').val();
+		const filter_params = {};
+		filter_params[$(this).attr('name')] = $(this).val();
+		$(this).siblings('input[name*=filter]').each(function(){
+			filter_params[$(this).attr('name')] = $(this).val();
+		});
+		$.ajax({
+		  url: "/exchanges/configurations/" + target_feature + "/edit",
+		  type: 'GET',
+		  data: filter_params
+		})
+	  // .done(function() {
+	  //   spinner.addClass('d-none');
+	  // });
+  });
+});

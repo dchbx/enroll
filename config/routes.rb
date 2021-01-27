@@ -115,6 +115,7 @@ Rails.application.routes.draw do
     resources :configurations do
       member do
         get :namespace_edit
+        post :clone_feature
         post :update_feature
         patch :toggle_feature
       end
@@ -148,8 +149,6 @@ Rails.application.routes.draw do
         get :configuration
         get :edit_feature
         put :update_feature
-        get :catalogs_new
-        get :catalogs
         get :settings
         get :find_feature
         get :find_catalogs

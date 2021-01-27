@@ -36,7 +36,7 @@ module Exchanges
 
     def render_configuration_navigation_menu(options = {})
 
-      options = {namespace_options: {include_no_features_defined: true}}
+      options = {namespace_options: {include_no_features_defined: false}}
 
       # graph = EnrollRegistry[:feature_graph]
 

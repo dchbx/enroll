@@ -2,6 +2,8 @@ class Exchanges::ConfigurationsController < ApplicationController
   include ::Pundit
 
   def edit
+    @filter_result = EnrollRegistry[params[:id]] {params[:filter]}.success if params[:filter]
+
     respond_to do |format|
       format.js
     end
@@ -16,8 +18,16 @@ class Exchanges::ConfigurationsController < ApplicationController
     end
   end
 
+  def clone_feature
+    result = EnrollRegistry[params[:id]] {{params: params[:feature], registry: EnrollRegistry}}.success
+
+    respond_to do |format|
+      format.js
+    end
+  end
+
   def update_feature
-    @feature = ResourceRegistry::Operations::Features::Update.new.call(feature: feature_params, registry: EnrollRegistry)
+    @feature = ResourceRegistry::Operations::Features::Update.new.call(feature: feature_params, registry: EnrollRegistry, filter: params[:filter])
 
     respond_to do |format|
       format.js

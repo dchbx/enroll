@@ -20,7 +20,6 @@ registry:
           content_type: :feature_enabled
           description: Individual Benefits Offered
           is_required: true
-          is_visible: true
       - key: :congressional_market
         is_enabled: true
         meta:
@@ -35,26 +34,12 @@ registry:
         - :enroll_app
         - :aca_shop_market
       meta:
-        label: Shop
+        label: ACA Shop
         content_type: :feature_list
         description: 'ACA Shop Market Settings'
         is_required: true
         is_visible: true
     features:
-      - key: :benefit_market_catalogs_filter
-        item: BenefitMarkets::Operations::BenefitMarketCatalogs::Configure.new
-        is_enabled: true
-        meta:
-          label: Select Plan Year
-          content_type: :model_filter
-          default: :''
-          description: Select Benefit Market Catalog Calender Year
-          is_required: true
-          is_visible: true
-        settings:
-          - key: :model_query_params
-            item:
-              market_kind: :aca_shop
       - key: :benefit_market_catalogs_configuration
         item: BenefitMarkets::Operations::BenefitMarketCatalogs::Configure.new
         is_enabled: true
@@ -66,17 +51,20 @@ registry:
           is_required: true
           is_visible: true
         settings:
+          - key: :filter_params
+            meta:
+              label: Select Plan Year
+              content_type: :filter
+              default: :''
+              description: Select Benefit Market Catalog Calender Year
+              is_required: true
+            item:
+              criteria:
+                market_kind: :aca_shop
+              name: :effective_year
           - key: :model_query_params
             item:
               market_kind: :aca_shop
-          - key: :filter_enabled
-            item: ''
-            meta:
-              label: Select plan year
-              content_type: :select
-              description: Select Benefit Market Catalog Calender Year
-              is_required: false
-              is_visible: true
           - key: :title
             item:
               attribute: :title
@@ -99,30 +87,11 @@ registry:
               description: Enter market catalog description
               is_required: false
               is_visible: true
-          # return [array of calender years, catalog_for_the_year_passed]
-          # - key: :benefit_market_catalogs_find_model
-          #   is_enabled: true
-          #   item: BenefitMarkets::Operations::BenefitMarketCatalogs::FindModel.new
-            # item:
-            #   class_name: "BenefitMarkets::BenefitMarketCatalog"
-            #   scope:
-            #     name: :by_kind_and_application_date
-            #     arguments:
-            #       - :aca_shop
-            #       - <%= 2.years.ago..1 %>
-            # - operation that gets filter_criteria 
-            # - operation that find model record
-            # - find model operation
-            #    - collection of benefit_market_catalogs
-            # - create filter using calender year
-            #   - select box with years
-            # - detect record for current calender year 
-            # - display feature form using using current record
       - key: :health_packages
         is_enabled: true
         item: :features_display
         meta:
-          label: Health Product Packages
+          label: Health Packages
           content_type: :nav
           default: :''
           description: 'Configurations for Health Product Packages'
@@ -131,29 +100,40 @@ registry:
         settings:
           - key: :product_packages
             item:
-              - :health_product_package_2020
               - :health_product_package_2021
+              - :health_product_package_2020
             meta:
               label: Product Packages
               content_type: :feature_group
               description: product packages
               is_required: false
               is_visible: true
-      - key: :dental_packages
-        is_enabled: true
-        meta:
-          label: Dental Product Packages
-          content_type: :nav
-          default: :''
-          description: 'Configurations for Dental Product Packages'
-          is_required: true
-          is_visible: true
   - namespace:
     - :dchbx
     - :enroll_app
     - :aca_shop_market
     - :health_product_packages
     features:
+      - key: :shop_product_package_clone
+        item: ResourceRegistry::Operations::Features::Clone.new
+        is_enabled: true
+        meta:
+          label: Shop Product Package Clone
+          content_type: :legend
+          default: nil
+          description: Clone shop product packages
+          is_required: false
+          is_visible: true
+        settings:
+          - key: :calender_year
+            item: nil
+            meta:
+              label: Calender Year
+              content_type: :select
+              description: Choose calender year for new product package
+              enum: <%= [Date.today.year + 1, Date.today.year + 2].reduce([]) {|values, date| values << [date, date]} %>
+              is_required: false
+              is_visible: true
       - key: :health_product_package_2021
         is_enabled: true
         item: :feature_collection
@@ -175,6 +155,14 @@ registry:
               label: Contribution Models
               content_type: :feature_list_panel
               description: Contribution Models
+              is_required: false
+              is_visible: true
+          - key: :clone
+            item: "/exchanges/configurations/shop_product_package_clone/edit"
+            meta:
+              label: Clone Product Package
+              content_type: :feature_action
+              description: Clone Product Packages for the given calender year
               is_required: false
               is_visible: true
       - key: :health_product_package_2020

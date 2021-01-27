@@ -1,1 +1,17 @@
 $('#data_container').html("<%= j render partial: 'exchanges/configurations/edit' %>");
+
+$(function(){
+  $('.edit_feature .feature-filter').change(function(){
+		const target_feature = $(this).siblings('#target_feature').val();
+		const filter_params = {};
+		filter_params[$(this).attr('name')] = $(this).val();
+		$(this).siblings('input[name*=filter]').each(function(){
+		  filter_params[$(this).attr('name')] = $(this).val();
+		});
+		$.ajax({
+		  url: "/exchanges/configurations/" + target_feature + "/edit",
+		  type: 'GET',
+		  data: filter_params
+		})
+  });
+});

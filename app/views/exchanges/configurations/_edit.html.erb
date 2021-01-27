@@ -1,4 +1,4 @@
-<%= feature_panel(params[:id], EnrollRegistry) %>
+<%= feature_panel(params[:id], EnrollRegistry, {filter_result: @filter_result, action_params: params[:feature]}) %>
 
 <style>
 	label {
@@ -10,5 +10,16 @@
 	}
 	.form-group{
 		margin-bottom: 1rem;
+	}
+
+    .input-group-addon {
+		width: auto;
+		min-width: 16px;
+		padding: 4px 5px;
+		line-height: 1.5;
+		margin-left: -2px;
+		margin-right:-2px;
+		background: #F2F2F2;
+		border: 1px solid #ced4da;
 	}
 </style>
