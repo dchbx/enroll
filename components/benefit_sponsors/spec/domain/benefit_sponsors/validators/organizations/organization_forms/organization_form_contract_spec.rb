@@ -24,7 +24,7 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationForms::Or
 
   let(:profile) do
     {
-      profile_type: 'broker_agency',
+      profile_type: 'broker_agency', market_kind: 'individual_only',
       office_locations_attributes: {"0" => office_location}
     }
   end
