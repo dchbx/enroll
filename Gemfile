@@ -79,6 +79,7 @@ gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
+gem 'i18n-tasks', '~> 0.9.33'
 gem 'interactor',               '~> 3.0'
 gem 'interactor-rails',         '~> 2.2'
 gem 'jbuilder',                 '~> 2.7'
@@ -127,8 +128,6 @@ group :development do
   gem 'rubocop',                require: false
   gem 'rubocop-rspec'
   gem 'rubocop-git'
-
-
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
