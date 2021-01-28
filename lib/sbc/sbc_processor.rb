@@ -1,8 +1,8 @@
 require 'ostruct'
 class SbcProcessor
 
-  SHEETS = ['IVL', 'SHOP Q1', 'SHOP Q2', 'SHOP Q3', 'SHOP Q4']
-  CARRIERS = ["Dominion National", "Aetna", "CareFirst", "Delta Dental", "Dentegra", "MetLife", "Kaiser", "UnitedHealthcare"]
+  SHEETS = ['IVL', 'SHOP Q1', 'SHOP Q2', 'SHOP Q3', 'SHOP Q4'].freeze
+  CARRIERS = ["Dominion National", "Aetna", "CareFirst", "Delta Dental", "Dentegra", "MetLife", "Kaiser", "UnitedHealthcare"].freeze
   S3_BUCKET = "sbc"
 
   def initialize(matrix_path, sbc_dir_path)
