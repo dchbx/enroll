@@ -109,6 +109,7 @@ module BenefitSponsors
 
         def add_custom_methods_on_struct(obj)
           obj[:staff_roles_attributes] = nil
+          obj[:persisted?] = false
           obj.staff_roles.first[:persisted?] = false
           obj.organization.profile[:office_locations_attributes] = nil
           obj.organization.profile.office_locations.first[:persisted?] = false

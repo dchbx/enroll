@@ -13,16 +13,16 @@ module BenefitSponsors
         def call(params)
           validated_params =    yield validate(params)
           sanitized_params =    yield sanitize_params(validated_params)
-          organization, profile = if organization_exists?(sanitized_params[:organization][:fein])
-                                    yield create_employer_profile_for_existing_organization(sanitized_params)
-                                  else
-                                    yield create_new_organization_and_profile(sanitized_params)
-                                  end
+          @organization, @profile, @status = if organization_exists?(sanitized_params[:organization][:fein])
+                                               yield create_employer_profile_for_existing_organization(sanitized_params)
+                                             else
+                                               yield create_new_organization_and_profile(sanitized_params)
+                                             end
 
-          _status = yield persist_organization!(organization)
-          _staff_role = yield create_employer_staff_role(sanitized_params[:staff_roles], profile, validated_params[:person_id])
+          _status = yield persist_organization!
+          _staff_role_status, redirection_link = yield create_employer_staff_role(sanitized_params[:staff_roles], validated_params[:person_id])
 
-          Success(organization)
+          Success([redirection_link, @status])
         end
 
         private
@@ -49,7 +49,7 @@ module BenefitSponsors
 
         def create_employer_profile_for_existing_organization(constructed_params)
           profile = @existing_organization.employer_profile
-          return Success([@existing_organization, profile]) if profile.present?
+          return Success([@existing_organization, profile, 'existing']) if profile.present?
 
           result = build_profile(constructed_params[:organization][:profile])
 
@@ -70,7 +70,7 @@ module BenefitSponsors
 
           org = create_organization(build_org_result.value!)
           profile = create_profile(org.value!, build_profile_result.value!)
-          Success([org.value!, profile.value!])
+          Success([org.value!, profile.value!, 'new'])
         end
 
         def build_profile(profile_attrs)
@@ -104,31 +104,40 @@ module BenefitSponsors
           Success(profile)
         end
 
-        def persist_organization!(organization)
-          if organization.valid?
-            organization.benefit_sponsorships.each do |benefit_sponsorship|
+        def persist_organization!
+          return unless @status == 'new'
+
+          if @organization.valid?
+            @organization.benefit_sponsorships.each do |benefit_sponsorship|
               benefit_sponsorship.save! if benefit_sponsorship.new_record?
             end
-            Success(organization.save!)
+            Success(@organization.save!)
           else
-            Failure("Unable to save organization due to #{organization.errors.full_messages}")
+            Failure("Unable to save organization due to #{@organization.errors.full_messages}")
           end
         end
 
-        def create_employer_staff_role(staff_role_params, profile, person_id)
+        def create_employer_staff_role(staff_role_params, person_id)
           if person_id.blank?
             #TODO: Create or match person
             Success(true)
           else
-            result = BenefitSponsors::Operations::Employers::AddEmployerStaff.new.call(staff_role_params.merge!(profile_id: profile.id.to_s, person_id: person_id))
+            result = BenefitSponsors::Operations::Employers::AddEmployerStaff.new.call(staff_role_params.merge!(profile_id: @profile.id.to_s, person_id: person_id))
             if result.success?
               person = result.value![:person]
-              approve_employer_staff_role(person, profile)
-              Success(true)
+              approve_employer_staff_role(person, @profile) if @status == 'new'
+              redirection_link = fetch_redirection_link(person_id)
+              Success([true, redirection_link])
             else
               Failure({:message => 'Unable to Employer create staff role'})
             end
           end
+        end
+
+        def fetch_redirection_link(person_id)
+          return "show_manage_protals_url@#{person_id}" if @status == 'existing' && person_id.present?
+
+          "sponsor_home_registration_url@#{@profile.id}"
         end
 
         def approve_employer_staff_role(person, profile)

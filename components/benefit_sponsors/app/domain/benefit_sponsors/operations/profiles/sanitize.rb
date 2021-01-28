@@ -13,7 +13,7 @@ module BenefitSponsors
         include Dry::Monads[:result, :do]
 
         def call(params)
-          sanitized_params = yield parse(params.deep_symbolize_keys!)
+          sanitized_params = yield parse(params.to_h.deep_symbolize_keys)
 
           Success(sanitized_params)
         end

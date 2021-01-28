@@ -9,3 +9,6 @@ registry:
       - key: :send_secure_message_employer
         item: :send_secure_message
         is_enabled: true
+      - key: :employer_registration
+        item: BenefitSponsors::Operations::Employers::Create.new
+        is_enabled: true

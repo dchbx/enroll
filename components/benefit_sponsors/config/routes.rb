@@ -3,6 +3,7 @@ BenefitSponsors::Engine.routes.draw do
   namespace :profiles do
     resources :registrations do
       get :new_employer_profile_form, on: :collection
+      post :create_employer_profile, on: :collection
       post :counties_for_zip_code, on: :collection
     end
 
