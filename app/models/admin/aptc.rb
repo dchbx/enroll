@@ -359,10 +359,12 @@ class Admin::Aptc < ApplicationController
             # Update Applied APTC on the enrolllment level.
             duplicate_hbx.applied_aptc_amount = updated_aptc_value
 
-            # Update elected_aptc_pct to the correct value based on the new applied_amount
-            duplicate_hbx.elected_aptc_pct = actual_aptc_value/max_aptc
+            monthly_max_aptc = family.active_household.tax_households.tax_household_with_year(duplicate_hbx.effective_on.year).last.monthly_max_aptc(duplicate_hbx, duplicate_hbx.effective_on)
 
-            duplicate_hbx.aggregate_aptc_amount = max_aptc
+            # Update elected_aptc_pct to the correct value based on the new applied_amount
+            duplicate_hbx.elected_aptc_pct = actual_aptc_value/monthly_max_aptc
+
+            duplicate_hbx.aggregate_aptc_amount = monthly_max_aptc
 
             # Reset aasm_state
             duplicate_hbx.aasm_state = "shopping"
