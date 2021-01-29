@@ -44,6 +44,7 @@
               <%end%>
             </table>
             <%= hidden_field_tag 'comments' %>
+            <%= hidden_field_tag :family_actions_id, @element_to_replace_id %>
         <%end%>
         <%= submit_tag "Submit" , onclick: "ReinstateModal()", class: 'btn btn-primary' %>
     <%end%>
