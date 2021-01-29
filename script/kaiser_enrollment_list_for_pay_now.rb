@@ -12,7 +12,6 @@ field_names = %w[First_Name
 
 logger_field_names = %w[Enrollment_ID Backtrace]
 
-file_name = "#{Rails.root}/enrollment_list_for_pay_now.csv"
 report_file_name = "#{Rails.root}/kaiser_enrollment_list_for_pay_now_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 logger_file_name = "#{Rails.root}/kaiser_enrollment_list_for_pay_now_logger_#{TimeKeeper.date_of_record.strftime('%m_%d_%Y')}.csv"
 
@@ -20,7 +19,6 @@ CSV.open(logger_file_name, 'w', force_quotes: true) do |logger_csv|
   logger_csv << logger_field_names
   CSV.open(report_file_name, 'w', force_quotes: true) do |report_csv|
     report_csv << field_names
-    effective_on = TimeKeeper.date_of_record
     enrollments = HbxEnrollment.all.where(:kind.in => ['individual', 'coverall'],
                                           :aasm_state.in => ['coverage_selected'],
                                           :effective_on => TimeKeeper.date_of_record,
