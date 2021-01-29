@@ -7,7 +7,6 @@ Feature: Individual Qualifying life of event kind based on eligibity dates
     Given Hbx Admin Creates and Publish Individual market SEP Type
     And Hbx Admin logs out
 
-  @flaky
   Scenario: Consumer can qualify for Special enrollment period based on eligibity dates
     Given Individual creates account and on home page
     And Individual should see listed individual market SEP Types
