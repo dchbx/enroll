@@ -491,6 +491,7 @@ def employer_poc
         end
       else
         message = {notice: "Unable to find/update Enrollment."}
+        redirect_to exchanges_hbx_profiles_root_path, flash: message
       end
     rescue Exception => e
       message = {error: e.to_s}
@@ -587,20 +588,22 @@ def employer_poc
     if enrollment.present?
       begin
         reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+        @element_to_replace_id = params[:family_actions_id]
         if reinstated_enrollment.present?
           if params['comments'].present?
             reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
           end
-          message = {notice: "Enrollment Reinstated successfully."}
+          respond_to do |format|
+            format.js
+          end
         end
       rescue Exception => e
         message = {error: e.to_s}
       end
     else
       message = {notice: "Unable to find Enrollment."}
+      redirect_to exchanges_hbx_profiles_root_path, flash: message
     end
-
-    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def edit_dob_ssn

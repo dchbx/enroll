@@ -91,7 +91,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-        <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
+        <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmReinstate(event); return false;'>Confirm</button>
       </div>
     </div>
   </div>
@@ -105,17 +105,38 @@
             var enrollment_can_be_reinstated = $(this).closest('tr').find("td#enrollment_can_be_reinstated").text();
             if (enrollment_can_be_reinstated == "true" && active_enroll_exists_with_reinstate_date == "false") {
                 $('#show_reinstate').show();
-                $("a.modal_confirm").show();
+                $(".btn-confirmation").show();
             }else{
                 $('#show_reinstate').hide();
-                $("a.modal_confirm").hide();
+                $(".btn-confirmation").hide();
             }
         });
     }
-    $("a.modal_confirm").click(function() {
-        $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
-        $("#reinstate-form").submit();
-    });
+    // $("a.modal_confirm").click(function() {
+    //     $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
+    //     $("#reinstate-form").submit();
+    // });
+
+    function confirmReinstate(event){
+      $("#reinstate-form #comments").val($('.modal-dialog .comments').val());
+      $(".btn-confirmation").attr('disabled', 'disabled');
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      var formData = new FormData($('#reinstate-form')[0]);
+
+      $.ajax({
+        url: '/exchanges/hbx_profiles/reinstate_enrollment.js',
+        type: "POST",
+        data : formData,
+        contentType: false,
+        processData: false,
+      });
+    }
     $('div#reinstate_confirm').on('hidden.bs.modal', function () {
         $('.modal-dialog .bg-warning').html('');
     })
