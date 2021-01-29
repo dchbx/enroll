@@ -39,7 +39,7 @@ class PlanSelection
 
     hbx_enrollment.update_attributes!(is_any_enrollment_member_outstanding: true) if enrollment_members_verification_status(market_kind)
 
-    hbx_enrollment.select_coverage!(qle: qle)
+    hbx_enrollment.select_coverage!(qle: qle) if may_select_coverage?
   end
 
   def enrollment_members_verification_status(market_kind)

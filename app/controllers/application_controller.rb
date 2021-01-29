@@ -86,7 +86,7 @@ class ApplicationController < ActionController::Base
   private
 
     def strong_params
-      params.permit(:controller, :action)
+      params.permit!
     end
 
     def secure_message(from_provider, to_provider, subject, body)

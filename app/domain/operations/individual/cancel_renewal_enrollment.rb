@@ -29,11 +29,12 @@ module Operations
 
       def product_matched(enr, enrollment)
         return false unless enr.product.present?
-        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id
+        enr.product_id == enrollment&.product&.renewal_product&.id || enr.product.hios_base_id == enrollment&.product&.renewal_product&.hios_base_id ||
+          enr.product.issuer_profile_id == enrollment&.product&.renewal_product&.issuer_profile_id
       end
 
       def cancel_renewals(enrollment)
-        year = TimeKeeper.date_of_record.year + 1
+        year = HbxProfile.bcp_by_oe_dates.start_on.year
         renewal_enrollments = enrollment.family.hbx_enrollments.by_coverage_kind(enrollment.coverage_kind).by_year(year).show_enrollments_sans_canceled.by_kind(enrollment.kind)
         renewal_enrollments.each do |enr|
           next unless enr&.subscriber&.applicant_id == enrollment&.subscriber&.applicant_id

@@ -17,7 +17,7 @@ module VlpDoc
     params.permit!
     if params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true"
       if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
-        vlp_doc_params = params[source][:consumer_role][:vlp_documents_attributes]['0'].to_h.delete_if {|_k,v| v.blank? }
+        vlp_doc_params = params.require(source).permit(vlp_doc_params_list).dig(:consumer_role, :vlp_documents_attributes, "0").delete_if {|_k, v| v.blank? }.to_h
         result = ::Validators::VlpV37Contract.new.call(vlp_doc_params)
         if result.failure? && source == 'person'
           invalid_key = result.errors.to_h.keys.first

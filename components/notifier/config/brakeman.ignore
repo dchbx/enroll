@@ -1,0 +1,26 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "c5d79e8b8236b7a3e6f5720164e275def81f455a17426bbbff41350158a865b7",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/notifier/notice_kinds_controller.rb",
+      "line": 58,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(\"#{Rails.root}/tmp/#{Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id}_#{Notifier::NoticeKind.find(params[:id]).title.titleize.gsub(/\\s+/, \"_\")}.pdf\", :type => \"application/pdf\", :disposition => \"inline\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Notifier::NoticeKindsController",
+        "method": "preview"
+      },
+      "user_input": "Notifier::NoticeKind.find(params[:id]).notice_recipient.hbx_id",
+      "confidence": "Medium",
+      "note": ""
+    }
+  ],
+  "updated": "2020-12-30 12:55:58 -0500",
+  "brakeman_version": "4.10.0"
+}

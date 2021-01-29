@@ -132,7 +132,7 @@ class Insured::FamilyMembersController < ApplicationController
     @address_errors = validate_address_params(params)
 
     if @dependent.family_member.try(:person).present? && @dependent.family_member.try(:person).is_resident_role_active?
-      if @address_errors.blank? && @dependent.update_attributes(params.require(:dependent))
+      if @address_errors.blank? && @dependent.update_attributes(params[:dependent])
         respond_to do |format|
           format.html { render 'show_resident' }
           format.js { render 'show_resident' }
@@ -155,8 +155,14 @@ class Insured::FamilyMembersController < ApplicationController
         info_changed: @info_changed,
         is_homeless: params[:dependent]["is_homeless"],
         is_temporarily_out_of_state: params[:dependent]["is_temporarily_out_of_state"],
-        dc_status: @dc_status)
-      consumer_role.update_attribute(:is_applying_coverage,  params[:dependent][:is_applying_coverage]) if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
+        dc_status: @dc_status
+      )
+      if consumer_role.present? && !params[:dependent][:is_applying_coverage].nil?
+        consumer_role.update_attribute(
+          :is_applying_coverage,
+          params[:dependent][:is_applying_coverage]
+        )
+      end
       respond_to do |format|
         format.html { render 'show' }
         format.js { render 'show' }
@@ -225,7 +231,7 @@ class Insured::FamilyMembersController < ApplicationController
   private
 
   def permit_dependent_person_params
-    params.require(:dependent).permit(:family_id, :same_with_primary, :addresses => {})
+    params.require(:dependent).permit!
   end
 
   def set_family

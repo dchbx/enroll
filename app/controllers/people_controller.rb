@@ -387,6 +387,6 @@ private
   end
 
   def dependent_params
-    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k) }.permit(*person_parameters_list)
+    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k)}.permit!
   end
 end

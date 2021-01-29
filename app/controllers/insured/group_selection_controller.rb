@@ -1,6 +1,7 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
+  before_action :permit_params, only: [:create]
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
@@ -68,8 +69,8 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    keep_existing_plan = @adapter.keep_existing_plan?(permitted_group_selection_params)
-    @market_kind = @adapter.create_action_market_kind(permitted_group_selection_params)
+    keep_existing_plan = @adapter.keep_existing_plan?(params)
+    @market_kind = @adapter.create_action_market_kind(params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
@@ -78,9 +79,9 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    unless @adapter.is_waiving?(permitted_group_selection_params)
+    unless @adapter.is_waiving?(params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_ids = params[:family_member_ids].values.collect do |family_member_id|
+      family_member_ids = params.require(:family_member_ids).to_h.collect do |_index, family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
@@ -96,7 +97,7 @@ class Insured::GroupSelectionController < ApplicationController
               ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + census_effective_on.strftime('%m/%d/%Y')
       end
 
-      if @adapter.is_waiving?(permitted_group_selection_params)
+      if @adapter.is_waiving?(params)
         raise "Waive Coverage Failed" unless hbx_enrollment.save
 
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
@@ -105,8 +106,7 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-
-    if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
+    if @adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
       if sep.present?
@@ -227,7 +227,11 @@ class Insured::GroupSelectionController < ApplicationController
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
-  def permitted_group_selection_params
+  def permit_params
+    params.permit!
+  end
+
+  def permitted_group_selection_paramss
     params.permit(
       :change_plan, :consumer_role_id, :market_kind, :qle_id,
       :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
@@ -273,9 +277,9 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group = nil
       benefit_group_assignment = nil
 
-      if @adapter.is_waiving?(permitted_group_selection_params)
+      if @adapter.is_waiving?(params)
         if @adapter.previous_hbx_enrollment.present?
-          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
+          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, params)
         else
           @adapter.build_new_shop_waiver_enrollment(@employee_role)
         end
@@ -303,7 +307,7 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   def initialize_common_vars
-    @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(permitted_group_selection_params)
+    @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params)
     @person = @adapter.person
     @family = @adapter.family
     @coverage_household = @adapter.coverage_household
