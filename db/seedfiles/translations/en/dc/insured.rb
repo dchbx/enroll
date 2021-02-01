@@ -328,7 +328,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.dental' => "Dental",
   :'en.insured.group_selection.new.coverage_begin_ivl_enrollment_effective_date' => "If you enroll today, coverage will begin %{ivl_enrollment_effective_date}.",
   :'en.insured.group_selection.new.need_coverage_earlier_html' => "Do you need coverage earlier? See if you qualify for a <a href='#' id='find_sep_link'>Special Enrollment Period</a>",
-  :'en.insured.group_selection.new.show_residency_alert_msg' => "Since %{full_name} is not a resident of the %{aca_state_name} she/he is not eligible to purchase a plan through %{ site_short_name}. Other members may still be eligible to enroll. Please call us at %{contact_center_phone_number} to learn about other health insurance options for %{full_name}.",
+  :'en.insured.group_selection.new.show_residency_alert_msg' => "Since %{full_name} is not a resident of the %{aca_state_name} she/he is not eligible to purchase a plan through %{site_short_name}. Other members may still be eligible to enroll. Please call us at %{contact_center_phone_number} to learn about other health insurance options for %{full_name}.",
   :'en.insured.group_selection.new.what_would_you_like_to_do' => "What would you like to do?",
   :'en.shop_for_new_plan' => "Shop for new plan",
   :'en.keep_existing_plan' => "Keep existing plan",
