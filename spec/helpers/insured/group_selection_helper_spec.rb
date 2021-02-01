@@ -365,7 +365,7 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           sep = family.special_enrollment_periods.new
           sep.effective_on_kind = 'date_of_event'
           sep.qualifying_life_event_kind = qle_kind
-          sep.qle_on = TimeKeeper.date_of_record - 7.days
+          sep.qle_on = expired_application.start_on + 10.days
           sep.save
           sep
         end
