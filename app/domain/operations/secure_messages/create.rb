@@ -31,16 +31,17 @@ module Operations
       end
 
       def construct_message_payload(resource, message_params, document)
+        # rubocop:disable Layout/LineLength - when breaking into different lines anchor tag is failing to construct href. Tried several approaches.
         body = if document.present?
                  message_params[:body] + "<br>You can download the notice by clicking this link " \
                    "<a href=" \
-                   "#{Rails.application.routes.url_helpers.cartafact_document_download_path((message_params[:model_klass] || resource.class.to_s),
-                                                                                            (message_params[:model_id] || resource.id.to_s), 'documents', document.id)}? \
-                                                                                            content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" \
+                   "#{Rails.application.routes.url_helpers.cartafact_document_download_path(message_params[:model_klass] || resource.class.to_s,
+                                                                                            message_params[:model_id] || resource.id.to_s, 'documents', document.id)}?content_type=#{document.format}&filename=#{document.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" \
                    " target='_blank'>" + document.title.gsub(/[^0-9a-z.]/i,'') + "</a>"
                else
                  message_params[:body]
                end
+        # rubocop:enable Layout/LineLength
 
         Success({ :subject => message_params[:subject],
                   :body => body,
