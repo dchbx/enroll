@@ -7,12 +7,11 @@
    # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
    #  initially_hidden_enrollment class. %>
 <% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
-<% initially_hidden_enrollment_css_class = included_in_original_enrollment_scope == false ? "initially_hidden_enrollment hidden" : ""%>
 
-<div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
+<div class="module hbx-enrollment-panel panel panel-default">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
-      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> Coverage
+      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %>
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
@@ -27,14 +26,14 @@
           <%= display_carrier_logo(Maybe.new(product), {width: 110}) %>
         </div>
         <h3>
-          <%= link_to product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true %>
+          <%= link_to(product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true)%>
         </h3>
       </div>
       <div class="col-xs-12 vertically-aligned-row mt-1">
         <div class="enrollment-premium info vertical-align-top">
           <p class="mb-0">
             <strong><%= l10n("premium") %>:</strong>
-            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %><%= l10n("month").to_s.downcase %>
+            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>
           </p>
         </div>
         <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
@@ -54,7 +53,7 @@
           <%= hbx_enrollment.effective_on %>
           <% if read_only == true %>
           <br>
-          <strong class="text-danger"><%= l10n("plan_end") %>:
+          <strong class="text-danger">
           </strong>
           <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
           <span class="text-danger">
@@ -104,7 +103,6 @@
       <div class="hired-on info vertical-align-top">
         <strong><%= l10n("waiver_reason") %>:
         </strong>
-        <%= hbx_enrollment.waiver_reason %>
       </div>
       <% end %>
     </div>
@@ -130,7 +128,7 @@
       </div>
       <% if hbx_enrollment.is_reinstated_enrollment?%>
           <div class="enrollment-effective info vertical-align-top">
-            <strong> <%= l10n("reinstated_enrollment") %></strong>
+            <strong> </strong>
           </div>
       <%end%>
     </div>
@@ -146,7 +144,7 @@
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
           <label><%= l10n("APTC_amount") %>:</label>
-          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong><%= l10n("month").to_s.downcase %>
+          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>
         </p>
         <% else %>
         &nbsp;
@@ -213,6 +211,12 @@
 </div>
 <% end %>
 
+<td colspan="1"><%= "Untranslated String" %></td>
+Here is another bad string.
+<%= "Bad String" %>
+This is a problematic string.
+Here. This is another string- we have to test it and see what happens.
+This <%= "Bad String" %>is another test
 
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");

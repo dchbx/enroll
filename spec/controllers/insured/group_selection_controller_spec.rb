@@ -259,6 +259,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:active_employee_roles).and_return [employee_role]
         allow(person).to receive(:has_active_employee_role?).and_return true
+        allow(hbx_profile1).to receive(:under_open_enrollment?).and_return true
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile1
         sign_in user
       end
@@ -698,7 +699,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household)}
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
     let(:current_year) { TimeKeeper.date_of_record.year }
-    let(:effective_on) { TimeKeeper.date_of_record.beginning_of_month }
+    let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,

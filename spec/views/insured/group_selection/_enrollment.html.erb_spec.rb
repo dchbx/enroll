@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
@@ -17,10 +19,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
     let(:person) {FactoryBot.create(:person)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
     let(:employee_role) { FactoryBot.build_stubbed(:employee_role) }
-    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile ) }
+    let(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile) }
     let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
     let(:active_household) {family.active_household}
-    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: active_household )}
+    let(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment, family: family, household: active_household)}
     let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, :with_issuer_profile) }
     let!(:sep) do
       local_sep = FactoryBot.create(:special_enrollment_period, family: family)
@@ -42,6 +44,10 @@ RSpec.describe "insured/group_selection/_enrollment.html.erb", dbclean: :after_e
       assign :family, family
       assign :termination_date_options, { hbx_enrollment.id.to_s => ['end_of_event_month']}
       render "insured/group_selection/enrollment", hbx_enrollment: hbx_enrollment
+    end
+
+    it "should show Covered" do
+      expect(rendered).to match(/Covered/)
     end
 
     it 'should have title' do
