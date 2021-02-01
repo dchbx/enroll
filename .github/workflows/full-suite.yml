@@ -53,7 +53,7 @@ jobs:
       - name: Run View Linter
         run: |
           git fetch --no-tags --depth=1 origin master
-          bundle exec rake view_translations_linter:lint_files view_files_list="$(git diff --name-only origin/master | grep .html.erb | xargs)"
+          bundle exec rake view_translations_linter:lint_files view_files_list="$(git diff --name-only origin/master | grep -v 'spec/' | grep .html.erb | xargs)"
   brakeman:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
