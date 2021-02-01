@@ -6,6 +6,7 @@ FactoryBot.define do
     transient do
       initial_application_state { :active }
       renewal_application_state { :enrollment_open }
+      expired_application_state { :expired }
       draft_application_state { :draft }
       default_effective_period { nil }
       default_open_enrollment_period { nil }
@@ -102,6 +103,17 @@ FactoryBot.define do
           default_effective_period: evaluator.default_effective_period,
           default_open_enrollment_period: evaluator.default_open_enrollment_period
         )
+      end
+    end
+
+    trait :with_expired_benefit_application do
+      after :build do |benefit_sponsorship, evaluator|
+        FactoryBot.build(:benefit_sponsors_benefit_application,
+                         :with_benefit_package,
+                         benefit_sponsorship: benefit_sponsorship,
+                         aasm_state: evaluator.expired_application_state,
+                         default_effective_period: evaluator.default_effective_period,
+                         default_open_enrollment_period: evaluator.default_open_enrollment_period)
       end
     end
 

@@ -348,6 +348,50 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
           expect(subject.selected_enrollment(family, employee_role, 'health')).to eq nil
         end
       end
+
+      context 'it should return terminated or expired enrollment if effective on falls under expired or terminated PY' do
+        let(:person)       { FactoryBot.create(:person, :with_family) }
+        let(:family)       { person.primary_family }
+        let(:organization)     { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_dc_employer_profile_expired_application, site: site) }        # let(:profile)      { binding.pry organization.employer_profile}
+        let(:expired_application) { organization.employer_profile.benefit_applications.expired.first }
+        let(:profile) { organization.employer_profile }
+        let(:expired_benefit_package) { expired_application.benefit_packages.first }
+        let!(:census_employee)  { FactoryBot.create(:benefit_sponsors_census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: profile, active_benefit_group_assignment: expired_benefit_package.id) }
+        let(:employee_role)     { FactoryBot.create(:benefit_sponsors_employee_role, employer_profile: profile, person: person, census_employee_id: census_employee.id, benefit_sponsors_employer_profile_id: profile.id) }
+
+        let(:qle_kind) { FactoryBot.create(:qualifying_life_event_kind, :effective_on_event_date) }
+
+        let(:sep) do
+          sep = family.special_enrollment_periods.new
+          sep.effective_on_kind = 'date_of_event'
+          sep.qualifying_life_event_kind = qle_kind
+          sep.qle_on = TimeKeeper.date_of_record - 7.days
+          sep.save
+          sep
+        end
+
+        let!(:expired_enrollment) do
+          FactoryBot.create(:hbx_enrollment, :with_enrollment_members, :with_product,
+                            household: family.active_household,
+                            family: family,
+                            aasm_state: "coverage_expired",
+                            kind: "employer_sponsored",
+                            effective_on: expired_application.start_on,
+                            rating_area_id: expired_application.recorded_rating_area_id,
+                            sponsored_benefit_id: expired_application.benefit_packages.first.health_sponsored_benefit.id,
+                            sponsored_benefit_package_id: expired_application.benefit_packages.first.id,
+                            benefit_sponsorship_id: expired_application.benefit_sponsorship.id,
+                            employee_role_id: employee_role.id)
+        end
+
+        before do
+          allow(employee_role).to receive(:census_employee).and_return census_employee
+        end
+
+        it "should return benefit group assignment belongs to expired py when benefit_group belongs to expired plan year" do
+          expect(subject.selected_enrollment(family, employee_role, 'health')).to eq expired_enrollment
+        end
+      end
     end
   end
 
