@@ -1,0 +1,12 @@
+var containing_row = $("#<%= @element_to_replace_id %>").closest('TR');
+var $parent_row = containing_row;
+if ( $('tr.child-row:visible').length > 0 ) {
+  $('tr.child-row:visible').remove();
+}
+
+if ( $parent_row.next().hasClass('child-row') ) {
+//
+}
+else {
+  $parent_row.after('<tr class="child-row"><td colspan="100"><%= j render "reinstate_enrollment"%></td></tr>');
+}
