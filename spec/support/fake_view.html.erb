@@ -1,0 +1,242 @@
+<% can_make_changes_for_enrollment = hbx_enrollment.can_make_changes? %>
+<% if hbx_enrollment.is_coverage_waived? %>
+  <%= render partial: 'insured/families/waived_coverage_widget', locals: { read_only: read_only || can_make_changes_for_enrollment , hbx_enrollment: hbx_enrollment } %>
+<% else %>
+<% product = hbx_enrollment.product %>
+<% # This assures that hbx enrollments in the original scope will be displayed on the page. Otherwise, they're hidden,
+   # and when the 'display all enrollments' checkbox is selected, it will remove hidden from everything with the
+   #  initially_hidden_enrollment class. %>
+<% included_in_original_enrollment_scope = @hbx_enrollments.to_a.include?(hbx_enrollment) %>
+
+<div class="module hbx-enrollment-panel panel panel-default">
+  <div class="panel-heading vertically-aligned-row">
+    <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
+      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %>
+      <span class="separator">
+        <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
+      </span>
+    </h3>
+    <%= render partial: "insured/families/enrollment_progress", locals: {step: hbx_enrollment.enroll_step, hbx_enrollment: hbx_enrollment} %>
+  </div>
+
+  <div class="panel-body">
+    <div class="row">
+      <div class="col-xs-12 vertically-aligned-row">
+        <div>
+          <%= display_carrier_logo(Maybe.new(product), {width: 110}) %>
+        </div>
+        <h3>
+          <%= link_to(product.title, summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true)%>
+        </h3>
+      </div>
+      <div class="col-xs-12 vertically-aligned-row mt-1">
+        <div class="enrollment-premium info vertical-align-top">
+          <p class="mb-0">
+            <strong><%= l10n("premium") %>:</strong>
+            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>
+          </p>
+        </div>
+        <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
+        <div class="enrollment-effective info vertical-align-top">
+          <strong><%= l10n("effective_date") %>:
+          </strong>
+          <%= hbx_enrollment.effective_on %>
+        </div>
+        <div class="enrollment-effective info vertical-align-top">
+          <strong><%= l10n("coverage_end") %>:
+          </strong>
+          <%= enrollment_coverage_end(hbx_enrollment) %>
+        </div>
+        <% else %>
+        <div class="enrollment-effective info vertical-align-top">
+          <strong><%= l10n("plan_start") %>:</strong>
+          <%= hbx_enrollment.effective_on %>
+          <% if read_only == true %>
+          <br>
+          <strong class="text-danger">
+          </strong>
+          <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
+          <span class="text-danger">
+            <%= @census_employee.coverage_terminated_on.end_of_month %>
+          </span>
+          <% end %>
+          <% end %>
+        </div>
+        <% end %>
+      </div>
+      <div class="col-xs-12 vertically-aligned-row">
+        <% unless hide_policy_selected_date?(hbx_enrollment) %>
+        <div class="enrollment-created-at info vertical-align-top">
+          <strong><%= l10n("plan_selected") %>:</strong>
+          <%= format_policy_purchase_date(hbx_enrollment) %>
+          (<%= format_policy_purchase_time(hbx_enrollment) %>)
+        </div>
+        <% end %>
+        <div class="enrollment-type info vertical-align-top">
+          <strong><%= l10n("plan_type") %>:</strong>
+          <%= render_plan_type_details(product) %>
+        </div>
+      </div>
+      <% if read_only == true %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="benefit-group info vertical-align-top">
+          <strong><%= l10n("benefit_group") %>:
+          </strong>
+          <%= @benefit_group.try(:title) %>
+        </div>
+        <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
+        <div class="hired-on info vertical-align-top">
+          <strong><%= l10n("hired_on") %>:
+          </strong>
+          <%= @census_employee.employee_role.try(:hired_on) %></p>
+      </div>
+      <% end %>
+    </div>
+    <% if hbx_enrollment.is_coverage_waived? %>
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="benefit-group info vertical-align-top">
+        <strong><%= l10n("enrollment_status") %>:
+        </strong>
+        <%= l10n("coverage_waived") %>
+      </div>
+      <% if @census_employee.employee_role.present? && employee_role = @census_employee.employee_role %>
+      <div class="hired-on info vertical-align-top">
+        <strong><%= l10n("waiver_reason") %>:
+        </strong>
+      </div>
+      <% end %>
+    </div>
+    <% end %>
+    <% end %>
+    <% if hbx_enrollment.coverage_termination_pending? %>
+      <div class="col-xs-12 vertically-aligned-row">
+        <div class="enrollment-effective info">
+          <p>
+            <strong><%= l10n("insured.families.future_enrollment_termination_date") %>:</strong>
+            <%= hbx_enrollment.terminated_on %>
+          </p>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-type info">
+        <p class="mb-0">
+          <strong><%= l10n("market_type") %>: </strong>
+          <%= show_market_name_by_enrollment hbx_enrollment %>
+        </p>
+      </div>
+      <% if hbx_enrollment.is_reinstated_enrollment?%>
+          <div class="enrollment-effective info vertical-align-top">
+            <strong> </strong>
+          </div>
+      <%end%>
+    </div>
+    <div class="col-xs-12 vertically-aligned-row">
+      <div class="enrollment-type info vertical-align-top">
+        <p>
+          <strong class="bullet-separator"><%= HbxProfile::ShortName %>
+            ID:</strong>
+          <%= hbx_enrollment.hbx_id %>
+        </p>
+      </div>
+      <div>
+        <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
+        <p>
+          <label><%= l10n("APTC_amount") %>:</label>
+          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>
+        </p>
+        <% else %>
+        &nbsp;
+        <% end %>
+      </div>
+    </div>
+    <div class="col-xs-12 vertically-aligned-row">
+      <% names = hbx_enrollment.covered_members_first_names %>
+      <% if names.present? %>
+      <div class="family-members info vertical-align-top">
+        <p>
+          <strong><%= l10n("covered") %>:</strong>
+          <a href="#"><%= names.delete_at(0).camelcase %></a>
+          <% names.each do |name| %>
+          <span class="separator">
+            <a href="#"><%= name.camelcase %></a>
+          </span>
+          <% end %>
+        </p>
+      </div>
+      <% end %>
+    </div>
+  </div>
+  <% if read_only == true %>
+    <% if !hbx_enrollment.is_coverage_waived? %>
+    <br/>
+    <%= render partial: "employers/census_employees/enrollment_details", locals: { enrollment:  hbx_enrollment} %>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="panel-footer">
+  <div class="vertically-aligned-row">
+    <div>
+      <%= render partial: "shared/plan_shoppings/sbc_link", locals: { plan: product } %>
+    </div>
+    <div>
+      <a class="vertically-aligned-row" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
+        <i class="fa fa-phone fa-2x"></i>
+        <span class="col-xs-11 enrollment-tile-summary"><%= l10n("plan_contact_info") %></span>
+      </a>
+        <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
+    </div>
+    <% if !read_only == true %>
+      <div class="col-lg-3">
+        <div class="row <%if !can_make_changes_for_enrollment %>cna<%end%>">
+         <% if can_make_changes_for_enrollment && !(hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_canceled?) && hbx_enrollment.is_shop?%>
+            <%= pundit_span Family, :updateable? %>
+               <!-- Use turbolinks: false, to avoid calling controller action twice-->
+              <%= link_to l10n('make_changes'), new_insured_group_selection_path(person_id: @person.id, employee_role_id: @employee_role.try(:id), change_plan: 'change_plan', hbx_enrollment_id: hbx_enrollment.id, coverage_kind: hbx_enrollment.coverage_kind), class: 'btn btn-default btn-block ee-make-changes', disabled: !can_make_changes_for_enrollment,  data: { turbolinks: false } %>
+            </span>
+          <!-- This potentially allows certain shop users to view Make Changes -->
+          <% elsif can_make_changes_for_enrollment %>
+            <%= pundit_span Family, :updateable? %>
+              <%= link_to l10n("make_changes"), edit_plan_insured_group_selections_path(hbx_enrollment_id: hbx_enrollment.id, family_id: @family.id), { class: 'btn btn-default btn-block ivl-make-changes' } %>
+            </span>
+          <% end %>
+          <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year, source: 'account'}), {class: 'btn btn-primary  btn-block', remote: true} %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+</div>
+<% end %>
+
+<td colspan="1"><%= "Untranslated String" %></td>
+
+
+
+
+<script>
+  var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
+  var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+  function toggleDisplayEnrollments(event) {
+    if (event.target.checked) {
+      for (var i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
+        initiallyHiddenEnrollmentPanels[i].classList.remove("hidden");
+      }
+    } else {
+        for (var i = 0; i < initiallyHiddenEnrollmentPanels.length; i++) {
+        initiallyHiddenEnrollmentPanels[i].classList.add("hidden");
+      }
+    }
+  };
+  // For when family home page loaded through clicking off of the families index page
+  if (enrollmentToggleCheckbox != null || enrollmentToggleCheckbox != undefined) {
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  };
+  // For when families home page is refreshed when user on it
+  document.addEventListener("DOMContentLoaded", function() {
+    var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
+    enrollmentToggleCheckbox.addEventListener('click', toggleDisplayEnrollments);
+  })
+ </script>

@@ -132,10 +132,10 @@
 </table>
 
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: "You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage.  After sending you that form, you or your insurance company told us you didn’t make any premium payments for the plan(s) with the Marketplace-assigned policy number(s) listed below. You’re receiving this notice and the enclosed voided Form 1095-A to reflect this updated information."} %>
+content: "You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage. After sending you that form, you or your insurance company told us you didn’t make any premium payments for the plan(s) with the Marketplace-assigned policy number(s) listed below. You’re receiving this notice and the enclosed voided Form 1095-A to reflect this updated information."} %>
 </br></br></br></br>
 <%= render partial: 'notices/shared/paragraph', :locals => {
-content: 'We have also told the IRS to disregard information we sent about your enrollment in the plan(s) listed above. You should not use the Form 1095-A for any of the above plans when you file your taxes.  This Form 1095-A is now void, as shown in the upper right corner of the enclosed form.  If you’ve already filed your taxes using this Form 1095-A, you may need to file an amended tax return.'} %>
+content: 'We have also told the IRS to disregard information we sent about your enrollment in the plan(s) listed above. You should not use the Form 1095-A for any of the above plans when you file your taxes. This Form 1095-A is now void, as shown in the upper right corner of the enclosed form. If you’ve already filed your taxes using this Form 1095-A, you may need to file an amended tax return.'} %>
 
 <% if notice.is_a_void_active_cover_letter %>
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -147,10 +147,10 @@ content: 'We have also told the IRS to disregard information we sent about your 
 <% end %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers_for_ivl', :locals => {
- contents: ["The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}. If you believe the information on your Form 1095-A is not accurate, please go to the tax information section at <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a> for information on how to request a corrected Form 1095-A, or call us at #{notice.hbe.phone}."], heading: 'If You Think This Form is Wrong', sub_heading: '', top_margin: '12px'} %>
+ contents: ["If you believe your Form 1095-A was voided by mistake please call #{Settings.site.short_name} at #{Settings.contact_center.short_number}. #{Settings.site.short_name} does not control the individual mandate and cannot provide tax advice. For more information on these topics, consult a tax adviser or the IRS website at <a href=#{Settings.site.irs_url}>IRS.gov</a>."], heading: 'If You Think We Made a Mistake', sub_heading: '', top_margin: '12px'} %>
 
 <%= render partial: 'notices/shared/paragraph_with_headers', :locals => {
- contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{notice.hbe.phone}. #{Settings.site.short_name} cannot provide tax advice. For more information on these topics, consult a tax adviser."], heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
+ contents: ["Go to <a href=#{Settings.site.home_url}>#{notice.hbe.short_url}</a>, or call us at #{Settings.contact_center.short_number}."], heading: 'Still Have Questions?', sub_heading: '', top_margin: '8px', bottom_margin: '8px'} %>
 
 <div style="page-break-inside: avoid;">
   <%= render partial: 'notices/shared/paragraph', :locals => {
@@ -162,7 +162,6 @@ content: 'We have also told the IRS to disregard information we sent about your 
 
 <%= render partial: 'notices/shared/reference_paragraph', :locals => {
 contents: ['<strong>Legal Reference:</strong> The following laws, regulations and rules apply to this letter:',
-'DC individual mandate: DC Official Code §47-5102(a)',
-'Federal individual mandate: 26 U.S.C. §5000A',
+'Individual mandate: 26 U.S.C. §5000A',
 'Exchange requirement to send 1095-A: 26 U.S.C. §36B(f); 26 C.F.R. §1-36B-5',
 'Requirement to reconcile advance premium tax credit: 26 C.F.R. §1-36B-4']} %>
