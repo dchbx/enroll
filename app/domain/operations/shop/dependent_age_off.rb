@@ -36,7 +36,7 @@ module Operations
         Success(HbxEnrollment.enrolled.shop_market.all_with_multiple_enrollment_members)
       end
 
-      def process_shop_dep_age_off(enrollments, shop_logger, new_date)
+      def process_shop_dep_age_off(enrollments, shop_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
         cut_off_age = EnrollRegistry[:aca_shop_dependent_age_off].settings(:cut_off_age).item
         enrollments.no_timeout.inject([]) do |_result, enrollment|
           next if enrollment.employer_profile&.is_fehb?

@@ -314,7 +314,7 @@ The I-94 number is also called the admissions number. It is an 11 character sequ
   :'en.insured.family_members.index.add_member_info_html' => "<span class='bold'>Here's your chance to add family members to your plan.</span><br>Add family members by clicking the 'Add Member' button. If you don't need to add more members, or when you are done adding members, click continue.",
   :'en.month' => "Month",
   :'en.termination_date' => "Termination date",
-  :'en.insured.group_selection.coverage_household_ineligible_coverage' => "Employer sponsored coverage is not yet available",
+  :'en.insured.group_selection.coverage_household_ineligible_coverage' => "Employer sponsored coverage is not available",
   :'en.insured.group_selection.new.choose_coverage_for_your_household' => "Choose Coverage for your Household",
   :'en.insured.group_selection.new.select_who_needs_coverage' => "Select who needs coverage and the type of coverage needed. When you’re finished, select CONTINUE.",
   :'en.insured.group_selection.new.effective_date' => "EFFECTIVE DATE",

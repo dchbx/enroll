@@ -36,7 +36,7 @@ module Operations
         Success(BenefitSponsors::Organizations::Organization.where(:"profiles._type" => /.*FehbEmployerProfile$$$/))
       end
 
-      def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date)
+      def process_fehb_dep_age_off(congressional_ers, fehb_logger, new_date) # rubocop:disable Metrics/CyclomaticComplexity
         cut_off_age = EnrollRegistry[:aca_fehb_dependent_age_off].settings(:cut_off_age).item
         congressional_ers.each do |organization|
           benefit_application = organization.active_benefit_sponsorship.active_benefit_application

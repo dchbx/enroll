@@ -85,12 +85,7 @@ RSpec.describe Operations::Fehb::DependentAgeOff, type: :model, dbclean: :after_
   context 'valid date' do
     it 'Should process the request when configured annually' do
       result = subject.call(new_date: TimeKeeper.date_of_record.beginning_of_year)
-      process_result = if ::EnrollRegistry[:aca_fehb_dependent_age_off].settings(:period).item == :annual
-                         "Successfully dropped dependents for FEHB market"
-                       else
-                         "Successfully dropped dependents for FEHB market"
-                       end
-      expect(result.success).to eq(process_result)
+      expect(result.success).to eq('Successfully dropped dependents for FEHB market')
     end
   end
   # rubocop:enable Style/IdenticalConditionalBranches
