@@ -1,3 +1,4 @@
+@flaky
 Feature: Individual Qualifying life of event kind based on eligibity dates
   Background:
     Given that a user with a HBX staff role with hbx_tier3 subrole exists
