@@ -13,7 +13,7 @@ RSpec.describe Operations::GenerateSamlResponse do
   let(:build_saml_repsonse) {double}
   let(:encode_saml_response) {double}
   let(:connection) {double}
-  let(:params) do 
+  let(:params) do
     {:enrollment_id => hbx_enrollment.hbx_id }
   end
 
@@ -22,7 +22,7 @@ RSpec.describe Operations::GenerateSamlResponse do
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:build_saml_response).and_return build_saml_repsonse
     allow_any_instance_of(OneLogin::RubySaml::SamlGenerator).to receive(:encode_saml_response).and_return encode_saml_response
   end
-  
+
   subject do
     described_class.new.call(params)
   end
