@@ -84,19 +84,24 @@ class BenefitGroupAssignment
     def on_date(census_employee, date)
       assignments = census_employee.benefit_group_assignments.select{ |bga| bga.created_at.present? && !bga.canceled? }
       assignments_with_no_end_on, assignments_with_end_on = assignments.partition { |bga| bga.end_on.nil? }
-      perspective_assignments_with_end_on = assignments_with_end_on.select { |assignment| assignment.start_on > date }
+
       if assignments_with_end_on.present?
-        valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
-        if valid_assignments_with_end_on.present?
-          valid_assignments_with_end_on.select { |assignment| assignment.end_on.to_date > date.to_date  }.max_by(&:created_at) ||
-            valid_assignments_with_end_on.last
-        elsif assignments_with_no_end_on.present?
-          filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
-        else
-          perspective_assignments_with_end_on.last
-        end
+        filter_assignments_with_end_on(assignments_with_end_on, assignments_with_no_end_on, date)
       elsif assignments_with_no_end_on.present?
         filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
+      end
+    end
+
+    def filter_assignments_with_end_on(assignments_with_end_on, assignments_with_no_end_on, date)
+      perspective_assignments_with_end_on = assignments_with_end_on.select { |assignment| assignment.start_on > date }
+      valid_assignments_with_end_on = assignments_with_end_on.select { |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
+      if valid_assignments_with_end_on.present?
+        valid_assignments_with_end_on.select { |assignment| assignment.end_on.to_date > date.to_date  }.max_by(&:created_at) ||
+          valid_assignments_with_end_on.last
+      elsif assignments_with_no_end_on.present?
+        filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
+      else
+        perspective_assignments_with_end_on.last
       end
     end
 

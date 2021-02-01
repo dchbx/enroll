@@ -861,14 +861,18 @@ class CensusEmployee < CensusMember
   end
 
   def off_cycle_benefit_group_assignment=(benefit_package_id = nil)
-    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.off_cycle_benefit_application
-    if benefit_application.present?
-      benefit_packages = benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
-    end
+    benefit_packages = fetch_off_cycle_benefit_packages(benefit_package_id)
 
     return unless benefit_packages.present? && (off_cycle_benefit_group_assignment.blank? || !benefit_packages.map(&:id).include?(off_cycle_benefit_group_assignment.benefit_package.id))
 
-    create_benefit_group_assignment(benefit_packages, true)
+    create_benefit_group_assignment(benefit_packages, off_cycle: true)
+  end
+
+  def fetch_off_cycle_benefit_packages(benefit_package_id)
+    benefit_application = benefit_sponsorship&.benefit_package_by(benefit_package_id)&.benefit_application || benefit_sponsorship&.off_cycle_benefit_application
+    return unless benefit_application
+
+    benefit_package_id.present? ? [benefit_application.benefit_packages.find(benefit_package_id)] : benefit_application.benefit_packages
   end
 
   def renewal_benefit_group_assignment=(renewal_package_id)

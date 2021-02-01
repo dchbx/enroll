@@ -1375,6 +1375,22 @@ module BenefitSponsors
       it_behaves_like "for an employer on the exchange", "terminated", "enrollment_open", false
       it_behaves_like "for an employer on the exchange", "terminated", "enrollment_closed", false
       it_behaves_like "for an employer on the exchange", "terminated", "active", false
+
+      context 'employer has multiple canceled applications after terminated application' do
+        let(:start_on)                    { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+        let(:termination_date)            { TimeKeeper.date_of_record.next_month.end_of_month }
+        let!(:renewal_effective_period)   { termination_date.next_day..termination_date.next_day.next_year.prev_day }
+        let!(:effective_period)           { start_on..termination_date }
+        let!(:term_application)           { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :termination_pending, effective_period: effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:canceled_app1)              { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :canceled, effective_period: renewal_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:canceled_app2)              { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :canceled, effective_period: renewal_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:canceled_app3)              { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :canceled, effective_period: renewal_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:canceled_app4)              { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :canceled, effective_period: renewal_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:draft_app)                  { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :draft, effective_period: renewal_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
+
+
+        it { expect(active_benefit_sponsorship.is_potential_off_cycle_employer?).to eq true }
+      end
     end
 
     describe '.off_cycle_benefit_application' do

@@ -1,17 +1,9 @@
 class GroupSelectionPrevaricationAdapter
-  attr_accessor :person
-  attr_accessor :family
-  attr_accessor :coverage_household
-  attr_accessor :previous_hbx_enrollment
-  attr_accessor :change_plan
-  attr_accessor :coverage_kind
-  attr_accessor :enrollment_kind
-  attr_accessor :shop_for_plans
-  attr_accessor :optional_effective_on
-  attr_accessor :shop_under_current
-  attr_accessor :shop_under_future
 
   include ActiveModel::Model
+
+  attr_accessor :optional_effective_on, :shop_under_current, :shop_under_future, :person, :family,
+                :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans
 
   def self.initialize_for_common_vars(params)
     person_id = params.require(:person_id)
@@ -373,10 +365,9 @@ class GroupSelectionPrevaricationAdapter
 
   def fetch_benefit_package_for_sep(employee_role)
     family = employee_role.person.primary_family
-    benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on) ||
-                      employee_role.benefit_package(qle: true) ||
-                      employee_role.census_employee.possible_benefit_package
-    benefit_package
+    employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on) ||
+      employee_role.benefit_package(qle: true) ||
+      employee_role.census_employee.possible_benefit_package
   end
 
   # def is_dental_offered?(employee_role)

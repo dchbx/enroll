@@ -5,9 +5,8 @@ module Eligibility
       return true unless is_case_old?
 
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
-      if py.present?
-        create_benefit_group_assignment(py.benefit_groups) if active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
-      end
+
+      create_benefit_group_assignment(py.benefit_groups) if py.present? && active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
 
       if py = employer_profile.plan_years.renewing.first
         if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
@@ -20,7 +19,7 @@ module Eligibility
     # When switching benefit package, we are always creating a new BGA and terminating/cancelling previous BGA
     # TODO: Creating BGA for first benefit group only
 
-    def create_benefit_group_assignment(benefit_packages, off_cycle = false)
+    def create_benefit_group_assignment(benefit_packages, off_cycle: false)
       assignment = off_cycle ? off_cycle_benefit_group_assignment : active_benefit_group_assignment
       if benefit_packages.present?
         if assignment.present?
@@ -33,7 +32,14 @@ module Eligibility
           verified_end_date = assignment.benefit_package.effective_period.cover?(end_date) ? end_date : assignment.benefit_package.effective_period.max
           assignment.end_benefit(verified_end_date)
         end
+        deactive_benefit_group_assignments(benefit_packages.first)
         add_benefit_group_assignment(benefit_packages.first, new_start_on || benefit_packages.first.start_on, benefit_packages.first.end_on)
+      end
+    end
+
+    def deactive_benefit_group_assignments(benefit_package)
+      benefit_group_assignments.by_benefit_package(benefit_package).each do |benefit_group_assignment|
+        benefit_group_assignment.update_attributes(is_active: false) if benefit_group_assignment.is_active == true
       end
     end
 
@@ -48,6 +54,7 @@ module Eligibility
             end
           renewal_benefit_group_assignment.end_benefit(end_date)
         end
+        deactive_benefit_group_assignments(renewal_benefit_packages.first)
         add_benefit_group_assignment(renewal_benefit_packages.first, new_start_on || renewal_benefit_packages.first.start_on, renewal_benefit_packages.first.end_on)
       end
     end
