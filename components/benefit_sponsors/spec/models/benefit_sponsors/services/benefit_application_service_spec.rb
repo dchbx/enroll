@@ -221,18 +221,24 @@ module BenefitSponsors
         bs.save!
         bs
       end
-      let(:effective_period)              { Date.new(2019, 02, 01)..Date.new(2020,01,31) }
+      let(:year)                          { TimeKeeper.date_of_record.prev_year.year }
+      let(:effective_period)              { Date.new(year, 2, 1)..Date.new(year + 1, 1, 31) }
+      let(:oe_period)                     { Date.new(year, 1, 5)..Date.new(year, 1, 10) }
       let(:create_ba_params) do
         {
           "start_on" => effective_period.min.to_s, "end_on" => effective_period.max.to_s, "fte_count" => "11",
-          "open_enrollment_start_on" => "01/15/2019", "open_enrollment_end_on" => "01/20/2019",
+          "open_enrollment_start_on" => oe_period.min.to_s, "open_enrollment_end_on" => oe_period.max.to_s,
           "benefit_sponsorship_id" => benefit_sponsorship.id.to_s
         }
       end
       let!(:current_benefit_market_catalog) do
-        BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+        ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
+          site,
+          benefit_market,
+          (TimeKeeper.date_of_record.prev_year.beginning_of_year..TimeKeeper.date_of_record.prev_year.end_of_year)
+        )
         benefit_market.benefit_market_catalogs.where(
-          "application_period.min" => effective_period.min.to_s
+          "application_period.min" => TimeKeeper.date_of_record.prev_year.beginning_of_year
         ).first
       end
 

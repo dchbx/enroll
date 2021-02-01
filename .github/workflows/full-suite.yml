@@ -33,8 +33,29 @@ jobs:
           git config diff.renameLimit 800
           git fetch --no-tags --depth=1 origin master
           bundle exec rubocop-git origin/master | grep "no offenses detected"
+  view_linter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ruby/setup-ruby@v1
+      - name: Cache Gems
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+          restore-keys: |
+            v2-${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}-${{ hashFiles('**/Gemfile' ) }}
+      - name: bundle install
+        run: |
+          gem update --system
+          bundle config path vendor/bundle
+          bundle install
+      - name: Run View Linter
+        run: |
+          git fetch --no-tags --depth=1 origin master
+          bundle exec rake view_translations_linter:lint_git_difference_changed_lines
   brakeman:
-    needs: [rubocop]
+    needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -58,7 +79,7 @@ jobs:
             cd ../..
           done
   build-assets:
-    needs: [rubocop, brakeman]
+    needs: [rubocop, brakeman, view_linter]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

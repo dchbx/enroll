@@ -15,7 +15,7 @@
     <div class="row">
       <div class="col-xs-8">
         <div><%= display_carrier_logo(Maybe.new(plan), {width: 110}) %></div>
-        <h4><strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id:hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %></strong>
+        <h4><strong><%= link_to plan.try(:name), summary_products_plans_path({:standard_component_id => plan.try(:hios_id), hbx_enrollment_id: hbx_enrollment.id, active_year: plan.try(:active_year)}), remote: true %></strong>
         </h4>
           <div><p><%= render_plan_type_details(plan) %></p></div>
           <div>
@@ -27,7 +27,7 @@
             <% names = hbx_enrollment.covered_members_first_names %>
             <div class="family-members">
               <p>
-                <label>Covered:</label>
+                <label><%= l10n("covered")%></label>
                   <a href="#"><%= names.delete_at(0).to_s.camelcase %></a>
                   <% names.each do |name| %>
                     <span class="separator"><a href="#"><%= name.camelcase %></a></span>
@@ -46,7 +46,7 @@
                       <label><%= l10n("termination_date") %>: </label>
                     </div>
                     <div class="col-md-6 termination_date no-pd-left">
-                      <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: 'Choose..', required: true, id: hbx_enrollment.hbx_id, name: "terminated_on"} %>
+                      <%= select_tag :terminated_on, options_for_select(@termination_date_options[hbx_enrollment.id.to_s], selected: hbx_enrollment.terminated_on), {prompt: l10n("choose") + "..", required: true, id: hbx_enrollment.hbx_id, name: "terminated_on"} %>
                     </div>
                   </div>
                 <% else %>
