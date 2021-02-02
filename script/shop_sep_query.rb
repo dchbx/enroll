@@ -66,7 +66,8 @@ def gate_quiet_period(benefit_application, transition_at)
   # don't transmit enrollments until quiet period ended
   quiet_period = benefit_application.enrollment_quiet_period
   if transition_at.in_time_zone("UTC") <= quiet_period.max
-    return false if ::EnrollRegistry.feature_enabled?(:no_quiet_period_check_after_application_start_date) && quiet_period.max > benefit_application.start_on &&
+    exchange = ::EnrollRegistry[:no_quiet_period_check_after_application_start_date].item
+    return false if exchange == :dc && ::EnrollRegistry.feature_enabled?(:no_quiet_period_check_after_application_start_date) && quiet_period.max > benefit_application.start_on &&
         transition_at.in_time_zone("UTC") > benefit_application.open_enrollment_end_on
     true
   end
