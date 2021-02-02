@@ -6,6 +6,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::Pundit
   include ::SepAll
   include ::Config::AcaHelper
+  include ::L10nHelper
 
   before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
@@ -18,6 +19,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
   before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
+  before_action :can_manage_settings?, only: [:settings]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
   layout 'single_column'
@@ -916,6 +918,12 @@ def employer_poc
 
   def modify_admin_tabs?
     authorize HbxProfile, :modify_admin_tabs?
+  end
+
+  def can_manage_settings?
+    authorize HbxProfile, :can_manage_settings?
+  rescue Pundit::NotAuthorizedError
+    redirect_to exchanges_hbx_profiles_root_path, :flash => { :error => l10n("controller.hbx_profiles.settings_access_not_authorized") }
   end
 
   def can_submit_time_travel_request?

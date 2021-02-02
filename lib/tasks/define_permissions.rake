@@ -90,6 +90,12 @@ namespace :permissions do
   DefinePermissions.define_task :hbx_admin_can_manage_qles => :environment
 end
 
+# RAILS_ENV=production bundle exec rake permissions:hbx_admin_can_manage_settings
+namespace :permissions do
+  desc 'Super admin can modify resource registry settings'
+  DefinePermissions.define_task :hbx_admin_can_manage_settings => :environment
+end
+
 # RAILS_ENV=production bundle exec rake permissions:grant_super_admin_access user_email="<email address1>,<email address2>"
 namespace :permissions do
   desc 'grant super admin access for given users'
