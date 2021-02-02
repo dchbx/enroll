@@ -220,6 +220,10 @@ This <%= "Bad String" %>is another test
 <%= l10n('confirm') %>
 <%= "baD stRing" %>
 
+<%= @person.id %>
+<%= @family.primary_person.full_name %>
+<%= benefit_application.created_at %>
+
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
   var enrollmentToggleCheckbox = document.getElementById("display_all_enrollments");
