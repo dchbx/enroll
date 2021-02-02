@@ -1,10 +1,11 @@
 approved_translation_strings_in_erb_tags:
-  html_elements_and_helper_methods: ["l10n", "I18n", "content_for", "render", "pundit_span", "number_to_currency", "format_policy_purchase_date", "format_policy_purchase_time", "display_carrier_logo", "enrollment_coverage_end", "form_for", "pundit_class"]
-  non_word_numerical_strings: ["coverage_year", "effective_on", "coverage_terminated_on", "hired_on", "end_of_month", "start_of_month", "terminated_on", "active_year", "dob"]
+  html_elements_and_helper_methods: ["l10n", "I18n", "content_for", "render", "pundit_span", "number_to_currency",
+  "format_policy_purchase_date", "format_policy_purchase_time", "display_carrier_logo", "enrollment_coverage_end", "form_for", "pundit_class"]
+  non_word_numerical_strings: ["coverage_year", "effective_on", "coverage_terminated_on", "hired_on", "end_of_month",
+  "start_of_month", "terminated_on", "active_year", "dob", "suggested_cobra_effective_date", "date_of_record", "TimeKeeper"]
   proper_name_related_strings: ["name", "first_name", "last_name", "full_name", "title"]
   record_identifiers: ["hbx_id", "hbx_enrollment_id", "hios_id"]
-  non_text_method_calls: ["hios_id", "product_id"]
+  non_text_method_calls: ["hios_id", "product_id", "id"]
   other_strings: ["untranslated string", 'bad string']
 approved_translation_strings_outside_erb_tags:
-  string_list: ["%&gt", "ID:", "product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year}), remote: true)%&gt;", "0) %&gt;",
-  'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens"]
+  string_list: ["%&gt", "ID:", 'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens"]
