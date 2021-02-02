@@ -110,8 +110,13 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
 
     context 'when enrollment is new hire enrollment'  do
 
+      let(:start_on) { TimeKeeper.date_of_record.beginning_of_month - 3.months }
+
       before do
         allow(hbx_enrollment).to receive(:new_hire_enrollment_for_shop?).and_return(true)
+        open_enrollment_period = (initial_application.start_on - 10.days)..(initial_application.start_on - 1.days)
+        initial_application.update_attributes(open_enrollment_period: open_enrollment_period)
+        initial_application.save!
       end
 
       context 'enrollment effective date with in 2 months in the past' do
@@ -124,7 +129,7 @@ describe '.can_publish_enrollment?', :dbclean => :after_each do
 
       context 'enrollment effective date is more than 2 months in the past' do
         let(:enrollment_effective_on) { TimeKeeper.date_of_record - 3.months }
-        let(:submitted_at) { initial_application.open_enrollment_end_on - 1.day }
+        let(:submitted_at) { initial_application.open_enrollment_end_on.next_day }
 
         it 'should not publish enrollment' do
           expect(can_publish_enrollment?(hbx_enrollment, submitted_at)).to be_falsey
