@@ -75,7 +75,11 @@ module ApplicationHelper
     opts = options.dup
     obj_name = f.object_name
     obj_val = f.object.send(field_name.to_sym)
-    current_value = obj_val.blank? ? value : obj_val.is_a?(DateTime) ? obj_val.strftime("%m/%d/%Y") : obj_val
+    current_value = if obj_val.blank?
+                      value
+                    else
+                      obj_val.is_a?(DateTime) ? obj_val.strftime("%m/%d/%Y") : obj_val
+                    end
     html_class_list = opts.delete(:class) { |_k| "" }
     jq_tag_classes = (html_class_list.split(/\s+/) + ["jq-datepicker"]).join(" ")
     generated_field_name = "jq_datepicker_ignore_#{obj_name}[#{sanitized_field_name}]"
@@ -475,9 +479,11 @@ module ApplicationHelper
   end
 
   def relationship_options(dependent, referer)
-    relationships = referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?) ?
-      BenefitEligibilityElementGroup::Relationships_UI - ["self"] :
-      PersonRelationship::Relationships_UI
+    relationships = if referer.include?("consumer_role_id") || @person.try(:is_consumer_role_active?)
+                      BenefitEligibilityElementGroup::Relationships_UI - ["self"]
+                    else
+                      PersonRelationship::Relationships_UI
+                    end
     options_for_select(relationships.map{|r| [r.to_s.humanize, r.to_s] }, selected: dependent.try(:relationship))
   end
 
@@ -619,7 +625,7 @@ module ApplicationHelper
   end
 
   def display_dental_metal_level(plan)
-    if plan.class == Plan || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
+    if plan.instance_of?(Plan) || (plan.is_a?(Maybe) && plan.extract_value.class.to_s == 'Plan')
       return plan.metal_level.to_s.titleize if plan.coverage_kind.to_s == 'health'
 
       (plan.active_year == 2015 ? plan.metal_level : plan.dental_level).try(:to_s).try(:titleize) || ""

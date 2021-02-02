@@ -59,7 +59,7 @@ class BulkNoticeReflex < ApplicationReflex
     end
   end
 
-  def cache_or_fetch_entity_attrs(entity_identifier) # rubocop:disable Metrics/AbcSize
+  def cache_or_fetch_entity_attrs(entity_identifier) # rubocop:disable Metrics/AbcSize, Metrics/CyclomaticComplexity
     # this method accepts an org_identifier, which it uses to check for an existing cache or fetch the missing org with the given
     # identifier, which should be either a FEIN or an HBX id
     session[:bulk_notice] ||= { audience: {} }
@@ -71,7 +71,7 @@ class BulkNoticeReflex < ApplicationReflex
     consumer = Person.all_consumer_roles.by_hbx_id(entity_identifier).first
     resident = Person.all_resident_roles.by_hbx_id(entity_identifier).first
     census_employee = Person.all_employee_roles.by_hbx_id(entity_identifier).first
-    
+
     if organization
       session[:bulk_notice][:audience][organization.id.to_s] = { id: organization.id,
                                                                  legal_name: organization.legal_name,

@@ -56,11 +56,7 @@ module Exchanges
     private
 
     def bulk_notice_params
-<<<<<<< HEAD
       params.require(:admin_bulk_notice).permit(:audience_type, :subject, :body, audience_ids: [])
-=======
-      params.require(:admin_bulk_notice).except(:audience_identifiers, :user_id).permit(:audience_type, :subject, :body, audience_ids: [])
->>>>>>> 36180e398a... Bulk Upload Phase 2
     end
 
     def unread_messages

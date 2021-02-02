@@ -9,11 +9,11 @@ module BenefitApplicationWorld # rubocop:disable Metrics/ModuleLength, Style/Doc
     @renewal_state ||= key
   end
 
-  def health_state(key = false)
+  def health_state(key = false) # rubocop:disable Style/OptionalBooleanParameter
     @health_state ||= key
   end
 
-  def dental_state(key = false)
+  def dental_state(key = false) # rubocop:disable Style/OptionalBooleanParameter
     @dental_state ||= key
   end
 
@@ -25,7 +25,7 @@ module BenefitApplicationWorld # rubocop:disable Metrics/ModuleLength, Style/Doc
     @dental_package_kind ||= :single_product
   end
 
-  def dental_sponsored_benefit(default = false)
+  def dental_sponsored_benefit(default = false) # rubocop:disable Style/OptionalBooleanParameter
     @dental_sponsored_benefit = default
   end
 

@@ -6,6 +6,7 @@ module Transcripts
   class EnrollmentTranscript
 
     attr_accessor :transcript, :shop
+
     include Transcripts::Base
     include Transcripts::EnrollmentCommon
 
@@ -88,11 +89,9 @@ module Transcripts
 
       match_instance(enrollment)
 
-      if @enrollment.present?
-        if enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on
-          @duplicate_coverages << @enrollment if HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state) || @enrollment.coverage_terminated?
-          @enrollment = nil
-        end
+      if @enrollment.present? && enrollment_members_not_matched?(enrollment) && enrollment.effective_on > @enrollment.effective_on
+        @duplicate_coverages << @enrollment if HbxEnrollment::ENROLLED_STATUSES.include?(@enrollment.aasm_state) || @enrollment.coverage_terminated?
+        @enrollment = nil
       end
 
       if @enrollment.present?

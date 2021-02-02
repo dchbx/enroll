@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-<<<<<<< HEAD
 require File.join(Rails.root, "components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers.rb")
-=======
->>>>>>> e9f7af3894... Work in Progress.
 
 RSpec.describe BulkNoticeReflex, type: :reflex do
   describe "#new_identifier" do
@@ -24,7 +21,6 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
       reflex.element.value = identifiers
     end
 
-<<<<<<< HEAD
     context 'of multiple ids' do
       let(:audience_ids) { nil }
       let(:audience_type) { 'employer' }
@@ -106,8 +102,6 @@ RSpec.describe BulkNoticeReflex, type: :reflex do
       end
     end
 
-=======
->>>>>>> e9f7af3894... Work in Progress.
     context 'of one id' do
       let(:audience_ids) { nil }
       let(:audience_type) { 'employer' }
