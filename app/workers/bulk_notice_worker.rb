@@ -5,7 +5,7 @@ class BulkNoticeWorker
   include Sidekiq::Worker
   include CableReady::Broadcaster
 
-  def perform(audience_id, bulk_notice_id) # rubocop:disable Metrics/AbcSize
+  def perform(audience_id, bulk_notice_id)
     sleep 2
 
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
@@ -32,13 +32,14 @@ class BulkNoticeWorker
     puts "Processing #{audience_id} for Bulk Notice request #{bulk_notice_id}"
   end
 
-  def process_secure_message(params)
+  def process_secure_message(params) # rubocop:disable Metrics/CyclomaticComplexity
     puts params
-    if @bulk_notice.audience_type == 'employee'
+    case @bulk_notice.audience_type
+    when 'employee'
       #loop through each employee
       results = process_secure_message_for_employees(params)
       result = results.any?(&:success?)
-    elsif @bulk_notice.audience_type == 'consumer' || @bulk_notice.audience_type == 'resident' || @bulk_notice.audience_type == 'census_employee'
+    when 'consumer', 'resident', 'census_employee'
       resource = @entity
       result = Operations::SecureMessageAction.new.call(
         params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),
