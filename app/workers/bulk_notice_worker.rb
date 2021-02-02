@@ -9,8 +9,8 @@ class BulkNoticeWorker
     sleep 2
 
     @bulk_notice = Admin::BulkNotice.find(bulk_notice_id)
-    @entity = BenefitSponsors::Organizations::Organization.where(_id: audience_id) ||
-              Person.find(_id: audience_id)
+    @entity = BenefitSponsors::Organizations::Organization.where(_id: audience_id).first ||
+              Person.where(_id: audience_id).first
 
     params = fetch_params(@bulk_notice)
 
@@ -40,6 +40,7 @@ class BulkNoticeWorker
     # end
 
     Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}") unless result.success?
+    Rails.logger.error("PROCESSINNNNNNNNGG")
 
     @bulk_notice.results.create(
       audience_id: audience_id,
