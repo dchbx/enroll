@@ -212,9 +212,17 @@
 <% end %>
 
 <td colspan="1"><%= "Untranslated String" %></td>
+Here is another bad string.
+<%= "Bad String" %>
+This is a problematic string.
+Here. This is another string- we have to test it and see what happens.
+This <%= "Bad String" %>is another test
+<%= l10n('confirm') %>
+<%= "baD stRing" %>
 
-
-
+<%= @person.id %>
+<%= @family.primary_person.full_name %>
+<%= benefit_application.created_at %>
 
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
