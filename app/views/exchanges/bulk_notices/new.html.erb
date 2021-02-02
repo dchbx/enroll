@@ -3,12 +3,9 @@
 <div class="container" data-controller="bulk-notice">
 
   <h4>New Message</h4>
-<<<<<<< HEAD
+
   <p><%= l10n("admin_actions.bulk_upload.new.description_text") %></p>
   <strong>Important:</strong> <p><%= l10n("admin_actions.bulk_upload.new.description_sub_text") %></p>
-=======
-  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
->>>>>>> e9f7af3894... Work in Progress.
 
   <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path, html: { multipart: true }) do |f| %>
     <%= f.select :audience_type, { 'Resident' => :resident, 'Consumer' => :consumer, 'Census Employee' => :census_employee, 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
@@ -16,7 +13,6 @@
       <tbody>
         <tr>
           <th style="text-transform: capitalize;">Recipients:</th>
-<<<<<<< HEAD
           <td>
             <div id='recipient-list' class='collapsed float-left' data-target="bulk-notice.recipientList"></div>
             <div id='more-recipients' class='float-right pr-1'>
@@ -24,10 +20,6 @@
               <a href data-target="bulk-notice.lessRecipients" data-action='bulk-notice#collapseRecipients' class='d-none'>Less...</a>
             </div>
 
-=======
-          <td data-target="bulk-notice.recipientList">
-            <div id='recipient-list'></div>
->>>>>>> e9f7af3894... Work in Progress.
             <%= f.text_area :audience_identifiers, rows: 1, data: { reflex: 'blur->BulkNotice#new_identifier' }, placeholder: 'FEINs or HBX IDs, comma separated', id: 'bulk-notice-audience-identifiers' %>
           </td>
         </tr>

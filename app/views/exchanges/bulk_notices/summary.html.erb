@@ -31,7 +31,6 @@
     <div class='col-10 p-3'>
       <%= @bulk_notice.body %>
     </div>
-<<<<<<< HEAD
 
     <% unless @bulk_notice.documents.empty? %>
       <div class='col-2 p-3'>
@@ -42,17 +41,6 @@
         <% @bulk_notice.documents.each_with_index do |document, i| %>
           <div class='py-1'>
             <span><%= document.title %></span>
-=======
-    <div class='col-2 p-3'>
-      Attachments
-    </div>
-
-    <% unless @bulk_notice.documents.empty? %>
-      <div class='col-10 p-3'>
-        <% @bulk_notice.documents.each_with_index do |document, i| %>
-          <div class='py-1'>
-            <span><%= document.title %>&nbsp;<a data-action='bulk-notice#deleteFile' href>
->>>>>>> e9f7af3894... Work in Progress.
           </div>
         <% end %>
       </div>
@@ -61,11 +49,7 @@
 
   <div class='row bg-white mt-5 p-3 font-weight-bold py-3 border-top border-left border-right'>
     <div class='col-4'>
-<<<<<<< HEAD
       Recipient
-=======
-      Receipient
->>>>>>> e9f7af3894... Work in Progress.
     </div>
     <div class='col-2 text-right'>
       Status
