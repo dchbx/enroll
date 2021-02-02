@@ -2,7 +2,6 @@ approved_translation_strings_in_erb_tags:
   html_elements_and_helper_methods: ["l10n", "I18n", "content_for", "fields_for", "file_field_tag", "form_tag", "render", "pundit_span", "number_to_currency", "partial",
   "format_policy_purchase_date", "format_policy_purchase_time", "display_carrier_logo", "enrollment_coverage_end", "form_for", "pundit_class"]
   non_word_numerical_strings: ["coverage_year", "effective_on", "coverage_terminated_on", "hired_on", "end_of_month",
-<<<<<<< HEAD
   "start_of_month", "terminated_on", "active_year", "dob", "suggested_cobra_effective_date", "date_of_record", "TimeKeeper", "created_at", "sent_at", "fein"]
   proper_name_related_strings: ["name", "first_name", "last_name", "full_name", "title", "subject", "body"]
   record_identifiers: ["hbx_id", "hbx_enrollment_id", "hios_id", "hios_id", "product_id", "id",]
