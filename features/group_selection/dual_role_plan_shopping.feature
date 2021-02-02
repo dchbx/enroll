@@ -7,6 +7,7 @@ Feature: EE with consumer role plan purchase
     Given all products with issuer profile
     Then  an application provides health and dental packages
     Then there are sponsored benefit offerings for spouse and child
+    When Individual visits the Insured portal during open enrollment
 
   Scenario: when user purchase plan for self & having ineligible family member
     Given a matched Employee exists with consumer role
