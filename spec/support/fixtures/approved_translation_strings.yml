@@ -9,7 +9,7 @@ approved_translation_strings_in_erb_tags:
   record_method_calls: ["address.", "benefit_group.", "broker_role.", "broker_agency.", benefit_sponsorship.",
   "benefit_application.", "benefit_package.", "carrier.", "carrier_profile.", "consumer_profile.", "family.", "census_employee.", "census_member.",
   "employee_role.", "hbx_enrollment.", "object."]
-  instance_variables: [""]
+  instance_variables: ['@']
   other_strings: ["untranslated string", 'bad string']
 approved_translation_strings_outside_erb_tags:
   string_list: ["%&gt", "ID:", 'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens"]
