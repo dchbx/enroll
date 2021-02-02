@@ -38,7 +38,6 @@ gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'branch_0.9.0'
-# gem 'resource_registry',  path: 'vendor/plugins/resource_registry'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
@@ -63,8 +62,7 @@ gem 'aasm',                     '~> 4.8'
 gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
-# gem 'rgl',                      '~> 0.5.6'
-gem 'rgl',  path: 'vendor/plugins/rgl'
+gem 'rgl',                      '~> 0.5.6'
 
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
