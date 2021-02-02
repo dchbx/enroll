@@ -115,7 +115,7 @@ Rails.application.routes.draw do
     resources :configurations do
       member do
         get :namespace_edit
-        post :clone_feature
+        post :renew_feature
         post :update_feature
         patch :toggle_feature
       end

@@ -6,26 +6,25 @@
 <% end %>
 
 <div class="container" style="height: 100%;">
-  <div class="bottom-pd">
-      <h1 class="heading-text">Enroll Configurations</h1>
-
-	  <div class="row mt-4" id="configurations">
-	  	<div class="col-md-3 sidebar">
-	  		<%= render_configuration_navigation_menu %>
-	  	</div>
-
-	  	<div class="col-md-9 main">
-	  		<div id="data_container"></div>
-	  	</div>
-	  </div>
+  <div class="row mt-4 bottom-pd" id="configurations">
+    <div class="col-md-12">
+      <h1 class="heading-text">Configurations</h1>
+    </div>
+    <div class="col-md-3 sidebar">
+      <%= render_configuration_navigation_menu %>
+    </div>
+    <div class="col-md-9 main">
+      <div id="data_container"></div>
+    </div>
   </div>
 </div>
 
 <script>
   $(function(){
-    $('#configurations #namespace-link').click(function(e) {
-      hasClass = $(this).hasClass('highlight');
+    $('#configurations .nav-link').click(function(e) {
       $('.highlight').removeClass('highlight');
+
+      hasClass = $(this).hasClass('highlight');
       if (!hasClass) {
         $(this).addClass('highlight')
       }
@@ -54,25 +53,28 @@
 
   #configurations {
     height: 100%;
-    background-color: #e6e6e6;
-    width: 100%
+    width: 100%;
   }
 
-   #configurations .list-group {
-     color: black;
-   	 background-color: #fff;
-   }
+  #configurations .sidebar {
+    background-color: #e6e6e6;
+  }
 
-   #uic-primary-nav ul {
-	   margin-top: 0;
-   }
+  #configurations .list-group {
+    color: black;
+    background-color: #fff;
+  }
 
-   .toggle.btn-primary, .toggle-group .btn-primary {
-     color: #fff;
-     background-color: #007bff;
-     border-color: #007bff;
-     text-transform: none;
-     border-bottom-width: inherit;
+  #uic-primary-nav ul {
+    margin-top: 0;
+  }
+
+  .toggle.btn-primary, .toggle-group .btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    text-transform: none;
+    border-bottom-width: inherit;
   }
 
 	.toggle-on.btn { padding-right: 1rem; }

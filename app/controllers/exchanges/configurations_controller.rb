@@ -18,8 +18,8 @@ class Exchanges::ConfigurationsController < ApplicationController
     end
   end
 
-  def clone_feature
-    result = EnrollRegistry[params[:id]] {{params: params[:feature], registry: EnrollRegistry}}.success
+  def renew_feature
+    @result = EnrollRegistry[params[:id]] {{params: params[:feature], registry: EnrollRegistry}}
 
     respond_to do |format|
       format.js

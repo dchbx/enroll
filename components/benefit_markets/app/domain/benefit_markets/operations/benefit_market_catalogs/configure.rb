@@ -32,7 +32,7 @@ module BenefitMarkets
 
         def find_catalogs(benefit_market, values)
           catalog_year =  values['effective_year'].to_i if values['effective_year']
-          catalog_year ||= TimeKeeper.date_of_record.prev_year.year
+          catalog_year ||= TimeKeeper.date_of_record.year
 
           catalogs = benefit_market.benefit_market_catalogs
           calender_years = catalogs.sort{|a, b| b.application_period.min <=> a.application_period.min}.map(&:product_active_year)
