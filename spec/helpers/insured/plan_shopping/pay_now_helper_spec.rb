@@ -331,6 +331,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
         from_state: hbx_enrollment.aasm_state,
         to_state: "coverage_selected"
       )
+      hbx_enrollment.update_attributes(effective_on: TimeKeeper.date_of_record + 1.day)
       assign(:enrollment, hbx_enrollment)
     end
 
