@@ -147,11 +147,7 @@ Rails.application.routes.draw do
         get :broker_agency_index
         get :general_agency_index
         get :configuration
-        get :edit_feature
-        put :update_feature
         get :settings
-        get :find_feature
-        get :find_catalogs
         post :set_date
         post :update_setting
         get :staff_index
