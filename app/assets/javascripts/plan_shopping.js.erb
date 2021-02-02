@@ -246,6 +246,7 @@ $(function() {
     $("#filter-sidebar select.plan-carrier-selection-filter").prop('selectedIndex', 0).selectric('refresh');
     $("#filter-sidebar select.plan-hsa-eligibility-selection-filter").prop('selectedIndex', 0).selectric('refresh');
 		applyPlanFilters();
+    resetAptc();
   });
 
   $(document).on('click', '#sort_by a', function(){
