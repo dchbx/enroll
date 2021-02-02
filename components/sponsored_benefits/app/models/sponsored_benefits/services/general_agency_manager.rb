@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module SponsoredBenefits
   module Services
     class GeneralAgencyManager
@@ -31,7 +33,7 @@ module SponsoredBenefits
         end
       end
 
-      def assign_default_general_agency(broker_agency_profile, ids=form.plan_design_organization_ids, start_on= TimeKeeper.datetime_of_record)
+      def assign_default_general_agency(broker_agency_profile, ids = form.plan_design_organization_ids, start_on = TimeKeeper.datetime_of_record)
         return true if broker_agency_profile.default_general_agency_profile_id.blank?
         broker_role_id = broker_agency_profile.primary_broker_role.id
         ids.each do |id|
@@ -40,7 +42,7 @@ module SponsoredBenefits
         end
       end
 
-      def fire_general_agency(ids=form.plan_design_organization_ids)
+      def fire_general_agency(ids = form.plan_design_organization_ids)
         ids.each do |id|
           plan_design_organization(id).general_agency_accounts.active.each do |account|
             account.terminate!
@@ -89,29 +91,29 @@ module SponsoredBenefits
         SponsoredBenefits::Organizations::PlanDesignOrganization.find(id)
       end
 
-      def broker_agency_profile(id=form.broker_agency_profile_id)
+      def broker_agency_profile(id = form.broker_agency_profile_id)
         return @broker_agency_profile if defined? @broker_agency_profile
         @broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(id) || ::BrokerAgencyProfile.find(id)
       end
 
-      def general_agency_profile(id=form.general_agency_profile_id)
+      def general_agency_profile(id = form.general_agency_profile_id)
         return @general_agency_profile if defined? @general_agency_profile
         @general_agency_profile = BenefitSponsors::Organizations::GeneralAgencyProfile.find(id) || ::GeneralAgencyProfile.find(id)
       end
 
       def current_default_ga
-        broker_agency_profile.default_general_agency_profile rescue nil
+        broker_agency_profile.default_general_agency_profile
+      rescue StandardError => e
+        Rails.logger.error {"Unable to get default agency due to #{e}"}
       end
 
-      def send_notice(opts={})
-        begin
+      def send_notice(opts = {})
           # ShopNoticesNotifierJob.perform_later(opts[:modal_id].to_s, opts[:event], employer_profile_id: opts[:employer_profile_id].to_s)
-        rescue Exception => e
-          (Rails.logger.error {"Unable to deliver opts[:event] to General Agency ID: #{opts[:modal_id]} due to #{e}"}) unless Rails.env.test?
-        end
+      rescue StandardError => e
+        (Rails.logger.error {"Unable to deliver opts[:event] to General Agency ID: #{opts[:modal_id]} due to #{e}"}) unless Rails.env.test?
       end
 
-      def send_message(opts={})
+      def send_message(opts = {})
         subject = "You are associated to #{opts[:employer_profile].legal_name}- #{opts[:general_agency_profile].legal_name} (#{opts[:status]})"
         body = "<br><p>Associated details<br>General Agency : #{opts[:general_agency_profile].legal_name}<br>Employer : #{opts[:employer_profile].legal_name}<br>Status : #{opts[:status]}</p>"
         secure_message(opts[:broker_agency_profile], opts[:general_agency_profile], subject, body)

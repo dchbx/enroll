@@ -46,8 +46,7 @@ class BulkNoticeReflex < ApplicationReflex
   def org_badges_for(audience_ids, audience_type)
     # this method loops through the given audience_ids and displays a normal badge or error badge if the types are wrong
     audience_ids.reduce('') do |badges, identifier|
-      org_attrs = cache_or_fetch_org_attrs(identifier)
-<<<<<<< HEAD
+      org_attrs = cache_or_fetch_entity_attrs(identifier)
       if badges.include?(identifier) # already has a badge for this identifier
         badges
       elsif org_attrs.key?(:error)
@@ -56,44 +55,49 @@ class BulkNoticeReflex < ApplicationReflex
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], hbx_id: org_attrs[:hbx_id] })
       else
         badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', hbx_id: org_attrs[:hbx_id] })
-=======
-      return badges if badges.include?(identifier)
-      if org_attrs.key?(:error)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: identifier, error: org_attrs[:error], legal_name: org_attrs[:legal_name] })
-      elsif org_attrs[:types].include?(audience_type)
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_badge", locals: { id: org_attrs[:id], legal_name: org_attrs[:legal_name] })
-      else
-        badges + ApplicationController.render(partial: "exchanges/bulk_notices/recipient_error_badge", locals: { id: org_attrs[:id], error: 'Wrong audience type', legal_name: org_attrs[:legal_name] })
->>>>>>> e9f7af3894... Work in Progress.
       end
     end
   end
 
-  def cache_or_fetch_org_attrs(org_identifier)
+  def cache_or_fetch_entity_attrs(entity_identifier) # rubocop:disable Metrics/AbcSize
     # this method accepts an org_identifier, which it uses to check for an existing cache or fetch the missing org with the given
-<<<<<<< HEAD
-    # identifier, which should be either a FEIN, Id or an HBX id
-=======
     # identifier, which should be either a FEIN or an HBX id
->>>>>>> e9f7af3894... Work in Progress.
     session[:bulk_notice] ||= { audience: {} }
-    return session[:bulk_notice][:audience][org_identifier] if session[:bulk_notice][:audience].key?(org_identifier)
+    return session[:bulk_notice][:audience][entity_identifier] if session[:bulk_notice][:audience].key?(entity_identifier)
 
-    organization = BenefitSponsors::Organizations::Organization.where(fein: org_identifier).first ||
-<<<<<<< HEAD
-                   BenefitSponsors::Organizations::Organization.where(hbx_id: org_identifier).first ||
-                   BenefitSponsors::Organizations::Organization.where(id: org_identifier).first
-=======
-                   BenefitSponsors::Organizations::Organization.where(hbx_id: org_identifier).first
->>>>>>> e9f7af3894... Work in Progress.
+    organization = BenefitSponsors::Organizations::Organization.where(fein: entity_identifier).first ||
+                   BenefitSponsors::Organizations::Organization.where(hbx_id: entity_identifier).first ||
+                   BenefitSponsors::Organizations::Organization.where(id: entity_identifier).first
+    consumer = Person.all_consumer_roles.by_hbx_id(entity_identifier).first
+    resident = Person.all_resident_roles.by_hbx_id(entity_identifier).first
+    census_employee = Person.all_employee_roles.by_hbx_id(entity_identifier).first
+    
     if organization
       session[:bulk_notice][:audience][organization.id.to_s] = { id: organization.id,
                                                                  legal_name: organization.legal_name,
                                                                  fein: organization.fein,
                                                                  hbx_id: organization.hbx_id,
                                                                  types: organization.profile_types }
+    elsif consumer
+      session[:bulk_notice][:audience][consumer.id.to_s] = { id: consumer.id,
+                                                             legal_name: consumer.full_name,
+                                                             fein: "",
+                                                             hbx_id: consumer.hbx_id,
+                                                             types: 'consumer' }
+    elsif resident
+      session[:bulk_notice][:audience][resident.id.to_s] = { id: resident.id,
+                                                             legal_name: resident.full_name,
+                                                             fein: "",
+                                                             hbx_id: resident.hbx_id,
+                                                             types: 'resident' }
+    elsif census_employee
+      session[:bulk_notice][:audience][census_employee.id.to_s] = { id: census_employee.id,
+                                                                    legal_name: census_employee.full_name,
+                                                                    fein: "",
+                                                                    hbx_id: census_employee.hbx_id,
+                                                                    types: 'census_employee' }
     else
-      session[:bulk_notice][:audience][org_identifier] = { id: org_identifier, error: 'Not found' }
+      session[:bulk_notice][:audience][entity_identifier] = { id: entity_identifier, error: 'Not found' }
     end
   end
 end

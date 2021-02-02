@@ -1,6 +1,7 @@
-module BenefitApplicationWorld
+# frozen_string_literal: true
 
-  def aasm_state(key=nil)
+module BenefitApplicationWorld # rubocop:disable Metrics/ModuleLength, Style/Documentation
+  def aasm_state(key = nil)
     @aasm_state ||= key
   end
 
@@ -8,11 +9,11 @@ module BenefitApplicationWorld
     @renewal_state ||= key
   end
 
-  def health_state(key=false)
+  def health_state(key = false)
     @health_state ||= key
   end
 
-  def dental_state(key=false)
+  def dental_state(key = false)
     @dental_state ||= key
   end
 
@@ -24,7 +25,7 @@ module BenefitApplicationWorld
     @dental_package_kind ||= :single_product
   end
 
-  def dental_sponsored_benefit(default=false)
+  def dental_sponsored_benefit(default = false)
     @dental_sponsored_benefit = default
   end
 
@@ -48,7 +49,7 @@ module BenefitApplicationWorld
     @sic_code ||= benefit_sponsorship.sic_code
   end
 
-  def application_dates_for(effective_date, aasm_state)
+  def application_dates_for(effective_date, _aasm_state)
     oe_period = if effective_date >= TimeKeeper.date_of_record
                   TimeKeeper.date_of_record.beginning_of_month..(effective_date.prev_month + Settings.aca.shop_market.open_enrollment.monthly_end_on - 1.day)
                 else
@@ -65,40 +66,36 @@ module BenefitApplicationWorld
     application_dates = application_dates_for(current_effective_date, new_application_status)
 
     @new_application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
-                       :with_benefit_package,
-                       benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
-                       effective_period: application_dates[:effective_period],
-                       aasm_state: new_application_status,
-                       open_enrollment_period: application_dates[:open_enrollment_period],
-                       recorded_rating_area: rating_area,
-                       recorded_service_areas: [service_area],
-                       package_kind: package_kind)
+                                         :with_benefit_package,
+                                         benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
+                                         effective_period: application_dates[:effective_period],
+                                         aasm_state: new_application_status,
+                                         open_enrollment_period: application_dates[:open_enrollment_period],
+                                         recorded_rating_area: rating_area,
+                                         recorded_service_areas: [service_area],
+                                         package_kind: package_kind)
     @new_application.benefit_sponsor_catalog.benefit_application = @new_application
     @new_application.benefit_sponsor_catalog.save!
     @new_application
   end
 
-  def create_applications(predecessor_status: , new_application_status: )
-    if predecessor_status
-      aasm_state(predecessor_status)
-    end
+  def create_applications(predecessor_status:, new_application_status:)
+    aasm_state(predecessor_status) if predecessor_status
 
-    if new_application_status
-      renewal_state(new_application_status)
-    end
+    renewal_state(new_application_status) if new_application_status
 
     application_dates = application_dates_for(renewal_effective_date, renewal_state)
     @new_application = FactoryBot.create(:benefit_sponsors_benefit_application, :with_benefit_sponsor_catalog,
-                       :with_benefit_package, :with_predecessor_application,
-                       predecessor_application_state: aasm_state,
-                       benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
-                       effective_period: application_dates[:effective_period],
-                       aasm_state: renewal_state,
-                       open_enrollment_period: application_dates[:open_enrollment_period],
-                       recorded_rating_area: renewal_rating_area,
-                       recorded_service_areas: [renewal_service_area],
-                       package_kind: package_kind,
-                       predecessor_application_catalog: true)
+                                         :with_benefit_package, :with_predecessor_application,
+                                         predecessor_application_state: aasm_state,
+                                         benefit_sponsorship: @employer_profile.active_benefit_sponsorship,
+                                         effective_period: application_dates[:effective_period],
+                                         aasm_state: renewal_state,
+                                         open_enrollment_period: application_dates[:open_enrollment_period],
+                                         recorded_rating_area: renewal_rating_area,
+                                         recorded_service_areas: [renewal_service_area],
+                                         package_kind: package_kind,
+                                         predecessor_application_catalog: true)
   end
 
   def initial_application
@@ -110,16 +107,23 @@ module BenefitApplicationWorld
   end
 
   def ce
-    create_list(:census_employee, 1 , :with_active_assignment, first_name: "Patrick", last_name: "Doe", dob: "1980-01-01".to_date, ssn: "786120965", benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: initial_application.benefit_packages.first)
+    create_list(:census_employee,
+                1, :with_active_assignment,
+                first_name: "Patrick",
+                last_name: "Doe",
+                dob: "1980-01-01".to_date,
+                ssn: "786120965",
+                benefit_sponsorship: benefit_sponsorship,
+                employer_profile: benefit_sponsorship.profile,
+                benefit_group: initial_application.benefit_packages.first)
   end
 
   def find_product_package(product_kind,package_kind)
     current_benefit_market_catalog.product_packages.detect do |product_package|
       product_package.product_kind == product_kind &&
-      product_package.package_kind == package_kind
+        product_package.package_kind == package_kind
     end
   end
-
 end
 
 World(BenefitApplicationWorld)

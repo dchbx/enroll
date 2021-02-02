@@ -42,6 +42,7 @@ module Exchanges
 
     def update
       @bulk_notice = Admin::BulkNotice.find(params[:id])
+
       if @bulk_notice.update_attributes(bulk_notice_params)
         @bulk_notice.upload_document(params, current_user) if params[:file].present?
         @bulk_notice.process! unless params[:commit] == "Preview"
@@ -55,7 +56,11 @@ module Exchanges
     private
 
     def bulk_notice_params
+<<<<<<< HEAD
       params.require(:admin_bulk_notice).permit(:audience_type, :subject, :body, audience_ids: [])
+=======
+      params.require(:admin_bulk_notice).except(:audience_identifiers, :user_id).permit(:audience_type, :subject, :body, audience_ids: [])
+>>>>>>> 36180e398a... Bulk Upload Phase 2
     end
 
     def unread_messages

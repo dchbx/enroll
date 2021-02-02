@@ -11,7 +11,7 @@
 >>>>>>> e9f7af3894... Work in Progress.
 
   <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path, html: { multipart: true }) do |f| %>
-    <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
+    <%= f.select :audience_type, { 'Resident' => :resident, 'Consumer' => :consumer, 'Census Employee' => :census_employee, 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
     <table class='table table-message-wrapper'>
       <tbody>
         <tr>
