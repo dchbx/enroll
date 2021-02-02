@@ -62,7 +62,7 @@ module ApplicationHelper
   end
 
   #Shopping enrollment family premium (plan shopping page)
-  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc = true)
+  def shopping_group_premium(plan_cost, plan_ehb_cost, can_use_aptc = true) # rubocop:disable Style/OptionalBooleanParameter
     return plan_cost unless session['elected_aptc'].present? && session['max_aptc'].present? && can_use_aptc
 
     aptc_amount = session['elected_aptc'].to_f
