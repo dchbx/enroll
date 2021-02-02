@@ -6,6 +6,6 @@ approved_translation_strings_in_erb_tags:
   proper_name_related_strings: ["name", "first_name", "last_name", "full_name", "title"]
   record_identifiers: ["hbx_id", "hbx_enrollment_id", "hios_id"]
   non_text_method_calls: ["hios_id", "product_id", "id"]
-  other_strings: ["untranslated string", 'bad string']
+  other_strings: ["untranslated string", 'bad string', 'modal_confirm']
 approved_translation_strings_outside_erb_tags:
   string_list: ["%&gt", "ID:", 'here is another bad string', "this is a problematic string, here this is another string we have to test it and see what happens"]
