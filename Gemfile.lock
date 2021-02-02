@@ -26,11 +26,10 @@ GIT
 
 GIT
   remote: https://github.com/ideacrew/resource_registry.git
-  revision: e14d079d9ed594d52a0b630cfb4fcd76a11ad035
+  revision: 4e3c20b0721fc9e81db94d86d2f569256534bf48
   branch: branch_0.9.0
   specs:
     resource_registry (0.9.0)
-      bootsnap (~> 1.0)
       deep_merge (>= 1.0.0)
       dry-configurable (= 0.9)
       dry-container (~> 0.7)
@@ -42,10 +41,9 @@ GIT
       i18n (>= 0.7.0)
       loofah (>= 2.3.1)
       mime-types
-      nokogiri (>= 1.9.1)
+      nokogiri (>= 1.11.1)
       ox (~> 2.0)
-      pry-byebug
-      rack (>= 1.6.13)
+      rack (>= 2.2.3)
       rgl
 
 GIT
@@ -609,7 +607,7 @@ GEM
     mimemagic (0.3.5)
     mini_magick (4.10.1)
     mini_mime (1.0.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.5.0)
     minitest (5.14.2)
     monetize (1.9.4)
       money (~> 6.12)
@@ -668,8 +666,9 @@ GEM
     net-ssh (4.2.0)
     newrelic_rpm (5.7.0.350)
     nio4r (2.5.4)
-    nokogiri (1.10.10)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.11.1)
+      mini_portile2 (~> 2.5.0)
+      racc (~> 1.4)
     nokogiri-happymapper (0.8.1)
       nokogiri (~> 1.5)
     non-stupid-digest-assets (1.0.9)
@@ -678,7 +677,7 @@ GEM
     overcommit (0.57.0)
       childprocess (>= 0.6.3, < 5)
       iniparse (~> 1.4)
-    ox (2.14.0)
+    ox (2.14.1)
     parallel (1.20.1)
     parallel_tests (2.26.2)
       parallel
@@ -694,6 +693,7 @@ GEM
     puma (3.12.4)
     pundit (2.1.0)
       activesupport (>= 3.0.0)
+    racc (1.5.2)
     rack (2.2.3)
     rack-protection (2.1.0)
       rack
@@ -1052,7 +1052,7 @@ DEPENDENCIES
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
   newrelic_rpm (~> 5.0)
-  nokogiri (~> 1.10.8)
+  nokogiri (~> 1.11.1)
   nokogiri-happymapper (~> 0.8.0)
   non-stupid-digest-assets
   notifier!

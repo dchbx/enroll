@@ -35,7 +35,6 @@ module Exchanges
     end
 
     def render_configuration_navigation_menu(options = {})
-
       options = {namespace_options: {include_no_features_defined: false}}
 
       # graph = EnrollRegistry[:feature_graph]
@@ -49,10 +48,8 @@ module Exchanges
       # vertices = root_paths.collect{|path| graph.vertices.detect{|v| v.path == path}}
       # options = {namespace_options: {starting_namespaces: vertices}}
 
-
       # graph = EnrollRegistry[:feature_graph]
       # options = {namespace_options: {include_no_features_defined: false, starting_namespaces: [graph.vertices[2], graph.vertices[3]]}}
-
 
       nav = EnrollRegistry.navigation(options)
       nav.render_html
