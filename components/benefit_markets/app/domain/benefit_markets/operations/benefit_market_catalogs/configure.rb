@@ -22,6 +22,12 @@ module BenefitMarkets
         private
 
         def validate(params)
+          return Failure("Market kind must be provided") unless params['market_kind']
+          params['effective_year'] = if params['effective_year']
+            params['effective_year'].to_i
+          else
+            TimeKeeper.date_of_record.year
+          end
 
           Success(params)
         end
@@ -31,16 +37,13 @@ module BenefitMarkets
         end
 
         def find_catalogs(benefit_market, values)
-          catalog_year =  values['effective_year'].to_i if values['effective_year']
-          catalog_year ||= TimeKeeper.date_of_record.year
-
           catalogs = benefit_market.benefit_market_catalogs
           calender_years = catalogs.sort{|a, b| b.application_period.min <=> a.application_period.min}.map(&:product_active_year)
-          current_catalog = catalogs.by_application_date(Date.new(catalog_year,1,1)).first
+          current_catalog = catalogs.by_application_date(Date.new(values['effective_year'],1,1)).first
 
           Success({
             calender_years: calender_years,
-            catalog_year: catalog_year,
+            catalog_year: values['effective_year'],
             record: current_catalog
           })
         end

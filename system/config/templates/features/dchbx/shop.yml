@@ -98,18 +98,18 @@ registry:
               description: Enter market catalog description
               is_required: false
               is_visible: true
-          - key: :probation_period_kinds
-            item:
-              attribute: :probation_period_kinds
-              constraints:
-                max_length: 200
-            meta:
-              label: Probation Period Kinds
-              content_type: :select
-              description: Sponsor choices for length of time new members must wait before they're eligible to enroll
-              enum: BenefitMarkets::PROBATION_PERIOD_KINDS
-              is_required: false
-              is_visible: true
+          # - key: :probation_period_kinds
+          #   item:
+          #     attribute: :probation_period_kinds
+          #     constraints:
+          #       max_length: 200
+          #   meta:
+          #     label: Probation Period Kinds
+          #     content_type: :select
+          #     description: Sponsor choices for length of time new members must wait before they're eligible to enroll
+          #     enum: BenefitMarkets::PROBATION_PERIOD_KINDS
+          #     is_required: false
+          #     is_visible: true
       - key: :health_packages
         is_enabled: true
         item: :features_display
@@ -167,11 +167,11 @@ registry:
           is_visible: true
         settings:
           - key: :contribution_models
-            item: # Namespaces::ListFeatures
-              - :initial_sponsor_jan_default_2021
-              - :initial_sponsor_default_2021
-              - :renewal_sponsor_jan_default_2021
-              - :renewal_sponsor_default_2021
+            item:
+              operation: ResourceRegistry::Operations::Namespaces::ListFeatures.new
+              params:
+                namespace: "enroll_app.aca_shop_market.benefit_market_catalog.catalog_2021.contribution_model_criteria"
+                registry: EnrollRegistry
             meta:
               label: Contribution Models
               content_type: :feature_list_panel
@@ -199,10 +199,10 @@ registry:
         settings:
           - key: :contribution_models
             item:
-              - :initial_sponsor_jan_default_2020
-              - :initial_sponsor_default_2020
-              - :renewal_sponsor_jan_default_2020
-              - :renewal_sponsor_default_2020
+              operation: ResourceRegistry::Operations::Namespaces::ListFeatures.new
+              params:
+                namespace: "enroll_app.aca_shop_market.benefit_market_catalog.catalog_2020.contribution_model_criteria"
+                registry: EnrollRegistry
             meta:
               label: Contribution Models
               content_type: :feature_list_panel
