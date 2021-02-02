@@ -83,14 +83,6 @@ module Exchanges
       end
     end
 
-    def qle_types
-      @datatable = Effective::Datatables::SepTypeDataTable.new
-
-      respond_to do |format|
-        format.js
-      end
-    end
-
     def sorting_sep_types
       @sortable = QualifyingLifeEventKind.all
       respond_to do |format|
