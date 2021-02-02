@@ -3,22 +3,9 @@ registry:
   - namespace:
       path:
         - :features
-      meta:
-        label: Features
-        content_type: :nav
-        description: 'Configuration settings for Features'
-        is_required: true
-        is_visible: true
     features:
       - key: :enroll_app
         is_enabled: true
-        meta:
-          label: Enroll Application
-          content_type: :legend
-          default: true
-          description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
-          is_required: true
-          is_visible: true
         settings:
           - key: :application_name
             item: "enroll_dc"
@@ -54,28 +41,6 @@ registry:
             item: "https://www.dchealthlink.com/nondiscrimination"
           - key: :submit_docs_url
             item: "https://www.dchealthlink.com/submit-docs"
-          - key: :health
-            item: true
-            meta:
-              label: Active
-              content_type: :slider_switch
-              description: Enable/Disable Health Products
-              value:
-                key: :health_products
-                class_name: "ResourceRegistry::Mongoid::Feature"
-              is_required: false
-              is_visible: true
-          - key: :dental
-            item: false
-            meta:
-              label: Active
-              content_type: :slider_switch
-              description: Enable/Disable Dental Products
-              value:
-                key: :dental_products
-                class_name: "ResourceRegistry::Mongoid::Feature"
-              is_required: false
-              is_visible: true
       - key: :pay_now_functionality
         item: "kaiser_enabled"
         is_enabled: true

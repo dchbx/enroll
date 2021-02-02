@@ -42,6 +42,17 @@ registry:
     features:
       - key: :benefit_market_catalogs_configuration
         item: BenefitMarkets::Operations::BenefitMarketCatalogs::Configure.new
+        # Registry::ConfigureFeature
+        # item: ResourceRegistry::Operations::Registries::ConfigureFeature.new({
+        #   entity_class: BenefitMarketCatalogs::BenefitMarketCatalog,
+        #   # contract_class: Validators::BenefitMarketCatalogs::BenefitMarketCatalogContract,
+        #   # find_class: Operations::BenefitMarketCatalogs::BenefitMarketCatalog::Find,
+        #   # persist_class: Operations::BenefitMarketCatalogs::BenefitMarketCatalog::Persist
+        #   filter: {
+        #     market_kind,
+        #     calender_year
+        #   }
+        # })
         is_enabled: true
         meta:
           label: Benefit Market Catalogs
@@ -87,6 +98,18 @@ registry:
               description: Enter market catalog description
               is_required: false
               is_visible: true
+          - key: :probation_period_kinds
+            item:
+              attribute: :probation_period_kinds
+              constraints:
+                max_length: 200
+            meta:
+              label: Probation Period Kinds
+              content_type: :select
+              description: Sponsor choices for length of time new members must wait before they're eligible to enroll
+              enum: BenefitMarkets::PROBATION_PERIOD_KINDS
+              is_required: false
+              is_visible: true
       - key: :health_packages
         is_enabled: true
         item: :features_display
@@ -99,9 +122,7 @@ registry:
           is_visible: true
         settings:
           - key: :product_packages
-            item:
-              - :health_product_package_2021
-              - :health_product_package_2020
+            item: 'dchbx.enroll_app.aca_shop_market.health_product_packages'
             meta:
               label: Product Packages
               content_type: :feature_group
@@ -114,15 +135,15 @@ registry:
     - :aca_shop_market
     - :health_product_packages
     features:
-      - key: :shop_product_package_clone
-        item: ResourceRegistry::Operations::Features::Clone.new
+      - key: :shop_product_package_renew
+        item: ResourceRegistry::Operations::Features::Renew.new
         is_enabled: true
         meta:
-          label: Shop Product Package Clone
-          content_type: :legend
-          default: nil
-          description: Clone shop product packages
-          is_required: false
+          label: Renew Product Package
+          content_type: :feature_action
+          default: :''
+          description: 'Renew health product packages'
+          is_required: true
           is_visible: true
         settings:
           - key: :calender_year
@@ -131,7 +152,7 @@ registry:
               label: Calender Year
               content_type: :select
               description: Choose calender year for new product package
-              enum: <%= [Date.today.year + 1, Date.today.year + 2].reduce([]) {|values, date| values << [date, date]} %>
+              enum: <%= [Date.today.year + 1, Date.today.year + 2] %>
               is_required: false
               is_visible: true
       - key: :health_product_package_2021
@@ -146,7 +167,7 @@ registry:
           is_visible: true
         settings:
           - key: :contribution_models
-            item:
+            item: # Namespaces::ListFeatures
               - :initial_sponsor_jan_default_2021
               - :initial_sponsor_default_2021
               - :renewal_sponsor_jan_default_2021
@@ -157,12 +178,12 @@ registry:
               description: Contribution Models
               is_required: false
               is_visible: true
-          - key: :clone
-            item: "/exchanges/configurations/shop_product_package_clone/edit"
+          - key: :renew
+            item: "/exchanges/configurations/shop_product_package_renew/edit"
             meta:
-              label: Clone Product Package
+              label: Renew Product Package
               content_type: :feature_action
-              description: Clone Product Packages for the given calender year
+              description: Renew Product Packages for the given calender year
               is_required: false
               is_visible: true
       - key: :health_product_package_2020

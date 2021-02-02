@@ -586,6 +586,21 @@ registry:
             item: 0
           - key: :fifty_percent_sponsor_fixed_percent_contribution_model
             item: <%= 2 / 3.0 %>
+    # - namespace:
+    #   - :enroll_app
+    #   - :aca_shop_market
+    #   - :benefit_market_catalog
+    # features:
+    #   - key: :contribution_models
+    #     is_enabled: true
+    #     meta:
+    #     settings:
+    #       - key: :zero_percent_sponsor_fixed_percent_contribution_model
+    #         item: 0
+    #         meta:
+    #       - key: :fifty_percent_sponsor_fixed_percent_contribution_model
+    #         item: 50
+    #         meta:
   - namespace:
       - :enroll_app
       - :aca_shop_market
