@@ -86,8 +86,7 @@ class HbxProfilePolicy < ApplicationPolicy
 
   def can_manage_settings?
     role = user_hbx_staff_role
-    return false unless role
-    return false unless role.permission.name == "super_admin"
+    return false unless (role || role.permission.name == "super_admin")
     role.permission.can_manage_settings
   end
 
