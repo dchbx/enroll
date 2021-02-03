@@ -76,7 +76,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   end
 
   describe "Check family has Kaiser enrollments or not" do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser Permanente') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',
@@ -170,7 +170,7 @@ RSpec.describe Insured::PlanShopping::ReceiptHelper, :type => :helper do
   end
 
   describe 'Whether family has break in coverage enrollments' do
-    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser Permanente') }
+    let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile, legal_name: 'Kaiser') }
     let(:product) do
       FactoryBot.create(:benefit_markets_products_health_products_health_product,
                         title: 'IVL Test Plan Silver',

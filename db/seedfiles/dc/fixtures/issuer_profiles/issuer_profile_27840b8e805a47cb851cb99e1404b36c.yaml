@@ -8,7 +8,7 @@ attributes: !ruby/hash:BSON::Document
   created_at: 2015-10-09 23:55:44.577000000 Z
   dba: 
   hbx_id: 27840b8e805a47cb851cb99e1404b36c
-  legal_name: Kaiser Permanente
+  legal_name: Kaiser
   updated_at: 2015-10-09 23:55:44.577000000 Z
   site_id: !ruby/object:BSON::ObjectId
     raw_data: !binary |-
