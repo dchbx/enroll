@@ -12,6 +12,13 @@ RSpec.describe ViewTranslationsLinter do
       end
     end
 
+    context "removes any git related text with @@" do
+      let(:linter_with_git_text) { ViewTranslationsLinter.new({fake_view_filename: "@@ -0,0 +1,59 @@ no newline at the end of file"}, [], 'outside_erb') }
+      it "should return true" do
+        expect(linter_with_git_text.all_translations_present?).to eq(true)
+      end
+    end
+
     context "approved_translation_strings" do
       context "non approved string passed" do
         let(:linter_with_non_approved_string) { ViewTranslationsLinter.new({fake_view_filename: "<%= 'Non-approved String' %>"}, [], 'in_erb')}
@@ -45,6 +52,33 @@ RSpec.describe ViewTranslationsLinter do
 
         it "should return true" do
           expect(linter_with_unapproved_method_string.all_translations_present?).to eq(true)
+        end
+      end
+
+      context "full fake view" do
+        # Doesn't uses .erb filename to avoid github action
+        let(:filename_with_violations) { "spec/support/fake_view_2.html" }
+        let(:filename_with_violations_stringified) { File.read("#{Rails.root}/#{filename_with_violations}") }
+        context "outside erb" do
+          let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'outside_erb') }
+
+          it "should return puts message for violated strings" do
+            $stdout = StringIO.new
+            linter_file_with_violations.all_translations_present?
+            $stdout.rewind
+            result_string = "The following are potentially untranslated substrings missing OUTSIDE_ERB from spec/support/fake_view_2.html:\nSent Messages\nSubject\nRecipients\nDate Sent\nRecipient Type\n"
+            expect($stdout.string).to eq(result_string)
+          end
+        end
+
+        context "inside erb" do
+          let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'in_erb') }
+          it "should return puts message for violated strings" do
+            $stdout = StringIO.new
+            linter_file_with_violations.all_translations_present?
+            $stdout.rewind
+            expect($stdout.string).to include("responsible party")
+          end
         end
       end
     end
