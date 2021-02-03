@@ -34,7 +34,7 @@ registry:
         is_enabled: true
         settings:
         - key: :carriers
-          item: 'Kaiser Permanente'
+          item: 'Kaiser'
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true

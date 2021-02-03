@@ -12,7 +12,7 @@
     <id>
       <id>53e67210eb899a460300000d</id>
     </id>
-    <name>Kaiser Permanente</name>
+    <name>Kaiser</name>
     <is_active>true</is_active>
   </carrier>
   <market>urn:openhbx:terms:v1:aca_marketplace#individual</market>

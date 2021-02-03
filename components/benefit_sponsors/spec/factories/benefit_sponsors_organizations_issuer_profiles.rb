@@ -22,7 +22,7 @@ FactoryBot.define do
     end
 
     trait :kaiser_profile do
-      legal_name        { "Kaiser Permanente" }
+      legal_name        { "Kaiser" }
     end
   end
 end

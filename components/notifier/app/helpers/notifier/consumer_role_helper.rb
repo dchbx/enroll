@@ -145,7 +145,7 @@ module Notifier
         "(855) 224-3016"
       when "Dominion National"
         "(855) 224-3016"
-      when "Kaiser Permanente"
+      when "Kaiser"
         "(844) 524-7370"
       end
     end

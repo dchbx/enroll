@@ -198,7 +198,7 @@ class IvlNotices::EnrollmentNoticeBuilderWithDateRange < IvlNotice
       "(800) 471-0236"
     when "Dominion"
       "(855) 224-3016"
-    when "Kaiser Permanente"
+    when "Kaiser"
       "(844) 524-7370"
     end
   end

@@ -58,10 +58,10 @@ describe "shared/_#{Settings.aca.state_abbreviation.downcase}_carrier_contact_in
     end
   end
 
-  context 'for Kaiser Permanente' do
+  context 'for Kaiser' do
     before :each do
       allow(plan).to receive(:kind).and_return('health')
-      allow(issuer_profile).to receive(:legal_name).and_return('Kaiser Permanente')
+      allow(issuer_profile).to receive(:legal_name).and_return('Kaiser')
       render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: plan, hbx_enrollment: hbx_enrollment }
     end
 
