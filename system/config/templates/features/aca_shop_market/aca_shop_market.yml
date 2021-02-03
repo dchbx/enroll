@@ -9,6 +9,5 @@ registry:
       - key: :send_secure_message_employer
         item: :send_secure_message
         is_enabled: true
-      - key: :no_quiet_period_check_after_application_start_date
-        item: :dc
-        is_enabled: true
+      - key: :verify_quiet_period_after_application_effectuated
+        is_enabled: false
