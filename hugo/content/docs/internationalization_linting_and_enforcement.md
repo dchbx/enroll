@@ -9,25 +9,44 @@ draft: false
 Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb files are left untranslated. The ViewTranslationsLinter class will be run automatically on Github actions against any of your branch's files containing .html.erb files, with the following command:
 
 ```
-bundle exec rake view_translations_linter:lint_files view_files_list="$(git diff --name-only origin/master | grep .html.erb | xargs)"
+bundle exec rake view_translations_linter:lint_git_difference_changed_lines"
 ```
 
-You can run the above *locally* if you wish, or pass in individual files like so:
+You can run the above *locally* if you wish, like so:
 ```
-RAILS_ENV=production bundle exec rake view_translations_linter:lint_files view_files_list='spec/support/fake_view.html.erb'
+bundle exec rake view_translations_linter:lint_git_difference_changed_lines
 ```
 
 ## How Linting Works
 
-The task will lint both strings *within* ERB tags, and outside of them. Example:
+The task will lint both strings *within* ERB tags, and outside of them.
+
+Example 1:
 ```
 # Within ERB Tags
 <%= "This string would fail the check" %>
+# Change this and add a corresponding translation
+<%= l10n('string_check_fail_message') %>
+```
 
+Example 2:
+```
 # Outside ERB Tags
 <p>"This would fail the check for outside ERB tags" %>
+<p> <%= l10n('string_check_fail_message') %>
 
 ```
+
+Example 2:
+
+```
+  # Within ERB Tags
+  <%= link_to l10n('Back to Messages', main_app.exchanges_bulk_notices_path, class: 'btn btn-alt-blue' %>
+  # Change it to this and add translation
+  <%= link_to l10n('back_to_messages'), main_app.exchanges_bulk_notices_path, class: 'btn btn-alt-blue' %>
+
+```
+
 
 ## When My Build Breaks
 
