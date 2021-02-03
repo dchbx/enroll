@@ -1,0 +1,4 @@
+{
+  unique_html_attributes: ["alt", "for", "id", "placeholder"],
+  verify_alt_attribute_presence: ["img"]
+}
