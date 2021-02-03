@@ -807,7 +807,7 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
           let(:family1) {FactoryBot.create(:family, :with_primary_family_member, :person => person1)}
           let(:household) {FactoryBot.create(:household, family: family1)}
           let(:date) {TimeKeeper.date_of_record}
-          let!(:organization) {FactoryBot.create(:organization, legal_name: "CareFirst", dba: "care")}
+          let!(:organization) {FactoryBot.create(:organization, legal_name: "CareFirst BCBS", dba: "care")}
           let!(:carrier_profile1) {FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
           let!(:carrier_profile2) {FactoryBot.create(:benefit_sponsors_organizations_issuer_profile)}
           let!(:product1) {FactoryBot.create(:benefit_markets_products_health_products_health_product, benefit_market_kind: :aca_individual, kind: :health, csr_variant_id: '01')}

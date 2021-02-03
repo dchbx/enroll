@@ -22,7 +22,7 @@ cp = org.create_carrier_profile(id: "53e67210eb899a460300001a", abbrev: "BLHI", 
 org = Organization.new(office_locations: [hbx_office], fein: "060000000", legal_name: "MetLife")
 cp = org.create_carrier_profile(id: "53e67210eb899a460300001d", abbrev: "META", hbx_carrier_id: nil, ivl_health: false, ivl_dental: false, shop_health: false, shop_dental: false, issuer_hios_ids: ['43849'])
 
-org = Organization.new(office_locations: [hbx_office], fein: "070000000", legal_name: "CareFirst")
+org = Organization.new(office_locations: [hbx_office], fein: "070000000", legal_name: "CareFirst BCBS")
 cp = org.create_carrier_profile(id: "53e67210eb899a4603000004", abbrev: "GHMSI", hbx_carrier_id: "116036", ivl_health: true, ivl_dental: false, shop_health: true, shop_dental: false, issuer_hios_ids: ["86052", "78079"])
 
 org = Organization.new(office_locations: [hbx_office], fein: "080000000", legal_name: "Aetna")

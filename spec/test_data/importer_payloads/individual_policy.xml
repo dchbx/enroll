@@ -383,7 +383,7 @@
             </alias_id>
           </alias_ids>
         </id>
-        <name>CareFirst</name>
+        <name>CareFirst BCBS</name>
         <display_name>String</display_name>
         <is_active>true</is_active>
       </carrier>

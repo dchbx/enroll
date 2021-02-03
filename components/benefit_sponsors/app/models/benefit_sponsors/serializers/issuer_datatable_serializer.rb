@@ -36,7 +36,7 @@ module BenefitSponsors
           {
             "Aetna" => ['1-855-586-6959', '', 'from 8am-6pm EST, Monday - Friday'],
             "BestLife" => ['1-800-433-0088', '', ''],
-            "CareFirst" => ['1-855-444-3119', '', ''],
+            "CareFirst BCBS" => ['1-855-444-3119', '', ''],
             "Delta Dental" => ['1-800-872-0500', '', ''],
             "Dentegra" => ['1-800-471-0284', '', ''],
             "Dominion" => ['1-855-224-3016', '', ''],

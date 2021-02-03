@@ -23,7 +23,7 @@ RSpec.describe "insured/thankyou.html.erb", dbclean: :after_each do
         kind: "employer_sponsored"
       )
     end
-    let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
+    let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst BCBS") }
     let(:group_enrollment) do
       instance_double(
         BenefitSponsors::Enrollments::GroupEnrollment,

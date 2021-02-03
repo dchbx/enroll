@@ -13,7 +13,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     instance_double(CensusEmployee)
   end
 
-  let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
+  let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst BCBS") }
 
   let(:employer_profile) do
     instance_double(

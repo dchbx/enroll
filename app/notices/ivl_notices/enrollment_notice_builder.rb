@@ -178,7 +178,7 @@ class IvlNotices::EnrollmentNoticeBuilder < IvlNotice
     case legal_name
     when "BestLife"
       "(800) 433-0088"
-    when "CareFirst"
+    when "CareFirst BCBS"
       "(855) 444-3119"
     when "Delta Dental"
       "(800) 471-0236"

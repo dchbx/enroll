@@ -55,7 +55,7 @@ RSpec.describe "insured/plan_shoppings/receipt.html.erb" do
       total_premium: double("total_premium"),
       total_employer_contribution: double("total_employer_contribution"),
       total_employee_cost: double("total_employee_cost"),
-      issuer_profile: double(legal_name: "carefirst"),
+      issuer_profile: double(legal_name: "carefirst BCBS"),
       metal_level: "Silver",
       coverage_kind: "health",
       kind: "health",

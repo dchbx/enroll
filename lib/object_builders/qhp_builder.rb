@@ -55,7 +55,7 @@ class QhpBuilder
     elsif file_path.include?("united")
       "UnitedHealthcare"
     elsif file_path.include?("carefirst") || file_path.include?("cf")
-      "CareFirst"
+      "CareFirst BCBS"
     end
   end
 
