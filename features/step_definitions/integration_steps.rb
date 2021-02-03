@@ -437,6 +437,7 @@ end
 
 Given(/^(.+) has not signed up as an HBX user$/) do |actor|
   step "I use unique values"
+  sleep 5
 end
 
 When(/^.* visit the Employer portal$/) do

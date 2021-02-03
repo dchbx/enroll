@@ -39,7 +39,7 @@ RSpec.describe 'notices/ivl/ivl_vta_notice.html.erb' do
     it { expect(rendered).to have_selector('h3', text: 'NOTICE - VOID FORM 1095-A TAX FORM') }
     it { expect(rendered).not_to match(/Dear #{person.full_name}:/) }
     it { expect(rendered).to match(/You previously received a Form 1095-A from #{Settings.site.short_name} with information about your #{previous_year} health insurance coverage./) }
-    it { expect(rendered).to match(/The information on your Form 1095-A is based on records provided by your health insurance company and #{Settings.site.short_name}./) }
+    it { expect(rendered).to match(/If you believe your Form 1095-A was voided by mistake please call/) }
     it { expect(rendered).to match(/The #{Settings.site.short_name} Team/) }
   end
 

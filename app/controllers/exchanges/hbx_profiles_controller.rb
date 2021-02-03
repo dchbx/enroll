@@ -256,7 +256,6 @@ def employer_poc
    # end
   end
 
-
   def staff_index
     @q = params.permit(:q)[:q]
     @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
@@ -441,7 +440,6 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    uniq_cancel_params = params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
     params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_cancel_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
@@ -462,7 +460,6 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    uniq_terminate_params = params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) }.compact.map(&:to_s).map(&:to_sym)
     params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_terminate_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
@@ -859,6 +856,14 @@ def employer_poc
 
   def permitted_params_family_index_dt
     params.permit(:scopes)
+  end
+
+  def uniq_terminate_params
+    params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) || key.match(/transmit_hbx_.*/) || key.match(/family_.*/) }.compact.map(&:to_s)
+  end
+
+  def uniq_cancel_params
+    params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) || key.match(/transmit_hbx_.*/) || key.match(/family_.*/) }.compact.map(&:to_s)
   end
 
   def get_resource(params)
