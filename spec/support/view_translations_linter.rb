@@ -71,18 +71,23 @@ class ViewTranslationsLinter
       # removes leading and ending extra blankspace, and blank strings, and downcase, returning an array like:
       # ["list all attributes", "success"]
       #  Further reading: https://stackoverflow.com/a/54405741/5331859
-      potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view).split("\n+")
-      potential_substrings_words_only = potential_substrings_no_html_tags&.reject!(&:blank?)
+      potential_substrings_no_html_tags = ActionView::Base.full_sanitizer.sanitize(stringified_view).split("\n")
+      return [] if potential_substrings_no_html_tags.blank?
+      potential_substrings_words_only = potential_substrings_no_html_tags&.reject(&:blank?)
       return [] if potential_substrings_words_only.blank?
-      potential_substrings_words_only_stripped = potential_substrings_words_only.map(&:strip)
-      return [] if potential_substrings_words_only_stripped.blank?
-      potential_substrings_no_chars = potential_substrings_words_only_stripped.map(&:strip)&.uniq&.select { |element| element.length > 1 }&.map do |string|
-      # Remove special characters from strings. This will also act to remove any single special character strings hanging around like "-"
-        string.gsub!(/[^0-9a-z ]/i, '')
+      # Remove Git lines from beginning of string. Won't affect others
+      # TODO: Noline appears for some reason, investigate it
+      potential_substrings_words_only_no_git = potential_substrings_words_only.reject do |string|
+        string.match(/@@/) || string.match(/no newline/)
       end
-      return [] if potential_substrings_no_chars.compact.blank?
-      # Remove any blank strings (after the gsub removed special characters) and Downcase to simplify adding to the allow list
-      potential_substrings = potential_substrings_no_chars&.reject!(&:blank?)&.map(&:downcase)
+      potential_substrings_words_only_stripped = potential_substrings_words_only_no_git.map(&:strip).select { |element| element.length > 1 }.uniq
+      return [] if potential_substrings_words_only_stripped.blank?
+      # Use gsub over gsub!, otherwise nil will be returned if no substition was made
+      # REFS: https://stackoverflow.com/a/28364117/5331859
+      potential_substrings_no_special_chars = potential_substrings_words_only_stripped.map { |string| string.gsub(/[^0-9a-z ]/i, '') }
+      return [] if potential_substrings_no_special_chars.compact.blank?
+      # Remove any blank strings (after the gsub removed special characters)
+      potential_substrings = potential_substrings_no_special_chars&.reject(&:blank?)
     end
     potential_substrings
   end
@@ -91,8 +96,10 @@ class ViewTranslationsLinter
 
   def untranslated_warning_message(views_with_errors)
     views_with_errors.each do |filename, unapproved_substrings|
-      puts("The following are potentially untranslated substrings missing #{filter_type.upcase} from #{filename}: #{unapproved_substrings.join(', ')}")
+      puts("The following are potentially untranslated substrings missing #{filter_type.upcase} from #{filename}:")
+      unapproved_substrings.each do |substring|
+        puts(substring.to_s)
+      end
     end
-    puts("Please modify your ERB and place them in translation helper tags with a coorelating translation or add them to the approved string list.")
   end
 end
