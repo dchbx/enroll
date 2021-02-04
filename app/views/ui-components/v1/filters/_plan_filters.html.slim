@@ -142,7 +142,7 @@
         = hidden_field_tag :market_kind, @market_kind
         = hidden_field_tag :coverage_kind, @coverage_kind
         = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
-        form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
+        form onsubmit=("return false")
           input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85" style="padding:0;"
           span style="font-size:12px;" 0%
           span.pull-right style="font-size:12px;" 85%
@@ -256,6 +256,12 @@
 // Needed to fix for shop if user hits back button in browser
 - if @market_kind == 'shop' || @market_kind == 'fehb' || @market_kind == 'individual'
   javascript:
+
+    function resetAptc() {
+      $("#elected_aptc").val(#{number_with_precision(@elected_aptc, precision: 2)}).change();
+      $(".all-filters-row .apply-btn").first().click()
+    }
+
     var promise1 = new Promise(function(resolve, reject) {
       setTimeout(function() {
         resolve('completed');
