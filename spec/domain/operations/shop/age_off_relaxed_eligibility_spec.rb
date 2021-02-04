@@ -352,6 +352,41 @@ module Operations
               expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Failure)
             end
           end
+
+          context 'returns success when dep turns 26 on effective month with previous coverage' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               family_member: primary_fm,
+               market_key: :aca_shop_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            before do
+              person.update_attributes(dob: Date.new(1995, 2, 15))
+            end
+
+            it 'should return failure' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
+
+          context 'returns success when dep turns 26 on effective month without previous coverage' do
+            let(:input_params) do
+              {effective_on: Date.new(2021, 2, 1),
+               family_member: primary_fm,
+               market_key: :aca_shop_dependent_age_off,
+               relationship_kind: 'child'}
+            end
+
+            before do
+              enrollment.hbx_enrollment_members.delete_all
+              person.update_attributes(dob: Date.new(1995, 2, 15))
+            end
+
+            it 'should return failure' do
+              expect(subject.call(input_params)).to be_a(Dry::Monads::Result::Success)
+            end
+          end
         end
       end
     end
