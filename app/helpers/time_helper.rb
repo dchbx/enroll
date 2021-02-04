@@ -27,12 +27,12 @@ module TimeHelper
   def sep_optional_date(family, min_or_max, market_kind = nil, effective_date = nil)
     person = family.primary_applicant.person
 
-    return nil unless is_valid_person?(person, market_kind)
+    return nil unless has_employee_role?(person, market_kind)
     benefit_applications = person.active_employee_roles.map{|ee| ee.fetch_benefit_applications_for_date(effective_date)}.flatten
     min_or_max == 'min' ? benefit_applications.map(&:start_on).min : benefit_applications.map(&:end_on).max
   end
 
-  def is_valid_person?(person, market_kind)
+  def has_employee_role?(person, market_kind)
     has_dual_roles         = person.has_consumer_role? && person.has_active_employee_role?
     has_only_employee_role = person.has_active_employee_role? && !person.has_consumer_role?
 
