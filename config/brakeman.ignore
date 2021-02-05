@@ -126,7 +126,7 @@
       "check_name": "Execute",
       "message": "Possible command injection",
       "file": "app/data_migrations/cancel_plan_years_group.rb",
-      "line": 23,
+      "line": 21,
       "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
       "code": "system(\"rake migrations:cancel_plan_year feins='#{row[\"FEIN\"]}' plan_year_state='#{row[\"aasm_state\"]}'\")",
       "render_path": null,
@@ -559,6 +559,26 @@
       "note": ""
     },
     {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "62029ab01040c08839c5dd6ee8d0b14dec3c167348d02f50b65c827384e27f45",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/custom_linters/translations/view_translations_linter_helper.rb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`git diff HEAD^ HEAD  --unified=0 #{filename} | tail +6 | sed -e 's/^+//'`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ViewTranslationsLinterHelper",
+        "method": "changed_lines_from_file_string"
+      },
+      "user_input": "filename",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
       "warning_type": "Mass Assignment",
       "warning_code": 70,
       "fingerprint": "66163d92b7272111b82a92c69616a8b830873a2fd11cb84ba5583f33c9d6f7df",
@@ -633,7 +653,7 @@
           "type": "controller",
           "class": "Exchanges::HbxProfilesController",
           "method": "view_enrollment_to_update_end_date",
-          "line": 482,
+          "line": 479,
           "file": "app/controllers/exchanges/hbx_profiles_controller.rb",
           "rendered": {
             "name": "exchanges/hbx_profiles/view_enrollment_to_update_end_date",
@@ -1140,6 +1160,6 @@
       "note": ""
     }
   ],
-  "updated": "2021-01-27 13:24:53 -0500",
+  "updated": "2021-02-04 15:07:50 -0500",
   "brakeman_version": "5.0.0"
 }
