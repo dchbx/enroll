@@ -8,8 +8,9 @@
 # Approved Translation Strings - an array of approved strings to ignore, best kept in YML
 # Filter Type - Denoting which query you'd like to lint the file for. Currently supported are
 # 'in_erb' and 'outside_erb'
+
 class ViewTranslationsLinter
-  attr_accessor :filter_type, :puts_output, :stringified_view_files, :approved_translation_strings
+  attr_accessor :filter_type, :stringified_view_files, :approved_translation_strings
 
   def initialize(stringified_view_files, approved_translation_strings, filter_type)
     @stringified_view_files = stringified_view_files
@@ -47,6 +48,14 @@ class ViewTranslationsLinter
     # Other queries for parsing files can be added here
     # when 'in_slim'
     # when 'outside_slim'
+    when 'in_haml_ruby_tags'
+      potential_substrings_haml_tags = stringified_view.scan(/=(.*)\n/).flatten.compact
+      return [] if potential_substrings_haml_tags.blank?
+      # This will return strings where subbing out all special characters actually returns a value
+      potential_substrings_words_only = potential_substrings_haml_tags.select { |string| string.gsub(/[^0-9a-z ]/i, '').present? }
+      return [] if potential_substrings_words_only.blank?
+      potential_substrings = potential_substrings_words_only.reject(&:blank?)
+      return [] if potential_substrings.blank?
     when 'in_erb'
       # The following method will return all code between ERB tags.
       # Since this will return *all* code between ERB tags,
