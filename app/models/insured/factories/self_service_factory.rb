@@ -70,7 +70,7 @@ module Insured
 
         eli_fac_obj = ::Factories::EligibilityFactory.new(reinstatement.id)
         max_applicable_aptc = eli_fac_obj.fetch_max_aptc
-        reinstatement.update_attributes!(elected_aptc_pct: applied_aptc_amount/max_applicable_aptc , applied_aptc_amount: cost_decorator.total_aptc_amount)
+        reinstatement.update_attributes!(elected_aptc_pct: applied_aptc_amount / max_applicable_aptc, applied_aptc_amount: cost_decorator.total_aptc_amount)
       end
 
       def self.member_level_aptc_breakdown(new_enrollment, applied_aptc_amount)

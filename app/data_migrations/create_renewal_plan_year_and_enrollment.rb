@@ -20,23 +20,23 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
 
     if organization.present? && organization.employer_profile.active_benefit_application.present?
       case action
-        when "renewal_plan_year"
-          create_renewal_plan_year(organization)
-        when "renewal_plan_year_passive_renewal"
-          create_renewal_plan_year_passive_renewal(organization)
-        when "trigger_passive_renewal"
-          trigger_passive_renewals(organization)
-        else
-          puts "Invalid action" unless Rails.env.test?
+      when "renewal_plan_year"
+        create_renewal_plan_year(organization)
+      when "renewal_plan_year_passive_renewal"
+        create_renewal_plan_year_passive_renewal(organization)
+      when "trigger_passive_renewal"
+        trigger_passive_renewals(organization)
+      else
+        puts "Invalid action" unless Rails.env.test?
       end
     else
-      puts "No Oganization found" unless Rails.env.test? &&  organization.blank?
-      puts "No active plan year found" unless Rails.env.test? &&   organization.employer_profile.active_benefit_application.blank?
+      puts "No Oganization found" unless Rails.env.test? && organization.blank?
+      puts "No active plan year found" unless Rails.env.test? && organization.employer_profile.active_benefit_application.blank?
     end
   end
 
   def create_renewal_plan_year(organization)
-    benefit_application =  organization.employer_profile.active_benefit_application
+    benefit_application = organization.employer_profile.active_benefit_application
     BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(benefit_application).renew_application
     puts "triggered renewal plan year for #{organization.legal_name}" unless Rails.env.test?
   end
@@ -59,17 +59,15 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
   end
 
   def trigger_renewal_py_for_employers
-    benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications'.exists => true,
-                                                                   :'benefit_applications'=>
+    benefit_sponsorships = BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:benefit_applications.exists => true,
+                                                                                          :benefit_applications =>
                                                                        { :$elemMatch =>
                                                                              {
-                                                                                 :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),
-                                                                                 :"aasm_state".in => [:active]
-                                                                             }
-                                                                       })
+                                                                               :'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),
+                                                                               :aasm_state.in => [:active]
+                                                                             }})
 
     benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
-
       benefit_application = benefit_sponsorship.benefit_applications.where(:'effective_period.min' => Date.strptime(ENV['start_on'].to_s, "%m/%d/%Y"),:aasm_state => :active).first
       if benefit_application.present? && benefit_sponsorship.benefit_applications.detect(&:is_renewing?).blank?
         organization = benefit_application.sponsor_profile.organization

@@ -5,6 +5,7 @@ require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'shoulda/matchers'
 require 'webmock/rspec'
+require 'stimulus_reflex_testing/rspec'
 
 WebMock.allow_net_connect!
 
