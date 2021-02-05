@@ -28,19 +28,19 @@
                     jQuery('#cancel_message').show();
                     jQuery('#termination_message').hide();
                     jQuery('#no_termination_message').show();
-                    jQuery("a.modal_confirm").show();
+                    jQuery(".btn-confirmation").show();
                 }
                 else if(new_term_date !== enrollment_effective && output ){
                   jQuery('#cancel_message').hide();
                   jQuery('#termination_message').hide();
                   jQuery('#no_termination_message').show();
-                  jQuery("a.modal_confirm").hide();
+                  jQuery(".btn-confirmation").hide();
                 }
                 else{
                     jQuery('#cancel_message').hide();
                     jQuery('#termination_message').show();
                     jQuery('#no_termination_message').hide();
-                    jQuery("a.modal_confirm").show();
+                    jQuery(".btn-confirmation").show();
                 }
             }
         });
