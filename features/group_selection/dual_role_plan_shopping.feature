@@ -41,5 +41,7 @@ Feature: EE with consumer role plan purchase
     And employee also has a health enrollment with primary covered under first employer
     Then Employee sign in to portal
     And employee shouldnt see make changes button in individual market
-    And employee should see make changes button in shop market
+    When Employee should be able to see Actions dropdown
+    Then Employee clicks on the Actions button
+    When Employee clicks on the make changes to my coverage button
 
