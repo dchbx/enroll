@@ -1,0 +1,65 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<div class="container" data-controller="bulk-notice">
+
+  <h4>New Message</h4>
+  <p><%= l10n("admin_actions.bulk_upload.new.description_text") %></p>
+  <strong>Important:</strong> <p><%= l10n("admin_actions.bulk_upload.new.description_sub_text") %></p>
+
+  <%= form_for(@bulk_notice, url: exchanges_bulk_notices_path, html: { multipart: true }) do |f| %>
+    <%= f.select :audience_type, { 'Broker Agency' => :broker_agency, 'Employer' => :employer, 'General Agency' => :general_agency, 'Employee' => :employee }, { selected: @bulk_notice.audience_type }, class: 'form-control col-2', data: { target: 'bulk-notice.audienceSelect', reflex: 'change->BulkNotice#audience_select' } %>
+    <table class='table table-message-wrapper'>
+      <tbody>
+        <tr>
+          <th style="text-transform: capitalize;">Recipients:</th>
+          <td>
+            <div id='recipient-list' class='collapsed float-left' data-target="bulk-notice.recipientList"></div>
+            <div id='more-recipients' class='float-right pr-1'>
+              <a href data-target="bulk-notice.moreRecipients" data-action='bulk-notice#expandRecipients' class='d-none'>0 more...</a>
+              <a href data-target="bulk-notice.lessRecipients" data-action='bulk-notice#collapseRecipients' class='d-none'>Less...</a>
+            </div>
+
+            <%= f.text_area :audience_identifiers, rows: 1, data: { reflex: 'blur->BulkNotice#new_identifier' }, placeholder: 'FEINs or HBX IDs, comma separated', id: 'bulk-notice-audience-identifiers' %>
+          </td>
+        </tr>
+        <tr>
+          <th style="text-transform: capitalize;">Subject<span class="text-danger">*</span>:</th>
+          <td><%= f.text_field :subject, :size => "55", placeholder: 'Subject', include_blank: false, required: true %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Content<span class="text-danger"></span>:</th>
+          <td><%= f.text_area :body, rows: 5, placeholder: 'Write here...', required: true  %></td>
+        </tr>
+        <tr>
+          <th style="vertical-align: top; text-transform: capitalize;">Document: (optional)<span class="text-danger"></span></th>
+          <td><%= file_field_tag :file, accept: 'image/png,image/jpeg,application/pdf', class: "doc-upload-file"%></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class='form-group'>
+    <%= link_to 'Back', exchanges_bulk_notices_path, class: 'btn btn-outline-primary col-2' %>
+    <%= f.submit "Preview", class: 'btn btn-alt-blue col-2 offset-10', onclick: "onSubmit();" %>
+    </div>
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  function onSubmit() {
+    if (!document.getElementsByClassName('badge-alt-blue').length) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (document.getElementsByClassName('badge-danger').length) {
+        alert('Recipients is invalid. Please check red badges.')
+      } else {
+        alert('Recipients should not be blank')
+      }
+      return
+    }
+
+    if (document.getElementsByClassName('badge-danger').length) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      alert('Recipients is invalid. Please check red badges.')
+    }
+  }
+</script>

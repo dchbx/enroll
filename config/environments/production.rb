@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   # Verifies that versions and hashed value of the package contents in the project's package.json
   config.webpacker.check_yarn_integrity = false
@@ -6,7 +8,12 @@ Rails.application.configure do
 
   # Code is not reloaded between requests.
   config.cache_classes = true
-  config.cache_store = :memory_store
+  config.cache_store = :redis_cache_store, { driver: :hiredis, url: "redis://localhost:6379/1" }
+  config.session_store :cache_store,
+                       key: "_session",
+                       compress: true,
+                       pool_size: 5,
+                       expire_after: 1.year
 
   # Eager load code on boot. This eager loads most of Rails and
   # your application in memory, allowing both threaded web servers
@@ -17,6 +24,10 @@ Rails.application.configure do
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
   config.action_controller.perform_caching = true
+
+  config.action_cable.mount_path = '/cable'
+  config.action_cable.allowed_request_origins = [%r{http://*},
+                                                 %r{https://*}]
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
   # Add `rack-cache` to your Gemfile before enabling this.

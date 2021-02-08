@@ -7,12 +7,13 @@ module Operations
   class SecureMessageAction
     send(:include, Dry::Monads[:result, :do, :try])
 
-    def call(params:, user:)
+    def call(params:, user: nil)
       validate_params = yield validate_params(params)
       resource = yield fetch_resource(validate_params)
       uploaded_doc = yield upload_document(resource, validate_params, user) if params[:file].present?
+      uploaded_doc ||= params[:document] if params[:document].present?
       secure_message_result = yield upload_secure_message(resource, validate_params, uploaded_doc)
-      result = yield send_generic_notice_alert(secure_message_result)
+      result = yield send_generic_notice_alert(resource)
       Success(result)
     end
 
@@ -25,7 +26,7 @@ module Operations
     end
 
     def fetch_resource(validate_params)
-      if validate_params[:resource_name].classify.constantize == Person
+      if validate_params[:resource_name]&.classify&.constantize == Person
         ::Operations::People::Find.new.call(person_id: validate_params[:resource_id])
       else
         BenefitSponsors::Operations::Profiles::FindProfile.new.call(profile_id: validate_params[:resource_id])
