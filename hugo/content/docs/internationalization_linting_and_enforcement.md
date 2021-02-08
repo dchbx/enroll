@@ -6,7 +6,7 @@ draft: false
 
 ## Translations View Linter
 
-Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb files are left untranslated. The ViewTranslationsLinter class will be run automatically on Github actions against any of your branch's files containing .html.erb files, with the following command:
+Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb and .haml files are left untranslated. The ViewTranslationsLinter class will be run automatically on Github actions against any of your branch's files containing .html.erb files, with the following command:
 
 ```
 bundle exec rake view_translations_linter:lint_git_difference_changed_lines"
