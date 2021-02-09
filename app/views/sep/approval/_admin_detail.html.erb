@@ -85,6 +85,12 @@
 					</div>
 					<div class='row row-form-wrapper no-buffer'>
 						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+							<%= check_box_tag :coverage_renewal_flag, 'true' , false, id: "coverage_renewal_flag", class: 'coverage_renewal_checkbox' %>
+              <%= l10n("hbx_profiles.coverage_renewal_flag") %>
+						</div>
+					</div>
+					<div class='row row-form-wrapper no-buffer'>
+						<div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
 			    			<%= text_area_tag :admin_comment, "", class: "floatlabel interaction-control-broker-message-body custom-textarea", rows: 3, placeholder: "Enter Comments Here"%>
 						</div>
 					</div>
