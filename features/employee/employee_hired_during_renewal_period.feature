@@ -31,7 +31,9 @@ Feature: Employee hired during renewal period
     Then Employee clicks on Continue button on receipt page
     Then Patrick Doe should see "my account" page with active enrollment
     And Patrick Doe should see passive renewal
-    Then Patrick Doe click on make changes button on passive renewal
+    When Employee should be able to see Actions dropdown
+    Then Employee clicks on the Actions button
+    When Employee clicks on the make changes to my coverage button
     Then Employee should see the group selection page
     When Employee clicks continue on the group selection page
     Then Employee should see the list of plans
