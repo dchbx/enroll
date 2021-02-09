@@ -901,7 +901,7 @@ def employer_poc
   def sep_params
     params.except(:utf8, :commit).permit(:market_kind, :person, :firstName, :lastName, :family_actions_id,
                                          :effective_on_kind, :qle_id, :event_date, :effective_on_date, :csl_num,
-                                         :start_on, :end_on, :next_poss_effective_date, :option1_date, :option2_date, :option3_date, :admin_comment)
+                                         :start_on, :end_on, :next_poss_effective_date, :option1_date, :option2_date, :option3_date, :admin_comment, :coverage_renewal_flag)
   end
 
   def timekeeper_params

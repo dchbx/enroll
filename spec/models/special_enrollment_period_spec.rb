@@ -2,6 +2,28 @@ require 'rails_helper'
 
 RSpec.describe SpecialEnrollmentPeriod, :type => :model, :dbclean => :after_each do
 
+  describe "A new model instance", dbclean: :after_each do
+    it { is_expected.to be_mongoid_document }
+    it { is_expected.to have_fields(:qualifying_life_event_kind_id).of_type(BSON::ObjectId)}
+    it { is_expected.to have_field(:qle_on).of_type(Date)}
+    it { is_expected.to have_field(:is_valid).of_type(Mongoid::Boolean)}
+    it { is_expected.to have_field(:effective_on_kind).of_type(String)}
+    it { is_expected.to have_field(:effective_on).of_type(Date)}
+    it { is_expected.to have_field(:submitted_at).of_type(DateTime)}
+    it { is_expected.to have_field(:title).of_type(String)}
+    it { is_expected.to have_field(:start_on).of_type(Date)}
+    it { is_expected.to have_field(:end_on).of_type(Date)}
+    it { is_expected.to have_field(:qle_answer).of_type(String)}
+    it { is_expected.to have_field(:next_poss_effective_date).of_type(Date)}
+    it { is_expected.to have_field(:option1_date).of_type(Date)}
+    it { is_expected.to have_field(:option2_date).of_type(Date)}
+    it { is_expected.to have_field(:option3_date).of_type(Date)}
+    it { is_expected.to have_field(:csl_num).of_type(String)}
+    it { is_expected.to have_field(:admin_flag).of_type(Mongoid::Boolean)}
+    it { is_expected.to have_field(:optional_effective_on).of_type(Array).with_default_value_of([]) }
+    it { is_expected.to have_field(:coverage_renewal_flag).of_type(Mongoid::Boolean).with_default_value_of(false) }
+  end
+
   let(:family)        { FactoryBot.create(:family, :with_primary_family_member) }
   let(:shop_qle)      { QualifyingLifeEventKind.create(
                           title: "Entered into a legal domestic partnership",
