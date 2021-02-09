@@ -91,10 +91,10 @@ module BenefitSponsors
 
         def initiate_broker_profile
           return if params[:broker_agency].blank?
-          params[:broker_agency].permit!
+          broker_agency_params = params.permit(broker_agency: {})
           @profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new
           #@profile = BenefitSponsors::Organizations::BrokerAgencyProfile.new(market_kind: :aca_shop, entity_kind: params[:broker_agency][:entity_kind].to_sym)
-          @broker_agency = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(@profile, params[:broker_agency])
+          @broker_agency = BenefitSponsors::Organizations::Factories::BrokerProfileFactory.new(@profile, broker_agency_params)
         end
 
         def assign_filter_and_agency_type

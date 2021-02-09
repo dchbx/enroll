@@ -1,6 +1,8 @@
 class Exchanges::ScheduledEventsController < ApplicationController
   layout "single_column"
 
+  before_action :scheduled_event_params, only: [:create, :update]
+
   def new
     @scheduled_event = ScheduledEvent.new
   end

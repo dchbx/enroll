@@ -4,18 +4,29 @@ date: 2021-01-26T12:12:25-05:00
 draft: false
 ---
 
-## Translations View Linter
+## Translations View Linter and View Linter Full Report
 
-Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb and .haml files are left untranslated. The ViewTranslationsLinter class will be run automatically on Github actions against any of your branch's files containing .html.erb files, with the following command:
+Enroll includes a custom class, ViewTranslationsLinter, to lint view files and assure that no strings within .erb and .haml files are left untranslated. .slim files will be added in the near future. The ViewTranslationsLinter class will be run automatically on Github actions against any of your branch's files containing .html.erb files, with the following command:
 
-```
-bundle exec rake view_translations_linter:lint_git_difference_changed_lines"
-```
-
-You can run the above *locally* if you wish, like so:
 ```
 bundle exec rake view_translations_linter:lint_git_difference_changed_lines
 ```
+
+While the lint_git_difference_changed_lines rake task is best usd for your branch's individual filess, if you wish to view the status of translations for all of the views in the application, run the following rake task:
+
+`
+bundle exec rake view_translations_linter_report:run
+`
+
+It will return output with information such as:
+
+`
+For a total of 16 files in the ui_helpers directory:
+There are a total of 1 views with translations both inside and outside erb missing.
+There are a total of 2 views with translations outside erb missing.
+There are a total of 0 views with translations inside erb missing.
+There are a total of 13 views with all translations present.
+`
 
 ## How Linting Works
 
@@ -48,11 +59,16 @@ Example 2:
 ```
 
 
+
+## Technical Details
+The ViewTranslationsLinter, ViewTranslationsLinterHelper, and ViewTranslationsLinterReport live in the lib/custom_linters/translations/ directory. The approved strings are located in the config/translations_linter/approved_translation_strings.yml directory.
+
+
 ## When My Build Breaks
 
 First, take a look at the output for the strings that didn't pass the check. 
 
-Next, check the "Allow List." We include an "Allow List" of approved strings in an ERB file /spec/support/fixtures/approved_translation_strings.yml for strings that should be allowed through. Please do *not* add to this YML without lead dev approval. Here are the kinds of strings we allow and what exactly they allow:
+Next, check the "Allow List." We include an "Allow List" of approved strings in an ERB file config/translations_linter/approved_translation_strings.yml for strings that should be allowed through. Please do *not* add to this YML without lead dev approval. Here are the kinds of strings we allow and what exactly they allow:
 
 | String Type Description                       | String List                                                                                                                             |
 | -------------------------------------         | -----------                                                                                                                             |

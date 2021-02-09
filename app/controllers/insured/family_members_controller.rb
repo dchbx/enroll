@@ -4,8 +4,7 @@ class Insured::FamilyMembersController < ApplicationController
   include VlpDoc
   include ApplicationHelper
 
-  before_action :permit_dependent_person_params, only: %i[create update]
-
+  before_action :dependent_person_params, only: [:create, :update]
   before_action :set_current_person, :set_family
   before_action :set_dependent, only: [:destroy, :show, :edit, :update]
 
@@ -148,7 +147,7 @@ class Insured::FamilyMembersController < ApplicationController
     end
     consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
     @info_changed, @dc_status = sensitive_info_changed?(consumer_role)
-    if @address_errors.blank? && @dependent.update_attributes(params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
+    if @address_errors.blank? && @dependent.update_attributes(dependent_person_params[:dependent]) && update_vlp_documents(consumer_role, 'dependent', @dependent)
       consumer_role = @dependent.family_member.try(:person).try(:consumer_role)
       consumer_role&.check_for_critical_changes(
         @dependent.family_member.family,
@@ -230,8 +229,8 @@ class Insured::FamilyMembersController < ApplicationController
 
   private
 
-  def permit_dependent_person_params
-    params.require(:dependent).permit!
+  def dependent_person_params
+    params.permit(:dependent => {})
   end
 
   def set_family

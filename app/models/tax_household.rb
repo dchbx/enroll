@@ -32,7 +32,7 @@ class TaxHousehold
   scope :tax_household_with_year, ->(year) { where( effective_starting_on: (Date.new(year)..Date.new(year).end_of_year)) }
   scope :active_tax_household, ->{ where(effective_ending_on: nil) }
 
-  # validate :validate_dates
+  validate :validate_dates
 
   def latest_eligibility_determination
     eligibility_determinations.sort {|a, b| a.determined_at <=> b.determined_at}.last

@@ -15,7 +15,7 @@ module BenefitMarkets
 
     def create
       # pundit can I do this here
-      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params[:benefit_market].merge(site_id: @site_id)
+      @benefit_market = BenefitMarkets::Forms::BenefitMarket.for_create params.merge(site_id: @site_id)
       if @benefit_market.save
         redirect_to site_benefit_markets_path(site_id: @site_id)
       else
@@ -50,7 +50,9 @@ module BenefitMarkets
     end
 
     def permit_params
-      self.params = params.permit!
+      self.params = params.require(:benefit_market).permit(:site_urn, :kind, :title, :description,
+                                                           :aca_individual_configuration => {},
+                                                           :aca_shop_configuration => {})
     end
 
     def market_params

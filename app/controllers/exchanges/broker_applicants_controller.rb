@@ -57,12 +57,12 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       flash[:notice] = "Broker applicant is now extended."
     elsif params['pending']
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.pending!
       flash[:notice] = "Broker applicant is now pending."
     else
       broker_carrier_appointments
-      broker_role.update(params.require(:person).require(:broker_role_attributes).permit!.except(:id))
+      broker_role.update(params.require(:person).require(:broker_role_attributes).permit(:training, :license, :carrier_appointments => {}).except(:id))
       broker_role.approve!
       broker_role.reload
 
@@ -96,8 +96,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each{ |key,_str| all_carrier_appointments[key] = "true" }
     else
       # Fix this
-      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit!
-      all_carrier_appointments.merge!(permitted_params) if permitted_params
+      permitted_params = params.require(:person).require(:broker_role_attributes).permit(:carrier_appointments => {}).to_h
+      all_carrier_appointments.merge!(permitted_params[:carrier_appointments]) if permitted_params[:carrier_appointments]
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments
     end
   end

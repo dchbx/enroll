@@ -9,7 +9,8 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
-  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
+  before_action :can_view_entire_family_enrollment_history?, only: [:display_all_hbx_enrollments]
+  before_action :transition_family_members_update_params, only: [:transition_family_members_update]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -228,7 +229,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if !params.permit![:file] || !params.permit![:subject]
+    if !params[:file] || !params[:subject]
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -246,7 +247,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -304,14 +305,13 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def transition_family_members_update
-    params_hash = params.permit!.to_h
-    @row_id = params_hash[:family_actions_id]
-    params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
+    @row_id = params[:family_actions_id]
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(@permitted_param_keys).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
-    @family = Family.find(params_hash[:family])
+    @family = Family.find(params[:family])
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|

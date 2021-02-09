@@ -104,12 +104,26 @@ module BenefitSponsors
 
       def registration_params
         current_user_id = current_user.present? ? current_user.id : nil
-        params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id})
-        params[:agency].permit!
+        agency_params = params.permit(agency: {})
+        agency_params[:agency].merge!({:profile_id => params["id"],:current_user_id => current_user_id})
       end
 
       def organization_params
-        params[:agency][:organization].permit!
+        org_params = params.require(:agency).require(:organization).permit(
+          :legal_name, :dba, :fein, :entity_kind, :sic_code,
+          :profile_attributes => {
+            :office_locations_attributes => [
+              {:address_attributes => [:kind, :address_1, :address_2, :city, :state, :zip, :county]},
+              {:phone_attributes => [:kind, :area_code, :number, :extension]},
+              {:email_attributes => [:kind, :address]},
+              :is_primary
+            ]
+          }
+        )
+
+        org_params[:profile_attributes][:office_locations_attributes].delete_if {|_key, value| value.blank?} if org_params[:profile_attributes][:office_locations_attributes].present?
+
+        org_params
       end
 
       def current_person
@@ -137,7 +151,8 @@ module BenefitSponsors
             super
           end
         when :new?
-          session[:portal] = url_for(params.permit!)
+          params_hash = params.permit(:profile_type, :controller, :action)
+          session[:portal] = url_for(params_hash)
           redirect_to self.send(:sign_up_url)
         else
           session[:custom_url] = main_app.new_user_registration_path unless current_user

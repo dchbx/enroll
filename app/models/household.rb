@@ -87,7 +87,12 @@ class Household
       primary_family_member = self.family_members.select{|p| primary_person == p.person}.first
       if tax_households.present?
         latest_tax_household = tax_households.where(effective_ending_on: nil).last
-        latest_tax_household&.update_attributes(effective_ending_on: verified_tax_household.start_date)
+        effective_ending_on = if latest_tax_household.present? && latest_tax_household.effective_starting_on > verified_tax_household.start_date
+                                latest_tax_household.effective_starting_on
+                              else
+                                verified_tax_household.start_date
+                              end
+        latest_tax_household&.update_attributes(effective_ending_on: effective_ending_on)
       end
       th = tax_households.build(
         allocated_aptc: verified_tax_household.allocated_aptcs.first.total_amount,
@@ -152,7 +157,12 @@ class Household
     return unless verified_tax_households.present? # && !verified_tax_households.map(&:eligibility_determinations).map(&:present?).include?(false)
     if latest_active_tax_households.present?
       latest_active_tax_households.each do |latest_tax_household|
-        latest_tax_household.update_attributes(effective_ending_on: verified_tax_households.first.start_date)
+        effective_ending_on = if latest_tax_household.effective_starting_on > verified_tax_households.first.start_date
+                                latest_tax_household.effective_starting_on
+                              else
+                                verified_tax_households.first.start_date
+                              end
+        latest_tax_household.update_attributes(effective_ending_on: effective_ending_on)
       end
     end
 

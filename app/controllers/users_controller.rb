@@ -11,7 +11,6 @@ class UsersController < ApplicationController
   end
 
   def confirm_lock
-    params.permit!
     authorize User, :lockable?
     @user_id  = params[:user_action_id]
   rescue Pundit::NotAuthorizedError
