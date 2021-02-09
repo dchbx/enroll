@@ -110,7 +110,8 @@ module Operations
 
       def prior_year_ivl_enrollment?(enrollment)
         return false if enrollment.special_enrollment_period.blank?
-        prior_bcp = HbxProfile.current_hbx.benefit_sponsorship.previous_benefit_coverage_period
+        prior_bcp = HbxProfile.current_hbx&.benefit_sponsorship&.previous_benefit_coverage_period
+        return false unless prior_bcp
         prior_bcp.contains?(enrollment.effective_on)
       end
     end
