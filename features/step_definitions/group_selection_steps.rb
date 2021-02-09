@@ -537,7 +537,7 @@ end
 
 When(/^\w+ clicks on the make changes to my coverage button/) do
   enable_change_tax_credit_button
-  page.all('a', text: 'Make changes to my coverage').first
+  page.all('a', text: 'Make changes to my coverage').first.click
   wait_for_ajax
 end
 
