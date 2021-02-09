@@ -34,6 +34,13 @@ FactoryBot.define do
         [FactoryBot.build(:benefit_coverage_period, :no_open_enrollment_coverage_period, coverage_year: coverage_year), FactoryBot.build(:benefit_coverage_period, :last_years_coverage_period, coverage_year: coverage_year)]
       end
     end
+
+    trait :normal_oe_period_with_past_coverage_periods do
+      benefit_coverage_periods do
+        [FactoryBot.build(:benefit_coverage_period, :last_years_no_open_enrollment_coverage_period, coverage_year: coverage_year), FactoryBot.build(:benefit_coverage_period, :no_open_enrollment_coverage_period, coverage_year: coverage_year),
+         FactoryBot.build(:benefit_coverage_period, :next_years_open_enrollment_coverage_period, coverage_year: coverage_year)]
+      end
+    end
   end
 end
 

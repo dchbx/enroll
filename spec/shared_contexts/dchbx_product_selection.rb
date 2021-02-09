@@ -594,3 +594,252 @@ RSpec.shared_context 'family with two members and one enrollment and one predece
                       applicant_id: family_member.id)
   end
 end
+
+RSpec.shared_context 'prior and current benefit coverage periods and products', :shared_context => :metadata do
+  let(:prior_coverage_year) { Date.today.year - 1}
+  let(:current_coverage_year) { Date.today.year }
+  let(:prior_hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :no_open_enrollment_coverage_period,
+                      coverage_year: prior_coverage_year)
+  end
+  let(:prior_benefit_coverage_period) do
+    prior_hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+      (bcp.start_on.year == prior_coverage_year)
+    end
+  end
+
+  let(:prior_benefit_package) { prior_benefit_coverage_period.benefit_packages.first }
+
+  let(:current_benefit_coverage_period) {prior_benefit_coverage_period.successor}
+  let(:current_benefit_package) { current_benefit_coverage_period.benefit_packages.first}
+
+  let(:prior_product) do
+    product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
+    product.update_attributes(application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31))
+    product
+  end
+
+  let(:current_product) do
+    r_product = BenefitMarkets::Products::Product.find(current_benefit_package.benefit_ids.first)
+    prior_product.renewal_product_id = r_product.id
+    prior_product.save!
+    prior_product.reload
+    r_product
+  end
+end
+
+RSpec.shared_context 'family has no current year coverage and not in open enrollment and purchased coverage in prior year via SEP', :shared_context => :metadata do
+  include_context 'prior and current benefit coverage periods and products'
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      product: prior_product)
+  end
+end
+
+RSpec.shared_context 'family has current year coverage and not in open enrollment and purchased coverage in prior year via SEP', :shared_context => :metadata do
+  include_context 'prior and current benefit coverage periods and products'
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+
+  let(:current_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(current_coverage_year, 11, 1),
+                      family: family,
+                      product: current_product)
+  end
+
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      product: prior_product)
+  end
+end
+
+RSpec.shared_context 'family has current year and prior year coverage and not in open enrollment and purchased new coverage in prior year via SEP', :shared_context => :metadata do
+  include_context 'prior and current benefit coverage periods and products'
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+
+  let(:current_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(current_coverage_year, 2, 1),
+                      family: family,
+                      product: current_product)
+  end
+
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      product: prior_product)
+  end
+
+
+  let(:prior_ivl_enrollment_2) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 2, 1),
+                      family: family,
+                      product: prior_product,
+                      aasm_state: 'coverage_expired')
+  end
+end
+
+RSpec.shared_context 'prior, current and next year benefit coverage periods and products', :shared_context => :metadata do
+  let(:prior_coverage_year) { Date.today.year - 1}
+  let(:current_coverage_year) { Date.today.year }
+  let(:renewal_coverage_year) { Date.today.next_year.year }
+
+  let(:hbx_profile) do
+    FactoryBot.create(:hbx_profile,
+                      :current_oe_period_with_past_coverage_periods,
+                      coverage_year: current_coverage_year)
+  end
+  let(:prior_benefit_coverage_period) do
+    hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect do |bcp|
+      (bcp.start_on.year == prior_coverage_year)
+    end
+  end
+
+  let(:prior_benefit_package) { prior_benefit_coverage_period.benefit_packages.first }
+
+  let(:current_benefit_coverage_period) {prior_benefit_coverage_period.successor}
+  let(:current_benefit_package) { current_benefit_coverage_period.benefit_packages.first}
+
+  let(:renewal_benefit_coverage_period) {current_benefit_coverage_period.successor}
+  let(:renewal_benefit_package) { renewal_benefit_coverage_period.benefit_packages.first}
+
+  let(:prior_product) do
+    product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
+    product.update_attributes(application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31))
+    product
+  end
+
+  let(:current_product) do
+    r_product = BenefitMarkets::Products::Product.find(current_benefit_package.benefit_ids.first)
+    prior_product.renewal_product_id = r_product.id
+    prior_product.save!
+    prior_product.reload
+    r_product
+  end
+
+  let(:renewal_product) do
+    r_product = BenefitMarkets::Products::Product.find(renewal_benefit_package.benefit_ids.first)
+    r_product.update_attributes(application_period: Date.new(renewal_coverage_year,1,1)..Date.new(renewal_coverage_year,12,31))
+    current_product.renewal_product_id = r_product.id
+    current_product.save!
+    current_product.reload
+    r_product
+  end
+end
+
+RSpec.shared_context 'family has prior, current and renewal year coverage and in open enrollment and purchased new coverage in prior year via SEP', :shared_context => :metadata do
+  include_context 'prior, current and next year benefit coverage periods and products'
+
+  let(:consumer_role) { FactoryBot.create(:consumer_role) }
+  let(:family) do
+    FactoryBot.create(:family,
+                      :with_primary_family_member,
+                      person: consumer_role.person)
+  end
+  let(:sep) {  FactoryBot.create(:special_enrollment_period, effective_on: Date.new(prior_coverage_year, 11, 1), family: family)}
+
+  let(:current_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(current_coverage_year, 2, 1),
+                      family: family,
+                      product: current_product)
+  end
+
+  let(:prior_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      special_enrollment_period_id: sep.id,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 11, 1),
+                      family: family,
+                      product: prior_product)
+  end
+
+
+  let(:prior_ivl_enrollment_2) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(prior_coverage_year, 2, 1),
+                      family: family,
+                      product: prior_product,
+                      aasm_state: 'coverage_expired')
+  end
+
+  let(:renewal_ivl_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      :individual_unassisted,
+                      :with_enrollment_members,
+                      enrollment_members: family.family_members,
+                      household: family.active_household,
+                      effective_on: Date.new(renewal_coverage_year, 1, 1),
+                      family: family,
+                      product: renewal_product)
+  end
+end
+
+

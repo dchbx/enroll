@@ -45,3 +45,9 @@ registry:
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+
+      - key: :prior_plan_year_sep
+        is_enabled: true
+        settings:
+          - key: :prior_plan_eligible_year
+            item: <%= TimeKeeper.date_of_record.prev_year.year %>
