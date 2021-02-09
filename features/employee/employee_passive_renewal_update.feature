@@ -47,7 +47,9 @@ Feature: Passive renewal should be updated when EE updates his current coverage
     And employee Patrick Doe already matched with employer ABC Widgets and logged into employee portal
     And Patrick Doe has active coverage and passive renewal
     Then Patrick Doe should see active and renewing enrollments
-    When Patrick Doe selects make changes on active enrollment
+    When Employee should be able to see Actions dropdown
+    Then Employee clicks on the Actions button
+    When Employee clicks on the make changes to my coverage button
     Then Patrick Doe should see page with SelectPlanToTerminate button
     When Patrick Doe clicks SelectPlanToTerminate button
     Then Patrick Doe selects active enrollment for termination
