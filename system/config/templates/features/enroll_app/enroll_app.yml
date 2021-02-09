@@ -82,3 +82,8 @@ registry:
       - key: :age_off_relaxed_eligibility
         item: Operations::AgeOffRelaxedEligibility.new
         is_enabled: true
+      - key: :prior_plan_year_sep
+        is_enabled: true
+        settings:
+          - key: :prior_plan_eligible_year
+            item: <%= TimeKeeper.date_of_record.prev_year.year %>

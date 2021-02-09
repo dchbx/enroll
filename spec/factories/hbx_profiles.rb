@@ -28,5 +28,9 @@ FactoryBot.define do
     trait :last_years_coverage_period do
       benefit_sponsorship { FactoryBot.build(:benefit_sponsorship, :last_years_coverage_period, coverage_year: coverage_year) }
     end
+
+    trait :current_oe_period_with_past_coverage_periods do
+      benefit_sponsorship { FactoryBot.build(:benefit_sponsorship, :normal_oe_period_with_past_coverage_periods, coverage_year: coverage_year) }
+    end
   end
 end

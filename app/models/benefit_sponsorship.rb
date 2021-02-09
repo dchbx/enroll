@@ -31,6 +31,10 @@ class BenefitSponsorship
     benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record + 1.year) }
   end
 
+  def previous_benefit_coverage_period
+    benefit_coverage_periods.detect { |bcp| bcp.contains?(TimeKeeper.date_of_record - 1.year) }
+  end
+
   def earliest_effective_date
     current_benefit_period.earliest_effective_date if current_benefit_period
   end
