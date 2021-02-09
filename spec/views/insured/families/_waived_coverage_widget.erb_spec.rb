@@ -63,7 +63,7 @@ RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
     end
 
     it "should display make changes button" do
-      expect(rendered).to have_link('Make Changes')
+      expect(rendered).to have_text("Actions")
     end
   end
 
@@ -73,7 +73,7 @@ RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
     end
 
     it "should not display make changes button" do
-      expect(rendered).not_to have_link('Make Changes')
+      expect(rendered).not_to have_text("Actions")
     end
   end
 end
