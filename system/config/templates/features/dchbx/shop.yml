@@ -122,7 +122,13 @@ registry:
           is_visible: true
         settings:
           - key: :product_packages
-            item: 'dchbx.enroll_app.aca_shop_market.health_product_packages'
+            item:
+              operation: ResourceRegistry::Operations::Namespaces::ListFeatures.new
+              params:
+                namespace: "dchbx.enroll_app.aca_shop_market.health_product_packages"
+                registry: EnrollRegistry
+                order: :calender_year
+            # item: 'dchbx.enroll_app.aca_shop_market.health_product_packages'
             meta:
               label: Product Packages
               content_type: :feature_group
@@ -166,6 +172,8 @@ registry:
           is_required: true
           is_visible: true
         settings:
+          - key: :calender_year
+            item: 2021
           - key: :contribution_models
             item:
               operation: ResourceRegistry::Operations::Namespaces::ListFeatures.new
@@ -197,6 +205,8 @@ registry:
           is_required: true
           is_visible: true
         settings:
+          - key: :calender_year
+            item: 2020
           - key: :contribution_models
             item:
               operation: ResourceRegistry::Operations::Namespaces::ListFeatures.new
