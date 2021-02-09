@@ -34,6 +34,7 @@ Feature: User should be able to pay for plan
     And tries to purchase with a break in coverage
     Then I click on purchase confirm button for matched person
     And I should click on pay now button
+    Then I should be able to view DC Health LINK text
 
     Examples:
       | role          |
