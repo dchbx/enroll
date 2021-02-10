@@ -30,7 +30,7 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
   let(:benefit_group_assignment) { census_employee.active_benefit_group_assignment }
   let(:member_enrollment) {BenefitSponsors::Enrollments::MemberEnrollment.new(member_id:hbx_enrollment_member.id, product_price:BigDecimal(100),sponsor_contribution:BigDecimal(100))}
   let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
-  let(:address){ Address.new(kind: 'home', address_1: "1111 spalding ct", address_2: "apt 444", city: "atlanta", state: "ga", zip: "30338") }
+  let(:address){ Address.new(kind: 'home', address_1: "1111 spalding ct", address_2: "apt 444", city: "atlanta", state: "KY", zip: "30338") }
   let(:hbx_enrollment_member){ FactoryBot.build(:hbx_enrollment_member, is_subscriber:true,  applicant_id: family.family_members.first.id, coverage_start_on: (TimeKeeper.date_of_record).beginning_of_month, eligibility_date: (TimeKeeper.date_of_record).beginning_of_month) }
   let(:hbx_enrollment){ FactoryBot.create(:hbx_enrollment, :with_product, sponsored_benefit_package_id: benefit_group_assignment.benefit_group.id,
     household: household,
