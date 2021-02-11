@@ -27,6 +27,10 @@ class IvlHomepage
     '.interaction-click-control-view-details'
   end
 
+  def self.aptc_amount_text
+    'APTC amount'
+  end
+
   def self.shop_for_plans
     '.interaction-click-control-shop-for-plans'
   end

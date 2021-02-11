@@ -7,6 +7,10 @@ class IvlEnrollmentSubmitted
     'span.btn-default'
   end
 
+  def self.enrollment_submitted_text
+    'Enrollment Submitted'
+  end
+
   def self.print_btn
     '#btnPrint'
   end

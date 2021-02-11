@@ -4,6 +4,10 @@
 #insured/interactive_identity_verifications/failed_validation?step=questions&verification_transaction_id
 class IvlVerifyIdentity
 
+  def self.verify_identity_text
+    'Verify Identity'
+  end
+
   def self.pick_answer_a
     'label[for="interactive_verification_questions_attributes_0_response_id_a"] span'
   end

@@ -3,6 +3,10 @@
 #insured/group_selections/new?change_plan=&consumer_role_id&person_id
 class IvlChooseCoverage
 
+  def self.choose_coverage_for_your_household_text
+    'Choose Coverage for your Household'
+  end
+  
   def self.primary_checkbox
     '#family_member_ids_0'
   end
