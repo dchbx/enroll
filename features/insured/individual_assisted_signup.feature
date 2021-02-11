@@ -17,7 +17,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     When the individual is on the Help Paying for Coverage page
     And the individual does not apply for assistance and clicks continue
     And the individual clicks on the Continue button of the Household Info page
-    And the individual enters a SEP
+    # And the individual enters a SEP
     And taxhousehold info is prepared for aptc user
     When the individual clicks on the Continue button of the Group Selection page
     And the individual is in the Plan Selection page
@@ -44,7 +44,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     When taxhousehold info is prepared for aptc user with selected eligibility
     And the individual does not apply for assistance and clicks continue
     And the individual clicks on the Continue button of the Household Info page
-    And the individual enters a SEP
+    # And the individual enters a SEP
     And the individual clicks on the Continue button of the Group Selection page
     When the individual sets APTC amount
     And the individual selects a non silver plan on Plan Shopping page
