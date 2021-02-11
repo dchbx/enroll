@@ -6,7 +6,7 @@ class IvlAuthorizationAndConsent
   def self.authorization_and_consent_text
     'Authorization and Consent'
   end
-  
+
   def self.i_agree_radiobtn
     'label[for="agreement_agree"] span'
   end

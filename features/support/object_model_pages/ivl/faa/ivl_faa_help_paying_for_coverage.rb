@@ -6,7 +6,7 @@ class IvlFaaHelpPayingForCoverage
   def self.yes_radiobtn
     'label[for="radio1"] span'
   end
-      
+
   def self.no_radiobtn
     'label[for="radio2"] span'
   end
@@ -19,4 +19,3 @@ class IvlFaaHelpPayingForCoverage
     'Help Paying for Coverage'
   end
 end
-  

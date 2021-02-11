@@ -626,8 +626,8 @@ end
 
 When(/^(\w+) signs in$/) do |person|
   click_link 'Sign In'
-  fill_in 'user[login]', with: (@u.find 'email' + person)
-  find('#user_email').set(@u.find('email' + person))
+  fill_in 'user[login]', with: "email#{person}"
+  find('#user_email').set "email#{person}"
   fill_in 'user[password]', with: "aA1!aA1!aA1!"
   click_button 'Sign in'
 end
