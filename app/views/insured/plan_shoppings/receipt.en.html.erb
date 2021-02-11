@@ -53,14 +53,6 @@
         <% end %>
         <%= render partial: "insured/plan_shoppings/pay_now", locals: { source: "Plan Shopping", hbx_enrollment: @enrollment }%>
         <%= link_to 'Print', '#', id: 'btnPrint', class: "btn btn-default interaction-click-control-print-purchase-confirmation" %>
-
-        <% if show_pay_now?("Plan Shopping", @enrollment) %>
-          <br/>
-          <br/>
-          <strong>You only have the option to PAY NOW while you’re on this page. If you leave this page without selecting PAY NOW,
-            you’ll have to wait until Kaiser Permanente sends you an invoice to make your first
-            month’s payment and activate your coverage.</strong>
-        <% end %>
       </div>
 
       <div id="how_to_pay" class="modal fade" role="dialog" style="display: none;" <% if @enrollment.employee_role.present? %>data-employee-role="true"<% else %>data-employee-role="false"<% end %>>
