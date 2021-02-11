@@ -5,7 +5,7 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 # Census Employee termination Code
 class BulkCensusEmployeesTermination < MongoidMigrationTask
   def migrate
-    files = Dir.glob(File.join(Rails.root, "bulk_terminate", "*.csv"))
+    files = Dir.glob(File.join(Rails.root, "bulk_terminate", "*.xlsx"))
     files.each do |file_path|
       result = Roo::Spreadsheet.open(file_path)
       sheets = result.sheets
