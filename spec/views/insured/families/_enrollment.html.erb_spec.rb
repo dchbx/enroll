@@ -15,7 +15,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     instance_double(CensusEmployee)
   end
 
-  let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "carefirst") }
+  let(:carrier_profile) { instance_double(BenefitSponsors::Organizations::IssuerProfile, legal_name: "CareFirst") }
 
   let(:employer_profile) do
     instance_double(
@@ -96,6 +96,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "when kind is employer_sponsored" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
@@ -108,6 +109,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
 
     it "when kind is employer_sponsored_cobra" do
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored_cobra')
+      allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(true)
@@ -116,18 +118,26 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     end
 
     if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
-      it "when kind is individual" do
-        allow(hbx_enrollment).to receive(:kind).and_return('individual')
-        allow(hbx_enrollment).to receive(:is_ivl_by_kind?)
-        allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
-        allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
-        allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
-        allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
-        allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
-        render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
-        expect(rendered).to have_content('Individual & Family')
-        expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
-        expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+      context "when kind is individual" do
+
+        before :each do
+          allow(hbx_enrollment).to receive(:kind).and_return('individual')
+          allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(true)
+          allow(hbx_enrollment).to receive(:is_enrolled_by_aasm_state?)
+          allow(hbx_enrollment).to receive(:is_shop?).and_return(false)
+          allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
+          allow(hbx_enrollment).to receive(:applied_aptc_amount).and_return(100.0)
+          allow(hbx_enrollment).to receive(:is_any_enrollment_member_outstanding).and_return false
+          render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
+        end
+
+        it "should have all expected renders" do
+          expect(rendered).to have_content('Individual & Family')
+          expect(rendered).to have_selector('strong', text: HbxProfile::ShortName.to_s)
+          expect(rendered).to have_content(/#{hbx_enrollment.hbx_id}/)
+          expect(rendered).to have_link "Make a first Payment for a new plan"
+        end
+
       end
     end
   end
@@ -205,6 +215,7 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
     before :each do
       allow(hbx_enrollment).to receive(:is_reinstated_enrollment?).and_return(false)
       allow(hbx_enrollment).to receive(:kind).and_return('employer_sponsored')
+      allow(hbx_enrollment).to receive(:is_ivl_by_kind?).and_return(false)
       allow(hbx_enrollment).to receive(:is_shop?).and_return(true)
       allow(hbx_enrollment).to receive(:can_make_changes?).and_return(true)
       allow(hbx_enrollment).to receive(:is_cobra_status?).and_return(false)
