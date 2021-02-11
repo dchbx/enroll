@@ -220,10 +220,10 @@
 
               <% if past_effective_on?(hbx_enrollment) && can_pay_now?(hbx_enrollment) %>
                 <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-                <%= link_to "Make a first Payment for a new plan", 'https://www.bestlife.com/exchange/payment_option.html', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "BEST Life" %>
-                <%= link_to "Make a first Payment for a new plan", 'https://member.carefirst.com/members/home.page', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "CareFirst" %>
-                <%= link_to "Make a first Payment for a new plan", 'https://www1.deltadentalins.com/login.html', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "Delta Dental" %>
-                <%= link_to "Make a first Payment for a new plan", 'https://www.dominionmembers.com/', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "Dominion" %>
+                <%= link_to l10n("insured.families.make_a_first_payment"), 'https://www.bestlife.com/exchange/payment_option.html', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "BEST Life" %>
+                <%= link_to l10n("insured.families.make_a_first_payment"), 'https://member.carefirst.com/members/home.page', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "CareFirst" %>
+                <%= link_to l10n("insured.families.make_a_first_payment"), 'https://www1.deltadentalins.com/login.html', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "Delta Dental" %>
+                <%= link_to l10n("insured.families.make_a_first_payment"), 'https://www.dominionmembers.com/', class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank' if product&.issuer_profile.legal_name == "Dominion" %>
                 <% if product&.issuer_profile.legal_name ==  EnrollRegistry[:pay_now_functionality].setting(:carriers).item %>
                   <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("plans.kaiser.pay_now.first_payment")%></button>
                 <% end %>
