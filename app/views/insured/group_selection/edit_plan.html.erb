@@ -28,11 +28,11 @@
           <div class="panel-body">
             <div class="row">
               <div class="col-xs-8">
-                <div><%=h product[:display_carrier_logo] %></div>
+                <div><%= raw product[:display_carrier_logo] %></div>
                 <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
                 </h4>
                 <div>
-                  <p><%=h render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
+                  <p><%= raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
                 </div>
                 <div>
                   <p>

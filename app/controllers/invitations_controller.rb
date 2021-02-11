@@ -42,7 +42,7 @@ class InvitationsController < ApplicationController
   end
 
   def require_login_and_allow_new_account
-    params_hash = params.permit!.to_h
+    params_hash = params.permit(:id, :person_id).to_h
     person = Person.find(params_hash[:person_id]) if params_hash[:person_id]
     if person&.user
       invitation = Invitation.find(params_hash[:id])

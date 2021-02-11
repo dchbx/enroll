@@ -14,7 +14,6 @@ module VlpDoc
   end
 
   def validate_vlp_params(params, source, consumer_role, dependent)
-    params.permit!
     if params[source][:naturalized_citizen] == "true" || params[source][:eligible_immigration_status] == "true"
       if params[source][:consumer_role].present? && params[source][:consumer_role][:vlp_documents_attributes].present?
         vlp_doc_params = params.require(source).permit(vlp_doc_params_list).dig(:consumer_role, :vlp_documents_attributes, "0").delete_if {|_k, v| v.blank? }.to_h
@@ -85,15 +84,19 @@ module VlpDoc
 
   def sensitive_info_changed?(role)
     return unless role
-    params_hash = params.permit!.to_h
-    info_changed = role.sensitive_information_changed?(params_hash[:person] || params_hash[:dependent])
+    info_changed_params = if params[:person]
+                            params.permit(:person => {})[:person].to_h
+                          else
+                            params.permit(:dependent => {})[:dependent].to_h
+                          end
+    info_changed = role.sensitive_information_changed?(info_changed_params)
     dc_status = (role.person.is_homeless || role.person.is_temporarily_out_of_state)
     [info_changed, dc_status]
   end
 
   def native_status_changed?(role)
     return unless role
-    params_hash = params.permit!.to_h
+    params_hash = params.permit("tribal_id").to_h
     role.person.send("tribal_id") != params_hash["tribal_id"]
   end
 end

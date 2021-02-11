@@ -5,7 +5,7 @@
   <div class='container'>
     <h1> Families </h1>
     <%#= link_to 'Switch to APTC / CSR Families', aptc_csr_family_index_exchanges_hbx_profiles_path, remote: true%>
-    <%= h render_datatable(@datatable) %>
+    <%= raw render_datatable(@datatable) %>
   </div>
 
   <div class="container">

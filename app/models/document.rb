@@ -12,6 +12,7 @@ class Document
   RESOURCE_LIST = %w[BenefitSponsors::Organizations::AcaShopDcEmployerProfile
                      BenefitSponsors::Organizations::FehbEmployerProfile
                      BenefitSponsors::Organizations::AcaShopCcaEmployerProfile
+                     BenefitSponsors::Organizations::GeneralAgencyProfile
                      EmployeeRole Person ConsumerRole].freeze
 
   after_save :notify_on_save

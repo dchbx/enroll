@@ -448,10 +448,21 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         it_behaves_like "IVL state machine transitions and workflow", "111111111", "lawful_permanent_resident", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
         it_behaves_like "IVL state machine transitions and workflow", "111111111", "alien_lawfully_present", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
         it_behaves_like "IVL state machine transitions and workflow", "111111111", "naturalized_citizen", true, "valid", :ssa_pending, :verification_outstanding, "ssn_invalid!"
+
+        context 'fails ssn when verification type is already in review' do
+          before do
+            verification_types.by_name("Social Security Number").first.update_attributes(validation_status: 'review')
+            consumer.aasm_state = "ssa_pending"
+            consumer.ssn_invalid! verification_attr
+          end
+          it 'should remain in review' do
+            expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("review")
+          end
+        end
+
         it "fails ssn with callback" do
           consumer.aasm_state = "ssa_pending"
           consumer.ssn_invalid! verification_attr
-          expect(verification_types.by_name("Social Security Number").first.validation_status).to eq("outstanding")
         end
         it "fails lawful presence with callback" do
           consumer.aasm_state = "ssa_pending"
@@ -534,6 +545,17 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
           consumer.fail_dhs! verification_attr
           expect(consumer.lawful_presence_determination.aasm_state).to eq("verification_outstanding")
         end
+
+        context 'fails dhs when verification type is already in review' do
+          before do
+            verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| type.update_attributes(validation_status: 'review') }
+            consumer.aasm_state = "dhs_pending"
+            consumer.fail_dhs! verification_attr
+          end
+          it 'should remain in review' do
+            expect(verification_types.reject{|type| VerificationType::NON_CITIZEN_IMMIGRATION_TYPES.include? type.type_name }.each{ |type| ['review'].include?(type.validation_status) }).to be_truthy
+          end
+        end
       end
 
       context "pass_dhs" do
@@ -594,6 +616,17 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
             consumer.is_state_resident = true
             consumer.fail_residency! verification_attr
             expect(consumer.is_state_resident).to be false
+          end
+
+          context 'fails residency when verification type is already in review' do
+            before do
+              verification_types.by_name("DC Residency").first.update_attributes(validation_status: 'review')
+              consumer.is_state_resident = true
+              consumer.fail_residency! verification_attr
+            end
+            it 'should remain in review' do
+              expect(verification_types.by_name("DC Residency").first.validation_status).to eq 'review'
+            end
           end
         end
       end

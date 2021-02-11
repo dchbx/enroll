@@ -6,7 +6,7 @@ class GroupSelectionPrevaricationAdapter
                 :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans
 
   def self.initialize_for_common_vars(params)
-    person_id = params.require(:person_id)
+    person_id = params[:person_id]
     person = Person.find(person_id)
     family = person.primary_family
     coverage_household = family.active_household.immediate_family_coverage_household
@@ -39,7 +39,7 @@ class GroupSelectionPrevaricationAdapter
 
   def check_shopping_roles(params)
     if params[:employee_role_id].present?
-      emp_role_id = params.require(:employee_role_id)
+      emp_role_id = params[:employee_role_id]
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     elsif params[:resident_role_id].present?
       @resident_role = @person.resident_role
@@ -344,6 +344,16 @@ class GroupSelectionPrevaricationAdapter
 
   def can_shop_both_markets?(person)
     can_shop_individual?(person) && can_shop_shop?(person)
+  end
+
+  def no_employer_benefits_error_message(hbx_enrollment)
+    if hbx_enrollment.sponsored_benefit_package.benefit_application.terminated?
+      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer."
+    elsif hbx_enrollment.sponsored_benefit_package.benefit_application.termination_pending?
+      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer or call our Customer Care Center at #{Settings.contact_center.phone_number}."
+    else
+      "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}"
+    end
   end
 
   def is_eligible_for_dental?(employee_role, change_plan, enrollment, effective_date)

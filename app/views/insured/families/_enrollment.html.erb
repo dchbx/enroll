@@ -12,7 +12,7 @@
 <div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
-      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> Coverage
+      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> <%= l10n('coverage').titleize %>
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
