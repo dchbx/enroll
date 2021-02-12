@@ -3,26 +3,26 @@ Feature: Consumer verification process
   Scenario: Outstanding verification
     Given Individual has not signed up as an HBX user
     Given the FAA feature configuration is enabled
-    * Individual visits the Insured portal during open enrollment
+    * the user visits the Consumer portal during open enrollment
     * Individual creates HBX account
     * I should see a successful sign up message
-    * user should see your information page
-    * user goes to register as an individual
-    * user clicks on continue button
+    * the user sees Your Information page
+    * the user registers as an individual
+    * the individual clicks on the Continue button
     * user should see heading labeled personal information
     * Individual should click on Individual market for plan shopping
-    * Individual should see a form to enter personal information
+    * the individual sees form to enter personal information
     * Individual click continue button
     * Individual agrees to the privacy agreeement
-    * Individual should see identity verification page and clicks on submit
-    * Individual should be on the Help Paying for Coverage page
+    * the individual answers the questions of the Identity Verification page and clicks on submit
+    * the individual is on the Help Paying for Coverage page
     * Individual does not apply for assistance and clicks continue
     * Individual should see the dependents form
-    * I click on continue button on household info form
+    * the individual clicks on the Continue button of the Household Info page
     * I click on continue button on group selection page
     * I select a plan on plan shopping page
     * I click on purchase button on confirmation page
-    * I click on continue button to go to the individual home page
+    * the individual clicks on the Continue button to go to the Individual home page
     * I should see Documents link
     * I click on verification link
     * I should see page for documents verification
