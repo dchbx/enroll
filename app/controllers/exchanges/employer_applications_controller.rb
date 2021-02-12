@@ -24,10 +24,10 @@ module Exchanges
       transmit_to_carrier = params['transmit_to_carrier'] == "true" || params['transmit_to_carrier'] == true ? true : false
       @service = BenefitSponsors::Services::BenefitApplicationActionService.new(@application, { end_on: end_on, termination_kind: termination_kind, termination_reason: termination_reason, transmit_to_carrier: transmit_to_carrier })
       result, _application, errors = @service.terminate_application
-      if result
-        flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application terminated successfully."
-      else
+      if errors.present?
         flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be terminated: #{errors.values.to_sentence}"
+      else
+        flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application terminated successfully."
       end
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
@@ -37,10 +37,10 @@ module Exchanges
       transmit_to_carrier = params['transmit_to_carrier'] == "true" || params['transmit_to_carrier'] == true ? true : false
       @service = BenefitSponsors::Services::BenefitApplicationActionService.new(@application, { transmit_to_carrier: transmit_to_carrier })
       result, _application, errors = @service.cancel_application
-      if result
-        flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application canceled successfully."
-      else
+      if errors.present?
         flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|memo, error| '#{memo}<li>#{error}</li>'}.html_safe}"
+      else
+        flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application canceled successfully."
       end
       render :js => "window.location = #{exchanges_hbx_profiles_root_path.to_json}"
     end
