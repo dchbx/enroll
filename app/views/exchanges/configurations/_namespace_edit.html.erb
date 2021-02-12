@@ -1,0 +1,14 @@
+<%= namespace_panel(@namespace, EnrollRegistry, {horizontal: true}) if @namespace.features.present? %>
+
+<style>
+	label {
+		font-weight: normal;
+		-webkit-font-smoothing: auto;
+	}
+	.card-body {
+		padding: 1.25rem;
+	}
+	.form-group{
+		margin-bottom: 1rem;
+	}
+</style>

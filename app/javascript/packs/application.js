@@ -3,6 +3,7 @@ import Turbolinks from 'turbolinks';
 import { Application } from "stimulus";
 import { definitionsFromContext } from "stimulus/webpack-helpers";
 import 'bootstrap';
+import 'jquery';
 import 'jquery-ui';
 import '../css/application.scss';
 import '@fortawesome/fontawesome-free';

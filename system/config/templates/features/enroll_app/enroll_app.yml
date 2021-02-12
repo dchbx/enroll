@@ -1,24 +1,36 @@
 ---
 registry:
   - namespace:
-      - :features
+      path:
+        - :features
     features:
       - key: :enroll_app
         is_enabled: true
-        meta:
-          label: Enroll Application
-          content_type: :boolean
-          default: true
-          description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
-          is_required: true
-          is_visible: true
         settings:
           - key: :application_name
             item: "enroll_dc"
+            meta:
+              label: Application Name
+              content_type: :text_field
+              description: Enter application name
+              is_required: false
+              is_visible: true
           - key: :copyright_period_start
             item: "2013"
+            meta:
+              label: Copyright Period Start
+              content_type: :text_field
+              description: Enter copyright period start calender year
+              is_required: false
+              is_visible: true
           - key: :policies_url
             item: "https://dchealthlink.com/"
+            meta:
+              label: Policies Url
+              content_type: :text_field
+              description: Enter healthlink policies link
+              is_required: false
+              is_visible: true
           - key: :faqs_url
             item: "https://dchealthlink.com/help"
           - key: :help_url
@@ -38,10 +50,45 @@ registry:
       - key: :send_secure_message_family
         item: :send_secure_message
         is_enabled: true
-
       - key: :sep_carousel_message
         item: :sep_carousel
         is_enabled: true
         settings:
           - key: :effective_period
             item: <%= Date.new(2020,9,18)..Date.new(2021,3,31) %>
+      - key: :health_products
+        is_enabled: true
+        meta:
+          label: Health Products
+          content_type: :legend
+          default: true
+          description: Health Products
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :faqs_url
+            item: "https://dchealthlink.com/help"
+            meta:
+              label: FAQ's Url
+              content_type: :text_field
+              description: Enter Frequently Asked Questions link
+              is_required: false
+              is_visible: true
+      - key: :dental_products
+        is_enabled: true
+        meta:
+          label: Dental Products
+          content_type: :legend
+          default: true
+          description: Dental Products
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"
+            meta:
+              label: Help Url
+              content_type: :text_field
+              description: Enter Help link
+              is_required: false
+              is_visible: true

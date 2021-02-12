@@ -65,6 +65,11 @@ module BenefitMarkets
       BenefitSponsorCatalogFactory.call(effective_date, self, service_areas)
     end
 
+    def self.by_kind_and_application_date(kind, date)
+      date = Date.parse(date) if date.is_a?(String)
+      by_application_date(date).detect{|catalog| catalog.kind == kind.to_sym}
+    end
+
     # Remove this and delegate properly once Products are implemented
     def product_market_kind
       bmk = benefit_market.kind.to_s
@@ -96,6 +101,12 @@ module BenefitMarkets
 
     def application_period_cover?(compare_date)
       application_period.cover?(compare_date)
+    end
+
+    def status
+      return :active if application_period.cover?(TimeKeeper.date_of_record)
+      return :expired if application_period.max < TimeKeeper.date_of_record
+      :draft
     end
 
     def effective_period_on(effective_date)

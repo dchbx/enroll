@@ -111,6 +111,19 @@ Rails.application.routes.draw do
       resources :products, only: [:index]
     end
 
+    resources :configurations do
+      member do
+        get :namespace_edit
+        post :renew_feature
+        post :update_feature
+        patch :toggle_feature
+      end
+
+      collection do
+        post :update_namespace
+      end
+    end
+
     resources :hbx_profiles do
       root 'hbx_profiles#show'
 
@@ -133,6 +146,7 @@ Rails.application.routes.draw do
         get :broker_agency_index
         get :general_agency_index
         get :configuration
+        get :settings
         post :set_date
         post :update_setting
         get :staff_index

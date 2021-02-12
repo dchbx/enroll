@@ -47,6 +47,7 @@ class Permission
   field :manage_agency_staff, type: Boolean, default: false
   field :can_send_secure_message, type: Boolean, default: false
   field :can_manage_qles, type: Boolean, default: false
+  field :can_manage_settings, type: Boolean, default: false
 
   class << self
     def hbx_staff

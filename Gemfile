@@ -37,8 +37,7 @@ gem "benefit_sponsors",   path: "components/benefit_sponsors"
 gem 'financial_assistance', path: 'components/financial_assistance'
 gem "notifier",           path: "components/notifier"
 gem 'openhbx_cv2',        git:  'https://github.com/dchbx/openhbx_cv2.git', branch: 'master'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'master'
-# gem 'resource_registry',  git: '../resource_registry'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'branch_0.9.0'
 
 gem "sponsored_benefits", path: "components/sponsored_benefits"
 gem "transport_gateway",  path: "components/transport_gateway"
@@ -63,6 +62,7 @@ gem 'aasm',                     '~> 4.8'
 gem 'addressable',              '~> 2.3'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
+gem 'rgl',                      '~> 0.5.6'
 
 gem 'aws-sdk',                  '~> 2.2.4'
 gem 'bcrypt',                   '~> 3.1'
@@ -92,7 +92,7 @@ gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
 gem 'money-rails',              '~> 1.13'
 gem 'net-ssh',                  '= 4.2.0'
-gem 'nokogiri',                 '~> 1.10.8'
+gem 'nokogiri',                 '~> 1.11.1'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'

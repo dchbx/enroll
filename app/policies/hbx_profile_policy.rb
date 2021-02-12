@@ -84,6 +84,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_send_secure_message
   end
 
+  def can_manage_settings?
+    role = user_hbx_staff_role
+    return false unless (role || role.permission.name == "super_admin")
+    role.permission.can_manage_settings
+  end
+
   def show?
     @user.has_role?(:hbx_staff) ||
       @user.has_role?(:csr) ||

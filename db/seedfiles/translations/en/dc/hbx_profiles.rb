@@ -31,5 +31,6 @@ HBX_PROFILES_TRANSLATIONS = {
 	"en.hbx_profiles.cancel" => "Cancel",
 	"en.hbx_profiles.publish_application" => "Publish Application",
 	"en.hbx_profiles.force_publish_success" => "Force Publish Successful",
-	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review"
+	"en.hbx_profiles.force_published_application_review" => "Force Published Application Under Review",
+	"en.controller.hbx_profiles.settings_access_not_authorized" => "You're not authorized to access application settings"
 }
