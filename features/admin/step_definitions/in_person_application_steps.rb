@@ -20,3 +20,7 @@ When(/^the Admin clicks CONTINUE after uploading and verifying an Identity$/) do
   expect(page).to have_content('Identity successfully verified.')
   find('.button', text: 'CONTINUE').click
 end
+
+Then(/^the Admin should be on the Help Paying for Coverage page$/) do
+  expect(page).to have_content IvlFaaHelpPayingForCoverage.help_paying_coverage_text
+end
