@@ -28,26 +28,43 @@
                     jQuery('#cancel_message').show();
                     jQuery('#termination_message').hide();
                     jQuery('#no_termination_message').show();
-                    jQuery("a.modal_confirm").show();
+                    jQuery(".btn-confirmation").show();
                 }
                 else if(new_term_date !== enrollment_effective && output ){
                   jQuery('#cancel_message').hide();
                   jQuery('#termination_message').hide();
                   jQuery('#no_termination_message').show();
-                  jQuery("a.modal_confirm").hide();
+                  jQuery(".btn-confirmation").hide();
                 }
                 else{
                     jQuery('#cancel_message').hide();
                     jQuery('#termination_message').show();
                     jQuery('#no_termination_message').hide();
-                    jQuery("a.modal_confirm").show();
+                    jQuery(".btn-confirmation").show();
                 }
             }
         });
-    } 
-    jQuery("a.modal_confirm").click(function() {
-        jQuery("#termiante_with_earlier_date-form").submit();
-    });
+    }
+
+    function confirmUpdateEndDate(event){
+      $(".btn-confirmation").attr('disabled', 'disabled');
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      var formData = new FormData($('#termiante_with_earlier_date-form')[0]);
+
+      $.ajax({
+        url: '/exchanges/hbx_profiles/update_enrollment_termianted_on_date.js',
+        type: "POST",
+        data : formData,
+        contentType: false,
+        processData: false,
+      });
+    }
 </script>
 
 <td colspan="90%">
@@ -134,7 +151,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default btn-default" data-dismiss="modal">Close</button>
-          <%= link_to "Confirm",  '', class: 'btn btn-primary mtz modal_confirm' %>
+          <button type="button" class="btn btn-primary btn-confirmation" onclick='confirmUpdateEndDate(event); return false;'>Confirm</button>
         </div>
       </div>
     </div>

@@ -952,6 +952,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "POST reinstate_enrollment", :dbclean => :around_each do
+    render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -973,7 +974,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
     it "should redirect to root path" do
       post :reinstate_enrollment, params: {enrollment_id: enrollment.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
-      expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+      expect(response).to render_template("reinstate_enrollment")
+      expect(response.body).to have_content(/Enrollment Reinstated successfully/i)
     end
   end
 
@@ -1251,6 +1253,7 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
   end
 
   describe "POST update_enrollment_termianted_on_date", :dbclean => :around_each do
+    render_views
     let(:user) { FactoryBot.create(:user, roles: ["hbx_staff"]) }
     let!(:person) { FactoryBot.create(:person)}
     let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person)}
@@ -1276,10 +1279,12 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
 
     context "shop enrollment" do
       context "with valid params" do
+
         it "should render template " do
           post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
         context "enrollment that already terminated with past date" do
@@ -1326,7 +1331,8 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
         it "should render template " do
           post :update_enrollment_termianted_on_date, params: {enrollment_id: enrollment.id.to_s, family_actions_id: family.id, new_termination_date: TimeKeeper.date_of_record.to_s}, format: :js, xhr: true
           expect(response).to have_http_status(:success)
-          expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
+          expect(response).to render_template("update_enrollment_termianted_on_date")
+          expect(response.body).to have_content(/Enrollment Updated Successfully/i)
         end
 
         context "enrollment that already terminated with past date" do
@@ -1360,7 +1366,6 @@ RSpec.describe Exchanges::HbxProfilesController, dbclean: :around_each do
       it "should redirect to root path" do
         post :update_enrollment_termianted_on_date, params: {enrollment_id: '', family_actions_id: '', new_termination_date: ''}, format: :js, xhr: true
         expect(response).to have_http_status(:success)
-        expect(response).to redirect_to(exchanges_hbx_profiles_root_path)
       end
     end
 
