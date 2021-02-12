@@ -254,6 +254,14 @@ class Insured::PlanShoppingsController < ApplicationController
     @products = @member_groups.map(&:group_enrollment).map(&:product)
     extract_from_shop_products
 
+    if @hbx_enrollment.is_shop?
+      Rails.logger.info("In Plan Shoppings controller
+                         hbx_enrollment=#{@hbx_enrollment.inspect}
+                         rate_schedule_date=#{@hbx_enrollment.sponsored_benefit.rate_schedule_date}
+                         member_group=#{@member_groups.first.inspect}
+                         products=#{@products.map(&:active_year).uniq} *************************************")
+    end
+
     if plan_match_dc
       is_congress_employee = @hbx_enrollment.fehb_profile ? true : false
       @dc_checkbook_url = ::Services::CheckbookServices::PlanComparision.new(@hbx_enrollment, is_congress_employee).generate_url

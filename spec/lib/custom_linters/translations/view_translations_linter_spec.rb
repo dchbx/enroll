@@ -6,21 +6,17 @@ require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_
 
 RSpec.describe ViewTranslationsLinter do
   include ViewTranslationsLinterHelper
-  let(:approved_translations_hash) { YAML.load_file("#{Rails.root}/spec/support/fixtures/approved_translation_strings.yml").with_indifferent_access }
-  let(:approved_record_call_between_erb_strings) do
-    approved_translations_hash[:approved_translation_strings_in_erb_tags][:record_method_calls]
-  end
 
   context "#all_translations_present" do
     context "no filename list present" do
-      let(:linter_no_filename_list) { ViewTranslationsLinter.new(nil, ["approved String"], 'in_erb')}
+      let(:linter_no_filename_list) { ViewTranslationsLinter.new(nil, approved_translation_strings_in_erb_tags, 'in_erb')}
       it "should return true" do
         expect(linter_no_filename_list.all_translations_present?).to eq(true)
       end
     end
 
     context "removes any git related text with @@" do
-      let(:linter_with_git_text) { ViewTranslationsLinter.new({fake_view_filename: "@@ -0,0 +1,59 @@ no newline at the end of file"}, [], 'outside_erb') }
+      let(:linter_with_git_text) { ViewTranslationsLinter.new({fake_view_filename: "@@ -0,0 +1,59 @@ no newline at the end of file"}, approved_translation_strings_outside_erb_tags, 'outside_erb') }
       it "should return true" do
         expect(linter_with_git_text.all_translations_present?).to eq(true)
       end
@@ -28,7 +24,7 @@ RSpec.describe ViewTranslationsLinter do
 
     context "approved_translation_strings" do
       context "non approved string passed" do
-        let(:linter_with_non_approved_string) { ViewTranslationsLinter.new({fake_view_filename: "<%= 'Non-approved String' %>"}, [], 'in_erb')}
+        let(:linter_with_non_approved_string) { ViewTranslationsLinter.new({fake_view_filename: "<%= 'Non-approved String' %>"}, approved_translation_strings_in_erb_tags, 'in_erb')}
         it "should give puts output showing that the special - char was passed" do
           $stdout = StringIO.new
           linter_with_non_approved_string.all_translations_present?
@@ -38,7 +34,7 @@ RSpec.describe ViewTranslationsLinter do
       end
 
       context "approved string passed" do
-        let(:linter_with_approved_string) { ViewTranslationsLinter.new({fake_view_filename: "render approved string"}, ["approved String", "render"], 'in_erb')}
+        let(:linter_with_approved_string) { ViewTranslationsLinter.new({fake_view_filename: "<%= render %>"}, approved_translation_strings_in_erb_tags, 'in_erb')}
         it "should return true" do
           expect(linter_with_approved_string.all_translations_present?).to eq(true)
         end
@@ -48,7 +44,7 @@ RSpec.describe ViewTranslationsLinter do
         let(:linter_with_unapproved_method_string) do
           ViewTranslationsLinter.new(
             {fake_view_filename: "<%= family.primary_person.full_name %> <%= benefit_application.created_at %> <%= person.id %> <%= family.hbx_enrollments.map(&:hbx_id) %>"},
-            approved_record_call_between_erb_strings,
+            approved_translation_strings_in_erb_tags,
             'in_erb'
           )
         end
@@ -64,7 +60,7 @@ RSpec.describe ViewTranslationsLinter do
           let(:filename_with_violations) { "spec/support/fake_view_2.html" }
           let(:filename_with_violations_stringified) { File.read("#{Rails.root}/#{filename_with_violations}") }
           context "outside erb" do
-            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'outside_erb') }
+            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, {}, 'outside_erb') }
 
             it "should return puts message for violated strings" do
               $stdout = StringIO.new
@@ -73,10 +69,17 @@ RSpec.describe ViewTranslationsLinter do
               result_string = "The following are potentially untranslated substrings missing OUTSIDE_ERB from spec/support/fake_view_2.html:\nSent Messages\nSubject\nRecipients\nDate Sent\nRecipient Type\n"
               expect($stdout.string).to eq(result_string)
             end
+
+            it "should return true if violated substrings are approved" do
+              approved_hash = {}
+              approved_hash[:exact_match_strings] = ["Sent Messages", "Subject", "Recipients", "Date Sent", "Recipient Type"]
+              linter = ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, approved_hash, 'outside_erb')
+              expect(linter.all_translations_present?).to eq(true)
+            end
           end
 
           context "inside erb" do
-            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, [], 'in_erb') }
+            let(:linter_file_with_violations) { ViewTranslationsLinter.new({filename_with_violations.to_sym => filename_with_violations_stringified}, {}, 'in_erb') }
             it "should return puts message for violated strings" do
               $stdout = StringIO.new
               linter_file_with_violations.all_translations_present?

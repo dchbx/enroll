@@ -31,8 +31,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def create
-    params.permit!
-    @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
+    @organization = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
 
     if @organization.save(current_user)
       flash[:notice] = "Successfully created Broker Agency Profile"
@@ -58,7 +57,6 @@ class BrokerAgencies::ProfilesController < ApplicationController
 
   def update
     sanitize_broker_profile_params
-    params.permit!
 
     # lookup by the origanization and not BrokerAgencyProfile
     broker_agency_profile = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))

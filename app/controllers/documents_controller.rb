@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
+  before_action :cartafact_download_params, only: [:cartafact_download]
   respond_to :html, :js
 
   def download
@@ -264,6 +265,11 @@ class DocumentsController < ApplicationController
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
   end
 
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
+  end
+
   def update_documents_status(family_member)
     family = family_member.family
     family.update_family_document_status!
@@ -300,9 +306,5 @@ class DocumentsController < ApplicationController
   def set_min_due_date_on_family
     family = @family_member.family
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
-  end
-
-  def cartafact_download_params
-    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 end

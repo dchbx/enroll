@@ -212,6 +212,14 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
+    context "internationalization" do
+      let(:file_location) { "app/views/insured/families/_enrollment.html.erb"}
+      it "should have all expected translations" do
+        expect(translations_in_erb_tags_present?(file_location)).to eq(true)
+        expect(translations_outside_erb_tags_present?(file_location)).to eq(true)
+      end
+    end
+
     it "should open the sbc pdf" do
       expect(rendered).to have_selector("a[href='#{"/document/download/#{Settings.site.s3_prefix}-enroll-sbc-#{aws_env}/7816ce0f-a138-42d5-89c5-25c5a3408b82?content_type=application/pdf&filename=APlanName.pdf&disposition=inline"}']")
     end

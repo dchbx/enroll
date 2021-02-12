@@ -7,7 +7,7 @@ class IvlNoticesNotifierJob < ActiveJob::Base
     role = person.consumer_role || person.resident_role
     event_kind = ApplicationEventKind.where(:event_name => event).first
     notice_trigger = event_kind.notice_triggers.first
-    notice_trigger.notice_builder.camelize.constantize.new(role, {
+    notice_class(notice_trigger.notice_builder).new(role, {
       template: notice_trigger.notice_template,
       subject: event_kind.title,
       event_name: event,
