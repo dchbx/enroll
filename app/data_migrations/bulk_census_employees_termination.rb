@@ -21,7 +21,7 @@ class BulkCensusEmployeesTermination < MongoidMigrationTask
           key = key.gsub('-','')
           first_name = row_info[@headers["first_name"]].squish
           last_name = row_info[@headers["last_name"]].squish
-          termination_date = row_info[@headers["termination_date"]].squish
+          termination_date = row_info[@headers["termination_date"]].to_s.squish
           termination_date = Date.strptime(termination_date,'%m/%d/%y').to_date
           census_employee = CensusEmployee.by_ssn(key).first
           if census_employee.present?
