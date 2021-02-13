@@ -48,6 +48,7 @@ PLAN_TRANSLATIONS = {
 
   'en.plans.bestlife_phone' => '1-800-433-0088',
   'en.plans.bestlife_href_phone' => 'tel:+18004330088',
+  'en.plans.kaiser.pay_now.first_payment' => "<b>Make a first Payment</b> for my new plan",
   'en.plans.kaiser.pay_now.redirection_message' => "You are leaving the %{site_short_name} website and entering a privately-owned website created, operated and maintained by Kaiser Permanente.",
   'en.plans.kaiser.pay_now.link_info' => 'This link is provided for your convenience to allow you to pay your first month’s insurance premium now. It’s only available to make your first payment.',
   'en.plans.kaiser.pay_now.collecting_info' => 'The information that Kaiser Permanente collects and maintains as a result of your visit to its website is different from the information that DC Health Link collects and maintains.',
