@@ -35,6 +35,10 @@ module Enroll
     config.assets.enabled = true
     config.assets.paths << "#{Rails.root}/app/assets/info"
 
+    # Citation: https://bigbinary.com/blog/per-form-csrf-token-in-rails-5
+    # Citation II: https://github.com/rails/rails/pull/22275
+    config.action_controller.per_form_csrf_tokens = true
+
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
     config.i18n.fallbacks = {'am' => 'en', 'es' => 'en', 'ja' => 'en'}
     config.paths.add "app/api", glob: "**/*.rb"
