@@ -118,7 +118,7 @@ gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
 gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '~> 3.3'
+gem 'stimulus_reflex', '~> 3.3', '>= 3.3.0'
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -139,7 +139,7 @@ group :development do
 end
 
 group :development, :test do
-  gem 'action-cable-testing'
+  gem 'action-cable-testing', '>= 0.6.1'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
