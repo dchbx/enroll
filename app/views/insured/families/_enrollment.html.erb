@@ -218,8 +218,10 @@
                 </span>
               <% end %>
 
-              <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
-              <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("plans.kaiser.pay_now.first_payment")%></button>
+              <% if past_effective_on?(hbx_enrollment) && can_pay_now?(hbx_enrollment) %>
+                <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
+                <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("plans.kaiser.pay_now.first_payment")%></button>
+              <% end %>
             </div>
           </div>
         </div>
