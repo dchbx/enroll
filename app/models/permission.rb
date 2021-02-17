@@ -45,6 +45,7 @@ class Permission
   field :can_access_pay_now, type: Boolean, default: false
   field :view_agency_staff, type: Boolean, default: false
   field :manage_agency_staff, type: Boolean, default: false
+  field :can_access_age_off_excluded, type: Boolean, default: false
   field :can_send_secure_message, type: Boolean, default: false
   field :can_manage_qles, type: Boolean, default: false
 

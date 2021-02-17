@@ -698,7 +698,7 @@ When(/^.+ enters? the dependent info of Patrick wife$/) do
   fill_in 'dependent[last_name]', with: 'Patrick'
   fill_in 'dependent[ssn]', with: '123445678'
   fill_in 'jq_datepicker_ignore_dependent[dob]', with: '01/15/1996'
-  find('#dependents_info_wrapper').click
+  find(:xpath, "//label[@for='radio_female']").click
   sleep 1
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click

@@ -84,6 +84,10 @@ module PermissionsConcern
         false
       end
     end
+
+    def does_not_have_any_staff_role?
+      !has_broker_agency_staff_role? && !has_general_agency_staff_role? && !has_employer_staff_role?
+    end
   end
 
   class_methods do

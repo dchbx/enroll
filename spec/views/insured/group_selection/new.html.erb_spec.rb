@@ -137,7 +137,7 @@ RSpec.describe "insured/group_selection/new.html.erb" do
       end
 
       it "should have a 'not eligible'" do
-        expect(rendered).to have_selector('td', text: 'Employer sponsored coverage is not yet available', count: 2)
+        expect(rendered).to have_selector('td', text: 'Employer sponsored coverage is not available', count: 2)
       end
     end
   end

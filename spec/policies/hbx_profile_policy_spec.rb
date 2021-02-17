@@ -118,6 +118,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -133,6 +134,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be false
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -148,6 +150,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -163,6 +166,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -175,6 +179,7 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be false
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -186,6 +191,7 @@ describe HbxProfilePolicy do
       expect(policy.approve_broker?).to be true
       expect(policy.approve_ga?).to be true
       expect(policy.can_modify_plan_year?).to be true
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be true
     end
 

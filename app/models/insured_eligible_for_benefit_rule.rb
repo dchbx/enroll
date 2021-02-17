@@ -110,7 +110,19 @@ class InsuredEligibleForBenefitRule
 
   def is_child_age_satisfied?
     unless @new_effective_on.nil?
-      relation_ship_with_primary_applicant == 'child' && @new_effective_on.kind_of?(Date) && @new_effective_on < @role.dob+26.years ? true : false
+      if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
+        dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+          {
+            effective_on: @new_effective_on,
+            family_member: @family&.find_family_member_by_person(@role.person),
+            market_key: :aca_individual_dependent_age_off,
+            relationship_kind: relation_ship_with_primary_applicant
+          }
+        end
+        @new_effective_on.is_a?(Date) && dependent_coverage_eligible.success? ? true : false
+      else
+        relation_ship_with_primary_applicant == 'child' && @new_effective_on.is_a?(Date) && @new_effective_on < @role.dob + 26.years ? true : false
+      end
     else
       age = age_on_next_effective_date(@role.dob)
       relation_ship_with_primary_applicant == 'child' && age > 26 ? false : true

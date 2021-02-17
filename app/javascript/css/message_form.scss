@@ -1,0 +1,72 @@
+table.table-bg-white {
+  background-color: #ffffff;
+}
+table.table-bg-white tr td, table.table-bg-white tr th {
+  padding: 8px 18px;
+  vertical-align: middle;
+}
+table.table-bg-white tr td {
+  font-weight: 300;
+}
+table.table-bg-white tr th {
+  font-weight: 400;
+}
+td.brd-r {
+  border-left: 1px solid #ddd;
+}
+table.table.table-message-wrapper {
+  background: #ffffff none repeat scroll 0 0;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+table.table.table-message-wrapper tr th {
+  color: #414141;
+  font-size: 12px;
+  font-weight: 400;
+  padding-left: 20px !important;
+  text-transform: uppercase;
+  width: 20%;
+}
+table.table.table-message-wrapper tr td a {
+  color: #414141;
+  font-size: 12px;
+  font-weight: 400;
+}
+table.table.table-message-wrapper tr td, table.table.table-message-wrapper tr th {
+  padding: 15px 5px;
+  vertical-align: middle;
+}
+table.table.table-message-wrapper tr:first-child td, table.table.table-message-wrapper tr:first-child th {
+  border-top: medium none;
+}
+table.table.table-message-wrapper tr td input, table.table.table-message-wrapper tr td textarea {
+  border: medium none;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 100;
+  margin: 0;
+  padding: 0;
+  width: 100%
+}
+table.table.table-message-wrapper tr th.vtop {
+  vertical-align: top;
+}
+.input-no-pd .form-group {margin-bottom: 15px;}
+.input-no-pd .form-control {padding: 0 10px !important;}
+.input-no-pd .form-control:focus {background-color: #fff; border-color: #337ab7;}
+
+.input-no-pd input[placeholder] {font-size: 14px !important; color: #555555;}
+.input-no-pd .form-control::-webkit-input-placeholder {font-size: 14px !important; color: #555555;}
+.input-no-pd .form-control:-moz-placeholder {font-size: 14px !important; color: #555555;}
+.row input.form-control.message_subject {padding-top: 5px !important;}
+
+#sent_messages {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+#recipient-list.collapsed {
+  max-height: 30px;
+  overflow-y: hidden;
+  max-width: 90%;
+}

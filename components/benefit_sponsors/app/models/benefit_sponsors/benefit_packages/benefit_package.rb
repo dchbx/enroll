@@ -64,7 +64,7 @@ module BenefitSponsors
       end
 
       def effective_on_for(date_of_hire)
-        [start_on, eligible_on(date_of_hire)].max
+        [start_on.to_date, eligible_on(date_of_hire)].max
       end
 
       def effective_on_for_cobra(date_of_hire)

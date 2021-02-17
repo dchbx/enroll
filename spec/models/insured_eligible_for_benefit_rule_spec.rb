@@ -1,6 +1,7 @@
 require 'rails_helper'
 
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
+
 RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
   let(:family) { double }
   let(:rule) { InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, family: family)}
@@ -243,18 +244,47 @@ RSpec.describe InsuredEligibleForBenefitRule, :type => :model do
 
   context "is_child_age_satisfied?" do
     let(:new_effective_on) {TimeKeeper.date_of_record}
-    let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,new_effective_on:new_effective_on)}
 
-    it "should return true when new_effective_on is before child crossed 26 years" do
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 20.years
-      expect(rule.is_child_age_satisfied?).to eq true
+    context 'when age_off_relaxed_eligibility setting is turned off' do
+      let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package, new_effective_on: new_effective_on)}
+      it "should return true when new_effective_on is before child crossed 26 years" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(false)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 20.years
+        expect(rule.is_child_age_satisfied?).to eq true
+      end
+
+      it "should return false when new_effective_on is after child entered 26 years" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(false)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 30.years
+        expect(rule.is_child_age_satisfied?).to eq false
+      end
     end
 
-    it "should return false when new_effective_on is after child entered 26 years" do
-      allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
-      allow(consumer_role).to receive(:dob).and_return TimeKeeper.date_of_record - 30.years
-      expect(rule.is_child_age_satisfied?).to eq false
+    context 'when age_off_relaxed_eligibility setting is turned on' do
+      let(:rule) {InsuredEligibleForBenefitRule.new(consumer_role, benefit_package,new_effective_on: Date.new(2020,1,1))}
+
+      it "should return false when child is 27 in effective year" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        consumer_role.update_attributes(dob: Date.new(1992,9,1))
+        expect(rule.is_child_age_satisfied?).to eq false
+      end
+
+      it "should return true when child is 27+ in effective period" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        consumer_role.update_attributes(dob: Date.new(1993,9,1))
+        expect(rule.is_child_age_satisfied?).to eq false
+      end
+
+      it "should return true when child is exactly 26 in effective period" do
+        allow(EnrollRegistry[:age_off_relaxed_eligibility].feature).to receive(:is_enabled).and_return(true)
+        allow(rule).to receive(:relation_ship_with_primary_applicant).and_return 'child'
+        consumer_role.update_attributes(dob: Date.new(1994,1,1))
+        expect(rule.is_child_age_satisfied?).to eq false
+      end
     end
   end
 

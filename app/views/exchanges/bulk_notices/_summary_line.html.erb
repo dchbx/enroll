@@ -1,0 +1,22 @@
+<% bulk_notice ||= @bulk_notice %>
+<% org ||= session[:bulk_notice].try(:[], :audience).try(:[], id) %>
+<% org ||= BenefitSponsors::Organizations::Organization.find(id).attributes.symbolize_keys.slice(id, :fein, :hbx_id, :legal_name) %>
+<% result = bulk_notice.results.where(audience_id: id).first %>
+<div id='<%= "bulk-notice-#{bulk_notice.id}-audience-#{id}" %>' class='row summary-row px-3 bg-white border-left border-right' data-audience-id='<%= id %>'>
+  <div class='col-4'>
+    <%= org[:legal_name] %>
+  </div>
+  <div class='col-2 text-right'>
+    <% if result %>
+      <% result.result %> at <%= result.created_at %>
+    <% else %>
+      Not sent
+    <% end %>
+  </div>
+  <div class='col-3 text-right text-truncate'>
+    <%= org[:fein] %>
+  </div>
+  <div class='col-3 text-right text-truncate'>
+    <%= org[:hbx_id] %>
+  </div>
+</div>

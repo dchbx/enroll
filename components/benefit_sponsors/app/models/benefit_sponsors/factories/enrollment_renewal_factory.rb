@@ -49,7 +49,7 @@ module BenefitSponsors
             builder.set_as_renew_enrollment
           end
         end
-        @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members
+        @renewal_enrollment.hbx_enrollment_members = cloned_enrollment_members(@renewal_enrollment)
         finalize_hbx_enrollment_members
       end
 
@@ -75,17 +75,32 @@ module BenefitSponsors
         end
       end 
 
-      def cloned_enrollment_members
+      def cloned_enrollment_members(ren_enr)
         @base_enrollment.hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
-          members << HbxEnrollmentMember.new({
-            applicant_id: hbx_enrollment_member.applicant_id,
-            eligibility_date: @new_effective_on,
-            coverage_start_on: @new_effective_on,
-            is_subscriber: hbx_enrollment_member.is_subscriber
-            })
+          if eligible_to_get_covered?(ren_enr.effective_on, hbx_enrollment_member, ren_enr.dep_age_off_market_key)
+            members << HbxEnrollmentMember.new({applicant_id: hbx_enrollment_member.applicant_id,
+                                                eligibility_date: @new_effective_on,
+                                                coverage_start_on: @new_effective_on,
+                                                is_subscriber: hbx_enrollment_member.is_subscriber})
+          end
+          members
         end
       end   
-  
+
+      def eligible_to_get_covered?(effective_on, hbx_enr_member, market_key)
+        return true unless EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
+        dep_relationship = hbx_enr_member.family_member.relationship
+        return true unless  EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(dep_relationship)
+        ::EnrollRegistry[:age_off_relaxed_eligibility] do
+          {
+            effective_on: effective_on,
+            family_member: hbx_enr_member&.family_member,
+            market_key: market_key,
+            relationship_kind: dep_relationship
+          }
+        end.success?
+      end
+
       def renewal_enrollment
         @renewal_enrollment
       end
