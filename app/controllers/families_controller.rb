@@ -58,6 +58,10 @@ private
   def set_family
     set_current_person
     return unless @person.present?
+    # Handles an exception where there is no family_id for
+    # hbx staff. HBX staff will visit various families so
+    # family will not be pulled from their person record
+    return if current_user && current_user.has_hbx_staff_role?
 
     if @person.primary_family.present?
       @family = @person.primary_family
