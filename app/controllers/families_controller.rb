@@ -61,8 +61,10 @@ private
 
     if @person.primary_family.present?
       @family = @person.primary_family
-    else
+    elsif params[:family].present?
       @family = Family.find(params[:family])
+    else
+      redirect_to root_path
     end
   end
 
