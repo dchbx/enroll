@@ -13,16 +13,8 @@ module Insured
         end
       end
 
-      def pay_now_validation?(hbx_enrollment)
-        return true if carrier_with_payment_option?(hbx_enrollment) && individual?(hbx_enrollment)
-      end
-
-      def has_any_previous_enrollments?(hbx_enrollment)
-        return true if has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_kaiser_enrollments?(hbx_enrollment)
-      end
-
       def can_pay_now?(hbx_enrollment)
-        return true if pay_now_validation?(hbx_enrollment) && has_any_previous_enrollments?(hbx_enrollment)
+        return true if carrier_with_payment_option?(hbx_enrollment) && individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
       end
 
       def carrier_with_payment_option?(hbx_enrollment)
@@ -33,7 +25,7 @@ module Insured
         hbx_enrollment.kind.in?(['individual', 'coverall'])
       end
 
-      def has_any_previous_kaiser_enrollments?(hbx_enrollment)
+      def has_any_previous_enrollments?(hbx_enrollment)
         carrier = EnrollRegistry[:pay_now_functionality].setting(:carriers).item
         all_kaiser_enrollments = hbx_enrollment.family.hbx_enrollments.where(:aasm_state.nin => ["inactive", "shopping", "coverage_canceled"]).select do |enr|
           next if enr.product.blank? || enr.subscriber.blank? || enr.is_shop?
