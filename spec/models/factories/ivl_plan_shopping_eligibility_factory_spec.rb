@@ -17,6 +17,10 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
     p_table.premium_tuples.each { |pt| pt.update_attributes!(cost: pt.age)}
   end
 
+  before :each do
+    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+  end
+
   unless Settings.site.faa_enabled
     describe 'cases for single tax household scenarios' do
       include_context 'setup one tax household with two ia members'
@@ -36,7 +40,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
         context 'for one member enrollment' do
           context 'tax_household exists' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -64,7 +68,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
             before :each do
               family.active_household.tax_households = []
               family.active_household.save!
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -94,7 +98,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -122,7 +126,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -156,7 +160,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -184,7 +188,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1)
+              @eligibility_factory ||= described_class.new(enrollment1, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -221,7 +225,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'where ehb_premium less than selected_aptc and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1, 150.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
               @ehb_premium = @eligibility_factory.send(:total_ehb_premium, enrollment1.product.id)
@@ -252,7 +256,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
 
           context 'where selected_aptc less than ehb_premium and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1, 35.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
@@ -282,7 +286,7 @@ RSpec.describe Factories::IvlPlanShoppingEligibilityFactory do
           context 'where available_aptc less than ehb_premium and selected_aptc' do
             before do
               family.active_household.tax_households.first.destroy
-              @eligibility_factory = described_class.new(enrollment1, 100.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1, enrollment1.effective_on, 100.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
