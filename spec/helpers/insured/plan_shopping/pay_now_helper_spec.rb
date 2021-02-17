@@ -37,7 +37,7 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
           assign(:enrollment, hbx_enrollment)
         end
         it "returns #{market.in?(['individual', 'coverall'])} for #{market} + Kaiser" do
-          allow(helper).to receive(:has_any_previous_kaiser_enrollments?).with(hbx_enrollment).and_return false
+          allow(helper).to receive(:has_any_previous_enrollments?).with(hbx_enrollment).and_return false
           expect(helper.show_pay_now?("Plan Shopping", hbx_enrollment)).to eq false
         end
       end
@@ -112,59 +112,59 @@ RSpec.describe Insured::PlanShopping::PayNowHelper, :type => :helper do
     end
 
     it 'return false if household has kaiser enrollments in current benefit coverage period with same subscriber' do
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is shopping state' do
       hbx_enrollment.update_attributes(aasm_state: 'shopping')
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is canceled state' do
       hbx_enrollment.update_attributes(aasm_state: 'coverage_canceled')
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is inactive state' do
       hbx_enrollment.update_attributes(aasm_state: 'inactive')
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment is inactive state' do
       hbx_enrollment.hbx_enrollment_members.detect(&:is_subscriber).update_attributes(is_subscriber: false)
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false previous enrollment has no product' do
       hbx_enrollment.unset(:product_id)
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false if household has kaiser enrollments in current benefit coverage period' do
       hbx_enrollment.update_attributes(kind: "employer_sponsored")
       hbx_enrollment1.update_attributes(kind: "employer_sponsored")
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false if household has kaiser enrollments in a previous benefit coverage period year' do
       hbx_enrollment1.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'return false if household had no kaiser enrollments in current benefit coverage period' do
       issuer_profile.update_attributes(legal_name: 'Something')
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
 
     it 'should return false if enrollments do not have product' do
       hbx_enrollment.update_attributes(product_id: "")
       hbx_enrollment1.update_attributes(product_id: "")
-      expect(helper.has_any_previous_kaiser_enrollments?(hbx_enrollment)).to eq false
+      expect(helper.has_any_previous_enrollments?(hbx_enrollment)).to eq false
     end
   end
 
