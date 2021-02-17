@@ -112,6 +112,17 @@ class CensusEmployee < CensusMember
     )
   }
 
+
+  scope :eligible_reinstate_for_package, lambda { |benefit_package, active_on|
+    where(:benefit_group_assignments => {:$elemMatch => {:benefit_package_id => benefit_package.id,
+                                                        :start_on => { "$gte" => benefit_package.start_on },
+                                                        :end_on => (benefit_package.canceled? ? benefit_package.start_on : benefit_package.end_on).to_date}},
+         "$or" => [{"employment_terminated_on" => nil},
+                   {"employment_terminated_on" => {"$exists" => false}},
+                   {"employment_terminated_on" => {"$gte" => active_on}}])
+  }
+
+
   scope :employees_for_benefit_application_sponsorship, ->(benefit_application) {
     new_effective_date = benefit_application.start_on
     benefit_sponsorship_id = benefit_application.benefit_sponsorship.id
@@ -326,8 +337,19 @@ class CensusEmployee < CensusMember
     end
   end
 
-  def create_benefit_group_assignment(benefit_packages, off_cycle = false)
-    assignment = off_cycle ? off_cycle_benefit_group_assignment : active_benefit_group_assignment
+  def benefit_group_assignment_by_package(package_id, start_on)
+    # benefit_group_assignments.where(benefit_package_id: package_id).order_by(:'updated_at'.desc).first
+    benefit_group_assignments.detect { |benefit_group_assignment| benefit_group_assignment.benefit_package_id == package_id && benefit_group_assignment.is_active?(start_on) }
+  end
+
+  def create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated: false)
+    assignment = if reinstated
+                   future_active_reinstated_benefit_group_assignment
+                 elsif off_cycle
+                   off_cycle_benefit_group_assignment
+                 else
+                   active_benefit_group_assignment
+                 end
     if benefit_packages.present?
       if assignment.present?
         end_date, new_start_on =
@@ -367,6 +389,19 @@ class CensusEmployee < CensusMember
     benefit_group_assignments.select { |assignment| assignment.is_active? }.each do |benefit_group_assignment|
       benefit_group_assignment.end_on = [new_benefit_group.start_on - 1.day, benefit_group_assignment.start_on].max
     end
+  end
+
+  def future_active_reinstated_benefit_group_assignment
+    reinstated_app = benefit_sponsorship&.future_active_reinstated_benefit_application
+    return if reinstated_app.nil?
+
+    assignment = benefit_package_assignment_on(reinstated_app.start_on)
+    benefit_package_ids = reinstated_app.benefit_packages.map(&:id)
+    benefit_package_ids.include?(assignment&.benefit_package&.id) ? assignment : nil
+  end
+
+  def reinstated_benefit_group_with_future_date
+    future_active_reinstated_benefit_group_assignment.benefit_package if future_active_reinstated_benefit_group_assignment&.benefit_package&.benefit_application&.active?
   end
 
   def published_benefit_group_assignment

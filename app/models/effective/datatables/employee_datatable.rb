@@ -41,9 +41,21 @@ module Effective
         }, :sortable => false, :filter => false
 
         unless attributes['current_py_terminated']
-          table_column :benefit_package, :proc => proc { |row|
-            row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
-          }, :sortable => false, :filter => false
+          if attributes['reinstated']
+            table_column :benefit_package, :label => 'Reinstated Benefit Package', :proc => proc { |row|
+              row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
+            }, :sortable => false, :filter => false
+          else
+            table_column :benefit_package, :proc => proc { |row|
+              row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
+            }, :sortable => false, :filter => false
+          end
+        end
+
+        if attributes["future_reinstated"]
+          table_column :reinstated_benefit_package, :label => 'Reinstated Benefit Package', :proc => proc { |row|
+            row.future_active_reinstated_benefit_group_assignment.benefit_group.title.capitalize if row.future_active_reinstated_benefit_group_assignment.present?
+          }, :filter => false, :sortable => false
         end
 
         if attributes["renewal"]
@@ -61,6 +73,12 @@ module Effective
         unless attributes['current_py_terminated']
           table_column :enrollment_status, :proc => proc { |row|
             enrollment_state(row)
+          }, :sortable => false, :filter => false
+        end
+
+        if attributes["future_reinstated"]
+          table_column :reinstated_enrollment_status, :proc => proc { |row|
+            reinstated_enrollment_state(row)
           }, :sortable => false, :filter => false
         end
 

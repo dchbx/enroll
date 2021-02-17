@@ -2,8 +2,8 @@
   
 </style>
 
-<div class="container" id="employer_applications_table">
-  <div class = "table-responsive table-override"> 
+<div class="container bottom-pd" id="employer_applications_table">
+  <div class = "table-override">
   <h4 class="text-center heading-text"> <%= l10n("exchange.employer_applications.applications").titleize %> </h4>
   <% benefit_applications = @benefit_sponsorship.benefit_applications %>
   <% if benefit_applications.present? %>
@@ -38,12 +38,16 @@
                   Actions <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" style="padding:10px">
-                    <li onclick="pyAction('cancel','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="cancel-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.cancel") %></li>
-                    <li onclick="pyAction('terminate','<%= application.id %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="terminate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.terminate") %></li>
-                    <!-- <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= @benefit_sponsorship.id %>', '<%= application.terminated_on %>', '')" class="reinstate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.reinstate") %></li> -->
+                  <li onclick="pyAction('cancel','<%= application.id %>', '<%= application.aasm_state %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="cancel-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.cancel") %></li>
+                  <li onclick="pyAction('terminate','<%= application.id %>', '<%= application.aasm_state %>', '<%= @benefit_sponsorship.id %>', '0', '<%= application.start_on.to_date.to_s %>')" class="terminate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.terminate") %></li>
+                  <%if ::EnrollRegistry.feature_enabled?(:benefit_application_reinstate)%>
+                    <%if display_reinstate_benefit_application?(application) %>
+                      <li onclick="pyAction('reinstate', '<%= application.id %>', '<%= application.aasm_state %>', '<%= @benefit_sponsorship.id %>', '<%= (application.end_on.to_date.next_day).to_s if application.end_on.present?%>', '<%= application.start_on.to_date.to_s %>')" class="reinstate-py btn btn-default btn-block"><%= l10n("exchange.employer_applications.reinstate") %></li>
+                    <%end%>
+                  <%end%>
                 </ul>
               </div>
-              
+
             </td>
           </tr>
           <% @reasons = BenefitSponsors::BenefitApplications::BenefitApplication::VOLUNTARY_TERM_REASONS %>
@@ -62,10 +66,12 @@
             </td>
             <% end %>
             <td colspan="2">
-              <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on.next_day) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
+              <input type="text" class="uidatepicker form-control date py-end-date" style="width:120px" placeholder="Select Term Date" id="date_picker_<%= application.id %>" reinstate_start_date="<%= (application.end_on.to_date.next_day).to_s if application.end_on.present?%>" onchange="validateFormat('<%= application.id %>', '<%= TimeKeeper.format_date(application.start_on) %>', '<%= TimeKeeper.format_date(application.end_on.next_day) %>')"> <span class="glyphicon glyphicon-calendar" id="calendar_icon" style="font-size:1.5em" aria-hidden="true" ></span>
             </td>
+            <div>
+            </div>
             <td colspan="2">
-              <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, disabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
+              <%= check_box_tag 'transmit_to_carrier', 'transmit_to_carrier', true, enabled: true  %> <%= l10n("exchange.employer_applications.transmit_to_carrier") %>
             </td>
             <td colspan="1">
               <button class="btn btn-primary btn-sm plan-year-submit" onclick="submitPlanActions()"><%= l10n("exchange.employer_applications.submit") %></button>
@@ -78,9 +84,9 @@
     <h2><%= l10n("exchange.employer_applications.no_valid_pys") %> <%= @benefit_sponsorship.profile.legal_name.titleize %></h2>
   <% end %>
 </div>
-
 <div class="attestation_form"></div>
 </div>
+<%= render "exchanges/employer_applications/reinstate_benefit_application_modal" %>
 
 <script type="text/javascript" charset="utf-8">
   initializeDataTables();

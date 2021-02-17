@@ -1,0 +1,22 @@
+<div class="modal" id="reinstateBenefitApplication" tabindex="-1" role="dialog" role="document">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+
+      <%= form_tag(reinstate_exchanges_employer_applications_path, method: :put) do %>
+          <div class="modal-body">
+            <h4><%= l10n("exchange.employer_applications.confirmation_message")%></h4>
+          </div>
+          <%= hidden_field_tag 'transmit_to_carrier' %>
+          <%= hidden_field_tag 'employer_id' %>
+          <%= hidden_field_tag 'employer_application_id' %>
+          <div class="modal-footer">
+            <%= submit_tag l10n("exchange.employer_applications.continue"), class: "btn btn-primary mtz  btn-small" %>
+            <span class="btn btn-default btn-small" data-dismiss="modal"><%= l10n("exchange.employer_applications.cancel")%></span>
+          </div>
+      <% end %>
+    </div>
+  </div>
+</div>

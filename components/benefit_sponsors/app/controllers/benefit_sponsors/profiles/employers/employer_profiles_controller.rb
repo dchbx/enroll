@@ -242,6 +242,9 @@ module BenefitSponsors
             data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
           end
 
+          data_table_params.merge!({ future_reinstated: true }) if @employer_profile.future_active_reinstated_benefit_application.present?
+          data_table_params.merge!({reinstated: true}) if @employer_profile.current_benefit_application&.reinstated_id.present?
+
           data_table_params.merge!({
             is_submitted: true
           }) if @employer_profile&.renewal_benefit_application&.is_submitted?

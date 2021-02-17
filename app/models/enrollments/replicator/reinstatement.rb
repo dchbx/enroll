@@ -33,13 +33,10 @@ module Enrollments
 
       def renewal_benefit_group_assignment
         assignment = census_employee.renewal_benefit_group_assignment
-        if assignment.blank?
-          if census_employee.active_benefit_group_assignment.blank?
-            census_employee.save
-          end
-          if renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
-            assignment = census_employee.published_benefit_group_assignment
-          end
+        if assignment.blank? && census_employee.active_benefit_group_assignment(new_effective_date).blank?
+          census_employee.save
+        elsif renewal_benefit_application == census_employee.published_benefit_group_assignment.benefit_application
+          assignment = census_employee.published_benefit_group_assignment
         end
         assignment
       end

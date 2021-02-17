@@ -754,6 +754,7 @@ describe "Enabled/Disabled IVL market" do
     it_behaves_like 'float_fix', 102.1699999999, 102.17
     it_behaves_like 'float_fix', 866.0799999996, 866.08
     it_behaves_like 'float_fix', (2.76 + 2.43), 5.19
+    it_behaves_like 'float_fix', (0.57 * 100), 57
   end
 
   describe 'round_down_float_two_decimals' do

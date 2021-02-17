@@ -28,6 +28,21 @@ module BenefitMarkets
           optional(:renewal_product_id).maybe(Types::Bson)
           optional(:sbc_document).maybe(:hash)
           required(:premium_tables).array(:hash)
+
+          before(:value_coercer) do |result|
+            result_hash = result.to_h
+
+            if result_hash[:application_period].is_a?(Hash)
+              result_hash[:application_period].deep_symbolize_keys
+              result_hash.merge!({application_period: (result_hash[:application_period][:min]..result_hash[:application_period][:max])})
+            end
+
+            if result_hash[:premium_ages].is_a?(Hash)
+              result_hash[:premium_ages].deep_symbolize_keys
+              result_hash.merge!({premium_ages: (result_hash[:premium_ages][:min]..result_hash[:premium_ages][:max])})
+            end
+            result_hash
+          end
         end
 
         rule(:sbc_document) do

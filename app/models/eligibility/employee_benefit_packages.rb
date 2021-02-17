@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Eligibility
   module EmployeeBenefitPackages
     # Deprecated
@@ -7,20 +9,23 @@ module Eligibility
       py = employer_profile.plan_years.published.first || employer_profile.plan_years.where(aasm_state: 'draft').first
 
       create_benefit_group_assignment(py.benefit_groups) if py.present? && active_benefit_group_assignment.blank? || active_benefit_group_assignment&.benefit_group&.plan_year != py
-
-      if py = employer_profile.plan_years.renewing.first
-        if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
-          add_renew_benefit_group_assignment(py.benefit_groups)
-        end
-      end
+      py = employer_profile.plan_years.renewing.first
+      return unless py
+      add_renew_benefit_group_assignment(py.benefit_groups) if benefit_group_assignments.where(:benefit_group_id.in => py.benefit_groups.map(&:id)).blank?
     end
 
     # R4 Updates
     # When switching benefit package, we are always creating a new BGA and terminating/cancelling previous BGA
     # TODO: Creating BGA for first benefit group only
 
-    def create_benefit_group_assignment(benefit_packages, off_cycle: false)
-      assignment = off_cycle ? off_cycle_benefit_group_assignment : active_benefit_group_assignment
+    def create_benefit_group_assignment(benefit_packages, off_cycle: false, reinstated: false)
+      assignment = if reinstated
+                     future_active_reinstated_benefit_group_assignment
+                   elsif off_cycle
+                     off_cycle_benefit_group_assignment
+                   else
+                     active_benefit_group_assignment
+                   end
       if benefit_packages.present?
         if assignment.present?
           end_date, new_start_on =
@@ -65,9 +70,7 @@ module Eligibility
       raise ArgumentError, "expected BenefitGroup" unless new_benefit_group.is_a?(BenefitGroup)
 
       benefit_group_assignments.renewing.each do |benefit_group_assignment|
-        if benefit_group_assignment.benefit_group_id == new_benefit_group.id
-          benefit_group_assignment.destroy
-        end
+        benefit_group_assignment.destroy if benefit_group_assignment.benefit_group_id == new_benefit_group.id
       end
 
       bga = BenefitGroupAssignment.new(benefit_group: new_benefit_group, start_on: new_benefit_group.start_on)
@@ -100,17 +103,19 @@ module Eligibility
     end
 
     def published_benefit_group
-      published_benefit_group_assignment.benefit_group if published_benefit_group_assignment
+      published_benefit_group_assignment&.benefit_group
     end
 
     def renewal_published_benefit_group
-      if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.is_submitted?
-        renewal_benefit_group_assignment.benefit_group
-      end
+      renewal_benefit_group_assignment.benefit_group if renewal_benefit_group_assignment && renewal_benefit_group_assignment.benefit_group.plan_year.is_submitted?
     end
 
     def off_cycle_published_benefit_group
       off_cycle_benefit_group_assignment.benefit_package if off_cycle_benefit_group_assignment&.benefit_package&.benefit_application&.is_submitted?
+    end
+
+    def reinstated_benefit_group_with_future_date
+      future_active_reinstated_benefit_group_assignment.benefit_package if future_active_reinstated_benefit_group_assignment&.benefit_package&.benefit_application&.active?
     end
 
     def possible_benefit_package(shop_under_current: false, shop_under_future: false)
@@ -125,11 +130,13 @@ module Eligibility
       benefit_package_based_on_assignment
     end
 
-    def benefit_package_based_on_assignment
+    def benefit_package_based_on_assignment # rubocop:disable Metrics/CyclomaticComplexity
       if renewal_benefit_group_assignment.present? && (renewal_benefit_group_assignment.benefit_application.is_renewal_enrolling? || renewal_benefit_group_assignment.benefit_application.enrollment_eligible?)
         renewal_benefit_group_assignment.benefit_package
       elsif off_cycle_benefit_group_assignment.present? && (off_cycle_benefit_group_assignment.benefit_application.is_enrolling? || off_cycle_benefit_group_assignment.benefit_application.enrollment_eligible?)
         off_cycle_benefit_group_assignment.benefit_package
+      elsif reinstated_benefit_group_with_future_date.present? && reinstated_benefit_group_with_future_date.benefit_application.active?
+        future_active_reinstated_benefit_group_assignment.benefit_package
       elsif active_benefit_group_assignment.present? && !active_benefit_group_assignment.benefit_package.is_conversion?
         active_benefit_group_assignment.benefit_package
       end
@@ -156,7 +163,7 @@ module Eligibility
     def has_benefit_group_assignment?
       return has_benefit_group_assignment_deprecated? if is_case_old?
       (active_benefit_group_assignment.present? && (BenefitSponsors::BenefitApplications::BenefitApplication::PUBLISHED_STATES + BenefitSponsors::BenefitApplications::BenefitApplication::IMPORTED_STATES).include?(active_benefit_group_assignment.benefit_application.aasm_state)) ||
-      (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
+        (renewal_benefit_group_assignment.present? && renewal_benefit_group_assignment.benefit_application.is_renewing?)
     end
   end
 end

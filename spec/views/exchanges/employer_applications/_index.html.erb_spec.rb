@@ -22,6 +22,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
       sign_in(user)
       assign :employer_profile, employer_profile
       assign :benefit_sponsorship, benefit_sponsorship
+      initial_application.update_attributes!(aasm_state: :terminated)
       render "exchanges/employer_applications/index", employers_action_id: "employers_action_#{employer_profile.id}", employer_id: benefit_sponsorship
     end
 
@@ -38,6 +39,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     end
 
     it "should have cancel, terminate, reinstate links" do
+      allow(::EnrollRegistry).to receive(:feature_enabled?).with(:benefit_application_reinstate).and_return(true)
       expect(rendered).to match(/cancel/)
       expect(rendered).to match(/terminate/)
       expect(rendered).to match(/reinstate/)
@@ -94,7 +96,7 @@ RSpec.describe "exchanges/employer_applications/index.html.erb", dbclean: :after
     it "should have not cancel, terminate, reinstate links" do
       expect(rendered).not_to match(/cancel/)
       expect(rendered).not_to match(/terminate/)
-      expect(rendered).not_to match(/reinstate/)
+      expect(rendered).not_to match(/Reinstate/)
     end
   end
 end

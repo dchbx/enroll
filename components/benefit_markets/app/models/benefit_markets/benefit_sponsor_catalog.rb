@@ -50,6 +50,10 @@ module BenefitMarkets
                       .by_product_kind(sponsored_benefit.product_kind)[0]
     end
 
+    def start_on
+      effective_period.min
+    end
+
     # def service_areas=(service_areas)
     #   self.service_area_ids = service_areas.map(&:_id)
     #   @service_areas = service_areas

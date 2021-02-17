@@ -14,6 +14,8 @@ var pyEndDate = "";
 var termKind = "";
 var termReason = "";
 var pyEndOn = "";
+var pyStartDate = "";
+var pyStatus = "";
 var pyStartOn = ""
 
 if ( $parent_row.next().hasClass('child-row') ) {
@@ -45,7 +47,7 @@ function populateDropDown(status) {
 
   var cancel_states = ["approved", "pending", "draft", "imported", "enrollment_open", "enrollment_extended", "enrollment_closed", "enrollment_eligible", "binder_paid", "enrollment_ineligible", "active"]
   var term_states = ["active", "suspended", "expired", "termination_pending"]
-  var reinstate_states = []
+  var reinstate_states = ["terminated", "termination_pending", "retroactive_canceled", "canceled"]
 
   if (cancel_states.indexOf(status) > -1) {
     $('li.cancel-py').removeClass('blocking');
@@ -145,6 +147,14 @@ function hideEndDateField(startDate, applicationId) {
   },300)
 }
 
+function disableTransmitToCarrier(applicationId) {
+  $('#' + applicationId).find('input[id=transmit_to_carrier]').prop('disabled', true);
+}
+
+function enableTransmitToCarrier(applicationId) {
+  $('#' + applicationId).find('input[id=transmit_to_carrier]').prop('disabled', false);
+}
+
 function showEndDateField() {
   $('input.py-end-date').removeClass('hidden')
   $('#calendar_icon').removeClass('hidden')
@@ -179,17 +189,33 @@ function validTerminatePy() {
   }
 }
 
-function pyAction(action, id, employer_id, term_date, start_on) {
+function populateReinstateStartDate(pyStatus, pyStartDate, pyEndDate, applicationId) {
+
+  var canceled_states = ["retroactive_canceled", "canceled"]
+  var terminated_states = ["terminated", "termination_pending"]
+
+  if (canceled_states.indexOf(pyStatus) > -1) {
+    hideEndDateField(pyStartDate, applicationId);
+  }
+
+  if (terminated_states.indexOf(pyStatus) > -1) {
+    hideEndDateField(pyEndDate, applicationId);
+  }
+}
+
+function pyAction(action, id, status, employer_id, end_on, start_on) {
   applicationId = id;
   employerId = employer_id
   actionSelected = action;
+  pyStatus = status;
   pyStartDate = start_on
+  pyEndDate = end_on
   showPlanYearActions(id);
   showEndDateField();
   if (action == "reinstate") {
-    disableDatePicker();
-    $('input#datepicker').val(<%= Date.today %>);
+    populateReinstateStartDate(pyStatus, pyStartDate, pyEndDate, applicationId)
     hideTerminationRadios();
+    enableTransmitToCarrier(applicationId);
     enableSubmitButton()
   }
   
@@ -198,12 +224,14 @@ function pyAction(action, id, employer_id, term_date, start_on) {
     clearDatePickerValue();
     disableSubmitButton();
     updateDatePickerBasedOnTermReason('voluntary', id)
+    disableTransmitToCarrier(applicationId);
   }
   
   if (action == 'cancel') {
     hideEndDateField(pyStartDate, applicationId);
     hideTerminationRadios();
     enableSubmitButton();
+    disableTransmitToCarrier();
   }
   // Clears all end dates from previous rows
   var endDates = document.querySelectorAll('.py-end-date');
@@ -296,14 +324,22 @@ function checkTermReason() {
 
 // You can use the actionSelected here
 function submitPlanActions() {
-  termKind = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
-  termReason = $('#term_reason_' + applicationId).val()
-  transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
-  $.ajax({
-    url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
-    method: 'PUT',
-    data: { employer_id: employerId, end_on: pyEndDate, term_kind: termKind, term_reason: termReason, transmit_to_carrier: transmit_to_carrier }
-  });
+  if (actionSelected == 'reinstate'){
+    $("#reinstateBenefitApplication").modal('show');
+    transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
+    $('input:hidden[name=transmit_to_carrier]').val(transmit_to_carrier)
+    $('input:hidden[name=employer_id]').val(employerId)
+    $('input:hidden[name=employer_application_id]').val(applicationId)
+  }else{
+    termKind = actionSelected == "terminate" ? $('input[name=term_actions]:checked').val() : ""
+    termReason = $('#term_reason_' + applicationId).val()
+    transmit_to_carrier =  $('#' + applicationId).find('input[id=transmit_to_carrier]').is(":checked")
+    $.ajax({
+        url: "/exchanges/employer_applications/"+applicationId+"/"+actionSelected,
+        method: 'PUT',
+        data: { employer_id: employerId, end_on: pyEndDate, term_kind: termKind, term_reason: termReason, transmit_to_carrier: transmit_to_carrier }
+    });
+  }
 }
 
 $('#attestation_documents_table').mousemove(function() {

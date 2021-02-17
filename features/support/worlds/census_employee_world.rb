@@ -312,6 +312,14 @@ And(/^Assign benefit group assignments to (.*?) employee$/) do |legal_name|
   end
 end
 
+And(/^employee should see (.*?) enrollment$/) do |enrollment_status|
+  if enrollment_status == 'terminated'
+    expect(page).to have_content('Terminated')
+  else
+    expect(page).to have_content('Termination Pending')
+  end
+end
+
 And(/^employees for (.*?) have a selected coverage$/) do |legal_name|
 
   step "Employees for #{legal_name} have both Benefit Group Assignments Employee role"
@@ -420,7 +428,35 @@ And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be unde
   expect(off_cycle_enrollments).to include(most_recent_enrollment)
 end
 
-And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |legal_name, named_person|
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the future reinstated benefit application$/) do |named_person, _legal_name|
+  sleep 1
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  reinstated_benefit_application = census_employee.benefit_sponsorship.future_active_reinstated_benefit_application
+  benefit_package = reinstated_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = reinstated_benefit_application.end_on
+  reinstated_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(reinstated_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(reinstated_enrollments).to include(most_recent_enrollment)
+end
+
+And(/^employee (.*?) of employer (.*?) most recent HBX Enrollment should be under the (termination pending|reinstated) benefit application$/) do |named_person, _legal_name, _aasm_state|
+  sleep 1
+  person = people[named_person]
+  person_record = Person.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  census_employee = CensusEmployee.where(first_name: person[:first_name], last_name: person[:last_name]).last
+  current_benefit_application = census_employee.benefit_sponsorship.current_benefit_application
+  benefit_package = current_benefit_application.benefit_packages[0]
+  sponsored_benefit = benefit_package.sponsored_benefits.first
+  end_date = current_benefit_application.end_on
+  current_enrollments = HbxEnrollment.by_benefit_application_and_sponsored_benefit(current_benefit_application, sponsored_benefit, end_date)
+  most_recent_enrollment = person_record.primary_family.hbx_enrollments.last
+  expect(current_enrollments).to include(most_recent_enrollment)
+end
+
+And(/^employer (.*?) with employee (.*?) has has person and user record present$/) do |_legal_name, named_person|
   person = people[named_person]
   person_record_from_census_employee(person)
   user_record_from_census_employee(person)

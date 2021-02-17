@@ -34,7 +34,7 @@ module Eligibility
     end
 
     def possible_benefit_group_assignment
-      renewal_benefit_group_assignment || off_cycle_benefit_group_assignment || active_benefit_group_assignment
+      renewal_benefit_group_assignment || off_cycle_benefit_group_assignment || future_active_reinstated_benefit_group_assignment || active_benefit_group_assignment
     end
   end
 end
