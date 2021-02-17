@@ -110,7 +110,8 @@ module BenefitSponsors
           return Success(reinstated_ba.benefit_sponsorship) unless TimeKeeper.date_of_record >= renewal_ba_generation_date
 
           ba_enrollment_service = ::BenefitSponsors::BenefitApplications::BenefitApplicationEnrollmentService.new(reinstated_ba)
-          ba_enrollment_service.renew_application
+          async_workflow_id = Rails.env.production? ? SecureRandom.uuid.gsub("-","") : nil
+          ba_enrollment_service.renew_application(async_workflow_id)
           Success(reinstated_ba.benefit_sponsorship)
         end
       end

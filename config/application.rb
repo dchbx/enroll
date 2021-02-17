@@ -4,6 +4,7 @@ require File.expand_path('../boot', __FILE__)
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "rails/test_unit/railtie"
+require "action_cable/engine"
 require "sprockets/railtie" # Uncomment this line for Rails 3.1+
 
 # Configure fallbacks for mongoid errors:
@@ -72,6 +73,8 @@ module Enroll
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::EmployerBenefitRenewalSubscriber")
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageRenewalGroupAssignmentSubscriber", 3)
       config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageEmployeeRenewerSubscriber", 3)
+      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::BenefitPackageReinstateGroupAssignmentSubscriber")
+      config.acapi.add_amqp_worker("BenefitSponsors::Subscribers::ReinstateEmployeeEnrollmentSubscriber")
       config.acapi.add_amqp_worker("TransportProfiles::Subscribers::TransportArtifactSubscriber")
       config.acapi.add_async_subscription("Notifier::NotificationSubscriber")
     end

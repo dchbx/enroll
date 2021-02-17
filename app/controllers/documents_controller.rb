@@ -49,7 +49,7 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h, user: current_user})
+    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
     if result.success?
       response_data = result.value!
       send_data response_data, get_options(params)
@@ -58,6 +58,7 @@ class DocumentsController < ApplicationController
       redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
     end
   rescue StandardError => e
+    Rails.logger.error {"Cartafact Download Error - #{e}"}
     redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
@@ -264,11 +265,6 @@ class DocumentsController < ApplicationController
     owner.user.has_hbx_staff_role? || documents.find(document_id).present?
   end
 
-  #permitting required params for cartafact downloads
-  def cartafact_download_params
-    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
-  end
-
   def update_documents_status(family_member)
     family = family_member.family
     family.update_family_document_status!
@@ -305,5 +301,10 @@ class DocumentsController < ApplicationController
   def set_min_due_date_on_family
     family = @family_member.family
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+  end
+
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 end

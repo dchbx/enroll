@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module BenefitSponsors
   module BenefitPackages
     class BenefitPackage
@@ -257,8 +259,9 @@ module BenefitSponsors
         ::Operations::BenefitGroupAssignments::Reinstate.new.call({benefit_group_assignment: benefit_group_assignment, options: {benefit_package: self} })
       end
 
-      def reinstate_enrollment(hbx_enrollment)
-        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment, options: {benefit_package: self, notify: benefit_application.is_application_trading_partner_publishable?}})
+      def reinstate_enrollment(hbx_enrollment, notify: false)
+        notify_trading_partner = notify.present? ? notify : benefit_application.is_application_trading_partner_publishable?
+        ::Operations::HbxEnrollments::Reinstate.new.call({hbx_enrollment: hbx_enrollment, options: {benefit_package: self, notify: notify_trading_partner}})
       end
 
       def renew_member_benefits
@@ -439,14 +442,40 @@ module BenefitSponsors
 
       def reinstate_member(census_employee, predecessor_package, end_date)
         benefit_group_assignment = census_employee.benefit_group_assignments.where(benefit_package_id: predecessor_package.id, end_on: end_date).order_by(:created_at.desc).first
-        result = reinstate_benefit_group_assignment(benefit_group_assignment)
-        raise StandardError, "assignment: #{benefit_group_assignment.id}" unless result.success?
+
+        if Rails.env.production?
+          trigger_reinstate_assignment_event(census_employee, benefit_group_assignment)
+        else
+          result = reinstate_benefit_group_assignment(benefit_group_assignment)
+          raise StandardError, "assignment: #{benefit_group_assignment.id}" unless result.success?
+        end
+
         enrollments_eligible_for_reinstate(census_employee, predecessor_package).each do |hbx_enrollment|
-          result = reinstate_enrollment(hbx_enrollment)
-          raise StandardError, "enrollment: #{hbx_enrollment.hbx_id}" unless result.success?
+          if Rails.env.production?
+            trigger_reinstate_enrollment_event(hbx_enrollment)
+          else
+            result = reinstate_enrollment(hbx_enrollment)
+            raise StandardError, "enrollment: #{hbx_enrollment.hbx_id}" unless result.success?
+          end
         end
       rescue StandardError => e
         Rails.logger.error { "Unable to reinstate census member: #{census_employee.id} - #{e.message}" }
+      end
+
+      def trigger_reinstate_assignment_event(census_employee, benefit_group_assignment)
+        notify("acapi.info.events.benefit_package.reinstate_employee_assignment",
+               { :census_employee_id => census_employee.id.to_s,
+                 :benefit_group_assignment_id => benefit_group_assignment.id.to_s,
+                 :benefit_package_id => self.id.to_s})
+      end
+
+      def trigger_reinstate_enrollment_event(hbx_enrollment)
+        notify("acapi.info.events.benefit_package.reinstate_employee_enrollment",
+               {
+                 :notify => benefit_application.is_application_trading_partner_publishable?,
+                 :hbx_enrollment_id => hbx_enrollment.id.to_s,
+                 :benefit_package_id => self.id.to_s
+               })
       end
 
       def cancel_member_benefits(delete_benefit_package: false, enroll_notify: false)

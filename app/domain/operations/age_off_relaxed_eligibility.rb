@@ -57,13 +57,14 @@ module Operations
         if (dob + cut_off_age.years) < compare_26_old
           Failure('Not Eligible')
         else
-          has_continuous_coverage?(family_member, market_key, effective_on) ? Success('Eligible') : Failure('Not eligible')
+          has_continuous_coverage?(family_member, market_key, effective_on, cut_off_age) ? Success('Eligible') : Failure('Not eligible')
         end
       end
     end
 
     # Checks to see if the family member has a continuous coverage until new effective_on
-    def has_continuous_coverage?(family_member, market_key, effective_on)
+    def has_continuous_coverage?(family_member, market_key, effective_on, cut_off_age)
+      return true if family_member.person.age_on(effective_on) < cut_off_age # checks for dependent who turns 26 in the same effective on month.
       kind = (market_key == :aca_individual_dependent_age_off) ? :individual_market : :shop_market
       enr = family_member.family.hbx_enrollments.enrolled_and_terminated.send(kind).where(:"hbx_enrollment_members.applicant_id" => family_member.id).effective_asc.last
       return false if enr.blank?

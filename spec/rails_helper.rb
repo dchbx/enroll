@@ -9,6 +9,7 @@ require 'rspec/rails'
 require 'shoulda/matchers'
 require 'webmock/rspec'
 require "#{Rails.root}/lib/custom_linters/translations/view_translations_linter_helper.rb"
+require 'stimulus_reflex_testing/rspec'
 
 WebMock.allow_net_connect!
 

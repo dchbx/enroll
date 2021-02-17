@@ -208,6 +208,15 @@ module BenefitSponsors
       # End: API fields
       #
 
+      def self.all_profiles
+        Rails.cache.fetch("all_profiles", expires_in: 4.hour) do
+          profiles = []
+          profiles.push(*self.employer_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'employer' } })
+          profiles.push(*self.broker_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'broker_agency' } })
+          profiles.push(*self.general_agency_profiles.all.map { |org| { fein: org.fein, hbx_id: org.hbx_id, legal_name: org.legal_name, id: org.id.to_s, entity_type: 'general_agency' } })
+        end
+      end
+
       # Strip non-numeric characters
       def fein=(new_fein)
         numeric_fein = new_fein.to_s.gsub(/\D/, '')
@@ -269,16 +278,36 @@ module BenefitSponsors
         end
       end
 
+      def profile_types
+        result = []
+        result << 'employer' if is_employer_profile?
+        result << 'broker_agency' if is_broker_agency_profile?
+        result << 'general_agency' if is_general_agency_profile?
+        result
+      end
+
       def employer_profile
         self.profiles.where(_type: /.*EmployerProfile$/).first
+      end
+
+      def is_employer_profile?
+        profiles.where(_type: /.*EmployerProfile$/).present?
       end
 
       def broker_agency_profile
         self.profiles.where(_type: /.*BrokerAgencyProfile$/).first
       end
 
+      def is_broker_agency_profile?
+        profiles.where(_type: /.*BrokerAgencyProfile$/).present?
+      end
+
       def general_agency_profile
         self.profiles.where(_type: /.*GeneralAgencyProfile$/).first
+      end
+
+      def is_general_agency_profile?
+        profiles.where(_type: /.*GeneralAgencyProfile$/).present?
       end
 
       def hbx_profile
