@@ -229,8 +229,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       expect(rendered).to match /#{Settings.site.short_name}/
     end
 
-    it "should display the link of view detail" do
-      expect(rendered).to have_selector("a[href='/products/plans/summary?active_year=#{product.active_year}&hbx_enrollment_id=#{hbx_enrollment.id}&source=account&standard_component_id=#{product.hios_id}']", text: "View Details")
+    it "should display the Actions Drop down" do
+      expect(rendered).to have_text("Actions")
     end
 
     it "should display the plan start" do
@@ -341,8 +341,8 @@ RSpec.describe "insured/families/_enrollment.html.erb" do
       render partial: "insured/families/enrollment", collection: [hbx_enrollment], as: :hbx_enrollment, locals: { read_only: false }
     end
 
-    it "should display make changes button" do
-      expect(rendered).to have_text("Make Changes")
+    it "should display Actions button" do
+      expect(rendered).to have_text("Actions")
     end
   end
 

@@ -153,6 +153,10 @@ And(/^I should be able to click  Leave DC Health LINK buttton$/) do
   sleep 5
 end
 
+Then(/^I should be able to view DC Health LINK text$/) do
+  expect(page).to have_content("You are leaving the DC Health Link website and entering a privately-owned website created, operated and maintained by Kaiser Permanente.")
+end
+
 And(/^I should see an alert with error message$/) do
   expect(page.driver.browser.switch_to.alert.text).to have_content("We're sorry, but something went wrong. You can try again, or pay once you receive your invoice.")
 end
