@@ -45,6 +45,10 @@ module Insured
         return true if hbx_enrollment.effective_on > TimeKeeper.date_of_record
       end
 
+      def past_or_on_effective_on?(hbx_enrollment)
+        return true if hbx_enrollment.effective_on >= TimeKeeper.date_of_record
+      end
+
       def has_break_in_coverage_enrollments?(hbx_enrollment)
         enrollments = hbx_enrollment.family.enrollments.current_year.where(aasm_state: "coverage_terminated")
         enrollments.any? { |enr| enr.terminated_on.year == hbx_enrollment.effective_on.year && (hbx_enrollment.effective_on - enr.terminated_on) > 1 }

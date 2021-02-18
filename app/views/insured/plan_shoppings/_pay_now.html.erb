@@ -6,40 +6,7 @@
   <% end %>
 <% end %>
 
-<!-- Payment confitmation modal-->
-<div class="modal fade" tabindex="-1" role="dialog" id="payNowModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title text-center text-uppercase"></h4>
-      </div>
-      <div class="modal-body">
-        <p>
-          <%= l10n('plans.kaiser.pay_now.redirection_message', site_short_name: Settings.site.short_name) %><br/>
-          <ul>
-            <li><%= l10n('plans.kaiser.pay_now.link_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.collecting_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.exchange_disclaimer_for_auth') %></li>
-            <br/>
-          </ul>
-          <%= l10n('plans.kaiser.pay_now.exchange_disclaimer') %>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
-          <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
-          <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
-            Leave DC Health LINK
-          </button>
-        </form>
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal">GO BACK</button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+<%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment %>
 
 <script>
 $("#pay-now").on('click', function (e) {

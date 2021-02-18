@@ -17,6 +17,29 @@ function runGlossary() {
     // Certain glossary terms have been rearranged to avoid a smaller word being given a popover instead of the
     // full glossary term (e.g. Premium/ Premium Tax Credit)
     var terms = [
+      // UPDATE TEXT OF TERMS AFTER DROPDOWN TEXT REFACTOR
+      {
+        "term": "View my coverage details",
+        "description": "Learn more about what my plan covers."
+      },
+      {
+        "term": "Make changes to my coverage",
+        "description": "Make changes to my plan."
+      },
+      {
+        "term": "Make a first payment for my new plan",
+        "description": "This payment will confirm your enrollment and allow you to begin your coverage. Please note it typically takes up to 3-5 business days after you sign up for you to be able to make a first payment."
+      },
+      // Kaiser payment definition
+      {
+        "term": "Make payments for my plan",
+        "description": "If you have already made your first premium payment for your plan, and are looking to make your monthly premium payment, you may log into your payment account here."
+      },
+      // Other payment definition
+      // {
+      //   "term": "Make payments for my plan",
+      //   "description": "Go to your insurance company's payment portal to make a new payment or manage your existing payments."
+      // },
       {
         "term": "ACA",
         "description": "The acronym for the <a href='https://dchealthlink.com/glossary#affordable_care_act' target='_blank'>Affordable Care Act<\/a>."
@@ -1096,9 +1119,17 @@ function runGlossary() {
           var description  = term.description;
           var newElement   = "";
           $(matchingEl).html().toString().split(popoverRegex).forEach(function(text){
+            // in the case of the pay now actions dropdown, if kaiser enrollment use kaiser definition, if any other use other definition
+            if (term = "Make Payments for My Plan") {
+              if ($(matchingEl).hasClass('pay-now-other')) {
+                description = "Go to your insurance company's payment portal to make a new payment or manage your existing payments.";
+              }
+            }
             // if a matching term has not yet been given a popover, replace it with the popover element
             if (!text.includes("class=\"glossary\"")) {
-              newElement += text.replace(termRegex, '<span class="glossary" data-toggle="popover" data-placement="auto top" data-trigger="click focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" data-content="' + description + '" data-title="' + term.term + '<button data-dismiss=\'modal\' type=\'button\' class=\'close\' aria-label=\'Close\' onclick=\'hideGlossaryPopovers()\'></button>">$1</span>');
+              // if dropdown-glossary make popover on hover, as clicking the link would redirect and not show the popover
+              var trigger = ($(matchingEl).hasClass('dropdown-glossary') ? 'hover' : 'click')
+              newElement += text.replace(termRegex, '<span class="glossary" data-toggle="popover" data-placement="auto top" data-trigger="' + trigger + ' focus" data-boundary="window" data-fallbackPlacement="flip" data-html="true" data-content="' + description + '" data-title="' + term.term + '<button data-dismiss=\'modal\' type=\'button\' class=\'close\' aria-label=\'Close\' onclick=\'hideGlossaryPopovers()\'></button>">$1</span>');
             }
             else {
               // if the term has already been given a popover, do not search it again
@@ -1108,6 +1139,9 @@ function runGlossary() {
           });
         });
     });
+    if ($('#account-detail').length > 0) {
+      $('[data-trigger="hover focus"]').popover({placement: 'right', container: '#account-detail'});
+    }
     $('[data-toggle="popover"]').popover();
 
     // Because of the change to popover on click instead of hover, you need to
