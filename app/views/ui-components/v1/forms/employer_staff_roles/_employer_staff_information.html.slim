@@ -30,5 +30,14 @@ fieldset
     = f.hidden_field :person_id, value: f.object.person_id
     = f.hidden_field :profile_id, value: nil
     = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
-      = render partial: './ui-components/v1/forms/coverage_record', locals: { f: f }
+      - @coverage_record_form = f
+      .col-md-3.mb-3
+        label for="inputApplying"  #{l10n('is_applying_coverage')} *
+        = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying', :onchange => 'isApplyingCoverage(this)'
+        .invalid-feedback
+          | Please select an applying coverage option.
+
+- if @coverage_record_form.present?
+  fieldset.mt-2.col-md-12.optional.hidden
+    = render partial: './ui-components/v1/forms/coverage_record', locals: { f: @coverage_record_form }
 
