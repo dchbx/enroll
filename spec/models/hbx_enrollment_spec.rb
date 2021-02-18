@@ -1003,6 +1003,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         hbx_enrollment.cancel_coverage!
         expect(hbx_enrollment.terminated_on).to eq nil
       end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq true
+        hbx_enrollment.cancel_coverage!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_coverage?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
+      end
     end
 
     context "cancel_for_non_payment!" do
@@ -1017,6 +1030,19 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
       it "should not populate the terminated on" do
         hbx_enrollment.cancel_for_non_payment!
         expect(hbx_enrollment.terminated_on).to eq nil
+      end
+
+      it "should cancel coverage expired ivl enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'individual')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq true
+        hbx_enrollment.cancel_for_non_payment!
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
+      end
+
+      it "should not cancel coverage expired shop enrollment" do
+        hbx_enrollment.update_attributes(aasm_state: 'coverage_expired', kind: 'employer_sponsored')
+        expect(hbx_enrollment.may_cancel_for_non_payment?).to eq false
+        expect(hbx_enrollment.aasm_state).to eq 'coverage_expired'
       end
     end
 
@@ -3849,10 +3875,32 @@ describe ".propogate_cancel" do
         expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
         expect(active_coverage.aasm_state).to eq "coverage_canceled"
       end
+
+      it 'should cancel renewal enrollment when canceling expired enrollment' do
+        active_coverage.update_attributes(aasm_state: 'coverage_expired')
+        active_coverage.reload
+        expect(active_coverage.aasm_state).to eq 'coverage_expired'
+        active_coverage.cancel_coverage!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
     end
 
     context "cancel_for_non_payment" do
       it 'should cancel renewal enrollment when canceling active enrollment' do
+        active_coverage.cancel_for_non_payment!
+        family.reload
+        renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(active_coverage.aasm_state).to eq "coverage_canceled"
+      end
+
+      it 'should cancel renewal enrollment when canceling expired enrollment' do
+        active_coverage.update_attributes(aasm_state: 'coverage_expired')
+        active_coverage.reload
+        expect(active_coverage.aasm_state).to eq 'coverage_expired'
         active_coverage.cancel_for_non_payment!
         family.reload
         renewal_enrollment = family.hbx_enrollments.where(effective_on: TimeKeeper.date_of_record.next_year.beginning_of_year).first
