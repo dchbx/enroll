@@ -768,7 +768,7 @@ class HbxEnrollment
   def term_or_cancel_benefit_group_assignment
     return unless benefit_group_assignment && (census_employee.employee_termination_pending? || census_employee.employment_terminated?) && census_employee.coverage_terminated_on
 
-    termed_date = census_employee.coverage_terminated_on
+    termed_date = [census_employee.coverage_terminated_on, sponsored_benefit_package.end_on].min
     end_date = benefit_group_assignment.start_on > termed_date ? benefit_group_assignment.start_on : termed_date
     benefit_group_assignment.end_benefit(end_date)
     benefit_group_assignment.save
