@@ -6,6 +6,7 @@ require 'dry/monads/do'
 module BenefitSponsors
   module Operations
     module BenefitApplication
+      # Finds benefit application with the given id
       class FindModel
         include Dry::Monads[:result, :do]
 
