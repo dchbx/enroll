@@ -247,6 +247,33 @@ class EmployeeRole
     end
   end
 
+  def fetch_benefit_applications_for_date(effective_date = nil)
+    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && prior_py_or_active_py_sep?(effective_date)
+      employer_profile.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPPROVED_AND_TERMINATED_STATES).select{|ba| ((ba.start_on.beginning_of_day..ba.end_on.end_of_day).cover? effective_date) }
+    else
+      employer_profile.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES)
+    end
+  end
+
+  def prior_py_or_active_py_sep?(effective_date)
+    return false if effective_date.blank?
+    application_states = BenefitSponsors::BenefitApplications::BenefitApplication::COVERAGE_EFFECTIVE_STATES
+    active_benefit_application = employer_profile.benefit_applications.where(:aasm_state.in => application_states).last
+
+    return false if active_benefit_application.blank?
+    return true if (active_benefit_application.start_on.beginning_of_day..active_benefit_application.end_on.end_of_day).cover?(effective_date)
+
+    offset_months = EnrollRegistry[:prior_plan_year_sep].setting(:offset_months).item
+    start_date = active_benefit_application.start_on
+    end_date = start_date - offset_months.months
+
+    terminated_states = [:terminated, :expired, :termination_pending]
+    prior_ba = employer_profile.benefit_applications.future_effective_date(end_date).where(:aasm_state.in => terminated_states).max_by(&:created_at)
+    return false if prior_ba.blank?
+    return false unless (prior_ba.start_on..prior_ba.end_on).cover?(effective_date)
+    true
+  end
+
   def coverage_effective_on(current_benefit_group: nil, qle: false)
     if qle && benefit_package(qle: qle).present?
       current_benefit_group = benefit_package(qle: qle)

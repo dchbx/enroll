@@ -206,10 +206,10 @@ private
     return if next_poss_effective_date.blank?
     return true unless is_shop_or_fehb? && family.has_primary_active_employee?
 
-    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+    min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, next_poss_effective_date
+    max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, next_poss_effective_date
     if !(min_date || max_date)
-      errors.add(:next_poss_effective_date, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+      errors.add(:next_poss_effective_date, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligibile plan years present")
     elsif !next_poss_effective_date.between?(min_date, max_date)
       errors.add(:next_poss_effective_date, "out of range.")
     end
@@ -220,10 +220,10 @@ private
 
     optional_effective_on.each_with_index do |date_option, index|
       date_option = Date.strptime(date_option, "%m/%d/%Y")
-      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind
-      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind
+      min_date = sep_optional_date family, 'min', qualifying_life_event_kind.market_kind, date_option
+      max_date = sep_optional_date family, 'max', qualifying_life_event_kind.market_kind, date_option
       if !(min_date || max_date)
-        errors.add(:optional_effective_on, "No active plan years present") if !(errors.messages.values.flatten.include?("No active plan years present"))
+        errors.add(:optional_effective_on, "No eligible plan years present") unless errors.messages.values.flatten.include?("No eligibile plan years present")
       elsif !date_option.between?(min_date, max_date)
         errors.add(:optional_effective_on, "Date #{index+1} option out of range.")
       end

@@ -22,15 +22,19 @@ module TimeHelper
     TimeKeeper.date_of_record.between?(set_date_min_to_effective_on(enrollment), set_date_max_to_plan_end_of_year(enrollment)) ? TimeKeeper.date_of_record : set_date_max_to_plan_end_of_year(enrollment)
   end
 
-  def sep_optional_date family, min_or_max, market_kind=nil
+  def sep_optional_date(family, min_or_max, market_kind = nil, effective_date = nil)
     person = family.primary_applicant.person
+
+    return nil unless has_employee_role?(person, market_kind)
+    benefit_applications = person.active_employee_roles.map{|ee| ee.fetch_benefit_applications_for_date(effective_date)}.flatten.compact
+    min_or_max == 'min' ? benefit_applications.map(&:start_on).min : benefit_applications.map(&:end_on).max
+  end
+
+  def has_employee_role?(person, market_kind)
     has_dual_roles         = person.has_consumer_role? && person.has_active_employee_role?
     has_only_employee_role = person.has_active_employee_role? && !person.has_consumer_role?
 
-    return nil unless has_only_employee_role || (has_dual_roles && ['shop', 'fehb'].include?(market_kind))
-
-    active_plan_years = person.active_employee_roles.map(&:employer_profile).map(&:benefit_applications).map(&:published_or_renewing_published).flatten
-    min_or_max == 'min' ? active_plan_years.map(&:start_on).min : active_plan_years.map(&:end_on).max
+    has_only_employee_role || (has_dual_roles && %w[shop fehb].include?(market_kind))
   end
 end
 

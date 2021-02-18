@@ -88,9 +88,9 @@ purchases.each do |rec|
   Rails.logger.info "-----publishing #{pol_id}"
 
   if rec["enrollment_state"] == 'auto_renewing' || is_retro_renewal_enrollment?(pol_id)
-    puts "renewal enrollment #{pol_id}"
+    IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#auto_renew")
   else
-    puts "initial enrollment #{pol_id}"
+    IvlEnrollmentsPublisher.publish_action(purchase_event, pol_id, "urn:openhbx:terms:v1:enrollment#initial")
   end
 end
 
