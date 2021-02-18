@@ -473,6 +473,7 @@ def employer_poc
   def view_enrollment_to_update_end_date
     @person = Person.find(params[:person_id])
     @row = params[:family_actions_id]
+    @element_to_replace_id = params[:family_actions_id]
     @enrollments = @person.primary_family.terminated_enrollments
     @coverage_ended_enrollments = @person.primary_family.hbx_enrollments.where(:aasm_state.in=> ["coverage_terminated", "coverage_termination_pending", "coverage_expired"])
     @dup_enr_ids = fetch_duplicate_enrollment_ids(@coverage_ended_enrollments).map(&:to_s)
@@ -482,16 +483,19 @@ def employer_poc
     begin
       enrollment = HbxEnrollment.find(params[:enrollment_id].strip)
       @row = params[:family_actions_id]
+      @element_to_replace_id = params[:family_actions_id]
       termination_date = Date.strptime(params["new_termination_date"], "%m/%d/%Y")
       if enrollment.present? && enrollment.reterm_enrollment_with_earlier_date(termination_date, params["edi_required"].present?)
-        message = {notice: "Enrollment Updated Successfully."}
+        respond_to do |format|
+          format.js
+        end
       else
         message = {notice: "Unable to find/update Enrollment."}
+        redirect_to exchanges_hbx_profiles_root_path, flash: message
       end
     rescue Exception => e
       message = {error: e.to_s}
     end
-    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def broker_agency_index
@@ -584,20 +588,22 @@ def employer_poc
     if enrollment.present?
       begin
         reinstated_enrollment = enrollment.reinstate(edi: params['edi_required'].present?)
+        @element_to_replace_id = params[:family_actions_id]
         if reinstated_enrollment.present?
           if params['comments'].present?
             reinstated_enrollment.comments.create(:content => params[:comments].strip, :user => current_user.id)
           end
-          message = {notice: "Enrollment Reinstated successfully."}
+          respond_to do |format|
+            format.js
+          end
         end
       rescue Exception => e
         message = {error: e.to_s}
       end
     else
       message = {notice: "Unable to find Enrollment."}
+      redirect_to exchanges_hbx_profiles_root_path, flash: message
     end
-
-    redirect_to exchanges_hbx_profiles_root_path, flash: message
   end
 
   def edit_dob_ssn
