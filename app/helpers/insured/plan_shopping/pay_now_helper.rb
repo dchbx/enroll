@@ -4,6 +4,13 @@ module Insured
   module PlanShopping
     #helper related to paynow feature
     module PayNowHelper
+      LINK_URL = {
+        "BEST Life" => 'https://www.bestlife.com/exchange/payment_option.html',
+        "CareFirst" => "https://member.carefirst.com/members/home.page",
+        "Delta Dental" => "https://www1.deltadentalins.com/login.html",
+        "Dominion" => "https://www.dominionmembers.com/"
+      }.freeze
+
       def show_pay_now?(source, hbx_enrollment)
         return false unless EnrollRegistry[:pay_now_functionality].feature.is_enabled
         if source == "Plan Shopping"
@@ -15,6 +22,11 @@ module Insured
 
       def can_pay_now?(hbx_enrollment)
         return true if carrier_with_payment_option?(hbx_enrollment) && individual?(hbx_enrollment) && (has_break_in_coverage_enrollments?(hbx_enrollment) || !has_any_previous_enrollments?(hbx_enrollment))
+      end
+
+      def carrier_link(product)
+        legal_name = product.issuer_profile.legal_name
+        (link_to l10n("plans.kaiser.pay_now.first_payment"),LINK_URL[legal_name], class: "btn-link btn-block dropdown-item", style: 'padding: 6px 12px; margin: 4px 0;', target: '_blank').html_safe
       end
 
       def carrier_with_payment_option?(hbx_enrollment)
