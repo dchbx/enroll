@@ -6,7 +6,7 @@
       li
         a href="#general_agency_staff"  = l10n("general_agency_staff")
     #general_agency_registration
-      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form"
+      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form", locals: {create_action: 'create_ga_profile'}
     #general_agency_staff
 
 javascript:
