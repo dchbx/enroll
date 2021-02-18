@@ -1,4 +1,11 @@
 {
-  unique_html_attributes: ["alt", "for", "id", "placeholder"],
+  unique_html_attributes: ["alt", "for", "id", "name", "placeholder"],
   verify_alt_attribute_presence: ["img"]
 }
+
+# List so far
+# Unique HTML attributes - "alt", "for", "id", "name", "placeholder", etc.
+# Alt Text Presence - Images, logos, non text element
+# Unique Text for Links - Assure there are no links that have the same text. For example, there can't be five links on the same page with the text of only "Family" even if the href is different. They need 'title' elements in some cases
+# Tables - Row and column headers shall be identified for data tables.
+# - Descriptive labels - <input>, <textarea>, and <select> elements have descriptive labels.
