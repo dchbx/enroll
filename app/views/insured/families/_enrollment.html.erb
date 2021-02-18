@@ -200,7 +200,8 @@
               <%= l10n("actions")%>
               <span class="caret"></span>
             </button>
-            <div class="dropdown-menu" role="menu" aria-labelledby="dropdownmenuButton">
+            <% carrier = hbx_enrollment.product.carrier_profile.legal_name %>
+            <div class="dropdown-menu dropdown-glossary run-glossary <%= carrier == "Kaiser" ? '' : 'pay-now-other' %>" role="menu" aria-labelledby="dropdownmenuButton">
 
               <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
               <%= link_to l10n("view_details"), summary_products_plans_path({standard_component_id: product.hios_id, hbx_enrollment_id: hbx_enrollment.id, active_year: product.active_year, source: 'account'}), {class: 'btn-link btn-block dropdown-item', style: 'padding: 6px 12px; margin: 4px 0;', remote: true} %>
@@ -218,9 +219,14 @@
                 </span>
               <% end %>
 
-              <% if past_effective_on?(hbx_enrollment) && can_pay_now?(hbx_enrollment) %>
-                <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
+              <div class="dropdown-divider" style="border-top: 1px solid #e9ecef"></div>
+
+              <% if carrier == "Kaiser" && !past_or_on_effective_on?(hbx_enrollment) %>
                 <button class="btn-link btn-block" data-toggle="modal" data-target="#payNowModal" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("plans.kaiser.pay_now.first_payment")%></button>
+              <% elsif carrier == "Kaiser" && past_or_on_effective_on?(hbx_enrollment) %>
+                <button class="btn-link btn-block" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("make_payments_for_my_plan")%></button>
+              <% else %>
+                <button class="btn-link btn-block pay-now-other" style="padding: 6px 12px; margin: 4px 0; text-align: left;" data-enrollment="<%= hbx_enrollment.hbx_id %>"><%= l10n("make_payments_for_my_plan")%></button>
               <% end %>
             </div>
           </div>
@@ -232,40 +238,7 @@
 </div>
 <% end %>
 
-<!-- Refactor this modal to use pay now partial-->
-<div class="modal fade" tabindex="-1" role="dialog" id="payNowModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title text-center text-uppercase"></h4>
-      </div>
-      <div class="modal-body">
-        <p>
-          <%= l10n('plans.kaiser.pay_now.redirection_message', site_short_name: Settings.site.short_name) %><br/>
-          <ul>
-            <li><%= l10n('plans.kaiser.pay_now.link_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.collecting_info')%></li>
-            <li><%= l10n('plans.kaiser.pay_now.exchange_disclaimer_for_auth') %></li>
-            <br/>
-          </ul>
-          <%= l10n('plans.kaiser.pay_now.exchange_disclaimer') %>
-        </p>
-      </div>
-      <div class="modal-footer">
-        <form action=<%= @kp_pay_now_url %> method="post" target="_blank" id="pay_now_form">
-          <input type="hidden" name="SAMLResponse" value="response" id="sp"/>
-          <input type="hidden" name="RelayState" value=<%= @kp_relay_state %>/> 
-          <button type="submit" class="btn btn-primary pull-right sp interaction-click-control-print-purchase-confirmation" id="pay-now" value="<%= hbx_enrollment.hbx_id %>">
-            <%= l10n("leave_dc_health_link")%>
-          </button>
-        </form>
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal"><%= l10n("go_back")%></button>
-      </div>
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+<%= render "shared/pay_now_modal", hbx_enrollment: hbx_enrollment %>
 
 <script>
   var initiallyHiddenEnrollmentPanels = document.getElementsByClassName("initially_hidden_enrollment");
