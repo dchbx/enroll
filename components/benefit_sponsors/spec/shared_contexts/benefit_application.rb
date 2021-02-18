@@ -120,3 +120,107 @@ RSpec.shared_context "setup renewal application", :shared_context => :metadata d
   end
   let(:current_benefit_package)   { predecessor_application.benefit_packages[0] }
 end
+
+RSpec.shared_context "setup expired, and active benefit applications", :shared_context => :metadata do
+  include_context 'setup initial benefit application'
+
+  let(:expired_benefit_application) do
+    initial_application.update_attributes(aasm_state: :expired)
+    initial_application
+  end
+
+  let!(:active_benefit_application) do
+    application = expired_benefit_application.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :active)
+    application
+  end
+
+  let(:expired_benefit_package) { expired_benefit_application.benefit_packages[0] }
+  let(:active_benefit_package) { active_benefit_application.benefit_packages[0] }
+  let(:expired_sponsored_benefit) { expired_benefit_package.sponsored_benefit_for(coverage_kind) }
+  let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
+end
+
+RSpec.shared_context "setup expired, active and renewing benefit applications", :shared_context => :metadata do
+  include_context 'setup initial benefit application'
+
+  let(:expired_benefit_application) do
+    initial_application.update_attributes(aasm_state: :expired)
+    initial_application
+  end
+
+  let!(:active_benefit_application) do
+    application = expired_benefit_application.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :active)
+    application
+  end
+
+  let!(:renewal_benefit_application) do
+    application = active_benefit_application.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application
+  end
+
+  let(:expired_benefit_package) { expired_benefit_application.benefit_packages[0] }
+  let(:active_benefit_package) { active_benefit_application.benefit_packages[0] }
+  let(:renewal_benefit_package) { renewal_benefit_application.benefit_packages[0] }
+  let(:expired_sponsored_benefit) { expired_benefit_package.sponsored_benefit_for(coverage_kind) }
+  let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
+  let(:renewal_sponsored_benefit) { renewal_benefit_package.sponsored_benefit_for(coverage_kind) }
+end
+
+RSpec.shared_context "setup terminated and active benefit applications", :shared_context => :metadata do
+  include_context 'setup initial benefit application'
+
+  let(:benefit_application) do
+    initial_application
+  end
+
+  let!(:active_benefit_application) do
+    application = benefit_application.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :active)
+    application
+  end
+
+  let(:terminated_benefit_package) { benefit_application.benefit_packages[0] }
+  let(:active_benefit_package) { active_benefit_application.benefit_packages[0] }
+  let(:hired_on)        { benefit_application.start_on - 10.days }
+  let(:terminated_sponsored_benefit) { terminated_benefit_package.sponsored_benefit_for(coverage_kind) }
+  let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
+
+  let(:terminated_benefit_application) do
+    termination_date = benefit_application.start_on + 5.months
+    effective_period = benefit_application.start_on..termination_date
+    benefit_application.update_attributes(aasm_state: :terminated, terminated_on: termination_date, effective_period: effective_period)
+    benefit_application
+  end
+end
+
+RSpec.shared_context "setup expired and active benefit applications", :shared_context => :metadata do
+  include_context 'setup initial benefit application'
+
+  let(:expired_benefit_application) do
+    initial_application.update_attributes(aasm_state: :expired)
+    initial_application
+  end
+
+  let!(:active_benefit_application) do
+    application = expired_benefit_application.renew
+    application.approve_application!
+    application.begin_open_enrollment!
+    application.update_attributes(aasm_state: :active)
+    application
+  end
+
+  let(:expired_benefit_package) { expired_benefit_application.benefit_packages[0] }
+  let(:active_benefit_package) { active_benefit_application.benefit_packages[0] }
+  let(:expired_sponsored_benefit) { expired_benefit_package.sponsored_benefit_for(coverage_kind) }
+  let(:active_sponsored_benefit) { active_benefit_package.sponsored_benefit_for(coverage_kind) }
+end

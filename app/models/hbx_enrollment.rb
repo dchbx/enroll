@@ -949,7 +949,7 @@ class HbxEnrollment
     return unless sponsored_benefit_package.present?
     benefit_application = sponsored_benefit_package.benefit_application
     return unless benefit_application.present? && benefit_application.terminated_on.present?
-    term_or_cancel_enrollment(self, benefit_application.terminated_on, benefit_application.termination_reason)
+    term_or_cancel_enrollment(self, benefit_application.end_on, benefit_application.termination_reason)
   end
 
   def propagate_selection
@@ -974,6 +974,10 @@ class HbxEnrollment
   def handle_coverage_selection
     callback_context = { :hbx_enrollment => self }
     HandleCoverageSelected.call(callback_context)
+  end
+
+  def update_prior_coverage
+    EnrollRegistry[:prior_plan_year_sep]{ {enrollment: self} }
   end
 
   def update_renewal_coverage(options = nil)  # rubocop:disable Metrics/CyclomaticComplexity
@@ -1016,6 +1020,15 @@ class HbxEnrollment
                                  kind: kind,
                                  coverage_kind: coverage_kind,
                                  employee_role_id: employee_role_id)
+  end
+
+  def enrollments_for(benefit_application)
+    HbxEnrollment.where({ :sponsored_benefit_package_id.in => benefit_application.benefit_packages.pluck(:_id),
+                          :coverage_kind => coverage_kind,
+                          :kind => kind,
+                          :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive'],
+                          :effective_on.gte => benefit_application.start_on
+                        })
   end
 
   def cancel_reinstates_and_regenerate(application, reinstated_package)
@@ -1821,7 +1834,7 @@ class HbxEnrollment
       transitions from: :shopping, to: :renewing_waived
     end
 
-    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_reinstate_coverage] do
+    event :select_coverage, :after => [:record_transition, :propagate_selection, :update_prior_coverage, :update_reinstate_coverage] do
       transitions from: :shopping,
                   to: :coverage_selected, :guard => :can_select_coverage?
       transitions from: [:auto_renewing, :actively_renewing],
@@ -1875,8 +1888,8 @@ class HbxEnrollment
     event :cancel_coverage, :after => :record_transition do
       transitions from: [:coverage_termination_pending, :auto_renewing, :renewing_coverage_selected,
                          :renewing_transmitted_to_carrier, :renewing_coverage_enrolled, :coverage_selected,
-                         :transmitted_to_carrier, :coverage_renewed, :unverified,
-                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated],
+                         :transmitted_to_carrier, :coverage_renewed, :unverified, :coverage_terminated,
+                         :coverage_enrolled, :renewing_waived, :inactive, :coverage_reinstated, :coverage_expired],
                   to: :coverage_canceled
     end
 
