@@ -690,7 +690,7 @@ module ApplicationHelper
   end
 
   def find_plan_name(hbx_id)
-    HbxEnrollment.where(id: hbx_id).first.try(:plan).try(:name)
+    HbxEnrollment.where(id: hbx_id).first.try(:product).try(:name)
   end
 
   def has_new_hire_enrollment_period?(census_employee)
