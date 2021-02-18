@@ -1027,8 +1027,7 @@ class HbxEnrollment
                           :coverage_kind => coverage_kind,
                           :kind => kind,
                           :aasm_state.in => HbxEnrollment::RENEWAL_STATUSES + ['renewing_waived'] + HbxEnrollment::ENROLLED_STATUSES + ['inactive'],
-                          :effective_on.gte => benefit_application.start_on
-                        })
+                          :effective_on.gte => benefit_application.start_on })
   end
 
   def cancel_reinstates_and_regenerate(application, reinstated_package)

@@ -1,13 +1,20 @@
 # frozen_string_literal: true
 
 module Operations
+  # This class is invoked when a product selection is made.
+  # It will execute the side effects of making a product selection, as
+  # specific to the DCHBX customer.
   class UpdatePriorPlanCoverage
     include Dry::Monads[:result, :do, :try]
 
+    # Invoke the operation.
+    # @param opts [@enrollment] the invocation options
     def self.call(opts)
       self.new.call(opts)
     end
 
+    # Invoke the operation.
+    # @param opts [@enrollment] the invocation options
     def call(opts)
       enrollment = opts[:enrollment]
       return nil unless enrollment.is_shop?
@@ -70,8 +77,8 @@ module Operations
       hbx_enrollments.each{|en| en.cancel_coverage! if en.may_cancel_coverage? }
     end
 
-    def transition_enrollment(enrollment, ba)
-      enrollment.begin_coverage! if TimeKeeper.date_of_record >= ba.start_on && enrollment.may_begin_coverage?
+    def transition_enrollment(enrollment, benefit_application)
+      enrollment.begin_coverage! if TimeKeeper.date_of_record >= benefit_application.start_on && enrollment.may_begin_coverage?
       Success(enrollment)
     end
 
