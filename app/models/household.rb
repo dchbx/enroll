@@ -502,14 +502,6 @@ class Household
       submitted_at: TimeKeeper.datetime_of_record
     )
 
-    th.eligibility_determinations.create(
-      source: 'Admin',
-      benchmark_plan_id: slcsp_id,
-      max_aptc: params["max_aptc"].to_f,
-      csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr']),
-      determined_at: TimeKeeper.datetime_of_record
-    )
-
     params["family_members"].each do |person_hbx_id, thhm_info|
       person_id = Person.by_hbx_id(person_hbx_id).first.id
       family_member = family.family_members.where(person_id: person_id).first
@@ -520,6 +512,14 @@ class Household
         :reason => thhm_info["reason"]
       )
     end
+
+    th.eligibility_determinations.create(
+      source: 'Admin',
+      benchmark_plan_id: slcsp_id,
+      max_aptc: params['max_aptc'].to_f,
+      csr_percent_as_integer: (params['csr'] == 'limited' ? '-1' : params['csr']),
+      determined_at: TimeKeeper.datetime_of_record
+    )
 
     end_multiple_thh
 

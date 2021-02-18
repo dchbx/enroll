@@ -3,6 +3,10 @@ require 'rails_helper'
 if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
 RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
+  before :each do
+    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+    EnrollRegistry[:apply_aggregate_to_enrollment].feature.stub(:is_enabled).and_return(false)
+  end
   let(:months_array) {Date::ABBR_MONTHNAMES.compact}
 
   # Household
@@ -138,6 +142,7 @@ RSpec.describe Admin::Aptc, :type => :model, dbclean: :after_each do
       expect(family.active_household.hbx_enrollments.count).to eq enrollment_count + 1
       expect(last_enrollment.hbx_id).to_not eq family.active_household.hbx_enrollments.last.id
       expect(family.active_household.hbx_enrollments.last.applied_aptc_amount.to_f).not_to eq 85
+      expect(family.reload.hbx_enrollments.last.aggregate_aptc_amount.to_f).not_to be_zero
     end
   end
 

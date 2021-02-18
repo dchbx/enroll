@@ -14,6 +14,10 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
     p_table.premium_tuples.each { |pt| pt.update_attributes!(cost: pt.age)}
   end
 
+  before do
+    EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(false)
+  end
+
   if Settings.site.faa_enabled
     describe 'cases for multi tax household scenarios' do
       include_context 'setup two tax households with one ia member each'
@@ -30,7 +34,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       context 'for AvailableEligibilityService' do
         context 'for one member enrollment' do
           before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
 
@@ -58,7 +62,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           let!(:enrollment_member2) { FactoryBot.create(:hbx_enrollment_member, is_subscriber: false, hbx_enrollment: enrollment1, applicant_id: family_member2.id) }
 
           before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
 
@@ -88,7 +92,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           before :each do
             tax_household_member.update_attributes!(is_ia_eligible: false, is_medicaid_chip_eligible: true)
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
 
@@ -111,7 +115,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           let!(:enrollment_member21) { FactoryBot.create(:hbx_enrollment_member, hbx_enrollment: enrollment2, applicant_id: family_member.id, applied_aptc_amount: 50.00) }
 
           before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
           end
 
@@ -146,7 +150,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'for ehb_premium less than selected_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 150.00)
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 150.00)
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptc
             end
 
@@ -157,7 +161,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'for selected_aptc less than ehb_premium' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 35.00)
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 35.00)
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptc
             end
 
@@ -190,7 +194,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         context 'for one member enrollment' do
           context 'tax_household exists' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -218,7 +222,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             before :each do
               family.active_household.tax_households = []
               family.active_household.save!
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -248,7 +252,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -276,7 +280,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -309,7 +313,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'with valid tax household for all the shopping members' do
             before :each do
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -337,7 +341,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           context 'without valid tax household for all the shopping members' do
             before :each do
               family.active_household.tax_households.first.tax_household_members.second.destroy
-              @eligibility_factory ||= described_class.new(enrollment1.id)
+              @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
               @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
             end
 
@@ -374,7 +378,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'where ehb_premium less than selected_aptc and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 150.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 150.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
               @ehb_premium = @eligibility_factory.send(:total_ehb_premium, enrollment1.product.id)
@@ -405,7 +409,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context 'where selected_aptc less than ehb_premium and available_aptc' do
             before do
-              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
@@ -436,7 +440,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             before do
               @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :catastrophic, benefit_market_kind: :aca_individual)
               @product_id = @product.id.to_s
-              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
@@ -467,7 +471,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             before do
               @product = FactoryBot.create(:benefit_markets_products_dental_products_dental_product, benefit_market_kind: :aca_individual)
               @product_id = @product.id.to_s
-              @eligibility_factory = described_class.new(enrollment1.id, 35.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 35.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
             end
 
@@ -485,7 +489,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           context 'where available_aptc less than ehb_premium and selected_aptc' do
             before do
               family.active_household.tax_households.first.destroy
-              @eligibility_factory = described_class.new(enrollment1.id, 100.00, [@product_id])
+              @eligibility_factory = described_class.new(enrollment1.id, enrollment1.effective_on, 100.00, [@product_id])
               @applicable_aptc = @eligibility_factory.fetch_applicable_aptcs
               @aptc_per_member = @eligibility_factory.fetch_aptc_per_member
             end
@@ -519,7 +523,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
         context 'with one enrollment member' do
           before :each do
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
           end
           it 'should return the ratio hash for 1 enrollment member' do
@@ -535,7 +539,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
           before :each do
             person.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
             person2.update_attributes(dob: TimeKeeper.date_of_record - 40.years)
-            @eligibility_factory ||= described_class.new(enrollment1.id)
+            @eligibility_factory ||= described_class.new(enrollment1.id, enrollment1.effective_on)
             @member_level_aptcs ||= @eligibility_factory.fetch_member_level_applicable_aptcs(applicable_aptc)
           end
 
@@ -564,7 +568,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
 
           context '.fetch_elected_aptc_per_member' do
             it 'should return a Hash of members aptc' do
-              eligibility_factory = described_class.new(enrollment.id, 150.00, [@product_id])
+              eligibility_factory = described_class.new(enrollment.id, enrollment.effective_on, 150.00, [@product_id])
               elected_aptc_per_member = eligibility_factory.fetch_elected_aptc_per_member
               expect(elected_aptc_per_member.class).to eq Hash
               expect(elected_aptc_per_member.values[0]).to eq 82.20986460348162
@@ -572,7 +576,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
             end
 
             it 'should raise error for nil value' do
-              eligibility_factory = described_class.new(enrollment.id, nil, [@product_id])
+              eligibility_factory = described_class.new(enrollment.id, enrollment.effective_on, nil, [@product_id])
               expect {eligibility_factory.fetch_elected_aptc_per_member}.to raise_error(RuntimeError, /Cannot process without selected_aptc/)
             end
           end
@@ -581,7 +585,7 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
         context 'for fetch_max_aptc' do
           context '.fetch_max_aptc' do
             it 'should return max aptc' do
-              eligibility_factory = described_class.new(enrollment.id)
+              eligibility_factory = described_class.new(enrollment.id, enrollment.effective_on)
               max_aptc = eligibility_factory.fetch_max_aptc
               expect(max_aptc).to eq 500.0
             end
@@ -592,6 +596,89 @@ RSpec.describe Factories::EligibilityFactory, type: :model do
       after(:all) do
         DatabaseCleaner.clean
         TimeKeeper.set_date_of_record_unprotected!(Date.today)
+      end
+    end
+
+    describe 'cases for single tax household scenarios with calculate_monthly_aggregate feature enabled' do
+      before do
+        EnrollRegistry[:calculate_monthly_aggregate].feature.stub(:is_enabled).and_return(true)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(TimeKeeper.date_of_record.year, 8, 1))
+        @product = FactoryBot.create(:benefit_markets_products_health_products_health_product, metal_level_kind: :silver, benefit_market_kind: :aca_individual)
+        reset_premium_tuples
+        benefit_sponsorship = FactoryBot.create(:hbx_profile, :open_enrollment_coverage_period).benefit_sponsorship
+        benefit_sponsorship.benefit_coverage_periods.each { |bcp| bcp.update_attributes!(slcsp_id: @product.id) }
+      end
+      let(:year_start_date) {TimeKeeper.date_of_record.beginning_of_year}
+      let!(:agg_person) {FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 35.years)}
+      let!(:agg_person2) do
+        per2 = FactoryBot.create(:person, :with_consumer_role, dob: TimeKeeper.date_of_record - 25.years)
+        agg_person.ensure_relationship_with(per2, 'spouse')
+        per2
+      end
+      let!(:agg_family) do
+        fmly = FactoryBot.create(:family, :with_primary_family_member, person: agg_person)
+        FactoryBot.create(:family_member, family: fmly, person: agg_person2)
+        fmly
+      end
+      let(:primary_fm) {agg_family.primary_applicant}
+      let!(:agg_tax_household) { FactoryBot.create(:tax_household, household: agg_family.active_household, effective_ending_on: nil)}
+      let!(:agg_thh_member) { FactoryBot.create(:tax_household_member, applicant_id: primary_fm.id, tax_household: agg_tax_household)}
+      let!(:eligibilty_determination) { FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: agg_tax_household)}
+      let!(:agg_enrollment) do
+        enr = FactoryBot.create(:hbx_enrollment,
+                                family: agg_family,
+                                household: agg_family.active_household,
+                                is_active: true,
+                                aasm_state: 'coverage_selected',
+                                changing: false,
+                                effective_on: year_start_date,
+                                terminated_on: nil,
+                                applied_aptc_amount: 300.00)
+        FactoryBot.create(:hbx_enrollment_member, applicant_id: primary_fm.id, hbx_enrollment: enr, applied_aptc_amount: 150.00)
+        FactoryBot.create(:hbx_enrollment_member, applicant_id: agg_family.family_members.second.id, hbx_enrollment: enr, applied_aptc_amount: 150.00)
+        enr
+      end
+      let(:new_effective_date) {TimeKeeper.date_of_record}
+
+      context 'with an existing enrollment' do
+        context 'with valid tax household for all the shopping members' do
+          before :each do
+            FactoryBot.create(:tax_household_member, applicant_id: agg_family.family_members.second.id, tax_household: agg_tax_household)
+            @eligibility_factory ||= described_class.new(agg_enrollment.id, new_effective_date)
+            @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
+          end
+
+          it 'should have all the aptc shopping member ids' do
+            aptc_keys = @available_eligibility[:aptc].keys
+            agg_enrollment.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+              expect(aptc_keys).to include(member_id.to_s)
+            end
+          end
+
+          it { expect(@available_eligibility[:aptc][primary_fm.id.to_s]).to eq 457.2320499479709 }
+          it { expect(@available_eligibility[:aptc][agg_family.family_members.second.id.to_s]).to eq 322.76795005202916 }
+          it { expect(@available_eligibility[:total_available_aptc]).to eq 780.0 }
+          it { expect(@available_eligibility[:csr]).to eq 'csr_94' }
+        end
+
+        context 'without valid tax household for all the shopping members' do
+          before :each do
+            @eligibility_factory ||= described_class.new(agg_enrollment.id, new_effective_date)
+            @available_eligibility ||= @eligibility_factory.fetch_available_eligibility
+          end
+
+          it 'should have all the aptc shopping member ids' do
+            aptc_keys = @available_eligibility[:aptc].keys
+            agg_enrollment.hbx_enrollment_members.map(&:applicant_id).each do |member_id|
+              expect(aptc_keys).to include(member_id.to_s)
+            end
+          end
+
+          it { expect(@available_eligibility[:aptc][primary_fm.id.to_s]).to eq 780.0 }
+          it { expect(@available_eligibility[:aptc][agg_family.family_members.second.id.to_s]).to eq 0 }
+          it { expect(@available_eligibility[:total_available_aptc]).to eq 780.0 }
+          it { expect(@available_eligibility[:csr]).to eq 'csr_0' }
+        end
       end
     end
   end

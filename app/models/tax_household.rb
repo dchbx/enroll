@@ -7,7 +7,7 @@ class TaxHousehold
   include HasFamilyMembers
   include Acapi::Notifiers
   include Mongoid::Autoinc
-  include ApplicationHelper
+  include FloatHelper
 
   # A set of applicants, grouped according to IRS and ACA rules, who are considered a single unit
   # when determining eligibility for Insurance Assistance and Medicaid
@@ -161,17 +161,34 @@ class TaxHousehold
   end
 
   # Pass hbx_enrollment and get the total amount of APTC available by hbx_enrollment_members
-  def total_aptc_available_amount_for_enrollment(hbx_enrollment, excluding_enrollment = nil)
+  def total_aptc_available_amount_for_enrollment(hbx_enrollment, effective_on, excluding_enrollment = nil)
     return 0 if hbx_enrollment.blank?
     return 0 if is_all_non_aptc?(hbx_enrollment)
+    monthly_available_aptc = monthly_max_aptc(hbx_enrollment, effective_on)
+    member_aptc_hash = aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment)
     total = family.active_family_members.reduce(0) do |sum, member|
-      sum + (aptc_available_amount_by_member(excluding_enrollment)[member.id.to_s] || 0)
+      sum + (member_aptc_hash[member.id.to_s] || 0)
     end
     family_members = unwanted_family_members(hbx_enrollment)
     unchecked_aptc_fms = find_aptc_family_members(family_members)
     deduction_amount = total_benchmark_amount(unchecked_aptc_fms, hbx_enrollment) if unchecked_aptc_fms
     total = total - deduction_amount
     (total < 0.00) ? 0.00 : float_fix(total)
+  end
+
+  def monthly_max_aptc(hbx_enrollment, effective_on)
+    monthly_max_aggregate = if EnrollRegistry[:calculate_monthly_aggregate].feature.is_enabled
+                              shopping_fm_ids = hbx_enrollment.hbx_enrollment_members.pluck(:applicant_id)
+                              input_params = { family: hbx_enrollment.family,
+                                               effective_on: effective_on,
+                                               shopping_fm_ids: shopping_fm_ids,
+                                               subscriber_applicant_id: hbx_enrollment&.subscriber&.applicant_id }
+                              monthly_aggregate_amount = EnrollRegistry[:calculate_monthly_aggregate] {input_params}
+                              monthly_aggregate_amount.success? ? monthly_aggregate_amount.value! : 0
+                            else
+                              current_max_aptc.to_f
+                            end
+    float_fix(monthly_max_aggregate)
   end
 
   def total_benchmark_amount(family_members, hbx_enrollment)
@@ -182,13 +199,15 @@ class TaxHousehold
     total_sum
   end
 
-  def aptc_available_amount_by_member(excluding_enrollment_id = nil)
+  def aptc_available_amount_by_member(monthly_available_aptc, excluding_enrollment_id = nil)
     # Find HbxEnrollments for aptc_members in the current plan year where they have used aptc
     # subtract from available amount
     aptc_available_amount_hash = {}
     aptc_ratio_by_member.each do |member_id, ratio|
-      aptc_available_amount_hash[member_id] = current_max_aptc.to_f * ratio
+      aptc_available_amount_hash[member_id] = monthly_available_aptc.to_f * ratio
     end
+    return aptc_available_amount_hash if EnrollRegistry.feature_enabled?(:calculate_monthly_aggregate)
+
     # FIXME should get hbx_enrollments by effective_starting_on
     enrollments = household.hbx_enrollments_with_aptc_by_year(effective_starting_on.year)
     enrollments = enrollments.where(:id.ne => BSON::ObjectId.from_string(excluding_enrollment_id)) if excluding_enrollment_id
@@ -199,37 +218,6 @@ class TaxHousehold
       end
     end
     aptc_available_amount_hash
-  end
-
-  def total_aptc_available_amount
-    aptc_available_amount_by_member.present? ? aptc_available_amount_by_member.values.sum : 0
-  end
-
-  # Pass a list of tax_household_members and get amount of APTC available
-  def aptc_available_amount_for_enrollment(hbx_enrollment, plan, elected_aptc)
-    # APTC may be used only for Health, return 0 if plan.coverage_kind == "dental"
-    aptc_available_amount_hash_for_enrollment = {}
-
-    total_aptc_available_amount = total_aptc_available_amount_for_enrollment(hbx_enrollment)
-    elected_pct = total_aptc_available_amount > 0 ? (elected_aptc.to_f / total_aptc_available_amount.to_f) : 0
-    decorated_plan = UnassistedPlanCostDecorator.new(plan, hbx_enrollment)
-    hbx_enrollment.hbx_enrollment_members.each do |enrollment_member|
-      given_aptc = (aptc_available_amount_by_member[enrollment_member.applicant_id.to_s] || 0) * elected_pct
-      ehb_premium = decorated_plan.premium_for(enrollment_member) * plan.ehb
-      if plan.kind == 'dental'
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = 0
-      else
-        aptc_available_amount_hash_for_enrollment[enrollment_member.applicant_id.to_s] = [given_aptc, ehb_premium].min
-      end
-    end
-    aptc_available_amount_hash_for_enrollment
-
-    # premium_total = as_dollars(policy.pre_amt_tot)
-    # given_aptc = as_dollars(policy.applied_aptc)
-    # max_aptc = as_dollars(premium_total * plan.ehb)
-    # correct_aptc = (given_aptc > max_aptc) ? max_aptc : given_aptc
-    # policy.applied_aptc = correct_aptc
-    # $70
   end
 
   # Income sum of all tax filers in this Household for specified year
@@ -289,3 +277,4 @@ class TaxHousehold
     ::BenefitMarkets::Products::ProductFactory
   end
 end
+
