@@ -11,7 +11,7 @@ RSpec.describe L10nHelper, :type => :helper do
   end
 
   it "should handle non string translation keys gracefully" do
-    expect(helper.l10n({:formats=>{:default=>"%m/%d/%Y"}})).to eq('Translation Missing')
+    expect(helper.l10n({:formats => {:default => "%m/%d/%Y"}})).to eq('Translation Missing')
 
   end
 end
