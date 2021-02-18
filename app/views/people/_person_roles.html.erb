@@ -2,7 +2,7 @@
   <div class="mt-1 no-pd">
     <%#= link_to "Add Account", available_accounts_person_path(id: @person.id), class: "btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
     <% unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
-      <button type="button" class= "btn btn-default" data-toggle="modal" data-target="#addAccount">
+      <button type="button" class= "btn btn-outline-primary" data-toggle="modal" data-target="#addAccount">
         <%= l10n("hub.home_page.add_account") %>
       </button>
     <% end %>
@@ -169,7 +169,7 @@
             <% if active_role.kind.downcase === 'employer staff'  %>
               <div class="col-4 p-2">
                 <div class="dropdown pull-right">
-                  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     Actions
                     <span class="caret"></span>
                   </button>

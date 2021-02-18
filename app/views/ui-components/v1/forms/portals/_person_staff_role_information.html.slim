@@ -1,50 +1,60 @@
-legend Personal Information
-.row
-  .col-md-4
-    = f.hidden_field :person_id, value: f.object.person_id
-    label for="inputFirstName"  First Name *
-    = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John', value: f.object.first_name, readonly: true
-    .invalid-feedback
-      |
-        Please provide a first name.
-  .col-md-4
-    label for="inputLastName"  Last Name *
-    = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe', value: f.object.last_name, readonly: true
-    .invalid-feedback
-      |
-        Please provide a last name.
-  .col-md-4
-    label for="inputDob"  Date of Birth *
-    = f.text_field :dob, placeholder: 'MM/DD/YYYY', id: 'inputStaffDOB', required: true, class: 'form-control',  maxlength:10, minlength:10, readonly: true
-    .invalid-feedback
-      |
-        Please provide a date of birth.
-.row.mt-1
-  .col-md-3
-    label for="inputEmail"  Email *
-    = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com', onblur:'validateEmailFormat(this)'
-    .invalid-feedback
-      |
-        Please provide a email address.
+fieldset.mt-2
+  legend Personal Information
+  .row
+    .col-md-4
+      = f.hidden_field :person_id, value: f.object.person_id
+      label for="inputFirstName"  First Name *
+      = f.text_field :first_name, class: "form-control", required: true, placeholder: 'John', value: f.object.first_name, readonly: true
+      .invalid-feedback
+        |
+          Please provide a first name.
+    .col-md-4
+      label for="inputLastName"  Last Name *
+      = f.text_field :last_name, class: "floatlabel form-control interaction-field-control-person-last-name", required: true, placeholder: 'Doe', value: f.object.last_name, readonly: true
+      .invalid-feedback
+        |
+          Please provide a last name.
+    .col-md-4
+      label for="inputDob"  Date of Birth *
+      = f.text_field :dob, placeholder: 'MM/DD/YYYY', id: 'inputStaffDOB', required: true, class: 'form-control',  maxlength:10, minlength:10, readonly: true
+      .invalid-feedback
+        |
+          Please provide a date of birth.
+  .row.mt-1
+    .col-md-3
+      label for="inputEmail"  Email *
+      = f.text_field :email, class: "floatlabel form-control interaction-field-control-person-email", required: true, placeholder: 'john@example.com', onblur:'validateEmailFormat(this)'
+      .invalid-feedback
+        |
+          Please provide a email address.
 
-  .col-md-3
-    label for="inputAreaCode"  Area code *
-    = f.text_field :area_code, class: "form-control", minlength: '3', maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: '202', required: true
-    .invalid-feedback
-      |
-            Please provide a valid area code.
-  .col-md-3.col-sm-3
-    label for="inputNumber"  Number *
-    = f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', minlength: '7',maxlength:'7', onkeypress:'return isNumberKey(event)'
-    .invalid-feedback
-      |
-            Please provide a valid number.
+    .col-md-3
+      label for="inputAreaCode"  Area code *
+      = f.text_field :area_code, class: "form-control", minlength: '3', maxlength:'3', onkeypress:'return isNumberKey(event)', placeholder: '202', required: true
+      .invalid-feedback
+        |
+              Please provide a valid area code.
+    .col-md-3.col-sm-3
+      label for="inputNumber"  Number *
+      = f.text_field :number, placeholder:'1112222', required:'true', id:'inputNumber', class:'form-control', minlength: '7',maxlength:'7', onkeypress:'return isNumberKey(event)'
+      .invalid-feedback
+        |
+              Please provide a valid number.
 
-.row.mt-1
-  - if f.object.coverage_record.present?
+  .row.mt-1
+    - if f.object.coverage_record.present?
 
-    = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
-      = render partial: './ui-components/v1/forms/coverage_record', locals: { f: f }
+      = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
+        - @coverage_record_form = f
+        .col-md-3.mb-3
+          label for="inputApplying"  #{l10n('is_applying_coverage')} *
+          = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying', :onchange => 'isApplyingCoverage(this)'
+          .invalid-feedback
+            | Please select an applying coverage option.
+
+- if @coverage_record_form.present?
+  fieldset.mt-2.col-md-12.optional.hidden
+    = render partial: './ui-components/v1/forms/coverage_record', locals: { f: @coverage_record_form }
 
 javascript:
 

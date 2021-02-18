@@ -1,8 +1,7 @@
-fieldset.mt-2
 
-  = f.hidden_field :profile_type, value: params[:profile_type]
-  = f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
-    = render partial: './ui-components/v1/forms/portals/person_staff_role_information', locals: {f: f}
+= f.hidden_field :profile_type, value: params[:profile_type]
+= f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
+  = render partial: './ui-components/v1/forms/portals/person_staff_role_information', locals: {f: f}
 
 fieldset.mt-2
   legend Employer Information
