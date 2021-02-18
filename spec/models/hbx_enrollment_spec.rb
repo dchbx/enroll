@@ -4113,3 +4113,65 @@ describe '.eligible_to_reinstate?', dbclean: :around_each do
     end
   end
 end
+
+
+describe '.term_or_cancel_benefit_group_assignment', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month - 6.month}
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      aasm_state: 'coverage_selected',
+                      effective_on: current_effective_date,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: census_employee.employee_role.id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      rating_area_id: BSON::ObjectId.new,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'when employment term date outside benefit application end date.' do
+    before do
+      census_employee.terminate_employment!(TimeKeeper.date_of_record.end_of_month)
+      period = initial_application.effective_period.min..initial_application.start_on.next_month.end_of_month
+      initial_application.update_attributes!(aasm_state: :terminated, termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      enrollment.terminate_coverage!(initial_application.end_on)
+      enrollment.reload
+    end
+
+    it 'should update bga with application end date' do
+      expect(enrollment.terminated_on).to eq initial_application.end_on
+      expect(enrollment.benefit_group_assignment.end_on).to eq initial_application.end_on
+    end
+  end
+
+  context 'when employment term date inside benefit application end date.' do
+    before do
+      census_employee.terminate_employment!(TimeKeeper.date_of_record.end_of_month)
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.next_month.end_of_month
+      initial_application.update_attributes!(aasm_state: :terminated, termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
+      enrollment.reload
+    end
+
+    it 'should update bga with coverage term date' do
+      expect(enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+      expect(enrollment.benefit_group_assignment.end_on).to eq census_employee.coverage_terminated_on
+    end
+  end
+end

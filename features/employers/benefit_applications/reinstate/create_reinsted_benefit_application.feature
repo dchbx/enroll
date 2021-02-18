@@ -7,7 +7,7 @@ Feature: Ability for Admin to create an Reinstated benefit application and allow
     And ABC Widgets employer has a staff role
     And the Reinstate feature configuration is enabled
     And Qualifying life events are present
-
+  @flaky
 Scenario: Initial Employer is in termination pending. Admin is able to create reinstated benefit application
           and employees are able to plan shop in both active and future reinstated applications
 
