@@ -237,7 +237,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
 
     CSV.open(file_name, "w", force_quotes: true) do |csv|
       csv << detailed_report_field_names(start_on_date)
-      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications.effective_period.min' => start_on_date).each do |ben_spon|
+      BenefitSponsors::BenefitSponsorships::BenefitSponsorship.where(:'benefit_applications.effective_period.min' => start_on_date).no_timeout.each do |ben_spon|
         ben_spon.benefit_applications.each do |ben_app|
 
           next unless ben_app.effective_period.min == start_on_date && ben_app.is_renewing?
@@ -260,7 +260,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
             next unless enrollments
 
             ["health", "dental"].each do |kind|
-              enrollment_prev_year = enrollments.where(coverage_kind: kind, :effective_on.lt => start_on_date).first
+              enrollment_prev_year = enrollments.where(coverage_kind: kind, :effective_on.lt => start_on_date).last
               enrollment_current_year = enrollments.where(coverage_kind: kind, :effective_on => start_on_date).first
               next unless enrollment_prev_year || enrollment_current_year
 
