@@ -80,7 +80,7 @@ module BenefitSponsors
       end
 
       def can_skip_calculations_for(benefit_application)
-        [:expired, :canceled].include?(benefit_application.aasm_state) && benefit_application.benefit_packages.count > 2
+        [:expired, :canceled, :retroactive_canceled].include?(benefit_application.aasm_state) && benefit_application.benefit_packages.count > 2
       end
     end
   end

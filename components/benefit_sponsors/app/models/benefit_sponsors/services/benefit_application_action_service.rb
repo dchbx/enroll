@@ -20,6 +20,15 @@ module BenefitSponsors
           result, ba, errors = service.cancel
           map_errors_for(errors, onto: failed_results) if errors.present?
         end
+
+        # Cancel reinstated application
+        reinstated_app = benefit_sponsorship.benefit_applications.detect{|app| app.active? && app.reinstated_id == benefit_application.id}
+        if reinstated_app && reinstated_app.start_on != args[:end_on].to_date.next_day
+          service = initialize_service(reinstated_app)
+          _result, _ba, errors = service.cancel
+          map_errors_for(errors, onto: failed_results) if errors.present?
+        end
+
         # Terminates current application
         service = initialize_service(benefit_application)
         result, ba, errors =

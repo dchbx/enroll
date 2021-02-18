@@ -291,7 +291,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
     let(:person) { family.primary_person }
     let!(:household) { FactoryBot.create(:household, family: family)}
     let(:family) { FactoryBot.create(:family, :with_primary_family_member)}
-    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, end_on: benefit_package.end_on, benefit_package: benefit_package, census_employee: census_employee) }
+    let!(:benefit_group_assignment) { FactoryBot.create(:benefit_group_assignment, benefit_package: benefit_package, census_employee: census_employee)}
 
     shared_examples_for "active, waived and terminated enrollments" do |state, status, result, match_with_package_id, match_with_assignment_id|
 
@@ -339,7 +339,7 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       end
 
       it "should #{status}return the #{state} enrollments" do
-        result = (result == "active_enrollment") ?  [enrollment] : result
+        result = (result == "active_enrollment") ? [enrollment] : result
         expect(census_employee.active_benefit_group_assignment.active_and_waived_enrollments).to eq result
       end
     end
@@ -536,11 +536,13 @@ describe BenefitGroupAssignment, type: :model, dbclean: :after_each do
       let!(:assignment_two) do
         bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2018,8,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
+        benefit_package.benefit_application.update_attributes(effective_period: Date.new(2018,8,1)..Date.new(2019,7,31))
         bga
       end
       let!(:assignment_three) do
         bga = census_employee.benefit_group_assignments.build(start_on: Date.new(2019,5,1), end_on: nil, benefit_package_id: benefit_package.id)
         bga.save(validate: false)
+        benefit_package.benefit_application.update_attributes(effective_period: Date.new(2019,5,1)..Date.new(2020,4,30))
         bga
       end
 

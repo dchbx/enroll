@@ -1,5 +1,7 @@
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
+require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_application.rb"
 
 module BenefitSponsors
   RSpec.describe BenefitSponsorships::BenefitSponsorship, type: :model, dbclean: :after_each do
@@ -1458,6 +1460,60 @@ module BenefitSponsors
       it_behaves_like "for off-cycle employer", "active", "enrollment_ineligible", nil, false
       it_behaves_like "for off-cycle employer", "active", "terminated", "draft", true
       it_behaves_like "for off-cycle employer", "active", "termination_pending", "draft", true
+
+      context "benefit application with reinstated id " do
+        let!(:application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:term_application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :terminated, benefit_sponsorship: active_benefit_sponsorship) }
+
+        before do
+          term_application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 1, 31))
+          application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 2, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31), reinstated_id: term_application.id)
+        end
+
+        it "should return nil" do
+          expect(active_benefit_sponsorship.off_cycle_benefit_application).to eq nil
+        end
+      end
+
+      context "benefit application with predecessor_id " do
+        let!(:application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, benefit_sponsorship: active_benefit_sponsorship) }
+        let!(:expired_application) { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :expired, benefit_sponsorship: active_benefit_sponsorship) }
+
+        before do
+          expired_application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.last_year.year, 1, 1)..Date.new(TimeKeeper.date_of_record.last_year.year, 12, 31))
+          application.update_attributes(effective_period: Date.new(TimeKeeper.date_of_record.year, 1, 1)..Date.new(TimeKeeper.date_of_record.year, 12, 31), predecessor_id: expired_application.id)
+        end
+
+        it "should return nil" do
+          expect(active_benefit_sponsorship.off_cycle_benefit_application).to eq nil
+        end
+      end
+    end
+
+    describe '.future_active_reinstated_benefit_application', :dbclean => :after_each do
+
+      let(:benefit_sponsorship)                 { employer_profile.add_benefit_sponsorship }
+      let(:this_year)                           { Date.today.year }
+      let(:benefit_sponsor_catalog) { FactoryBot.create(:benefit_markets_benefit_sponsor_catalog, service_areas: [service_area]) }
+      let(:service_area) { create_default(:benefit_markets_locations_service_area) }
+      let(:benefit_application) do
+        build(
+          :benefit_sponsors_benefit_application,
+          benefit_sponsorship: benefit_sponsorship,
+          recorded_service_areas: benefit_sponsorship.service_areas,
+          benefit_sponsor_catalog: benefit_sponsor_catalog
+        )
+      end
+
+      it 'should return future_active_reinstated_benefit_application' do
+        period = benefit_application.effective_period.min + 1.year..(benefit_application.effective_period.max + 1.year)
+        benefit_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        expect(benefit_sponsorship.future_active_reinstated_benefit_application).to eq benefit_application
+      end
+
+      it 'should return nil if no reinstated enrollment present' do
+        expect(benefit_sponsorship.future_active_reinstated_benefit_application).to eq nil
+      end
     end
   end
 end

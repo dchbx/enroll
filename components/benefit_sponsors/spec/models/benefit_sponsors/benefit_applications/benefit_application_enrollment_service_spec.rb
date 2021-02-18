@@ -786,6 +786,7 @@ module BenefitSponsors
 
       context "when a benefit application is canceled" do
         before do
+          initial_application.update_attributes(aasm_state: :enrollment_ineligible)
           subject.cancel
           initial_application.reload
         end

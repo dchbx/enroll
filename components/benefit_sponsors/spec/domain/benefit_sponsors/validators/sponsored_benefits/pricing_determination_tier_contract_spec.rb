@@ -4,13 +4,13 @@ require "spec_helper"
 
 RSpec.describe BenefitSponsors::Validators::SponsoredBenefits::PricingDeterminationTierContract do
 
-  let(:pricing_unit_id)  { 'pricing_unit_id' }
+  let(:pricing_unit_id)  { BSON::ObjectId.new }
   let(:price)            { 227.07 }
 
   let(:missing_params)   { {pricing_unit_id: pricing_unit_id} }
-  let(:invalid_params)   { {pricing_unit_id: 227, price: price } }
-  let(:error_message1)   { {:price => ["is missing"]} }
-  let(:error_message2)   { {:pricing_unit_id => ["must be a string"]} }
+  let(:invalid_params)   { {pricing_unit_id: BSON::ObjectId.new, price: 'price' } }
+  let(:error_message1)   { {:price => ['is missing']} }
+  let(:error_message2)   { {:price => ['must be a float']} }
 
   context "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do

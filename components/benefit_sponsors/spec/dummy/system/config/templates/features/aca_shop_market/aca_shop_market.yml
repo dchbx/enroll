@@ -6,3 +6,9 @@ registry:
       - key: :waived_members_eligiblity
         item: :waived_members_eligiblity
         is_enabled: true
+      - key: :benefit_application_reinstate
+        item: :benefit_application_reinstate
+        is_enabled: true
+        settings:
+          - key: :offset_months
+            item: 0

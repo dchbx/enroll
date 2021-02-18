@@ -53,7 +53,7 @@ class HbxEnrollment
   WAIVED_STATUSES     = %w(inactive renewing_waived)
 
   ENROLLED_AND_RENEWAL_STATUSES = ENROLLED_STATUSES + RENEWAL_STATUSES
-
+  TERM_REASONS = %w[non_payment voluntary_withdrawl retroactive_canceled].freeze
 
   WAIVER_REASONS = [
       "I have coverage through spouse’s employer health plan",
@@ -65,7 +65,7 @@ class HbxEnrollment
       "I have coverage through Medicaid"
   ]
   CAN_TERMINATE_ENROLLMENTS = %w[coverage_termination_pending coverage_selected auto_renewing renewing_coverage_selected unverified coverage_enrolled].freeze
-
+  TERM_INITIATED_STATES = %w[coverage_termination_pending coverage_terminated coverage_canceled].freeze
   ENROLLMENT_TRAIN_STOPS_STEPS = {"coverage_selected" => 1, "transmitted_to_carrier" => 2, "coverage_enrolled" => 3,
                                   "auto_renewing" => 1, "renewing_coverage_selected" => 1, "renewing_transmitted_to_carrier" => 2, "renewing_coverage_enrolled" => 3}
 
@@ -304,6 +304,14 @@ class HbxEnrollment
       :"effective_on".gte => benefit_application.effective_period.min
     )
   end
+
+  scope :cancel_or_termed_by_benefit_package, lambda { |benefit_package|
+    where(
+        :sponsored_benefit_package_id => benefit_package.id,
+        :aasm_state.in => TERM_INITIATED_STATES,
+        :effective_on.gte => benefit_package.start_on
+    )
+  }
   embeds_many :workflow_state_transitions, as: :transitional
 
   belongs_to :benefit_sponsorship, class_name: "::BenefitSponsors::BenefitSponsorships::BenefitSponsorship", optional: true
@@ -518,6 +526,10 @@ class HbxEnrollment
   def parent_enrollment
     return nil if predecessor_enrollment_id.blank?
     HbxEnrollment.find(predecessor_enrollment_id)
+  end
+
+  def is_health_enrollment?
+    coverage_kind == "health"
   end
 
   def census_employee
@@ -1514,6 +1526,7 @@ class HbxEnrollment
     state :renewing_contingent_selected     # VLP-pending customer actively selected product during Open Enrollment
     state :renewing_contingent_transmitted_to_carrier
     state :renewing_contingent_enrolled
+    state :coverage_reinstated    # coverage reinstated
 
     # after_all_transitions :perform_employer_plan_year_count
 
@@ -1559,7 +1572,7 @@ class HbxEnrollment
                          :coverage_renewed, :unverified],
                   to: :coverage_enrolled, :guard => :is_shop?
 
-      transitions from: :auto_renewing, to: :coverage_selected
+      transitions from: [:auto_renewing, :renewing_coverage_selected, :coverage_reinstated], to: :coverage_selected
       transitions from: :renewing_waived, to: :inactive
     end
 
@@ -1636,6 +1649,10 @@ class HbxEnrollment
     event :force_select_coverage, :after => :record_transition do
       transitions from: :shopping, to: :coverage_selected, after: :propagate_selection
     end
+
+    event :reinstate_coverage, :after => :record_transition do
+      transitions from: :shopping, to: :coverage_reinstated
+    end
   end
 
   def termination_attributes_cleared?
@@ -1645,6 +1662,23 @@ class HbxEnrollment
 
   def can_be_expired?
     benefit_group.blank? || (benefit_group.present? && benefit_group.end_on <= TimeKeeper.date_of_record)
+  end
+
+  def is_waived?
+    workflow_state_transitions.any?{|wfst| wfst.event.match(/waive_coverage/) && wfst.to_state == 'inactive'}
+  end
+
+  def notify_of_coverage_start(publish_to_carrier)
+    config = Rails.application.config.acapi
+    notify(
+        "acapi.info.events.hbx_enrollment.coverage_selected",
+        {
+            :reply_to => "#{config.hbx_id}.#{config.environment_name}.q.glue.enrollment_event_batch_handler",
+            "hbx_enrollment_id" => self.hbx_id,
+            "enrollment_action_uri" => "urn:openhbx:terms:v1:enrollment#initial",
+            "is_trading_partner_publishable" => publish_to_carrier
+        }
+    )
   end
 
   def can_select_coverage?(qle: false)
@@ -1942,6 +1976,39 @@ class HbxEnrollment
 
   def is_admin_terminate_eligible?
     CAN_TERMINATE_ENROLLMENTS.map(&:to_s).include?(aasm_state.to_s)
+  end
+
+  def canceled_after?(transition, cancellation_time)
+    transition.to_state == 'coverage_canceled' && transition.transition_at >= cancellation_time
+  end
+
+  def termed_after?(transition, termination_time)
+    ['coverage_termination_pending','coverage_terminated'].include?(transition.to_state) && transition.transition_at >= termination_time
+  end
+
+  # used to check enrollment eligible to reinstate for a application by reason & wst.
+  def eligible_to_reinstate?
+    term_or_cancel_date_valid? && (term_or_cancel_eligble_to_reinstate_by_reason? || term_or_cancel_eligble_to_reinstate_by_wst?)
+  end
+
+  def term_or_cancel_date_valid?
+    return false unless sponsored_benefit_package.present?
+    return false if terminated_on.present? && terminated_on != sponsored_benefit_package.end_on.to_date
+    return false if effective_on < sponsored_benefit_package.start_on.to_date
+    true
+  end
+
+  def term_or_cancel_eligble_to_reinstate_by_reason?
+    ['coverage_terminated', 'coverage_termination_pending', 'coverage_canceled'].include?(aasm_state) && TERM_REASONS.include?(terminate_reason)
+  end
+
+  # used to check enrollment eligible to reinstate for a application by wst
+  def term_or_cancel_eligble_to_reinstate_by_wst?
+    application_transition = sponsored_benefit_package.benefit_application.workflow_state_transitions.detect do |transition|
+      sponsored_benefit_package.canceled? ? sponsored_benefit_package.canceled_as_active?(transition) : sponsored_benefit_package.term_as_active?(transition)
+    end
+    application_transition.present? &&
+        workflow_state_transitions.any?{ |wst| canceled_after?(wst, application_transition.transition_at) || termed_after?(wst, application_transition.transition_at)}
   end
 
   private

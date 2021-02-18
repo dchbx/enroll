@@ -10,7 +10,7 @@ RSpec.describe BenefitSponsors::Entities::PricingDeterminationTier do
 
     let(:required_params) do
       {
-        pricing_unit_id: '0192837465', price: 227.0
+        pricing_unit_id: BSON::ObjectId.new, price: 227.0
       }
     end
 

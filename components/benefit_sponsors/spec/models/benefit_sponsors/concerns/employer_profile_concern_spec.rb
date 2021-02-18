@@ -156,5 +156,23 @@ module BenefitSponsors
         expect(active_enrollment.terminated_on).to eq nil
       end
     end
+
+    describe '.future_active_reinstated_benefit_application', :dbclean => :after_each do
+
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup initial benefit application"
+
+      let(:benefit_application) { initial_application }
+
+      it 'should return future_active_reinstated_benefit_application' do
+        period = benefit_application.effective_period.min + 1.year..(benefit_application.effective_period.max + 1.year)
+        benefit_application.update_attributes!(reinstated_id: BSON::ObjectId.new, aasm_state: :active, effective_period: period)
+        expect(abc_profile.future_active_reinstated_benefit_application).to eq benefit_application
+      end
+
+      it 'should return nil if no reinstated enrollment present' do
+        expect(abc_profile.future_active_reinstated_benefit_application).to eq nil
+      end
+    end
   end
 end

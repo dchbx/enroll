@@ -15,6 +15,7 @@ class Employers::CensusEmployeesController < ApplicationController
       benefit_sponsors_employer_profile_id: @employer_profile.id,
       active_benefit_group_assignment: benefit_group_id,
       off_cycle_benefit_group_assignment: off_cycle_benefit_group_id,
+      reinstated_benefit_group_assignment: reinstated_benefit_group_id,
       renewal_benefit_group_assignment: renewal_benefit_group_id,
       no_ssn_allowed: @benefit_sponsorship.is_no_ssn_enabled
     }))
@@ -49,6 +50,7 @@ class Employers::CensusEmployeesController < ApplicationController
       active_benefit_group_assignment: benefit_group_id,
       renewal_benefit_group_assignment: renewal_benefit_group_id,
       off_cycle_benefit_group_assignment: off_cycle_benefit_group_id,
+      reinstated_benefit_group_assignment: reinstated_benefit_group_id,
       no_ssn_allowed: @census_employee.no_ssn_allowed || @benefit_sponsorship.is_no_ssn_enabled
     })
 
@@ -260,6 +262,10 @@ class Employers::CensusEmployeesController < ApplicationController
 
   def off_cycle_benefit_group_id
     params[:census_employee][:off_cycle_benefit_group_assignments][:benefit_group_id] if params[:census_employee] && params[:census_employee][:off_cycle_benefit_group_assignments].present?
+  end
+
+  def reinstated_benefit_group_id
+    params[:census_employee][:reinstated_benefit_group_assignments][:benefit_group_id] if params[:census_employee] && params[:census_employee][:reinstated_benefit_group_assignments].present?
   end
 
   def census_employee_params

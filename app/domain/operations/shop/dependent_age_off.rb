@@ -10,10 +10,10 @@ module Operations
       include Config::SiteConcern
       send(:include, Dry::Monads[:result, :do])
 
-      def call(new_date:)
+      def call(new_date:, enrollment_query: nil)
         yield can_process_event(new_date)
         shop_logger = yield initialize_logger("shop")
-        query_criteria = yield shop_query_criteria
+        query_criteria = yield shop_query_criteria(enrollment_query)
         process_shop_dep_age_off(query_criteria, shop_logger, new_date)
       end
 
@@ -32,7 +32,8 @@ module Operations
         Success(logger_file)
       end
 
-      def shop_query_criteria
+      def shop_query_criteria(enrollment_query)
+        return Success(enrollment_query) unless enrollment_query.nil?
         Success(HbxEnrollment.enrolled.shop_market.all_with_multiple_enrollment_members)
       end
 

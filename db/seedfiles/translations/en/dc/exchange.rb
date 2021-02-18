@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.applications" => "applications",
   "en.exchange.employer_applications.start_date" => "Start Date",
@@ -9,6 +11,10 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.status" => "Status",
   "en.exchange.employer_applications.terminate" => "Terminate",
   "en.exchange.employer_applications.cancel" => "Cancel",
+  "en.exchange.employer_applications.continue" => "Continue",
+  "en.exchange.employer_applications.confirmation_message" => "Would you like to reinstate the plan year?",
+  "en.exchange.employer_applications.success_message" => "Plan Year Reinstated Successfully Effective",
+  "en.exchange.employer_applications.unable_to_reinstate" => "An error occured when reinstating application.",
   "en.exchange.employer_applications.reinstate" => "Reinstate",
   "en.exchange.employer_applications.voluntary_term" => "Voluntary Termination",
   "en.exchange.employer_applications.non_payment_term" => "Non-Pay Termination",
@@ -41,4 +47,4 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.manage_sep_types.sep_type_list" => "List SEP Types",
   "en.exchange.manage_sep_types.titles" => "SEPs",
   "en.exchange.manage_sep_types.sort_description" => "Drag and drop to change the order that the SEPs appear to customer or admin. This list includes all SEPs. SEPs with Admin Only visibility will show on this list and on the Admin SEP menu and carousel, but will not show on the customer SEP carousel."
-}
+}.freeze

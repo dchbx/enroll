@@ -24,8 +24,9 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          lowest_cost_product = sponsored_benefit.lowest_cost_product(sponsored_benefit.benefit_package.start_on)
-          highest_cost_product = sponsored_benefit.highest_cost_product(sponsored_benefit.benefit_package.start_on)
+          start_on = sponsored_benefit.benefit_package.benefit_application.reinstated_id.present? ? sponsored_benefit.benefit_package.benefit_sponsor_catalog.start_on : sponsored_benefit.benefit_package.start_on
+          lowest_cost_product = sponsored_benefit.lowest_cost_product(start_on)
+          highest_cost_product = sponsored_benefit.highest_cost_product(start_on)
           group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
           sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, package)
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)
@@ -70,8 +71,9 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          lowest_cost_product = sponsored_benefit.lowest_cost_product(sponsored_benefit.benefit_package.start_on)
-          highest_cost_product = sponsored_benefit.highest_cost_product(sponsored_benefit.benefit_package.start_on)
+          start_on = sponsored_benefit.benefit_package.benefit_application.reinstated_id.present? ? sponsored_benefit.benefit_package.benefit_sponsor_catalog.start_on : sponsored_benefit.benefit_package.start_on
+          lowest_cost_product = sponsored_benefit.lowest_cost_product(start_on)
+          highest_cost_product = sponsored_benefit.highest_cost_product(start_on)
           group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
           sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, package)
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)
@@ -143,8 +145,9 @@ module BenefitSponsors
             }
           end
         else
-          lowest_cost_product = package.lowest_cost_product(benefit_application.start_on)
-          highest_cost_product = package.highest_cost_product(benefit_application.start_on)
+          start_on = sponsored_benefit.benefit_package.benefit_application.reinstated_id.present? ? sponsored_benefit.benefit_package.benefit_sponsor_catalog.start_on : sponsored_benefit.benefit_package.start_on
+          lowest_cost_product = sponsored_benefit.lowest_cost_product(start_on)
+          highest_cost_product = sponsored_benefit.highest_cost_product(start_on)
           group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
 
           sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, package)
@@ -201,8 +204,9 @@ module BenefitSponsors
             estimated_enrollee_maximum: tier_costs.max
           }
         else
-          lowest_cost_product = package.lowest_cost_product(benefit_application.start_on)
-          highest_cost_product = package.highest_cost_product(benefit_application.start_on)
+          start_on = sponsored_benefit.benefit_package.benefit_application.reinstated_id.present? ? sponsored_benefit.benefit_package.benefit_sponsor_catalog.start_on : sponsored_benefit.benefit_package.start_on
+          lowest_cost_product = sponsored_benefit.lowest_cost_product(start_on)
+          highest_cost_product = sponsored_benefit.highest_cost_product(start_on)
           group_cost_estimator = BenefitSponsors::SponsoredBenefits::CensusEmployeeEstimatedCostGroup.new(benefit_application.benefit_sponsorship, benefit_application.effective_period.min)
           sponsored_benefit_with_lowest_cost_product  = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, lowest_cost_product, package)
           sponsored_benefit_with_highest_cost_product = group_cost_estimator.calculate(sponsor_contribution.sponsored_benefit, highest_cost_product, package)

@@ -435,7 +435,10 @@ module BenefitSponsors
 
     def published_benefit_application(include_term_pending: true)
       submitted_applications = include_term_pending ? benefit_applications.submitted + benefit_applications.terminated_or_termination_pending : benefit_applications.submitted
-      submitted_applications.sort_by(&:created_at).reverse.detect { |submitted_application| submitted_application != off_cycle_benefit_application } || published_off_cycle_application
+      applications = submitted_applications.reject { |application| application == future_active_reinstated_benefit_application }
+      applications.sort_by(&:created_at).reverse.detect do |submitted_application|
+        submitted_application != off_cycle_benefit_application
+      end || published_off_cycle_application
     end
 
     def published_off_cycle_application
@@ -445,7 +448,7 @@ module BenefitSponsors
 
     def submitted_benefit_application(include_term_pending: true)
       # renewing_published_plan_year || active_plan_year ||
-      published_benefit_application(include_term_pending: include_term_pending) || active_imported_benefit_application
+      published_benefit_application(include_term_pending: include_term_pending) || future_active_reinstated_benefit_application || active_imported_benefit_application
     end
 
     def active_imported_benefit_application
@@ -519,7 +522,7 @@ module BenefitSponsors
     end
 
     def dt_display_benefit_application
-      benefit_applications.where(:aasm_state.ne => :canceled).order_by(:"effective_period.min".desc).first || latest_benefit_application
+      benefit_applications.where(:aasm_state.nin => [:canceled,:retroactive_canceled]).order_by(:"effective_period.min".desc).first || latest_benefit_application
     end
 
     def off_cycle_benefit_application
@@ -528,7 +531,20 @@ module BenefitSponsors
       return nil unless termed_or_ineligible_app
 
       compare_date = termed_or_ineligible_app.enrollment_ineligible? ? termed_or_ineligible_app.start_on : termed_or_ineligible_app.end_on
-      recent_bas.select { |recent_ba| recent_ba.start_on > compare_date }.first
+      application =  recent_bas.select { |recent_ba| recent_ba.start_on > compare_date && recent_ba.aasm_state != :canceled && exclude_renewal_and_renewal(recent_ba) }.first
+      benefit_applications.map(&:reinstated_id).include?(application&.id) ? nil : application
+    end
+
+    def exclude_renewal_and_renewal(recent_ba)
+      recent_ba.reinstated_id.blank? && recent_ba.predecessor_id.blank?
+    end
+
+    def current_active_reinstated_benefit_application
+      benefit_applications.order_by(:created_at.desc).detect {|application| application.active? && application.reinstated_id.present? && application.effective_period.cover?(TimeKeeper.date_of_record) }
+    end
+
+    def future_active_reinstated_benefit_application
+      benefit_applications.order_by(:created_at.desc).detect {|application| application.active? && application.reinstated_id.present? && application.start_on > TimeKeeper.date_of_record }
     end
 
     # use this only for EDI
@@ -555,13 +571,14 @@ module BenefitSponsors
 
     def is_potential_off_cycle_employer?
       latest_application = benefit_applications.order_by(:created_at.asc).to_a.last
-      benefit_applications.where(:aasm_state.ne => :canceled).order_by(:created_at.asc).to_a.last(2).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
+      benefit_applications.order_by(:created_at.asc).any?(&:is_termed_or_ineligible?) && (latest_application.canceled? || latest_application.is_termed_or_ineligible? || latest_application.draft?)
     end
 
     def most_recent_benefit_application
+      non_off_cycle_or_future_reinstated = off_cycle_benefit_application&.id || future_active_reinstated_benefit_application&.id
       published_benefit_application ||
-        benefit_applications.order(updated_at: :desc).non_terminated_non_imported.where(:id.ne => off_cycle_benefit_application&.id).first ||
-        benefit_applications.order_by(:updated_at.desc).non_imported.where(:id.ne => off_cycle_benefit_application&.id).first
+        benefit_applications.order(updated_at: :desc).non_terminated_non_imported.where(:id.ne => non_off_cycle_or_future_reinstated).first ||
+        benefit_applications.order_by(:updated_at.desc).non_imported.where(:id.ne => non_off_cycle_or_future_reinstated).first
     end
 
     def renewing_submitted_benefit_application # TODO -recheck

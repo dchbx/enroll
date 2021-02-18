@@ -60,6 +60,10 @@ module BenefitSponsors
 
   # Ensure class type and integrity of date period ranges
   def self.tidy_date_range(range_period, attribute = nil)
+    if range_period.is_a?(Hash)
+      period = range_period.deep_symbolize_keys
+      range_period = period[:min]..period[:max] if period.key?(:min) && period.key?(:max)
+    end
 
     return range_period if (range_period.begin.class == Date) && (range_period.end.class == Date) && (range_is_increasing? range_period)
 
