@@ -1,5 +1,5 @@
 # Rake task to interchange
-# To run rake task: RAILS_ENV=production bundle exec rake migrations:bulk_census_employees_termination
+# To run rake task: RAILS_ENV=production bundle exec rake migrations:bulk_census_employees_termination fein="12344444"
 
 require File.join(Rails.root, "app", "data_migrations", "bulk_census_employees_termination")
 namespace :migrations do

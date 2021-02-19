@@ -6,6 +6,8 @@ require File.join(Rails.root, "lib/mongoid_migration_task")
 class BulkCensusEmployeesTermination < MongoidMigrationTask
   def migrate
     files = Dir.glob(File.join(Rails.root, "bulk_terminate", "*.xlsx"))
+    organization = BenefitSponsors::Organizations::Organization.where(fein: ENV['fein']).first
+    all_census_employees = CensusEmployee.by_benefit_sponsor_employer_profile_id(organization.employer_profile.id)
     files.each do |file_path|
       result = Roo::Spreadsheet.open(file_path)
       sheets = result.sheets
@@ -23,11 +25,16 @@ class BulkCensusEmployeesTermination < MongoidMigrationTask
           last_name = row_info[@headers["last_name"]].squish
           termination_date = row_info[@headers["termination_date"]].to_s.squish
           termination_date = Date.strptime(termination_date,'%m/%d/%y').to_date
-          census_employee = CensusEmployee.by_ssn(key).first
-          if census_employee.present?
-            BulkCensusEmployeesTerminationJob.perform_now(census_employee, termination_date)
+          census_employees = all_census_employees.by_ssn(key)
+          if census_employees.size > 1
+            puts "#{first_name} #{last_name} has multiple census employees #{census_employees.size}"
           else
-            puts "unable to find census employee: #{first_name} #{last_name}"
+            census_employee = census_employees.first
+            if census_employee.present?
+              BulkCensusEmployeesTerminationJob.perform_now(census_employee, termination_date)
+            else
+              puts "unable to find census employee: #{first_name} #{last_name}"
+            end
           end
         end
       end
