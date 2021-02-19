@@ -279,14 +279,6 @@ class Admin::Aptc < ApplicationController
       thh = household.tax_households.build(thh_params)
       thh.save!
 
-      ed_params = {source: 'Admin',
-                   benchmark_plan_id: current_ed.benchmark_plan_id,
-                   max_aptc: max_aptc,
-                   csr_percent_as_integer: csr_percentage,
-                   determined_at: date,
-                   determined_on: date}
-      thh.eligibility_determinations.build(ed_params).save!
-
       current_thh.tax_household_members.each do |thh_member|
         thh_member_params = thh_member.attributes.slice('applicant_id',
                                                         'is_subscriber',
@@ -297,6 +289,15 @@ class Admin::Aptc < ApplicationController
         thh.tax_household_members.build(thh_member_params).save!
       end
       thh.save!
+
+      ed_params = {source: 'Admin',
+                   benchmark_plan_id: current_ed.benchmark_plan_id,
+                   max_aptc: max_aptc,
+                   csr_percent_as_integer: csr_percentage,
+                   determined_at: date,
+                   determined_on: date}
+      thh.eligibility_determinations.build(ed_params).save!
+
       household.end_multiple_thh
     end
 
@@ -358,8 +359,12 @@ class Admin::Aptc < ApplicationController
             # Update Applied APTC on the enrolllment level.
             duplicate_hbx.applied_aptc_amount = updated_aptc_value
 
+            monthly_max_aptc = family.active_household.tax_households.tax_household_with_year(duplicate_hbx.effective_on.year).last.monthly_max_aptc(duplicate_hbx, duplicate_hbx.effective_on)
+
             # Update elected_aptc_pct to the correct value based on the new applied_amount
-            duplicate_hbx.elected_aptc_pct = actual_aptc_value/max_aptc
+            duplicate_hbx.elected_aptc_pct = actual_aptc_value / monthly_max_aptc
+
+            duplicate_hbx.aggregate_aptc_amount = monthly_max_aptc
 
             # Reset aasm_state
             duplicate_hbx.aasm_state = "shopping"
@@ -418,6 +423,7 @@ class Admin::Aptc < ApplicationController
 
     def build_error_messages(max_aptc, csr_percentage, applied_aptcs_array, year, hbxs)
       sum_of_all_applied = 0.0
+      sum_of_all_max_for_hbx = 0.0
       aptc_errors = Hash.new
       if hbxs.present? && find_enrollment_effective_on_date(TimeKeeper.datetime_of_record).year != year
         aptc_errors["EFFECTIVE_DATE_OVERFLOW"] = Settings.aptc_errors.effective_date_overflow
@@ -433,13 +439,14 @@ class Admin::Aptc < ApplicationController
           plan_premium = hbx_enrollment.total_premium
           aptc_errors["PREMIUM_SMALLER_THAN_APPLIED"] = Settings.aptc_errors.plan_premium_smaller_than_applied + "[PLAN_PREMIUM (#{'%.2f' % plan_premium.to_s}) < APPLIED_APTC (#{'%.2f' % applied_aptc.to_s})] " if applied_aptc > plan_premium
           sum_of_all_applied += hbx[1]["aptc_applied"].to_f
+          sum_of_all_max_for_hbx += max_for_hbx
         end
       end
       #applied_aptcs_array.each {|hbx|  if applied_aptcs_array.present?
 
       if max_aptc == "NaN"
         aptc_errors["MAX_APTC_NON_NUMERIC"] = Settings.aptc_errors.max_aptc_non_numeric
-      elsif applied_aptcs_array.present? && sum_of_all_applied.to_f > max_aptc.to_f
+      elsif applied_aptcs_array.present? && sum_of_all_applied.to_f > sum_of_all_max_for_hbx.to_f
         aptc_errors["MAX_APTC_TOO_SMALL"] = Settings.aptc_errors.max_aptc_too_small
       elsif max_aptc.to_f > 9999.99
         aptc_errors["MAX_APTC_TOO_BIG"]  = Settings.aptc_errors.max_aptc_too_big
@@ -453,13 +460,17 @@ class Admin::Aptc < ApplicationController
       #3 Max APTC for Enrollment => Sum all (ratio * max_aptc) for each members
       max_aptc_for_enrollment = 0
       hbx = HbxEnrollment.find(hbx_id)
+
+      effective_on = ::Insured::Factories::SelfServiceFactory.find_enrollment_effective_on_date(TimeKeeper.date_of_record.in_time_zone('Eastern Time (US & Canada)'), hbx.effective_on).to_date
+      max_aptc = hbx.family.active_household.tax_households.tax_household_with_year(hbx.effective_on.year).last.monthly_max_aptc(hbx, effective_on)
+
       hbx_enrollment_members = hbx.hbx_enrollment_members
       aptc_ratio_by_member = hbx.family.active_household.latest_active_tax_household.aptc_ratio_by_member
       hbx_enrollment_members.each do |hem|
-        max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc_for_household.to_f)
+        max_aptc_for_enrollment += (aptc_ratio_by_member[hem.applicant_id.to_s].to_f * max_aptc.to_f)
       end
-      if max_aptc_for_enrollment > max_aptc_for_household.to_f
-        max_aptc_for_household.to_f
+      if max_aptc_for_enrollment > max_aptc.to_f
+        max_aptc.to_f
       else
         max_aptc_for_enrollment.to_f
       end

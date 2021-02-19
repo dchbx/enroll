@@ -94,6 +94,7 @@ class HbxEnrollment
   # TODO need to understand these two fields
   field :elected_aptc_pct, type: Float, default: 0.0
   field :applied_aptc_amount, type: Money, default: 0.0
+  field :aggregate_aptc_amount, type: Money, default: 0.0
   field :changing, type: Boolean, default: false
 
   field :effective_on, type: Date
@@ -383,6 +384,13 @@ class HbxEnrollment
     where(family_id: family_id).special_enrollments.individual_market.show_enrollments_sans_canceled.where(
       :"created_at" => {:"$gte" => start_date, :"$lt" => end_date}
     )
+  }
+
+  scope :yearly_aggregate, lambda { |family_id, year|
+    where(:family_id => family_id,
+          :effective_on => Date.new(year)..Date.new(year).end_of_year,
+          :aasm_state.in => (ENROLLED_AND_RENEWAL_STATUSES + TERMINATED_STATUSES),
+          :"applied_aptc_amount.cents".gt => 0)
   }
   # Rewritten from family scopes
   scope :enrolled_statuses, -> { where(:"aasm_state".in => ENROLLED_STATUSES) }
