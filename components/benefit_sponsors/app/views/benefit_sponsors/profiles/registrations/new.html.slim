@@ -6,7 +6,7 @@
       li
         a href="#broker_agency_staff"  = l10n("broker_agency_staff")
     #broker_registration
-      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form"
+      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form", locals: {create_action: nil}
     #broker_agency_staff
 
 - elsif @profile_type == "general_agency"
@@ -17,7 +17,7 @@
       li
         a href="#general_agency_staff"  = l10n("general_agency_staff")
     #general_agency_registration
-      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form"
+      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form", locals: {create_action: nil}
     #general_agency_staff
 
 - else

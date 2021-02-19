@@ -83,7 +83,61 @@ class ApplicationController < ActionController::Base
     yield
   end
 
+  def set_current_portal
+    session[:current_portal] = current_portal(request.path).presence || session[:current_portal]
+  end
+
   private
+
+  def current_portal(path)
+    return 'Staff Member' if current_user.try(:has_hbx_staff_role?)
+
+    begin
+      case path
+      when /employer_profiles/, /broker_agency_profiles/, /general_agency_profiles/
+        current_organization_portal(path)
+      when /families/, /insured/
+        'MY COVERAGE'
+      when /show_roles/
+        'MY HUB'
+      end
+    rescue StandardError => e
+      Rails.logger.error { "Unable to set current portal for user - #{current_user.id} due to #{e.backtrace}" }
+    end
+  end
+
+  def is_employer_staff?(profile_id)
+    roles = current_user&.person&.active_employer_staff_roles
+    return false unless roles
+
+    roles.any? { |employer_staff_role| employer_staff_role.benefit_sponsor_employer_profile_id.to_s == profile_id }
+  end
+
+  def is_broker_staff?(profile_id)
+    roles = current_user&.person&.active_broker_staff_roles
+    return false unless roles
+
+    roles.any? { |broker_staff_role| broker_staff_role.benefit_sponsors_broker_agency_profile_id.to_s == profile_id }
+  end
+
+  def is_ga_staff?(profile_id)
+    roles = current_user&.person&.active_general_agency_staff_roles
+    return false unless roles
+
+    roles.any? { |ga_staff_role| ga_staff_role.benefit_sponsors_general_agency_profile_id.to_s == profile_id }
+  end
+
+  def current_organization_portal(path)
+    id = path.split('/').detect { |str| str.match?(/\d/) }
+    organization = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => BSON::ObjectId(id)).first
+    if is_employer_staff?(id)
+      "<strong>#{organization.legal_name}</strong> <br> Point of Contact - Employer Staff"
+    elsif is_broker_staff?(id)
+      "<strong>#{organization.legal_name}</strong> <br> Point of Contact - Broker Staff"
+    elsif is_ga_staff?(id)
+      "<strong>#{organization.legal_name}</strong> <br> Point of Contact - GA Staff"
+    end
+  end
 
     def strong_params
       params.permit!
@@ -225,6 +279,7 @@ class ApplicationController < ActionController::Base
     def after_sign_in_path_for(resource)
       if request.referrer =~ /sign_in/
         redirect_path = confirm_last_portal(request, resource)
+        session[:current_portal] = current_portal(redirect_path)
         session[:portal] || redirect_path
       else
         session[:portal] || request.referer || root_path

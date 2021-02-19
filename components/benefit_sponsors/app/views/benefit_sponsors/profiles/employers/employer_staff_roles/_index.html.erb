@@ -1,0 +1,28 @@
+<div class="staff-roles-tab">
+  <h2> Staff Roles </h2>
+  <table class = "table table-striped table-bordered">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Staff Role Created At</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @staff_people.each do |person| %>
+        <tr>
+          <td><%= person.full_name %></td>
+          <td><%= person.employer_staff_roles.where(benefit_sponsor_employer_profile_id: @profile.id).last&.created_at %></td>
+          <td><%= link_to 'Show/Add Roles', main_app.show_roles_person_path(person.id), class: 'btn btn-danger' %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<style type="text/css">
+  .staff-roles-tab {
+    margin: 15px;
+    padding-top: 0px !important;
+  }
+</style>

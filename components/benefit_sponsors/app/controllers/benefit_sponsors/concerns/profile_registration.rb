@@ -24,6 +24,10 @@ module BenefitSponsors
         profiles_employers_employer_profile_path(profile_id, tab: 'home')
       end
 
+      def show_manage_protals_url(person_id)
+        main_app.show_roles_person_path(id: person_id)
+      end
+
       def agency_edit_registration_url
         edit_profiles_registration_path(@agency.organization.profile.id)
       end

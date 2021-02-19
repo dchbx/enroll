@@ -1,0 +1,139 @@
+#uic-families-right-menu, #uic-employers-right-menu {
+  background-color: #007bc4;
+  padding: 20px 0;
+  list-style-type: none;
+
+  li {
+    padding: 8px 0;
+    padding-right: 15px;
+  }
+  li a {
+    color: #cbe6ff;
+    text-align: left;
+    padding-left: 15px;
+    font-weight: 600;
+    font-size: 18px;
+    display: inline-block;
+    width: 100%;
+  }
+  li a:hover {
+    background-color: transparent;
+  }
+  .badge {
+    background-color: $primary-orange;
+  }
+  .panel {
+    border-radius: 0;
+    background-image: none;
+    border-bottom: none;
+    padding: 0 20px;
+    font-size: 14px;
+    margin-top:0;
+    padding: 0 10px;
+  }
+}
+
+.fa-user-circle {
+  color: #23527c;
+}
+
+.personal-info-container {
+  max-width: 1000px;
+}
+
+.personal-info-hr {
+  border: 1px solid #ddd;
+}
+
+.red-star {
+  color: red;
+}
+
+.personal-info-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: rgb(131, 135, 128)
+}
+
+.personal-info-heading {
+  font-size: 16px;
+  font-weight: bold;
+  color: rgb(131, 135, 128)
+}
+
+.dropdown-toggle:after { content: none }
+
+.no-pd{padding: 0;}
+
+.svg-inline--fa {
+  color: $primary-blue;
+  cursor: pointer;
+  &.pull-right {
+    margin: 6px 10px 0 0;
+
+    &:last-of-type {
+      margin: 6px 10px 0 0;
+      position: absolute;
+      right: 5px;
+    }
+  }
+}
+
+.pull-right {
+  float: right !important;
+}
+
+.mt-1 {
+  margin-top: 10px !important;
+}
+
+.mt-2 {
+  margin-top: 20px !important;
+}
+
+.mt-3 {
+  margin-top: 30px !important;
+}
+
+.ml-25 {
+  margin-left: 25px;
+}
+
+.hub-label {
+  font-size: 25px
+}
+
+.hub-label a {
+  color: #007bc4;
+  font-weight: 600;
+}
+
+.hub-flex-shadow {
+  box-shadow: 0 2px 4px rgba(0,0,0,.25);
+  border-left: solid 5px #007bc4;
+}
+
+.hub-item-flex-shadow {
+  box-shadow: 0 6px 4px rgba(0,0,0,.25);
+}
+
+.caret {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  margin-left: 2px;
+  vertical-align: middle;
+  border-top: 4px dashed;
+  border-top: 4px solid \9;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+}
+
+
+.broker-staff {
+  width: 60em;
+}
+
+.general-agency-staff {
+  width: 60em;
+}

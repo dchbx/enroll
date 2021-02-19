@@ -7,10 +7,10 @@ module BenefitSponsors
         include ActiveModel::Validations
         include BenefitSponsors::Forms::NpnField
 
-        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending
-        attr_accessor :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind
-        attr_accessor :area_code, :number, :extension
-        attr_accessor :handler
+        attr_accessor :profile_id, :profile_type, :organization, :profile, :current_user, :claimed, :pending, :coverage_record,
+                      :first_name, :last_name, :email, :dob, :npn, :fein, :legal_name, :person, :market_kind,
+                      :area_code, :number, :extension, :handler
+
         cattr_accessor :profile_type
 
         delegate :is_employer_profile?, :is_broker_profile?, :is_general_agency_profile?, to: :class
@@ -94,6 +94,7 @@ module BenefitSponsors
             else
               initialize_staff_role_from_person(attrs[:person_id])
             end
+            self.coverage_record = attrs[:coverage_record] if attrs[:coverage_record].present?
           end
         end
 
@@ -285,18 +286,50 @@ module BenefitSponsors
           def persist_representative!
             profile = organization.employer_profile
             person.user = current_user
-            employer_ids = person.employer_staff_roles.map(&:employer_profile_id)
+            employer_ids = person.employer_staff_roles.where(:aasm_state.ne => :is_closed).map(&:benefit_sponsor_employer_profile_id)
             if employer_ids.include? profile.id
               pending = false
             else
               pending = organization && Person.staff_for_employer(profile).detect{|person|person.user_id}
               role_state = pending ? 'is_applicant' : 'is_active'
-              person.employer_staff_roles << EmployerStaffRole.new(person: person, :benefit_sponsor_employer_profile_id => profile.id, is_owner: true, aasm_state: role_state)
+              attrs = {
+                person: person,
+                :benefit_sponsor_employer_profile_id => profile.id,
+                is_owner: true,
+                aasm_state: role_state
+              }
+              if factory.coverage_record.present?
+                coverage_record = factory.coverage_record
+                address = coverage_record[:address]
+                email = coverage_record[:email]
+                attrs.merge!({coverage_record: {ssn: coverage_record[:ssn],
+                                                gender: coverage_record[:gender],
+                                                dob: coverage_record[:dob],
+                                                hired_on: coverage_record[:hired_on],
+                                                is_applying_coverage: coverage_record[:is_applying_coverage],
+                                                address: Address.new({kind: address[:kind],
+                                                                      address_1: address[:kind],
+                                                                      address_2: address[:address_2],
+                                                                      city: address[:city],
+                                                                      county: address[:county],
+                                                                      state: address[:state],
+                                                                      zip: address[:zip]}),
+                                                email: Email.new({kind: email[:kind],
+                                                                  address: email[:address]})}})
+              end
+              person.employer_staff_roles << EmployerStaffRole.new(attrs)
             end
+
             factory.pending = pending
             current_user.roles << "employer_staff" unless current_user.roles.include?("employer_staff")
             current_user.save!
             person.save!
+            approve_employer_staff_role
+          end
+
+          def approve_employer_staff_role
+            role = person.employer_staff_roles.where(benefit_sponsor_employer_profile_id: factory.profile_id.to_s, aasm_state: :is_active).last
+            role&.approve!
           end
 
           def fetch_organization(attributes)

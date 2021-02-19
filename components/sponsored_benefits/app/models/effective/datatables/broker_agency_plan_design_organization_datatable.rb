@@ -47,6 +47,7 @@ module Effective
             ['View Quotes', sponsored_benefits.organizations_plan_design_organization_plan_design_proposals_path(row, profile_id: attributes[:profile_id]), 'ajax'],
             ['Create Quote', sponsored_benefits.new_organizations_plan_design_organization_plan_design_proposal_path(row, profile_id: attributes[:profile_id]), 'static'],
             ['Edit Employer Details', sponsored_benefits.edit_organizations_plan_design_organization_path(row, profile_id: attributes[:profile_id]), edit_employer_link_type(row)],
+            ['Show/Add Roles', benefit_sponsors.profiles_employers_employer_staff_roles_path(profile_id: row.sponsor_profile_id, employer_actions_id: "plan_design_#{row.id}"), 'ajax'],
             ['Remove Employer', sponsored_benefits.organizations_plan_design_organization_path(row),
                               remove_employer_link_type(row),
                               "Are you sure you want to remove this employer?"],
@@ -71,6 +72,12 @@ module Effective
 
       def edit_employer_link_type(employer)
         employer.is_prospect? ? 'ajax' : 'disabled'
+      end
+
+      def add_roles_link_type(allow)
+        feature_enabled = ::EnrollRegistry.feature_enabled?(:manage_account_functionality)
+        policy_accepted_and_allow = feature_enabled && allow
+        policy_accepted_and_allow ? 'ajax' : 'disabled'
       end
 
       def broker_name(row)

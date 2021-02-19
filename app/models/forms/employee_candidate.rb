@@ -18,7 +18,7 @@ module Forms
     # include ::Forms::DateOfBirthField
     #include Validations::USDate.on(:date_of_birth)
 
-    validate :does_not_match_a_different_users_person
+    validate :does_not_match_a_different_users_person, unless: :admin?
     validates :ssn,
               length: {minimum: 9, maximum: 9, message: "SSN must be 9 digits"},
               allow_blank: true,
@@ -95,6 +95,10 @@ module Forms
 
     def persisted?
       false
+    end
+
+    def admin?
+      return User.find(user_id).has_hbx_staff_role? if user_id.present?
     end
   end
 end

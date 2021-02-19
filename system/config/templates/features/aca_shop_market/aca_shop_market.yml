@@ -15,3 +15,12 @@ registry:
         settings:
            - key: :offset_months
              item: 0
+      - key: :employer_registration
+        item: BenefitSponsors::Operations::Employers::Create.new
+        is_enabled: true
+      - key: :broker_registration
+        item: BenefitSponsors::Operations::BrokerAgencies::Create.new
+        is_enabled: true
+      - key: :ga_registration
+        item: BenefitSponsors::Operations::GeneralAgencies::Create.new
+        is_enabled: true

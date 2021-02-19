@@ -1,6 +1,7 @@
 class BrokerAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
+  include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
   include AASM
   include Mongoid::History::Trackable
@@ -65,6 +66,10 @@ class BrokerAgencyStaffRole
     end
   end
 
+  def has_broker_agency_profile?
+    self.benefit_sponsors_broker_agency_profile_id.present? || self.broker_agency_profile_id.present?
+  end
+
   def send_invitation
     # TODO: broker agency staff is not actively supported right now
     # Also this method call sends an employee invitation, which is bug 8028
@@ -103,6 +108,18 @@ class BrokerAgencyStaffRole
 
   def is_active?
     aasm_state == "active"
+  end
+
+  def fetch_redirection_link
+    return nil if aasm_state.to_sym != :active
+
+    if benefit_sponsors_broker_agency_profile_id.present?
+      broker_agency_profile = BenefitSponsors::Organizations::BrokerAgencyProfile.find(benefit_sponsors_broker_agency_profile_id)
+      BenefitSponsors::Engine.routes.url_helpers.profiles_broker_agencies_broker_agency_profile_path(broker_agency_profile, tab: 'home').to_s
+    else
+      broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id)
+      Rails.application.routes.url_helpers.broker_agencies_profile_path(broker_agency_profile).to_s
+    end
   end
 
   ## Class methods

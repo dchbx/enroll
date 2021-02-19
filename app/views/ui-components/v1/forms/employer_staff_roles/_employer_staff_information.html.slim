@@ -1,0 +1,43 @@
+fieldset
+  legend = l10n("personal_information")
+
+  .row
+    .col-md-3.mb-3
+      label for="inputFirstname"   #{l10n('first_name')} *
+      = f.text_field :first_name, placeholder: 'First Name', required: 'true', id: 'inputFirstname', class: 'form-control', readonly: true
+      .invalid-feedback
+
+        = l10n("invalid_first_name")
+
+    .col-md-3.mb-3
+      label for="inputLastname"  #{l10n('last_name')} *
+      = f.text_field :last_name, placeholder: 'Last Name', required: 'true', id: 'inputLastname', class: 'form-control', readonly: true
+      .invalid-feedback
+
+        = l10n("invalid_last_name")
+
+    .col-md-3.mb-3
+      label for="inputDOB"  #{l10n('date_of_birth')} *
+      = f.text_field :dob, placeholder: 'MM/DD/YYYY', required: 'true', id: 'inputStaffDOB', class: 'form-control', readonly: true
+      .invalid-feedback
+
+        = l10n("invalid_dob")
+
+    .col-md-3.mb-3
+      label for="inputEmail"  #{l10n('email')} *
+      = f.email_field :email, placeholder: 'Email', required: 'true', id: 'inputEmail', class: 'form-control'
+
+    = f.hidden_field :person_id, value: f.object.person_id
+    = f.hidden_field :profile_id, value: nil
+    = f.fields_for :coverage_record, f.object.coverage_record, errors: {}, fieldset: false do |f|
+      - @coverage_record_form = f
+      .col-md-3.mb-3
+        label for="inputApplying"  #{l10n('is_applying_coverage')} *
+        = f.select :is_applying_coverage, options_for_select([['Yes', true], ['No', false]], selected: f.object.is_applying_coverage), {}, class: "form-control", required: true, id: 'isApplying', :onchange => 'isApplyingCoverage(this)'
+        .invalid-feedback
+          | Please select an applying coverage option.
+
+- if @coverage_record_form.present?
+  fieldset.mt-2.col-md-12.optional.hidden
+    = render partial: './ui-components/v1/forms/coverage_record', locals: { f: @coverage_record_form }
+

@@ -1,12 +1,12 @@
 <% if @general_agency_profiles.present?  %>
   <br />
   <div class='table-responsive col-12'>
-    <table style='width: 100%; border-collapse: collapse; border: 1px solid #d5d5d5' class="general-agency-staff">
+    <table style='border-collapse: collapse; border: 1px solid #d5d5d5' class="general-agency-staff">
       <thead style='height: 40px;'>
         <th style='width: 18%; height: 40px; padding: 10px'> <%= l10n("legal_name") %></th>
         <th style='width: 18%'> <%= l10n("npn") %></th>
-        <th style='width: 18%'> <%= l10n("primary_general_agency_staff_name") %></th>
-        <th style='width: 18%'> <%= l10n("select_this_general_agency") %></th>
+        <th style='width: 28%'> <%= l10n("primary_general_agency_staff_name") %></th>
+        <th style='width: 30%'> <%= l10n("select_this_general_agency") %></th>
       </thead>
       <% @general_agency_profiles.each do |agency| %>
       <tbody class="select-ga">

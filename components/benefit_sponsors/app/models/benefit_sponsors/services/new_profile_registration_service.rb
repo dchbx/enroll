@@ -18,7 +18,44 @@ module BenefitSponsors
 
       def build(attrs)
         organization = factory_class.build(attrs)
-        attributes_to_form_params(organization)
+        params = attributes_to_form_params(organization)
+        if attrs[:person_id].present?
+          person = Person.where(id: attrs[:person_id]).first
+          home_address = person.home_address
+          email = person.work_email || person.home_email
+          params[:staff_roles].first.merge!({
+                                              person_id: attrs[:person_id],
+                                              first_name: person.first_name,
+                                              last_name: person.last_name,
+                                              email: person.work_email_or_best,
+                                              dob: person.dob,
+                                              coverage_record: {
+                                                ssn: person.ssn,
+                                                gender: person.gender,
+                                                dob: person.dob,
+                                                hired_on: nil,
+                                                is_applying_coverage: false,
+                                                address: {
+                                                  kind: 'home',
+                                                  address_1: home_address&.kind,
+                                                  address_2: home_address&.address_2,
+                                                  address_3: home_address&.address_3,
+                                                  city: home_address&.city,
+                                                  county: home_address&.county,
+                                                  state: home_address&.state,
+                                                  location_state_code: home_address&.location_state_code,
+                                                  full_text: home_address&.full_text,
+                                                  zip: home_address&.zip,
+                                                  country_name: home_address&.country_name
+                                                },
+                                                email: {
+                                                  kind: email&.kind,
+                                                  address: email&.address
+                                                }
+                                              }
+                                            })
+        end
+        params
       end
 
       def find

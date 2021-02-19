@@ -43,6 +43,15 @@ module EmployerWorld
       site: site
     )
   end
+
+  def create_employer_staff(staff_name, legal_name, user)
+    employer_profile = employer_profile(legal_name)
+    person = FactoryBot.create(:person, first_name: staff_name.split(/\s/)[0], last_name: staff_name.split(/\s/)[1], user: user)
+    employer_staff_role = create(:employer_staff_role, aasm_state: :active, benefit_sponsor_employer_profile_id: employer_profile.id)
+    person.employer_staff_roles << employer_staff_role
+    user.roles = ['employer_staff']
+    user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/employers/employer_profiles/#{employer_profile.id}?tab=home")
+  end
 end
 
 World(EmployerWorld)

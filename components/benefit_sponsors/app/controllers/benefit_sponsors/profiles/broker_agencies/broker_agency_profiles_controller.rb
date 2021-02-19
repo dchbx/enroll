@@ -11,6 +11,7 @@ module BenefitSponsors
         rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
         before_action :set_current_person, only: [:staff_index]
+        before_action :set_current_portal, only: [:show]
         before_action :check_and_download_commission_statement, only: [:download_commission_statement, :show_commission_statement]
 
         skip_before_action :verify_authenticity_token, only: :create
@@ -47,6 +48,27 @@ module BenefitSponsors
           @broker_agency_profile = ::BenefitSponsors::Organizations::BrokerAgencyProfile.find(params[:id])
           @provider = current_user.person
           @id=params[:id]
+        end
+
+        def new_broker_profile
+          authorize User, :add_roles?
+          @person_id = params[:person_id]
+          @agency = BenefitSponsors::Operations::BrokerAgencies::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def create_broker_profile
+          authorize User, :add_roles?
+          result = EnrollRegistry[:broker_registration] { registration_params.to_h }
+          if result.success?
+            redirection_url, _status = result.value!
+            flash[:notice] = 'Thank you for submitting your request to access the broker account. Your application for access is pending'
+            redirect_to redirection_url
+          else
+            redirect_to new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
+          end
         end
 
         def staff_index
@@ -233,6 +255,14 @@ module BenefitSponsors
         def collect_and_sort_commission_statements(sort_order='ASC')
           @statement_years = (Settings.aca.shop_market.broker_agency_profile.minimum_commission_statement_year..TimeKeeper.date_of_record.year).to_a.reverse
           @statements.sort_by!(&:date).reverse!
+        end
+
+        def registration_params
+          current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+          current_user_id ||= current_user.present? ? current_user.id : nil
+          params[:agency] ||= {}
+          params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
+          params[:agency].permit!
         end
       end
     end

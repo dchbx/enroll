@@ -1,0 +1,80 @@
+.broker-agency-staff-registration-container
+  h1.mb-4.heading-text#loaded = l10n("Employer_staff")
+  
+  = form_for @staff_member, as: :staff_member, :url => url_for(:controller => 'employer_staff_roles', :action => 'create_staff_member'), method: 'post', html: { class: "needs-ajax-validation s508", novalidate:true } do |f|
+    div#employer_staff
+    = render partial: './ui-components/v1/forms/employer_staff_roles/employer_staff_information', locals: { f: f }
+
+    .row.mt-3.employer-search
+      div.col-md-6
+        div
+          h5 Select your Employer
+        div style='display: flex;'
+          input.col-md-8#example-search-input.form-control.py-2 type="search" placeholder="Legal Name/Fein/HBX ID" /
+          button.btn.btn-primary.search type="button" onclick="employerSearch(); return false" data-loading-text="Loading..."
+              |
+               Search
+      .result.col-md-12
+
+      br
+    .row.no-pd
+      .col-md-9.col-sm-9.col-xs-12
+        .row.no-buffer
+          .col-md-4.col-sm-4.col-xs-12.form-group-lg
+            br
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'employer-staff-btn']
+              = l10n("submit_application")
+
+javascript:
+  validateForm();
+
+  function isApplyingCoverage(element) {
+    var result = document.querySelectorAll('.optional');
+    var ssn =  document.getElementById("inputSsn")
+    var gender =  document.getElementById("inputGender")
+    var hiredOn =  document.getElementById("inputHiredOn")
+    if (element.value === "true") {
+      result.forEach(function (ele) {
+        ele.classList.remove("hidden");
+      });
+
+      ssn.setAttribute("required", "true");
+      gender.setAttribute("required", "true");
+      hiredOn.setAttribute("required", "true");
+
+    } else {
+      result.forEach(function (ele) {
+        ele.classList.add("hidden");
+      });
+
+      ssn.required = false;
+      gender.required = false;
+      hiredOn.required = false;
+    }
+  }
+
+  function employerSearch() {
+    var employer_search = document.getElementById('example-search-input').value
+    document.getElementById('employer-staff-btn').disabled = true;
+    if (employer_search != undefined) {
+      $.ajax({
+        url: '/benefit_sponsors/profiles/employers/employer_staff_roles/employer_search.js',
+        type: "GET",
+        data: {'q': employer_search}
+      });
+    }
+    ;
+  }
+
+  function selectEmployer(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+      var element = result.querySelectorAll('.select-employer')
+      element.forEach(function (ele) {
+        ele.classList.remove("agency-selected");
+      })
+    });
+    document.getElementById('staff_member_profile_id').value = element.dataset.employer_profile_id;
+    element.closest(".select-employer").classList.add('agency-selected')
+    document.getElementById('employer-staff-btn').disabled = false;
+  }

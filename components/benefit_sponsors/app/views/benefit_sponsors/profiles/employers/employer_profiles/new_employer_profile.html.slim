@@ -1,0 +1,21 @@
+.container-fluid style='padding: 50px;'
+  #employer_profile_form
+    ul
+      li
+        a href="#employer_registration" Employer Registration
+      li
+        a href="#employer_staff" Employer Staff
+    #employer_registration
+      = form_for @agency, as: :agency, url: {action: "create_employer_profile"},  html: { class: "needs-ajax-validation s508", novalidate:true } do |f|
+        = hidden_field_tag :manage_portals, true
+        = hidden_field_tag :person_id, @person_id
+        = hidden_field_tag :profile_type, params[:profile_type]
+        = render partial: 'new_employer_profile', locals: {f: f}
+
+    #employer_staff
+      = render partial: 'benefit_sponsors/profiles/employers/employer_staff_roles/new_staff_member'
+
+javascript:
+  validateAjaxForm();
+
+  $("#employer_profile_form").tabs();

@@ -1,0 +1,2 @@
+HUB_TRANSLATIONS = {
+}

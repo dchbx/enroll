@@ -22,4 +22,14 @@ class UserPolicy < ApplicationPolicy
     return false unless role.permission
     role.permission.view_login_history
   end
+
+  def add_roles?
+    return false if user.blank?
+    return false if user.has_hbx_staff_role? && !can_add_staff_roles?
+    true
+  end
+
+  def can_add_staff_roles?
+    user.person.hbx_staff_role.permission.can_add_staff_roles
+  end
 end

@@ -119,29 +119,33 @@ describe Forms::EmployeeCandidate, "asked to match a person" do
   end
 
   context "who does have a user acccount associated with current user" do
-    let(:user) { double(id: 20) }
+    let(:user) { double(id: 20, has_hbx_staff_role?: false) }
     let(:person) { double(user: user) }
 
     it "should return the person when one is matched by dob and ssn" do
       allow(Person).to receive(:where).with(search_params).and_return(people)
+      allow(User).to receive(:find).with(user.id).and_return user
       expect(subject.valid?).to be_truthy
       expect(subject.match_person).to eq person
     end
   end
 
   context "who does have a user acccount associated" do
-    let(:user) { double(id: 12) }
+    let(:user) { double(id: 12, has_hbx_staff_role?: false) }
     let(:person) { double(user: user) }
 
     it "should have an error that the person is associted with another use" do
       allow(Person).to receive(:where).with(search_params).and_return(people)
+      allow(User).to receive(:find).and_return user
       subject.valid?
       expect(subject).to have_errors_on(:base)
     end
   end
 
   context "future date of birth" do
+    let(:user) { double(id: 12, has_hbx_staff_role?: false) }
     it "gives error on dob" do
+      allow(User).to receive(:find).and_return user
       subject.dob = TimeKeeper.date_of_record + 20.years
       expect(subject.valid?).to be_falsey
       expect(subject).to have_errors_on(:dob)

@@ -4,6 +4,7 @@ class EmployerStaffRole
   include AASM
 
   embedded_in :person
+  embeds_one :coverage_record
 
   field :is_owner, type: Boolean, default: true
   field :benefit_sponsor_employer_profile_id, type: BSON::ObjectId

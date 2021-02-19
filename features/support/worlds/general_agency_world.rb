@@ -30,7 +30,7 @@ module GeneralAgencyWorld
   end
 
   def general_agency_profile(legal_name = nil)
-    @general_agency_profile ||= general_agency_organization(legal_name).general_agency_profile if general_agency_organization(legal_name).present?
+    @general_agency_profile = general_agency_organization(legal_name).general_agency_profile if general_agency_organization(legal_name).present?
   end
 
   def assign_staff_to_general_agency(staff_name, legal_name)
@@ -41,6 +41,15 @@ module GeneralAgencyWorld
     @ga_staff = create(:user, person: person, email: people[staff_name][:email], password: people[staff_name][:password], password_confirmation: people[staff_name][:password])
     @ga_staff.roles = ['general_agency_staff']
     @ga_staff.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/general_agencies/general_agency_profiles/#{general_agency_profile.id}")
+  end
+
+  def create_ga_staff(staff_name, legal_name, user)
+    general_agency_profile = general_agency_profile(legal_name)
+    person = FactoryBot.create(:person, first_name: staff_name.split(/\s/)[0], last_name: staff_name.split(/\s/)[1], user: user)
+    primary_general_agency_staff_role = create(:general_agency_staff_role, aasm_state: :active, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true)
+    person.general_agency_staff_roles << primary_general_agency_staff_role
+    user.roles = ['general_agency_staff']
+    user.update_attributes(last_portal_visited: "/benefit_sponsors/profiles/general_agencies/general_agency_profiles/#{general_agency_profile.id}")
   end
 end
 
