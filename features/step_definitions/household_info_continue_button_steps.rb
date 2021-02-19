@@ -56,12 +56,14 @@ Given(/^at least one other household members exist$/) do
   find('#new_applicant > div.house.col-md-12.col-sm-12.col-xs-12.no-pd > div:nth-child(5) > div.col-md-5.mt18 > label.static_label.label-floatlabel.mt-label').click
   find("span", :text => "choose").click
   find(:xpath, "//div[@class='selectric-scroll']/ul/li[contains(text(), 'Spouse')]").click
+
   choose('applicant_us_citizen_true', allow_label_click: true)
   choose('applicant_naturalized_citizen_false', allow_label_click: true)
   choose('indian_tribe_member_no', allow_label_click: true)
   choose('radio_incarcerated_no', allow_label_click: true)
 
-  find(:xpath, '//label[@for="is_applying_coverage_false"]').click
+  find(:xpath, '//label[@for="is_applying_coverage_true"]').click
+
   find(".btn", text: "CONFIRM MEMBER").click
 
   sleep 2

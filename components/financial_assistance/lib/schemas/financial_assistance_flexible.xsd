@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://openhbx.org/api/terms/1.0" targetNamespace="http://openhbx.org/api/terms/1.0" elementFormDefault="qualified">
+	<xs:include schemaLocation="common.xsd"/>
+	<xs:include schemaLocation="links.xsd"/>
+	<xs:include schemaLocation="individual.xsd"/>
+	<xs:include schemaLocation="verification_services.xsd"/>
+	<xs:element name="financial_assistance_application" type="FinancialAssistanceApplicationType"/>
+	<xs:complexType name="FinancialAssistanceApplicantType">
+		<xs:sequence>
+			<xs:element name="individual" type="FinancialAssistanceApplicantIndivdualType"/>
+      <xs:element name='citizen_status' minOccurs='0'>
+        <xs:simpleType>
+          <xs:restriction base='xs:anyURI'>
+            <xs:enumeration value='us_citizen'/>
+            <xs:enumeration value='naturalized_citizen'/>
+            <xs:enumeration value='alien_lawfully_present'/>
+            <xs:enumeration value='not_lawfully_present_in_us'/>
+            <xs:enumeration value='non_native_not_lawfully_present_in_us'/>
+            <xs:enumeration value='lawful_permanent_resident'/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+			<xs:element name="immigration_information" type="ImmigrationInformationType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Individual's immigration information and documentation</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="has_fixed_address" type="xs:boolean"/>
+			<xs:element name="is_living_in_state" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_temp_out_of_state" minOccurs="0"/>
+			<xs:element name="is_required_to_file_taxes" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="tax_filer_type" type="TaxFilerNameType"/>
+			<xs:element name="is_joint_tax_filing" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_claimed_as_tax_dependent" type="xs:boolean"/>
+			<xs:element name="has_insurance" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="had_prior_insurance" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="has_state_health_benefit" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_medicare_eligible" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_physically_disabled" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_student" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="student_type" type="FinancialAssistanceApplicationStudentNameType" minOccurs="0"/>
+			<xs:element name="school_type" type="FinancialAssistanceApplicationSchoolNameType" minOccurs="0"/>
+			<xs:element name="student_status_end_on" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="is_ia_eligible" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_medicaid_chip_eligible" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_magi_medicaid" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_self_attested_blind" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_self_attested_disabled" type="xs:boolean"/>
+			<xs:element name="is_self_attested_long_term_care" type="xs:boolean"/>
+			<xs:element name="is_veteran" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_refugee" type="xs:boolean"/>
+			<xs:element name="is_trafficking_victim" type="xs:boolean"/>
+			<xs:element name="is_former_foster_care" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="age_left_foster_care" type="xs:integer" minOccurs="0"/>
+			<xs:element name="foster_care_us_state" type="UsStateNameType" minOccurs="0"/>
+			<xs:element name="had_medicaid_during_foster_care" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_pregnant" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_enrolled_on_medicaid" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_post_partum_period" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="children_expected_count" type="xs:integer" minOccurs="0"/>
+			<xs:element name="pregnancy_due_on" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="pregnancy_end_on" type="SimpleDateType" minOccurs="0"/>
+			<xs:element name="is_subject_to_five_year_bar" type="xs:boolean"/>
+			<xs:element name="is_five_year_bar_met" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_forty_quarters" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_ssn_applied" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="non_ssn_apply_reason" type="xs:string" minOccurs="0"/>
+			<xs:element name="has_daily_living_help" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="has_bill_pay_3_month_help" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_resident_post_092296" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="is_vets_spouse_or_child" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="incomes">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="income" type="FinancialAssistanceApplicantIncomeType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="deductions">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="deduction" type="FinancialAssistanceApplicantDeductionType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="benefits">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="benefit" type="FinancialAssistanceApplicantBenefitType" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="FinancialAssistanceApplicationType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType">
+				<xs:annotation>
+					<xs:documentation>HBX-assigned identifier for this application.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="haven_app_id" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="haven_ic_id" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="e_case_id" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="applicant_type" type="FinancialAssistanceApplicationApplicantNameType"/>
+			<xs:element name="request_type" type="xs:string"/>
+			<xs:element name="motivation_type" type="FinancialAssistanceApplicationMotivationNameType"/>
+			<xs:element name="status" type="FinancialAssistanceApplicationStatusNameType"/>
+			<xs:element name="submitted_at" type="xs:dateTime"/>
+			<xs:element name="effective_date" type="xs:dateTime"/>
+			<xs:element name="assistance_year" type="xs:gYear"/>
+			<xs:element name="is_renewal_authorized" type="xs:boolean"/>
+			<xs:element name="renewal_base_year" type="xs:gYear" minOccurs="0"/>
+			<xs:element name="years_to_renew" type="xs:integer" minOccurs="0"/>
+			<xs:element name="us_state" type="LocationStateCodeType"/>
+			<xs:element name="has_accepted_medicaid_terms" type="xs:boolean"/>
+			<xs:element name="has_accepted_medicaid_insurance_collection_terms" type="xs:boolean"/>
+			<xs:element name="has_accepted_attestation_terms" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="has_accepted_submission_terms" type="xs:boolean"/>
+			<xs:element name="has_accepted_parent_living_out_of_home_terms" type="xs:boolean"/>
+			<xs:element name="has_accepted_report_change_terms" type="xs:boolean"/>
+			<xs:element name="request_full_determination" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="assistance_tax_households" type="AssistanceTaxHouseholdsListType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceTaxHouseholdsListType">
+		<xs:sequence>
+			<xs:element name="assistance_tax_household" type="AssistanceTaxHouseholdType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceTaxHouseholdType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType">
+				<xs:annotation>
+					<xs:documentation>HBX-assigned identifier for this tax household..</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="primary_applicant_id" type="IdentifierSimpleType"/>
+			<xs:element name="assistance_tax_household_members" type="AssistanceTaxHouseholdMemberListType"/>
+			<xs:element name="eligibility_determinations" type="AssistanceEligibilityDeterminationListType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceEligibilityDeterminationListType">
+		<xs:sequence>
+			<xs:element name="eligibility_determination" type="AssistanceEligibilityDeterminationType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceEligibilityDeterminationType">
+		<xs:sequence>
+			<xs:element name="id" type="IdentifierType"/>
+			<xs:element name="eligibility_determination_applicants" type="AssistanceEligibilityDeterminationApplicantListType"/>
+			<xs:element name="total_incomes_by_year" type="AssistedTaxHouseholdIncomesByYearType"/>
+			<xs:element name="household_state" type="HouseholdStatusNameType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Eligibility system workflow status</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="maximum_aptc" type="CurrencyType">
+				<xs:annotation>
+					<xs:documentation>Premium tax credit assistance eligibility.  Available to household with income between 100% and 400% of the Federal Poverty Level (FPL)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="csr_percent" type="xs:float">
+				<xs:annotation>
+					<xs:documentation>Cost-sharing reduction assistance eligibility for co-pays, etc.  Available to households with income between 100-250% of FPL and enrolled in Silver plan.
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="aptc_csr_annual_household_income" type="CurrencyType" minOccurs="0"/>
+			<xs:element name="benchmark_plan_id" type="IdentifierSimpleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Silver plan used to calculate assistance values</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="effective_on" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Date eligibility values begin to apply.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="determination_date" type="SimpleDateType">
+				<xs:annotation>
+					<xs:documentation>Date eligibility was established</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="aptc_annual_income_limit" type="CurrencyType" minOccurs="0"/>
+			<xs:element name="csr_annual_income_limit" type="CurrencyType" minOccurs="0"/>
+			<xs:element ref="comments" minOccurs="0"/>
+			<xs:group ref="OptionalResourceTimestampGroup"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceEligibilityDeterminationApplicantListType">
+		<xs:sequence>
+			<xs:element name="eligibility_determination_applicant" type="AssistanceEligibilityDeterminationApplicantType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistanceEligibilityDeterminationApplicantType">
+		<xs:complexContent>
+			<xs:restriction base="IndividualType">
+				<xs:sequence>
+					<xs:element name="id" type="IdentifierType" minOccurs="0"/>
+					<xs:element name="person" type="PersonType"/>
+					<xs:element ref="person_relationships" minOccurs="0"/>
+					<xs:element name="person_demographics" type="PersonDemographicsType" minOccurs="0"/>
+					<xs:element name="preferred_contact_method" type="PreferredContactMethodType" minOccurs="0"/>
+					<xs:element name="is_primary_applicant" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="is_consent_applicant" type="xs:boolean" minOccurs="0"/>
+					<xs:element name="is_coverage_applicant" type="xs:boolean" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Individual is applying for health coverage</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="is_without_assistance" type="xs:boolean"/>
+					<xs:element name="is_insurance_assistance_eligible" type="xs:boolean"/>
+					<xs:element name="is_medicaid_chip_eligible" type="xs:boolean"/>
+					<xs:element name="is_non_magi_medicaid_eligible" type="xs:boolean"/>
+					<xs:element name="is_totally_ineligible" type="xs:boolean"/>
+					<xs:element name="person_health" type="IndividualHealthType" minOccurs="0"/>
+					<xs:element name="total_incomes_by_year" type="AssistedIndividualTotalIncomesByYearType"/>
+				</xs:sequence>
+			</xs:restriction>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AssistanceTaxHouseholdMemberListType">
+		<xs:sequence>
+			<xs:element name="assistance_tax_household_member" type="FinancialAssistanceApplicantType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="AssistedTaxHouseholdIncomesByYearType">
+		<xs:annotation>
+			<xs:documentation>Sum of all qualified household income sources, including incomes of person who pays taxes, spouse and dependents, less qualified deductions, by calendar year. Also includes information about verification of the income.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="total_income_by_year" type="VerifiedCurrencyAmountPerAnnumType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
