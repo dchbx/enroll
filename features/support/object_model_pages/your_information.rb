@@ -8,6 +8,10 @@ class YourInformation
     '.interaction-click-control-help'
   end
 
+  def self.your_information_text
+    'Your Information'
+  end
+
   def self.logout_link
     '.interaction-click-control-logout'
   end

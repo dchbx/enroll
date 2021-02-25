@@ -7,8 +7,32 @@ class IvlChoosePlan
     '.interaction-click-control-find-your-doctor'
   end
 
+  def self.choose_plan_text
+    'Choose Plan'
+  end
+
   def self.estimate_your_cost_link
     'interaction-click-control-estimate-your-cost'
+  end
+
+  def self.aptc_tool_available_text
+    'Available'
+  end
+
+  def self.aptc_tool_apply_monthly_text
+    'Apply Monthly'
+  end
+
+  def self.aptc_monthly_amount
+    'elected_aptc'
+  end
+
+  def self.aptc_tool_how_is_this_calculated_text
+    'How Is This Calculated?'
+  end
+
+  def self.aptc_tool_how_is_this_calculated_link
+    'a[class="interaction-click-control-how-is-this-calculated?"]'
   end
 
   def self.hmo_checkbox
@@ -44,7 +68,7 @@ class IvlChoosePlan
   end
 
   def self.select_plan_btn
-    '.plan-select'
+    '.btn.btn-default.btn-right'
   end
 
   def self.see_details_btn
@@ -57,5 +81,9 @@ class IvlChoosePlan
 
   def self.continue_btn
     '.interaction-click-control-continue'
+  end
+
+  def self.non_silver_plan_modal_text
+    'You are Eligible for Lower Costs'
   end
 end

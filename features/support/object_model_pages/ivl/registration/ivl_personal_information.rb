@@ -36,7 +36,7 @@ class IvlPersonalInformation
     'jq_datepicker_ignore_person[dob]'
   end
 
-  def self.social_security
+  def self.ssn
     'person[ssn]'
   end
 

@@ -2,12 +2,12 @@ Feature: UI Validations for Document Type (Required/Optional) will match V37 VLP
 
   Background: Singing up a consumer account and landing on the Personal information page
     Given Individual has not signed up as an HBX user
-    When Individual visits the Insured portal during open enrollment
+    When the user visits the Consumer portal during open enrollment
     Then Individual creates a new HBX account
     Then Individual should see a successful sign up message
-    And user should see your information page
-    When user goes to register as an individual
-    When user clicks on continue button
+    And the user sees Your Information page
+    When the user registers as an individual
+    When the individual clicks on the Continue button
     Then Individual logs out
 
   Scenario Outline: The ability to enter my document information for my <document type> Document and should not able to validates the inputs
