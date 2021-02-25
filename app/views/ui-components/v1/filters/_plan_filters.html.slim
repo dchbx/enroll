@@ -84,9 +84,69 @@
           center
             button.btn.btn-default.btn-default data-dismiss="modal" type="button" Cancel
             =link_to l10n("confirm"), @dc_checkbook_url , class: "btn btn-primary"
+  #how_is_this_calculated.modal.fade role="document" tabindex="-1"
+    .modal-dialog
+      .modal-content
+        .modal-header style="height:0;border-bottom:0;"
+          button.close aria-label="Close" data-dismiss="modal" type="button"
+            span aria-hidden="true" &times;
+        .modal-body style="margin-right:20px;"
+          p style="margin-bottom:0px;font-weight:400;"
+            strong = l10n("modal_how_is_this_calculated")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated1")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated2")
+          p style="margin-bottom:0px;font-weight:400;" = l10n("modal_how_is_this_calculated3")
+          ul
+            li
+              strong = l10n("modal_how_is_this_calculated4") + ": "
+              span = l10n("modal_how_is_this_calculated5")
+            li
+              strong = l10n("modal_how_is_this_calculated6") + ": "
+              span = l10n("modal_how_is_this_calculated7")
+            li
+              strong = l10n("modal_how_is_this_calculated8") + ": "
+              span = l10n("modal_how_is_this_calculated9")
 
 
   h3.header-title Filter Results
+  .checkbox-filter-wrapper style="border-bottom:0;"
+    - if @market_kind == 'shop' || @market_kind == 'fehb'
+      .form-inline.search-apply-wrapper.mt-1
+        a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"
+          = l10n("apply")
+        a.btn.btn-default#reset-btn onclick="resetAllFilters()"
+          = l10n("reset")
+    - else
+      .form-inline.search-apply-wrapper
+        a.btn.btn-primary.apply-btn.mz href="javascript:void(0);" title="Apply all filters" = l10n("apply")
+        a.btn.btn-default.reset-btn#reset-btn href="javascript:void(0);" = l10n("reset")
+  - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
+    h5
+      strong Your Tax Credit
+      a href="#" data-toggle="tooltip" data-placement="right" data-container="body" title="Your Tax Credit"
+        i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
+    .aptc.panel.panel-default
+      .panel-body style="padding:10px;"
+        .row style="margin:0;"
+          .col-xs-6 style="padding:0;"
+            p.text-left style="font-size:12px;" = l10n('available').to_s
+          .col-xs-6 style="padding:0;"
+            p.text-right style="font-size:12px;" = number_to_currency(@max_aptc, precision: 2)
+        .row style="margin:0;"
+          .col-xs-6 style="padding:0;"
+            p.text-left style="line-height:16px; font-size:12px;" = l10n('apply_monthly')
+          .col-xs-6 style="padding:0;"
+            p
+              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}" style="width:100%;"
+        = hidden_field_tag :max_aptc, @max_aptc
+        = hidden_field_tag :market_kind, @market_kind
+        = hidden_field_tag :coverage_kind, @coverage_kind
+        = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
+        form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
+          input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85" style="padding:0;"
+          span style="font-size:12px;" 0%
+          span.pull-right style="font-size:12px;" 85%
+        h6 style="font-weight:400; margin-top:0;" = link_to l10n("how_is_this_calculated") + "?", "", data: {toggle: "modal", target: "#how_is_this_calculated"}
   - if @market_kind == 'individual' || @market_kind == 'coverall' || @sponsored_benefit.try(:product_package_kind) == :single_issuer
     .checkbox-filter-wrapper-uc
       h5
@@ -180,41 +240,16 @@
       input.plan-metal-deductible-from-selection-filter.form-control type="text" placeholder="$0" value='0' onblur="deductibleFromAmount(this)" maxlength="10" oninput="toCurrency(this)"
       small To
       input.plan-metal-deductible-to-selection-filter.form-control type="text" placeholder="$#{@max_deductible || 5000}" onblur="deductibleToAmount(this)" maxlength="10" oninput="toCurrency(this)" value='#{@max_deductible || 5000}'
-  - if @person.has_active_consumer_role? && @tax_household.present? && @market_kind == "individual"
-    .aptc
-      hr
-        .row
-          .col-xs-6
-            p.title = l10n('aptc').to_s.upcase
-            p.title = l10n('available')
-            p
-              span = number_to_currency(@max_aptc, precision: 2)
-          .col-xs-6
-            p.title
-              br
-            p.title = l10n('used')
-            p
-              | $
-              input#elected_aptc onchange="setMinMax(this, #{@max_aptc})" type="text" value="#{number_with_precision(@elected_aptc, precision: 2)}"
-      = hidden_field_tag :max_aptc, @max_aptc
-      = hidden_field_tag :market_kind, @market_kind
-      = hidden_field_tag :coverage_kind, @coverage_kind
-      = hidden_field_tag :set_elected_aptc_url, set_elected_aptc_insured_plan_shopping_path(id: @hbx_enrollment.try(:id)) if @hbx_enrollment.present?
-      form oninput=("pct.value = (elected_pct.value*100).toFixed(0)") onsubmit=("return false")
-        input max="1" min="0" name="elected_pct" step="0.05" type="range" value="0.85"
-        span
-          output name="pct" 85
-          | %
   .checkbox-filter-wrapper
     - if @market_kind == 'shop' || @market_kind == 'fehb'
       .form-inline.search-apply-wrapper.mt-1
-        a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()"
+        a.btn.btn-primary.mz href="javascript:void(0)" onclick="filterResults()" title="Apply all filters"
           = l10n("apply")
         a.btn.btn-default#reset-btn onclick="resetAllFilters()"
           = l10n("reset")
     - else
       .form-inline.search-apply-wrapper
-        a.btn.btn-primary.apply-btn.mz href="javascript:void(0);" = l10n("apply")
+        a.btn.btn-primary.apply-btn.mz href="javascript:void(0);" title="Apply all filters" = l10n("apply")
         a.btn.btn-default.reset-btn#reset-btn href="javascript:void(0);" = l10n("reset")
 
 
