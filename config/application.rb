@@ -4,6 +4,7 @@ require File.expand_path('../boot', __FILE__)
 require "action_controller/railtie"
 require "action_mailer/railtie"
 require "rails/test_unit/railtie"
+require "action_cable/engine"
 require "sprockets/railtie" # Uncomment this line for Rails 3.1+
 require "action_cable/engine"
 

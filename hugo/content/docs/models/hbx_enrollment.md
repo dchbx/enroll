@@ -1,7 +1,7 @@
 ---
 title: "HBX Enrollments"
 date: 2020-12-14T12:12:25-05:00
-draft: true
+draft: false
 ---
 
 The backbone of the Enroll application, the HBX Enrollment class each individual health or dental policy.
@@ -23,7 +23,7 @@ Check out more directly on the [HBX Enrollment](https://github.com/dchbx/enroll/
 
 # Display of HBX Enrollment on Website UI
 
-During the plan shopping process, an HBX Enrollment record will be created attached to that person's family. Also note, if the user *exits* the plan shopping process without making a purchase, the HBX Enrollment will revert to an AASM state of _shopping_ and will not have a _plan_ attached to it. 
+During the plan shopping process, an HBX Enrollment record will be created attached to that person's family. Also note, if the user *exits* the plan shopping process without making a purchase, the HBX Enrollment will revert to an AASM state of _shopping_ and will not have a _plan_ attached to it.
 
 After shopping and successfully purchasing a plan, the information for HBX Enrollment is primarily displayed on the "enrollment tile", which can be accessed through the *Families Home Page* (for the view of the employee/individual consumer) and *Census Detail Page* (for the Employer).
 

@@ -15,7 +15,7 @@ module Exchanges
     end
 
     def create
-      result = EnrollRegistry[:sep_types]{ {params: format_create_params(params)} }
+      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
       respond_to do |format|
         format.html do
           if result.failure?
@@ -31,13 +31,12 @@ module Exchanges
     end
 
     def edit
-      params.permit!
-      @qle = Forms::QualifyingLifeEventKindForm.for_edit(params.to_h)
+      @qle = Forms::QualifyingLifeEventKindForm.for_edit(params)
     end
 
     def update
-      formatted_params = format_update_params(params)
-      result = EnrollRegistry[:sep_types]{ {params: formatted_params} }
+      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
+
       respond_to do |format|
         format.html do
           if result.failure?
@@ -45,7 +44,7 @@ module Exchanges
             @failure = result.failure
             return render :edit
           else
-            flash[:success] = l10n("controller.manage_sep_type.#{formatted_params['publish'] ? 'publish_success' : 'update_success'}")
+            flash[:success] = l10n("controller.manage_sep_type.#{forms_qualifying_life_event_kind_form_params.to_h['publish'] ? 'publish_success' : 'update_success'}")
           end
         end
       end
@@ -92,7 +91,6 @@ module Exchanges
     end
 
     def sort
-      params.permit!
       EnrollRegistry[:sort_sep_type]{ {params: params} }
       render json: { message: l10n("controller.manage_sep_type.sort_success"), status: 'success' }, status: :ok
     rescue StandardError
@@ -105,25 +103,45 @@ module Exchanges
       params.require(:qualifying_life_event_kind_form).permit(
         :start_on,:end_on,:title,:tool_tip,:pre_event_sep_in_days,
         :is_self_attested, :reason, :post_event_sep_in_days,
-        :market_kind,:effective_on_kinds, :ordinal_position
+        :market_kind, :effective_on_kinds, :ordinal_position
       ).to_h.symbolize_keys
     end
 
-    def format_create_params(params)
-      params.permit!
-      params['forms_qualifying_life_event_kind_form'].to_h
-    end
+    def forms_qualifying_life_event_kind_form_params
+      forms_params = params.require(:forms_qualifying_life_event_kind_form).permit(
+        [
+          "_id",
+          "coverage_end_on",
+          "coverage_start_on",
+          "created_by",
+          "date_options_available",
+          "end_on",
+          "event_kind_label",
+          "is_self_attested",
+          "is_visible",
+          "market_kind",
+          "post_event_sep_in_days",
+          "pre_event_sep_in_days",
+          "published_by",
+          "qle_event_date_kind",
+          "reason",
+          "start_on",
+          "title",
+          "tool_tip",
+          "updated_by",
+          "publish",
+          "other_reason",
+          effective_on_kinds: []
+        ]
+      )
 
-    def format_update_params(params)
-      params.permit!
-      params['forms_qualifying_life_event_kind_form'].merge!({_id: params[:id]})
-      params['forms_qualifying_life_event_kind_form'].to_h
+      forms_params.merge!({_id: params[:id]}) if params.dig(:id)
+      forms_params.to_h
     end
 
     def format_expire_sep_type(params)
-      params.permit!
-      params.merge!({end_on: params.to_h[:qualifying_life_event_kind][:end_on],
-                     updated_by: params.to_h[:qualifying_life_event_kind][:updated_by]})
+      params.merge!({end_on: params[:qualifying_life_event_kind][:end_on],
+                     updated_by: params[:qualifying_life_event_kind][:updated_by]})
     end
 
     def updateable?

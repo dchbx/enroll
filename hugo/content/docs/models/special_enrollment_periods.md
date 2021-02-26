@@ -1,10 +1,10 @@
 ---
 title: "Special Enrollment Periods/Qualifying Life Event Kinds"
 date: 2020-11-18T12:12:25-05:00
-draft: true
+draft: false
 ---
 
-The Enroll Application offers both employee self-attested, and caseworker-managed, Qualifying Life Events and resulting Special Enrollment Periods. 
+The Enroll Application offers both employee self-attested, and caseworker-managed, Qualifying Life Events and resulting Special Enrollment Periods.
 
 ## Special Enrollment Periods (SEP)/Qualifying Life Event (QLE) Kinds
 
@@ -66,4 +66,3 @@ Admin users can also manually create a special enrollment period for a family wi
 [Add SEP Read and Write](https://github.com/dchbx/enroll/blob/master/features/admin/add_sep_read_and_write.feature.wip)
 
 _Developer Notes: Checkout the dropdown actions in family_data_table.rb_
-

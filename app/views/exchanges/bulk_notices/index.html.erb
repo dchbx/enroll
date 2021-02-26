@@ -1,0 +1,59 @@
+<%= render partial: "ui-components/v1/navs/primary_nav" %>
+
+<div class='container mt-5'>
+  <div class='row'>
+    <div class='col-3 pl-0'>
+      <h2>Sent Messages</h2>
+    </div>
+    <div class='col-3 offset-6 text-right pr-0'>
+      <%= link_to 'New Message', main_app.new_exchanges_bulk_notice_path, class: 'btn btn-alt-blue' %>
+    </div>
+  </div>
+
+  <div class='row bg-white mt-5 font-weight-bold py-3 border-top border-left border-right' id='sent_messages'>
+    <div class='col-4'>
+      Subject
+    </div>
+    <div class='col-2 text-right'>
+      Recipients
+    </div>
+    <div class='col-2 text-right'>
+      Date Sent
+    </div>
+    <div class='col-2 text-right'>
+      Recipient Type
+    </div>
+    <div class='col-2 text-right'>
+      Responsible Party
+    </div>
+  </div>
+
+  <% @bulk_notices.each do |bulk_notice| %>
+    <div class='row bg-white border-left border-right'>
+      <div class='col-4'>
+        <% if !bulk_notice.documents.empty? %>
+          <i class="fas fa-paperclip"></i>&nbsp;
+        <% end %>
+        <%= link_to bulk_notice.subject, exchanges_bulk_notice_path(bulk_notice) %>
+      </div>
+      <div class='col-2 text-right'>
+        <%= bulk_notice.audience_ids&.count || 0 %>
+      </div>
+      <div class='col-2 text-right'>
+        <%= bulk_notice.sent_at || bulk_notice.aasm_state.capitalize %>
+      </div>
+      <div class='col-2 text-right'>
+        <%= bulk_notice.audience_type&.humanize&.titleize %>
+      </div>
+      <div class='col-2 text-right'>
+        <%= bulk_notice.user&.person&.full_name %>
+      </div>
+    </div>
+  <% end %>
+
+  <div class='row bg-white border-left border-right border-bottom mb-5'>
+    <div class='col-12'>
+      &nbsp;
+    </div>
+  </div>
+</div>

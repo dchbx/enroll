@@ -387,7 +387,7 @@ module SponsoredBenefits
           end
 
           benefit_groups = self.benefit_application.benefit_groups.select { |bg| bg.id != self.id}
-          ce.find_or_create_benefit_group_assignment(benefit_groups.first)
+          ce.create_benefit_group_assignment(benefit_groups.first)
         end
       end
     end

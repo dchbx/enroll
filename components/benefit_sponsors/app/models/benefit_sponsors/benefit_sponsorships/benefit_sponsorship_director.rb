@@ -10,6 +10,7 @@ module BenefitSponsors
     end
 
     def process(benefit_sponsorships, event)
+      @logger.info "Now Processing event: #{event} on #{TimeKeeper.date_of_record.strftime('%Y_%m_%d')}_#{Time.now.in_time_zone('Eastern Time (US & Canada)').strftime('%H:%M:%S')}"
       if event == :renew_sponsor_benefit
         benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
           notify("acapi.info.events.benefit_sponsorship.execute_benefit_renewal", {
@@ -22,6 +23,7 @@ module BenefitSponsors
       business_policy_name = policy_name(event)
       benefit_sponsorships.no_timeout.each do |benefit_sponsorship|
         begin
+          @logger.info "Processing legal_name: #{benefit_sponsorship.legal_name}"
           business_policy = business_policy_for(benefit_sponsorship, business_policy_name)
           sponsor_service_for(benefit_sponsorship).execute(benefit_sponsorship, event, business_policy)
         rescue Exception => e
@@ -30,6 +32,7 @@ module BenefitSponsors
           @logger.error e.backtrace.join("\n")
         end
       end
+      @logger.info '-' * 50
     end
 
     def business_policy_for(benefit_sponsorship, business_policy_name)

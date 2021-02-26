@@ -245,12 +245,13 @@ RSpec.describe Enrollments::Replicator::Reinstatement, :type => :model, dbclean:
 
           before do
             TimeKeeper.set_date_of_record_unprotected!(renewal_effective_date + 5.days)
-            census_employee.terminate_employment(reinstate_effective_date.prev_day)
-            enrollment.reload
-            census_employee.reload
             benefit_sponsorship.benefit_applications.where(aasm_state: :active).first.update(aasm_state: :expired)
             renewal_application.update(aasm_state: :active)
             benefit_sponsorship.reload
+            census_employee.benefit_sponsorship.reload
+            census_employee.terminate_employment(reinstate_effective_date.prev_day)
+            enrollment.reload
+            census_employee.reload
           end
 
           after do

@@ -751,9 +751,6 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     let(:person) { consumer_role.person }
     let(:ua_params) do
       {
-        addresses: [],
-        phones: [],
-        emails: [],
         person: {
           "first_name" => primary.person.name_first,
           "last_name" => primary.person.name_last,
@@ -764,7 +761,10 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
           "gender" => primary.person_demographics.sex.split('#').last,
-          "is_applying_coverage" => false
+          "is_applying_coverage" => false,
+          addresses: [],
+          phones: [],
+          emails: []
         }
       }
     end
@@ -773,7 +773,7 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
       DatabaseCleaner.clean
     end
 
-    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
     let(:family) { consumer_role.person.primary_family }
     before :each do
       family.update_attributes!(:e_case_id => parser.integrated_case_id)
@@ -798,9 +798,6 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
     let(:person) { consumer_role.person }
     let(:ua_params) do
       {
-        addresses: [],
-        phones: [],
-        emails: [],
         person: {
           "first_name" => primary.person.name_first,
           "last_name" => primary.person.name_last,
@@ -810,7 +807,10 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
           "dob" => primary.person_demographics.birth_date,
           "ssn" => primary.person_demographics.ssn,
           "no_ssn" => "",
-          "gender" => primary.person_demographics.sex.split('#').last
+          "gender" => primary.person_demographics.sex.split('#').last,
+          addresses: [],
+          phones: [],
+          emails: []
         }
       }
     end
@@ -819,14 +819,14 @@ describe Factories::EnrollmentFactory, "with a freshly created consumer role" do
       DatabaseCleaner.clean
     end
 
-    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params,user) }
+    let(:consumer_role) { Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user) }
     let(:family) { consumer_role.person.primary_family }
     before :each do
       allow(Factories::EnrollmentFactory).to receive(:initialize_person).and_return([nil, nil])
     end
 
     it "should return nil for the consumer role" do
-      expect(Factories::EnrollmentFactory.construct_consumer_role(ua_params,user)).not_to be
+      expect(Factories::EnrollmentFactory.construct_consumer_role(ua_params[:person], user)).not_to be
     end
   end
 end

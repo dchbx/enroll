@@ -8,34 +8,39 @@ module BenefitSponsors
   RSpec.describe Factories::EnrollmentRenewalFactory, dbclean: :around_each do
 
     include_context "setup benefit market with market catalogs and product packages"
-    include_context "setup renewal application"
+    include_context "setup initial benefit application"
 
+    let(:renewal_effective_date)          { (TimeKeeper.date_of_record + 45.days).beginning_of_month }
+    let(:current_effective_date)          { renewal_effective_date.prev_year }
     let(:product_kinds)                   { [:health, :dental] }
     let(:dental_sponsored_benefit)        { true }
-    let(:renewal_state)                   { :enrollment_open }
     let(:dental_package_kind)             { :multi_product }
     let(:catalog_health_package_kinds)    { [:single_issuer, :metal_level, :single_product] }
     let(:catalog_dental_package_kinds)    { [:multi_product, :single_issuer] }
-    let(:renewal_effective_date)          { (TimeKeeper.date_of_record + 45.days).beginning_of_month }
-    let(:current_effective_date)          { renewal_effective_date.prev_year }
     let(:predecessor_application_catalog) { true }
-
+    let!(:renewal_application) do
+      application = initial_application.renew
+      application.approve_application!
+      application.begin_open_enrollment!
+      application
+    end
+    let(:benefit_package) { renewal_application.benefit_packages[0] }
     let(:hired_on)        { TimeKeeper.date_of_record - 2.years }
     let(:person)          { FactoryBot.create(:person) }
     let(:shop_family)     { FactoryBot.create(:family, :with_primary_family_member, person: person)}
     let(:employee_role)   { FactoryBot.create(:employee_role, benefit_sponsors_employer_profile_id: abc_profile.id, hired_on: hired_on, person: person, census_employee: census_employee) }
     let(:enrollment_kind) { "open_enrollment" }
-
     let(:census_employee) do
-      census_employee = create(:census_employee, :with_active_assignment,
+      census_employee = create(:census_employee,
              benefit_sponsorship: benefit_sponsorship,
              employer_profile: benefit_sponsorship.profile,
              benefit_group: current_benefit_package,
              hired_on: hired_on)
-      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, is_active: false)
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: current_benefit_package, census_employee: census_employee, start_on: current_benefit_package.start_on, end_on: current_benefit_package.end_on)
+      census_employee.benefit_group_assignments << build(:benefit_group_assignment, benefit_group: benefit_package, census_employee: census_employee, start_on: benefit_package.start_on, end_on: benefit_package.end_on)
+      census_employee.save
       census_employee
     end
-
     let(:sponsored_benefit) { current_benefit_package.sponsored_benefit_for(coverage_kind) }
 
     let!(:enrollment) do

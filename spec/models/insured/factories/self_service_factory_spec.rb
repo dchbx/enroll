@@ -14,7 +14,7 @@ module Insured
     let!(:family) {FactoryBot.create(:family, :with_primary_family_member_and_dependent, person: person)}
     let(:sep) {FactoryBot.create(:special_enrollment_period, family: family)}
     let(:sbc_document) {FactoryBot.build(:document, subject: 'SBC', identifier: 'urn:openhbx#123')}
-    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
+    let(:product) {FactoryBot.create(:benefit_markets_products_health_products_health_product, title: 'AAA', issuer_profile_id: 'ab1233', metal_level_kind: :silver, benefit_market_kind: :aca_individual, sbc_document: sbc_document)}
     let!(:enrollment) {FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, consumer_role_id: person.consumer_role.id)}
     let!(:hbx_enrollment_member1) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.primary_applicant.id, is_subscriber: true, eligibility_date: TimeKeeper.date_of_record, hbx_enrollment: enrollment, coverage_start_on: TimeKeeper.date_of_record)}
     let!(:hbx_enrollment_member2) {FactoryBot.create(:hbx_enrollment_member, applicant_id: family.family_members[1].id, eligibility_date: TimeKeeper.date_of_record, coverage_start_on: TimeKeeper.date_of_record, hbx_enrollment: enrollment)}
@@ -71,7 +71,7 @@ module Insured
 
       let(:sep) { FactoryBot.create(:special_enrollment_period, family: family) }
       let(:sbc_document) { FactoryBot.build(:document, subject: "SBC", identifier: "urn:openhbx#123") }
-      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", issuer_profile_id: "ab1233", sbc_document: sbc_document) }
+      let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, title: "AAA", metal_level_kind: :silver, issuer_profile_id: "ab1233", sbc_document: sbc_document) }
       let(:enrollment_to_cancel) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today + 1.month) }
       let(:enrollment_to_term) { FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, product: product, effective_on: Date.today - 1.month) }
 
@@ -124,7 +124,7 @@ module Insured
     describe "update enrollment for renewing enrollments" do
 
       before :each do
-        TimeKeeper.set_date_of_record_unprotected!(Date.new(TimeKeeper.date_of_record.year,12,15))
+        TimeKeeper.set_date_of_record_unprotected!(Date.new(Date.today.year, 12, 15))
         effective_on = hbx_profile.benefit_sponsorship.current_benefit_period.start_on
         tax_household10 = FactoryBot.create(:tax_household, household: family.active_household, effective_ending_on: nil, effective_starting_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
         eligibility_determination = FactoryBot.create(:eligibility_determination, tax_household: tax_household10, max_aptc: 2000, determined_on: hbx_profile.benefit_sponsorship.current_benefit_period.start_on)
@@ -138,7 +138,7 @@ module Insured
         @product.save!
         enrollment.update_attributes(product: @product, effective_on: effective_on, aasm_state: "auto_renewing")
         hbx_profile.benefit_sponsorship.benefit_coverage_periods.each {|bcp| bcp.update_attributes!(slcsp_id: @product.id)}
-        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(TimeKeeper.date_of_record), 'R-DC001').and_return(679.8)
+        allow(::BenefitMarkets::Products::ProductRateCache).to receive(:lookup_rate).with(@product, effective_on, person.age_on(Date.today), 'R-DC001').and_return(679.8)
       end
 
       it 'should return the updated enrollment' do
@@ -194,6 +194,11 @@ module Insured
         params = subject.find(enrollment.id, family.id)
         expect(params[:elected_aptc_pct]).to eq 0.09
       end
+    end
+
+    after(:all) do
+      DatabaseCleaner.clean
+      TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
   end
 end

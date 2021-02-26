@@ -6,7 +6,7 @@ require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
 RSpec.describe "FinalEligibilityNoticeScript", :dbclean => :after_each do
   include_context 'setup benefit market with market catalogs and product packages'
 
-  let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141890", first_name: "John", last_name: "Smith") }
+  let!(:person3) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141892", first_name: "John", last_name: "Smith") }
   let!(:person4) { FactoryBot.create(:person, :with_consumer_role, hbx_id: "141891", first_name: "John", last_name: "Smith1") }
   let!(:family_member4) { FactoryBot.create(:family_member, family: family3, person: person4) }
   let(:consumer_role) { person3.consumer_role }
@@ -120,6 +120,7 @@ def invoke_script(with_params = true)
     ARGV[0] = input_file
     ARGV[1] = 'final_eligibility_notice'
     ARGV[2] = 'aqhp'
+    ARGV[3] = 'spec/test_data/notices/event_report_09_11_2020.csv'
   else
     ARGV[0] = nil
     ARGV[1] = nil

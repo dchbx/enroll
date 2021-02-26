@@ -89,7 +89,6 @@ class Employers::EmployerProfilesController < Employers::EmployersController
           end
         end
       else
-        params.permit!
         build_organization
         @employer_profile.attributes = params[:employer_profile]
         @organization.save(validate: false)
@@ -142,8 +141,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
   def update
     sanitize_employer_profile_params
-    params.permit!
-    @organization = Organization.find(params[:id])
+    @organization = Organization.find(params.permit(:id))
 
     #save duplicate office locations as json in case we need to refresh
     @organization_dup = @organization.office_locations.as_json
@@ -254,8 +252,8 @@ class Employers::EmployerProfilesController < Employers::EmployersController
   def download_documents # Should be in ER attestations controller
     @employer_profile = EmployerProfile.find(params[:id])
     #begin
-      doc = @employer_profile.documents.find(params[:ids][0])
-    send_file doc.identifier, file_name: doc.title,content_type:doc.format
+    doc = @employer_profile.documents.find(params[:ids][0])
+    doc.present? ? (send_file doc.identifier, file_name: doc.title, content_type: doc.format) : nil
 
       #render json: { status: 200, message: 'Successfully submitted the selected employer(s) for binder paid.' }
     #rescue => e
@@ -350,7 +348,7 @@ class Employers::EmployerProfilesController < Employers::EmployersController
 
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
-      @census_employees = census_employees.where("last_name" => /^#{page_no}/i).page(params[:pagina])
+      @census_employees = census_employees.where("last_name" => /^#{Regexp.escape(page_no)}/i).page(params[:pagina])
       #@avaliable_employee_names ||= @census_employees.limit(20).map(&:full_name).map(&:strip).map {|name| name.squeeze(" ")}.uniq
     else
       @total_census_employees_quantity = census_employees.count

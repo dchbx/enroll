@@ -72,6 +72,76 @@ module BenefitSponsors
       end
     end
 
+    describe '.census_employees_assigned_on' do
+      let(:renewed_enrollment) { double("hbx_enrollment")}
+      let(:ra) {initial_application.renew}
+      let(:ia) {predecessor_application}
+      let(:bs) { ra.predecessor.benefit_sponsorship}
+      let(:cbp){ra.predecessor.benefit_packages.first}
+      let(:rbp){ra.benefit_packages.first}
+      let!(:rhsb) do
+        sb = rbp.health_sponsored_benefit
+        sb.product_package_kind = :single_product
+        sb.save
+        sb
+      end
+      let(:ibp){ia.benefit_packages.first}
+      let(:roster_size) { 5 }
+      let(:enrollment_kinds) { ['health'] }
+      let!(:census_employees) { create_list(:census_employee, roster_size, :with_active_assignment, benefit_sponsorship: bs, employer_profile: bs.profile, benefit_group: cbp) }
+      let!(:person) { FactoryBot.create(:person) }
+      let!(:family) {FactoryBot.create(:family, :with_primary_family_member, person: person)}
+      let!(:employee_role) { FactoryBot.create(:benefit_sponsors_employee_role, person: person)}
+      let!(:census_employee) { census_employees.first }
+      let(:hbx_enrollment) do
+        FactoryBot.build(
+          :hbx_enrollment,
+          :shop,
+          household: family.active_household,
+          family: family,
+          product: cbp.sponsored_benefits.first.reference_product,
+          coverage_kind: :health,
+          employee_role_id: census_employee.employee_role.id,
+          sponsored_benefit_package_id: cbp.id,
+          benefit_group_assignment_id: census_employee.benefit_group_assignments.last.id
+        )
+      end
+
+      let(:renewal_product_package)    { renewal_benefit_market_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+      let(:product) { renewal_product_package.products[0] }
+
+      let!(:update_product) do
+        reference_product = current_benefit_package.sponsored_benefits.first.reference_product
+        reference_product.renewal_product = product
+        reference_product.save!
+      end
+
+      let(:active_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: ibp, census_employee: census_employee)}
+      let(:renewal_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: rbp, census_employee: census_employee)}
+
+      let(:renewal_benefit_package) { ra.benefit_packages.last }
+
+      before :each do
+        ra.benefit_packages.build(title: "Fake Title", probation_period_kind: ::BenefitMarkets::PROBATION_PERIOD_KINDS.sample).save!
+        new_benefit_package = ra.benefit_packages.last
+        renewal_benefit_package.benefit_sponsorship.census_employees.each do |census_employee|
+          census_employee.add_renew_benefit_group_assignment([new_benefit_package])
+          census_employee.benefit_group_assignments.each do |bga|
+            allow(bga).to receive(:start_on).and_return(ra.start_on)
+          end
+        end
+      end
+
+      it "should return census employees by the benefit_packages package and assignment date" do
+        expect(renewal_benefit_package.census_employees_assigned_on(ra.start_on).last.class).to eq(CensusEmployee)
+      end
+
+      it "should return blank if no census employees in non term and pending state" do
+        renewal_benefit_package.benefit_sponsorship.census_employees.update_all(aasm_state: 'employment_terminated')
+        expect(renewal_benefit_package.census_employees_assigned_on(ra.start_on).length).to eq(0)
+      end
+    end
+
     describe ".renew" do
       context "when passed renewal benefit package to current benefit package for renewal" do
 
@@ -425,8 +495,8 @@ module BenefitSponsors
         reference_product.save!
       end
 
-      let(:active_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: ibp, census_employee: census_employee, is_active: true)}
-      let(:renewal_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: rbp, census_employee: census_employee, is_active: false)}
+      let(:active_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: ibp, census_employee: census_employee)}
+      let(:renewal_bga) {FactoryBot.build(:benefit_sponsors_benefit_group_assignment, benefit_group: rbp, census_employee: census_employee)}
 
       let!(:census_update) do
         census_employee.benefit_group_assignments = [active_bga, renewal_bga]

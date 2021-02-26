@@ -209,24 +209,21 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "222"},
        "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
     end
-    let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true) }
-    let(:dependent_properties) { ActionController::Parameters.new({addresses: valid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
+    let(:dependent_properties) { {addresses: valid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
     let(:save_result) { false }
-    # let(:test_family) { FactoryBot.build(:family, :with_primary_family_member) }
-
-    before :each do
-      sign_in(user)
-      allow(Forms::FamilyMember).to receive(:new).with(dependent_properties).and_return(dependent)
-      allow(dependent).to receive(:save).and_return(save_result)
-      allow(dependent).to receive(:address=)
-      allow(dependent).to receive(:family_id).and_return(dependent_properties)
-      allow(Family).to receive(:find).with(dependent_properties).and_return(test_family)
-      post :create, params: {dependent: dependent_properties}
-    end
+    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     describe "with an invalid dependent" do
+      before :each do
+        sign_in(user)
+        # No Resident Role
+        allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
+        post :create, params: {dependent: dependent_properties}, :format => "js"
+      end
+
       it "should assign the dependent" do
-        expect(assigns(:dependent)).to eq dependent
+        expect(assigns(:dependent).class).to eq(Forms::FamilyMember)
+        expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
       it "should render the new template" do
@@ -238,8 +235,16 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a valid dependent" do
       let(:save_result) { true }
 
+      before :each do
+        sign_in(user)
+        # No resident role
+        allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
+        post :create, params: {dependent: dependent_properties}, :format => "js"
+      end
+
       it "should assign the dependent" do
-        expect(assigns(:dependent)).to eq dependent
+        expect(assigns(:dependent).class).to eq(Forms::FamilyMember)
+        expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
       it "should assign the created" do
@@ -254,10 +259,19 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     describe "with a valid dependent but not applying for coverage" do
       let(:save_result) { true }
-      let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true" } }
+      let(:dependent_properties) { { "is_applying_coverage" => "false", "same_with_primary" => "true", "family_id" => test_family.id.to_s } }
+      let(:test_family) { FactoryBot.create(:family, :with_primary_family_member)}
+
+      before :each do
+        sign_in(user)
+        # No resident role
+        allow_any_instance_of(Forms::FamilyMember).to receive(:save).and_return(save_result)
+        post :create, params: {dependent: dependent_properties}, :format => "js"
+      end
 
       it "should assign the dependent" do
-        expect(assigns(:dependent)).to eq dependent
+        expect(assigns(:dependent).class).to eq ::Forms::FamilyMember
+        expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
       it "should assign the created" do
@@ -272,7 +286,9 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
     describe "when update_vlp_documents failed" do
       before :each do
+        sign_in(user)
         allow(controller).to receive(:update_vlp_documents).and_return false
+        post :create, params: {dependent: dependent_properties}, :format => "js"
       end
 
       it "should render the new template" do
@@ -289,16 +305,20 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
     describe "with a valid dependent but invalid addresses" do
       before :each do
         allow(controller).to receive(:update_vlp_documents).and_return false
+        sign_in(user)
+        post :create, params: {dependent: dependent_properties}, :format => "js"
       end
 
       let(:address_errors) {[{:zip => ["Home Addresses: zip should be in the form: 12345 or 12345-1234"]}, {:zip => ["Mailing Addresses: zip should be in the form: 12345 or 12345-1234"]}]}
 
       let(:dependent) { double(addresses: [invalid_addresses_attributes], family_member: true, same_with_primary: true) }
-      let(:dependent_properties) { ActionController::Parameters.new({addresses: invalid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
+      let(:dependent_properties) { {addresses: invalid_addresses_attributes, :family_id => test_family.id, same_with_primary: "false" } }
+      let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
 
       it "should assign the dependent" do
-        expect(assigns(:dependent)).to eq dependent
+        expect(assigns(:dependent).class).to eq Forms::FamilyMember
+        expect(assigns(:dependent).family_id).to eq(test_family.id.to_s)
       end
 
       it "should not assign the created" do
@@ -389,7 +409,6 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
   describe "PUT update" do
     let(:address) { double }
     let(:family_member) { double }
-    let(:dependent_id) { "234dlfjadsklfj" }
     let(:valid_addresses_attributes) do
       {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
        "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
@@ -399,29 +418,37 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
        "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
     end
     let(:dependent) { double(addresses: [valid_addresses_attributes], family_member: true, same_with_primary: true) }
-    let(:dependent_properties) { ActionController::Parameters.new({ "first_name" => "lkjdfkajdf", addresses: valid_addresses_attributes, :family_id => "saldjfalkdjf", same_with_primary: "false" }).permit! }
+    let(:dependent_properties) do
+      {
+        addresses: valid_addresses_attributes,
+        :family_id => test_family.id,
+        same_with_primary: true
+      }
+    end
+    let(:invalid_dependent_properties) do
+      {
+        addresses: invalid_addresses_attributes,
+        :family_id => test_family.id,
+        same_with_primary: false
+      }
+    end
+
     let(:update_result) { false }
+    let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
 
     before(:each) do
       sign_in(user)
-      allow(Forms::FamilyMember).to receive(:find).with(dependent_id).and_return(dependent)
-      allow(dependent).to receive(:update_attributes).with(dependent_properties).and_return(update_result)
-      allow(dependent).to receive(:family_id).and_return(test_family.id)
-      allow(Family).to receive(:find).with(test_family.id).and_return(test_family)
-      allow(address).to receive(:is_a?).and_return(true)
-      allow(dependent).to receive(:same_with_primary=)
-      allow(dependent).to receive(:addresses=)
     end
 
     describe "with an invalid dependent" do
       it "should render the edit template" do
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
       end
 
       it "addresses should be an array" do
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: invalid_dependent_properties}
         expect(assigns(:dependent).addresses.class).to eq Array
       end
     end
@@ -430,14 +457,14 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
       let(:update_result) { true }
       it "should render the show template" do
         allow(controller).to receive(:update_vlp_documents).and_return(true)
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("show")
       end
 
       it "should render the edit template when update_vlp_documents failure" do
         allow(controller).to receive(:update_vlp_documents).and_return(false)
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
       end
@@ -455,13 +482,13 @@ RSpec.describe Insured::FamilyMembersController, dbclean: :after_each do
 
 
       it "should render the edit template" do
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(response).to have_http_status(:success)
         expect(response).to render_template("edit")
       end
 
       it "should assign the address_errors" do
-        put :update, params: {id: dependent_id, dependent: dependent_properties}
+        put :update, params: {id: test_family.family_members.last.id.to_s, dependent: dependent_properties}
         expect(assigns(:address_errors)).to eq address_errors
       end
     end

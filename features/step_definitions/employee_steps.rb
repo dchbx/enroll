@@ -37,16 +37,22 @@ Given(/(.*) has a matched employee role/) do |_name|
 end
 
 def employee_by_legal_name(legal_name, person)
-  org = org_by_legal_name(legal_name)
-  employee_role = FactoryBot.create(:employee_role, person: person, benefit_sponsors_employer_profile_id: org.employer_profile.id)
-  FactoryBot.create(:census_employee,
-                    first_name: person.first_name,
-                    last_name: person.last_name,
-                    ssn: person.ssn,
-                    dob: person.dob,
-                    employer_profile: org.employer_profile,
-                    benefit_sponsorship: benefit_sponsorship(org),
-                    employee_role_id: employee_role.id)
+  org = employer(legal_name)
+  employee_role = FactoryBot.create(:employee_role,
+                                    person: person,
+                                    benefit_sponsors_employer_profile_id: org.employer_profile.id)
+  ce = FactoryBot.create(:census_employee,
+                         first_name: person.first_name,
+                         last_name: person.last_name,
+                         aasm_state: 'eligible',
+                         ssn: person.ssn,
+                         dob: person.dob,
+                         employer_profile: org.employer_profile,
+                         benefit_sponsorship: benefit_sponsorship(org),
+                         employee_role_id: employee_role.id)
+  employee_role.census_employee_id = ce.id
+  employee_role.save!
+  ce
 end
 
 Given(/a person exists with dual roles/) do
@@ -174,4 +180,36 @@ Then(/Employee should see (.*?) page with "(.*?)" as coverage effective date/) d
   else
     find('.interaction-click-control-go-to-my-account').click
   end
+end
+
+And(/staff role person clicks on employees link$/) do
+  click_link 'Employees'
+end
+
+And(/staff role person clicks on employee (.*?)$/) do |named_person|
+  sleep(5)
+  click_link named_person
+  expect(page.current_path).to include("census_employee")
+end
+
+Given(/census employee (.*?) has a past DOH$/) do |named_person|
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  ce.update_attributes!(created_at: TimeKeeper.date_of_record.prev_year, updated_at: TimeKeeper.date_of_record.prev_year)
+end
+
+Then(/the user should see a dropdown for Off Plan Year benefit package$/) do
+  # Selectric is weird
+  Capybara.ignore_hidden_elements = false
+  sleep(5)
+  expect(page).to have_text("Off Cycle Benefit Package")
+  Capybara.ignore_hidden_elements = true
+end
+
+And(/census employee (.*?) has benefit group assignment of the off cycle benefit application$/) do |named_person|
+  click_button 'Update Employee'
+  person = people[named_person]
+  ce = CensusEmployee.where(:first_name => /#{person[:first_name]}/i, :last_name => /#{person[:last_name]}/i).first
+  benefit_package_id = ce.benefit_sponsorship.off_cycle_benefit_application.benefit_packages[0].id #there's only one benefit package
+  expect(ce.benefit_group_assignments.pluck(:benefit_package_id).include?(benefit_package_id)).to be_truthy
 end

@@ -1,29 +1,32 @@
-<h1>Translations</h1>
+<div class='container'>
 
-<%= link_to "New Translation", new_translation_path %>
+  <h1>Translations</h1>
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Language Key</th>
-      <th>Value</th>
-      <th colspan="3"></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @translations.each do |translation| %>
+  <%= link_to "New Translation", new_translation_path %>
+
+  <table class="table table-striped">
+    <thead>
       <tr>
-        <td><%= translation.key %></td>
-        <td><%= translation.value %></td>
-        <td><%= link_to 'Show', translation %></td>
-        <td><%= link_to 'Edit', edit_translation_path(translation) %></td>
-        <td><%= link_to 'Destroy', translation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <th>Language Key</th>
+        <th>Value</th>
+        <th colspan="3"></th>
       </tr>
-    <% end %>
-  </tbody>
+    </thead>
+    <tbody>
+      <% @translations.each do |translation| %>
+        <tr>
+          <td><%= translation.key %></td>
+          <td><%= translation.value %></td>
+          <td><%= link_to 'Show', translation %></td>
+          <td><%= link_to 'Edit', edit_translation_path(translation) %></td>
+          <td><%= link_to 'Destroy', translation, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        </tr>
+      <% end %>
+    </tbody>
 
-</table>
+  </table>
 
-<br>
+  <br>
 
-<%= link_to "New Translation", new_translation_path %>
+  <%= link_to "New Translation", new_translation_path %>
+</div>

@@ -4,6 +4,7 @@ class DocumentsController < ApplicationController
   before_action :set_verification_type
   before_action :set_person, only: [:enrollment_docs_state, :fed_hub_request, :enrollment_verification, :update_verification_type, :extend_due_date, :update_ridp_verification_type]
   before_action :add_type_history_element, only: [:update_verification_type, :fed_hub_request, :destroy]
+  before_action :cartafact_download_params, only: [:cartafact_download]
   respond_to :html, :js
 
   def download
@@ -14,22 +15,27 @@ class DocumentsController < ApplicationController
   end
 
   def download_employer_document
-    send_file params[:path]
+    document = BenefitSponsors::Documents::EmployerAttestationDocument.find_by(identifier: params[:path])
+    document.present? ? (send_file document.identifier) : redirect_back(fallback_location: root_path, :flash => {error: "Document Not Found"})
+  rescue StandardError => e
+    redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
   def authorized_download
     begin
       model = params[:model].camelize.safe_constantize
       model_id = params[:model_id]
-      relation = params[:relation]
+      relation = ["documents"].include?(params[:relation]) ? params[:relation] : "documents"
       relation_id = params[:relation_id]
 
       #this is a fix for new model inbox-messages notice download
       if model == "AcaShopCcaEmployerProfile"
         model = "BenefitSponsors::Organizations::AcaShopCcaEmployerProfile".safe_constantize
       end
+      model_klass = Document::RESOURCE_LIST.include?(model) ? model.safe_constantize : nil
+      raise "Sorry! Invalid Request" unless model_klass
 
-      model_object = model.find(model_id)
+      model_object = model_klass.find(model_id)
       documents = model_object.send(relation.to_sym)
       if authorized_to_download?(model_object, documents, relation_id)
         uri = documents.find(relation_id).identifier
@@ -43,7 +49,7 @@ class DocumentsController < ApplicationController
   end
 
   def cartafact_download
-    result = ::Operations::Documents::Download.call({params: params.permit!.to_h, user: current_user})
+    result = ::Operations::Documents::Download.call({params: cartafact_download_params.to_h.deep_symbolize_keys, user: current_user})
     if result.success?
       response_data = result.value!
       send_data response_data, get_options(params)
@@ -52,6 +58,7 @@ class DocumentsController < ApplicationController
       redirect_back(fallback_location: root_path, :flash => {error: errors[:message]})
     end
   rescue StandardError => e
+    Rails.logger.error {"Cartafact Download Error - #{e}"}
     redirect_back(fallback_location: root_path, :flash => {error: e.message})
   end
 
@@ -201,10 +208,6 @@ class DocumentsController < ApplicationController
     end
   end
 
-  def download_employer_document
-    send_file params[:path]
-  end
-
   def download_documents
     docs = Document.find(params[:ids])
     docs.each do |doc|
@@ -244,6 +247,7 @@ class DocumentsController < ApplicationController
   end
 
   private
+
   def updateable?
     authorize Family, :updateable?
   end
@@ -297,5 +301,10 @@ class DocumentsController < ApplicationController
   def set_min_due_date_on_family
     family = @family_member.family
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+  end
+
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 end

@@ -28,7 +28,7 @@ RSpec.describe User, :type => :model, dbclean: :after_each do
       let(:params){valid_params.deep_merge!({oim_id: "user+name"})}
       it 'contains invalid characters' do
         expect(User.create(**params).errors[:oim_id].any?).to be_truthy
-        expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special charcters ; # % = | + , \" > < \\ \/"]
+        expect(User.create(**params).errors[:oim_id]).to eq ["cannot contain special characters ; # % = | + , \" > < \\ \/"]
       end
     end
 

@@ -40,9 +40,11 @@ module Effective
           employee_state_format(row, row.aasm_state, row.employment_terminated_on)
         }, :sortable => false, :filter => false
 
-        table_column :benefit_package, :proc => Proc.new { |row|
-          row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
-        }, :sortable => false, :filter => false
+        unless attributes['current_py_terminated']
+          table_column :benefit_package, :proc => proc { |row|
+            row.active_benefit_group_assignment.benefit_group.title.capitalize if row.active_benefit_group_assignment.present?
+          }, :sortable => false, :filter => false
+        end
 
         if attributes["renewal"]
           table_column :renewal_benefit_package, :label => 'Renewal Benefit Package', :proc => Proc.new { |row|
@@ -50,14 +52,28 @@ module Effective
           }, :filter => false, :sortable => false
         end
 
-        table_column :enrollment_status, :proc => Proc.new { |row|
+        if attributes["off_cycle"]
+          table_column :off_cycle_benefit_package, :label => 'Off-Cycle Benefit Package', :proc => proc { |row|
+            row.off_cycle_benefit_group_assignment.benefit_package.title.capitalize if row.off_cycle_benefit_group_assignment.present?
+          }, :filter => false, :sortable => false
+        end
+
+        unless attributes['current_py_terminated']
+          table_column :enrollment_status, :proc => proc { |row|
             enrollment_state(row)
-        }, :sortable => false, :filter => false
+          }, :sortable => false, :filter => false
+        end
 
         # Do not show column unless renewal_benefit_application aasm state is in PUBLISHED_STATES
         if attributes["renewal"] && attributes["is_submitted"]
           table_column :renewal_enrollment_status, :proc => Proc.new { |row|
             renewal_enrollment_state(row)
+          }, :filter => false, :sortable => false
+        end
+
+        if attributes["off_cycle"] && attributes["is_off_cycle_submitted"]
+          table_column :off_cycle_enrollment_status, :proc => proc { |row|
+            off_cycle_enrollment_state(row)
           }, :filter => false, :sortable => false
         end
 

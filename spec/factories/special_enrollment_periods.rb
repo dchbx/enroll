@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :special_enrollment_period do
     family
-    qle_on  { 10.days.ago.to_date }
+    qle_on  { TimeKeeper.date_of_record - 1.day }
     qualifying_life_event_kind_id { FactoryBot.create(:qualifying_life_event_kind)._id }
     start_on { qle_on }
     end_on  { qle_on + 30.days }

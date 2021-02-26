@@ -5,11 +5,14 @@ describe TerminateACensusEmployee, dbclean: :after_each do
   subject { TerminateACensusEmployee.new(given_task_name, double(:current_scope => nil)) }
 
   describe "changes the census employees aasm_state to terminated" do
-    let(:benefit_group)            { FactoryBot.build(:benefit_group) }
-    let(:plan_year)                { FactoryBot.build(:plan_year, benefit_groups: [benefit_group], start_on: Date.new(Date.today.year,Date.today.month,1)) }
-    let(:employer_profile)         { FactoryBot.create(:employer_profile, plan_years: [plan_year]) }
-    let(:benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_group: benefit_group) }
-    let(:census_employee) { FactoryBot.create(:census_employee, :old_case, employer_profile: employer_profile, benefit_group_assignments: [benefit_group_assignment] ) }
+
+    let(:site_key)              { Settings.site.key.to_sym }
+    let(:site)                  { build(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, site_key) }
+    let(:benefit_sponsor)       { create(:benefit_sponsors_organizations_general_organization, "with_aca_shop_#{site_key}_employer_profile_initial_application".to_sym, site: site) }
+    let(:benefit_sponsorship)   { benefit_sponsor.active_benefit_sponsorship }
+    let(:employer_profile)      { benefit_sponsorship.profile }
+    let!(:benefit_package)      { benefit_sponsorship.benefit_applications.first.benefit_packages.first}
+    let!(:census_employee)      { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: employer_profile, benefit_group: benefit_package) }
 
     around do |example|
      ClimateControl.modify id: census_employee.id,

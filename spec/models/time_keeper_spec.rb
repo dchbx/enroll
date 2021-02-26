@@ -74,7 +74,7 @@ RSpec.describe TimeKeeper, type: :model do
     end
 
     context "and new date is one day later than current date_of_record" do
-      let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+      let!(:hbx_profile) { FactoryBot.create(:hbx_profile, :normal_ivl_open_enrollment) }
       it "should advance the date" do
         expect(TimeKeeper.set_date_of_record(next_day)).to eq next_day
       end

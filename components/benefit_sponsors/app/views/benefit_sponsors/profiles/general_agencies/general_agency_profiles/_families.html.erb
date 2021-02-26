@@ -3,7 +3,7 @@
     <div class="tab-content" id="myTabContent">
       <div class="container">
         <div id="families">
-          <%= raw render_datatable(@datatable,"lengthMenu": [[10, 25, 50], [10, 25, 50]], buttons: [
+          <%= h render_datatable(@datatable,"lengthMenu": [[10, 25, 50], [10, 25, 50]], buttons: [
             'copy','csv','excel','print'
         ]) %>
           </div>

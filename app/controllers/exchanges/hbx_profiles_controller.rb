@@ -7,7 +7,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   include ::SepAll
   include ::Config::AcaHelper
 
-  before_action :permit_params, only: [:family_index_dt]
+  before_action :permitted_params_family_index_dt, only: [:family_index_dt]
   before_action :modify_admin_tabs?, only: [:binder_paid, :transmit_group_xml]
   before_action :check_hbx_staff_role, except: [:request_help, :configuration, :show, :assister_index, :family_index, :update_cancel_enrollment, :update_terminate_enrollment, :identity_verification]
   before_action :set_hbx_profile, only: [:edit, :update, :destroy]
@@ -122,9 +122,9 @@ class Exchanges::HbxProfilesController < ApplicationController
     @orgs = Organization.search(@q).exists(employer_profile: true)
     @page_alphabets = page_alphabets(@orgs, "legal_name")
     page_no = cur_page_no(@page_alphabets.first)
-    @organizations = @orgs.where("legal_name" => /^#{page_no}/i)
+    @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(page_no)}/i) if page_no.present?
 
-    @employer_profiles = @organizations.map {|o| o.employer_profile}
+    @employer_profiles = @organizations&.map {|o| o.employer_profile}
 
     respond_to do |format|
       format.html { render "employers/employer_profiles/index" }
@@ -141,7 +141,10 @@ class Exchanges::HbxProfilesController < ApplicationController
     @subject = params[:subject].presence
     @body = params[:body].presence
     @element_to_replace_id = params[:actions_id]
-    result = ::Operations::SecureMessageAction.new.call(params: params.permit!.to_h, user: current_user)
+    result = ::Operations::SecureMessageAction.new.call(
+      params: params.permit(:actions_id, :body, :file, :resource_name, :resource_id, :subject, :controller).to_h,
+      user: current_user
+    )
     @error_on_save = result.failure if result.failure?
     respond_to do |format|
       if @error_on_save
@@ -253,14 +256,13 @@ def employer_poc
    # end
   end
 
-
   def staff_index
     @q = params.permit(:q)[:q]
     @staff = Person.where(:$or => [{csr_role: {:$exists => true}}, {assister_role: {:$exists => true}}])
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -275,7 +277,7 @@ def employer_poc
     @page_alphabets = page_alphabets(@staff, "last_name")
     page_no = cur_page_no(@page_alphabets.first)
     if @q.nil?
-      @staff = @staff.where(last_name: /^#{page_no}/i)
+      @staff = @staff.where(last_name: /^#{Regexp.escape(page_no)}/i)
     else
       @staff = @staff.where(last_name: @q)
     end
@@ -438,7 +440,7 @@ def employer_poc
   end
 
   def update_cancel_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_cancel_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -458,7 +460,7 @@ def employer_poc
   end
 
   def update_terminate_enrollment
-    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit!.except(:utf8, :commit, :controller, :action).to_h)
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(uniq_terminate_params).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
@@ -852,8 +854,16 @@ def employer_poc
     end
   end
 
-  def permit_params
-    params.permit!
+  def permitted_params_family_index_dt
+    params.permit(:scopes)
+  end
+
+  def uniq_terminate_params
+    params.keys.map { |key| key.match(/terminate_hbx_.*/) || key.match(/termination_date_.*/) || key.match(/transmit_hbx_.*/) || key.match(/family_.*/) }.compact.map(&:to_s)
+  end
+
+  def uniq_cancel_params
+    params.keys.map { |key| key.match(/cancel_hbx_.*/) || key.match(/cancel_date_.*/) || key.match(/transmit_hbx_.*/) || key.match(/family_.*/) }.compact.map(&:to_s)
   end
 
   def get_resource(params)

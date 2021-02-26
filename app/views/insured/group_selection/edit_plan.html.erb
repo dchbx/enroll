@@ -28,11 +28,11 @@
           <div class="panel-body">
             <div class="row">
               <div class="col-xs-8">
-                <div><%=raw product[:display_carrier_logo] %></div>
+                <div><%= raw product[:display_carrier_logo] %></div>
                 <h4><strong><%= link_to product[:title], summary_products_plans_path({:standard_component_id => product.hios_id, hbx_enrollment_id: hbx_enrollment[:id], active_year: product.active_year}), remote: true %></strong>
                 </h4>
                 <div>
-                  <p><%=raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
+                  <p><%= raw render_product_type_details(product[:metal_level_kind], product[:nationwide]) %></p>
                 </div>
                 <div>
                   <p>
@@ -73,7 +73,7 @@
               <div class="col-md-6 margin-top-15px">
                 <a class="vertically-aligned-row" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>" data-toggle="modal">
                   <i class="fa fa-phone fa-2x margin-right-15px"></i>
-                  <span><%= l10n(".plan_contact_info") %></span>
+                  <span><%= l10n("plan_contact_info") %></span>
                 </a>
                 <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
                 </a>

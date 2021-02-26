@@ -9,6 +9,8 @@ class BrokerRole
   PROVIDER_KINDS = %W[broker assister]
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
+  BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'all'].freeze
+
   MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",

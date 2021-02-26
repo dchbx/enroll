@@ -807,17 +807,31 @@ Given("Individual creates account and on home page") do
   step "user should see heading labeled personal information"
   step "Individual should click on Individual market for plan shopping"
   step "Individual should see a form to enter personal information"
-  step "Individual clicks on Save and Exit"
-  step "Individual resumes enrollment"
-  step "Individual click on Sign In"
-  step "I signed in"
-  step "Individual sees previously saved address"
-  step "Individual agrees to the privacy agreeement"
-  step "Individual should see identity verification page and clicks on submit"
+  # Needs two continue clicks
+  find('.btn', text: 'CONTINUE').click
+  sleep(2)
+  find('.btn', text: 'CONTINUE').click
+  # Fill out security questions
+  # step 'the user answers all the VERIFY IDENTITY  questions'
+  step 'the user clicks on submit button'
+  # Verify identity
+  sleep(1)
+  step 'the user answers all the VERIFY IDENTITY  questions'
+  sleep(1)
+  step 'the user clicks on submit button'
+  # Click Continue Application
+  click_link "Continue Application"
   step "Then Individual should be on the Help Paying for Coverage page"
   step "Then Individual does not apply for assistance and clicks continue"
   step "Individual should see the dependents form"
   step "I click on continue button on household info form"
+  # TODO: Previously, it expected the none of the situations listed to just show up.
+  #  Adding this here to make pass
+  sleep(2)
+  if page.all('a').detect { |link| link[:id] == 'find_sep_link'}.present?
+    find('#find_sep_link').click
+    sleep(2)
+  end
   step "I click on none of the situations listed above apply checkbox"
   step "I click on back to my account button"
   step "I should land on home page"

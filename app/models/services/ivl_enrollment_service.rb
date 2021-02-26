@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Services
   class IvlEnrollmentService
 
@@ -7,7 +9,7 @@ module Services
 
     def process_enrollments(new_date)
       expire_individual_market_enrollments
-      begin_coverage_for_ivl_enrollments
+      begin_coverage_for_ivl_enrollments if new_date == new_date.beginning_of_year
       send_enrollment_notice_for_ivl(new_date)
       send_reminder_notices_for_ivl(new_date)
     end
@@ -39,7 +41,7 @@ module Services
       @logger.info "Started begin_coverage_for_ivl_enrollments process at #{TimeKeeper.datetime_of_record.to_s}"
       current_benefit_period = HbxProfile.current_hbx.benefit_sponsorship.current_benefit_coverage_period
       ivl_enrollments = HbxEnrollment.where(
-        :effective_on => current_benefit_period.start_on,
+        :effective_on => { "$gte" => current_benefit_period.start_on, "$lt" => current_benefit_period.end_on},
         :kind.in => ['individual', 'coverall'],
         :aasm_state.in => ['auto_renewing', 'renewing_coverage_selected']
       )
@@ -77,6 +79,8 @@ module Services
     end
 
     def send_enrollment_notice_for_ivl(new_date)
+      @logger.info '*' * 50
+      @logger.info "Started send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
       families = enrollment_notice_for_ivl_families(new_date)
       families.each do |family|
         begin
@@ -86,6 +90,8 @@ module Services
           Rails.logger.error { "Unable to deliver enrollment notice #{person.hbx_id} due to #{e.inspect}" }
         end
       end
+      @logger.info "Ended send_enrollment_notice_for_ivl process at #{TimeKeeper.datetime_of_record}"
+      families
     end
 
     def send_reminder_notices_for_ivl(date)
@@ -119,8 +125,8 @@ module Services
         rescue StandardError => e
           @logger.info "Unable to send verification reminder notices to #{person.hbx_id} due to #{e}"
         end
-        @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
       end
+      @logger.info "End of generating reminder notices at #{TimeKeeper.datetime_of_record}"
     end
   end
 end

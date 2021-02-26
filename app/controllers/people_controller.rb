@@ -50,7 +50,7 @@ class PeopleController < ApplicationController
       if params[:commit].downcase.include?('exit')
         # Logout of session
       else
-        redirect_to person_person_landing(@person)
+        redirect_to person_person_landing_path(@person)
       end
     else
       render new, :error => "Please complete all required fields"
@@ -382,11 +382,12 @@ private
       :is_temporarily_out_of_state,
       :id,
       :consumer_role,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :age_off_excluded
     ]
   end
 
   def dependent_params
-    params.require(:family_member).reject{|k, v| k == "id" or k =="primary_relationship"}.permit!
+    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k)}.permit(*person_parameters_list)
   end
 end

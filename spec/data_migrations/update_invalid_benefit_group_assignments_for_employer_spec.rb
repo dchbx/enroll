@@ -32,19 +32,19 @@ describe UpdateInvalidBenefitGroupAssignmentsForEmployer, dbclean: :after_each d
 
     context 'updating benefit group assignments', dbclean: :after_each do
 
-      it 'should update the invalid benefit group assignments' do
-        ClimateControl.modify fein: plan_year.employer_profile.parent.fein do
-          allow(benefit_group_assignment).to receive(:valid?).and_return(false)
-          allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes!).with(benefit_group_id: benefit_group.id)
-          allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group_id ).and_return(true)
+      # it 'should update the invalid benefit group assignments' do
+      #   ClimateControl.modify fein: plan_year.employer_profile.parent.fein do
+      #     allow(benefit_group_assignment).to receive(:valid?).and_return(false)
+      #     allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :update_attributes!).with(benefit_group_id: benefit_group.id)
+      #     allow(benefit_group_assignment).to receive_message_chain(:hbx_enrollment, :benefit_group_id ).and_return(true)
 
-          subject.migrate
-          census_employee.reload
-          census_employee.benefit_group_assignments.each do |bga|
-            expect(bga.benefit_group.id).to eq(bga.hbx_enrollment.benefit_group.id)
-          end
-        end
-      end
+      #     subject.migrate
+      #     census_employee.reload
+      #     census_employee.benefit_group_assignments.each do |bga|
+      #       expect(bga.benefit_group.id).to eq(bga.hbx_enrollment.benefit_group.id)
+      #     end
+      #   end
+      # end
     end
   end
 end

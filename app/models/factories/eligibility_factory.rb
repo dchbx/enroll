@@ -112,6 +112,10 @@ module Factories
       # We still consider AvailableAptc in this calculation because the
       # :applied_aptc(ElectedAptc) is given externally for Passive Renewals
       # and not calculated by the EA.
+
+      product = fetch_product(product_id)
+      return { product_id => 0.00 } unless product.can_use_aptc?
+
       ehb_premium = total_ehb_premium(product_id)
       applicable_aptc = [@available_aptc, @selected_aptc, ehb_premium].min
       @can_round_off_cents = @selected_aptc > ehb_premium
@@ -124,9 +128,13 @@ module Factories
     end
 
     def total_ehb_premium(product_id)
-      product = ::BenefitMarkets::Products::Product.find(product_id)
+      product = fetch_product(product_id)
       cost_decorator = @enrollment.ivl_decorated_hbx_enrollment(product)
       cost_decorator.total_ehb_premium
+    end
+
+    def fetch_product(product_id)
+      ::BenefitMarkets::Products::Product.find(product_id)
     end
 
     def shopping_member_ids

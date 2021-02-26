@@ -1,22 +1,18 @@
 class GroupSelectionPrevaricationAdapter
-  attr_accessor :person
-  attr_accessor :family
-  attr_accessor :coverage_household
-  attr_accessor :previous_hbx_enrollment
-  attr_accessor :change_plan
-  attr_accessor :coverage_kind
-  attr_accessor :enrollment_kind
-  attr_accessor :shop_for_plans
-  attr_accessor :optional_effective_on
 
   include ActiveModel::Model
 
+  attr_accessor :optional_effective_on, :shop_under_current, :shop_under_future, :person, :family,
+                :coverage_household, :previous_hbx_enrollment, :change_plan, :coverage_kind, :enrollment_kind, :shop_for_plans
+
   def self.initialize_for_common_vars(params)
-    person_id = params.require(:person_id)
+    person_id = params[:person_id]
     person = Person.find(person_id)
     family = person.primary_family
     coverage_household = family.active_household.immediate_family_coverage_household
     change_plan = params[:change_plan].present? ? params[:change_plan] : ''
+    shop_under_current = params[:shop_under_current] == "true"
+    shop_under_future = params[:shop_under_future] == "true"
     coverage_kind = params[:coverage_kind].present? ? params[:coverage_kind] : 'health'
     enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
     shop_for_plans = params[:shop_for_plans].present? ? params[:shop_for_plans] : ''
@@ -29,7 +25,9 @@ class GroupSelectionPrevaricationAdapter
       coverage_kind: coverage_kind,
       enrollment_kind: enrollment_kind,
       shop_for_plans: shop_for_plans,
-      optional_effective_on: optional_effective_on
+      optional_effective_on: optional_effective_on,
+      shop_under_current: shop_under_current,
+      shop_under_future: shop_under_future
     )
     if params[:hbx_enrollment_id].present?
       enrollment = ::HbxEnrollment.find(params[:hbx_enrollment_id])
@@ -41,7 +39,7 @@ class GroupSelectionPrevaricationAdapter
 
   def check_shopping_roles(params)
     if params[:employee_role_id].present?
-      emp_role_id = params.require(:employee_role_id)
+      emp_role_id = params[:employee_role_id]
       @employee_role = @person.employee_roles.detect { |emp_role| emp_role.id.to_s == emp_role_id.to_s }
     elsif params[:resident_role_id].present?
       @resident_role = @person.resident_role
@@ -239,7 +237,7 @@ class GroupSelectionPrevaricationAdapter
     return unless select_market(params) == 'shop' || select_market(params) == 'fehb'
 
     if possible_employee_role.present?
-      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?)
+      assigned_benefit_package = possible_employee_role.benefit_package(qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future)
     end
 
     if @change_plan.present? && @previous_hbx_enrollment.present?
@@ -308,7 +306,7 @@ class GroupSelectionPrevaricationAdapter
 
   def build_new_shop_waiver_enrollment(controller_employee_role, params)
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_new_waiver_enrollment(is_qle: is_qle?, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
+    e_builder.build_new_waiver_enrollment(is_qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future, optional_effective_on: optional_effective_on, waiver_reason: get_waiver_reason(params))
   end
 
   def build_change_shop_waiver_enrollment(
@@ -348,28 +346,38 @@ class GroupSelectionPrevaricationAdapter
     can_shop_individual?(person) && can_shop_shop?(person)
   end
 
-
-  def is_eligible_for_dental?(employee_role, change_plan, enrollment)
-    if change_plan == "change_by_qle"
-      family = employee_role.person.primary_family
-      benefit_package = employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on)
-      if benefit_package.blank?
-        benefit_package = employee_role.benefit_package(qle: true) || employee_role.census_employee.possible_benefit_package
-      end
-      benefit_package.present? && benefit_package.is_offering_dental?
+  def no_employer_benefits_error_message(hbx_enrollment)
+    if hbx_enrollment.sponsored_benefit_package.benefit_application.terminated?
+      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer."
+    elsif hbx_enrollment.sponsored_benefit_package.benefit_application.termination_pending?
+      "Your employer is no longer offering health insurance through #{Settings.site.short_name}. Please contact your employer or call our Customer Care Center at #{Settings.contact_center.phone_number}."
     else
-      renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
-      active_benefit_package  = employee_role.census_employee.active_benefit_package
-
-      if change_plan == 'change_plan' && enrollment.present? && enrollment.is_shop?
-        enrollment.sponsored_benefit_package.is_offering_dental?
-      elsif employee_role.can_enroll_as_new_hire?
-        active_benefit_package.present? && active_benefit_package.is_offering_dental?
-      else
-        current_benefit_package = (renewal_benefit_package || active_benefit_package)
-        current_benefit_package.present? && current_benefit_package.is_offering_dental?
-      end
+      "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}"
     end
+  end
+
+  def is_eligible_for_dental?(employee_role, change_plan, enrollment, effective_date)
+    renewal_benefit_package = employee_role.census_employee.renewal_published_benefit_package
+    active_benefit_package  = employee_role.census_employee.active_benefit_package(effective_date)
+
+    if change_plan == "change_by_qle"
+      benefit_package = fetch_benefit_package_for_sep(employee_role)
+      benefit_package.present? && benefit_package.is_offering_dental?
+    elsif change_plan == 'change_plan' && enrollment.present? && enrollment.is_shop?
+      enrollment.sponsored_benefit_package.is_offering_dental?
+    elsif employee_role.can_enroll_as_new_hire?
+      active_benefit_package.present? && active_benefit_package.is_offering_dental?
+    else
+      current_benefit_package = (renewal_benefit_package || active_benefit_package)
+      current_benefit_package.present? && current_benefit_package.is_offering_dental?
+    end
+  end
+
+  def fetch_benefit_package_for_sep(employee_role)
+    family = employee_role.person.primary_family
+    employee_role.census_employee.benefit_package_for_date(family.earliest_effective_sep.effective_on) ||
+      employee_role.benefit_package(qle: true) ||
+      employee_role.census_employee.possible_benefit_package
   end
 
   # def is_dental_offered?(employee_role)
@@ -426,7 +434,7 @@ class GroupSelectionPrevaricationAdapter
 
   # Assignment will never be nil unless you're setting incorrect sponsored_benefit_package on enrollment
   def assign_enrollment_to_benefit_package_assignment(employee_role, enrollment)
-    assignment = employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id)
+    assignment = employee_role.census_employee.benefit_group_assignment_by_package(enrollment.sponsored_benefit_package_id, enrollment.effective_on)
     assignment.update(hbx_enrollment_id: enrollment.id)
     enrollment.update(benefit_group_assignment_id: assignment.id)
   end
@@ -439,16 +447,14 @@ class GroupSelectionPrevaricationAdapter
   )
 
     e_builder = ::EnrollmentShopping::EnrollmentBuilder.new(coverage_household, controller_employee_role, coverage_kind)
-    e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, optional_effective_on: optional_effective_on)
+    e_builder.build_new_enrollment(family_member_ids: family_member_ids, is_qle: is_qle?, shop_under_current: shop_under_current, shop_under_future: shop_under_future,  optional_effective_on: optional_effective_on)
   end
 
-  def shop_health_and_dental_relationship_benefits(employee_role, benefit_group)
+  def shop_health_and_dental_relationship_benefits(employee_role, benefit_group, effective_date)
     health_offered_relationship_benefits = health_relationship_benefits(benefit_group)
     dental_offered_relationship_benefits = nil
 
-    if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment)
-      dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group)
-    end
+    dental_offered_relationship_benefits = dental_relationship_benefits(benefit_group) if is_eligible_for_dental?(employee_role, @change_plan, @hbx_enrollment, effective_date)
 
     return health_offered_relationship_benefits, dental_offered_relationship_benefits
   end

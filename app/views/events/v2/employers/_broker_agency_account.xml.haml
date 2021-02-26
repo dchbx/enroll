@@ -37,5 +37,5 @@
       - ga_accounts = plan_design_organization.general_agency_accounts.unscoped.select { |gaa| gaa.for_broker_agency_account?(broker_agency_account) }
       - if ga_accounts.any?
         %ga_assignments
-          = render :partial => "events/employers/general_agency_assignment", :collection => ga_accounts
+          = render :partial => "events/employers/general_agency_assignment", :collection => order_ga_accounts_for_employer_xml(ga_accounts)
 

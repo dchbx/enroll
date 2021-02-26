@@ -17,7 +17,8 @@ module Exchanges
     private
 
     def issuer_params
-      { issuer_profile_id: params['issuer_id'], filter: params['query']&.permit! }
+      params.permit(:issuer_id, :query)
+      { issuer_profile_id: params['issuer_id'], filter: params['query'] }
     end
   end
 end

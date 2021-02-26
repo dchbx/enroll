@@ -37,9 +37,9 @@ module BenefitSponsors
             fail:     ->(benefit_application){"At least one member must be eligible to enroll" }
 
     rule :all_waived_members_eligiblity,
-         validate: ->(benefit_application){ benefit_application.total_enrolled_count > benefit_application.all_waived_member_count },
+         validate: ->(benefit_application){ benefit_application.total_enrolled_and_waived_count > benefit_application.all_waived_member_count },
          success: ->(_benefit_application){"validated successfully"},
-         fail: ->(_benefit_application){"At least one eligible member enrolling must not be waived" }
+         fail: ->(_benefit_application){"At least one non-owner eligible member enrolling must not be waived" }
 
 
     business_policy :enrollment_elgibility_policy,

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 RSpec.shared_context 'setup initial family with one member', :shared_context => :metadata do
-
-  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role) }
+  let(:person_dob_year) { Date.today.year - 48 }
+  let!(:person) { FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, dob: Date.new(person_dob_year, 4, 4)) }
   let!(:family) { FactoryBot.create(:family, :with_primary_family_member, person: person) }
   let!(:family_member) { family.primary_applicant }
 end

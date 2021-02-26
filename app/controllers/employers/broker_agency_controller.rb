@@ -14,7 +14,7 @@ class Employers::BrokerAgencyController < ApplicationController
 
       if params[:page].present?
         @page_alphabet = cur_page_no(@page_alphabets.first)
-        @organizations = @orgs.where("legal_name" => /^#{@page_alphabet}/i)
+        @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(@page_alphabet)}/i)
       else
         @organizations = @orgs.limit(12).to_a
       end

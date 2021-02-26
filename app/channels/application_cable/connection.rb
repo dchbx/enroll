@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 module ApplicationCable
+  # Action Cable connection
   class Connection < ActionCable::Connection::Base
     identified_by :current_user
 
@@ -6,11 +9,11 @@ module ApplicationCable
       self.current_user = find_verified_user
     end
 
-    protected
+    private
 
     def find_verified_user
-      if current_user = User.find_by(oim_id: /admin@dc.gov/i)
-        current_user
+      if (verified_user = env['warden'].user)
+        verified_user
       else
         reject_unauthorized_connection
       end

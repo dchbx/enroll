@@ -411,7 +411,6 @@ RSpec.describe "employers/census_employees/show.html.erb", dbclean: :after_each 
       benefit_application = census_employee.employer_profile.benefit_applications.first
       benefit_application.cancel!
       bga = census_employee.benefit_group_assignments.first
-      bga.update_attributes(is_active: false)
       bga.reload
       census_employee.reload
       assign(:census_employee, census_employee)

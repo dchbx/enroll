@@ -30,6 +30,36 @@ describe HbxProfilePolicy do
     end
   end
 
+  permissions :can_view_or_change_translations? do
+    let!(:super_admin_user) { FactoryBot.create(:user, :with_hbx_staff_role, person: super_admin_person) }
+    let!(:super_admin_permission) { FactoryBot.create(:permission, :super_admin) }
+    let!(:super_admin_person) { FactoryBot.create(:person) }
+    let!(:hbx_profile) { FactoryBot.create(:hbx_profile) }
+    let!(:hbx_super_admin_staff_role) do
+      HbxStaffRole.create!(person: super_admin_person, permission_id: super_admin_permission.id, subrole: super_admin_subrole, hbx_profile_id: hbx_profile.id)
+    end
+    let(:super_admin_subrole) { 'super_admin' }
+    it "grants access to super admin staff" do
+      expect(subject).to permit(super_admin_user, HbxProfile)
+    end
+
+    it "denies access when csr" do
+      expect(subject).not_to permit(FactoryBot.build(:user, :csr, person: csr_person), HbxProfile)
+    end
+
+    it "denies access when assister" do
+      expect(subject).not_to permit(FactoryBot.build(:user, :assister, person: assister_person), HbxProfile)
+    end
+
+    it "denies access when employee" do
+      expect(subject).not_to permit(FactoryBot.build(:user, :employee, person: employee_person), HbxProfile)
+    end
+
+    it "denies access when normal user" do
+      expect(subject).not_to permit(User.new, HbxProfile)
+    end
+  end
+
   permissions :index? do
     it "grants access when hbx_staff" do
       expect(subject).to permit(FactoryBot.build(:user, :hbx_staff, person: hbx_staff_person), HbxProfile)
@@ -88,6 +118,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -103,6 +134,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be false
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -118,6 +150,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -133,6 +166,7 @@ describe HbxProfilePolicy do
       expect(policy.can_access_accept_reject_identity_documents?).to be false
       expect(policy.can_access_accept_reject_paper_application_documents?).to be false
       expect(policy.can_delete_identity_application_documents?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -145,6 +179,7 @@ describe HbxProfilePolicy do
       expect(policy.approve_ga?).to be false
       expect(policy.view_the_configuration_tab?).to be false
       expect(policy.can_submit_time_travel_request?).to be false
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be false
     end
 
@@ -156,6 +191,7 @@ describe HbxProfilePolicy do
       expect(policy.approve_broker?).to be true
       expect(policy.approve_ga?).to be true
       expect(policy.can_modify_plan_year?).to be true
+      expect(policy.can_access_age_off_excluded?).to be true
       expect(policy.can_send_secure_message?).to be true
     end
 

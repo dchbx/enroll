@@ -9,7 +9,8 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
-  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
+  before_action :can_view_entire_family_enrollment_history?, only: [:display_all_hbx_enrollments]
+  before_action :transition_family_members_update_params, only: [:transition_family_members_update]
 
   def home
     Caches::CurrentHbx.with_cache do
@@ -169,16 +170,17 @@ class Insured::FamiliesController < FamiliesController
       @resident_role_id = @person.resident_role.id
     end
 
-    if @qle.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
-      benefit_application = @person.active_employee_roles.first.employer_profile.active_benefit_application
-      reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
-      employee_role = @person.active_employee_roles.first
-      if Settings.site.key == :cca
-        trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-      elsif Settings.site.key == :dc
-        event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
-        trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
-      end
+    employee_role = @person.active_employee_roles.first
+
+    return unless @qle.present? && employee_role.present? && (@qle.shop? || @qle.fehb?) && !@qualified_date && params[:qle_id].present?
+
+    benefit_application = employee_role.employer_profile.active_benefit_application
+    reporting_deadline = @qle_date > today ? today : @qle_date + 30.days
+    if Settings.site.key == :cca
+      trigger_notice_observer(employee_role, benefit_application, 'employee_notice_for_sep_denial', qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
+    elsif Settings.site.key == :dc
+      event_name = @person.has_multiple_active_employers? ? 'sep_denial_notice_for_ee_active_on_multiple_rosters' : 'sep_denial_notice_for_ee_active_on_single_roster'
+      trigger_notice_observer(employee_role, benefit_application, event_name, qle_title: @qle.title, qle_reporting_deadline: reporting_deadline.strftime("%m/%d/%Y"), qle_event_on: @qle_event_date.strftime("%m/%d/%Y"))
     end
   end
 
@@ -227,7 +229,7 @@ class Insured::FamiliesController < FamiliesController
 
   # admin manually uploads a notice for person
   def upload_notice
-    if (!params.permit![:file]) || (!params.permit![:subject])
+    if !params[:file] || !params[:subject]
       flash[:error] = "File or Subject not provided"
       redirect_back(fallback_location: :back)
       return
@@ -245,7 +247,7 @@ class Insured::FamiliesController < FamiliesController
       begin
         @person.documents << notice_document
         @person.save!
-        send_notice_upload_notifications(notice_document, params.permit![:subject])
+        send_notice_upload_notifications(notice_document, params[:subject])
         flash[:notice] = "File Saved"
       rescue => e
         flash[:error] = "Could not save file."
@@ -303,15 +305,13 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def transition_family_members_update
-    params_hash = params.permit!.to_h
-    @row_id = params_hash[:family_actions_id]
-
-    params_parser = ::Forms::BulkActionsForAdmin.new(params_hash)
+    @row_id = params[:family_actions_id]
+    params_parser = ::Forms::BulkActionsForAdmin.new(params.permit(@permitted_param_keys).to_h)
     @result = params_parser.result
     @row = params_parser.row
     @family_id = params_parser.family_id
     params_parser.transition_family_members
-    @family = Family.find(params_hash[:family])
+    @family = Family.find(params[:family])
     @consumer_people = []
     @resident_people = []
     @result[:success].each do |person|
@@ -327,6 +327,12 @@ class Insured::FamiliesController < FamiliesController
   end
 
   private
+
+  def transition_family_members_update_params
+    dynamic_transition_params_keys = params.keys.map { |key| key.match(/transition_.*/) }.compact.map(&:to_s).map(&:to_sym)
+    non_dynamic_params_keys = [:family, :family_actions_id, :qle_id, :action]
+    @permitted_param_keys = dynamic_transition_params_keys.push(non_dynamic_params_keys).flatten
+  end
 
   def fetch_terminate_date(terminate_date)
     term_date = @family.terminate_date_for_shop_by_enrollment(@enrollment)
@@ -400,7 +406,7 @@ class Insured::FamiliesController < FamiliesController
     if @person.has_multiple_roles?
       @multiroles = @person.has_multiple_roles?
       employee_role = @person.active_employee_roles.first
-      @manually_picked_role = params[:market] || "shop_market_events"
+      @manually_picked_role = ["individual_market_events", "fehb_market_events", "shop_market_events"].include?(params[:market]) ? params[:market] : "shop_market_events"
 
       employee_qle_market_scope = "shop_market_events"
       employee_qle_market_scope = "fehb_market_events" if employee_role && employee_role.market_kind == "fehb"
@@ -450,15 +456,15 @@ class Insured::FamiliesController < FamiliesController
   end
 
   def file_path
-    params.permit(:file)[:file].tempfile.path
+    params[:file]&.tempfile
   end
 
   def file_name
-    params.permit![:file].original_filename
+    params[:file]&.original_filename
   end
 
   def file_content_type
-    params.permit![:file].content_type
+    params[:file]&.content_type
   end
 
   def send_notice_upload_notifications(notice, subject)

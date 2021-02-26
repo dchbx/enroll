@@ -1,6 +1,8 @@
 class Exchanges::ScheduledEventsController < ApplicationController
   layout "single_column"
 
+  before_action :scheduled_event_params, only: [:create, :update]
+
   def new
     @scheduled_event = ScheduledEvent.new
   end
@@ -9,7 +11,6 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def create
-    params.permit!
     scheduled_event = ScheduledEvent.new(scheduled_event_params)
     if scheduled_event.save!
       scheduled_event.update_attributes!(one_time: false) if scheduled_event.recurring_rules.present?
@@ -36,7 +37,6 @@ class Exchanges::ScheduledEventsController < ApplicationController
   end
 
   def update
-    params.permit!
     if scheduled_event.update_attributes!(scheduled_event_params)
       scheduled_event.event_exceptions.delete_all
       if scheduled_event.recurring_rules.present?

@@ -12,7 +12,7 @@
 <div class="module hbx-enrollment-panel panel panel-default <%= initially_hidden_enrollment_css_class %>">
   <div class="panel-heading vertically-aligned-row">
     <h3 class="heading-text text-uppercase" style="font-weight:600; font-size:18px">
-      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> Coverage
+      <%= hbx_enrollment.coverage_year %> <%= product.kind.to_s.titleize %> <%= l10n('coverage').titleize %>
       <span class="separator">
         <%= hbx_enrollment.is_shop? ? hbx_enrollment.employer_profile.legal_name : l10n("insured.families.individual_and_family") %>
       </span>
@@ -34,7 +34,7 @@
         <div class="enrollment-premium info vertical-align-top">
           <p class="mb-0">
             <strong><%= l10n("premium") %>:</strong>
-            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %>/month
+            <%= number_to_currency(current_premium(hbx_enrollment), precision: 2) %><%= l10n("month").to_s.downcase %>
           </p>
         </div>
         <% if hbx_enrollment.coverage_terminated? || hbx_enrollment.coverage_expired? || hbx_enrollment.coverage_termination_pending? %>
@@ -54,7 +54,7 @@
           <%= hbx_enrollment.effective_on %>
           <% if read_only == true %>
           <br>
-          <strong class="text-danger">Plan End:
+          <strong class="text-danger"><%= l10n("plan_end") %>:
           </strong>
           <% if @census_employee.show_plan_end_date? && !hbx_enrollment.is_cobra_status? %>
           <span class="text-danger">
@@ -130,7 +130,7 @@
       </div>
       <% if hbx_enrollment.is_reinstated_enrollment?%>
           <div class="enrollment-effective info vertical-align-top">
-            <strong> Reinstated Enrollment</strong>
+            <strong> <%= l10n("reinstated_enrollment") %></strong>
           </div>
       <%end%>
     </div>
@@ -146,7 +146,7 @@
         <% if hbx_enrollment.consumer_role.present? && (hbx_enrollment.applied_aptc_amount > 0) %>
         <p>
           <label><%= l10n("APTC_amount") %>:</label>
-          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong>/month
+          <strong><%= number_to_currency(hbx_enrollment.applied_aptc_amount, precision: 2) %></strong><%= l10n("month").to_s.downcase %>
         </p>
         <% else %>
         &nbsp;
@@ -186,7 +186,7 @@
     <div>
       <a class="vertically-aligned-row" data-toggle="modal" data-target="#<%= product.kind.to_s %>-<%= product.id %>-<%= hbx_enrollment.hbx_id%>">
         <i class="fa fa-phone fa-2x"></i>
-        <span class="col-xs-11 enrollment-tile-summary"><%= l10n(".plan_contact_info") %></span>
+        <span class="col-xs-11 enrollment-tile-summary"><%= l10n("plan_contact_info") %></span>
       </a>
         <%= render partial: "shared/#{Settings.aca.state_abbreviation.downcase}_carrier_contact_information", locals: { plan: product, hbx_enrollment: hbx_enrollment } unless product.issuer_profile.blank? %>
     </div>

@@ -126,9 +126,11 @@ RSpec.describe Operations::Individual::CancelRenewalEnrollment, dbclean: :after_
                           :ivl_product,
                           :gold,
                           renewal_product_id: renewal_product.id,
+                          issuer_profile_id: '1',
                           application_period: start_of_year..end_of_year)
       end
       before do
+        product.update_attributes(issuer_profile_id: '2')
         renewal_enrollment.update_attributes(product_id: gold_renewal_product.id, aasm_state: "renewing_coverage_selected")
         expired_enrollment.update_attributes(aasm_state: :coverage_selected)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
@@ -156,6 +158,32 @@ RSpec.describe Operations::Individual::CancelRenewalEnrollment, dbclean: :after_
       end
       before do
         product.update_attributes(hios_base_id: '41842DC040001')
+        renewal_enrollment.update_attributes(product_id: gold_renewal_product.id, aasm_state: "renewing_coverage_selected")
+        expired_enrollment.update_attributes(aasm_state: :coverage_selected)
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))
+      end
+
+      it 'should cancel active renewed enrollment' do
+        expect(renewal_enrollment.aasm_state).to eq "renewing_coverage_selected"
+        expect(renewal_enrollment2.aasm_state).to eq "coverage_selected"
+        expect(subject).to be_success
+        renewal_enrollment2.reload
+        renewal_enrollment.reload
+        expect(renewal_enrollment.aasm_state).to eq "coverage_canceled"
+        expect(renewal_enrollment2.aasm_state).to eq "coverage_selected"
+      end
+    end
+
+    context "should cancel active renewed coverage on terminating active coverage when issuer profile matchs with active coverage" do
+      let!(:gold_renewal_product) do
+        FactoryBot.create(:benefit_markets_products_health_products_health_product,
+                          :ivl_product,
+                          :gold,
+                          issuer_profile_id: '1',
+                          application_period: start_of_year..end_of_year)
+      end
+      before do
+        product.update_attributes(issuer_profile_id: '1')
         renewal_enrollment.update_attributes(product_id: gold_renewal_product.id, aasm_state: "renewing_coverage_selected")
         expired_enrollment.update_attributes(aasm_state: :coverage_selected)
         allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 11, 1))

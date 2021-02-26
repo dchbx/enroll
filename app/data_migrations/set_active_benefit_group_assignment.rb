@@ -26,10 +26,6 @@ class SetActiveBenefitGroupAssignment < MongoidMigrationTask
         active_assignment = census_employee.active_benefit_group_assignment
         next if active_assignment && bg_ids.include?(active_assignment.benefit_group_id)
 
-        if active_assignment
-          active_assignment.update_attributes(:is_active => false)
-        end
-
         assignments = find_assignments_for_benefit_groups(census_employee, bg_ids)
         if assignments.any?
           assignments.first.make_active

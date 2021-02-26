@@ -80,7 +80,7 @@ describe Insured::InteractiveIdentityVerificationsController do
     end
 
     describe "with an invalid interactive_verification" do
-      let(:verification_params) { { :whine_more => "sure why not" } }
+      let(:verification_params) { { :session_id => "sure why not", :transaction_id => "1234" } }
       let(:valid_verification) { false }
       it "should render new" do
         post :create, params: { "interactive_verification" => verification_params }

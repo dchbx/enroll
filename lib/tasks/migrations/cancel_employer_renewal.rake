@@ -26,16 +26,6 @@ namespace :migrations do
           end
         end
 
-        employer_profile.census_employees.each do |census_employee|
-          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => renewing_plan_year.benefit_groups.map(&:id))
-          assignments.each do |assignment|
-            if assignment.may_delink_coverage?
-              assignment.delink_coverage!
-              assignment.update_attribute(:is_active, false)
-            end
-          end
-        end
-
         if renewing_plan_year.may_cancel_renewal?
           puts "canceling plan year for employer #{employer_profile.legal_name}" unless Rails.env.test?
           renewing_plan_year.cancel_renewal!
@@ -70,16 +60,6 @@ namespace :migrations do
           if hbx_enrollment.may_cancel_coverage?
             hbx_enrollment.cancel_coverage!
             puts "canceling employees coverage for employer enrollment hbx_id:#{hbx_enrollment.hbx_id}" unless Rails.env.test?
-          end
-        end
-
-        employer_profile.census_employees.each do |census_employee|
-          assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
-          assignments.each do |assignment|
-            if assignment.may_delink_coverage?
-              assignment.delink_coverage!
-              assignment.update_attribute(:is_active, false)
-            end
           end
         end
 
@@ -130,13 +110,6 @@ namespace :migrations do
 
       plan_year.hbx_enrollments.each do |enrollment|
         enrollment.cancel_coverage! if enrollment.may_cancel_coverage?
-      end
-
-      employer_profile.census_employees.each do |census_employee|
-        assignments = census_employee.benefit_group_assignments.where(:benefit_group_id.in => plan_year.benefit_groups.map(&:id))
-        assignments.each do |assignment|
-          assignment.delink_coverage! if assignment.may_delink_coverage?
-        end
       end
 
       plan_year.cancel! if plan_year.may_cancel?

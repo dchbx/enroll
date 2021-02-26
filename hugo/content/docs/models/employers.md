@@ -1,7 +1,7 @@
 ---
 title: "Employers"
 date: 2020-12-11T12:12:25-05:00
-draft: true
+draft: false
 ---
 
 Using the Enroll Application, Employers may sponsor benefit coverage for their employees at initial offering and renewal of coverage. Employers set the rules under which employees and their eligible dependents receive coverage, they set employee premium contribution as well as the dependent coverage and contributions. They select a reference plan which sets their costs. Employers can also offer dental coverage to their employees. The dental coverage plan year must be the same as the medical coverage plan year.

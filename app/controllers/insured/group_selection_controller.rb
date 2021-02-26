@@ -1,7 +1,6 @@
 class Insured::GroupSelectionController < ApplicationController
   include Insured::GroupSelectionHelper
 
-  before_action :permit_params, only: [:create]
   before_action :initialize_common_vars, only: [:new, :create, :terminate_selection]
   # before_action :set_vars_for_market, only: [:new]
   # before_action :is_under_open_enrollment, only: [:new]
@@ -39,6 +38,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
+    @shop_under_current = @adapter.shop_under_current
+    @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
@@ -69,10 +70,9 @@ class Insured::GroupSelectionController < ApplicationController
   end
 
   def create
-    keep_existing_plan = @adapter.keep_existing_plan?(params)
-    @market_kind = @adapter.create_action_market_kind(params)
+    keep_existing_plan = @adapter.keep_existing_plan?(permitted_group_selection_params)
+    @market_kind = @adapter.create_action_market_kind(permitted_group_selection_params)
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
-
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
       if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
@@ -80,18 +80,17 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    unless @adapter.is_waiving?(params)
+    unless @adapter.is_waiving?(permitted_group_selection_params)
       raise "You must select at least one Eligible applicant to enroll in the healthcare plan" if params[:family_member_ids].blank?
-      family_member_ids = params.require(:family_member_ids).to_h.collect do |_index, family_member_id|
+      family_member_ids = params[:family_member_ids].values.collect do |family_member_id|
         BSON::ObjectId.from_string(family_member_id)
       end
     end
 
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
-
     if @market_kind == 'shop' || @market_kind == 'fehb'
 
-      raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
+      raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
       census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
       if census_effective_on > hbx_enrollment.effective_on
@@ -99,7 +98,7 @@ class Insured::GroupSelectionController < ApplicationController
               ' Please contact your Employer for assistance. You are eligible for employer benefits from ' + census_effective_on.strftime('%m/%d/%Y')
       end
 
-      if @adapter.is_waiving?(params)
+      if @adapter.is_waiving?(permitted_group_selection_params)
         raise "Waive Coverage Failed" unless hbx_enrollment.save
 
         @adapter.assign_enrollment_to_benefit_package_assignment(@employee_role, hbx_enrollment)
@@ -108,7 +107,7 @@ class Insured::GroupSelectionController < ApplicationController
       end
     end
 
-    if (@adapter.keep_existing_plan?(params) && @adapter.previous_hbx_enrollment.present?)
+    if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind
 
       if sep.present?
@@ -229,8 +228,17 @@ class Insured::GroupSelectionController < ApplicationController
     @fm_hash[family_member.id] = [is_ivl_coverage, rule, errors, incarcerated]
   end
 
-  def permit_params
-    params.permit!
+  def permitted_group_selection_params
+    params.permit(
+      :change_plan, :consumer_role_id, :market_kind, :qle_id,
+      :hbx_enrollment_id, :coverage_kind, :enrollment_kind,
+      :employee_role_id, :resident_role_id, :person_id,
+      :market_kind, :shop_for_plans,
+      :controller, :action, :commit,
+      :effective_on_option_selected,
+      :is_waiving, :waiver_reason,
+      family_member_ids: {}
+    )
   end
 
   def set_change_plan
@@ -266,9 +274,9 @@ class Insured::GroupSelectionController < ApplicationController
       benefit_group = nil
       benefit_group_assignment = nil
 
-      if @adapter.is_waiving?(params)
+      if @adapter.is_waiving?(permitted_group_selection_params)
         if @adapter.previous_hbx_enrollment.present?
-          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, params)
+          @adapter.build_change_shop_waiver_enrollment(@employee_role, @change_plan, permitted_group_selection_params)
         else
           @adapter.build_new_shop_waiver_enrollment(@employee_role)
         end
@@ -296,7 +304,7 @@ class Insured::GroupSelectionController < ApplicationController
 
 
   def initialize_common_vars
-    @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(params)
+    @adapter = GroupSelectionPrevaricationAdapter.initialize_for_common_vars(permitted_group_selection_params)
     @person = @adapter.person
     @family = @adapter.family
     @coverage_household = @adapter.coverage_household

@@ -13,7 +13,7 @@ class BrokerAgencies::ApplicantsController < ApplicationController
 
     if params[:page].present?
       page_no = cur_page_no(@page_alphabets.first)
-      @broker_applicants = @people.where("last_name" => /^#{page_no}/i)
+      @broker_applicants = @people.where("last_name" => /^#{Regexp.escape(page_no)}/i)
     else
       @broker_applicants = @people.to_a.first(20)
     end

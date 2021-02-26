@@ -3,8 +3,6 @@
 module Validators
   module QualifyingLifeEventKind
     class QlekContract < ::Dry::Validation::Contract
-      include DryL10nHelper
-
       params do
         required(:start_on).filled(:date)
         optional(:end_on).maybe(:date)
@@ -46,66 +44,56 @@ module Validators
       end
 
       rule(:start_on) do
-        if values[:start_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.start_date_valid")) if values[:start_on].is_a?(Date) && values[:start_on] < TimeKeeper.date_of_record
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.start_date_valid")) if values[:start_on].present? && values[:start_on].is_a?(Date) && values[:start_on] < TimeKeeper.date_of_record
       end
 
       rule(:end_on, :start_on) do
         if values[:end_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:end_on].is_a?(Date)
-          key.failure(l10n("validators.qualifying_life_event_kind.end_date_valid")) if values[:end_on].is_a?(Date) && values[:end_on] < values[:start_on]
+          key.failure(I18n.t("validators.qualifying_life_event_kind.date")) unless values[:end_on].is_a?(Date)
+          key.failure(I18n.t("validators.qualifying_life_event_kind.end_date_valid")) if values[:end_on].is_a?(Date) && values[:end_on] < values[:start_on]
         end
       end
 
       rule(:pre_event_sep_in_days) do
-        key.failure(l10n("validators.qualifying_life_event_kind.pre_event_sep_in_days")) unless value >= 0
+        key.failure(I18n.t("validators.qualifying_life_event_kind.pre_event_sep_in_days")) unless value >= 0
       end
 
       rule(:title) do
         if values[:publish].present? && values[:publish] == 'Publish'
           titles = ::QualifyingLifeEventKind.by_market_kind(values[:market_kind]).by_date(values[:start_on]).active_by_state.pluck(:title).map(&:parameterize).uniq
-          key.failure(l10n("validators.qualifying_life_event_kind.title")) if titles.include?(value.parameterize)
+          key.failure(I18n.t("validators.qualifying_life_event_kind.title")) if titles.include?(value.parameterize)
         end
       end
 
       rule(:post_event_sep_in_days) do
-        key.failure(l10n("validators.qualifying_life_event_kind.post_event_sep_in_days")) unless value >= 0
+        key.failure(I18n.t("validators.qualifying_life_event_kind.post_event_sep_in_days")) unless value >= 0
       end
 
       rule(:market_kind) do
-        key.failure(l10n("validators.qualifying_life_event_kind.market_kind")) unless ::QualifyingLifeEventKind::MARKET_KINDS.include?(value)
+        key.failure(I18n.t("validators.qualifying_life_event_kind.market_kind")) unless ::QualifyingLifeEventKind::MARKET_KINDS.include?(value)
       end
 
       rule(:effective_on_kinds) do
-        key.failure(l10n("validators.qualifying_life_event_kind.effective_on_kinds")) if values[:effective_on_kinds].blank?
+        key.failure(I18n.t("validators.qualifying_life_event_kind.effective_on_kinds")) if values[:effective_on_kinds].blank?
       end
 
       rule(:ordinal_position) do
-        key.failure(l10n("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
+        key.failure(I18n.t("validators.qualifying_life_event_kind.ordinal_position")) unless value >= 0
       end
 
       rule(:coverage_start_on) do
-        if values[:coverage_start_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_start_on].is_a?(Date)
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.date")) if values[:coverage_start_on].present? && !values[:coverage_start_on].is_a?(Date)
 
-        if values[:coverage_start_on].blank? && values[:coverage_end_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.coverage_start_on")) if values[:coverage_end_on].is_a?(Date)
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.coverage_start_on")) if values[:coverage_start_on].blank? && values[:coverage_end_on].present? && values[:coverage_end_on].is_a?(Date)
       end
 
       rule(:coverage_end_on) do
-        if values[:coverage_end_on].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.date")) unless values[:coverage_end_on].is_a?(Date)
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.date")) if values[:coverage_end_on].present? && !values[:coverage_end_on].is_a?(Date)
 
-        if values[:coverage_start_on].present? && values[:coverage_end_on].blank?
-          key.failure(l10n("validators.qualifying_life_event_kind.coverage_end_on")) if values[:coverage_start_on].is_a?(Date)
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.coverage_end_on")) if values[:coverage_start_on].present? && values[:coverage_end_on].blank? && values[:coverage_start_on].is_a?(Date)
 
-        if values[:coverage_start_on].present? && values[:coverage_end_on].present? && values[:coverage_start_on].is_a?(Date) && values[:coverage_end_on].is_a?(Date)
-          key.failure(l10n("validators.qualifying_life_event_kind.coverage_end_on_valid")) if values[:coverage_end_on] <= values[:coverage_start_on]
+        if values[:coverage_start_on].present? && values[:coverage_end_on].present? && values[:coverage_start_on].is_a?(Date) && values[:coverage_end_on].is_a?(Date) && (values[:coverage_end_on] <= values[:coverage_start_on])
+          key.failure(I18n.t("validators.qualifying_life_event_kind.coverage_end_on_valid"))
         end
       end
 
@@ -113,9 +101,7 @@ module Validators
         #TODO: uncomment when required mandatory for shop market
         #key.failure('must be selected') if values[:market_kind] != 'individual' && values[:termination_on_kinds].blank?
 
-        if values[:termination_on_kinds].present?
-          key.failure(l10n("validators.qualifying_life_event_kind.termination_on_kind")) if values[:termination_on_kinds].any? {|ele| !ele.is_a?(String)}
-        end
+        key.failure(I18n.t("validators.qualifying_life_event_kind.termination_on_kind")) if values[:termination_on_kinds].present? && values[:termination_on_kinds].any? {|ele| !ele.is_a?(String)}
       end
     end
   end

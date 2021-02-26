@@ -28,14 +28,41 @@ module Subscribers
       if event_kind.present?
         notice_trigger = event_kind.notice_triggers.first
 
-        builder = notice_trigger.notice_builder.camelize.constantize.new(recipient, {
+        notice_class(notice_trigger.notice_builder).new(recipient, {
           template: notice_trigger.notice_template,
           subject: event_kind.title,
           event_name: notice_event,
           options: payload['notice_params'],
-          mpi_indicator: notice_trigger.mpi_indicator,
-          }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
+          mpi_indicator: notice_trigger.mpi_indicator
+        }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
       end
+    end
+
+    def notice_class(notice_type)
+      notice_class = ['IvlNotice',
+                      'Notice',
+                      'IvlNotices::ConditionalEligibilityNoticeBuilder',
+                      'IvlNotices::CoverallToIvlTransitionNoticeBuilder',
+                      'IvlNotices::DocumentsVerification',
+                      'IvlNotices::EligibilityDenialNoticeBuilder',
+                      'IvlNotices::EligibilityNoticeBuilder',
+                      'IvlNotices::EnrollmentNoticeBuilder',
+                      'IvlNotices::EnrollmentNoticeBuilderWithDateRange',
+                      'IvlNotices::FinalCatastrophicPlanNotice',
+                      'IvlNotices::IneligibilityNoticeBuilder',
+                      'IvlNotices::IvlBacklogVerificationNoticeUqhp',
+                      'IvlNotices::IvlRenewalNotice',
+                      'IvlNotices::IvlTaxNotice',
+                      'IvlNotices::IvlToCoverallTransitionNoticeBuilder',
+                      'IvlNotices::IvlVtaNotice',
+                      'IvlNotices::NoAppealVariableIvlRenewalNotice',
+                      'IvlNotices::NoticeBuilder',
+                      'IvlNotices::ReminderNotice',
+                      'RenewalNotice',
+                      'IvlNotices::SecondIvlRenewalNotice',
+                      'IvlNotices::VariableIvlRenewalNotice'].find { |x| x == notice_type.classify }
+      raise "Unable to find the notice_class" if notice_class.nil?
+      notice_class.camelize.constantize
     end
   end
 end

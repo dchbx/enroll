@@ -1,10 +1,10 @@
 ---
 title: "Employees"
 date: 2020-12-11T12:12:25-05:00
-draft: true
+draft: false
 ---
 
-In Enroll terminology, Employees are those employed by the various Employers who utilize Enroll to allow their employees to select coverage. 
+In Enroll terminology, Employees are those employed by the various Employers who utilize Enroll to allow their employees to select coverage.
 
 ## Employees UI Walkthrough and Technical Explanation
 
@@ -42,4 +42,3 @@ Multiple levels of plan information available in plan shopping experience – hi
 Detailed plan shopping side-by-side comparison of up to every data element in the CCIIO templates filed by the carriers.
 
 We are contiuously reviewing the plan shopping experience with our team of user interface experts to allow for informed plan selections and facilitate improved health insurance literacy of our customer base. For example, we recently completed moderated user testing of our individual shopping experience. Improvements based on moderated user testing for plan comparison will also be made to SHOP shopping. We are also planning moderated user testing for employer and employee customers in SHOP.
-

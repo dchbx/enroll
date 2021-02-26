@@ -19,13 +19,11 @@ class FixBenefitGroupAssignmentsForConversionErWithoutActivePlanYear < MongoidMi
             bga = census_employee.benefit_group_assignments.select { |bga| plan_year.benefit_group_ids.include?(bga.benefit_group_id)}.first
             
             if bga.present?
-              bga.update_attributes!(is_active: true)
+              bga.make_active
               puts "assigned benefit_group for #{census_employee.full_name} of ER: #{organization.legal_name}" unless Rails.env.test?
               count += 1
             else
-              bga = BenefitGroupAssignment.new(benefit_group_id: plan_year.benefit_group_ids[0], 
-                                                start_on: plan_year.start_on,
-                                                  is_active: true)
+              bga = BenefitGroupAssignment.new(benefit_group_id: plan_year.benefit_group_ids[0], start_on: plan_year.start_on)
 
               census_employee.benefit_group_assignments << bga
               census_employee.save!

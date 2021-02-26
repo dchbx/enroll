@@ -328,6 +328,10 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
         expect(subject.selected_enrollment(family, employee_role, active_enrollment.coverage_kind)).to eq renewal_enrollment
       end
 
+      it 'should return nil if employee role is not present' do
+        expect(subject.selected_enrollment(family, nil, active_enrollment.coverage_kind)).to eq nil
+      end
+
       context 'it should not return any enrollment' do
 
         before do
@@ -347,38 +351,39 @@ RSpec.describe Insured::GroupSelectionHelper, :type => :helper, dbclean: :after_
     end
   end
 
-  describe "#benefit_group_assignment_by_plan_year", dbclean: :after_each do
-    let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
-    let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: organization.employer_profile)}
-    let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: organization.employer_profile)}
+  # Deprecated
+  # describe "#benefit_group_assignment_by_plan_year", dbclean: :after_each do
+  #   let(:organization) { FactoryBot.create(:organization, :with_active_and_renewal_plan_years)}
+  #   let(:census_employee) { FactoryBot.create(:census_employee, employer_profile: organization.employer_profile)}
+  #   let(:employee_role) { FactoryBot.create(:employee_role, employer_profile: organization.employer_profile)}
 
-    before do
-      allow(employee_role).to receive(:census_employee).and_return census_employee
-    end
+  #   before do
+  #     allow(employee_role).to receive(:census_employee).and_return census_employee
+  #   end
 
-    it "should return active benefit group assignment when the benefit group belongs to active plan year" do
-      benefit_group = organization.employer_profile.active_plan_year.benefit_groups.first
-      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.active_benefit_group_assignment
-    end
+  #   it "should return active benefit group assignment when the benefit group belongs to active plan year" do
+  #     benefit_group = organization.employer_profile.active_plan_year.benefit_groups.first
+  #     expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.active_benefit_group_assignment
+  #   end
 
-    it "should return renewal benefit group assignment when benefit_group belongs to renewing plan year" do
-      benefit_group = organization.employer_profile.show_plan_year.benefit_groups.first
-      expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.renewal_benefit_group_assignment
-    end
+  #   it "should return renewal benefit group assignment when benefit_group belongs to renewing plan year" do
+  #     benefit_group = organization.employer_profile.show_plan_year.benefit_groups.first
+  #     expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, nil)).to eq census_employee.renewal_benefit_group_assignment
+  #   end
 
-    # EE should have the ability to buy coverage from expired plan year if had an eligible SEP which falls in that period
+  #   # EE should have the ability to buy coverage from expired plan year if had an eligible SEP which falls in that period
 
-    context "when EE has an eligible SEP which falls in expired plan year period" do
+  #   context "when EE has an eligible SEP which falls in expired plan year period" do
 
-      let(:organization) { FactoryBot.create(:organization, :with_expired_and_active_plan_years)}
+  #     let(:organization) { FactoryBot.create(:organization, :with_expired_and_active_plan_years)}
 
-      it "should return benefit group assignment belongs to expired py when benefit_group belongs to expired plan year" do
-        benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
-        expired_bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
-        expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, "sep")).to eq expired_bga
-      end
-    end
-  end
+  #     it "should return benefit group assignment belongs to expired py when benefit_group belongs to expired plan year" do
+  #       benefit_group = organization.employer_profile.plan_years.where(aasm_state: "expired").first.benefit_groups.first
+  #       expired_bga = census_employee.benefit_group_assignments.where(benefit_group_id: benefit_group.id).first
+  #       expect(subject.benefit_group_assignment_by_plan_year(employee_role, benefit_group, nil, "sep")).to eq expired_bga
+  #     end
+  #   end
+  # end
 
   describe "disabling & checking market kinds, coverage kinds & kinds when user gets to plan shopping" do
     let(:primary) { FactoryBot.create(:person)}

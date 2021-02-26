@@ -67,7 +67,6 @@ module Factories
     end
 
     def self.construct_consumer_role(person_params, user)
-      person_params = person_params[:person]
       person, person_new = initialize_person(
         user,
         person_params["name_pfx"],
@@ -200,7 +199,8 @@ module Factories
       census_employee.employer_profile = employer_profile
       employee_role.employer_profile = employer_profile
       census_employee.benefit_group_assignments.each do |bga|
-        if bga.coverage_selected? && bga.hbx_enrollment.present? && !bga.hbx_enrollment.inactive?
+        next unless bga.hbx_enrollment.present?
+        if bga.hbx_enrollment.coverage_selected? && bga.hbx_enrollment.present? && !bga.hbx_enrollment.inactive?
           bga.hbx_enrollment.employee_role_id = employee_role.id
           bga.hbx_enrollment.save
         end
@@ -269,7 +269,6 @@ module Factories
     end
 
     def self.construct_resident_role(person_params, user)
-      person_params = person_params[:person]
       person, person_new = initialize_person(
         user, person_params["name_pfx"], person_params["first_name"],
         person_params["middle_name"] , person_params["last_name"],

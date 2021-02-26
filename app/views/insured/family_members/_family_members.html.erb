@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-2 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
       <label class="static_label label-floatlabel" for="name">AGE</label>
-      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(Date.today)}" %></span>
+      <span class="field_value floatlabel form-control active-floatlabel" id="name"><%= "#{@person.age_on(TimeKeeper.date_of_record)}" %></span>
     </div>
     <div class="col-md-3 col-sm-6 no-pd form-group-lg no-pd class-fa-household">
       <label class="static_label label-floatlabel" for="name">GENDER</label>
@@ -40,7 +40,7 @@
 <div class="row no-buffer <%= pundit_class Family, :updateable?%>">
   <div class="fail-search add-member <%= 'hidden' if !@family.active_family_members.empty? %>">
     <div class="col-md-12 col-sm-12 col-xs-12 no-pd">
-      <p class="fail"><%= l10n(".add_member_info_html") %></p>
+      <p class="fail"><%= l10n("insured.family_members.index.add_member_info_html") %></p>
       <br>
       <div class="form-inline text-center <%= pundit_class Family, :updateable?%>">
         <%= link_to l10n("add_member"), main_app.new_insured_family_member_path(:family_id => @family.id, employee_role_id: @employee_role.try(:id), consumer_role_id: @consumer_role.try(:id)), :remote => true, :class => "btn btn-default" %>

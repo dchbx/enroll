@@ -58,7 +58,7 @@ module BenefitSponsors
           if @q.nil?
             @staff = @staff.where(last_name: /^#{page_no}/i)
           else
-            @staff = @staff.where(last_name: /^#{@q}/i)
+            @staff = @staff.where(last_name: /^#{Regexp.escape(@q)}/i)
           end
         end
 
@@ -153,14 +153,19 @@ module BenefitSponsors
 
         def inbox
           @sent_box = true
-          id = params["id"]||params['profile_id']
-          @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(id))
-          @folder = (params[:folder] || 'Inbox').capitalize
-          if current_user.person._id.to_s == id
-            @provider = current_user.person
-          else
-            @provider = @broker_agency_provider
+          if params["id"].present?
+            provider_id = params["id"]
+            @broker_agency_provider = Person.find(provider_id)
+            @broker_agency_profile = @broker_agency_provider.broker_role.broker_agency_profile
+            authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          elsif params['profile_id'].present?
+            provider_id = params['profile_id']
+            @broker_agency_provider = find_broker_agency_profile(BSON::ObjectId(provider_id))
           end
+
+          @folder = (params[:folder] || 'Inbox').capitalize
+
+          @provider = (current_user.person._id.to_s == provider_id) ? current_user.person : @broker_agency_provider
         end
 
         def email_guide
@@ -181,7 +186,7 @@ module BenefitSponsors
         def find_broker_agency_profile(id = nil)
           organizations = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => id)
           @broker_agency_profile = organizations.first.broker_agency_profile if organizations.present?
-          authorize @broker_agency_profile, :access_to_broker_agency_profile?
+          authorize @broker_agency_profile, :access_to_broker_agency_profile? if @broker_agency_profile
         end
 
         def user_not_authorized(exception)

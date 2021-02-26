@@ -28,7 +28,7 @@ RSpec.describe BenefitSponsors::Entities::BenefitSponsorship do
     let(:required_params) do
       {
         _id: BSON::ObjectId.new, hbx_id: '1234567', aasm_state: :draft, profile_id: BSON::ObjectId.new, source_kind: :self_serve,
-        is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: oe_start_on,
+        is_no_ssn_enabled: true, market_kind: :aca_shop, organization_id: BSON::ObjectId.new, registered_on: nil,
         benefit_applications: [benefit_application], effective_begin_on: effective_period.min, effective_end_on: effective_period.max,
         ssn_enabled_on: nil , ssn_disabled_on: nil, termination_kind: termination_kind, termination_reason: termination_reason,
         predecessor_id: BSON::ObjectId.new

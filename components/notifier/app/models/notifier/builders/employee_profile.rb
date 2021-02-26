@@ -118,7 +118,10 @@ module Notifier
     end
 
     def has_parent_enrollment?
-      waiver_enr = census_employee_record.active_and_renewing_benefit_group_assignments.flat_map(&:hbx_enrollments).select {|en| HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
+      bgas = []
+      bgas << census_employee_record.active_benefit_group_assignment
+      bgas << census_employee_record.renewal_benefit_group_assignment
+      waiver_enr = bgas.compact.flat_map(&:hbx_enrollments).select {|en| HbxEnrollment::WAIVED_STATUSES.include?(en.aasm_state)}.first
       return false if waiver_enr.blank?
       waiver_enr.parent_enrollment.present?
     end

@@ -33,6 +33,7 @@ module Subscribers
       throw(:processing_issue, "ERROR: Failed to find primary family for users person in xml") unless family.present?
       stupid_family_id = family.id
       active_household = family.active_household
+      throw(:processing_issue, "ERROR: Invalid family due to #{family.errors.messages}") unless family.valid?
       family.save! # In case the tax household does not exist
       #        family = Family.find(stupid_family_id) # wow
       #        active_household = family.active_household
@@ -96,8 +97,12 @@ module Subscribers
           consumer_role.person.user.ridp_by_payload!
         end
       rescue => e
-        errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
-        throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
+        if consumer_role&.errors.present?
+          errors_list = consumer_role.errors.full_messages + [e.message] + e.backtrace
+          throw(:processing_issue, "Unable to update consumer vlp: #{errors_list.join("\n")}")
+        else
+          throw(:processing_issue, "Consumer Role is not present") unless consumer_role.present?
+        end
       end
     end
 
@@ -142,6 +147,7 @@ module Subscribers
               ssn: verified_family_member.person_demographics.ssn == "999999999" ? "" : verified_family_member.person_demographics.ssn ,
               gender: verified_family_member.person_demographics.sex.split('#').last
             )
+            throw(:processing_issue, "Invalid Person due to #{new_member.errors.messages}") unless new_member.valid?
             new_member.save!
             find_or_build_consumer_role(new_member)
             update_vlp_for_consumer_role(new_member.consumer_role, verified_family_member)

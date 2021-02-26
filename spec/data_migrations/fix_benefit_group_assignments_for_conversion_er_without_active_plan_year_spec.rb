@@ -13,6 +13,7 @@ describe FixBenefitGroupAssignmentsForConversionErWithoutActivePlanYear, dbclean
 
   describe "changing organization's fein" do
     let(:organization) { FactoryBot.create(:organization, :with_conversion_expired_and_renewing_canceled_plan_years) }
+    let(:coversion_plan_year) { organization.employer_profile.plan_years.where(is_conversion: true).first }
     let!(:census_employee) { FactoryBot.create :census_employee, employer_profile_id: organization.employer_profile.id }
 
     it "should not have any active_benefit_group_assignment" do
@@ -22,7 +23,7 @@ describe FixBenefitGroupAssignmentsForConversionErWithoutActivePlanYear, dbclean
     it "should assign a benefit group assignment" do
       subject.migrate
       census_employee.reload
-      expect(census_employee.active_benefit_group_assignment).not_to eq nil
+      expect(census_employee.active_benefit_group_assignment(coversion_plan_year.start_on)).not_to eq nil
     end
   end
 end

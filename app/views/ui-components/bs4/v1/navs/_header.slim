@@ -22,7 +22,7 @@ nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color"
           strong.cc-number
             = "#{Settings.contact_center.short_number} / TTY:#{Settings.contact_center.tty_number}"
     - if signed_in?
-      ul.list-group.list-group-flush.login-options
+      ul.list-group.list-group-flush.login-options.text-right
         li.list-group-item.user-actions.pt-0.pb-0
           = render partial: "shared/my_portal_links"
           .mt-3
@@ -32,6 +32,8 @@ nav class=("navbar navbar-expand-lg navbar-main pt-0 pb-0 #{"pre_prod_nav_color"
           strong
             = user_first_name_last_name_and_suffix
           - unless current_user.try(:person).try(:hbx_id).nil?
-            = l10n(".my_id")
+            | &nbsp;
+            | &nbsp;
+            | My ID
             | :
             = truncate(current_user.try(:person).try(:hbx_id).upcase, length: 8, omission: '')
