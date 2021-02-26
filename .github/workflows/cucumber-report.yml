@@ -7,22 +7,21 @@ jobs:
   cucumber-report:
     strategy:
       matrix:
-        feature:
-          [
-            'admin',
-            'brokers',
-            'cover_all',
-            'employee',
-            'employers',
-            'financial_assistance',
-            'general_agencies',
-            'group_selection',
-            'hbx',
-            'hbx_admin',
-            'insured',
+        feature: [
+            # 'admin',
+            # 'brokers',
+            # 'cover_all',
+            # 'employee',
+            # 'employers',
+            # 'financial_assistance',
+            # 'general_agencies',
+            # 'group_selection',
+            # 'hbx',
+            # 'hbx_admin',
+            # 'insured',
             'integration',
-            'permissions',
-            'plan_shopping',
+            # 'permissions',
+            # 'plan_shopping',
           ]
     runs-on: ubuntu-latest
     steps:
@@ -60,7 +59,7 @@ jobs:
       - name: run webpack
         run: NODE_ENV=test RAILS_ENV=test ./bin/webpack
       - name: Run tests
-        run: bundle exec cucumber features/${{ matrix.feature }} --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json --profile gh-report
+        run: bundle exec cucumber -P features/${{ matrix.feature }} --format json --out ci/cucumber/${{ matrix.feature }}-cucumber-report.json -r features -q --tags 'not @wip and not @broken and not @flaky and not @ma_only'
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:

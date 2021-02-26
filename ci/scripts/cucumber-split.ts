@@ -1,13 +1,13 @@
 const { promises: fs } = require('fs');
 
-import { FeatureStep, FileWithRuntime, FileGroup } from './models';
+import { ScenarioStep, FileWithRuntime, FileGroup } from './models';
 import { CucumberFeature } from './models';
 import { splitFilesIntoGroups } from './util';
 
 const REPORT_PATH = './ci/cucumber/local-cucumber-report.json';
 const SPLIT_CONFIG_PATH = './ci/cucumber-split-config.json';
 
-function calculateStepsRuntime(steps: FeatureStep[]) {
+function calculateStepsRuntime(steps: ScenarioStep[]) {
   return steps.reduce((runTime, step) => {
     return runTime + step.result.duration;
   }, 0);

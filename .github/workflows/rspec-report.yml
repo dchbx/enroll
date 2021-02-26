@@ -1,6 +1,5 @@
 name: rspec report
 on:
-  push:
   workflow_dispatch:
 
 jobs:
@@ -14,24 +13,18 @@ jobs:
             'controllers',
             'data_migrations',
             'domain',
-            'factories',
             'helpers',
             'interactors',
             'invoices',
             'lib',
             'mailers',
-            'migrations',
             'models',
             'notices',
             'policies',
             'reflexes',
             'reports',
-            'requests',
             'routing',
             'script',
-            'shared_contexts',
-            'shared_examples',
-            'support',
             'test_data',
             'views',
             'workers',
@@ -130,5 +123,5 @@ jobs:
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
-          name: ${{ matrix.folder }}
+          name: components-${{ matrix.folder }}
           path: ci/rspec/components-${{ matrix.folder }}-rspec-report.json
