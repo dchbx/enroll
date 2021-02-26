@@ -39,7 +39,6 @@ class EmployeeRole
   delegate :primary_family, to: :person, allow_nil: true
 #  delegate :hired_on, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
-  delegate :benefit_package_for_open_enrollment, to: :census_employee, allow_nil: true
 
   validates_presence_of :dob, :gender, :hired_on
   validates_presence_of :ssn, :if => Proc.new { |m| !m.person.no_ssn }
@@ -133,17 +132,44 @@ class EmployeeRole
     census_employee.benefit_package_for_date(possible_effective_date)
   end
 
-  def benefit_package(qle: false)
+  def benefit_package(qle: false, shop_under_current: false, shop_under_future: false)
     if qle.present?
       qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
+    elsif shop_under_current
+      census_employee.published_benefit_group
+    elsif shop_under_future
+      census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
     else
-      if census_employee.under_new_hire_enrollment_period?
-        benefit_package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
-        return benefit_package if benefit_package.present?
-      end
-
-      census_employee.renewal_published_benefit_group || census_employee.published_benefit_group
+      new_hire_or_possible_benefit_package
     end
+  end
+
+  def new_hire_or_possible_benefit_package
+    if census_employee.under_new_hire_enrollment_period?
+      benefit_package = census_employee.benefit_package_for_date(census_employee.earliest_eligible_date)
+      return benefit_package if benefit_package.present?
+    end
+
+    census_employee.renewal_published_benefit_group || census_employee.off_cycle_published_benefit_group || census_employee.published_benefit_group
+  end
+
+  def has_multiple_shop_oe_periods?
+    can_enroll_as_new_hire? && (is_under_open_enrollment? || is_under_off_cycle_open_enrollment?) && can_get_coverage_under_current_py?
+  end
+
+  # Check if a new hire can get immediate coverage under active application if employee is in off cycle/renewal open enrollment
+  def can_get_coverage_under_current_py?
+    active_package = census_employee.active_benefit_group_assignment&.benefit_package
+    future_package = census_employee.off_cycle_benefit_group_assignment&.benefit_package || census_employee.renewal_benefit_group_assignment&.benefit_package
+    return false if active_package.nil? || future_package.nil?
+
+    census_employee.coverage_effective_on(future_package) != census_employee.coverage_effective_on(active_package)
+  end
+
+  # Use this method to pull earliest effective on for new hire when there is no sep
+  def earliest_effective_on_for_new_hire_in_current_py
+    package = census_employee.active_benefit_group_assignment&.benefit_package
+    census_employee.coverage_effective_on(package)&.to_date
   end
 
   def benefit_group(qle: false)
@@ -184,6 +210,10 @@ class EmployeeRole
   def is_under_open_enrollment?
     return employer_profile.show_plan_year.present? && employer_profile.show_plan_year.open_enrollment_contains?(TimeKeeper.date_of_record) if is_case_old?
     employer_profile.published_benefit_application.present? && employer_profile.published_benefit_application.open_enrollment_contains?(TimeKeeper.date_of_record)
+  end
+
+  def is_under_off_cycle_open_enrollment?
+    employer_profile.published_off_cycle_application.present? && employer_profile.published_off_cycle_application.open_enrollment_contains?(TimeKeeper.date_of_record)
   end
 
   def benefit_begin_date

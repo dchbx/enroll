@@ -34,6 +34,7 @@ Feature: Insured Plan Shopping on Individual Assisted market
     Then Aptc user should see aptc amount on individual home page
     Then Individual logs out
 
+  @flaky
   Scenario: Should see the dailog box when selecting a non silver plan with eligiblity
     Given Individual has not signed up as an HBX user
     When Individual visits the Insured portal during open enrollment

@@ -11,23 +11,7 @@ class BulkNoticeWorker
     @org = BenefitSponsors::Organizations::Organization.find(audience_id)
     params = fetch_params(@bulk_notice)
 
-    if @bulk_notice.audience_type == 'employee'
-      #loop through each employee
-      results = @org.employer_profile.census_employees.each do |census_employee|
-        Operations::SecureMessageAction.new.call(
-          params: params.merge({ resource_id: census_employee&.employee_role&.person&.id&.to_s, resource_name: 'Person' }),
-          user: @bulk_notice.user
-        )
-      end
-      result = results&.any?(&:success?)
-    else
-      # normal profile params here for other audience types
-      resource = fetch_resource(@org, @bulk_notice.audience_type)
-      result = Operations::SecureMessageAction.new.call(
-        params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),
-        user: @bulk_notice.user
-      )
-    end
+    result = process_secure_message(params)
 
     Rails.logger.error("Error processing #{audience_id} for Bulk Notice request #{bulk_notice_id}") unless result.success?
 
@@ -46,6 +30,31 @@ class BulkNoticeWorker
     Rails.logger.info("Processing #{audience_id} for Bulk Notice request #{bulk_notice_id}")
   end
 
+  def process_secure_message(params)
+    if @bulk_notice.audience_type == 'employee'
+      #loop through each employee
+      results = process_secure_message_for_employees(params)
+      result = results.any?(&:success?)
+    else
+      # normal profile params here for other audience types
+      resource = fetch_resource(@org, @bulk_notice.audience_type)
+      result = Operations::SecureMessageAction.new.call(
+        params: params.merge({ resource_id: resource&.id&.to_s, resource_name: resource&.class&.to_s }),
+        user: @bulk_notice.user
+      )
+    end
+    result
+  end
+
+  def process_secure_message_for_employees(params)
+    @org.employer_profile.census_employees.each do |census_employee|
+      Operations::SecureMessageAction.new.call(
+        params: params.merge({ resource_id: census_employee.employee_role&.person&.id&.to_s, resource_name: 'Person' }),
+        user: @bulk_notice.user
+      )
+    end
+  end
+
   def fetch_params(bulk_notice)
     {
       subject: bulk_notice.subject,
@@ -58,15 +67,6 @@ class BulkNoticeWorker
   end
 
   def fetch_resource(org, profile_type)
-    return unless org
-
-    case profile_type
-    when 'broker_agency'
-      org.broker_agency_profile&.primary_broker_role&.person
-    when 'general_agency'
-      org.general_agency_profile
-    when 'employer'
-      org.employer_profile
-    end
+    org.send("#{profile_type}_profile") if org && ['employer', 'broker_agency', 'general_agency'].include?(profile_type)
   end
 end

@@ -259,6 +259,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
         allow(person).to receive(:consumer_role).and_return(consumer_role)
         allow(person).to receive(:active_employee_roles).and_return [employee_role]
         allow(person).to receive(:has_active_employee_role?).and_return true
+        allow(hbx_profile1).to receive(:under_open_enrollment?).and_return true
         allow(HbxProfile).to receive(:current_hbx).and_return hbx_profile1
         sign_in user
       end
@@ -672,7 +673,10 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     before do
       current_year = TimeKeeper.date_of_record.year
       is_tax_credit_btn_enabled = TimeKeeper.date_of_record < Date.new(current_year, 11, HbxProfile::IndividualEnrollmentDueDayOfMonth + 1)
-      allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5)) unless is_tax_credit_btn_enabled
+      unless is_tax_credit_btn_enabled
+        allow(TimeKeeper).to receive(:date_of_record).and_return(Date.new(current_year, 10, 5))
+        hbx_enrollment.update!(effective_on: TimeKeeper.date_of_record.next_month.beginning_of_month)
+      end
     end
 
     after do
@@ -695,7 +699,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let!(:tax_household_member2) {FactoryBot.create(:tax_household_member, applicant_id: family.family_members[1].id, tax_household: tax_household)}
     let!(:eligibilty_determination) {FactoryBot.create(:eligibility_determination, max_aptc: 500.00, tax_household: tax_household, csr_eligibility_kind: 'csr_73')}
     let(:current_year) { TimeKeeper.date_of_record.year }
-    let(:effective_on) { Date.new(current_year, 11, 1) }
+    let(:effective_on) { TimeKeeper.date_of_record.next_month.beginning_of_month }
 
     let!(:hbx_enrollment) do
       FactoryBot.create(:hbx_enrollment,
@@ -727,14 +731,7 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
     let(:new_aptc_amount) {250.0}
     let(:new_aptc_pct) {'0.5'}
 
-    let(:params) do
-      {
-          'effective_on_date' => fetch_effective_date_of_new_enrollment.to_date,
-          'applied_pct_1' => new_aptc_pct,
-          'aptc_applied_total' => new_aptc_amount,
-          'hbx_enrollment_id' => hbx_enrollment.id.to_s
-      }
-    end
+    let(:params) {{'applied_pct_1' => new_aptc_pct, 'aptc_applied_total' => new_aptc_amount, 'hbx_enrollment_id' => hbx_enrollment.id.to_s}}
 
     before :each do
       BenefitMarkets::Products::Product.all.each do |prod|
@@ -758,27 +755,12 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       post :edit_aptc, params: params
     end
 
-    def fetch_effective_date_of_new_enrollment
-      enr_created_datetime = DateTime.now.in_time_zone('Eastern Time (US & Canada)')
-      offset_month = enr_created_datetime.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth ? 1 : 2
-      year = enr_created_datetime.year
-      month = enr_created_datetime.month + offset_month
-      if month > 12
-        year += 1
-        month -= 12
-      end
-      day = 1
-      hour = enr_created_datetime.hour
-      min = enr_created_datetime.min
-      sec = enr_created_datetime.sec
-      DateTime.new(year, month, day, hour, min, sec).in_time_zone
-    end
-
     it 'should update current enrollment(cancel/terminate)' do
       hbx_enrollment.reload
       if TimeKeeper.date_of_record.day > HbxProfile::IndividualEnrollmentDueDayOfMonth
         expect(hbx_enrollment.aasm_state).to eq 'coverage_terminated'
-        expect(hbx_enrollment.terminated_on.to_date).to eq hbx_enrollment.effective_on.end_of_month.to_date
+        new_enrollment = family.hbx_enrollments.coverage_selected.first
+        expect(hbx_enrollment.terminated_on.to_date).to eq new_enrollment.effective_on.prev_day.to_date
       else
         expect(hbx_enrollment.aasm_state).to eq 'coverage_canceled'
       end
@@ -1030,6 +1012,25 @@ RSpec.describe Insured::GroupSelectionController, :type => :controller, dbclean:
       expect(response).to have_http_status(:redirect)
       expect(flash[:error]).not_to eq 'You must select the primary applicant to enroll in the healthcare plan'
       expect(response).not_to redirect_to(new_insured_group_selection_path(person_id: person.id, employee_role_id: employee_role.id, change_plan: '', market_kind: 'shop', enrollment_kind: ''))
+    end
+
+    context 'should block user from shopping' do
+
+      it 'when benefit application is in termination pending' do
+        initial_application.update_attributes(aasm_state: :termination_pending)
+        user = FactoryBot.create(:user, id: 190, person: FactoryBot.create(:person))
+        sign_in user
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
+        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer or call our Customer Care Center at 1-855-532-5465.'
+      end
+
+      it 'when benefit application is terminated' do
+        initial_application.update_attributes(aasm_state: :terminated)
+        user = FactoryBot.create(:user, id: 191, person: FactoryBot.create(:person))
+        sign_in user
+        post :create, params: { person_id: person.id, employee_role_id: employee_role.id, family_member_ids: family_member_ids }
+        expect(flash[:error]).to eq 'Your employer is no longer offering health insurance through DC Health Link. Please contact your employer.'
+      end
     end
 
     it "for cobra with invalid date" do

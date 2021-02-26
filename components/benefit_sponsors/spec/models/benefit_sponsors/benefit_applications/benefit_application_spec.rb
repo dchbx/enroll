@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require File.join(File.dirname(__FILE__), "..", "..", "..", "support/benefit_sponsors_site_spec_helpers")
 require "#{BenefitSponsors::Engine.root}/spec/shared_contexts/benefit_market.rb"
@@ -41,20 +43,20 @@ module BenefitSponsors
 
     let(:params) do
       {
-        effective_period:         effective_period,
-        open_enrollment_period:   open_enrollment_period,
-        benefit_sponsor_catalog:  benefit_sponsor_catalog,
+        effective_period: effective_period,
+        open_enrollment_period: open_enrollment_period,
+        benefit_sponsor_catalog: benefit_sponsor_catalog
       }
     end
 
     let(:valid_params) do
       {
-          effective_period:         effective_period,
-          open_enrollment_period:   open_enrollment_period,
-          benefit_sponsor_catalog:  benefit_sponsor_catalog,
-          recorded_rating_area_id: rating_area.id,
-          recorded_service_area_ids:[service_area.id],
-          recorded_sic_code: sic_code
+        effective_period: effective_period,
+        open_enrollment_period: open_enrollment_period,
+        benefit_sponsor_catalog: benefit_sponsor_catalog,
+        recorded_rating_area_id: rating_area.id,
+        recorded_service_area_ids: [service_area.id],
+        recorded_sic_code: sic_code
       }
     end
 
@@ -219,9 +221,9 @@ module BenefitSponsors
         context "and the new end date is valid" do
           let(:valid_date)  { effective_period_start_on - 1.day }
 
-          before {
+          before do
             benefit_application.extend_open_enrollment_period(valid_date)
-          }
+          end
 
           it "should change the open_enrollment_period end date and transition into open_enrollment" do
             expect(benefit_application.open_enrollment_end_on).to eq valid_date
@@ -260,10 +262,14 @@ module BenefitSponsors
       let(:april_open_enrollment_begin_on)  { april_effective_date - 1.month }
       let(:april_open_enrollment_end_on)    { april_open_enrollment_begin_on + 9.days }
 
-      let!(:march_sponsors)                 { FactoryBot.create_list(:benefit_sponsors_benefit_application, 3,
-                                              effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)) )}
-      let!(:april_sponsors)                 { FactoryBot.create_list(:benefit_sponsors_benefit_application, 2,
-                                              effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)) )}
+      let!(:march_sponsors)                 do
+        FactoryBot.create_list(:benefit_sponsors_benefit_application, 3,
+                               effective_period: (march_effective_date..(march_effective_date + 1.year - 1.day)))
+      end
+      let!(:april_sponsors)                 do
+        FactoryBot.create_list(:benefit_sponsors_benefit_application, 2,
+                               effective_period: (april_effective_date..(april_effective_date + 1.year - 1.day)))
+      end
 
       before { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
@@ -349,10 +355,10 @@ module BenefitSponsors
           end
 
           context "and open enrollment period begins" do
-            before {
-                TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
-                benefit_application.begin_open_enrollment!
-              }
+            before do
+              TimeKeeper.set_date_of_record_unprotected!(benefit_application.open_enrollment_period.min)
+              benefit_application.begin_open_enrollment!
+            end
             after { TimeKeeper.set_date_of_record_unprotected!(Date.today) }
 
             it "should transition to state: :enrollment_open" do
@@ -452,7 +458,28 @@ module BenefitSponsors
 
     end
 
+    describe '.is_off_cycle' do
+      let(:current_date1)                  { TimeKeeper.date_of_record.beginning_of_month.prev_month }
+      let!(:effective_period)              { (current_date1)..(current_date1.next_year.prev_day) }
+      let!(:renewal_effective_period)      { (current_date1.next_year)..(current_date1.prev_day + 2.years) }
+      let(:termination_date)               {renewal_effective_period.min + 65.days}
+      let(:offcycle_effective_period) do
+        date = termination_date.end_of_month.next_day
+        date..date.next_year.prev_day
+      end
+      let!(:initial_application) do
+        application = FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :termination_pending, effective_period: effective_period, benefit_sponsorship: benefit_sponsorship)
+        terminated_period = effective_period.min..termination_date
+        application.update_attributes!(effective_period: terminated_period)
+        application
+      end
+      let!(:offcycle_application) do
+        FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :draft, effective_period: offcycle_effective_period, benefit_sponsorship: benefit_sponsorship)
+      end
 
+      it { expect(initial_application.is_off_cycle?).to be_falsey }
+      it { expect(offcycle_application.is_off_cycle?).to be_truthy }
+    end
 
     ## TODO: Refactor for BenefitApplication
     # context "#to_plan_year", dbclean: :after_each do
@@ -512,8 +539,9 @@ module BenefitSponsors
         let(:package_kind)            { :single_issuer }
         let(:application_period_next_year)        { (Date.new(renewal_effective_date.year,1,1))..(Date.new(renewal_effective_date.year,12,31)) }
         let!(:employer_profile) {benefit_sponsorship.profile}
-        let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship:benefit_sponsorship, aasm_state: :active) }
+        let!(:initial_application) { create(:benefit_sponsors_benefit_application, benefit_sponsor_catalog: benefit_sponsor_catalog, effective_period: effective_period,benefit_sponsorship: benefit_sponsorship, aasm_state: :active) }
         let(:product_package)           { initial_application.benefit_sponsor_catalog.product_packages.detect { |package| package.package_kind == package_kind } }
+
         let(:benefit_package)   do
           bp = create(:benefit_sponsors_benefit_packages_benefit_package, health_sponsored_benefit: true, product_package: product_package, benefit_application: initial_application)
           reference_product = bp.sponsored_benefits.first.reference_product
@@ -545,7 +573,7 @@ module BenefitSponsors
             FactoryBot.create(:census_employee, benefit_sponsors_employer_profile_id: employer_profile.id, benefit_sponsorship: benefit_sponsorship, :benefit_group_assignments => [benefit_group_assignment])
           end
           let(:census_employee_scope) do
-            CensusEmployee.where(:"_id".in => [census_employee_1.id, census_employee_2.id])
+            CensusEmployee.where(:_id.in => [census_employee_1.id, census_employee_2.id])
           end
 
           let(:fake_email_address) {"fakeemail1@fakeemail.com" }
@@ -581,13 +609,12 @@ module BenefitSponsors
           end
 
           it "should create renewal benefit group assignment" do
-            expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
+            #expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
           end
 
           it "renewal benefit group assignment is_active set to false" do
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
+            expect(census_employee.renewal_benefit_group_assignment.activated_at).to eq nil
           end
         end
 
@@ -596,7 +623,7 @@ module BenefitSponsors
           before do
             renewal_bga
             renewal_application.aasm_state = :enrollment_open
-            renewal_application.recorded_rating_area=  rating_area
+            renewal_application.recorded_rating_area = rating_area
             renewal_application.recorded_service_areas = [service_area]
             renewal_application.recorded_sic_code = sic_code
             renewal_application.save!
@@ -605,10 +632,8 @@ module BenefitSponsors
           it "should not update benefit group assignments" do
             expect(renewal_application.aasm_state).to eq :enrollment_open
 
-            expect(census_employee.renewal_benefit_group_assignment.is_active).to eq false
             expect(census_employee.renewal_benefit_group_assignment.benefit_application).to eq renewal_application
 
-            expect(census_employee.active_benefit_group_assignment.is_active).to eq true
             expect(census_employee.active_benefit_group_assignment.benefit_application).to eq initial_application
           end
         end
@@ -618,7 +643,7 @@ module BenefitSponsors
           before do
             renewal_bga
             renewal_application.aasm_state = :enrollment_eligible
-            renewal_application.recorded_rating_area=  rating_area
+            renewal_application.recorded_rating_area = rating_area
             renewal_application.recorded_service_areas = [service_area]
             renewal_application.recorded_sic_code = sic_code
             initial_application.update_attributes(predecessor_id: renewal_application.id)
@@ -627,7 +652,7 @@ module BenefitSponsors
             renewal_application.activate_enrollment!
           end
 
-          it "should activate renewal benefit group assignment & set is_active to true" do
+          it "should activate renewal benefit group assignment" do
             expect(renewal_application.aasm_state).to eq :active
             renewal_bga = census_employee.benefit_group_assignments.effective_on(renewal_application.effective_period.min).first
             expect(renewal_bga.benefit_application).to eq renewal_application
@@ -635,7 +660,7 @@ module BenefitSponsors
           end
 
           xit "should deactivate active benefit group assignment" do
-            expect(census_employee.benefit_group_assignments.where(benefit_package_id:benefit_package.id).first.is_active).to eq false
+            expect(census_employee.benefit_group_assignments.where(benefit_package_id: benefit_package.id).first.is_active).to eq false
           end
         end
 
@@ -700,7 +725,7 @@ module BenefitSponsors
         end
       end
 
-      context "HbxEnrollment avalaibale for benefit application return the enrollment with the given date" do
+      context "HbxEnrollment available for benefit application return the enrollment with the given date" do
         before do
           enrollment = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month)
           enrollment1 = HbxEnrollment.new(effective_on: Date.today.next_month.beginning_of_month + 2.months)
@@ -732,13 +757,17 @@ module BenefitSponsors
 
     describe "Date period behaviors" do
       let(:subject)             { BenefitApplications::BenefitApplicationSchedular.new }
-      let(:begin_day)           { Settings.aca.shop_market.open_enrollment.monthly_end_on -
-                                  Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
-      let(:grace_begin_day)     { Settings.aca.shop_market.open_enrollment.monthly_end_on -
-                                  Settings.aca.shop_market.open_enrollment.minimum_length.days }
+      let(:begin_day)           do
+        Settings.aca.shop_market.open_enrollment.monthly_end_on -
+          Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+      end
+      let(:grace_begin_day)     do
+        Settings.aca.shop_market.open_enrollment.monthly_end_on -
+          Settings.aca.shop_market.open_enrollment.minimum_length.days
+      end
 
       def standard_begin_day
-        (begin_day > 0) ? begin_day : 1
+        begin_day > 0 ? begin_day : 1
       end
 
       it "should return the day of month deadline for an open enrollment standard period to begin" do
@@ -825,8 +854,10 @@ module BenefitSponsors
 
         let(:prior_month)                     { effective_date - 1.month }
 
-        let(:begin_day)                        { Settings.aca.shop_market.open_enrollment.monthly_end_on -
-                                                Settings.aca.shop_market.open_enrollment.minimum_length.adv_days }
+        let(:begin_day)                        do
+          Settings.aca.shop_market.open_enrollment.monthly_end_on -
+            Settings.aca.shop_market.open_enrollment.minimum_length.adv_days
+        end
 
         let(:open_enrollment_end_day)         { Settings.aca.shop_market.open_enrollment.monthly_end_on }
         let(:open_enrollment_end_on)          { Date.new(prior_month.year, prior_month.month, open_enrollment_end_day) }
@@ -834,21 +865,21 @@ module BenefitSponsors
         let(:late_open_enrollment_begin_on)   { Date.new(prior_month.year, prior_month.month, late_open_enrollment_begin_day) }
         let(:late_open_enrollment_period)     { late_open_enrollment_begin_on..open_enrollment_end_on }
 
-        let(:binder_payment_due_on) {
+        let(:binder_payment_due_on) do
           Date.new(prior_month.year, prior_month.month, Settings.aca.shop_market.binder_payment_due_on)
-        }
+        end
 
-        let(:valid_timetable)                 {
-                                                {
-                                                    effective_date:                 effective_date,
-                                                    effective_period:               effective_date..(effective_date.next_year - 1.day),
-                                                    open_enrollment_period:         TimeKeeper.date_of_record..open_enrollment_end_on,
-                                                    open_enrollment_period_minimum: late_open_enrollment_period,
-                                                    binder_payment_due_on:          binder_payment_due_on
-                                                }
-                                              }
+        let(:valid_timetable)                 do
+          {
+            effective_date: effective_date,
+            effective_period: effective_date..(effective_date.next_year - 1.day),
+            open_enrollment_period: TimeKeeper.date_of_record..open_enrollment_end_on,
+            open_enrollment_period_minimum: late_open_enrollment_period,
+            binder_payment_due_on: binder_payment_due_on
+          }
+        end
         def late_open_enrollment_begin_day
-          (begin_day > 0) ? begin_day : 1
+          begin_day > 0 ? begin_day : 1
         end
 
         it "should provide a valid an enrollment timetabe hash for that effective date" do
@@ -859,12 +890,12 @@ module BenefitSponsors
           timetable = subject.enrollment_timetable_by_effective_date(false, effective_date)
 
           expect(BenefitApplications::BenefitApplication.new(
-                              effective_period: timetable[:effective_period],
-                              open_enrollment_period: timetable[:open_enrollment_period],
-                              recorded_service_areas:  [service_area],
-                              recorded_rating_area:    rating_area,
-                              recorded_sic_code:       sic_code,
-                            )).to be_valid
+                   effective_period: timetable[:effective_period],
+                   open_enrollment_period: timetable[:open_enrollment_period],
+                   recorded_service_areas: [service_area],
+                   recorded_rating_area: rating_area,
+                   recorded_sic_code: sic_code
+                 )).to be_valid
         end
       end
     end
@@ -900,37 +931,41 @@ module BenefitSponsors
     end
 
     describe "Navigating BenefitSponsorship Predecessor/Successor linked list", :dbclean => :after_each do
-      let(:node_a)    { described_class.new(benefit_sponsorship: benefit_sponsorship,
-                                                effective_period: effective_period,
-                                                open_enrollment_period: open_enrollment_period,
-                                                recorded_sic_code: sic_code,
-                                                recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
-                                              ) }
-      let(:node_a1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
-                                                effective_period: effective_period,
-                                                open_enrollment_period: open_enrollment_period,
-                                                recorded_sic_code: sic_code,
-                                                recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
-                                                predecessor: node_a,
-                                              ) }
-      let(:node_a1a)  { described_class.new(benefit_sponsorship: benefit_sponsorship,
-                                                effective_period: effective_period,
-                                                open_enrollment_period: open_enrollment_period,
-                                                recorded_sic_code: sic_code,
-                                                recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
-                                                predecessor: node_a1,
-                                              ) }
-      let(:node_b1)   { described_class.new(benefit_sponsorship: benefit_sponsorship,
-                                                effective_period: effective_period,
-                                                open_enrollment_period: open_enrollment_period,
-                                                recorded_sic_code: sic_code,
-                                                recorded_rating_area: rating_area,
-                                                recorded_service_areas: [service_area],
-                                                predecessor: node_a,
-                                              ) }
+      let(:node_a)    do
+        described_class.new(benefit_sponsorship: benefit_sponsorship,
+                            effective_period: effective_period,
+                            open_enrollment_period: open_enrollment_period,
+                            recorded_sic_code: sic_code,
+                            recorded_rating_area: rating_area,
+                            recorded_service_areas: [service_area])
+      end
+      let(:node_a1)   do
+        described_class.new(benefit_sponsorship: benefit_sponsorship,
+                            effective_period: effective_period,
+                            open_enrollment_period: open_enrollment_period,
+                            recorded_sic_code: sic_code,
+                            recorded_rating_area: rating_area,
+                            recorded_service_areas: [service_area],
+                            predecessor: node_a)
+      end
+      let(:node_a1a)  do
+        described_class.new(benefit_sponsorship: benefit_sponsorship,
+                            effective_period: effective_period,
+                            open_enrollment_period: open_enrollment_period,
+                            recorded_sic_code: sic_code,
+                            recorded_rating_area: rating_area,
+                            recorded_service_areas: [service_area],
+                            predecessor: node_a1)
+      end
+      let(:node_b1)   do
+        described_class.new(benefit_sponsorship: benefit_sponsorship,
+                            effective_period: effective_period,
+                            open_enrollment_period: open_enrollment_period,
+                            recorded_sic_code: sic_code,
+                            recorded_rating_area: rating_area,
+                            recorded_service_areas: [service_area],
+                            predecessor: node_a)
+      end
 
       it "should manage predecessors", :aggregate_failures do
         expect(node_a1a.predecessor).to eq node_a1
@@ -966,11 +1001,11 @@ module BenefitSponsors
 
       context "for expiration_date" do
         it "should default to min date of effective_period" do
-          expect(benefit_application.expiration_date).to eq (benefit_application.effective_period.min)
+          expect(benefit_application.expiration_date).to eq benefit_application.effective_period.min
         end
 
         it "should not default to max date of effective_period" do
-          expect(benefit_application.expiration_date).not_to eq (benefit_application.effective_period.max)
+          expect(benefit_application.expiration_date).not_to eq benefit_application.effective_period.max
         end
       end
     end
@@ -1165,7 +1200,7 @@ module BenefitSponsors
 
       context ".renewal_quiet_period_end", dbclean: :after_each do
         it 'should return renewal quiet period dates' do
-          renewal_quiet_period = renewal_application.start_on + (Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
+          renewal_quiet_period = renewal_application.start_on + Settings.aca.shop_market.renewal_application.quiet_period.month_offset.months + (Settings.aca.shop_market.renewal_application.quiet_period.mday - 1).days
           expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on).mday).to eq 15
           expect(renewal_application.renewal_quiet_period_end(renewal_application.start_on)).to eq renewal_quiet_period
         end
@@ -1173,7 +1208,7 @@ module BenefitSponsors
 
       context ".initial_quiet_period_end", dbclean: :after_each do
         it 'should return initial quiet period dates' do
-          inital_quiet_period = predecessor_application.start_on + (Settings.aca.shop_market.initial_application.quiet_period.month_offset.months) + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
+          inital_quiet_period = predecessor_application.start_on + Settings.aca.shop_market.initial_application.quiet_period.month_offset.months + (Settings.aca.shop_market.initial_application.quiet_period.mday - 1).days
           expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on).mday).to eq 28
           expect(predecessor_application.initial_quiet_period_end(predecessor_application.start_on)).to eq inital_quiet_period
         end
@@ -1303,40 +1338,41 @@ module BenefitSponsors
     end
 
 
-describe '.is_renewing?' do
-  include_context "setup benefit market with market catalogs and product packages"
-  include_context "setup renewal application"
+    describe '.is_renewing?' do
+      include_context "setup benefit market with market catalogs and product packages"
+      include_context "setup renewal application"
 
-  let!(:ineligible_application) { FactoryBot.create(:benefit_sponsors_benefit_application,
-    :with_benefit_package,
-    :benefit_sponsorship => benefit_sponsorship,
-    :aasm_state => 'enrollment_ineligible',
-    :effective_period =>  (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day)
-  )}
+      let!(:ineligible_application) do
+        FactoryBot.create(:benefit_sponsors_benefit_application,
+                          :with_benefit_package,
+                          :benefit_sponsorship => benefit_sponsorship,
+                          :aasm_state => 'enrollment_ineligible',
+                          :effective_period => (predecessor_application.effective_period.min - 1.year)..(predecessor_application.effective_period.min.prev_day))
+      end
 
-  before do
-    benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
-  end
+      before do
+        benefit_sponsorship.benefit_applications.draft.first.predecessor_id = predecessor_application.id
+      end
 
-  context "finding if plan year is a renewal or not" do
-    it 'renewing application should return true' do
-      expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+      context "finding if plan year is a renewal or not" do
+        it 'renewing application should return true' do
+          expect(benefit_sponsorship.benefit_applications.draft.first.is_renewing?).to eq true
+        end
+
+        it 'active application should return false' do
+          expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
+        end
+
+        it 'old ineligible application should return false' do
+          expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
+        end
+
+        it 'renewal application transitions to enrollment ineligible state' do
+          renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
+          expect(renewal_application.is_renewing?).to eq true
+        end
+      end
     end
-
-    it 'active application should return false' do
-      expect(benefit_sponsorship.benefit_applications.active.first.is_renewing?).to eq false
-    end
-
-    it 'old ineligible application should return false' do
-      expect(benefit_sponsorship.benefit_applications.enrollment_ineligible.first.is_renewing?).to eq false
-    end
-
-    it 'renewal application transitions to enrollment ineligible state' do
-      renewal_application.update_attributes(:aasm_state => "enrollment_ineligible")
-      expect(renewal_application.is_renewing?).to eq true
-    end
-  end
-end
 
     describe '.employee_participation_ratio_minimum' do
 
@@ -1364,7 +1400,7 @@ end
         end
 
         context "start on is not on january 1st" do
-          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year + 1, 1, 31) }
 
           it 'should return system default minimum ratio' do
             expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
@@ -1390,7 +1426,7 @@ end
         end
 
         context "start on is not on january 1st" do
-          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year + 1, 1, 31) }
 
           it 'should return system default minimum ratio' do
             expect(application.employee_participation_ratio_minimum).to eq application.system_min_participation_default_for(effective_period.min)
@@ -1406,7 +1442,7 @@ end
         end
 
         context "start on is not on january 1st" do
-          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year + 1, 1, 31) }
           let(:feature) { ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] }
 
           it 'should return minimum participation ratio from registry' do
@@ -1415,16 +1451,16 @@ end
         end
 
         context "contribution key missing" do
-          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year+1, 1, 31) }
+          let(:effective_period) { Date.new(start_on.year, 2, 1)..Date.new(start_on.year + 1, 1, 31) }
           let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: nil))}
 
           it 'should return error' do
-            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] do
               {
                 product_package: product_package,
                 calender_year: application.start_on.year
               }
-            }
+            end
 
             expect(result.failure?).to be_truthy
             expect(result.failure).to eq "contribution key missing."
@@ -1440,12 +1476,12 @@ end
           let(:product_package) { double(benefit_kind: :aca_shop, contribution_model: double(key: :list_bill_contribution_model))}
 
           it 'should return error' do
-            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] {
+            result = ::EnrollRegistry["#{market.kind}_fetch_enrollment_minimum_participation_#{start_on.year}"] do
               {
                 product_package: product_package,
                 calender_year: application.start_on.year
               }
-            }
+            end
 
             expect(result.failure?).to be_truthy
             expect(result.failure).to eq "unable to find minimum contribution for given contribution model."

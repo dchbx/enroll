@@ -9,8 +9,8 @@ class Insured::FamiliesController < FamiliesController
   before_action :check_employee_role
   before_action :find_or_build_consumer_role, only: [:home]
   before_action :calculate_dates, only: [:check_move_reason, :check_marriage_reason, :check_insurance_reason]
-  before_action :can_view_entire_family_enrollment_history?, only: %i[display_all_hbx_enrollments]
-  before_action :transition_family_members_update_params, only: %i[transition_family_members_update]
+  before_action :can_view_entire_family_enrollment_history?, only: [:display_all_hbx_enrollments]
+  before_action :transition_family_members_update_params, only: [:transition_family_members_update]
 
   def home
     Caches::CurrentHbx.with_cache do

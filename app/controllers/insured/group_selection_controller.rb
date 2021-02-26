@@ -38,6 +38,8 @@ class Insured::GroupSelectionController < ApplicationController
 
     # Benefit group is what we will need to change
     @benefit_group = @adapter.select_benefit_group(params)
+    @shop_under_current = @adapter.shop_under_current
+    @shop_under_future = @adapter.shop_under_future
     @new_effective_on = @adapter.calculate_new_effective_on(params)
 
     @adapter.if_should_generate_coverage_family_members_for_cobra(params) do |cobra_members|
@@ -88,7 +90,7 @@ class Insured::GroupSelectionController < ApplicationController
     hbx_enrollment = build_hbx_enrollment(family_member_ids)
     if @market_kind == 'shop' || @market_kind == 'fehb'
 
-      raise "Unable to find employer-sponsored benefits for enrollment year #{hbx_enrollment.effective_on.year}" unless hbx_enrollment.sponsored_benefit_package.shoppable?
+      raise @adapter.no_employer_benefits_error_message(hbx_enrollment) unless hbx_enrollment.sponsored_benefit_package.shoppable?
 
       census_effective_on = @employee_role.census_employee.coverage_effective_on(hbx_enrollment.sponsored_benefit_package)
       if census_effective_on > hbx_enrollment.effective_on
@@ -104,7 +106,6 @@ class Insured::GroupSelectionController < ApplicationController
         return
       end
     end
-
 
     if @adapter.keep_existing_plan?(permitted_group_selection_params) && @adapter.previous_hbx_enrollment.present?
       sep = @hbx_enrollment.earlier_effective_sep_by_market_kind

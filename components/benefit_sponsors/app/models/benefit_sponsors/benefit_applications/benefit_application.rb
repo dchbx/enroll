@@ -29,6 +29,7 @@ module BenefitSponsors
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid, :active, :suspended].freeze
     SUBMITTED_STATES              = ENROLLMENT_ELIGIBLE_STATES + APPLICATION_APPROVED_STATES + ENROLLING_STATES + COVERAGE_EFFECTIVE_STATES
     TERMINATED_IMPORTED_STATES    = TERMINATED_STATES + IMPORTED_STATES
+    ACTIVE_AND_TERMINATED_STATES  = COVERAGE_EFFECTIVE_STATES + [:terminated]
     APPPROVED_AND_TERMINATED_STATES   = APPROVED_STATES +  [:termination_pending, :terminated, :expired]
     RENEWAL_TRANSMISSION_STATES = APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + ENROLLMENT_INELIGIBLE_STATES
 
@@ -155,10 +156,12 @@ module BenefitSponsors
     scope :non_canceled,                    ->{ where(:aasm_state.nin => CANCELED_STATES) }
     scope :non_draft,                       ->{ not_in(aasm_state: APPLICATION_DRAFT_STATES) }
     scope :non_imported,                    ->{ not_in(aasm_state: IMPORTED_STATES) }
-
+    scope :active_and_terminated_states,    ->{ any_in(aasm_state: ACTIVE_AND_TERMINATED_STATES) }
     scope :expired,                         ->{ any_in(aasm_state: EXPIRED_STATES) }
     scope :non_terminated_non_imported,     ->{ not_in(aasm_state: TERMINATED_IMPORTED_STATES) }
     scope :approved_and_terminated,         ->{ any_in(aasm_state: APPPROVED_AND_TERMINATED_STATES) }
+    scope :terminated_or_termination_pending,-> { any_in(aasm_state: [:termination_pending, :terminated]) }
+    scope :termed_or_ineligible,            -> { any_in(aasm_state: [:termination_pending, :terminated] + ENROLLMENT_INELIGIBLE_STATES) }
 
     # Used for specific DataTable Action only
     scope :active_states_per_dt_action,     ->{ any_in(aasm_state: [:active, :pending, :enrollment_open, :binder_paid, :enrollment_closed, :termination_pending]) }
@@ -335,6 +338,14 @@ module BenefitSponsors
       @recorded_rating_area
     end
 
+    def is_termed_or_ineligible?
+      termination_pending? || terminated? || enrollment_ineligible?
+    end
+
+    def is_off_cycle?
+      self == benefit_sponsorship.off_cycle_benefit_application
+    end
+
     def recorded_rating_area
       return nil if recorded_rating_area_id.blank?
       return @recorded_rating_area if defined? @recorded_rating_area
@@ -483,14 +494,20 @@ module BenefitSponsors
       IMPORTED_STATES.include?(aasm_state)
     end
 
+    # rubocop:disable Style/InverseMethods
     def is_renewing?
-      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES )
-      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :"aasm_state".in => required_states + [:active, :expired])
+      required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
+      applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
       predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0)
     end
+    # rubocop:enable Style/InverseMethods
 
     def is_renewal_enrolling?
       predecessor.present? && (ENROLLING_STATES).include?(aasm_state)
+    end
+
+    def is_enrolling?
+      ENROLLING_STATES.include?(aasm_state)
     end
 
     def open_enrollment_contains?(date)
@@ -802,8 +819,8 @@ module BenefitSponsors
         :binder_paid,
         :enrollment_eligible,
         :active,
-        :expired,
-        :termination_pending
+        # :termination_pending,
+        :expired
       ].include?(aasm_state)
     end
 

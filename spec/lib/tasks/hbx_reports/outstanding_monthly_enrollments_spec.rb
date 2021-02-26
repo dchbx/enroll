@@ -3,7 +3,7 @@ require 'csv'
 require File.join(Rails.root, "app", "reports", "hbx_reports", "outstanding_monthly_enrollments")
 require "#{Rails.root}/app/helpers/config/aca_helper"
 
-describe OutstandingMonthlyEnrollments, dbclean: :after_each do
+describe OutstandingMonthlyEnrollments, dbclean: :around_each do
   
   context 'reports:outstanding_monthly_enrollments_report' do
 

@@ -46,36 +46,45 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
     let!(:renewal_application)           { FactoryBot.create(:benefit_sponsors_benefit_application, aasm_state: :active, effective_period: new_effective_period, benefit_sponsorship: active_benefit_sponsorship) }
 
     context 'should return false when an active PY no canceled PY' do
-      it{ expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false }
+      it{ expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false }
+    end
+
+    context "should return true when terminaton pending benefit applications, non active, and non published" do
+      before do
+        other_bas = renewal_application.benefit_sponsorship.benefit_applications.reject { |ba| ba == renewal_application }
+        other_bas.each(&:destroy)
+        renewal_application.update_attributes(aasm_state: :termination_pending)
+      end
+      it{ expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true }
     end
 
     context 'should return false when a published PY' do
       before do
         renewal_application.update_attributes(:aasm_state => :enrollment_open)
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
     end
 
     context 'should return true when with an active initial and canceled renewal PY with renewal start date is greater the initial end on' do
       before do
         renewal_application.update_attributes(:aasm_state => :canceled)
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
     end
 
-    context 'should return false when with an active initial and termination pending renewal PY' do
+    context 'should return true when with an active initial and termination pending renewal PY' do
       before do
         renewal_application.update_attributes(:aasm_state => :termination_pending)
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
     end
 
-    context 'should return false when with a published initial and termination pending renewal PY' do
+    context 'should return true when the most recent application is in termination_pending' do
       before do
         predecessor_application.update_attributes(:aasm_state => :enrollment_open)
         renewal_application.update_attributes(:aasm_state => :termination_pending)
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq false}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
     end
 
     context 'should return true when with an inactive initial and termination pending renewal PY' do
@@ -83,7 +92,7 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
         predecessor_application.update_attributes(:aasm_state => :expired)
         renewal_application.update_attributes(:aasm_state => :enrollment_ineligible, effective_period: (TimeKeeper.date_of_record.beginning_of_month)..(TimeKeeper.date_of_record.beginning_of_month.next_year.prev_day))
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
     end
 
     context 'should return false when BA is_renewal true' do
@@ -91,7 +100,71 @@ RSpec.describe BenefitSponsors::ApplicationHelper, type: :helper, dbclean: :afte
         renewal_application.update_attributes(:aasm_state => :canceled)
         predecessor_application.update_attributes(:aasm_state => :enrollment_ineligible)
       end
-      it {expect(add_plan_year_button_business_rule(employer_profile.benefit_applications)).to eq true}
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return true when renewal application is ineligible' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :enrollment_ineligible)
+        predecessor_application.update_attributes(:aasm_state => :active)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return false when renewal application is valid(non-ineligible)' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :enrollment_open)
+        predecessor_application.update_attributes(:aasm_state => :active)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
+    end
+
+    context 'should return false when renewal application is pending' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :pending)
+        predecessor_application.update_attributes(:aasm_state => :active)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
+    end
+
+    context 'should return true when active application is termination_pending' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :canceled)
+        predecessor_application.update_attributes(:aasm_state => :termination_pending)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return true when active application is terminated' do
+      before do
+        renewal_application.update_attributes(:aasm_state => :canceled)
+        predecessor_application.update_attributes(:aasm_state => :terminated)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return true when current application(initial) is terminated' do
+      before do
+        renewal_application.destroy
+        predecessor_application.update_attributes(:aasm_state => :terminated)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return true when current application(initial) is termination_pending' do
+      before do
+        renewal_application.destroy
+        predecessor_application.update_attributes(:aasm_state => :termination_pending)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq true}
+    end
+
+    context 'should return false when current application(initial) is pending' do
+      before do
+        renewal_application.destroy
+        predecessor_application.update_attributes(:aasm_state => :pending)
+      end
+      it {expect(add_plan_year_button_business_rule(active_benefit_sponsorship, employer_profile.benefit_applications)).to eq false}
     end
   end
 end

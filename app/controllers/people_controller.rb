@@ -382,11 +382,12 @@ private
       :is_temporarily_out_of_state,
       :id,
       :consumer_role,
-      :is_applying_coverage
+      :is_applying_coverage,
+      :age_off_excluded
     ]
   end
 
   def dependent_params
-    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k) }.permit(*person_parameters_list)
+    params.require(:family_member).reject{|k, _v| ["id", "primary_relationship"].include?(k)}.permit(*person_parameters_list)
   end
 end

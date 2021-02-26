@@ -15,7 +15,7 @@ module Exchanges
     end
 
     def create
-      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params.to_h} }
+      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
       respond_to do |format|
         format.html do
           if result.failure?
@@ -35,7 +35,8 @@ module Exchanges
     end
 
     def update
-      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params.to_h} }
+      result = EnrollRegistry[:sep_types]{ {params: forms_qualifying_life_event_kind_form_params} }
+
       respond_to do |format|
         format.html do
           if result.failure?
@@ -135,7 +136,7 @@ module Exchanges
       )
 
       forms_params.merge!({_id: params[:id]}) if params.dig(:id)
-      forms_params
+      forms_params.to_h
     end
 
     def format_expire_sep_type(params)

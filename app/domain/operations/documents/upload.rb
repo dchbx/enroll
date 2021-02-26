@@ -11,17 +11,23 @@ module Operations
       include Config::SiteHelper
 
       def call(resource:, file_params:, user:, subjects: nil)
-        return Failure({:message => ['Please find valid resource to create document.']}) if resource.blank?
-
-        header = yield construct_headers(resource, user)
-        body = yield construct_body(resource, file_params, subjects)
-        response = yield upload_to_doc_storage(resource, header, body)
+        recipient = yield fetch_recipient(resource)
+        header = yield construct_headers(recipient, user)
+        body = yield construct_body(recipient, file_params, subjects)
+        response = yield upload_to_doc_storage(recipient, header, body)
         validated_params = yield validate_response(response.transform_keys(&:to_sym))
-        file = yield create_document(resource, file_params, validated_params)
+        file = yield create_document(recipient, file_params, validated_params)
         Success(file)
       end
 
       private
+
+      def fetch_recipient(resource)
+        recipient = resource.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile) ? resource&.primary_broker_role&.person : resource
+        return Failure({:message => ['Please find valid resource to create document.']}) if recipient.blank?
+
+        Success(recipient)
+      end
 
       def encoded_payload(payload)
         Base64.strict_encode64(payload.to_json)
@@ -54,10 +60,11 @@ module Operations
           'creator': Settings.site.publisher,
           'publisher': Settings.site.publisher,
           'type': 'text',
-          'format': 'application/octet-stream',
           'source': 'enroll_system',
           'language': 'en',
-          'date_submitted': TimeKeeper.date_of_record
+          'date_submitted': TimeKeeper.date_of_record,
+          'title': file_params[:file].original_filename,
+          'format': file_params[:file].content_type
         }
         document_body[:subjects] = subjects unless subjects.nil?
         Success({ document: document_body.to_json,

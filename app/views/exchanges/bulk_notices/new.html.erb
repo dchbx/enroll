@@ -38,7 +38,28 @@
     </table>
     <div class='form-group'>
     <%= link_to 'Back', exchanges_bulk_notices_path, class: 'btn btn-outline-primary col-2' %>
-    <%= f.submit "Preview", class: 'btn btn-alt-blue col-2 offset-10' %>
+    <%= f.submit "Preview", class: 'btn btn-alt-blue col-2 offset-10', onclick: "onSubmit();" %>
     </div>
   <% end %>
 </div>
+
+<script type="text/javascript">
+  function onSubmit() {
+    if (!document.getElementsByClassName('badge-alt-blue').length) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (document.getElementsByClassName('badge-danger').length) {
+        alert('Recipients is invalid. Please check red badges.')
+      } else {
+        alert('Recipients should not be blank')
+      }
+      return
+    }
+
+    if (document.getElementsByClassName('badge-danger').length) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      alert('Recipients is invalid. Please check red badges.')
+    }
+  }
+</script>

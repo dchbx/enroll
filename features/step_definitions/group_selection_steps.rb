@@ -264,7 +264,7 @@ And(/(.*) should also see the reason for ineligibility/) do |named_person|
   role = named_person
 
   if role == 'employee' && person.active_employee_roles.present?
-    expect(page).to have_content "Employer sponsored coverage is not yet available"
+    expect(page).to have_content "Employer sponsored coverage is not available"
   else
     expect(page).to have_content "eligibility failed on family_relationships"
   end
@@ -664,6 +664,7 @@ And(/the metal level is (.*)/) do |metal_level|
 end
 
 Then(/the Change Tax Credit button should be available/) do
+  sleep(2)
   expect(page).to have_content("Change Tax Credit")
 end
 

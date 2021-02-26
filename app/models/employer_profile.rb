@@ -491,7 +491,7 @@ class EmployerProfile
             if qhh.employee.present?
                 quote_employee = qhh.employee
                 ce = CensusEmployee.new("employer_profile_id" => self.id, "first_name" => quote_employee.first_name, "last_name" => quote_employee.last_name, "dob" => quote_employee.dob, "hired_on" => plan_year.start_on)
-                ce.find_or_create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
+                ce.create_benefit_group_assignment(plan_year.benefit_groups.find(benefit_group_mapping[qhh.quote_benefit_group_id.to_s].to_s).to_a)
 
                 qhh.dependents.each do |qhh_dependent|
                   ce.census_dependents << CensusDependent.new(

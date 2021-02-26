@@ -66,7 +66,7 @@ module BenefitSponsors
 
               if @benefit_sponsorship.present?
                 @broker_agency_accounts = @benefit_sponsorship.broker_agency_accounts
-                @current_plan_year = @benefit_sponsorship.submitted_benefit_application
+                @current_plan_year = @benefit_sponsorship.submitted_benefit_application(include_term_pending: false)
               end
 
               collect_and_sort_invoices(params[:sort_order])
@@ -233,9 +233,26 @@ module BenefitSponsors
             renewal: true
           }) if @employer_profile.renewal_benefit_application.present?
 
+          if @employer_profile.off_cycle_benefit_application.present?
+            data_table_params.merge!(
+              {
+                off_cycle: true
+              }
+            )
+            data_table_params.merge!({current_py_terminated: true}) if @employer_profile.current_benefit_application&.terminated?
+          end
+
           data_table_params.merge!({
             is_submitted: true
           }) if @employer_profile&.renewal_benefit_application&.is_submitted?
+
+          if @employer_profile&.off_cycle_benefit_application&.is_submitted?
+            data_table_params.merge!(
+              {
+                is_off_cycle_submitted: true
+              }
+            )
+          end
 
           data_table_params
         end

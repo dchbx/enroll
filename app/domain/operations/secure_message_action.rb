@@ -13,7 +13,7 @@ module Operations
       uploaded_doc = yield upload_document(resource, validate_params, user) if params[:file].present?
       uploaded_doc ||= params[:document] if params[:document].present?
       secure_message_result = yield upload_secure_message(resource, validate_params, uploaded_doc)
-      result = yield send_generic_notice_alert(secure_message_result)
+      result = yield send_generic_notice_alert(resource)
       Success(result)
     end
 

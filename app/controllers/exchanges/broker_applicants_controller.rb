@@ -96,8 +96,8 @@ class Exchanges::BrokerApplicantsController < ApplicationController
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments.each{ |key,_str| all_carrier_appointments[key] = "true" }
     else
       # Fix this
-      permitted_params = params[:person][:broker_role_attributes][:carrier_appointments].permit(all_carrier_appointments.keys)
-      all_carrier_appointments.merge!(permitted_params) if permitted_params
+      permitted_params = params.require(:person).require(:broker_role_attributes).permit(:carrier_appointments => {}).to_h
+      all_carrier_appointments.merge!(permitted_params[:carrier_appointments]) if permitted_params[:carrier_appointments]
       params[:person][:broker_role_attributes][:carrier_appointments] = all_carrier_appointments
     end
   end

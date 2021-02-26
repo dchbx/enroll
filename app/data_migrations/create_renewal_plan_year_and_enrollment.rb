@@ -97,7 +97,7 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
       next if renewing_plan_year.blank?
 
       renewing_plan_year.benefit_packages.each do |benefit_package|
-        benefit_package.census_employees_assigned_on(benefit_package.effective_period.min, false).each do |census_employee|
+        benefit_package.census_employees_assigned_on(benefit_package.effective_period.min).each do |census_employee|
           next if census_employee.renewal_benefit_group_assignment.blank?
           next if (HbxEnrollment::ENROLLED_STATUSES + HbxEnrollment::RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES).include?(census_employee.renewal_benefit_group_assignment&.hbx_enrollment&.aasm_state)
 

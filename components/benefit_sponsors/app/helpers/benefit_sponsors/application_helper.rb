@@ -101,11 +101,11 @@ module BenefitSponsors
       provider.inbox.messages.select {|m| folder == (m.folder.try(:capitalize) || 'Inbox')}.sort_by(&:created_at).reverse
     end
 
-    def add_plan_year_button_business_rule(benefit_applications)
+    def add_plan_year_button_business_rule(benefit_sponsorship, benefit_applications)
       canceled_rule_check = benefit_applications.active.present? && benefit_applications.canceled.select{ |ba| ba.start_on > benefit_applications.active.first.end_on }.present?
       ineligible_rule_check = benefit_applications.enrollment_ineligible.effective_date_begin_on
-      published_and_ineligible_apps = benefit_applications.published + benefit_applications.enrollment_ineligible
-      ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check) && benefit_applications.none?(&:is_renewing?)
+      published_and_ineligible_apps = benefit_applications.published + benefit_applications.enrollment_ineligible + benefit_applications.pending
+      ((published_and_ineligible_apps - ineligible_rule_check).blank? || canceled_rule_check || benefit_sponsorship.is_potential_off_cycle_employer?)
     end
 
     def benefit_application_claim_quote_warnings(benefit_applications)

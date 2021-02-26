@@ -157,18 +157,30 @@ class Enrollments::IndividualMarket::FamilyEnrollmentRenewal
     end
   end
 
+  # rubocop:disable Style/RedundantReturn
   def eligible_to_get_covered?(member)
     child_relations = %w[child ward foster_child adopted_child]
 
-    if child_relations.include?(member.family_member.relationship)
-      return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
+    return true unless child_relations.include?(member.family_member.relationship)
 
-      @dependent_age_off = true unless @dependent_age_off
-      return false
-    else
-      true
+    if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
+      dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+        {
+          effective_on: renewal_coverage_start,
+          family_member: member&.family_member,
+          market_key: :aca_individual_dependent_age_off,
+          relationship_kind: member.family_member.relationship
+        }
+      end
+      return true if dependent_coverage_eligible.success?
+    elsif child_relations.include?(member.family_member.relationship)
+      return true if member.person.age_on(renewal_coverage_start.prev_day) < 26
     end
+
+    @dependent_age_off ||= true
+    return false
   end
+  # rubocop:enable Style/RedundantReturn
 
   def eligible_enrollment_members
     @enrollment.hbx_enrollment_members.reject do |member|

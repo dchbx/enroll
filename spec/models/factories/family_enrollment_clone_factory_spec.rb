@@ -19,8 +19,8 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   let!(:update_renewal_app) { renewal_application.update_attributes(aasm_state: :enrollment_eligible) }
   let(:coverage_terminated_on) { TimeKeeper.date_of_record.prev_month.end_of_month }
   let(:employee_role) { FactoryBot.create :employee_role, employer_profile: employer_profile }
-  let!(:active_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package)}
-  let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: renewal_benefit_package.start_on, benefit_package: renewal_benefit_package)}
+  let!(:active_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, benefit_package: sponsored_benefit_package, start_on: sponsored_benefit_package.start_on, end_on: coverage_terminated_on)}
+  let!(:renewal_benefit_group_assignment) { FactoryBot.build(:benefit_group_assignment, start_on: renewal_benefit_package.start_on, benefit_package: renewal_benefit_package, end_on: renewal_benefit_package.end_on)}
   let!(:ce) do
     FactoryBot.create :census_employee,
                       :owner,
@@ -95,7 +95,7 @@ RSpec.describe Factories::FamilyEnrollmentCloneFactory, :type => :model, dbclean
   context 'family under renewing employer' do
     let(:external_enrollment) { false }
 
-    it 'should recive cobra enrollment' do
+    it 'should receive cobra enrollment' do
       expect(family.enrollments.size).to eq 1
       expect(family.enrollments.map(&:kind)).not_to include('employer_sponsored_cobra')
       generate_cobra_enrollment

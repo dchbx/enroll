@@ -26,8 +26,7 @@ class GroupSelectionEligibilityChecker
     member_relationship = @contribution_model.member_relationship_for(rel, coverage_age, disability)
     return false if mapped_relationship.blank?
     return false if member_relationship.blank?
-    return false if mapped_relationship.to_s == 'dependent' && member_relationship.age_comparison.to_s == ">="
-
+    return false if mapped_relationship.to_s == 'dependent' && member_eligible_for_coverage?(coverage_date, family_member, rel)
     matching_contribution_units = @contribution_model.contribution_units.select do |cu|
       cu.at_least_one_matches?({mapped_relationship.to_s => 1})
     end
@@ -45,5 +44,23 @@ class GroupSelectionEligibilityChecker
     disability = family_member.person.is_disabled
     dob = family_member.person.dob
     [rel, disability, dob]
+  end
+
+  def member_eligible_for_coverage?(coverage_date, family_member, rel)
+    market_key = @sponsored_benefit.reference_product.benefit_market_kind == :aca_shop ? :aca_shop_dependent_age_off : :aca_fehb_dependent_age_off
+    if EnrollRegistry.feature_enabled?(:age_off_relaxed_eligibility)
+      return false unless EnrollRegistry[market_key].setting(:relationship_kinds).item.include?(rel)
+      dependent_coverage_eligible = ::EnrollRegistry[:age_off_relaxed_eligibility] do
+        {
+          effective_on: coverage_date,
+          family_member: family_member,
+          market_key: market_key,
+          relationship_kind: rel
+        }
+      end
+      dependent_coverage_eligible.success? ? false : true
+    else
+      member_relationship.age_comparison.to_s == ">="
+    end
   end
 end

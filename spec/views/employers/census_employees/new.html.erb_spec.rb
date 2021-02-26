@@ -6,7 +6,7 @@ describe "employers/census_employees/new.html.erb", dbclean: :after_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
 
-  let(:census_employee) { CensusEmployee.new }
+  let!(:census_employee) { FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: abc_profile, benefit_group: current_benefit_package) }
 
   before :each do
     @user = FactoryBot.create(:user)

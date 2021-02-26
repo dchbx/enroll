@@ -63,7 +63,7 @@ module UserWorld
         raise "No permission was found for subrole #{subrole}"
       end
       hbx_staff_role = HbxStaffRole.create!( person: person, permission_id: permission_id, subrole: subrole, hbx_profile_id: hbx_profile_id)
-      @admin = FactoryBot.create(:user, :person => person)
+      @admin = FactoryBot.create(:user,:with_hbx_staff_role, :person => person)
     end
   end
 end
@@ -131,6 +131,10 @@ end
 
 Then(/^the user will see the Extend Open Enrollment button$/) do
   expect(page).to have_css('.btn.btn-xs', text: 'Extend Open Enrollment')
+end
+
+And(/^the user clicks the Plan Years button$/) do
+  find('.btn.btn-xs', text: 'Plan Years').click
 end
 
 Then(/^the user will see the Plan Years button$/) do

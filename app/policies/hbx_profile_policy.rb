@@ -1,5 +1,10 @@
 class HbxProfilePolicy < ApplicationPolicy
 
+  # Acts as the entire Pundit Policy for app/controllers/translations_controller.rb
+  def can_view_or_change_translations?
+    user_hbx_staff_role&.permission&.name == "super_admin"
+  end
+
   def view_admin_tabs?
     role = user_hbx_staff_role
     return false unless role
@@ -71,6 +76,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role = user_hbx_staff_role
     return false unless role
     role.permission.can_force_publish
+  end
+
+  def can_access_age_off_excluded?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_access_age_off_excluded
   end
 
   def can_send_secure_message?

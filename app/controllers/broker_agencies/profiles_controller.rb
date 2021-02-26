@@ -31,7 +31,7 @@ class BrokerAgencies::ProfilesController < ApplicationController
   end
 
   def create
-    @organization = ::Forms::BrokerAgencyProfile.new(params[:organization])
+    @organization = ::Forms::BrokerAgencyProfile.new(params.permit(:organization))
 
     if @organization.save(current_user)
       flash[:notice] = "Successfully created Broker Agency Profile"

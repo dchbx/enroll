@@ -17,6 +17,8 @@ module Operations
     let!(:general_agency_staff_role) { FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, person: general_agency_person, is_primary: true)}
     let!(:general_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_general_agency_profile, organization: organization) }
 
+    let(:broker_agency_profile) { FactoryBot.create(:benefit_sponsors_organizations_broker_agency_profile) }
+
     let(:consumer_person) {FactoryBot.create(:person, :with_consumer_role)}
     let(:employee_person) {FactoryBot.create(:person, :with_employee_role)}
 
@@ -79,5 +81,17 @@ module Operations
       end
     end
 
+<<<<<<< HEAD
+=======
+    describe "passing broker agency profile as :resource" do
+
+      let(:params) { { resource: broker_agency_profile }}
+
+      it "passes" do
+        expect(subject).to be_success
+      end
+    end
+
+>>>>>>> origin
   end
 end

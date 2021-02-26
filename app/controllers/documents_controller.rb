@@ -248,10 +248,6 @@ class DocumentsController < ApplicationController
 
   private
 
-  def cartafact_download_params
-    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
-  end
-
   def updateable?
     authorize Family, :updateable?
   end
@@ -305,5 +301,10 @@ class DocumentsController < ApplicationController
   def set_min_due_date_on_family
     family = @family_member.family
     family.update_attributes(min_verification_due_date: family.min_verification_due_date_on_family)
+  end
+
+  #permitting required params for cartafact downloads
+  def cartafact_download_params
+    params.permit(:relation, :relation_id, :model, :model_id, :content_type, :disposition, :file_name, :user)
   end
 end

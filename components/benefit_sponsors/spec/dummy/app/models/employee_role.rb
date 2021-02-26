@@ -28,7 +28,6 @@ class EmployeeRole
   delegate :primary_family, to: :person, allow_nil: true
 #  delegate :hired_on, to: :census_employee, allow_nil: true
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
-  delegate :benefit_package_for_open_enrollment, to: :census_employee, allow_nil: true
 
   validates_presence_of :ssn, :dob, :gender, :hired_on
   # validates_presence_of :employer_profile_id

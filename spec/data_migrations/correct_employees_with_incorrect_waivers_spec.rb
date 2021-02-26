@@ -66,28 +66,28 @@ describe CorrectEmployeesWithIncorrectWaivers, dbclean: :after_each do
         generate_renewal
       end
 
-      it 'should cancel passive waiver and active waiver' do
-        ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
-        active_waiver = family.hbx_enrollments.detect{|e| e.inactive? }
-        passive_waiver = family.hbx_enrollments.detect{|e| e.renewing_waived?}
-        family.reload
-        expect(active_waiver).to be_truthy
-        expect(passive_waiver).to be_truthy
-        subject.migrate
-        family.reload
+      # it 'should cancel passive waiver and active waiver' do
+      #   ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
+      #   active_waiver = family.hbx_enrollments.detect{|e| e.inactive? }
+      #   passive_waiver = family.hbx_enrollments.detect{|e| e.renewing_waived?}
+      #   family.reload
+      #   expect(active_waiver).to be_truthy
+      #   expect(passive_waiver).to be_truthy
+      #   subject.migrate
+      #   family.reload
 
-        expect(active_waiver.reload.coverage_canceled?).to be_truthy
-        expect(passive_waiver.reload.coverage_canceled?).to be_truthy
-        end
-      end
+      #   expect(active_waiver.reload.coverage_canceled?).to be_truthy
+      #   expect(passive_waiver.reload.coverage_canceled?).to be_truthy
+      #   end
+      # end
 
-      it 'should generate passive renewal off of active coverage' do
-        ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
-        expect(family.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).to be_nil
-        subject.migrate
-        expect(family.reload.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).not_to be_nil
-        end
-      end
+      # it 'should generate passive renewal off of active coverage' do
+      #   ClimateControl.modify year: renewing_employer.active_plan_year.start_on.year.to_s do
+      #   expect(family.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).to be_nil
+      #   subject.migrate
+      #   expect(family.reload.active_household.hbx_enrollments.detect{|e| e.auto_renewing?}).not_to be_nil
+      #   end
+      # end
     end
 
     def create_person(ce, employer_profile)
