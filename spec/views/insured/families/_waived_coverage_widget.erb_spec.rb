@@ -6,7 +6,7 @@ RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
 
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup initial benefit application"
-  
+
   let(:person) {FactoryBot.create(:person)}
   let(:family){ FactoryBot.create(:family, :with_primary_family_member_and_dependent) }
   let(:family_members){ family.family_members.where(is_primary_applicant: false).to_a }
@@ -33,11 +33,11 @@ RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
   # Added in the case of @person not persent
   context 'a person object not passed to widget' do
     let(:person) { nil }
-    
+
     before :each do
       render partial: 'insured/families/waived_coverage_widget', locals: { hbx_enrollment: hbx_enrollment, read_only: true }
     end
-    
+
     it 'should not break the page' do
       expect(rendered).to match (/waived/i)
     end
@@ -74,6 +74,16 @@ RSpec.describe "_waived_coverage_widget.html.erb",  dbclean: :after_each do
 
     it "should not display make changes button" do
       expect(rendered).not_to have_link('Make Changes')
+    end
+  end
+
+  context "when coverage_kind is dental" do
+    before :each do
+      allow(hbx_enrollment).to receive(:coverage_kind).and_return('dental')
+      render partial: 'insured/families/waived_coverage_widget', locals: { hbx_enrollment: hbx_enrollment, read_only: true }
+    end
+    it "should not display reason waived" do
+      expect(rendered).not_to have_content("Reason Waived")
     end
   end
 end

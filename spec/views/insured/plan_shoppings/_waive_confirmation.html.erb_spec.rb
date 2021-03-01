@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
@@ -37,6 +39,28 @@ RSpec.describe "insured/plan_shoppings/_waive_confirmation.html.erb" do
     it "should have disabled submit" do
       expect(rendered).to have_selector("input[disabled=disabled]", count: 1)
       expect(rendered).to have_selector("input[value='Submit']", count: 1)
+    end
+  end
+
+  context "when coverage_kind is dental" do
+    before :each do
+      assign(:waivable, true)
+      assign(:mc_coverage_kind, 'dental')
+      allow(view).to receive(:policy_helper).and_return(double('FamilyPolicy', updateable?: true))
+      render "insured/plan_shoppings/waive_confirmation", enrollment: instance_double("HbxEnrollment", id: "enrollment_id")
+    end
+
+    it "should display confirm waive" do
+      expect(rendered).to have_content("Confirm Waive")
+    end
+
+    it "should not show waiver reason field" do
+      expect(rendered).not_to have_content("Waiver Reason")
+    end
+
+    it "should show Confirm button rather than Submit" do
+      expect(rendered).to have_content("Confirm")
+      expect(rendered).not_to have_content("Submit")
     end
   end
 end
