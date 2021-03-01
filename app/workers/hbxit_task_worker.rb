@@ -25,10 +25,10 @@ class HbxitTaskWorker
   def around_cleanup
     # Do something before perform
     # SQS beging messaging
-    ActionCable.server.broadcast 'notifications_channel', message: "Starting Job"
+    # ActionCable.server.broadcast 'notifications_channel', message: "Starting Job"
     yield
     # Do something after perform
     # SQS end messaging
-    ActionCable.server.broadcast 'notifications_channel', message: "Job has completed"
+    # ActionCable.server.broadcast 'notifications_channel', message: "Job has completed"
   end
 end

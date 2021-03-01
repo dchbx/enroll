@@ -31,16 +31,17 @@ namespace :hbxinternal do
         person = Person.where(hbx_id:ENV['hbx_id']).first
         dob = person.dob
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
+        # ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
         notify_admin_client(ENV['newRakeTaskId'], 'Missing fields to perform change person dob task.', dob, nil, ENV['task'])
         notify_broker ENV['task']
       rescue => error
-        ActionCable.server.broadcast 'notifications_channel', message: error.message
+        # ActionCable.server.broadcast 'notifications_channel', message: error.message
+        p error
       else
-        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Updated DOB for person record"
+        # ActionCable.server.broadcast 'notifications_channel', message: "2/3 Updated DOB for person record"
         new_dob = Date.strptime(ENV['dob'],'%m/%d/%Y')
         person.update_attributes(dob:new_dob)
-        ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
+        # ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
         close_broker_connection ENV['task']
         notify_admin_client(ENV['newRakeTaskId'], 'Completed-Success', dob, new_dob, ENV['task'])
       end
@@ -58,14 +59,14 @@ namespace :hbxinternal do
         close_broker_connection_with_error(ENV['task'], "Unable to locate a person with HBXID: #{ENV['hbx_id']}") if person.nil?
         notify_admin_client(ENV['newRakeTaskId'], "Completed-Failure: Unable to locate person with HBXID: #{ENV['hbx_id']}}".to_json, nil, nil, ENV['task']) if person.nil?
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id']}" if person.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
+        #ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located person record for #{ENV['hbx_id']}"
         notify_broker ENV['task']
       rescue => error
-        ActionCable.server.broadcast 'notifications_channel', message: error.message
+        #ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
-        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
+        #ActionCable.server.broadcast 'notifications_channel', message: "2/3 Remove ssn from person with HBX ID #{ENV['hbx_id']}"
         person.unset(:encrypted_ssn)
-        ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
+        #ActionCable.server.broadcast 'notifications_channel', message: '3/3 Task complete you may close console.'
         notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", current_ssn.to_s.last(4), person.try(:ssn), ENV['task'])
         close_broker_connection ENV['task']
       end
@@ -85,21 +86,21 @@ namespace :hbxinternal do
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
         notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}".to_json, nil, nil, ENV['task']) if person1.nil?
         notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}".to_json, nil, nil, ENV['task']) if person2.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
+        #ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
         notify_broker ENV['task']
       rescue => error
-        ActionCable.server.broadcast 'notifications_channel', message: error.message
+        #ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
         ssn1 = person1.ssn
         ssn2 = person2.ssn
         raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no ssn" if ssn1.nil?
         raise StandardError.new "Person with HBXID: #{ENV['hbx_id_2']} has no ssn" if ssn2.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving SSN's between accounts"
+        #ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving SSN's between accounts"
         person1.unset(:encrypted_ssn)
         person2.unset(:encrypted_ssn)
         person1.update_attributes(ssn: ssn2)
         person2.update_attributes(ssn: ssn1)
-        ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
+        #ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
         close_broker_connection ENV['task']
         notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Person 1 SSN: #{ssn1.to_s.last(4)} Person 2 SSN: #{ssn2.to_s.last(4)}", "Person 1 SSN: #{person1.ssn.to_s.last(4)} Person 2 SSN: #{person2.ssn.to_s.last(4)}", ENV['task'])
       end
@@ -120,18 +121,18 @@ namespace :hbxinternal do
         raise StandardError.new "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}" if person2.nil?
         notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_1']}".to_json, nil, nil, ENV['task']) if person1.nil?
         notify_admin_client(ENV['newRakeTaskId'], "Unable to locate a person with HBXID: #{ENV['hbx_id_2']}".to_json, nil, nil, ENV['task']) if person2.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
+        #ActionCable.server.broadcast 'notifications_channel', message: "1/3 Located persons record for #{ENV['hbx_id_1']} and #{ENV['hbx_id_2']}"
         notify_broker ENV['task']
       rescue => error
-        ActionCable.server.broadcast 'notifications_channel', message: error.message
+        #ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
         user = person1.user
         raise StandardError.new "Person with HBXID: #{ENV['hbx_id_1']} has no user" if user.nil?
-        ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
+        #ActionCable.server.broadcast 'notifications_channel', message: "2/3 Moving user account between person accounts"
         person1.unset(:user_id)
         person2.set(user_id: user.id)
         sleep 1
-        ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
+        #ActionCable.server.broadcast 'notifications_channel', message: "3/3 Task complete you may close console"
         close_broker_connection ENV['task']
         notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Person 1 User ID: #{person1_user_id} Person 2 SSN: #{person2_user_id}", "Person 1 User ID: #{person1.try(:user).id} Person 2 SSN: #{person2.try(:user).id}", ENV['task'])
       end
@@ -151,16 +152,16 @@ namespace :hbxinternal do
         notify_admin_client(ENV['newRakeTaskId'], "No census employee was found with ssn provided".to_json, nil, nil, ENV['task']) if census_employee.nil?
         raise StandardError.new "The census employee is not in employment terminated state" if census_employee.aasm_state != "employment_terminated"
         notify_admin_client(ENV['newRakeTaskId'], "The census employee is not in employment terminated state".to_json, nil, nil, ENV['task']) if census_employee.aasm_state != "employment_terminated"
-        ActionCable.server.broadcast 'notifications_channel', message: "1/4 Located census employee record"
+        #ActionCable.server.broadcast 'notifications_channel', message: "1/4 Located census employee record"
         notify_broker ENV['task']
       rescue => error
-        ActionCable.server.broadcast 'notifications_channel', message: error.message
+        #ActionCable.server.broadcast 'notifications_channel', message: error.message
       else
-        ActionCable.server.broadcast 'notifications_channel', message: "2/4 Updating termination date"
+        #ActionCable.server.broadcast 'notifications_channel', message: "2/4 Updating termination date"
         census_employee.update_attributes(employment_terminated_on: new_termination_date)
-        ActionCable.server.broadcast 'notifications_channel', message: "3/4 Successfully updated termination date"
+        #ActionCable.server.broadcast 'notifications_channel', message: "3/4 Successfully updated termination date"
         sleep 1
-        ActionCable.server.broadcast 'notifications_channel', message: "4/4 Task complete you may close console"
+        #ActionCable.server.broadcast 'notifications_channel', message: "4/4 Task complete you may close console"
         close_broker_connection ENV['task']
         notify_admin_client(ENV['newRakeTaskId'], "Completed-Success", "Census Employee ID: #{census_employee.id}, Terminated On: #{original_terminated_on}", "Census Employee ID: #{census_employee.id}, Terminated On: #{new_termination_date}", ENV['task'])
       end
@@ -172,13 +173,13 @@ namespace :hbxinternal do
 
   task :employers_failing_minimum_participation => :environment do
     begin
-      ActionCable.server.broadcast 'notifications_channel', message: "... Generating Employers Failing Minimum Participation report ..."
+      #ActionCable.server.broadcast 'notifications_channel', message: "... Generating Employers Failing Minimum Participation report ..."
       Rake::Task['reports:shop:employers_failing_minimum_participation'].invoke
       notify_broker ENV['task']
     rescue => error
-      ActionCable.server.broadcast 'notifications_channel', message: error.message
+      #ActionCable.server.broadcast 'notifications_channel', message: error.message
     else
-      ActionCable.server.broadcast 'notifications_channel', message: "... Completed report generation ..."
+      #ActionCable.server.broadcast 'notifications_channel', message: "... Completed report generation ..."
       close_broker_connection ENV['task']
     end
   end

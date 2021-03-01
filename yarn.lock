@@ -1717,10 +1717,10 @@ bytes@3.1.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.1.0.tgz#f6cf7933a360e0588fa9fde85651cdc7f805d1f6"
 
-"cable_ready@>= 4.3.0":
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/cable_ready/-/cable_ready-4.3.0.tgz#69c6c6963a60d7891f43c7530e343007a00a50b3"
-  integrity sha512-/hjwgdwMoe2hE5KKunsuWXDTr26GzwR7CovdFKHdSHD/yZTFFIv/eY27slMiXUEb57X12GHdliSM59rftTKpoQ==
+"cable_ready@>= 4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/cable_ready/-/cable_ready-4.5.0.tgz#1207218dd16934d12addfbd34c26ead853570672"
+  integrity sha512-9bom1DuYe1teBdRckgKWjg+rWRLWrkOvkhzlXkhb33X+Pfu/QK9e4vGk6hGK9PVKVr0SYZC41dByFGknW4spLg==
   dependencies:
     morphdom "^2.6.1"
 
@@ -3549,11 +3549,6 @@ form-data@~2.3.2:
     asynckit "^0.4.0"
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
-
-"form-serialize@>= 0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/form-serialize/-/form-serialize-0.7.2.tgz#b0a2ff0c22026fb6d3d15c9d33f6de6a432e4732"
-  integrity sha1-sKL/DCICb7bT0VydM/beakMuRzI=
 
 forwarded@~0.1.2:
   version "0.1.2"
@@ -7966,7 +7961,7 @@ stdout-stream@^1.4.0:
   dependencies:
     readable-stream "^2.0.1"
 
-"stimulus@>= 1.1", stimulus@^1.1.1:
+stimulus@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/stimulus/-/stimulus-1.1.1.tgz#53c2fded6849e7b85eed3ed8dd76e33abd74bec5"
   integrity sha512-R0mBqKp48YnRDZOxZ8hiOH4Ilph3Yj78CIFTBkCwyHs4iGCpe7xlEdQ7cjIxb+7qVCSxFKgxO+mAQbsNgt/5XQ==
@@ -7974,15 +7969,13 @@ stdout-stream@^1.4.0:
     "@stimulus/core" "^1.1.1"
     "@stimulus/webpack-helpers" "^1.1.1"
 
-stimulus_reflex@^3.3.0:
-  version "3.3.0"
-  resolved "https://registry.yarnpkg.com/stimulus_reflex/-/stimulus_reflex-3.3.0.tgz#3de755f21374d399d5337e0c60f5350cf81cc0de"
-  integrity sha512-HfeUIGeaA7N3tJEhJKt5SoiwTNw0Q8dt1DW9U0WNQom3F1ImaXigoP19spyrGS7yJmGw3Cwj/bikwwHsIdxaKg==
+stimulus_reflex@3.4.1:
+  version "3.4.1"
+  resolved "https://registry.yarnpkg.com/stimulus_reflex/-/stimulus_reflex-3.4.1.tgz#2606aee3b2911b5939d68f65a75262fe3c626204"
+  integrity sha512-YbFcuE4HndNe9RBQvF/Vu+7GDt0zLGdhQTXuGfLDVti1qggPG3kPgV1YBZ9volzBTGUmLp2PQbxG9j5AIyYp5A==
   dependencies:
     "@rails/actioncable" ">= 6.0"
-    cable_ready ">= 4.3.0"
-    form-serialize ">= 0.7.2"
-    stimulus ">= 1.1"
+    cable_ready ">= 4.5.0"
 
 stream-browserify@^2.0.1:
   version "2.0.2"

@@ -5,7 +5,9 @@ class Api::Hbxinternal::V1::RakeTriggerController < ActionController::Base
     response = {
       namespace: 'hbxinternal',
       desc:  'testing triggering rake execution from endpoint',
-      task: 'trigger_from_endpoint'
+      task: 'trigger_from_endpoint',
+      message: 'Connection to enroll is up and running ...',
+      status: 200
     }
     system "rake hbxinternal:trigger_from_endpoint &"
     render json: response

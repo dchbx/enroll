@@ -5,7 +5,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
 gem 'rails', '~> 5.2.4.3'
-gem 'sidekiq'
 
 #######################################################
 # FIXME
@@ -100,7 +99,7 @@ gem 'pundit',                   '~> 2.0'
 gem 'rack-cors',                '~> 0.4.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
-gem 'redis',                    '~> 4.0'
+gem 'redis',                    '~> 4.2.5'
 gem 'redis-rails',              '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
@@ -108,7 +107,7 @@ gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 1.12'
 gem 'sass-rails',               '~> 5'
-gem 'sidekiq',                  '~> 6.0.2'
+gem 'sidekiq',                  '~> 6.1.3'
 gem 'slim',                     '~> 3.0'
 gem 'slim-rails',               '~> 3.2'
 gem 'symmetric-encryption',     '~> 3.9.1'
@@ -159,6 +158,7 @@ group :development, :test do
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
   gem 'yard-mongoid',           '~> 0.1',     require: false
+  gem 'pry', '~> 0.13.1'
 end
 
 group :test do
