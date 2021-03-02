@@ -64,38 +64,38 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
     puts "::: complete :::"
   end
 
-  puts "*"*80
-  puts "Loading Site seed"
-  glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/site_seed.rb")
-  load glob_pattern
-  __send__("load_#{Settings.aca.state_abbreviation.downcase}_site_seed")
-  puts "Loading benefit market seed"
-  bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/benefit_markets_seed.rb")
-  load bm_glob_pattern
-  __send__("load_#{Settings.aca.state_abbreviation.downcase}_benefit_markets_seed")
-  puts "complete"
+  # puts "*"*80
+  # puts "Loading Site seed"
+  # glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/site_seed.rb")
+  # load glob_pattern
+  # __send__("load_#{Settings.aca.state_abbreviation.downcase}_site_seed")
+  # puts "Loading benefit market seed"
+  # bm_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/benefit_markets_seed.rb")
+  # load bm_glob_pattern
+  # __send__("load_#{Settings.aca.state_abbreviation.downcase}_benefit_markets_seed")
+  # puts "complete"
 
-  puts "*"*80
-  puts "Loading Rating Areas."
-  system "bundle exec rake load_rate_reference:run_all_rating_areas"
-  puts "::: complete :::"
+  # puts "*"*80
+  # puts "Loading Rating Areas."
+  # system "bundle exec rake load_rate_reference:run_all_rating_areas"
+  # puts "::: complete :::"
 
-  puts "*"*80
-  puts "Loading carriers"
-  require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
-  if Settings.site.key == :dc
-    ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/issuer_profiles_seed.rb")
-    load ra_glob_pattern
-    __send__("load_#{Settings.aca.state_abbreviation.downcase}_issuer_profile_seed")
-  else
-    system "bundle exec rake migrations:load_issuer_profiles"
-  end
-  puts "::: complete :::"
+  # puts "*"*80
+  # puts "Loading carriers"
+  # require File.join(File.dirname(__FILE__),'seedfiles', "carriers_seed_#{Settings.aca.state_abbreviation.downcase}")
+  # if Settings.site.key == :dc
+  #   ra_glob_pattern = File.join(Rails.root, "db/seedfiles/#{Settings.aca.state_abbreviation.downcase}/issuer_profiles_seed.rb")
+  #   load ra_glob_pattern
+  #   __send__("load_#{Settings.aca.state_abbreviation.downcase}_issuer_profile_seed")
+  # else
+  #   system "bundle exec rake migrations:load_issuer_profiles"
+  # end
+  # puts "::: complete :::"
 
-  puts "*"*80
-  puts "Loading Carrier Service Areas."
-  system "bundle exec rake load_service_reference:run_all_service_areas"
-  puts "::: complete :::"
+  # puts "*"*80
+  # puts "Loading Carrier Service Areas."
+  # system "bundle exec rake load_service_reference:run_all_service_areas"
+  # puts "::: complete :::"
 
   puts "*"*80
   puts "Loading SERFF Plan data"
@@ -129,25 +129,34 @@ if (ENV["type"] != "fixtures") && missing_plan_dumps
   puts "::: complete :::"
   puts "*"*80
 
-  puts "Loading Contribution and Pricing models"
-  pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/dc/pricing_and_contribution_models_seed.rb")
-  load pricing_and_contribution_models_seed_glob_pattern
-  load_dc_shop_pricing_models_seed
-  load_dc_shop_contribution_models_seed
-  puts "Loading Contribution and Pricing models done"
+  # puts "Loading Contribution and Pricing models"
+  # pricing_and_contribution_models_seed_glob_pattern = File.join(Rails.root, "db/seedfiles/dc/pricing_and_contribution_models_seed.rb")
+  # load pricing_and_contribution_models_seed_glob_pattern
+  # load_dc_shop_pricing_models_seed
+  # load_dc_shop_contribution_models_seed
+  # puts "Loading Contribution and Pricing models done"
 
-  puts "*"*80
+  # puts "*"*80
   # system "bundle exec rake load:benefit_market_catalog[2018]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2019]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2020]"
-  system "bundle exec rake load:dc_benefit_market_catalog[2021]"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2019]"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2020]"
+  # system "bundle exec rake load:dc_benefit_market_catalog[2021]"
+
+  # TODO: - Add Fehb market, load old plans related data for BQT
+  system "bundle exec rake shop:site_seed"
+  system "bundle exec rake shop:issuer_and_locations_seed"
+  system "bundle exec rake shop:products_seed"
+  system "bundle exec rake shop:market_seed"
+  system "bundle exec rake system:admin_seed"
+  system "bundle exec rake system:people_seed"
+
   puts "::: complete :::"
   puts "*"*80
 
 
-  system "bundle exec rake migrations:add_contribution_models_to_product_package"
+  # system "bundle exec rake migrations:add_contribution_models_to_product_package"
 
-  puts "*"*80
+  # puts "*"*80
   puts "Loading QLE kinds."
   require File.join(File.dirname(__FILE__),'seedfiles', 'qualifying_life_event_kinds_seed')
   require File.join(File.dirname(__FILE__),'seedfiles', 'ivl_life_events_seed')   if Settings.site.key == :dc
@@ -218,12 +227,12 @@ system "bundle exec rake import:create_2021_ivl_packages"
 puts "::: complete :::"
 puts "*"*80
 
-puts "*"*80
-system "bundle exec rake permissions:initial_hbx"
+# puts "*"*80
+# system "bundle exec rake permissions:initial_hbx"
 # TODO FIX This
-permission = Permission.hbx_staff
-Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
-puts "*"*80
+# permission = Permission.hbx_staff
+# Person.where(hbx_staff_role: {:$exists => true}).all.each{|p|p.hbx_staff_role.update_attributes(permission_id: permission.id, subrole:'hbx_staff')}
+# puts "*"*80
 
 if Settings.aca.security_questions
   require File.join(File.dirname(__FILE__),'seedfiles', 'security_questions_seed')
