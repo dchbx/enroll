@@ -1,0 +1,29 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    - :cobra
+    features:
+      - key: :cobra_eligibility_criterion_2018
+        item: :cobra_eligibility_criterion
+        is_enabled: false
+      - key: :cobra_eligibility_criterion_2019
+        item: :cobra_eligibility_criterion
+        is_enabled: false
+      - key: :cobra_eligibility_criterion_2020
+        item: :cobra_eligibility_criterion
+        is_enabled: true
+        settings:
+          - key: :initial_sponsor
+            item: <%= Date.new(2020,7,1)..Date.new(2020,12,31) %>
+          - key: :renewal_sponsor
+            item: <%= Date.new(2020,7,1)..Date.new(2020,12,31) %>
+      - key: :cobra_eligibility_criterion_2021
+        item: :cobra_eligibility_criterion
+        is_enabled: true
+        settings:
+          - key: :initial_sponsor
+            item: <%= Date.new(2021,1,1)..Date.new(2021,12,31) %>
+          - key: :renewal_sponsor
+            item: <%= Date.new(2021,1,1)..Date.new(2021,12,31) %>
