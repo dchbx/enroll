@@ -666,7 +666,7 @@ class CensusEmployee < CensusMember
 
   # Initialize a new, refreshed instance for rehires via deep copy
   def replicate_for_rehire
-    return nil unless self.employment_terminated?
+    return nil unless employment_terminated? || cobra_terminated?
     new_employee = self.dup
     new_employee.hired_on = nil
     new_employee.employment_terminated_on = nil

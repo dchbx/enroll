@@ -345,7 +345,6 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
           expect(CensusEmployee.find(initial_census_employee.id).coverage_terminated_on).to eq earliest_retro_coverage_termination_date
         end
 
-
         context "and the terminated employee is rehired" do
           let!(:rehire) {initial_census_employee.replicate_for_rehire}
 
@@ -363,6 +362,36 @@ RSpec.describe CensusEmployee, type: :model, dbclean: :around_each do
             expect(rehire.hired_on).to_not eq initial_census_employee.hired_on
             expect(rehire.active_benefit_group_assignment.present?).to be_falsey
             expect(rehire.employee_role.present?).to be_falsey
+          end
+
+          it "the previously terminated census employee should be in rehired state" do
+            expect(initial_census_employee.aasm_state).to eq "rehired"
+          end
+        end
+
+        context "and the COBRA terminated employee is rehired" do
+
+          before do
+            initial_census_employee.update_for_cobra(hired_on.next_day)
+            initial_census_employee.terminate_employee_role!
+          end
+
+          let!(:cobra_rehire) { initial_census_employee.replicate_for_rehire }
+
+          it "rehired census employee instance should have same demographic info" do
+            expect(cobra_rehire.first_name).to eq initial_census_employee.first_name
+            expect(cobra_rehire.last_name).to eq initial_census_employee.last_name
+            expect(cobra_rehire.gender).to eq initial_census_employee.gender
+            expect(cobra_rehire.ssn).to eq initial_census_employee.ssn
+            expect(cobra_rehire.dob).to eq initial_census_employee.dob
+            expect(cobra_rehire.employer_profile).to eq initial_census_employee.employer_profile
+          end
+
+          it "rehired census employee instance should be initialized state" do
+            expect(cobra_rehire.eligible?).to be_truthy
+            expect(cobra_rehire.hired_on).to_not eq initial_census_employee.hired_on
+            expect(cobra_rehire.active_benefit_group_assignment.present?).to be_falsey
+            expect(cobra_rehire.employee_role.present?).to be_falsey
           end
 
           it "the previously terminated census employee should be in rehired state" do
