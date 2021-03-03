@@ -83,7 +83,8 @@ module Subscribers
       family.save!
     end
 
-    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member )
+    def update_vlp_for_consumer_role(consumer_role, verified_primary_family_member)
+      return if consumer_role.fully_verified?
       begin
         verified_verifications = verified_primary_family_member.verifications
         consumer_role.import!(authority:"curam")
