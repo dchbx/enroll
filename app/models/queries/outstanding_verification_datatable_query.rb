@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+
+# rubocop:disable Metrics/CyclomaticComplexity
+
+# rubocop:disable Metrics/PerceivedComplexity
+
+# rubocop:disable Layout/ConditionPosition
+
 module Queries
   class OutstandingVerificationDatatableQuery
 
@@ -12,19 +20,38 @@ module Queries
       @custom_attributes = attributes
     end
 
-    def person_search search_string
+    def person_search(search_string)
       Family.outstanding_verification_datatable if search_string.blank?
     end
 
-    def build_scope()
-
+    def build_scope
       family = Family.outstanding_verification_datatable
-      person = Person
-      family= family.send(@custom_attributes[:documents_uploaded]) if @custom_attributes[:documents_uploaded].present?
-      if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
-         family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from],@custom_attributes[:custom_datatable_date_to])
+      if @custom_attributes[:documents_uploaded].present?
+        family = if @custom_attributes[:documents_uploaded] == 'all'
+                   family # Keep the full scope
+                 elsif @custom_attributes[:documents_uploaded] == 'vlp_fully_uploaded'
+                   family.vlp_fully_uploaded
+                 elsif
+                   family.send(@custom_attributes[:documents_uploaded])
+                 end
       end
-      #add other scopes here
+      if @custom_attributes[:custom_datatable_date_from].present? & @custom_attributes[:custom_datatable_date_to].present?
+        family = family.min_verification_due_date_range(@custom_attributes[:custom_datatable_date_from], @custom_attributes[:custom_datatable_date_to], family)
+      end
+      if @order_by.keys.first == "name"
+        family = if @order_by[@order_by.keys.first] == 1
+                   family.order_by_name_ascending(family)
+                 else
+                   family.order_by_name_descending(family)
+                 end
+      elsif @order_by.keys.first == 'documents_uploaded'
+        family = if @order_by[@order_by.keys.first] == 1
+                   family.documents_uploaded_ascending
+                 else
+                   family.documents_uploaded_descending
+                 end
+      end
+      # add other scopes here
       return family if @search_string.blank? || @search_string.length < 2
       person_id = build_people_id_criteria(@search_string)
       #Caution Mongo optimization on chained "$in" statements with same field
@@ -41,8 +68,7 @@ module Queries
         Person.collection.aggregate([
                                       {"$match" => {
                                         "$text" => {"$search" => clean_str}
-                                      }.merge(Person.search_hash(clean_str))
-                                      },
+                                      }.merge(Person.search_hash(clean_str))},
                                       {"$project" => {"first_name" => 1, "last_name" => 1, "full_name" => 1}},
                                       {"$sort" => {"last_name" => 1, "first_name" => 1}},
                                       {"$project" => {"_id" => 1}}
@@ -55,6 +81,7 @@ module Queries
     end
 
     def skip(num)
+      return if build_scope.is_a?(Array)
       build_scope.skip(num)
     end
 
@@ -77,3 +104,11 @@ module Queries
 
   end
 end
+
+# rubocop:enable Metrics/CyclomaticComplexity
+
+# rubocop:enable Metrics/PerceivedComplexity
+
+# rubocop:enable Layout/ConditionPosition
+
+

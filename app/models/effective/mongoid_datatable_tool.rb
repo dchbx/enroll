@@ -49,6 +49,7 @@ module Effective
     end
 
     def paginate(collection)
+      return if  collection.skip((page - 1) * per_page).nil?
       result_scope = collection.skip((page - 1) * per_page).limit(per_page)
       result_scope
     end

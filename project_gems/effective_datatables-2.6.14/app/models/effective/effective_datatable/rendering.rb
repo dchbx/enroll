@@ -46,6 +46,7 @@ module Effective
       end
 
       def arrayize(collection)
+        collection = @collection_class if collection.nil?
         return collection if @arrayized  # Prevent the collection from being arrayized more than once
         @arrayized = true
 

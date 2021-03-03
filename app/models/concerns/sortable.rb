@@ -11,6 +11,7 @@ module Sortable
     scope :order_created_desc,  ->{ order(:"created_at".desc) }
     scope :order_updated_asc,   ->{ order(:"updated_at".asc) }
     scope :order_updated_desc,  ->{ order(:"updated_at".desc) }
+    # TODO: This probably needs to be updated to properly dig in and sort by names
     scope :order_name_asc,      ->{ order(:"last_name".asc, :"first_name".asc) }
     scope :order_name_desc,     ->{ order(:"last_name".desc, :"first_name".desc) }
   end
