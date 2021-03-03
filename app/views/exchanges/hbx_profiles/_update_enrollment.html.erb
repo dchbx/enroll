@@ -3,6 +3,7 @@
   <%if !@dont_allow_change && !@dont_update_ssn %>
 
     <h4 class="title">DOB / SSN Update Successful</h4>
+      <% @person.reload %>
       <table class="table table-border">
         <thead></thead>
         <tbody>
