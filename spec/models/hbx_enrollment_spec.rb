@@ -932,6 +932,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
         expect(enrollment.coverage_expired?).to be_truthy
       end
     end
+
+    context 'for event waive_coverage' do
+      before :each do
+        enrollment.update_attributes!(aasm_state: 'coverage_reinstated')
+        enrollment.waive_coverage!
+      end
+
+      it 'should transition the enrollment to inactive' do
+        expect(enrollment.inactive?).to be_truthy
+      end
+    end
   end
 
   context "can_terminate_coverage?" do
@@ -3780,6 +3791,33 @@ describe ".parent enrollments", dbclean: :around_each do
       end
     end
   end
+
+  context 'is_waived?' do
+    context 'non-waived enrollment' do
+      it 'should return false if the enrollment is non-waived' do
+        expect(active_enrollment.is_waived?).to be_falsy
+      end
+    end
+
+    context 'waived enrollment' do
+      before {active_enrollment.update_attributes!(aasm_state: 'shopping')}
+      context 'with event waive_coverage!' do
+        before {active_enrollment.waive_coverage!}
+
+        it 'should return true if the enrollment is waived' do
+          expect(active_enrollment.is_waived?).to be_truthy
+        end
+      end
+
+      context 'with event waive_coverage' do
+        before {active_enrollment.waive_coverage}
+
+        it 'should return true if the enrollment is waived' do
+          expect(active_enrollment.is_waived?).to be_truthy
+        end
+      end
+    end
+  end
 end
 
 describe 'calculate effective_on' do
@@ -3825,5 +3863,315 @@ describe 'calculate effective_on' do
 
   it 'effective date on CCHH page should return off_cycle_application effective date' do
     expect(calculated_effective_on).to eq off_cycle_application.effective_period.min
+  end
+end
+
+describe '.cancel_or_termed_by_benefit_package', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) { TimeKeeper.date_of_record.beginning_of_month - 6.months }
+  let(:aasm_state) { :active }
+  let(:benefit_package) { initial_application.benefit_packages[0] }
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      effective_on: benefit_package.start_on,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      employee_role_id: census_employee.employee_role.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'enrollment terminated for benefit package' do
+    before do
+      enrollment.terminate_coverage!(benefit_package.end_on)
+    end
+
+    it "should return terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq benefit_package.end_on
+    end
+  end
+
+  context 'future terminated enrollment for benefit package' do
+    before do
+      enrollment.schedule_coverage_termination!(benefit_package.end_on)
+    end
+
+    it "should return future terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq benefit_package.end_on
+    end
+  end
+
+  context 'canceled enrollment for benefit package' do
+    before do
+      initial_application.cancel!
+      enrollment.cancel_coverage!
+    end
+
+    it "should return terminated enrollment" do
+      enrollment_scope = HbxEnrollment.cancel_or_termed_by_benefit_package(benefit_package)
+      expect(enrollment_scope.count).to eq 1
+      expect(enrollment_scope.first).to eq enrollment
+      expect(enrollment_scope.first.terminated_on).to eq nil
+    end
+  end
+end
+
+describe '.update_reinstate_coverage', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month - 6.month}
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      aasm_state: 'coverage_selected',
+                      effective_on: current_effective_date,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: census_employee.employee_role.id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      rating_area_id: BSON::ObjectId.new,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+
+  context 'plan shopping in termination pending coverage span' do
+    before do
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+      initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      initial_application.schedule_enrollment_termination!
+      EnrollRegistry[:benefit_application_reinstate]{ {params: {benefit_application: initial_application, options: {transmit_to_carrier: true} } } }
+      family.hbx_enrollments.map(&:reload)
+      census_employee.reload
+      @reinstated_application = benefit_sponsorship.benefit_applications.detect{|app| app.reinstated_id.present?}
+      @reinstated_package = @reinstated_application.benefit_packages.first
+      @reinstated_enrollment = family.hbx_enrollments.where(sponsored_benefit_package_id: @reinstated_package.id).first
+    end
+
+    context 'on purchase' do
+      let!(:new_enrollment_purchase) do
+        FactoryBot.build(:hbx_enrollment, :with_enrollment_members,
+                         household: family.latest_household,
+                         coverage_kind: 'health',
+                         family: family,
+                         aasm_state: 'shopping',
+                         effective_on: @reinstated_application.start_on - 1.month,
+                         kind: 'employer_sponsored',
+                         benefit_sponsorship_id: benefit_sponsorship.id,
+                         sponsored_benefit_package_id: current_benefit_package.id,
+                         sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                         employee_role_id: census_employee.employee_role.id,
+                         product: current_benefit_package.sponsored_benefits[0].reference_product,
+                         rating_area_id: BSON::ObjectId.new,
+                         predecessor_enrollment_id: enrollment.id,
+                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+      end
+
+      it 'should create new reinstated enrollment' do
+        expect(family.hbx_enrollments.count).to eq 2
+        new_enrollment_purchase.select_coverage!
+        family.reload
+
+        expect(family.hbx_enrollments.count).to eq 4
+        expect(family.hbx_enrollments.where(sponsored_benefit_package_id: @reinstated_package.id, aasm_state: 'coverage_selected').count).to eq 1
+      end
+
+      it 'should cancel previous reinstated coverage if any exists' do
+        new_enrollment_purchase.select_coverage!
+        @reinstated_enrollment.reload
+        expect(@reinstated_enrollment.coverage_canceled?).to eq true
+      end
+
+      it 'should terminate new purchase with application end date' do
+        new_enrollment_purchase.select_coverage!
+        new_enrollment_purchase.reload
+        expect(new_enrollment_purchase.terminated_on).to eq initial_application.end_on
+        expect(new_enrollment_purchase.aasm_state).to eq 'coverage_termination_pending'
+      end
+    end
+
+    context 'on waive_coverage' do
+      let!(:new_enrollment_purchase) do
+        FactoryBot.build(:hbx_enrollment, :with_enrollment_members,
+                         household: family.latest_household,
+                         coverage_kind: 'health',
+                         family: family,
+                         aasm_state: 'shopping',
+                         effective_on: @reinstated_application.start_on - 1.month,
+                         kind: 'employer_sponsored',
+                         benefit_sponsorship_id: benefit_sponsorship.id,
+                         sponsored_benefit_package_id: current_benefit_package.id,
+                         sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                         employee_role_id: census_employee.employee_role.id,
+                         product: current_benefit_package.sponsored_benefits[0].reference_product,
+                         rating_area_id: BSON::ObjectId.new,
+                         predecessor_enrollment_id: enrollment.id,
+                         benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+      end
+
+      it 'should cancel previous reinstated coverage' do
+        expect(family.hbx_enrollments.count).to eq 2
+        new_enrollment_purchase.waive_coverage!
+        family.reload
+        expect(family.hbx_enrollments.count).to eq 3
+        @reinstated_enrollment.reload
+        expect(@reinstated_enrollment.coverage_canceled?).to eq true
+      end
+    end
+  end
+end
+
+describe '.eligible_to_reinstate?', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month - 6.month}
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      aasm_state: 'coverage_selected',
+                      effective_on: current_effective_date,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: census_employee.employee_role.id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      rating_area_id: BSON::ObjectId.new,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'reinstate eigible enrollment for a application' do
+    before do
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month
+      initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      initial_application.schedule_enrollment_termination!
+      enrollment.reload
+    end
+
+    it 'terminated enrollment with term date & reason matchs application' do
+      expect(enrollment.eligible_to_reinstate?).to eq true
+    end
+
+    it 'canceled enrollment with term reason matchs application' do
+      enrollment.update_attributes(aasm_state: 'coverage_canceled')
+      enrollment.reload
+      expect(enrollment.eligible_to_reinstate?).to eq true
+    end
+
+    it 'terminated enrollment with term date greater than application end date' do
+      enrollment.update_attributes(terminated_on: TimeKeeper.date_of_record.next_month.end_of_month)
+      expect(enrollment.eligible_to_reinstate?).to eq false
+    end
+
+    it 'canceled enrollment with start date before application start date' do
+      enrollment.update_attributes(effective_on: TimeKeeper.date_of_record.last_year)
+      expect(enrollment.eligible_to_reinstate?).to eq false
+    end
+  end
+end
+
+
+describe '.term_or_cancel_benefit_group_assignment', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_month - 6.month}
+  let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+  let(:family) { person.primary_family }
+  let!(:census_employee) do
+    ce = FactoryBot.create(:census_employee, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+    ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+    person.employee_roles.first.update_attributes(census_employee_id: ce.id, benefit_sponsors_employer_profile_id: abc_profile.id)
+    ce
+  end
+  let!(:enrollment) do
+    FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                      household: family.latest_household,
+                      coverage_kind: 'health',
+                      family: family,
+                      aasm_state: 'coverage_selected',
+                      effective_on: current_effective_date,
+                      kind: 'employer_sponsored',
+                      benefit_sponsorship_id: benefit_sponsorship.id,
+                      sponsored_benefit_package_id: current_benefit_package.id,
+                      sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                      employee_role_id: census_employee.employee_role.id,
+                      product: current_benefit_package.sponsored_benefits[0].reference_product,
+                      rating_area_id: BSON::ObjectId.new,
+                      benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+  end
+
+  context 'when employment term date outside benefit application end date.' do
+    before do
+      census_employee.terminate_employment!(TimeKeeper.date_of_record.end_of_month)
+      period = initial_application.effective_period.min..initial_application.start_on.next_month.end_of_month
+      initial_application.update_attributes!(aasm_state: :terminated, termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      enrollment.terminate_coverage!(initial_application.end_on)
+      enrollment.reload
+    end
+
+    it 'should update bga with application end date' do
+      expect(enrollment.terminated_on).to eq initial_application.end_on
+      expect(enrollment.benefit_group_assignment.end_on).to eq initial_application.end_on
+    end
+  end
+
+  context 'when employment term date inside benefit application end date.' do
+    before do
+      census_employee.terminate_employment!(TimeKeeper.date_of_record.end_of_month)
+      period = initial_application.effective_period.min..TimeKeeper.date_of_record.next_month.end_of_month
+      initial_application.update_attributes!(aasm_state: :terminated, termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+      enrollment.terminate_coverage!(TimeKeeper.date_of_record.end_of_month)
+      enrollment.reload
+    end
+
+    it 'should update bga with coverage term date' do
+      expect(enrollment.terminated_on).to eq census_employee.coverage_terminated_on
+      expect(enrollment.benefit_group_assignment.end_on).to eq census_employee.coverage_terminated_on
+    end
   end
 end

@@ -10,6 +10,14 @@ module BenefitMarkets
           required(:effective_period).filled(type?: Range)
           required(:rating_area_id).filled(Types::Bson)
           optional(:premium_tuples).array(:hash)
+
+          before(:value_coercer) do |result|
+            result_hash = result.to_h
+            if result_hash[:effective_period].is_a?(Hash)
+              result_hash[:effective_period].deep_symbolize_keys
+              result_hash.merge({effective_period: (result_hash[:effective_period][:min]..result_hash[:effective_period][:max])})
+            end
+          end
         end
 
         rule(:premium_tuples).each do

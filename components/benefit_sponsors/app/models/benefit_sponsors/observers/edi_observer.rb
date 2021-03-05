@@ -38,6 +38,11 @@ module BenefitSponsors
         employer_profile = model_event.klass_instance.employer_profile
         deliver(recipient: employer_profile, event_object: model_event.klass_instance, event_name: BenefitApplications::BenefitApplication::INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG, edi_params: { plan_year_id: model_event.klass_instance.id.to_s })
       end
+
+      def trigger_benefit_coverage_period_reinstated_event(model_event)
+        employer_profile = model_event.klass_instance.employer_profile
+        deliver(recipient: employer_profile, event_object: model_event.klass_instance, event_name: BenefitApplications::BenefitApplication::REINSTATED_PLAN_YEAR_EVENT_TAG)
+      end
     end
   end
 end

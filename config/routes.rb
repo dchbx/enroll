@@ -201,9 +201,9 @@ Rails.application.routes.draw do
     resources :employer_applications do
       put :terminate
       put :cancel
-      put :reinstate
       collection do
         get :term_reasons
+        put :reinstate
       end
     end
 

@@ -87,6 +87,7 @@ class BenefitGroupAssignment
 
       if assignments_with_end_on.present?
         filter_assignments_with_end_on(assignments_with_end_on, assignments_with_no_end_on, date)
+
       elsif assignments_with_no_end_on.present?
         filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
       end
@@ -101,12 +102,13 @@ class BenefitGroupAssignment
       elsif assignments_with_no_end_on.present?
         filter_assignments_with_no_end_on(assignments_with_no_end_on, date)
       else
-        perspective_assignments_with_end_on.last
+        bg_assignment = perspective_assignments_with_end_on.detect{ |assignment| (assignment.start_on..assignment.end_on).cover?(date) }
+        bg_assignment || perspective_assignments_with_end_on.last
       end
     end
 
     def filter_assignments_with_no_end_on(assignments, date)
-      valid_assignments_with_no_end_on = assignments.select { |assignment| (assignment.start_on..assignment.start_on.next_year.prev_day).cover?(date) }
+      valid_assignments_with_no_end_on = no_end_on(assignments, date)
       perspective_assignments = assignments.select { |assignment| assignment.start_on > date }
       assignment =
         if valid_assignments_with_no_end_on.size > 1
@@ -114,9 +116,11 @@ class BenefitGroupAssignment
         else
           valid_assignments_with_no_end_on.first
         end
-      return assignment if assignment.present?
+      assignment.present? ? assignment : perspective_assignments.max_by(&:created_at)
+    end
 
-      perspective_assignments.max_by(&:created_at)
+    def no_end_on(assignments, date)
+      assignments.select { |assignment| (assignment.start_on..(assignment.benefit_package&.end_on || assignment.start_on.next_year.prev_day)).cover?(date) }
     end
 
     def by_benefit_group_id(bg_id)
@@ -382,8 +386,7 @@ class BenefitGroupAssignment
 
   def is_active?(date = TimeKeeper.date_of_record)
     return false if start_on.blank? || canceled?
-
-    end_date = end_on || start_on.next_year.prev_day
+    end_date = end_on || benefit_package&.end_on || start_on.next_year.prev_day
     (start_on..end_date).cover?(date)
   end
 

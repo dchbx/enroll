@@ -36,6 +36,7 @@ RSpec.describe "employers/employer_profiles/my_account/_employees_by_status.html
     sponsored_benefit_package_id: BSON::ObjectId.new
     )}
 
+
   let!(:enrollment_with_coverage_waived)   { FactoryBot.create( :hbx_enrollment,
     household: primary_family.latest_household,
     employee_role_id: employee_role.id,

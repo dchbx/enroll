@@ -841,21 +841,32 @@ module BenefitSponsors
 
       context "when enrollment is in auto renewing state" do
         let(:enr_state) {"auto_renewing"}
+        let(:renewal_state) { :canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "auto_renewing"
           benefit_package.cancel_member_benefits
           expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
         end
+
+        it "should not persist retro cancel reason for canceled applications" do
+          expect(hbx_enrollment.reload.terminate_reason).to eq nil
+        end
       end
 
       context "when enrollment is in coverage selected state state" do
         let(:enr_state) {"coverage_selected"}
+        let(:renewal_state) { :retroactive_canceled }
 
         it "should move auto renewing enrollment to coverage enrolled state" do
           expect(hbx_enrollment.aasm_state).to eq "coverage_selected"
           benefit_package.cancel_member_benefits
           expect(hbx_enrollment.reload.aasm_state).to eq "coverage_canceled"
+        end
+
+        it "should persist retro cancel reason for retroactive_canceled applications" do
+          benefit_package.cancel_member_benefits
+          expect(hbx_enrollment.reload.terminate_reason).to eq "retroactive_canceled"
         end
       end
     end
@@ -938,7 +949,7 @@ module BenefitSponsors
       context "when coverage_selected enrollments are present", :dbclean => :after_each do
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
           benefit_package.terminate_member_benefits
           hbx_enrollment.reload
           hbx_enrollment_1.reload
@@ -955,6 +966,12 @@ module BenefitSponsors
         it 'should move future enrollments to canceled state' do
           expect(hbx_enrollment_1.aasm_state).to eq "coverage_canceled"
         end
+
+        context "benefit application with termination_kind and NO termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment.terminate_reason).to eq "non_payment"
+          end
+        end
       end
 
       context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
@@ -962,10 +979,10 @@ module BenefitSponsors
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :terminated, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
           hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
           hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
-          benefit_package.terminate_member_benefits
+          benefit_package.terminate_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
         end
@@ -977,6 +994,12 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+
+        context "benefit application with termination_kind and termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment_1.terminate_reason).to eq "nonpayment"
+          end
         end
       end
 
@@ -1011,6 +1034,242 @@ module BenefitSponsors
           it "should update benefit_group_assignment end_on if end_on < benefit_application end on" do
             benefit_package.terminate_benefit_group_assignments
             expect(benefit_package.end_on).to eq @bga.end_on
+          end
+        end
+      end
+    end
+
+    describe '.reinstate_member_benefits' do
+      include_context 'setup initial benefit application'
+
+      let!(:effective_period_start_on) { TimeKeeper.date_of_record.beginning_of_year }
+      let!(:effective_period_end_on)   { TimeKeeper.date_of_record.end_of_year }
+      let!(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market }
+      let!(:benefit_market) { site.benefit_markets.first }
+      let!(:effective_period) { (effective_period_start_on..effective_period_end_on) }
+      let!(:current_benefit_market_catalog) do
+        BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_catalog(site, benefit_market, effective_period)
+        benefit_market.benefit_market_catalogs.where(:'application_period.min' => effective_period_start_on).first
+      end
+
+      let!(:service_areas) do
+        ::BenefitMarkets::Locations::ServiceArea.where(:active_year => current_benefit_market_catalog.application_period.min.year).all.to_a
+      end
+
+      let!(:rating_area) do
+        ::BenefitMarkets::Locations::RatingArea.where(:active_year => current_benefit_market_catalog.application_period.min.year).first
+      end
+      let(:current_effective_date) {TimeKeeper.date_of_record.beginning_of_year}
+
+      let(:person) { FactoryBot.create(:person, :with_employee_role, :with_family) }
+      let(:family) { person.primary_family }
+      let!(:census_employee) do
+        ce = FactoryBot.create(:census_employee, :with_active_assignment, benefit_sponsorship: benefit_sponsorship, employer_profile: benefit_sponsorship.profile, benefit_group: current_benefit_package)
+        ce.update_attributes!(employee_role_id: person.employee_roles.first.id)
+        person.employee_roles.first.update_attributes(census_employee_id: ce.id)
+        ce
+      end
+      let!(:enrollment) do
+        FactoryBot.create(:hbx_enrollment, :with_enrollment_members,
+                          household: family.latest_household,
+                          coverage_kind: 'health',
+                          family: family,
+                          aasm_state: 'coverage_selected',
+                          effective_on: current_effective_date,
+                          kind: 'employer_sponsored',
+                          benefit_sponsorship_id: benefit_sponsorship.id,
+                          sponsored_benefit_package_id: current_benefit_package.id,
+                          sponsored_benefit_id: current_benefit_package.sponsored_benefits[0].id,
+                          employee_role_id: census_employee.employee_role.id,
+                          product: current_benefit_package.sponsored_benefits[0].reference_product,
+                          rating_area_id: BSON::ObjectId.new,
+                          benefit_group_assignment_id: census_employee.active_benefit_group_assignment.id)
+      end
+
+      context 'given employee coverages got terminated after application termination' do
+        before do
+          period = initial_application.effective_period.min..(initial_application.end_on - 6.months).end_of_month
+          initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+          initial_application.terminate_enrollment!
+          effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+          cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+          cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+
+          cloned_catalog.benefit_application = cloned_application
+          cloned_catalog.save!
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.save!
+
+          @cloned_package = cloned_application.benefit_packages[0]
+          @cloned_package.reinstate_member_benefits
+          census_employee.reload
+        end
+
+        context 'on reinstate' do
+          it 'should reinstate terminated benefit group assigment' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.start_on).to eq @cloned_package.start_on
+          end
+
+          it 'should reinstate terminated coverages' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
+            if TimeKeeper.date_of_record >= reinstated_hbx.effective_on
+              expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            else
+              expect(reinstated_hbx.aasm_state).to eq "coverage_selected"
+            end
+            expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
+          end
+
+          it 'should assign reinstated benefit group assigment on reinstated enrollment' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.benefit_group_assignment_id).to eq reinstated_bga.id
+          end
+
+          it 'should update reinstated benefit group assigment with hbx enrollment id' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.hbx_enrollment_id).to eq reinstated_hbx.id
+          end
+        end
+      end
+
+      context 'given employee coverages moved to terminated pending after application terminated with future date' do
+        before do
+          initial_application.update_attributes(effective_period: (initial_application.start_on + 6.months..initial_application.end_on + 6.months))
+          initial_application.benefit_sponsor_catalog.update_attributes(effective_date: initial_application.start_on + 6.months, effective_period: (initial_application.start_on + 6.months..initial_application.end_on + 6.months))
+          enrollment.update_attributes(effective_on: initial_application.start_on)
+          census_employee.benefit_group_assignments.first.update_attributes(start_on: initial_application.start_on)
+          census_employee.reload
+          period = (initial_application.effective_period.min..TimeKeeper.date_of_record.end_of_month)
+          initial_application.update_attributes!(termination_reason: 'nonpayment', terminated_on: period.max, effective_period: period)
+          initial_application.schedule_enrollment_termination!
+          effective_period = (initial_application.effective_period.max.next_day)..(initial_application.benefit_sponsor_catalog.effective_period.max)
+          cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+          cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+          cloned_catalog.benefit_application = cloned_application
+          cloned_catalog.save!
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.save!
+          @cloned_package = cloned_application.benefit_packages[0]
+          @cloned_package.reinstate_member_benefits
+          census_employee.reload
+        end
+
+        context 'on reinstate' do
+
+          it 'should reinstate terminated benefit group assigment' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.start_on).to eq @cloned_package.start_on
+          end
+
+          it 'should reinstate terminated coverages' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
+            expect(reinstated_hbx.aasm_state).to eq "coverage_selected"
+            expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
+          end
+
+          it 'should assign reinstated benefit group assigment on reinstated enrollment' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.benefit_group_assignment_id).to eq reinstated_bga.id
+          end
+
+          it 'should update reinstated benefit group assigment with hbx enrollment id' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.hbx_enrollment_id).to eq reinstated_hbx.id
+          end
+        end
+      end
+
+      context 'given employee coverages canceled after application canceled' do
+        before do
+          initial_application.cancel!
+          effective_period = (initial_application.start_on..initial_application.end_on)
+          cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+          cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+          cloned_catalog.benefit_application = cloned_application
+          cloned_catalog.save!
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.save!
+          @cloned_package = cloned_application.benefit_packages[0]
+          @cloned_package.reinstate_member_benefits
+          census_employee.reload
+        end
+
+        context 'on reinstate' do
+
+          it 'should reinstate terminated benefit group assigment' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.start_on).to eq @cloned_package.start_on
+          end
+
+          it 'should reinstate terminated coverages' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
+            expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
+          end
+
+          it 'should assign reinstated benefit group assigment on reinstated enrollment' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.benefit_group_assignment_id).to eq reinstated_bga.id
+          end
+
+          it 'should update reinstated benefit group assigment with hbx enrollment id' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.hbx_enrollment_id).to eq reinstated_hbx.id
+          end
+        end
+      end
+
+      context 'given employee coverages canceled after application canceled' do #legacy cancel
+        before do
+          initial_application.cancel!
+          initial_application.update_attributes(aasm_state: :canceled)
+          enrollment.update_attributes(terminate_reason: '')
+          effective_period = (initial_application.start_on..initial_application.end_on)
+          cloned_application = ::BenefitSponsors::Operations::BenefitApplications::Clone.new.call({benefit_application: initial_application, effective_period: effective_period}).success
+          cloned_catalog = ::BenefitMarkets::Operations::BenefitSponsorCatalogs::Clone.new.call(benefit_sponsor_catalog: initial_application.benefit_sponsor_catalog).success
+          cloned_catalog.benefit_application = cloned_application
+          cloned_catalog.save!
+          cloned_application.assign_attributes({aasm_state: :active, reinstated_id: initial_application.id, benefit_sponsor_catalog_id: cloned_catalog.id})
+          cloned_application.save!
+          @cloned_package = cloned_application.benefit_packages[0]
+          @cloned_package.reinstate_member_benefits
+          census_employee.reload
+        end
+
+        context 'on reinstate' do
+
+          it 'should reinstate terminated benefit group assigment' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.start_on).to eq @cloned_package.start_on
+          end
+
+          it 'should reinstate terminated coverages' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.effective_on).to eq @cloned_package.start_on
+            expect(reinstated_hbx.aasm_state).to eq "coverage_enrolled"
+            expect(reinstated_hbx.predecessor_enrollment_id).to eq enrollment.id
+          end
+
+          it 'should assign reinstated benefit group assigment on reinstated enrollment' do
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            expect(reinstated_hbx.benefit_group_assignment_id).to eq reinstated_bga.id
+          end
+
+          it 'should update reinstated benefit group assigment with hbx enrollment id' do
+            reinstated_bga = census_employee.benefit_group_assignments.where(benefit_package_id: @cloned_package.id).first
+            reinstated_hbx = HbxEnrollment.where(sponsored_benefit_package_id: @cloned_package.id).first
+            expect(reinstated_bga.hbx_enrollment_id).to eq reinstated_hbx.id
           end
         end
       end
@@ -1091,7 +1350,7 @@ module BenefitSponsors
       let(:end_on) { TimeKeeper.date_of_record.next_month }
 
       before do
-        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+        initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "")
         benefit_package.termination_pending_member_benefits
         hbx_enrollment.reload
       end
@@ -1104,15 +1363,21 @@ module BenefitSponsors
         expect(hbx_enrollment.terminated_on).to eq initial_application.end_on
       end
 
+      context "benefit application with termination_kind and NO termination_reason" do
+        it 'should persist terminate reason to enrollment' do
+          expect(hbx_enrollment.terminate_reason).to eq "non_payment"
+        end
+      end
+
       context "when an employee has coverage_termination_pending enrollment", :dbclean => :after_each do
 
         let(:hbx_enrollment_terminated_on) { end_on.prev_month }
 
         before do
-          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record)
+          initial_application.update_attributes!(aasm_state: :termination_pending, effective_period: initial_application.start_on..end_on, terminated_on: TimeKeeper.date_of_record, termination_kind: "nonpayment", termination_reason: "nonpayment")
           hbx_enrollment.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: hbx_enrollment_terminated_on)
           hbx_enrollment_1.update_attributes!(effective_on: initial_application.start_on, aasm_state: "coverage_termination_pending", terminated_on: end_on + 2.months)
-          benefit_package.termination_pending_member_benefits
+          benefit_package.termination_pending_member_benefits(enroll_term_reason: "nonpayment")
           hbx_enrollment.reload
           hbx_enrollment_1.reload
         end
@@ -1124,6 +1389,12 @@ module BenefitSponsors
 
         it "should update hbx_enrollment terminated_on if terminated_on > benefit_application end on" do
           expect(hbx_enrollment_1.terminated_on).to eq end_on
+        end
+
+        context "benefit application with termination_kind and termination_reason" do
+          it 'should persist terminate reason to enrollment' do
+            expect(hbx_enrollment_1.terminate_reason).to eq "nonpayment"
+          end
         end
 
         context "pending terminate_benefit_group_assignments", :dbclean => :after_each do

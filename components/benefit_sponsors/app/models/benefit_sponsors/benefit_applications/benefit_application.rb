@@ -22,8 +22,8 @@ module BenefitSponsors
     ENROLLMENT_ELIGIBLE_STATES    = [:enrollment_eligible, :binder_paid].freeze
     ENROLLMENT_INELIGIBLE_STATES  = [:enrollment_ineligible].freeze
     COVERAGE_EFFECTIVE_STATES     = [:active, :termination_pending].freeze
-    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired].freeze
-    CANCELED_STATES               = [:canceled].freeze
+    TERMINATED_STATES             = [:suspended, :terminated, :canceled, :expired, :retroactive_canceled].freeze
+    CANCELED_STATES               = [:canceled, :retroactive_canceled].freeze
     EXPIRED_STATES                = [:expired].freeze
     IMPORTED_STATES               = [:imported].freeze
     APPROVED_STATES               = [:approved, :enrollment_open, :enrollment_extended, :enrollment_closed, :enrollment_eligible, :binder_paid, :active, :suspended].freeze
@@ -41,7 +41,9 @@ module BenefitSponsors
                                                   expired:    :expire,
                                                   terminated: :terminate,
                                                   termination_pending: :termination_pending,
-                                                  canceled:   :cancel
+                                                  canceled: :cancel,
+                                                  retroactive_canceled: :cancel,
+                                                  reinstated: :reinstate
                                                 }
 
     VOLUNTARY_TERMINATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_terminated_voluntary".freeze
@@ -52,6 +54,9 @@ module BenefitSponsors
 
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT_TAG = "benefit_coverage_renewal_carrier_dropped".freeze
     INITIAL_OR_RENEWAL_PLAN_YEAR_DROP_EVENT = "acapi.info.events.employer.benefit_coverage_renewal_carrier_dropped".freeze
+
+    REINSTATED_PLAN_YEAR_EVENT_TAG = "benefit_coverage_period_reinstated".freeze
+    REINSTATED_PLAN_YEAR_EVENT = "acapi.info.events.employer.benefit_coverage_period_reinstated".freeze
 
     VOLUNTARY_TERM_REASONS =
       [
@@ -117,6 +122,7 @@ module BenefitSponsors
 
     field :termination_kind,       type: String
     field :termination_reason,     type: String
+    field :reinstated_id, type: BSON::ObjectId
 
     delegate :benefit_market, to: :benefit_sponsorship
 
@@ -206,6 +212,7 @@ module BenefitSponsors
                                                                                                 :"effective_period.min".gte => Date.new(compare_year, 1, 1),
                                                                                                 :"effective_period.min".lte => Date.new(compare_year, 12, -1)
                                                                                               )}
+    scope :order_asc,                       ->{ order_by(:created_at.asc) }
 
     scope :by_overlapping_effective_period, ->(effective_period) {
       where(
@@ -281,7 +288,7 @@ module BenefitSponsors
       if benefit_sponsorship.source_kind == :mid_plan_year_conversion && predecessor.blank?
         end_on.prev_year + 1.day
       else
-        start_on
+        benefit_sponsor_catalog.start_on
       end
     end
 
@@ -498,7 +505,7 @@ module BenefitSponsors
     def is_renewing?
       required_states = (APPLICATION_APPROVED_STATES + APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES)
       applications = sponsor_profile.benefit_applications.where(:"effective_period.min".gt => effective_period.min, :aasm_state.in => required_states + [:active, :expired])
-      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0)
+      predecessor.present? && (required_states + ENROLLMENT_INELIGIBLE_STATES).include?(aasm_state) && !(applications.count > 0) && reinstated_id.blank?
     end
     # rubocop:enable Style/InverseMethods
 
@@ -854,8 +861,10 @@ module BenefitSponsors
       state :expired,    :after_enter => :transition_benefit_package_members  # Non-published plans are expired following their end on date
       state :canceled,   :after_enter => :transition_benefit_package_members  # Application closed prior to coverage taking effect
 
+      state :retroactive_canceled,   :after_enter => :transition_benefit_package_members  # Application closed after coverage taking to effect
       state :termination_pending, :after_enter => :transition_benefit_package_members # Coverage under this application is termination pending
       state :suspended   # Coverage is no longer in effect. members may not enroll or change enrollments
+      state :reinstated, :after_enter => :transition_benefit_package_members # This is tmp state in between draft and active(any active state).
 
       after_all_transitions [:publish_state_transition, :notify_application]
 
@@ -936,7 +945,7 @@ module BenefitSponsors
       end
 
       event :activate_enrollment do
-        transitions from: [:enrollment_eligible, :binder_paid],
+        transitions from: [:enrollment_eligible, :binder_paid, :reinstated],
           to:     :active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES,
           to:     :canceled
@@ -953,6 +962,7 @@ module BenefitSponsors
 
       # Enrollment processed stopped due to missing binder payment
       event :cancel do
+        transitions from: :active, to: :retroactive_canceled  # Enrollment cancelled after it became active
         transitions from: APPLICATION_DRAFT_STATES + ENROLLING_STATES + ENROLLMENT_ELIGIBLE_STATES + [:enrollment_ineligible, :active, :approved],
           to:     :canceled
       end
@@ -971,9 +981,9 @@ module BenefitSponsors
         transitions from: [:active, :suspended], to: :termination_pending
       end
 
-      # Coverage reinstated
-      event :reinstate_enrollment do
-        transitions from: [:suspended, :terminated], to: :active #, after: :reset_termination_and_end_date
+      # This transition is to indicate that the BenefitApplication is reinstated.
+      event :reinstate do
+        transitions from: :draft, to: :reinstated
       end
 
       event :extend_open_enrollment do
@@ -1195,6 +1205,15 @@ module BenefitSponsors
 
     def has_unassigned_census_employees?
       CensusEmployee.employees_for_benefit_application_sponsorship(self).count > CensusEmployee.benefit_application_assigned(self).count
+    end
+
+    def parent_reinstate_application
+      return unless reinstated_id
+      self.class.find(reinstated_id)
+    end
+
+    def canceled?
+      [:canceled, :retroactive_canceled].include?(aasm_state)
     end
 
     private

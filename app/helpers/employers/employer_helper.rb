@@ -37,16 +37,24 @@ module Employers::EmployerHelper
                                                                                   .html_safe
   end
 
+  def reinstated_enrollment_state(census_employee = nil)
+    humanize_enrollment_states(census_employee.future_active_reinstated_benefit_group_assignment)
+      .gsub("Coverage Selected", "Enrolled")
+      .gsub("Coverage Waived", "Waived").gsub("Coverage Terminated", "Terminated")
+      .gsub("Coverage Termination Pending", "Coverage Termination Pending")
+      .html_safe
+  end
+
   def humanize_enrollment_states(benefit_group_assignment)
     enrollment_states = []
 
     if benefit_group_assignment
       enrollments = benefit_group_assignment.hbx_enrollments
-
       %W(health dental).each do |coverage_kind|
-        if coverage = enrollments.detect{|enrollment| enrollment.coverage_kind == coverage_kind}
-          enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, coverage.aasm_state)} (#{coverage_kind})"
-        end
+        enrollment = enrollments.select{ |enr| enr.coverage_kind == coverage_kind}.max_by(&:created_at)
+        next unless enrollment
+
+        enrollment_states << "#{employee_benefit_group_assignment_status(benefit_group_assignment.census_employee, enrollment.aasm_state)} (#{coverage_kind})"
       end
       enrollment_states << '' if enrollment_states.compact.empty?
     end
@@ -84,16 +92,6 @@ module Employers::EmployerHelper
       state
     end
   end
-
-  def render_plan_offerings(benefit_group)
-
-    assignment_mapping.each do |bgsm_state, enrollment_statuses|
-      if enrollment_statuses.include?(enrollment_status.to_s)
-        return bgsm_state
-      end
-    end
-  end
-
 
   def invoice_formated_date(date)
     date.strftime("%m/%d/%Y")
@@ -164,13 +162,17 @@ module Employers::EmployerHelper
   end
 
   def get_benefit_packages_for_census_employee
-    initial_benefit_packages = @benefit_sponsorship.current_benefit_application&.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
-    renewing_benefit_packages = @benefit_sponsorship.renewal_benefit_application.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
+    initial_benefit_packages = @benefit_sponsorship&.current_benefit_application&.benefit_packages unless @benefit_sponsorship.current_benefit_application&.terminated?
+    renewing_benefit_packages = @benefit_sponsorship&.renewal_benefit_application&.benefit_packages if @benefit_sponsorship.renewal_benefit_application.present?
     return (initial_benefit_packages || []), (renewing_benefit_packages || [])
   end
 
   def off_cycle_benefit_packages_for_census_employee
     @benefit_sponsorship.off_cycle_benefit_application&.benefit_packages || []
+  end
+
+  def reinstated_benefit_packages_with_future_date_for_census_employee
+    @benefit_sponsorship.future_active_reinstated_benefit_application&.benefit_packages || []
   end
 
   def current_option_for_initial_benefit_package
@@ -197,6 +199,15 @@ module Employers::EmployerHelper
     application = @employer_profile.renewal_benefit_application
     return nil if application.blank?
     application.default_benefit_group || application.benefit_packages[0].id
+  end
+
+  def current_option_for_reinstated_benefit_package
+    bga = @census_employee.future_active_reinstated_benefit_group_assignment
+    return bga.benefit_package_id if bga&.benefit_package_id
+    application = @employer_profile.future_active_reinstated_benefit_application
+    return nil if application.blank?
+    return nil if application.benefit_packages.empty?
+    application.benefit_packages[0].id
   end
 
   def cobra_effective_date(census_employee)
@@ -288,19 +299,19 @@ module Employers::EmployerHelper
     return [links, content]
   end
 
-  def is_rehired(ce)
-    (ce.coverage_terminated_on.present?  && (ce.is_eligible? || ce.employee_role_linked?))
+  def is_rehired(census_employee)
+    (census_employee.coverage_terminated_on.present? && (census_employee.is_eligible? || census_employee.employee_role_linked?))
   end
 
-  def is_terminated(ce)
-    (ce.coverage_terminated_on.present? && !(ce.is_eligible? || ce.employee_role_linked?))
+  def is_terminated(census_employee)
+    (census_employee.coverage_terminated_on.present? && !(census_employee.is_eligible? || census_employee.employee_role_linked?))
   end
 
   def selected_benefit_plan(plan)
     case plan
-      when :single_issuer then 'One Carrier'
-      when :metal_level then 'One Level'
-      when :single_product then 'A Single Plan'
+    when :single_issuer then 'One Carrier'
+    when :metal_level then 'One Level'
+    when :single_product then 'A Single Plan'
     end
   end
 
@@ -310,5 +321,21 @@ module Employers::EmployerHelper
 
   def display_referred_by_field_for_employer?
     Settings.aca.employer_registration_has_referred_by_field
+  end
+
+  def check_for_canceled_wst?(application)
+    application.workflow_state_transitions.any?{|wst| wst.from_state.to_s == "active" && wst.to_state.to_s == "canceled"}
+  end
+
+  def is_ben_app_within_reinstate_period?(application)
+    offset_months = EnrollRegistry[:benefit_application_reinstate].setting(:offset_months).item
+    start_on = application.benefit_sponsor_catalog.effective_period.min
+    end_on = application.benefit_sponsor_catalog.effective_period.max + offset_months.months
+    (start_on..end_on).cover?(TimeKeeper.date_of_record)
+  end
+
+  def display_reinstate_benefit_application?(application)
+    return false unless [:terminated, :termination_pending, :retroactive_canceled].include?(application.aasm_state) || (application.canceled? && check_for_canceled_wst?(application))
+    is_ben_app_within_reinstate_period?(application)
   end
 end

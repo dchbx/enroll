@@ -9,3 +9,9 @@ registry:
       - key: :send_secure_message_employer
         item: :send_secure_message
         is_enabled: true
+      - key: :benefit_application_reinstate
+        item: BenefitSponsors::Operations::BenefitApplications::Reinstate.new
+        is_enabled: true
+        settings:
+           - key: :offset_months
+             item: 0
