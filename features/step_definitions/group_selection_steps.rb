@@ -523,9 +523,27 @@ end
 #   click_link 'Edit Plan'
 # end
 
+When(/^\w+ should be able to see Actions dropdown$/) do
+  page.all("#dropdownMenuButton").count > 0
+end
+
+Then(/^\w+ clicks on the Actions button$/) do
+  page.all("#dropdownMenuButton").first.click
+end
+
+And(/^\w+ should see able to see make changes to my coverage button$/) do
+  page.all('a', text: 'Make changes to my coverage').first
+end
+
+When(/^\w+ clicks on the make changes to my coverage button/) do
+  enable_change_tax_credit_button
+  page.all('a', text: 'Make changes to my coverage').first.click
+  wait_for_ajax
+end
+
 When(/(.*) clicks on the make changes button/) do |_role|
   enable_change_tax_credit_button
-  click_link('Make Changes')
+  page.all('a', text: 'Make changes to my coverage').first.click
   wait_for_ajax
 end
 
