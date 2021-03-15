@@ -12,12 +12,51 @@ end
 
 When(/^\w+ visits? the Insured portal outside of open enrollment$/) do
   FactoryBot.create(:hbx_profile, :no_open_enrollment_coverage_period)
+  step "Individual visits consumer or family portal with a QLE seed"
+end
+
+When(/^\w+ visits? the Insured portal outside of open enrollment with prior and current benefit coverage period$/) do
+  prior_coverage_year = Date.today.year - 1
+  current_coverage_year = Date.today.year
+  prior_hbx_profile = FactoryBot.create(:hbx_profile,
+                                          :no_open_enrollment_coverage_period,
+                                          coverage_year: prior_coverage_year)
+  prior_benefit_coverage_period = prior_hbx_profile.benefit_sponsorship.benefit_coverage_periods.detect { |bcp| (bcp.start_on.year == prior_coverage_year) }
+  prior_benefit_package = prior_benefit_coverage_period.benefit_packages.first
+  current_benefit_coverage_period = prior_benefit_coverage_period.successor
+  current_benefit_package = current_benefit_coverage_period.benefit_packages.first
+  prior_product = BenefitMarkets::Products::Product.find(prior_benefit_package.benefit_ids.first)
+  prior_product.update_attributes(application_period: Date.new(prior_coverage_year,1,1)..Date.new(prior_coverage_year,12,31))
+
+  r_product = BenefitMarkets::Products::Product.by_year(current_coverage_year).find(current_benefit_package.benefit_ids.last)
+  prior_product.renewal_product_id = r_product.id
+  prior_product.save!
+  prior_product.reload
+end
+
+When(/^\w+ visits? consumer or family portal with a QLE seed$/) do
   FactoryBot.create(:qualifying_life_event_kind, market_kind: "individual")
   BenefitMarkets::Products::ProductRateCache.initialize_rate_cache!
 
-  visit "/"
-  click_link 'Consumer/Family Portal'
+  step "Individual resumes enrollment"
   screenshot("individual_start")
+end
+
+
+Given(/^Exceptional circumstances QLE present$/) do
+  FactoryBot.create(:qualifying_life_event_kind,
+                      title: "A medical emergency prevented enrollment",
+                      tool_tip: "A serious medical emergency during open enrollment or special enrollment prevented enrollment",
+                      action_kind: "add_member",
+                      market_kind: "individual",
+                      ordinal_position: 100,
+                      reason: "exceptional_circumstances_medical_emergency",
+                      effective_on_kinds: ["first_of_month"],
+                      pre_event_sep_in_days: 0,
+                      post_event_sep_in_days: 60,
+                      is_self_attested: false,
+                      is_visible: false,
+                      date_options_available: true)
 end
 
 And(/Individual asks how to make an email account$/) do
@@ -333,7 +372,6 @@ And(/Individual again clicks on add member button/) do
   all(:css, ".mz").last.click
   sleep 2
 end
-
 
 And(/I click on continue button on household info form/) do
   screenshot("line 161")

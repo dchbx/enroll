@@ -18,6 +18,7 @@ FactoryBot.define do
                                      kind: 'health', deductible: 3000,
                                      metal_level_kind: "bronze",
                                      csr_variant_id: "01",
+                                     application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                      issuer_profile: issuer_profile)
       ivl_silver = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                      title: 'IVL Test Plan Silver',
@@ -26,6 +27,7 @@ FactoryBot.define do
                                      deductible: 2000,
                                      metal_level_kind: "silver",
                                      csr_variant_id: "01",
+                                     application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                      issuer_profile: issuer_profile)
       ivl_gold = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                    title: 'IVL Test Plan Gold',
@@ -33,6 +35,7 @@ FactoryBot.define do
                                    kind: 'health', deductible: 1000,
                                    metal_level_kind: "gold",
                                    csr_variant_id: "01",
+                                   application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                    issuer_profile: issuer_profile)
       ivl_plat = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                    title: 'IVL Test Plan Plat',
@@ -41,6 +44,7 @@ FactoryBot.define do
                                    deductible: 500,
                                    metal_level_kind: "platinum",
                                    csr_variant_id: "01",
+                                   application_period: (Date.new(evaluator.coverage_year, 1, 1)..Date.new(evaluator.coverage_year, 12, 31)),
                                    issuer_profile: issuer_profile)
       future_ivl_bronze = FactoryBot.create(:benefit_markets_products_health_products_health_product,
                                             title: 'IVL Test Plan Bronze',

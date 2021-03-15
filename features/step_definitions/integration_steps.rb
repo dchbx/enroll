@@ -1139,3 +1139,19 @@ And(/^Hbx Admin click on Employers/) do
   find_link("Employers").visible?
   click_link("Employers")
 end
+
+And(/^HBX Admin does sep process/) do
+  find('.interaction-click-control-add-sep').click
+  find('.label', :text => 'SEP REASON').click
+  find('li', :text => 'A medical emergency prevented enrollment').click
+  fill_in "EVENT DATE", with: (Date.today - 1.year).to_s
+  find('.label', :text => 'EFFECTIVE DATE RULE').click
+  find('li', :text => '15th of month').click
+  fill_in "SEP END DATE", with: ""
+  fill_in "SEP END DATE", with: (Date.today + 1.day).to_s
+  check 'coverage_renewal_flag'
+  click_button "Submit"
+  find('.interaction-click-control-first66272-last47372').click
+  step "Patrick Doe clicked on Shop For Plans button"
+end
+

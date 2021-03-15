@@ -6,8 +6,9 @@ end
 
 When(/^Hbx Admin clicks on the Action button of primary applicant$/) do
   within('.effective-datatable') do
-    find_all('.dropdown-toggle').last.click
+    find_all('.dropdown-toggle').first.click
   end
+  binding.pry
 end
 
 Then(/^Hbx Admin should see (.*?) link in action drop down$/) do |text|
