@@ -1,5 +1,6 @@
 name: Nightly Rails 6 Upgrade Test
 on:
+  push:
   schedule:
     - cron: '0 0 * * *'
 
