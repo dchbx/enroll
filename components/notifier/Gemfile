@@ -6,8 +6,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 
 # Declare any dependencies that are still in development here instead of in
 # your gemspec. These might include edge Rails or gems from your path or
@@ -16,4 +14,3 @@ gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee75
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
-

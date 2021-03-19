@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 6.0'
 gem 'sidekiq'
 
 #######################################################
@@ -25,7 +25,7 @@ gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
 
 ## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
+gem 'database_cleaner-mongoid'
 
 #######################################################
 
@@ -50,14 +50,14 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-gem 'mongoid',                  '~> 7.0.2'
+gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
 gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
+  gem 'mongoid_rails_migrations', '~> 1.4'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
@@ -70,7 +70,7 @@ gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
+gem 'coffee-rails',             '~> 5.0'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
@@ -119,6 +119,8 @@ gem 'webpacker',                '~> 4.0.2'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
+gem 'bigdecimal', '1.4.2'
+
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -152,7 +154,7 @@ group :development, :test do
   gem 'puma',                   '~> 3.12.4'
   gem 'rails-controller-testing'
   gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
+  gem 'rspec-rails',            '~> 4.0.2'
   gem 'rspec_junit_formatter'
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
@@ -165,7 +167,7 @@ group :test do
   gem 'capybara-screenshot',          '~> 1.0.18'
   gem 'cucumber-rails',               :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
+  gem 'mongoid-rspec',                '~> 4.1'
   gem 'rspec-instafail',              '~> 1'
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'

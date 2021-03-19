@@ -1,202 +1,3 @@
-<<<<<<< HEAD
-# frozen_string_literal: true
-
-source 'https://rubygems.org'
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-
-ruby '2.5.1'
-gem 'rails', '~> 5.2.4.3'
-gem 'sidekiq'
-
-#######################################################
-# FIXME
-#######################################################
-
-# Update to use features from new version
-gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
-# gem 'jquery-datatables-rails', '3.4.0'config/initializers/effective_datatables.rb
-
-# Verify this gem git reference is necessary.  Otherwise point it to release level
-gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
-
-## Fix this dependency -- bring into project
-# gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
-
-## Fix this dependency -- bring into project
-gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
-
-## Verify Rails 5 eliminates need for this gem with MongoDB
-gem 'database_cleaner',       '~> 1.7'
-
-#######################################################
-
-#######################################################
-# Local components/engines
-#######################################################
-gem 'acapi',              git: "https://github.com/ideacrew/acapi.git", branch: 'amqp_proc_title'
-gem "benefit_markets",    path: "components/benefit_markets"
-gem "benefit_sponsors",   path: "components/benefit_sponsors"
-gem 'financial_assistance', path: 'components/financial_assistance'
-gem "notifier",           path: "components/notifier"
-gem 'openhbx_cv2',        git:  'https://github.com/ideacrew/openhbx_cv2.git', branch: 'trunk'
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-# gem 'resource_registry',  git: '../resource_registry'
-
-gem "sponsored_benefits", path: "components/sponsored_benefits"
-gem "transport_gateway",  path: "components/transport_gateway"
-gem "transport_profiles", path: "components/transport_profiles"
-gem 'ui_helpers',         path: "components/ui_helpers"
-#######################################################
-
-## MongoDB gem dependencies
-gem 'bson',                     '~> 4.3'
-gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
-=======
-gem 'mongoid',                  '~> 7.2'
->>>>>>> ruby-2.7.1 and rails-6.0 upgrade
-=======
-gem 'mongoid',                  git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
->>>>>>> pointing mongoid to its github to fix a bug
-=======
-gem 'mongoid',                  '~> 7.0.2'
->>>>>>> REFS Maintenance - Begins toggle between rails 5 and 6
-gem 'mongo',                    '~> 2.6'
-gem 'mongo_session_store',      '~> 3.1'
-gem 'mongoid-autoinc',          '~> 6.0'
-gem 'mongoid-history',          '~> 0.8'
-# gem 'mongoid-versioning',       '~> 1.2.0'
-gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
-
-## General gems
-gem 'aasm',                     '~> 4.8'
-gem 'addressable',              '~> 2.3'
-gem 'animate-rails',            '~> 1.0.10'
-gem 'recurring_select'
-
-gem 'aws-sdk',                  '~> 2.2.4'
-gem 'bcrypt',                   '~> 3.1'
-gem 'bootsnap',                 '>= 1.1', require: false
-gem 'browser',                  '2.7.0'
-gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
-gem 'combine_pdf',              '~> 1.0'
-gem 'config',                   '~> 2.0'
-gem 'curl',                     '~> 0.0.9'
-gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "~> 0.5.9"
-gem 'jwt', "~> 2.2.1"
-gem 'haml',                     '~> 5.0'
-gem 'httparty',                 '~> 0.16'
-gem 'i18n',                     '~> 1.5'
-gem 'i18n-tasks', '~> 0.9.33'
-gem 'interactor',               '~> 3.0'
-gem 'interactor-rails',         '~> 2.2'
-gem 'jbuilder',                 '~> 2.7'
-gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'
-gem 'kaminari-mongoid'
-gem 'kaminari-actionview'
-gem 'language_list',            '~> 1'
-gem 'mail',                     '~> 2.7'
-gem 'maskedinput-rails',        '~> 1.4'
-gem 'money-rails',              '~> 1.13'
-gem 'net-ssh',                  '= 4.2.0'
-gem 'nokogiri',                 '~> 1.10.8'
-gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
-gem 'non-stupid-digest-assets'
-gem 'pundit',                   '~> 2.0'
-gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
-gem 'redcarpet',                '~> 3.4'
-gem 'redis',                    '~> 4.0'
-gem 'redis-rails',              '~> 5.0.2'
-gem 'resque',                   '~> 2.0'
-gem 'roo',                      '~> 2.1'
-gem 'rubyzip', '>= 1.3.0'
-gem 'ruby-saml',                '~> 1.3'
-gem 'sassc',                    '~> 1.12'
-gem 'sass-rails',               '~> 5'
-gem 'slim',                     '~> 3.0'
-gem 'slim-rails',               '~> 3.2'
-gem 'symmetric-encryption',     '~> 3.9.1'
-gem 'turbolinks',               '~> 5'
-gem 'uglifier',                 '>= 4'
-gem 'virtus',                   '~> 1.0'
-gem 'wicked_pdf',               '~> 1.1.0'
-gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '~> 4.0.2'
-gem 'fast_jsonapi'
-gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '~> 3.3'
-group :doc do
-  gem 'sdoc',                   '~> 1.0'
-end
-
-group :development do
-  gem "certified",              '~> 1'
-  gem 'overcommit',             '~> 0.47'
-  gem 'rubocop',                require: false
-  gem 'rubocop-rspec'
-  gem 'rubocop-git'
-  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console',            '>= 3'
-  gem 'listen',                 '>= 3.0.5', '< 3.2'
-
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
-  gem 'spring'
-  gem 'spring-watcher-listen'
-end
-
-group :development, :test do
-  gem 'action-cable-testing'
-  # gem 'bundler-audit',          '~> 0.6'
-  gem 'brakeman'
-  gem 'capistrano',             '~> 3.1'
-  gem 'capistrano-rails',       '1.4'
-  gem 'climate_control',        '~> 0.2.0'
-  gem 'email_spec',             '~> 2'
-  gem 'factory_bot_rails',      '~> 4.11'
-  gem 'forgery',                '~> 0.7.0'
-  gem 'parallel_tests',         '~> 2.26.2'
-  gem 'puma',                   '~> 3.12.4'
-  gem 'rails-controller-testing'
-  gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
-  gem 'rspec_junit_formatter'
-  gem 'stimulus_reflex_testing'
-  gem 'yard',                   '~> 0.9.20',  require: false
-  gem 'yard-mongoid',           '~> 0.1',     require: false
-end
-
-group :test do
-  gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'capybara',                     '~> 3.12'
-  gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
-  gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
-  gem 'mongoid-rspec',                '~> 4'
-  gem 'rspec-instafail',              '~> 1'
-  gem 'rspec-benchmark'
-  gem 'ruby-progressbar',             '~> 1'
-  gem 'shoulda-matchers',             '~> 3'
-  gem 'simplecov',                    '~> 0.14',  :require => false
-  gem 'test-prof'
-  gem 'warden',                       '~> 1.2.7'
-  gem 'watir',                        '~> 6.10.3'
-  gem 'webdrivers', '~> 3.0'
-  gem 'webmock',                      '~> 3.0.1'
-end
-
-group :production do
-  gem 'eye',          '0.10.0'
-  gem 'newrelic_rpm', '~> 5.0'
-  gem 'unicorn',      '~> 4.8'
-end
-=======
 GIT
   remote: https://github.com/harshared/simple_calendar.git
   revision: 109781178efa26c89ba51efa496bca29bc70a565
@@ -246,6 +47,15 @@ GIT
       rack (>= 1.6.13)
 
 GIT
+  remote: https://github.com/mongodb/mongoid.git
+  revision: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  ref: df6b2168ee7526f0c5e26f64f38851b91a0623e8
+  specs:
+    mongoid (7.3.0.alpha)
+      activemodel (>= 5.1, < 6.2)
+      mongo (>= 2.10.5, < 3.0.0)
+
+GIT
   remote: https://github.com/prawnpdf/prawn.git
   revision: 8028ca0cd2aae8c72df9fc4bf16388948423bcb2
   ref: 8028ca0cd2
@@ -269,9 +79,8 @@ PATH
       dry-validation
       language_list (~> 1)
       money-rails (~> 1.13)
-      mongoid (~> 7.0.2)
       pundit (~> 2.0)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
       virtus (~> 1.0)
@@ -298,10 +107,9 @@ PATH
       language_list (~> 1)
       mail
       money-rails (~> 1.13)
-      mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       roo (~> 2.1)
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
@@ -321,10 +129,9 @@ PATH
       font-awesome-rails (~> 4.7)
       haml-rails
       money-rails (~> 1.13.3)
-      mongoid (~> 7.0.2)
       mongoid-autoinc (~> 6.0)
       pundit (~> 2.0)
-      rails (~> 5.2.3)
+      rails (~> 6.0)
       slim (~> 3.0)
       symmetric-encryption (~> 3.9.1)
 
@@ -335,11 +142,10 @@ PATH
       aasm (~> 4.8)
       ckeditor (= 4.2.4)
       combine_pdf
-      config
+      config (~> 2.0)
       money-rails (~> 1.13)
-      mongoid (~> 7.0.2)
       non-stupid-digest-assets
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       redcarpet (~> 3.4.0)
       roo (~> 2.1.0)
       slim (= 3.0.9)
@@ -364,13 +170,9 @@ PATH
       dry-validation (~> 1.0)
       ffi (~> 1.9)
       kaminari (~> 0.17.0)
-<<<<<<< HEAD
-      mongoid (~> 7.0.2)
-=======
       money-rails (~> 1.13)
->>>>>>> 2090207f7b... fixed cucumbers and removed inheritence of sponsored_benefits benefit group from main app benefit group
       pundit (~> 2.0)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       roo (~> 2.1.0)
       sass (~> 3.7.3)
       slim (~> 3.0.8)
@@ -384,14 +186,13 @@ PATH
       aws-sdk (~> 2.2.4)
       net-sftp (~> 2.1, >= 2.1.2)
       net-ssh (= 4.2.0)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
 
 PATH
   remote: components/transport_profiles
   specs:
     transport_profiles (0.0.1)
-      mongoid (~> 7.0.2)
-      rails (~> 5.2.4.3)
+      rails (~> 6.0)
       rubyzip (>= 1.3.0)
       symmetric-encryption (~> 3.9.1)
       transport_gateway
@@ -400,7 +201,7 @@ PATH
   remote: components/ui_helpers
   specs:
     ui_helpers (0.0.1)
-      rails (~> 5.2.3)
+      rails (~> 6.0)
 
 PATH
   remote: project_gems/effective_datatables-2.6.14
@@ -428,52 +229,66 @@ GEM
       actioncable (>= 5.0)
     action_mailer_cache_delivery (0.3.7)
       actionmailer (>= 3.0)
-    actioncable (5.2.4.5)
-      actionpack (= 5.2.4.5)
+    actioncable (6.0.3.4)
+      actionpack (= 6.0.3.4)
       nio4r (~> 2.0)
       websocket-driver (>= 0.6.1)
-    actionmailer (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      actionview (= 5.2.4.5)
-      activejob (= 5.2.4.5)
+    actionmailbox (6.0.3.4)
+      actionpack (= 6.0.3.4)
+      activejob (= 6.0.3.4)
+      activerecord (= 6.0.3.4)
+      activestorage (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
+      mail (>= 2.7.1)
+    actionmailer (6.0.3.4)
+      actionpack (= 6.0.3.4)
+      actionview (= 6.0.3.4)
+      activejob (= 6.0.3.4)
       mail (~> 2.5, >= 2.5.4)
       rails-dom-testing (~> 2.0)
-    actionpack (5.2.4.5)
-      actionview (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    actionpack (6.0.3.4)
+      actionview (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
       rack (~> 2.0, >= 2.0.8)
       rack-test (>= 0.6.3)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.2.4.5)
-      activesupport (= 5.2.4.5)
+      rails-html-sanitizer (~> 1.0, >= 1.2.0)
+    actiontext (6.0.3.4)
+      actionpack (= 6.0.3.4)
+      activerecord (= 6.0.3.4)
+      activestorage (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
+      nokogiri (>= 1.8.5)
+    actionview (6.0.3.4)
+      activesupport (= 6.0.3.4)
       builder (~> 3.1)
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
-      rails-html-sanitizer (~> 1.0, >= 1.0.3)
+      rails-html-sanitizer (~> 1.1, >= 1.2.0)
     active_model_serializers (0.10.12)
       actionpack (>= 4.1, < 6.2)
       activemodel (>= 4.1, < 6.2)
       case_transform (>= 0.2)
       jsonapi-renderer (>= 0.1.1.beta1, < 0.3)
-    activejob (5.2.4.5)
-      activesupport (= 5.2.4.5)
+    activejob (6.0.3.4)
+      activesupport (= 6.0.3.4)
       globalid (>= 0.3.6)
-    activemodel (5.2.4.5)
-      activesupport (= 5.2.4.5)
-    activerecord (5.2.4.5)
-      activemodel (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
-      arel (>= 9.0)
-    activestorage (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      activerecord (= 5.2.4.5)
+    activemodel (6.0.3.4)
+      activesupport (= 6.0.3.4)
+    activerecord (6.0.3.4)
+      activemodel (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
+    activestorage (6.0.3.4)
+      actionpack (= 6.0.3.4)
+      activejob (= 6.0.3.4)
+      activerecord (= 6.0.3.4)
       marcel (~> 0.3.1)
-    activesupport (5.2.4.5)
+    activesupport (6.0.3.4)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (>= 0.7, < 2)
       minitest (~> 5.1)
       tzinfo (~> 1.1)
+      zeitwerk (~> 2.2, >= 2.2.2)
     addressable (2.7.0)
       public_suffix (>= 2.0.2, < 5.0)
     afm (0.2.2)
@@ -482,7 +297,6 @@ GEM
     amq-protocol (1.9.2)
     animate-rails (1.0.10)
       rails
-    arel (9.0.0)
     ast (2.4.2)
     awesome_print (1.8.0)
     aws-sdk (2.2.37)
@@ -499,8 +313,9 @@ GEM
     benchmark-malloc (0.2.0)
     benchmark-perf (0.6.0)
     benchmark-trend (0.4.0)
+    bigdecimal (1.4.2)
     bindex (0.8.1)
-    bootsnap (1.7.2)
+    bootsnap (1.7.0)
       msgpack (~> 1.0)
     brakeman (5.0.0)
     browser (2.7.0)
@@ -508,10 +323,8 @@ GEM
     builder (3.2.4)
     bunny (1.7.1)
       amq-protocol (~> 1.9.2)
-    cable_ready (4.5.0)
+    cable_ready (4.3.0)
       rails (>= 5.2)
-      thread-local (>= 1.1.0)
-    capistrano (3.16.0)
     capistrano (3.15.0)
       airbrussh (>= 1.0.0)
       i18n
@@ -533,14 +346,13 @@ GEM
     capybara-screenshot (1.0.25)
       capybara (>= 1.0, < 4)
       launchy
-    carrierwave (2.2.0)
+    carrierwave (2.1.0)
       activemodel (>= 5.0.0)
       activesupport (>= 5.0.0)
       addressable (~> 2.6)
       image_processing (~> 1.1)
       mimemagic (>= 0.3.0)
       mini_mime (>= 0.1.3)
-      ssrf_filter (~> 1.0)
     carrierwave-mongoid (1.3.0)
       carrierwave (>= 0.8, < 3)
       mongoid (>= 3.0, < 8.0)
@@ -578,9 +390,9 @@ GEM
       terrapin (= 0.6.0)
     coercible (1.0.0)
       descendants_tracker (~> 0.0.1)
-    coffee-rails (4.2.2)
+    coffee-rails (5.0.0)
       coffee-script (>= 2.2.0)
-      railties (>= 4.0.0)
+      railties (>= 5.2.0)
     coffee-script (2.4.1)
       coffee-script-source
       execjs
@@ -635,7 +447,10 @@ GEM
     curl (0.0.9)
       awesome_print (>= 0.2.1)
       unidecoder (>= 1.1.1)
-    database_cleaner (1.99.0)
+    database_cleaner-core (2.0.1)
+    database_cleaner-mongoid (2.0.1)
+      database_cleaner-core (~> 2.0.0)
+      mongoid
     deep_merge (1.2.1)
     descendants_tracker (0.0.4)
       thread_safe (~> 0.3, >= 0.3.1)
@@ -672,7 +487,7 @@ GEM
       concurrent-ruby (~> 1.0)
       dry-core (~> 0.4, >= 0.4.4)
       dry-equalizer
-    dry-schema (1.6.1)
+    dry-schema (1.6.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.8, >= 0.8.3)
       dry-core (~> 0.5, >= 0.5)
@@ -683,7 +498,7 @@ GEM
       dry-core (~> 0.5, >= 0.5)
       dry-types (~> 1.5)
       ice_nine (~> 0.11)
-    dry-types (1.5.1)
+    dry-types (1.5.0)
       concurrent-ruby (~> 1.0)
       dry-container (~> 0.3)
       dry-core (~> 0.5, >= 0.5)
@@ -721,8 +536,8 @@ GEM
     fast_jsonapi (1.5)
       activesupport (>= 4.2)
     ffi (1.9.25)
-    font-awesome-rails (4.7.0.7)
-      railties (>= 3.2, < 7)
+    font-awesome-rails (4.7.0.6)
+      railties (>= 3.2, < 6.2)
     forgery (0.7.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
@@ -747,7 +562,7 @@ GEM
     httparty (0.18.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
-    i18n (1.8.9)
+    i18n (1.8.8)
       concurrent-ruby (~> 1.0)
     i18n-tasks (0.9.33)
       activesupport (>= 4.0.2)
@@ -810,12 +625,12 @@ GEM
     middleware (0.1.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2021.0225)
+    mime-types-data (3.2020.1104)
     mimemagic (0.3.5)
     mini_magick (4.11.0)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
-    minitest (5.14.4)
+    minitest (5.14.3)
     monetize (1.9.4)
       money (~> 6.12)
     money (6.13.8)
@@ -830,9 +645,6 @@ GEM
     mongo_session_store (3.2.1)
       actionpack (>= 4.0)
       mongo (~> 2.0)
-    mongoid (7.0.12)
-      activemodel (>= 5.1, < 6.2)
-      mongo (>= 2.7.0, < 3.0.0)
     mongoid-autoinc (6.0.3)
       mongoid (>= 6.0, < 8.0)
     mongoid-compatibility (0.5.1)
@@ -912,18 +724,20 @@ GEM
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     railroady (1.5.3)
-    rails (5.2.4.5)
-      actioncable (= 5.2.4.5)
-      actionmailer (= 5.2.4.5)
-      actionpack (= 5.2.4.5)
-      actionview (= 5.2.4.5)
-      activejob (= 5.2.4.5)
-      activemodel (= 5.2.4.5)
-      activerecord (= 5.2.4.5)
-      activestorage (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+    rails (6.0.3.4)
+      actioncable (= 6.0.3.4)
+      actionmailbox (= 6.0.3.4)
+      actionmailer (= 6.0.3.4)
+      actionpack (= 6.0.3.4)
+      actiontext (= 6.0.3.4)
+      actionview (= 6.0.3.4)
+      activejob (= 6.0.3.4)
+      activemodel (= 6.0.3.4)
+      activerecord (= 6.0.3.4)
+      activestorage (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
       bundler (>= 1.3.0)
-      railties (= 5.2.4.5)
+      railties (= 6.0.3.4)
       sprockets-rails (>= 2.0.0)
     rails-controller-testing (1.0.5)
       actionpack (>= 5.0.1.rc1)
@@ -934,15 +748,15 @@ GEM
       nokogiri (>= 1.6)
     rails-html-sanitizer (1.3.0)
       loofah (~> 2.3)
-    rails-i18n (5.1.3)
+    rails-i18n (6.0.0)
       i18n (>= 0.7, < 2)
-      railties (>= 5.0, < 6)
-    railties (5.2.4.5)
-      actionpack (= 5.2.4.5)
-      activesupport (= 5.2.4.5)
+      railties (>= 6.0.0, < 7)
+    railties (6.0.3.4)
+      actionpack (= 6.0.3.4)
+      activesupport (= 6.0.3.4)
       method_source
       rake (>= 0.8.7)
-      thor (>= 0.19.0, < 2.0)
+      thor (>= 0.20.3, < 2.0)
     rainbow (3.0.0)
     raindrops (0.19.1)
     rake (13.0.3)
@@ -967,7 +781,7 @@ GEM
     redis-activesupport (5.2.0)
       activesupport (>= 3, < 7)
       redis-store (>= 1.3, < 2)
-    redis-namespace (1.8.1)
+    redis-namespace (1.8.0)
       redis (>= 3.0.4)
     redis-rack (2.1.3)
       rack (>= 2.0.8, < 3)
@@ -978,7 +792,7 @@ GEM
       redis-store (>= 1.2, < 2)
     redis-store (1.9.0)
       redis (>= 4, < 5)
-    regexp_parser (2.1.1)
+    regexp_parser (2.0.3)
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
@@ -1022,7 +836,7 @@ GEM
     rspec-support (3.10.2)
     rspec_junit_formatter (0.4.1)
       rspec-core (>= 2, < 4, != 2.12.0)
-    rubocop (1.11.0)
+    rubocop (1.9.1)
       parallel (~> 1.10)
       parser (>= 3.0.0.0)
       rainbow (>= 2.2.2, < 4.0)
@@ -1035,14 +849,13 @@ GEM
       parser (>= 2.7.1.5)
     rubocop-git (0.1.3)
       rubocop (>= 0.24.1)
-    rubocop-rspec (2.2.0)
+    rubocop-rspec (2.1.0)
       rubocop (~> 1.0)
       rubocop-ast (>= 1.1.0)
     ruby-progressbar (1.11.0)
     ruby-rc4 (0.1.5)
-    ruby-saml (1.12.0)
-      nokogiri (>= 1.10.5)
-      rexml
+    ruby-saml (1.11.0)
+      nokogiri (>= 1.5.10)
     ruby-vips (2.0.17)
       ffi (~> 1.9)
     ruby2_keywords (0.0.4)
@@ -1074,14 +887,15 @@ GEM
     sexp_processor (4.15.2)
     shoulda-matchers (3.1.3)
       activesupport (>= 4.0.0)
-    sidekiq (6.1.3)
+    sidekiq (6.0.7)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      redis (>= 4.2.0)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     sigdump (0.2.4)
-    simple_form (5.1.0)
-      actionpack (>= 5.2)
-      activemodel (>= 5.2)
+    simple_form (5.0.3)
+      actionpack (>= 5.0)
+      activemodel (>= 5.0)
     simplecov (0.21.2)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -1119,16 +933,14 @@ GEM
     sshkit (1.21.2)
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
-    ssrf_filter (1.0.7)
     state_machines (0.5.0)
-    stimulus_reflex (3.4.1)
-      cable_ready (>= 4.5)
+    stimulus_reflex (3.3.0)
+      cable_ready (>= 4.3.0)
       nokogiri
       rack
       rails (>= 5.2)
       redis
-    stimulus_reflex_testing (0.3.0)
-      stimulus_reflex (>= 3.3.0)
+    stimulus_reflex_testing (0.1.0)
     symmetric-encryption (3.9.1)
       coercible (~> 1.0)
     sys-uname (1.2.2)
@@ -1138,13 +950,12 @@ GEM
       unicode-display_width (~> 1.1, >= 1.1.1)
     terrapin (0.6.0)
       climate_control (>= 0.0.3, < 1.0)
-    test-prof (1.0.2)
+    test-prof (1.0.0)
     thor (1.1.0)
     thread (0.1.7)
-    thread-local (1.1.0)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    timers (4.3.3)
+    timers (4.3.2)
     ttfunk (1.0.3)
     turbolinks (5.2.1)
       turbolinks-source (~> 5.2)
@@ -1175,11 +986,11 @@ GEM
       warden (~> 1.2)
     watir (6.10.3)
       selenium-webdriver (~> 3.4, >= 3.4.1)
-    web-console (3.7.0)
-      actionview (>= 5.0)
-      activemodel (>= 5.0)
+    web-console (4.1.0)
+      actionview (>= 6.0.0)
+      activemodel (>= 6.0.0)
       bindex (>= 0.4.0)
-      railties (>= 5.0)
+      railties (>= 6.0.0)
     webdrivers (3.9.4)
       nokogiri (~> 1.6)
       rubyzip (~> 1.0)
@@ -1202,9 +1013,10 @@ GEM
     yard (0.9.26)
     yard-mongoid (0.1.0)
       yard (>= 0.8.4)
+    zeitwerk (2.4.2)
 
 PLATFORMS
-  x86_64-darwin-17
+  ruby
 
 DEPENDENCIES
   aasm (~> 4.8)
@@ -1217,6 +1029,7 @@ DEPENDENCIES
   bcrypt (~> 3.1)
   benefit_markets!
   benefit_sponsors!
+  bigdecimal (= 1.4.2)
   bootsnap (>= 1.1)
   brakeman
   browser (= 2.7.0)
@@ -1229,12 +1042,12 @@ DEPENDENCIES
   certified (~> 1)
   ckeditor (~> 4.2.4)
   climate_control (~> 0.2.0)
-  coffee-rails (~> 4.2.2)
+  coffee-rails (~> 5.0)
   combine_pdf (~> 1.0)
   config (~> 2.0)
   cucumber-rails
   curl (~> 0.0.9)
-  database_cleaner (~> 1.7)
+  database_cleaner-mongoid
   devise (~> 4.5)
   devise-jwt (~> 0.5.9)
   effective_datatables!
@@ -1265,11 +1078,11 @@ DEPENDENCIES
   money-rails (~> 1.13)
   mongo (~> 2.6)
   mongo_session_store (~> 3.1)
-  mongoid (~> 7.0.2)
+  mongoid!
   mongoid-autoinc (~> 6.0)
   mongoid-history (~> 0.8)
-  mongoid-rspec (~> 4)
-  mongoid_rails_migrations (~> 1.2)
+  mongoid-rspec (~> 4.1)
+  mongoid_rails_migrations (~> 1.4)
   mongoid_userstamp (~> 0.4)!
   net-ssh (= 4.2.0)
   newrelic_rpm (~> 5.0)
@@ -1284,7 +1097,7 @@ DEPENDENCIES
   puma (~> 3.12.4)
   pundit (~> 2.0)
   railroady (~> 1.5.3)
-  rails (~> 5.2.4.3)
+  rails (~> 6.0)
   rails-controller-testing
   recaptcha (~> 4.13)
   recurring_select
@@ -1296,7 +1109,7 @@ DEPENDENCIES
   roo (~> 2.1)
   rspec-benchmark
   rspec-instafail (~> 1)
-  rspec-rails
+  rspec-rails (~> 4.0.2)
   rspec_junit_formatter
   rubocop
   rubocop-git
@@ -1339,8 +1152,7 @@ DEPENDENCIES
   yard-mongoid (~> 0.1)
 
 RUBY VERSION
-   ruby 2.5.1p57
+   ruby 2.7.1p83
 
 BUNDLED WITH
-   2.2.12
->>>>>>> Sets everything up for rails 6 to switch to 5.
+   2.2.9

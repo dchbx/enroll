@@ -20,8 +20,6 @@ gem "effective_datatables", path: ".../../../../project_gems/effective_datatable
 gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
 gem 'webpacker', '~> 4.0.2'
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-gem 'mongoid',            git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
-
 # gem 'resource_registry',  git: '../../../resource_registry'
 
 group :development, :test do

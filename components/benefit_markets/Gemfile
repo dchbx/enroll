@@ -11,7 +11,6 @@ gemspec
 # your gem to rubygems.org.
 
 gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-gem 'mongoid',            git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 
 # To use a debugger
 # gem 'byebug', group: [:development, :test]

@@ -1,19 +1,19 @@
 source 'https://rubygems.org'
 
-# Declare your gem's dependencies in benefit_markets.gemspec.
+# Declare your gem's dependencies in notifier.gemspec.
 # Bundler will treat runtime dependencies like base dependencies, and
 # development dependencies will be added by default to the :development group.
 gemspec
+
+gem 'acapi', git: "https://github.com/ideacrew/acapi.git", branch: 'trunk'
+gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
+gem 'mongoid', git: 'https://github.com/mongodb/mongoid.git', ref: 'df6b2168ee7526f0c5e26f64f38851b91a0623e8'
 
 # Declare any dependencies that are still in development here instead of in
 # your gemspec. These might include edge Rails or gems from your path or
 # Git. Remember to move these dependencies to your gemspec before releasing
 # your gem to rubygems.org.
 
-gem 'resource_registry',  git:  'https://github.com/ideacrew/resource_registry.git', branch: 'trunk'
-
 # To use a debugger
 # gem 'byebug', group: [:development, :test]
-group :development, :test do
-  gem 'rails-controller-testing'
-end
+
