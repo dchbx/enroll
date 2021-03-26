@@ -708,6 +708,72 @@ describe EmployeeRole, dbclean: :around_each do
   end
 end
 
+describe '#fetch_benefit_applications_for_date', dbclean: :around_each do
+  include_context "setup benefit market with market catalogs and product packages"
+  include_context "setup initial benefit application"
+
+  let(:person) {FactoryBot.create(:person, :with_employee_role)}
+  let(:employee_role) {person.employee_roles.first}
+  let(:plan_year) { initial_application }
+  let(:employer_profile) { abc_profile }
+
+  context '#prior_plan_year_sep feature turned on' do
+
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:employer_profile).and_return(abc_profile)
+      allow(employer_profile).to receive(:plan_years).and_return(plan_year)
+    end
+
+    context 'when effective date does not fall under PY' do
+      it "not return any benefit applications" do
+        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+        allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+        expect(employee_role.fetch_benefit_applications_for_date(TimeKeeper.date_of_record - 5.days)).to eq([])
+      end
+    end
+
+    context 'when effective date falls under PY' do
+      it "return benefit applications" do
+        allow(plan_year).to receive(:aasm_state).and_return(:expired)
+        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+        allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+        expect(employee_role.fetch_benefit_applications_for_date(TimeKeeper.date_of_record + 5.days)).to eq([plan_year])
+      end
+    end
+  end
+
+  context '#prior_plan_year_sep feature turned off' do
+    before do
+      allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
+      allow(person).to receive(:active_employee_roles).and_return([employee_role])
+      allow(employee_role).to receive(:employer_profile).and_return(abc_profile)
+      allow(employer_profile).to receive(:plan_years).and_return(plan_year)
+    end
+
+    context 'when PY is expired or terminated' do
+      it "not return any benefit applications when py" do
+        plan_year.update_attributes(aasm_state: :expired)
+        expect(employee_role.fetch_benefit_applications_for_date(TimeKeeper.date_of_record + 5.days)).to eq([])
+      end
+
+      it "not return any benefit applications" do
+        plan_year.update_attributes(aasm_state: :terminated)
+        expect(employee_role.fetch_benefit_applications_for_date(TimeKeeper.date_of_record - 5.days)).to eq([])
+      end
+    end
+
+    context 'when PY is active' do
+      it "return benefit applications" do
+        allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+        allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+        expect(employee_role.fetch_benefit_applications_for_date(TimeKeeper.date_of_record + 5.days)).to eq([plan_year])
+      end
+    end
+  end
+end
+
 describe "#benefit_package", dbclean: :around_each do
   include_context "setup benefit market with market catalogs and product packages"
   include_context "setup renewal application"

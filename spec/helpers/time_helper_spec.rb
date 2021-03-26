@@ -109,6 +109,59 @@ RSpec.describe TimeHelper, :type => :helper, dbclean: :after_each do
       it "returns maximum range as end_date of plan_year" do
         expect(helper.sep_optional_date(family, 'max')).to eq(plan_year.end_on)
       end
+
+      context '#prior_plan_year_sep feature turned on' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(true)
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employer_profile).to receive(:plan_years).and_return(plan_year)
+        end
+
+        context 'when effective date does not fall under PY' do
+          it "not returns maximum range as end_date of plan_year" do
+            allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+            allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+            expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+          end
+        end
+
+        context 'when effective date falls under PY' do
+          it "returns maximum range as end_date of plan_year" do
+            allow(plan_year).to receive(:aasm_state).and_return(:expired)
+            allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+            allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+            expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(plan_year.end_on)
+          end
+        end
+      end
+
+      context '#prior_plan_year_sep feature turned off' do
+        before do
+          allow(EnrollRegistry).to receive(:feature_enabled?).with(:prior_plan_year_sep).and_return(false)
+          allow(person).to receive(:active_employee_roles).and_return([employee_role])
+          allow(employer_profile).to receive(:plan_years).and_return(plan_year)
+        end
+
+        context 'when PY is expired or terminated' do
+          it "not returns maximum range when py is expired" do
+            plan_year.update_attributes(aasm_state: :expired)
+            expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+          end
+
+          it "not returns maximum range when py is terminated" do
+            plan_year.update_attributes(aasm_state: :terminated)
+            expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record - 5.days)).to eq(nil)
+          end
+        end
+
+        context 'when PY is active' do
+          it "returns maximum range as end_date of plan_year" do
+            allow(plan_year).to receive(:start_on).and_return(TimeKeeper.date_of_record.beginning_of_month)
+            allow(plan_year).to receive(:end_on).and_return((TimeKeeper.date_of_record + 1.year).beginning_of_month - 1.day)
+            expect(helper.sep_optional_date(family, 'max', nil, TimeKeeper.date_of_record + 5.days)).to eq(plan_year.end_on)
+          end
+        end
+      end
     end
 
     context "for individual market" do

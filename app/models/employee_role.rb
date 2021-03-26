@@ -267,6 +267,15 @@ class EmployeeRole
     hired_on + 60.days >= TimeKeeper.date_of_record
   end
 
+  def fetch_benefit_applications_for_date(effective_date = nil)
+    if ::EnrollRegistry.feature_enabled?(:prior_plan_year_sep) && effective_date.present?
+      year = ::EnrollRegistry[:prior_plan_year_sep].setting(:prior_plan_eligible_year).item
+      employer_profile.benefit_applications.select{|ba| ((ba.start_on.beginning_of_day..ba.end_on.end_of_day).cover? effective_date) && ba.start_on.year >= year }
+    else
+      employer_profile.benefit_applications.where(:aasm_state.in => BenefitSponsors::BenefitApplications::BenefitApplication::APPROVED_STATES)
+    end
+  end
+
   def is_dental_offered?
     plan_year = employer_profile.find_plan_year_by_effective_date(coverage_effective_on(current_benefit_group: benefit_group))
 
