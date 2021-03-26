@@ -112,12 +112,15 @@ module Insured
       return unless employee_role.present?
 
       employer_profile = employee_role.employer_profile
-      benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, family.current_sep.effective_on)} || employer_profile.published_benefit_application
+      effective_on = family.current_sep.effective_on
+      benefit_application = employer_profile.benefit_applications.detect { |ba| is_covered_plan_year?(ba, effective_on)} || employer_profile.published_benefit_application
       enrollments = family.active_household&.hbx_enrollments
       if benefit_application.present? && benefit_application.is_renewing?
         renewal_enrollment(enrollments, employee_role, coverage_kind)
-      else
+      elsif benefit_application&.active?
         active_enrollment(enrollments, employee_role, coverage_kind)
+      elsif benefit_application&.expired? || benefit_application&.terminated?
+        previous_py_enrollment(enrollments, employee_role, coverage_kind, effective_on)
       end
     end
 
@@ -136,6 +139,19 @@ module Insured
         {
           :sponsored_benefit_package_id => employee_role.census_employee.active_benefit_package.try(:id),
           :aasm_state.in => HbxEnrollment::ENROLLED_STATUSES,
+          :coverage_kind => coverage_kind
+        }
+      ).first
+    end
+
+    def previous_py_enrollment(enrollments, employee_role, coverage_kind, effective_on)
+      benefit_package = employee_role.census_employee.benefit_package_for_date(effective_on)
+      return unless benefit_package
+
+      enrollments.where(
+        {
+          :sponsored_benefit_package_id => benefit_package.id,
+          :aasm_state.in => HbxEnrollment::TERMINATED_STATUSES,
           :coverage_kind => coverage_kind
         }
       ).first

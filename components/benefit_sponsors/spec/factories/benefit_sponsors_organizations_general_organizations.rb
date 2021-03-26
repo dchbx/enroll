@@ -52,6 +52,16 @@ FactoryBot.define do
       end
     end
 
+    trait :with_aca_shop_dc_employer_profile_expired_application do
+      with_aca_shop_dc_employer_profile
+      after :build do |organization, _evaluator|
+        organization.benefit_sponsorships = [build(:benefit_sponsors_benefit_sponsorship,
+                                                   :with_benefit_market,
+                                                   :with_expired_benefit_application,
+                                                   profile: organization.employer_profile)]
+      end
+    end
+
     trait :with_aca_shop_cca_employer_profile_initial_application do
       with_aca_shop_cca_employer_profile
       after :build do |organization, evaluator|
