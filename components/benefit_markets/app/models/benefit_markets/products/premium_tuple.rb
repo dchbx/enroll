@@ -10,6 +10,9 @@ module BenefitMarkets
     field :cost,  type: Float
     field :tobacco_cost, type: Float # if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
 
+    # Allowed values are 'Y', 'N', or nil for 'NA'
+    field :tobacco_use, type: String
+
     validates_presence_of :age, :cost
 
     default_scope   ->{ order(:"age".asc) }
@@ -27,6 +30,10 @@ module BenefitMarkets
       else
         other.updated_at.blank? || (updated_at < other.updated_at) ? -1 : 1
       end
+    end
+
+    def tobacco_use_value
+      tobacco_use.blank? ? "NA" : tobacco_use
     end
   end
 end
