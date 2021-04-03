@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Phone
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -7,8 +9,8 @@ class Phone
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
 
-  KINDS = ["home", "work", "mobile", "main", "fax"]
-  OFFICE_KINDS = ["phone main"]
+  KINDS = ["home", "work", "mobile", "main", "fax"].freeze
+  OFFICE_KINDS = ["phone main"].freeze
 
   field :kind, type: String
   field :country_code, type: String, default: ""
@@ -23,8 +25,8 @@ class Phone
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   before_validation :save_phone_components
@@ -32,18 +34,16 @@ class Phone
   before_save :set_full_phone_number
 
   validates :area_code,
-    numericality: true,
-    length: { minimum: 3, maximum: 3, message: "%{value} is not a valid area code" },
-    allow_blank: false
+            length: { minimum: 3, maximum: 3, message: "%{value} not a valid area code" },
+            allow_blank: false
 
   validates :number,
-    numericality: true,
-    length: { minimum: 7, maximum: 7, message: "%{value} is not a valid phone number" },
-    allow_blank: false
+            length: { minimum: 7, maximum: 7, message: "%{value} not a valid phone number" },
+            allow_blank: false
 
   validates :kind,
-    inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid phone type" },
-    allow_blank: false
+            inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} not a valid phone type" },
+            allow_blank: false
 
   def blank?
     [:full_phone_number, :area_code, :number, :extension].all? do |attr|
@@ -53,13 +53,13 @@ class Phone
 
   def save_phone_components
     phone_number = filter_non_numeric(self.full_phone_number).to_s
-    if !phone_number.blank?
-      length=phone_number.length
-      if length>10
+    unless phone_number.blank? # rubocop:disable Style/GuardClause
+      length = phone_number.length
+      if length > 10
         self.area_code = phone_number[0,3]
         self.number = phone_number[3,7]
-        self.extension = phone_number[10,length-10]
-      elsif length==10
+        self.extension = phone_number[10,length - 10]
+      elsif length == 10
         self.area_code = phone_number[0,3]
         self.number = phone_number[3,7]
         self.extension = ""
@@ -68,20 +68,20 @@ class Phone
   end
 
   def full_phone_number=(new_full_phone_number)
-   super filter_non_numeric(new_full_phone_number)
-   save_phone_components
+    super filter_non_numeric(new_full_phone_number)
+    save_phone_components
   end
 
   def area_code=(new_area_code)
-   super filter_non_numeric(new_area_code)
+    super filter_non_numeric(new_area_code)
   end
 
   def number=(new_number)
-   super filter_non_numeric(new_number)
+    super filter_non_numeric(new_number)
   end
 
   def extension=(new_extension)
-   super filter_non_numeric(new_extension)
+    super filter_non_numeric(new_extension)
   end
 
   def to_s
@@ -97,7 +97,8 @@ class Phone
     self.full_phone_number = to_s
   end
 
-private
+  private
+
   def filter_non_numeric(str)
     str.present? ? str.to_s.gsub(/\D/,'') : ""
   end

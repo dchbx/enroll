@@ -124,6 +124,7 @@ class Insured::EmployeeRolesController < ApplicationController
         end
       else
         bubble_address_errors_by_person(@person)
+        bubble_phone_errors_by_person(@person)
         build_nested_models
         respond_to do |format|
           format.html { render "edit" }

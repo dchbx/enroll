@@ -241,6 +241,7 @@ class Insured::ConsumerRolesController < ApplicationController
         @consumer_role.build_nested_models_for_person
         @vlp_doc_subject = get_vlp_doc_subject_by_consumer_role(@consumer_role)
         bubble_address_errors_by_person(@consumer_role.person)
+        bubble_phone_errors_by_person(@consumer_role.person)
         respond_to do |format|
           format.html { render "edit" }
         end

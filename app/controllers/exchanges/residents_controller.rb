@@ -127,6 +127,7 @@ class Exchanges::ResidentsController < ApplicationController
     else
       @resident_role.build_nested_models_for_person
       bubble_address_errors_by_person(@resident_role.person)
+      bubble_phone_errors_by_person(@resident_role.person)
       respond_to do |format|
         format.html { render "edit" }
       end
