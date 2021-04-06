@@ -30,10 +30,10 @@ module Operations
 
       def load_headers(sheet)
         header_row = sheet.row(1)
-        headers = Hash.new
-        header_row.each_with_index {|header,i|
+        headers = {}
+        header_row.each_with_index do |header,i|
           headers[header.to_s.underscore] = i
-        }
+        end
         Success(headers)
       end
 
@@ -46,9 +46,10 @@ module Operations
             row_info = sheet.row(row_number)
             query_criteria = { state: state_abbreviation }
 
-            if geographic_rating_area_model == 'county'
+            case geographic_rating_area_model
+            when 'county'
               query_criteria.merge!({ county_name: row_info[headers['county']].squish! })
-            elsif geographic_rating_area_model == 'zipcode'
+            when 'zipcode'
               query_criteria.merge!({ zip: row_info[headers["zip"]].squish! })
             else
               query_criteria.merge!({ county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].squish! })
@@ -60,7 +61,7 @@ module Operations
 
             ::BenefitMarkets::Locations::CountyZip.new(query_criteria).save!
           end
-        rescue
+        rescue StandardError
           return Failure({errors: ["Unable to import CountyZips from file"]})
         end
         Success('Created CountyZips for given data')

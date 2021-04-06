@@ -9,7 +9,7 @@ module Operations
       def call(params)
         values  = yield validate(params)
         data    = yield load_data(values[:file])
-        _load   =  yield import_records(data, values[:year])
+        _load = yield import_records(data, values[:year])
         Success()
       end
 
@@ -27,11 +27,12 @@ module Operations
         sheet = result.sheet(0)
         result = Hash.new {|results, k| results[k] = []}
 
-        if geographic_rating_area_model == 'county'
+        case geographic_rating_area_model
+        when 'county'
           (2..sheet.last_row).each do |i|
             result[sheet.cell(i, 4)] << { 'county_name' => sheet.cell(i, 2) }
           end
-        elsif geographic_rating_area_model == 'zipcode'
+        when 'zipcode'
           (2..sheet.last_row).each do |i|
             result[sheet.cell(i, 4)] << { 'zip' => sheet.cell(i, 1) }
           end
@@ -53,9 +54,9 @@ module Operations
           data.each do |rating_area_id, locations|
             location_ids = locations.map do |loc_record|
               query_criteria = {
-                                 state: state_abbreviation,
-                                 county_name: loc_record['county_name']
-                               }
+                state: state_abbreviation,
+                county_name: loc_record['county_name']
+              }
               query_criteria.merge!({ zip: loc_record['zip'] }) unless geographic_rating_area_model == 'county'
               query_criteria.merge!({ county_name: loc_record['county'] }) unless geographic_rating_area_model == 'zipcode'
               county_zip = ::Locations::CountyZip.where(query_criteria).first
@@ -82,7 +83,7 @@ module Operations
               ).save!
             end
           end
-        rescue
+        rescue StandardError
           return Failure({errors: ["Unable to import CountyZips from file"]})
         end
         Success('Created Rating Areas for given data')
