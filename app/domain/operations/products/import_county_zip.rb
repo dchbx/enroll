@@ -10,7 +10,7 @@ module Operations
         values  = yield validate(params)
         sheet   = yield load_data(values[:file])
         headers = yield load_headers(sheet)
-        _load  =  yield import_records(headers, sheet)
+        _load  =  yield import_records(headers, sheet, values[:import_timestamp])
         Success()
       end
 
@@ -22,14 +22,14 @@ module Operations
         Success(params)
       end
 
-      def load_data
-        result = Roo::Spreadsheet.open(params[:file])
+      def load_data(file)
+        result = Roo::Spreadsheet.open(file)
         sheet = result.sheet(0)
         Success(sheet)
       end
 
-      def load_headers
-        header_row = sheet_data.row(1)
+      def load_headers(sheet)
+        header_row = sheet.row(1)
         headers = Hash.new
         header_row.each_with_index {|header,i|
           headers[header.to_s.underscore] = i
@@ -37,21 +37,28 @@ module Operations
         Success(headers)
       end
 
-      def import_records(headers, sheet)
+      def import_records(headers, sheet, import_timestamp)
+        state_abbreviation = Settings.aca.state_abbreviation
+        geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+        return Success("CountyZips not needed") if geographic_rating_area_model == 'single'
         begin
           (2..sheet.last_row).each do |row_number|
             row_info = sheet.row(row_number)
-            # Get these form RR
-            state_abbreviation = 'ME'
-            geographic_rating_area_model = 'county'
             query_criteria = { state: state_abbreviation }
-            query_criteria.merge!({ zip: row_info[headers["zip"]].squish! }) if geographic_rating_area_model != 'county'
-            query_criteria.merge!({ county_name: row_info[headers['county']].squish! }) if geographic_rating_area_model != 'zipcode'
+
+            if geographic_rating_area_model == 'county'
+              query_criteria.merge!({ county_name: row_info[headers['county']].squish! })
+            elsif geographic_rating_area_model == 'zipcode'
+              query_criteria.merge!({ zip: row_info[headers["zip"]].squish! })
+            else
+              query_criteria.merge!({ county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].squish! })
+            end
+
             existing_county = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
             next if existing_county.present?
+            query_criteria.merge!({ created_at: import_timestamp })
 
-            params = query_criteria.merge!({created_at: params[:import_timestamp]})
-            ::BenefitMarkets::Locations::CountyZip.new(params).save!
+            ::BenefitMarkets::Locations::CountyZip.new(query_criteria).save!
           end
         rescue
           return Failure({errors: ["Unable to import CountyZips from file"]})

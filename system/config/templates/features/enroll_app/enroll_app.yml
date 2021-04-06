@@ -31,6 +31,8 @@ registry:
             item: "https://www.dchealthlink.com/submit-docs"
           - key: :state_residency
             item: "DC Residency"
+          - key: :geographic_rating_area_model
+            item: "county"
           - key: :site_key
             item: :dc
           - key: :state_abbreviation
