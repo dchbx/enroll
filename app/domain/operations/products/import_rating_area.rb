@@ -9,7 +9,7 @@ module Operations
       def call(params)
         values  = yield validate(params)
         data    = yield load_data(values[:file])
-        _load = yield import_records(data, values[:year])
+        _load = yield import_records(data, values[:year], values[:import_timestamp])
         Success()
       end
 
@@ -22,12 +22,15 @@ module Operations
         Success(params)
       end
 
-      def load_data
-        result = Roo::Spreadsheet.open(params[:file])
+      def load_data(file)
+        geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+        result = Roo::Spreadsheet.open(file)
         sheet = result.sheet(0)
         result = Hash.new {|results, k| results[k] = []}
 
         case geographic_rating_area_model
+        when 'single'
+          result = {}
         when 'county'
           (2..sheet.last_row).each do |i|
             result[sheet.cell(i, 4)] << { 'county_name' => sheet.cell(i, 2) }
@@ -47,9 +50,12 @@ module Operations
         Success(result)
       end
 
-      def import_records(data, year)
-        state_abbreviation = 'ME'
-        geographic_rating_area_model = 'county'
+      def import_records(data, year, import_timestamp)
+        state_abbreviation = Settings.aca.state_abbreviation
+        geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+
+        return Success("Rating Areas not needed") if geographic_rating_area_model == 'single'
+
         begin
           data.each do |rating_area_id, locations|
             location_ids = locations.map do |loc_record|
@@ -57,23 +63,32 @@ module Operations
                 state: state_abbreviation,
                 county_name: loc_record['county_name']
               }
-              query_criteria.merge!({ zip: loc_record['zip'] }) unless geographic_rating_area_model == 'county'
-              query_criteria.merge!({ county_name: loc_record['county'] }) unless geographic_rating_area_model == 'zipcode'
-              county_zip = ::Locations::CountyZip.where(query_criteria).first
+
+              case geographic_rating_area_model
+              when 'county'
+                query_criteria.merge!({ county_name: loc_record['county_name'].squish! })
+              when 'zipcode'
+                query_criteria.merge!({ zip: loc_record["zip"].squish! })
+              else
+                query_criteria.merge!({ county_name: loc_record['county_name'].squish!, zip: loc_record["zip"].squish! })
+              end
+
+              county_zip = ::BenefitMarkets::Locations::CountyZip.where(query_criteria).first
               county_zip._id
             end
 
-            rating_area = ::Locations::RatingArea.where(
+            rating_area = ::BenefitMarkets::Locations::RatingArea.where(
               {
                 active_year: year,
                 exchange_provided_code: rating_area_id
               }
             ).first
+
             if rating_area.present?
               rating_area.county_zip_ids = location_ids
               rating_area.save!
             else
-              ::Locations::RatingArea.new(
+              ::BenefitMarkets::Locations::RatingArea.new(
                 {
                   created_at: import_timestamp,
                   active_year: year,

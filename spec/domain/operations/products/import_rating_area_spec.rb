@@ -2,20 +2,23 @@
 
 require 'rails_helper'
 
-RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
+RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
 
   it 'should be a container-ready operation' do
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
   describe 'clients with geographic rating areas' do
+
     let(:import_timestamp) { DateTime.now }
     let(:file) { 'spec/test_data/plan_data/rating_areas/county_zipcode.xlsx' }
+    let(:year) { TimeKeeper.date_of_record.year }
 
     describe 'single geographic rating area' do
       let(:params) do
         {
           file: file,
+          year: year,
           import_timestamp: import_timestamp
         }
       end
@@ -29,8 +32,8 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
         expect(result.success?).to eq true
       end
 
-      it 'should not create any county zip objects' do
-        expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
+      it 'should not create any rating area objects' do
+        expect(::BenefitMarkets::Locations::RatingArea.all.count).to be_zero
       end
     end
 
@@ -43,8 +46,13 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
         let(:params) do
           {
             file: file,
+            year: year,
             import_timestamp: import_timestamp
           }
+        end
+
+        before do
+          ::Operations::Products::ImportCountyZip.new.call(params)
         end
 
         context 'without existing records' do
@@ -56,12 +64,8 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(@result.success?).to eq true
           end
 
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(10)
-          end
-
-          it 'should create CountyZip objects without county name' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.pluck(:county_name).uniq).to eq([nil])
+          it 'should create RatingArea objects' do
+            expect(::BenefitMarkets::Locations::RatingArea.all.count).to eq(7)
           end
         end
 
@@ -72,10 +76,10 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(result.success?).to eq true
           end
 
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, zip: '01001')
+          it 'should not create rating area objects if already exists' do
+            FactoryBot.create(:benefit_markets_locations_rating_area, exchange_provided_code: 'Rating Area 1')
             subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(zip: '01001').size).to eq(1)
+            expect(::BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: 'Rating Area 1').size).to eq(1)
           end
         end
       end
@@ -83,18 +87,23 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
       context 'failure' do
 
         it 'should return missing file' do
-          result = subject.call({ import_timestamp: import_timestamp })
+          result = subject.call({})
           expect(result.failure).to eq('Missing File')
         end
 
+        it 'should return missing year' do
+          result = subject.call({ file: file })
+          expect(result.failure).to eq('Missing Year')
+        end
+
         it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
+          result = subject.call({ file: file, year: year })
           expect(result.failure).to eq('Missing Import TimeStamp')
         end
 
-        it 'should not create CountyZip object' do
-          subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
+        it 'should not create RatingArea object' do
+          subject.call({ file: file, import_timestamp: import_timestamp })
+          expect(::BenefitMarkets::Locations::RatingArea.all.count).to be_zero
         end
       end
     end
@@ -109,8 +118,13 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
         let(:params) do
           {
             file: file,
+            year: year,
             import_timestamp: import_timestamp
           }
+        end
+
+        before do
+          ::Operations::Products::ImportCountyZip.new.call(params)
         end
 
         context 'without existing records' do
@@ -122,12 +136,8 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(@result.success?).to eq true
           end
 
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(5)
-          end
-
-          it 'should create CountyZip objects without zipcode' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.pluck(:zip).uniq).to eq([nil])
+          it 'should create RatingArea objects' do
+            expect(::BenefitMarkets::Locations::RatingArea.all.count).to eq(7)
           end
         end
 
@@ -138,10 +148,10 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(result.success?).to eq true
           end
 
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Hampden')
+          it 'should not create rating area objects if already exists' do
+            FactoryBot.create(:benefit_markets_locations_rating_area, exchange_provided_code: 'Rating Area 1')
             subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: 'Hampden').size).to eq(1)
+            expect(::BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: 'Rating Area 1').size).to eq(1)
           end
         end
       end
@@ -153,14 +163,19 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
           expect(result.failure).to eq('Missing File')
         end
 
+        it 'should return missing year' do
+          result = subject.call({ file: file })
+          expect(result.failure).to eq('Missing Year')
+        end
+
         it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
+          result = subject.call({ file: file, year: year })
           expect(result.failure).to eq('Missing Import TimeStamp')
         end
 
-        it 'should not create CountyZip object' do
+        it 'should not create RatingArea object' do
           subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
+          expect(::BenefitMarkets::Locations::RatingArea.all.count).to be_zero
         end
       end
     end
@@ -175,8 +190,13 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
         let(:params) do
           {
             file: file,
+            year: year,
             import_timestamp: import_timestamp
           }
+        end
+
+        before do
+          ::Operations::Products::ImportCountyZip.new.call(params)
         end
 
         context 'without existing records' do
@@ -188,13 +208,8 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(@result.success?).to eq true
           end
 
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(14)
-          end
-
-          it 'should create CountyZip objects with zipcode & county' do
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: nil).size).to eq(0)
-            expect(::BenefitMarkets::Locations::CountyZip.where(zip: nil).size).to eq(0)
+          it 'should create RatingArea objects' do
+            expect(::BenefitMarkets::Locations::RatingArea.all.count).to eq(7)
           end
         end
 
@@ -205,10 +220,10 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
             expect(result.success?).to eq true
           end
 
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Hampden', zip: '01001')
+          it 'should not create rating area objects if already exists' do
+            FactoryBot.create(:benefit_markets_locations_rating_area, exchange_provided_code: 'Rating Area 1')
             subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: 'Hampden', zip: '01001').size).to eq(1)
+            expect(::BenefitMarkets::Locations::RatingArea.where(exchange_provided_code: 'Rating Area 1').size).to eq(1)
           end
         end
       end
@@ -220,14 +235,19 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
           expect(result.failure).to eq('Missing File')
         end
 
+        it 'should return missing year' do
+          result = subject.call({ file: file })
+          expect(result.failure).to eq('Missing Year')
+        end
+
         it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
+          result = subject.call({ file: file, year: year })
           expect(result.failure).to eq('Missing Import TimeStamp')
         end
 
-        it 'should not create CountyZip object' do
+        it 'should not create RatingArea object' do
           subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
+          expect(::BenefitMarkets::Locations::RatingArea.all.count).to be_zero
         end
       end
     end
