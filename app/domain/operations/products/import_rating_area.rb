@@ -54,7 +54,15 @@ module Operations
         state_abbreviation = Settings.aca.state_abbreviation
         geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
 
-        return Success("Rating Areas not needed") if geographic_rating_area_model == 'single'
+        if geographic_rating_area_model == 'single'
+          ::BenefitMarkets::Locations::RatingArea.find_or_create_by!({
+                                                                       active_year: year,
+                                                                       exchange_provided_code: "R-#{state_abbreviation}001",
+                                                                       county_zip_ids: [],
+                                                                       covered_states: [state_abbreviation]
+                                                                     })
+          return Success("Rating Areas not needed")
+        end
 
         begin
           data.each do |rating_area_id, locations|

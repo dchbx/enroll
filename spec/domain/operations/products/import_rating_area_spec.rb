@@ -32,8 +32,15 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
         expect(result.success?).to eq true
       end
 
-      it 'should not create any rating area objects' do
-        expect(::BenefitMarkets::Locations::RatingArea.all.count).to be_zero
+      it 'should create one rating area' do
+        subject.call(params)
+        expect(::BenefitMarkets::Locations::RatingArea.all.count).to eq 1
+      end
+
+      it 'should not create rating area if there is an existing one' do
+        FactoryBot.create(:benefit_markets_locations_rating_area, exchange_provided_code: "R-#{Settings.aca.state_abbreviation}001", county_zip_ids: [])
+        subject.call(params)
+        expect(::BenefitMarkets::Locations::RatingArea.all.count).to eq 1
       end
     end
 
