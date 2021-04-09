@@ -85,12 +85,7 @@ module Operations
               county_zip._id
             end
 
-            rating_area = ::BenefitMarkets::Locations::RatingArea.where(
-              {
-                active_year: year,
-                exchange_provided_code: rating_area_id
-              }
-            ).first
+            rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
 
             if rating_area.present?
               rating_area.county_zip_ids = location_ids
