@@ -126,9 +126,9 @@ end
 group :development do
   gem "certified",              '~> 1'
   gem 'overcommit',             '~> 0.47'
-  gem 'rubocop',                require: false
-  gem 'rubocop-rspec'
-  gem 'rubocop-git'
+  gem 'rubocop', '>= 1.8.0', require: false
+  gem 'rubocop-rspec', '>= 1.38.1'
+  gem 'rubocop-git', '>= 0.1.3'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
   gem 'web-console',            '>= 3'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
