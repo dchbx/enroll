@@ -2,7 +2,7 @@
 
 module Operations
   module Products
-    # This class is to load county zip combinations.
+    # This class is to load rating areas.
     class ImportRatingArea
       include Dry::Monads[:result, :do]
 
@@ -61,7 +61,7 @@ module Operations
                                                                        county_zip_ids: [],
                                                                        covered_states: [state_abbreviation]
                                                                      })
-          return Success("Rating Areas not needed")
+          return Success("Created Rating areas")
         end
 
         begin
