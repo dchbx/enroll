@@ -159,6 +159,23 @@ module BenefitSponsors
     end
     let(:profile_factory_class) { BenefitSponsors::Organizations::Factories::ProfileFactory }
 
+
+    describe ".match_or_create_person", dbclean: :after_each do
+      context 'when equal to 1 person matched' do
+        before :each do
+          @person = FactoryBot.create(:person, first_name: 'Dany', last_name: 'Targ', dob: Date.new(1959, 9, 9))
+          FactoryBot.create(:user, person: @person)
+        end
+
+        it "should not raise an exception" do
+          obj = profile_factory_class.new(valid_employer_params)
+          obj.current_user = @person.user
+          obj.handler = profile_factory_class.initialize_handler('benefit_sponsor')
+          expect(obj.match_or_create_person).to be_truthy
+        end
+      end
+    end
+
     context '.persist' do
       context 'when type is benefit sponsor' do
         let(:profile_factory) do
