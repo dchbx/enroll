@@ -16,9 +16,9 @@
       <span class="pull-right">
         <span style="font-size: 24px;">
           <% if (@hbx_enrollment.present? && @hbx_enrollment.coverage_kind == 'health') || @plan.coverage_kind == 'health' %>
-          <%= number_to_currency(current_cost(@plan.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?)) %>
+          <%= number_to_currency(current_cost(@hbx_enrollment.total_employee_cost, @plan.ehb, @hbx_enrollment, @source, @plan.can_use_aptc?)) %>
           <% else %>
-          <%= number_to_currency(@plan.total_employee_cost) %>
+          <%= number_to_currency(@hbx_enrollment.total_employee_cost) %>
           <% end %>
         </span>
         <br/>
