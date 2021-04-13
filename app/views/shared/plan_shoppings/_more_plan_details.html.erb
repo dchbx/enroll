@@ -5,10 +5,12 @@
     &nbsp;
     <strong><%= plan_shopping_dependent_text(@hbx_enrollment) %></strong>
     &nbsp;&nbsp;
-    <% if (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' %>
-    Employer: &nbsp;
-    <strong><%= @hbx_enrollment.try(:benefit_sponsorship).try(:organization).try(:legal_name) %></strong>
-    &nbsp;&nbsp;
+    <% if (['shop','employer_sponsored','fehb'].include?(@market_kind)) && @coverage_kind == 'health' && @hbx_enrollment&.benefit_sponsorship %>
+      Employer: &nbsp;
+      <strong>
+        <%= @hbx_enrollment&.benefit_sponsorship&.organization&.legal_name %>    
+      </strong>
+      &nbsp;&nbsp;
     <% end %>
     <span class="ttu lg twelve">Plans:</span>
     &nbsp;
