@@ -36,7 +36,7 @@ module Forms
 
     def terminate_enrollments
       terminated_enrollments_transmission_info = {}
-      @params.each do |key, value|
+      params.each do |key, value|
         if key.to_s[/terminate_hbx_.*/]
           hbx = HbxEnrollment.find(params[key.to_s])
           begin
@@ -45,7 +45,8 @@ module Forms
             if termination_date >= ::TimeKeeper.date_of_record && hbx.is_shop?
               hbx.schedule_coverage_termination!(termination_date) if hbx.may_schedule_coverage_termination?
             elsif hbx.may_terminate_coverage?
-              hbx.terminate_coverage!(termination_date)
+              hbx.termination_submitted_on = ::TimeKeeper.datetime_of_record
+              hbx.terminate_benefit(termination_date)
             end
             @result[:success] << hbx
             terminated_enrollments_transmission_info[hbx.id] = params.key?("transmit_hbx_#{hbx.id.to_s}") ? true : false

@@ -63,9 +63,9 @@ describe Forms::BulkActionsForAdmin do
     end
 
     context "IVL" do
-      let(:termination_date) { Date.today + 1.month }
+      let(:termination_date) { ::TimeKeeper.date_of_record }
       let(:family) { FactoryBot.create(:family, :with_primary_family_member) }
-      let(:hbx_enrollment) do
+      let!(:hbx_enrollment) do
         FactoryBot.create(:hbx_enrollment, :individual_unassisted, family: family, aasm_state: 'coverage_enrolled')
       end
       let(:terminate_params) do
@@ -78,13 +78,17 @@ describe Forms::BulkActionsForAdmin do
           "termination_date_#{hbx_enrollment.id}" => termination_date.to_s
         }
       end
+      let(:benefit_coverage_period) do
+        double
+      end
       let(:bulk_actions_for_admin) do
         Forms::BulkActionsForAdmin.new(terminate_params)
       end
 
       before :each do
-        hbx_enrollment
         allow(bulk_actions_for_admin).to receive(:handle_edi_transmissions).with(hbx_enrollment.id, false).and_return(true)
+        allow(BenefitCoveragePeriod).to receive(:find_by_date).with(hbx_enrollment.effective_on).and_return(benefit_coverage_period)
+        allow(benefit_coverage_period).to receive(:termination_effective_on_for).with(::TimeKeeper.date_of_record).and_return(hbx_enrollment.effective_on)
         bulk_actions_for_admin.terminate_enrollments
         hbx_enrollment.reload
       end
