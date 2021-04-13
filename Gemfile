@@ -49,7 +49,7 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
-gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
+gem 'carrierwave-mongoid', '~> 1.3', '>= 1.3.0', :require => 'carrierwave/mongoid'
 gem 'mongoid',                  '~> 7.0.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
