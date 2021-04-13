@@ -1,26 +1,63 @@
 require 'rails_helper'
+require File.expand_path(
+  File.join(
+    File.dirname(__FILE__),
+    "../../../",
+    "support/benefit_sponsors_site_spec_helpers"
+  )
+)
+require File.expand_path(
+  File.join(
+    File.dirname(__FILE__),
+    "../../../",
+    "support/benefit_sponsors_product_spec_helpers"
+  )
+)
+require File.expand_path(
+  File.join(
+    File.dirname(__FILE__),
+    "../../../",
+    "support/benefit_sponsors_organization_spec_helpers"
+  )
+)
 
 module BenefitSponsors
   RSpec.describe ::BenefitSponsors::Services::StaffRoleService, type: :model, :dbclean => :after_each do
     let!(:security_question)  { FactoryBot.create_default :security_question }
 
-    let(:site)            { create(:benefit_sponsors_site, :with_benefit_market, :as_hbx_profile, :cca) }
-    let(:employer_organization)   { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_aca_shop_cca_employer_profile, site: site) }
+    let(:current_effective_date) { TimeKeeper.date_of_record }
+    let(:site) do
+      site = ::BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile_and_empty_benefit_market
+      benefit_market =  site.benefit_markets.first
+      ::BenefitSponsors::ProductSpecHelpers.construct_benefit_market_catalog_with_renewal_and_previous_catalog(
+        site,
+        benefit_market,
+        (current_effective_date.beginning_of_year..current_effective_date.end_of_year)
+      )
+      site
+    end 
+    let(:employer_organization)   do
+      org_id = ::BenefitSponsors::OrganizationSpecHelpers.with_aca_shop_employer_profile(site)
+      org = ::BenefitSponsors::Organizations::Organization.find(org_id)
+    end
     let(:employer_profile)        { employer_organization.employer_profile }
 
-    let!(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
+    let(:broker_organization)                  { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_broker_agency_profile, site: site) }
 
     let(:broker_agency_profile) { broker_organization.broker_agency_profile }
-    let!(:general_agency_organization) { FactoryBot.create(:benefit_sponsors_organizations_general_organization, :with_general_agency_profile, site: site) }
+    let(:general_agency_organization) do 
+      org_id = ::BenefitSponsors::OrganizationSpecHelpers.with_aca_shop_general_agency_profile(site)
+      org = ::BenefitSponsors::Organizations::Organization.find(org_id)
+    end
     let(:general_agency_profile) { general_agency_organization.general_agency_profile }
-    let!(:primary_general_agency_staff_role) {FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'active')}
+    let(:primary_general_agency_staff_role) {FactoryBot.create(:general_agency_staff_role, benefit_sponsors_general_agency_profile_id: general_agency_profile.id, is_primary: true, aasm_state: 'active')}
 
     # let!(:employer_profile) {benefit_sponsor.employer_profile}
-    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
-    let!(:broker_agency_staff_role) {FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
-    let!(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
-    let!(:broker_person) { FactoryBot.create(:person) }
+    let(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let(:person) { FactoryBot.create(:person, employer_staff_roles: [active_employer_staff_role]) }
+    let(:broker_agency_staff_role) {FactoryBot.build(:broker_agency_staff_role, benefit_sponsors_broker_agency_profile_id: broker_agency_profile.id)}
+    let(:active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state: 'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
+    let(:broker_person) { FactoryBot.create(:person) }
     let(:user) { FactoryBot.create(:user, :person => person)}
 
     describe ".find_profile" do
@@ -172,6 +209,9 @@ module BenefitSponsors
       end
 
       context "employer profile more than one staff role." do
+        before :each do
+          user
+        end
 
         let!(:another_person_active_employer_staff_role) {FactoryBot.build(:benefit_sponsor_employer_staff_role, aasm_state:'is_active', benefit_sponsor_employer_profile_id: employer_profile.id)}
         let!(:another_person) { FactoryBot.create(:person, employer_staff_roles:[another_person_active_employer_staff_role]) }
@@ -421,7 +461,10 @@ module BenefitSponsors
       end
 
       context 'zero matching person PII' do
-        before {@status, @result = subject.add_general_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+        before do
+          broker_agency_staff_role 
+          @status, @result = subject.add_general_agency_staff_role('sam', person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+        end
 
         it 'returns false' do
           expect(@status).to eq false
@@ -433,7 +476,10 @@ module BenefitSponsors
       end
 
       context 'matching one person PII' do
-        before {@status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)}
+        before do
+          primary_general_agency_staff_role
+          @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
+        end
 
         it 'returns true' do
           expect(@status).to eq true
@@ -446,6 +492,7 @@ module BenefitSponsors
 
       context 'person already has general agency staff role with this general agency' do
         before do
+          primary_general_agency_staff_role
           subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
           @status, @result = subject.add_general_agency_staff_role(person1.first_name, person1.last_name, person1.dob,'#default@email.com', general_agency_profile)
         end

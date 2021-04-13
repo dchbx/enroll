@@ -1,13 +1,41 @@
 require 'rails_helper'
+require File.expand_path(
+  File.join(
+    File.dirname(__FILE__),
+    "../../..",
+    "components/benefit_sponsors/spec/support/benefit_sponsors_site_spec_helpers"
+  )
+)
+require File.expand_path(
+  File.join(
+    File.dirname(__FILE__),
+    "../../..",
+    "components/benefit_sponsors/spec/support/benefit_sponsors_organization_spec_helpers"
+  )
+)
 
 if ExchangeTestingConfigurationHelper.general_agency_enabled?
 RSpec.describe GeneralAgencies::ProfilesController, dbclean: :after_each do
+  let(:site) { BenefitSponsors::SiteSpecHelpers.create_site_with_hbx_profile }
+
+  let(:benefit_sponsors_general_agency_profile) do
+    org_id = BenefitSponsors::OrganizationSpecHelpers.with_aca_shop_general_agency_profile(site)
+    org = BenefitSponsors::Organizations::Organization.find(org_id)
+    org.general_agency_profile
+  end
+
   let(:general_agency_profile) { FactoryBot.create(:general_agency_profile) }
-  let(:general_agency_staff) { FactoryBot.create(:general_agency_staff_role) }
+  let(:general_agency_staff) do
+    FactoryBot.create(
+      :general_agency_staff_role,
+      benefit_sponsors_general_agency_profile_id: benefit_sponsors_general_agency_profile.id
+    )
+  end
   let(:person) { FactoryBot.create(:person) }
   let(:user) { FactoryBot.create(:user, person: person) }
 
   before :each do
+    general_agency_staff
     allow(Settings.aca).to receive(:general_agency_enabled).and_return(true)
     Enroll::Application.reload_routes!
   end

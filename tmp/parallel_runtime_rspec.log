@@ -11,8 +11,6 @@ spec/controllers/broker_agencies/profiles_controller_spec.rb:83.8696170002222
 spec/controllers/exchanges/hbx_profiles_controller_spec.rb:83.68074399977922
 spec/controllers/general_agencies/profiles_controller_spec.rb:80.19047799985856
 spec/controllers/insured/plan_shoppings_controller_spec.rb:76.872244999744
-spec/views/general_agencies/_staffs.html.erb_spec.rb:63.525714000687
-spec/views/general_agencies/_show.html.erb_spec.rb:56.56670199986547
 spec/controllers/insured/consumer_roles_controller_spec.rb:54.824779000133276
 spec/models/family_spec.rb:48.468007998541
 spec/policies/census_employee_policy_spec.rb:46.991774999536574
@@ -138,8 +136,10 @@ spec/lib/tasks/terminate_benefit_application_spec.rb:5.7808080008253455
 spec/models/factories/family_enrollment_clone_factory_spec.rb:5.701869999989867
 spec/notices/shop_employer_notices/renewal_employer_open_enrollment_completed_spec.rb:5.628777000121772
 spec/models/factories/enrollment_factory_spec.rb:5.581530001014471
+spec/views/general_agencies/_show.html.erb_spec.rb:5.56670199986547
 spec/views/insured/group_selection/_enrollment.html.erb_spec.rb:5.5648730006068945
 spec/views/broker_agencies/profiles/_menu.html.erb_spec.rb:5.528822000138462
+spec/views/general_agencies/_staffs.html.erb_spec.rb:5.525714000687
 spec/views/shared/my_portal_links.html.erb_spec.rb:5.506529999896884
 spec/views/employers/employer_profiles/my_account/_census_employees.html.erb_spec.rb:5.489176000468433
 spec/notices/shop_employer_notices/initial_employer_first_invoice_available_spec.rb:5.4399929996579885
