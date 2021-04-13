@@ -133,6 +133,8 @@ class Employers::CensusEmployeesController < ApplicationController
         if new_census_employee.valid? && @census_employee.valid?
           @census_employee.save
           new_census_employee.save
+          # This will allow the person record to match with the new rehired census employee
+          @census_employee.deactivate_employee_role_after_replication
 
           # for new_census_employee
           new_census_employee.build_address if new_census_employee.address.blank?

@@ -679,6 +679,14 @@ class CensusEmployee < CensusMember
     new_employee
   end
 
+  def deactivate_employee_role_after_replication
+    if employee_role
+      unless employee_role.person.employee_roles.first.census_employee.aasm_state.to_s != "employee_termination_pending"
+        employee_role.person.employee_roles.first.update_attributes!(is_active: false)
+      end
+    end
+  end
+
   def is_business_owner?
     is_business_owner
   end

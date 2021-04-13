@@ -580,6 +580,41 @@ RSpec.describe Employers::CensusEmployeesController, dbclean: :after_each do
         expect(flash[:error]).to eq "Census Employee is already active."
       end
 
+      context "deactivating original employee role on rehire" do
+        let(:employee_role_double) { double(person: employee_role_person) }
+        let(:employee_role_person) {FactoryBot.create(:person) }
+        let(:census_employee_record) { FactoryBot.create(:census_employee) }
+        before do
+          allow(@hbx_staff_role).to receive(:permission).and_return(double('Permission', modify_employer: true))
+          sign_in @user
+          allow(CensusEmployee).to receive(:find).and_return(census_employee_record)
+          allow(census_employee_record).to receive(:aasm_state).and_return(:employment_terminated)
+          allow(census_employee_record).to receive(:employment_terminated_on).and_return(Date.today - 1.year)
+          allow(census_employee_record).to receive(:employer_profile).and_return(employer_profile)
+          allow(census_employee_record).to receive(:save).and_return(true)
+          allow(census_employee_record).to receive(:employee_role).and_return(employee_role_double)
+          allow(employee_role_person).to receive(:employee_roles).and_return([employee_role_double])
+          allow(employee_role_double).to receive(:update_attributes!).with(is_active: false)
+          allow(employee_role_double).to receive(:census_employee).and_return(census_employee_record)
+          CensusEmployee.destroy_all
+          census_employee_record
+        end
+
+        it "successfully deactivates" do
+          get(
+            :rehire,
+            params: { 
+              census_employee_id: census_employee_record.id,
+              employer_profile_id: employer_profile_id,
+              rehiring_date: (TimeKeeper::date_of_record + 30.days).to_s
+            },
+            :format => :js, xhr: true
+          )
+          expect(response).to have_http_status(:success)
+          expect(flash[:notice]).to eq "Successfully rehired Census Employee."
+        end
+      end
+
       context "when has new_census employee" do
         let(:new_census_employee) { double("test") }
         before do
