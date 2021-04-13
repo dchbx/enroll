@@ -992,10 +992,17 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     context "cancel_coverage!" do
       let(:family) {FactoryBot.create(:family, :with_primary_family_member)}
       let(:hbx_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "inactive")}
+      let(:terminated_enrollment) {FactoryBot.create(:hbx_enrollment, household: family.active_household, family: family, aasm_state: "coverage_terminated")}
 
       it "should cancel the enrollment" do
         hbx_enrollment.cancel_coverage!
         expect(hbx_enrollment.aasm_state).to eq "coverage_canceled"
+      end
+
+      it "should cancel the terminated enrollment" do
+        expect(terminated_enrollment.aasm_state).to eq "coverage_terminated"
+        terminated_enrollment.cancel_coverage!
+        expect(terminated_enrollment.aasm_state).to eq "coverage_canceled"
       end
 
       it "should not populate the terminated on" do
