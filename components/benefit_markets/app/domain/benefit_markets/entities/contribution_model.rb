@@ -7,7 +7,7 @@ module BenefitMarkets
 
       attribute :_id,                                   Types::Bson
       attribute :title,                                 Types::Strict::String
-      attribute :key,                                   Types::Symbol.optional
+      attribute :key,                                   Types::Symbol.optional.meta(omittable: true)
       attribute :sponsor_contribution_kind,             Types::Strict::String
       attribute :contribution_calculator_kind,          Types::Strict::String
       attribute :many_simultaneous_contribution_units,  Types::Strict::Bool

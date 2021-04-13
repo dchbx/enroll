@@ -12,16 +12,16 @@ module BenefitMarkets
           required(:product_kind).filled(:symbol)
           required(:title).filled(:string)
           required(:contribution_models).value(:array)
-          required(:pricing_model).filled(:hash)
+          required(:pricing_model).value(:any)
           required(:products).value(:array)
           optional(:description).maybe(:string)
           required(:contribution_model).value(:any)
-          required(:assigned_contribution_model).value(:any)
+          optional(:assigned_contribution_model).value(:any)
         end
 
         rule(:assigned_contribution_model) do
           if key? && value
-            if !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
+            if value.present? && !value.is_a?(::BenefitMarkets::Entities::ContributionModel)
               if value.is_a?(Hash)
                 result = BenefitMarkets::Validators::ContributionModels::ContributionModelContract.new.call(value)
                 key.failure(text: "invalid assigned contribution model", error: result.errors.to_h) if result&.failure?

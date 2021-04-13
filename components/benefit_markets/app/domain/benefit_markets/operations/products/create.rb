@@ -23,8 +23,9 @@ module BenefitMarkets
         def validate(params)
           contract = contract_class(params[:kind])
           result = contract.new.call(params)
+
           if result.success?
-            Success(result)
+            Success(result.to_h)
           else
             Failure("Unable to validate product with hios_id #{params[:hios_id]}")
           end
@@ -39,8 +40,7 @@ module BenefitMarkets
         end
 
         def create(values)
-          entity = entity_class(values[:kind])
-          product = entity.new(values)
+          product = entity_class(values[:kind]).new(values)
 
           Success(product)
         end

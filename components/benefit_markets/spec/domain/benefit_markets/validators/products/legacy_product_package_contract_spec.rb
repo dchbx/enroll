@@ -87,7 +87,7 @@ RSpec.describe BenefitMarkets::Validators::Products::LegacyProductPackageContrac
 
     context "sending with invalid parameters should fail validation with errors" do
       it { expect(subject.call(invalid_params).failure?).to be_truthy }
-      it { expect(subject.call(invalid_params).errors.to_h).to eq error_message2 }
+      it { expect(subject.call(invalid_params).errors.to_h.keys).to include :pricing_model }
     end
   end
 

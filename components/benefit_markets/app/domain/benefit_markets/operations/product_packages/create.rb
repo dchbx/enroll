@@ -15,8 +15,8 @@ module BenefitMarkets
         # @param [ Array<BenefitMarkets::Entities::Product> ] products Product
         # @return [ BenefitMarkets::Entities::ProductPackage ] product_package Product Package
         def call(product_package_params:, enrollment_eligibility:)
-          product_package_attrs       = yield set_assigned_contribution_model(product_package_params, enrollment_eligibility)
-          product_package_values      = yield validate(product_package_attrs, enrollment_eligibility)
+          product_package_attrs       = yield assign_contribution_model(product_package_params, enrollment_eligibility)
+          product_package_values      = yield validate(product_package_attrs)
           product_package             = yield create(product_package_values)
 
           Success(product_package)
@@ -24,9 +24,10 @@ module BenefitMarkets
 
         private
 
-        def validate(product_package_params, enrollment_eligibility)
+        def validate(product_package_params)
           result =
-            if enrollment_eligibility.market_kind == :fehb || product_package_params[:product_kind] != :health
+            if product_package_params[:benefit_kind] == :fehb || product_package_params[:product_kind] != :health
+              product_package_params[:contribution_models] ||= []
               ::BenefitMarkets::Validators::Products::LegacyProductPackageContract.new.call(product_package_params)
             else
               ::BenefitMarkets::Validators::Products::ProductPackageContract.new.call(product_package_params)
@@ -39,7 +40,9 @@ module BenefitMarkets
           end
         end
 
-        def set_assigned_contribution_model(product_package_values, enrollment_eligibility)
+        def assign_contribution_model(product_package_values, enrollment_eligibility = nil)
+          return Success(product_package_values) unless enrollment_eligibility
+
           key = "assign_contribution_model_#{enrollment_eligibility.market_kind}".to_sym
           result =
             if ::EnrollRegistry.feature_enabled?(key) && product_package_values[:product_kind] == :health

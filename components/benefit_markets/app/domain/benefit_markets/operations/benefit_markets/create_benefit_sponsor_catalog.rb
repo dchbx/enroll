@@ -90,18 +90,6 @@ module BenefitMarkets
           ::BenefitMarkets::Operations::Products::Find.new.call(effective_date: enrollment_eligibility.effective_date, service_areas: enrollment_eligibility.service_areas, product_package: product_package)
         end
 
-        def contribution_unit_models_for(contribution_model_params)
-          sponsor_contribution_kind = contribution_model_params[:sponsor_contribution_kind]
-          contribution_model_params[:contribution_units].collect do |contribution_unit_params|
-            result = ::BenefitMarkets::Operations::ContributionUnits::Create.new.call(contribution_unit_params: contribution_unit_params, sponsor_contribution_kind: sponsor_contribution_kind)
-            if result.success?
-              result.value!
-            else
-              Failure(result)
-            end
-          end
-        end
-
         def build_pricing_units_entities(pricing_units_params, package_kind)
           pricing_units_params.collect do |pricing_unit_params|
             ::BenefitMarkets::Operations::PricingUnits::Create.new.call(pricing_unit_params: pricing_unit_params, package_kind: package_kind).value!
@@ -109,10 +97,8 @@ module BenefitMarkets
         end
 
         def build_contribution_model_entity(params)
-          params[:contribution_units] = contribution_unit_models_for(params)
           contribution_model_entity = ::BenefitMarkets::Operations::ContributionModels::Create.new.call(contribution_params: params).value!
         end
-
 
         def contribution_models_for(contribution_models_params)
           contribution_models_params.collect do |contribution_model_params|
