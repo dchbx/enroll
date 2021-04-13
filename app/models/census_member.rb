@@ -18,6 +18,7 @@ class CensusMember
   field :encrypted_ssn, type: String
   field :gender, type: String
   field :dob, type: Date
+  field :age_off_excluded, type: Boolean, default: false
 
   include StrippedNames
 

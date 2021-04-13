@@ -280,13 +280,11 @@ class Employers::CensusEmployeesController < ApplicationController
     end
 =end
 
-    params.require(:census_employee).permit(:id,
-      :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on, :is_business_owner, :existing_cobra, :cobra_begin_date,
-      :address_attributes => [ :id, :kind, :address_1, :address_2, :city, :state, :zip ],
-      :email_attributes => [:id, :kind, :address],
-      :census_dependents_attributes => [
-        :id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn
-      ]
+    params.require(:census_employee).permit(:id, :first_name, :middle_name, :last_name, :name_sfx, :dob, :ssn, :gender, :hired_on, :employment_terminated_on,
+                                            :is_business_owner, :existing_cobra, :cobra_begin_date, :age_off_excluded,
+                                            :address_attributes => [:id, :kind, :address_1, :address_2, :city, :state, :zip],
+                                            :email_attributes => [:id, :kind, :address],
+                                            :census_dependents_attributes => [:id, :first_name, :last_name, :middle_name, :name_sfx, :dob, :gender, :employee_relationship, :_destroy, :ssn, :age_off_excluded]
     )
   end
 

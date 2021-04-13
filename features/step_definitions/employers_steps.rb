@@ -1102,3 +1102,7 @@ end
 And(/^employer should see census employee status as (.*?)$/) do |status|
   expect(page).to have_content status
 end
+
+Then(/^employer should not see the Ageoff Exclusion checkbox$/) do
+  expect(page).not_to have_content(/Ageoff Exclusion/)
+end

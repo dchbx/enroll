@@ -87,6 +87,11 @@
       </div>
       <% end %>
   </div>
+    <% if current_user.does_not_have_any_staff_role? %>
+      <div class="row row-form-wrapper no-buffer">
+          <%= render 'shared/age_off_excluded', f: f %>
+      </div>
+    <% end %>
 </div>
 
 <script>

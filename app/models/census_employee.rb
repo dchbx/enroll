@@ -68,6 +68,7 @@ class CensusEmployee < CensusMember
   field :aasm_state, type: String
   field :expected_selection, type: String, default: "enroll"
   field :no_ssn_allowed, type: Boolean, default: false
+  field :age_off_excluded, type: Boolean, default: false
 
   # Employer for this employee
   # @return [EmployerProfile]
