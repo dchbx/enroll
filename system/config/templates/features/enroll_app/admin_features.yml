@@ -1,0 +1,27 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_shop_market
+    features:
+      - key: :extend_open_enrollment
+        is_enabled: true
+        meta: 
+          label: Extend Open Enrollment
+          type: :legend
+          default: :boot
+          description: Boot available features
+          is_required: false
+          is_visible: false
+        settings:
+        - key: :open_enrollment_end_date
+          item: ''
+          meta:
+            label: Open Enrollment End Date
+            content_type: :date_select
+            default: ''
+            description: Choose Open Enrollment End Date
+            is_required: false
+            is_visible: true
+        - key: :label
+          item: Extend Open Enrollment

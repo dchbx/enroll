@@ -17,6 +17,7 @@ class Exchanges::HbxProfilesController < ApplicationController
   #before_action :authorize_for, except: [:edit, :update, :destroy, :request_help, :staff_index, :assister_index]
   #before_action :authorize_for_instance, only: [:edit, :update, :destroy]
   before_action :check_csr_or_hbx_staff, only: [:family_index]
+  before_action :extend_open_enrollment_feature_enabled?, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment]
   before_action :find_benefit_sponsorship, only: [:oe_extendable_applications, :oe_extended_applications, :edit_open_enrollment, :extend_open_enrollment, :close_extended_open_enrollment, :edit_fein, :update_fein, :force_publish, :edit_force_publish]
   # GET /exchanges/hbx_profiles
   # GET /exchanges/hbx_profiles.json
@@ -794,6 +795,10 @@ def employer_poc
   end
 
   private
+
+  def extend_open_enrollment_feature_enabled?
+    EnrollRegistry.feature_enabled?(:extend_open_enrollment)
+  end
 
   def group_enrollments_by_year_and_market(all_enrollments)
     current_year = TimeKeeper.date_of_record.year
