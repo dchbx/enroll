@@ -4,4 +4,4 @@
   %primary_applicant_id
     %id= financial_assistance_application.primary_applicant.person_hbx_id
   %assistance_tax_household_members
-    = render :partial => 'financial_assistance/events/assistance_tax_household_member', :collection => financial_assistance_application.active_applicants, as: :assistance_tax_household_member, :locals=> {:financial_assistance_application => financial_assistance_application, :assistance_tax_household => assistance_tax_household}
+    = render :partial => 'financial_assistance/events/assistance_tax_household_member', :collection => assistance_tax_household.applicants, as: :assistance_tax_household_member, :locals=> {:financial_assistance_application => financial_assistance_application, :assistance_tax_household => assistance_tax_household}
