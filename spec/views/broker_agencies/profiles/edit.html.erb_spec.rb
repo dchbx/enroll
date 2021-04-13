@@ -16,9 +16,6 @@ RSpec.describe "broker_agencies/profiles/edit.html.erb", :dbclean => :after_each
     expect(rendered).to have_selector('h3', text: 'Personal Information')
     expect(rendered).to have_selector('h3', text: 'Broker Agency Information')
   end
-  it "should block the market kind dropdown refs #9818" do
-    expect(rendered).to have_selector('.broker-agency-info.read_only_dropdown')
-  end
   it "should have two read only fields refs #9818"  do
     expect(rendered).to have_selector("[readonly='readonly']", count: 2)
   end
