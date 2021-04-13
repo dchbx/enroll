@@ -97,7 +97,7 @@ gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
 gem 'non-stupid-digest-assets'
 gem 'pundit',                   '~> 2.0'
-gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
+gem "recaptcha", "4.14.0"
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
 gem 'redis-rails',              '~> 5.0.2'
@@ -170,7 +170,7 @@ group :test do
   gem 'rspec-benchmark'
   gem 'ruby-progressbar',             '~> 1'
   gem 'shoulda-matchers',             '~> 3'
-  gem 'simplecov',                    '~> 0.14',  :require => false
+  gem 'simplecov', '~> 0.16', '>= 0.16.1', :require => false
   gem 'test-prof'
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
