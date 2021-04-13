@@ -1,0 +1,305 @@
+<div class="container no-pd">
+  <div class="mt-1 no-pd">
+    <%#= link_to "Add Account", available_accounts_person_path(id: @person.id), class: "btn btn-outline-primary" unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
+    <% unless @available_roles.admin_roles.present? || @available_roles.resident_roles.present? %>
+      <button type="button" class= "btn btn-outline-primary" data-toggle="modal" data-target="#addAccount">
+        <%= l10n("hub.home_page.add_account") %>
+      </button>
+    <% end %>
+
+    <div class="modal fade" id="addAccount" tabindex="-1" role="dialog" aria-labelledby="addAccountLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h5 class="modal-title label-color" id="addAccountLabel"><%= l10n("hub.home_page.add_account.modal.title") %></h5>
+            <div class='modal-options'>
+              <p><%= l10n("hub.home_page.add_account.modal.description") %> <strong><%= l10n("hub.home_page.title") %></strong></p>
+
+              <%# Get roles variable from controller & loop - todo %>
+              <div class="d-flex flex-row bg-white hub-item-flex-shadow ivl-card" data-toggle="modal" data-target="#addIvlAccount" data-dismiss="modal">
+                <div class="col-2">
+                  <i class="fas fa-users fa-3x"></i>
+                </div>
+                <div class="col-10">
+                  <div><strong  class='label-color'><%= l10n("hub.home_page.add_account.modal.ivl_title") %></strong></div>
+                  <div><small><%= l10n("hub.home_page.add_account.modal.ivl_description") %></small></div>
+                </div>
+              </div>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+              <%= link_to main_app.privacy_insured_employee_index_path(person_id: @person.id) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow employee-card">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employee_title") %></strong></div>
+                    <div><small><%= l10n("hub.home_page.add_account.modal.employee_description") %></small></div>
+                  </div>
+                </div>
+              <% end %>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+
+              <div class="d-flex flex-row bg-white hub-item-flex-shadow employer-card" data-toggle="modal" data-target="#addEmployerAccount" data-dismiss="modal">
+                <div class="col-2">
+                  <i class="fas fa-home fa-3x"></i>
+                </div>
+                <div class="col-10">
+                  <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.employer_title") %></strong></div>
+                  <div class=""><small><%= l10n("hub.home_page.add_account.modal.employer_description") %></small></div>
+                </div>
+              </div>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+              <%= link_to benefit_sponsors.new_broker_profile_profiles_broker_agencies_broker_agency_profiles_path(person_id: @person.id, profile_type: :broker_agency) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.broker_title") %></strong></div>
+                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.broker_description") %></small></div>
+                  </div>
+                </div>
+              <% end %>
+
+              <div style="padding: 10px;">
+                <p class='or-style'>or</p>
+              </div>
+              <%= link_to benefit_sponsors.new_general_agency_profile_profiles_general_agencies_general_agency_profiles_path(person_id: @person.id, profile_type: :general_agency) do %>
+                <div class="d-flex flex-row bg-white hub-item-flex-shadow broker-card">
+                  <div class="col-2">
+                    <i class="far fa-address-card fa-3x"></i>
+                  </div>
+                  <div class="col-10">
+                    <div class=""><strong class='label-color'><%= l10n("hub.home_page.add_account.modal.ga_title") %></strong></div>
+                    <div class=""><small><%= l10n("hub.home_page.add_account.modal.ga_description") %></small></div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="addEmployerAccount" tabindex="-1" role="dialog" aria-labelledby="addEmployerAccountLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h5 class="modal-title label-color" id="addEmployerAccountLabel"><%= l10n("hub.home_page.add_account.modal.employer_modal.title") %></h5>
+            <div class='modal-options'>
+              <p><%= l10n("hub.home_page.add_account.modal.employer_modal.description1") %> <strong>employer name</strong>. <%= l10n("hub.home_page.add_account.modal.employer_modal.description2") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.sub_description") %></strong> <%= l10n("hub.home_page.add_account.modal.employer_modal.description3") %></p>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect1" value="with_roster" checked>
+                <label class="form-check-label" for="employerRadioSelect1">
+                  <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_yes_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="employerRadioSelect" id="employerRadioSelect2" value="without_roster">
+                <label class="form-check-label" for="employerRadioSelect2">
+                  <%= l10n("hub.home_page.add_account.modal.employer_modal.roster_no_text") %> <strong><%= l10n("hub.home_page.add_account.modal.employer_modal.roster_sub_text") %></strong>
+                </label>
+              </div>
+
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) , class: "btn btn-danger with_roster_link" %>
+              <%= link_to 'Continue', benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: false) , class: "btn btn-danger without_roster_link hidden" %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="addIvlAccount" tabindex="-1" role="dialog" aria-labelledby="addIvlAccountLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+            <h5 class="modal-title label-color" id="addIvlAccountLabel"><%= l10n("hub.home_page.add_account.modal.ivl_modal.title") %></h5>
+            <div class='modal-options'>
+              <p><%= l10n("hub.home_page.add_account.modal.ivl_modal.description") %></p>
+
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="ivlRadioSelect" id="ivlRadioSelect1" value="aqhp" checked>
+                <label class="form-check-label" for="ivlRadioSelect1">
+                  <strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_yes_text") %> </strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_yes_text.sub_text") %>
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="ivlRadioSelect" id="ivlRadioSelect2" value="uqhp">
+                <label class="form-check-label" for="ivlRadioSelect2">
+                  <strong><%= l10n("hub.home_page.add_account.modal.ivl_modal.aqhp_no_text") %></strong>
+                </label>
+              </div>
+
+              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(aqhp: true, person_id: @person.id), class: 'btn btn-danger aqhp_link' %>
+              <%= link_to 'Continue', main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-danger uqhp_link hidden' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="mt-3">
+    <% if @available_roles.active_roles.present? %>
+      <% @available_roles.active_roles.each do |active_role| %>
+        <div class="col-12 mt-1 no-pd">
+          <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
+            <div class="col-8">
+              <div class="ml-25"><span class="hub-label"><strong><%= link_to active_role.name.humanize, active_role.link %></strong></span></div>
+              <div class="ml-25"><%= active_role.description.humanize %></div>
+            </div>
+            <% if active_role.kind.downcase === 'employer staff'  %>
+              <div class="col-4 p-2">
+                <div class="dropdown pull-right">
+                  <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Actions
+                    <span class="caret"></span>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-right actions-menu" aria-labelledby="dropdownMenuButton">
+                    <%= link_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor, with_roster: true) do %>
+                      <span class="dropdown-item">Copy this info to a new account</span>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="mt-3">
+    <% if @available_roles.pending_roles.present? %>
+      <h4> Pending Portals </h4>
+      <% @available_roles.pending_roles.each do |pending_role| %>
+        <div class="col-12 mt-1 no-pd">
+          <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
+            <div class="col-8">
+              <div class="ml-25"><span class="hub-label"><%= pending_role.name.humanize %></span></div>
+              <div class="ml-25">Point Of Contact - <%= pending_role.kind %></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="mt-3">
+    <% if @available_roles.inactive_roles.present? %>
+      <h4> Inactive Portals </h4>
+      <% @available_roles.inactive_roles.each do |inactive_portal| %>
+        <div class="col-12 mt-1 no-pd">
+          <div class="d-flex flex-row bg-white rounded hub-flex-shadow p-2">
+            <div class="col-8">
+              <div class="ml-25"><span class="hub-label"><%= inactive_portal.name %></span></div>
+              <div class="ml-25"><span class="hub-label"><%= inactive_portal.kind %></span></div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<style type="text/css">
+
+  .hub-item-flex-shadow {
+    cursor: pointer;
+    width: 95%;
+    border-radius: 10px;
+    text-align: left;
+    padding: 25px;
+    margin-bottom: 10px;
+    border: #b7afaf solid 1px
+  }
+
+  .hub-item-flex-shadow:hover {
+    zoom: 1.01;
+  }
+
+  .form-check {
+    padding-bottom: 10px;
+  }
+
+  a:hover {
+    text-decoration: none;
+    color: black;
+  }
+
+  a {
+    color: black;
+  }
+
+  .actions-menu {
+    border: 1px solid #007bc4;
+  }
+
+  .actions-menu span {
+    color: #007bc4;
+  }
+
+  .modal-options {
+    padding: 10px 50px 25px 75px;
+    text-align: left;
+  }
+
+  .modal-body {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .or-style {
+    border: 1px solid grey;
+    border-radius: 50%;
+    width: fit-content;
+    position: relative;
+    margin: 0 auto; padding: 5px;
+  }
+
+  .label-color {
+    color: #007bc4;
+  }
+
+</style>
+
+
+<script type="text/javascript">
+  $('input[name ="ivlRadioSelect"]').change(function() {
+    if ($(this).val() === 'aqhp') {
+      $('.uqhp_link').addClass('hidden');
+      $('.aqhp_link').removeClass('hidden');
+    } else {
+      $('.aqhp_link').addClass('hidden');
+      $('.uqhp_link').removeClass('hidden');
+    }
+  })
+
+  $('input[name ="employerRadioSelect"]').change(function() {
+    if ($(this).val() === 'with_roster') {
+      $('.without_roster_link').addClass('hidden');
+      $('.with_roster_link').removeClass('hidden');
+    } else {
+      $('.with_roster_link').addClass('hidden');
+      $('.without_roster_link').removeClass('hidden');
+    }
+  })
+</script>

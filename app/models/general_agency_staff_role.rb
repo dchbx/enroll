@@ -3,6 +3,7 @@
 class GeneralAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
+  include Mongoid::Timestamps
   include MongoidSupport::AssociationProxies
   include AASM
   include Mongoid::History::Trackable
@@ -78,7 +79,7 @@ class GeneralAgencyStaffRole
   end
 
   def general_agency_profile
-    return @general_agency_profile if defined? @broker_agency_profile
+    return @general_agency_profile if defined? @general_agency_profile
     if self.benefit_sponsors_general_agency_profile_id.nil?
       @general_agency_profile = ::GeneralAgencyProfile.find(general_agency_profile_id) if has_general_agency_profile?
     else
@@ -125,6 +126,16 @@ class GeneralAgencyStaffRole
 
   def is_open?
     agency_pending? || active?
+  end
+
+  def fetch_redirection_link
+    return nil if aasm_state.to_sym != :active
+
+    if general_agency_profile.is_a? BenefitSponsors::Organizations::GeneralAgencyProfile
+      BenefitSponsors::Engine.routes.url_helpers.profiles_general_agencies_general_agency_profile_path(general_agency_profile, tab: 'home').to_s
+    else
+      Rails.application.routes.url_helpers.general_agencies_profile_path(general_agency_profile).to_s
+    end
   end
 
   class << self

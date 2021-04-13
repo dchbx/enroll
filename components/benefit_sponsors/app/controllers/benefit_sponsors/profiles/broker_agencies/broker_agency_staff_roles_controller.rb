@@ -3,6 +3,8 @@ module BenefitSponsors
     module BrokerAgencies
       class BrokerAgencyStaffRolesController < ::BenefitSponsors::ApplicationController
 
+        layout 'bootstrap_4_two_column', :only => :new_staff_member
+
         def new
           @staff = BenefitSponsors::Organizations::OrganizationForms::StaffRoleForm.for_new
           set_ie_flash_by_announcement
@@ -67,6 +69,24 @@ module BenefitSponsors
           @broker_agency_profiles = @staff.broker_agency_search
         end
 
+        def new_staff_member
+          authorize User, :add_roles?
+          @staff_member = BenefitSponsors::Operations::BrokerAgencies::Forms::NewBrokerAgencyStaff.new.call(params).value!
+        end
+
+        def create_staff_member
+          authorize User, :add_roles?
+          staff_params = params.permit[:staff_member].to_h
+          result = BenefitSponsors::Operations::BrokerAgencies::AddBrokerAgencyStaff.new.call(staff_member_params.merge(dob: parse_date(staff_member_params['dob'])))
+          if result.success?
+            redirect_to main_app.show_roles_person_path(id: staff_params[:person_id])
+            flash[:notice] = result.value![:message]
+          else
+            redirect_to new_staff_member_profiles_broker_agencies_broker_agency_staff_roles_path(id: staff_params[:person_id])
+            flash[:error] = result.failure[:message]
+          end
+        end
+
         private
 
         def broker_staff_params
@@ -74,6 +94,21 @@ module BenefitSponsors
           params[:staff].merge!({profile_id: params["staff"]["profile_id"] || params["profile_id"] || params["id"], person_id: params["person_id"], profile_type: params[:profile_type] || "broker_agency_staff",
                                   filter_criteria: params.permit(:q), is_broker_registration_page: params[:broker_registration_page] || params["staff"]["is_broker_registration_page"]})
           params[:staff].permit!
+        end
+
+        def staff_member_params
+          params.require(:staff_member).permit(
+            :first_name,
+            :last_name,
+            :dob,
+            :email,
+            :person_id,
+            :profile_id
+          ).to_h
+        end
+
+        def parse_date(date)
+          Date.strptime(date, "%m/%d/%Y") if date
         end
       end
     end

@@ -12,6 +12,7 @@ module BenefitSponsors
 
         before_action :find_general_agency_profile, only: [:employers, :family_index]
         before_action :find_general_agency_staff, only: [:edit_staff, :update_staff]
+        before_action :set_current_portal, only: [:show]
 
         layout 'single_column'
 
@@ -20,6 +21,27 @@ module BenefitSponsors
           set_flash_by_announcement
           @general_agency_profile = ::BenefitSponsors::Organizations::GeneralAgencyProfile.find(params[:id])
           @provider = current_user.person
+        end
+
+        def new_general_agency_profile
+          authorize User, :add_roles?
+          @person_id = params[:person_id]
+          @agency = BenefitSponsors::Operations::GeneralAgencies::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def create_ga_profile
+          authorize User, :add_roles?
+          result = EnrollRegistry[:ga_registration] { registration_params.to_h }
+          if result.success?
+            redirection_url, _status = result.value!
+            flash[:notice] = 'Thank you for submitting your request to access the general agency account. Your application for access is pending'
+            redirect_to redirection_url
+          else
+            redirect_to new_general_agency_profile_profiles_general_agencies_general_agency_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
+          end
         end
 
         def employers
@@ -129,6 +151,14 @@ module BenefitSponsors
 
         def find_general_agency_staff
           @staff = GeneralAgencyStaffRole.find(params[:id])
+        end
+
+        def registration_params
+          current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+          current_user_id ||= current_user.present? ? current_user.id : nil
+          params[:agency] ||= {}
+          params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
+          params[:agency].permit!
         end
 
         def user_not_authorized(exception)

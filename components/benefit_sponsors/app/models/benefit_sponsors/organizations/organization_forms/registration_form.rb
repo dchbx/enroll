@@ -41,7 +41,7 @@ module BenefitSponsors
 
       def self.for_new(attrs)
         service = resolve_service(profile_type: attrs[:profile_type])
-        form_params = service.build(profile_type: attrs[:profile_type])
+        form_params = service.build(profile_type: attrs[:profile_type], person_id: attrs[:person_id])
         new(form_params.merge!({
           portal: attrs[:portal]
         }))

@@ -1,4 +1,6 @@
 EMPLOYER_TRANSLATIONS = {
+  :"en.employer_profiles.profiles.select_this_employer" => "Select this Employer",
+  :"en.employer_profiles.profiles.no_employer_found" => "No Employer found",
   :'en.employers.plan_years.reference_plan_details' => "Reference Plan Details",
   :'en.employers.plan_years.plan_benefits' => "PLAN BENEFITS",
   :'en.employers.plan_years.co_pay' => "CO-PAY",

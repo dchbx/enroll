@@ -8,9 +8,9 @@ module BenefitSponsors
         before_action :find_employer, only: [:show, :inbox, :bulk_employee_upload, :export_census_employees, :show_invoice, :coverage_reports, :download_invoice, :terminate_employee_roster_enrollments]
         before_action :load_group_enrollments, only: [:coverage_reports], if: :is_format_csv?
         before_action :check_and_download_invoice, only: [:download_invoice, :show_invoice]
-        before_action :wells_fargo_sso, only: [:show]
+        before_action :wells_fargo_sso, :set_current_portal, only: [:show]
         before_action :set_flash_by_announcement, only: :show
-        layout "two_column", except: [:new]
+        layout "two_column", except: [:new, :new_employer_profile]
 
         #New profile registration with existing organization and approval request submitted to employer
         def show_pending
@@ -57,7 +57,7 @@ module BenefitSponsors
             when 'brokers'
               @broker_agency_account = @employer_profile.active_broker_agency_account
             when 'families'
-              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).compact.select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
+              @employees = EmployeeRole.find_by_employer_profile(@employer_profile).select { |ee| CensusEmployee::EMPLOYMENT_ACTIVE_STATES.include?(ee.census_employee.aasm_state)}
             when 'inbox'
 
             else
@@ -77,6 +77,30 @@ module BenefitSponsors
                 format.js
               end
             end
+          end
+        end
+
+        def new_employer_profile
+          authorize User, :add_roles?
+          @person_id = params[:person_id]
+          @agency = BenefitSponsors::Operations::Employers::New.new.call({person_id: params[:person_id], profile_type: params[:profile_type], regitration_params: registration_params}).value!
+          @staff_member = BenefitSponsors::Operations::Employers::Forms::NewEmployerStaff.new.call({id: params[:person_id]}).value!
+          respond_to do |format|
+            format.html
+          end
+        end
+
+        def create_employer_profile
+          authorize User, :add_roles?
+          result = EnrollRegistry[:employer_registration] { registration_params.to_h }
+          if result.success?
+            redirection_url, status = result.value!
+            flash[:notice] = "Your employer account has been setup successfully." if status == 'new'
+            flash[:notice] = 'Thank you for submitting your request to access the employer account. Your application for access is pending'
+            redirect_to redirection_url
+          else
+            flash[:notice] = result.failure[:message] || "Unable to create Employer Account."
+            redirect_to benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: registration_params[:person_id], profile_type: registration_params[:profile_type])
           end
         end
 
@@ -345,6 +369,14 @@ module BenefitSponsors
         def user_not_authorized(exception)
           session[:custom_url] = main_app.new_user_registration_path unless current_user
           super
+        end
+
+        def registration_params
+          current_user_id = Person.find(params[:person_id]).user&.id if params[:manage_portals] && params[:person_id]
+          current_user_id ||= current_user.present? ? current_user.id : nil
+          params[:agency] ||= {}
+          params[:agency].merge!({:profile_id => params["id"], :current_user_id => current_user_id, :person_id => params["person_id"]})
+          params[:agency].permit!
         end
       end
     end

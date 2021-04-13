@@ -8,6 +8,8 @@ BenefitSponsors::Engine.routes.draw do
     namespace :broker_agencies do
       resources :broker_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
         collection do
+          get :new_broker_profile
+          post :create_broker_profile
           get :family_index
           get :messages
           get :staff_index
@@ -33,6 +35,8 @@ BenefitSponsors::Engine.routes.draw do
       resources :broker_agency_staff_roles do
         collection do
           get :search_broker_agency
+          get :new_staff_member
+          post :create_staff_member
         end
         member do
           get :approve
@@ -43,6 +47,8 @@ BenefitSponsors::Engine.routes.draw do
     namespace :general_agencies do
       resources :general_agency_profiles, only: [:new, :create, :show, :index, :edit, :update] do
         collection do
+          get :new_general_agency_profile
+          post :create_ga_profile
           get :families
           get :messages
           get :staff_index
@@ -67,6 +73,8 @@ BenefitSponsors::Engine.routes.draw do
       resources :general_agency_staff_roles do
         collection do
           get :search_general_agency
+          get :new_staff_member
+          post :create_staff_member
         end
         member do
           get :approve
@@ -81,6 +89,8 @@ BenefitSponsors::Engine.routes.draw do
         get :coverage_reports
         post :terminate_employee_roster_enrollments
         collection do
+          get :new_employer_profile
+          post :create_employer_profile
           get :generate_sic_tree
           get :show_pending
         end
@@ -99,6 +109,9 @@ BenefitSponsors::Engine.routes.draw do
       end
 
       resources :employer_staff_roles do
+        get :new_staff_member, on: :collection
+        post :create_staff_member, on: :collection
+        get :employer_search, on: :collection
         member do
           get :approve
         end

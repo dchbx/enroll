@@ -1,0 +1,39 @@
+.container-fluid style='padding: 50px;'
+  #broker_agency_form
+    ul
+      li
+        a href="#broker_registration"  = l10n("broker")
+      li
+        a href="#broker_agency_staff"  = l10n("broker_agency_staff")
+    #broker_registration
+      = render :partial => "benefit_sponsors/profiles/registrations/broker_registration_form", locals: {create_action: 'create_broker_profile'}
+    #broker_agency_staff
+
+javascript:
+  validateForm();
+
+  $("#broker_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.selector == "#broker_agency_staff") {
+        var url = "/benefit_sponsors/profiles/broker_agencies/broker_agency_staff_roles/new"
+        if(!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: {profile_type: "broker_agency_staff"},
+            success: function (data) {
+              $("#broker_agency_staff").html(data);
+              setTimeout(function() {
+              initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+
+              var cleave = new Cleave('#inputStaffDOB', {
+                  date: true,
+                  datePattern: ['m', 'd', 'Y']
+              });
+              })
+            }
+          })
+        }
+      }
+    }
+  });

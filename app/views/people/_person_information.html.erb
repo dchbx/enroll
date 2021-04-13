@@ -1,0 +1,96 @@
+<div class=" container personal-info-container no-pd">
+  <%= form_for @person, url: update_personal_info_person_path(id: @person.id), method: :put, html: { class: "personal_information_form" } do |f|%>
+    <h4 class="personal-info-heading"> <%= l10n("personal")%> </h4>
+    <div class="col-md-12 no-pd">
+      <div class="row">
+        <div class="col-md-3 mb-1">
+          <label for="inputFirstname" class="personal-info-label"><%= l10n("first_name")%><span class="red-star">*</span></label>
+          <i class="fa fa-info-circle pull-right"></i>
+          <%=f.text_field :first_name, id: "first-name", class: "form-control", placeholder: "First Name",  required: true %>
+        </div>
+        <div class="col-md-3 mb-1">
+          <label for="inputMiddlename" class="personal-info-label"><%= l10n("middle_name")%></label>
+          <%=f.text_field :middle_name, id: "middle-name", class: "form-control", placeholder: "Middle Name" %>
+        </div>
+
+        <div class="col-md-3 mb-1">
+          <label for="inputLastname" class="personal-info-label"><%= l10n("last_name")%><span class="red-star">*</span></label>
+          <i class="fas fa-info-circle pull-right"></i>
+          <%=f.text_field :last_name, id: "last-name", class: "form-control", placeholder: "Last Name" %>
+        </div>
+
+        <div class="col-md-3 mb-1">
+          <label for="inputSuffix" class="personal-info-label"><%= l10n("suffix")%></label>
+          <%= f.select :name_sfx, [ 'Jr.', 'Sr.', 'II', 'III', 'IV', 'V' ], { :include_blank => 'NONE' }, { :class => 'form-control'} %>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-3">
+          <label for="inputDOB" class="personal-info-label"><%= l10n("date_of_birth")%><span class="red-star">*</span></label>
+          <i class="fa fa-info-circle pull-right"></i>
+          <%=f.text_field :dob, placeholder: 'MM/DD/YYYY', id: 'inputStaffDOB', class:'form-control', disabled: true%>
+        </div>
+
+        <div class="col-md-3">
+          <label for="inputSSN" class="personal-info-label"><%= l10n("social_security")%><span class="red-star">*</span></label>
+          <i class="fa fa-info-circle pull-right"></i>
+          <%= f.text_field :ssn, placeholder: "Social Security", id: 'inputSSN', class: "form-control", disabled: true %>
+        </div>
+
+        <div class="col-md-3">
+          <label for="inputGender" class="personal-info-label"><%= l10n("gender")%></label>
+          <%= f.select :gender, ['Male', 'Female' ], { :prompt => 'Choose one...', :selected => @person.gender&.capitalize, }, { :class => 'form-control'} %>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-12 no-pd">
+      <hr class="personal-info-hr"/>
+    </div>
+
+    <h4 class="personal-info-heading"> <%= l10n("contact")%> </h4>
+
+    <% unless f.object.emails.nil?
+         ["home","work"].each do |kind|
+           f.object.emails.build(kind: kind) if f.object.emails.select{|email| email.kind == kind}.blank?
+         end
+       end
+    %>
+
+   <% if f.object.emails.present? %>
+      <%= f.fields_for :emails, errors: {}, fieldset: true do |email|  %>
+        <% kind = email.object.kind %>
+        <div class="col-md-12 no-pd">
+          <div class="row">
+            <div class="col-md-3 mb-1">
+              <label for="inputEmailKind" class="personal-info-label">Type</label>
+              <%= email.select(:kind, options_for_select(Email::KINDS, selected: kind), {:include_blank => "SELECT KIND"}, { :class => 'form-control'}) %>
+            </div>
+
+            <div class="col-md-3 mb-1">
+              <label for="inputEmailAddress" class="personal-info-label">Email</label>
+              <%= email.email_field :address, placeholder: "#{kind.capitalize} Email Address", class: "form-control" %>
+            </div>
+          </div>
+        </div>
+
+        <%= email.hidden_field :kind %>
+        <%= email.hidden_field :_destroy %>
+      <% end %>
+    <% end %>
+
+    <div class="col-md-12 no-pd mt-3">
+      <%= link_to 'Cancel', main_app.show_roles_person_path(id: @person.id), class: 'col-md-2 btn btn-outline-primary', id: 'save-person' %>
+        <button id="save-person" class="col-md-2 btn btn-primary pull-right"  type="submit"> Save Changes </button>
+    </div>
+
+  <% end %>
+</div>
+
+<script type="text/javascript">
+  $(document).on('turbolinks:load', function () {
+    $('.selectric-hide-select select').selectric('destroy')
+  });
+</script>
+

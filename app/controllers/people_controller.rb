@@ -3,6 +3,10 @@ class PeopleController < ApplicationController
   include ErrorBubble
   include VlpDoc
 
+  before_action :set_current_portal, only: [:show_roles]
+
+  layout 'bootstrap_4_two_column', :only => [:manage_account, :personal_info, :show_roles, :available_accounts]
+
   def new
     @person = Person.new
     build_nested_models
@@ -259,6 +263,17 @@ class PeopleController < ApplicationController
     @employer_profile= EmployerProfile.find_all_by_person(@person).first
 
     build_nested_models
+   end
+
+  def show_roles
+    @person = find_person(params[:id])
+    @available_roles = Operations::People::Roles::FindAll.new.call(params).value!
+    render :show_roles
+  end
+
+  def available_accounts
+    @person = find_person(params[:id])
+    render :available_accounts
   end
 
   def select_plan
@@ -273,6 +288,28 @@ class PeopleController < ApplicationController
 
     @plans = @benefit_group.elected_plans.entries.collect() do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
+    end
+  end
+
+  def manage_account
+    @person = find_person(params[:id])
+    render :manage_account
+  end
+
+  def personal_info
+    @person = find_person(params[:id])
+    render :personal_info
+  end
+
+  def update_personal_info
+    @person = find_person(params[:id])
+    respond_to do |format|
+      if @person.update_attributes(person_params)
+        format.html {  redirect_back fallback_location: '/', notice: 'Person successfully updated.' }
+      else
+        person_error_megs = @person.errors.full_messages.join('<br/>') if @person.errors.present?
+        format.html { redirect_back fallback_location: '/',  alert: "Person update failed. #{person_error_megs}" }
+      end
     end
   end
 

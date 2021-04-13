@@ -10,6 +10,7 @@ class Insured::ConsumerRolesController < ApplicationController
   before_action :individual_market_is_enabled?
   before_action :decrypt_params, only: [:create]
   before_action :set_cache_headers, only: [:edit]
+  before_action :set_current_portal, only: [:privacy, :edit]
 
   FIELDS_TO_ENCRYPT = [:ssn,:dob,:first_name,:middle_name,:last_name,:gender,:user_id].freeze
 
@@ -20,12 +21,13 @@ class Insured::ConsumerRolesController < ApplicationController
     params_hash = params.permit(:aqhp, :uqhp).to_h
     @val = params_hash[:aqhp] || params_hash[:uqhp]
     @key = params_hash.key(@val)
-    @search_path = {@key => @val}
+    @person = Person.find(params[:person_id]) if params[:person_id].present?
+    @search_path = {@key => @val, person_id: @person&.id}
     if @person.try(:resident_role?)
-      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? @person.resident_role.bookmark_url.to_s : nil
+      bookmark_url = @person.resident_role.bookmark_url.to_s.present? ? URI.parse(@person.resident_role.bookmark_url).to_s : nil
       redirect_to bookmark_url || family_account_path
     elsif @person.try(:consumer_role?)
-      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? @person.consumer_role.bookmark_url.to_s : nil
+      bookmark_url = @person.consumer_role.bookmark_url.to_s.present? ? URI.parse(@person.consumer_role.bookmark_url).to_s : nil
       redirect_to bookmark_url || family_account_path
     end
   end
@@ -39,17 +41,16 @@ class Insured::ConsumerRolesController < ApplicationController
       session.delete(:individual_assistance_path)
     end
 
-    if params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]
-      person = Person.find(session[:person_id])
+    person_params = {}
 
-      @person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
-      @person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
-      @person_params[:dob] = person.dob.strftime("%Y-%m-%d")
-
-      @person = ::Forms::ConsumerCandidate.new(@person_params)
-    else
-      @person = ::Forms::ConsumerCandidate.new
+    if (params.permit(:build_consumer_role)[:build_consumer_role].present? && session[:person_id]) || params[:person_id]
+      person = Person.find(session[:person_id] || params[:person_id])
+      person_params = person.attributes.extract!("first_name", "middle_name", "last_name", "gender")
+      person_params[:ssn] = Person.decrypt_ssn(person.encrypted_ssn)
+      person_params[:dob] = person.dob&.strftime("%Y-%m-%d")
     end
+
+    @person = ::Forms::ConsumerCandidate.new(person_params)
 
     respond_to do |format|
       format.html
@@ -424,7 +425,7 @@ class Insured::ConsumerRolesController < ApplicationController
       @person_params[field] = @person.attributes[field]
     end
 
-    @person_params[:dob] = @person.dob.strftime("%Y-%m-%d")
+    @person_params[:dob] = @person.dob&.strftime("%Y-%m-%d")
     @person_params.merge!({user_id: current_user.id})
   end
 end

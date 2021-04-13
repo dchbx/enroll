@@ -4,8 +4,33 @@ require "spec_helper"
 
 RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationContract do
 
-  let(:missing_params)   { {hbx_id: '1234321',  legal_name: 'abc_organization', entity_kind: :limited_liability_corporation} }
-  let(:error_message)    { {:site_id => ["is missing"], :fein => ["is missing"]} }
+  let(:missing_params)   { {legal_name: 'abc_organization', entity_kind: :limited_liability_corporation} }
+  let(:error_message)    { {:site_id => ["is missing"], :profiles => ["is missing"]} }
+
+  let(:phone) do
+    {
+      kind: "work", area_code: "483", number: "7897489", full_phone_number: "4837897489"
+    }
+  end
+
+  let(:address) do
+    {
+      kind: 'primary', address_1: "dc", address_2: "dc", city: "dc", state: "DC", zip: "12345"
+    }
+  end
+
+  let(:office_location) do
+    {
+      is_primary: true, address: address, phone: phone
+    }
+  end
+
+  let(:profile) do
+    {
+      is_benefit_sponsorship_eligible: false, contact_method: :test, corporate_npn: "1234567",
+      office_locations: [office_location]
+    }
+  end
 
   describe "Given invalid required parameters" do
     context "sending with missing parameters should fail validation with errors" do
@@ -15,7 +40,7 @@ RSpec.describe BenefitSponsors::Validators::Organizations::OrganizationContract 
   end
 
   describe "Given valid parameters" do
-    let(:valid_params) { missing_params.merge({fein: '987654321', site_id: BSON::ObjectId.new })}
+    let(:valid_params) { missing_params.merge({site_id: BSON::ObjectId.new, profiles: [profile] })}
 
     context "with required params" do
       it "should pass validation" do

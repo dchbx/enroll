@@ -24,18 +24,12 @@
           - if signed_in?
             li
               span.my-portal-links
-                = render partial: "shared/my_portal_links"
-                span = link_to l10n(".help"), Settings.site.help_url, target: '_blank', class: 'header-text'
-                span  |&nbsp;
-                span = link_to l10n(".logout"), main_app.destroy_user_session_path, method: "delete", class: "header-text"
-                br
-                strong.users-name = user_first_name_last_name_and_suffix
                 - unless current_user.try(:person).try(:hbx_id).nil?
-                  | &nbsp;
-                  | &nbsp;
                   span
-                    | ID
+                    | My ID
                     | : #{truncate(current_user.try(:person).try(:hbx_id).upcase, length: 9, omission: '')}
+                br
+                = render partial: "shared/my_portal_links"
   - if user_signed_in?
   javascript:
     // check time until logout

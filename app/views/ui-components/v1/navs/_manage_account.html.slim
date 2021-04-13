@@ -1,0 +1,9 @@
+nav
+  ul#uic-families-right-menu
+    - person_id = person_id if defined? person_id
+    li
+      = link_to 'Home', main_app.manage_account_person_path(id: person_id || @person.id)
+    li
+      = link_to 'Personal Info', main_app.personal_info_person_path(id: person_id || @person.id)
+    li
+      = link_to 'My Portals', main_app.show_roles_person_path(id: person_id || @person.id)

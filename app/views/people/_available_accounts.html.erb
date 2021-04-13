@@ -1,0 +1,115 @@
+<div class="container no-pd">
+  <h4 class="mt-3"> Available Portals </h4>
+  <div class="col-12 mt-3 no-pd">
+    <div class="d-flex flex-row bg-white rounded flex-shadow">
+      <div class="col-10 p-3">
+        <h6><b><%= l10n("employee")%></b></h6>
+        <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+      </div>
+      <div class="col-2 p-3">
+        <button type="button" id="employee-portal" class="btn btn-outline-primary pull-right mt-3" data-toggle="modal" data-target="#confirm-submit">
+          <%= l10n("add_portal")%>
+        </button>
+      </div>
+    </div>
+  </div>
+  <%if @person.consumer_role.blank? && @person.resident_role.blank? %>
+    <div class="col-12 mt-3 no-pd">
+      <div class="d-flex flex-row bg-white rounded flex-shadow">
+        <div class="col-10 p-3">
+          <h6><b><%= l10n("consumer")%></b></h6>
+          <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+        </div>
+        <div class="col-2 p-3">
+          <button type="button"  id="consumer-portal" class="btn btn-outline-primary pull-right mt-3" data-toggle="modal" data-target="#fein-consumer-confirm-submit">
+            <%= l10n("add_portal")%>
+          </button>
+        </div>
+      </div>
+    </div>
+  <%end%>
+  <div class="col-12 mt-3 no-pd">
+    <div class="d-flex flex-row bg-white rounded flex-shadow">
+      <div class="col-10 p-3">
+        <h6><b><%= l10n("employer")%></b></h6>
+        <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+      </div>
+      <div class="col-2 p-3">
+        <%= link_to l10n("add_portal"), benefit_sponsors.new_employer_profile_profiles_employers_employer_profiles_path(person_id: @person.id, profile_type: :benefit_sponsor) , class: "btn btn-outline-primary pull-right mt-3" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mt-3 no-pd">
+    <div class="d-flex flex-row bg-white rounded flex-shadow">
+      <div class="col-10 p-3">
+        <h6><b><%= l10n("employer_poc")%></b></h6>
+        <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+      </div>
+      <div class="col-2 p-3">
+        <%= link_to l10n("add_portal"), benefit_sponsors.new_staff_member_profiles_employers_employer_staff_roles_path(id: @person.id) , class: "btn btn-outline-primary pull-right mt-3" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mt-3 no-pd">
+    <div class="d-flex flex-row bg-white rounded flex-shadow">
+      <div class="col-10 p-3">
+        <h6><b><%= l10n('broker_poc') %></b></h6>
+        <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+      </div>
+      <div class="col-2 p-3">
+        <%= link_to "Add Portal", benefit_sponsors.new_staff_member_profiles_broker_agencies_broker_agency_staff_roles_path(id: @person.id) , class: "btn btn-outline-primary pull-right mt-3" %>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 mt-3 no-pd">
+    <div class="d-flex flex-row bg-white rounded flex-shadow">
+      <div class="col-10 p-3">
+        <h6><b><%= l10n('ga_poc') %></b></h6>
+        <p class="mt-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et aliqua..</p>
+      </div>
+      <div class="col-2 p-3">
+        <%= link_to "Add Portal", benefit_sponsors.new_staff_member_profiles_general_agencies_general_agency_staff_roles_path(id: @person.id) , class: "btn btn-outline-primary pull-right mt-3" %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="confirm-submit">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><%= l10n("confirm_creation_of_new_portal")%></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong><%= l10n("new_employee_application")%></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><%= l10n("cancel")%></button>
+        <%= link_to l10n("add_role"), main_app.privacy_insured_employee_index_path(person_id: @person.id), class: 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="fein-consumer-confirm-submit">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><%= l10n("confirm_creation_of_new_portal")%></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p><strong><%= l10n("new_consumer_application")%></strong></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal"><%= l10n("cancel")%></button>
+        <%= link_to l10n("add_role"), main_app.privacy_insured_consumer_role_index_path(uqhp: true, person_id: @person.id), class: 'btn btn-primary' %>
+      </div>
+    </div>
+  </div>
+</div>

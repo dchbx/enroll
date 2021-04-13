@@ -8,7 +8,7 @@
       - [value].flatten.each do |v|
         = raw v
 
-  = form_for @agency, as: :agency, url: {action: "create"}, html: {class: "needs-validation s508", id: 'broker_registration_form', novalidate: true} do |f|
+  = form_for @agency, as: :agency, url: {action: (create_action || "create")}, html: {class: "needs-validation s508", id: 'broker_registration_form', novalidate: true} do |f|
 
     = f.hidden_field :profile_type, value: params[:profile_type]
 

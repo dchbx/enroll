@@ -15,5 +15,4 @@ EXCHANGE_TRANSLATIONS = {
   "en.exchange.employer_applications.transmit_to_carrier" => "Transmit to Carrier",
   "en.exchange.employer_applications.submit" => "Submit",
   "en.exchange.employer_applications.no_valid_pys" => "No valid plan years present for",
-  "en.exchange.employer_applications.select_term_reason" => "Please select terminate reason",
 }

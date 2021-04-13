@@ -1,0 +1,32 @@
+.container-fluid style='padding: 50px;'
+  #general_agency_form
+    ul
+      li
+        a href="#general_agency_registration"  = l10n("general_agency")
+      li
+        a href="#general_agency_staff"  = l10n("general_agency_staff")
+    #general_agency_registration
+      = render :partial => "benefit_sponsors/profiles/registrations/general_agency_registration_form", locals: {create_action: 'create_ga_profile'}
+    #general_agency_staff
+
+javascript:
+  validateForm();
+
+  $("#general_agency_form").tabs({
+    activate: function (event, ui) {
+      if (ui.newPanel.selector == "#general_agency_staff") {
+        var url = "/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/new"
+        if(!$("#loaded").length) {
+          $.ajax({
+            url: url,
+            type: "GET",
+            data: {profile_type: "general_agency_staff"},
+            success: function (data) {
+              $("#general_agency_staff").html(data)
+                initDatepicker('inputStaffDOB', new Date("#{Date.today.beginning_of_month-90.years}"), new Date("#{Date.today.end_of_month-18.years}"));
+            }
+          })
+        }
+      }
+    }
+  });

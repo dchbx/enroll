@@ -23,6 +23,11 @@ body {
   overflow-y: auto;
 }
 
+.nm-content-1 {
+  height: calc(100vh - 130px);
+  overflow-y: auto;
+}
+
 .bulk_notices {
   padding-bottom: 45px;
 }

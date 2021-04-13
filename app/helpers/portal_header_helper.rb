@@ -12,9 +12,9 @@ module PortalHeaderHelper
     elsif current_user.try(:person).try(:csr_role) || current_user.try(:person).try(:assister_role)
       link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Trained Expert".html_safe, main_app.home_exchanges_agents_path, class: "portal"
     elsif current_user.person && current_user.person.active_employee_roles.any?
-      if controller_path.include?('broker_agencies')
+      if current_user.try(:has_broker_agency_staff_role?) && controller_path.include?('broker_agencies')
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
-      elsif controller_path.include?('general_agencies')
+      elsif current_user.try(:has_general_agency_staff_role?) && controller_path.include?('general_agencies')
         link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a General Agency".html_safe, benefit_sponsors.profiles_general_agencies_general_agency_profile_path(id: current_user.person.general_agency_staff_roles.first.benefit_sponsors_general_agency_profile_id), class: "portal"
       elsif controller == 'employer_profiles' || controller_path.include?('employers')
         #current user has both broker_agency staff role and employee role but not employer_staff_roles
@@ -25,7 +25,7 @@ module PortalHeaderHelper
           link_to "#{image_tag 'icons/icon-expert.png'} &nbsp; I'm a Broker".html_safe, get_broker_profile_path, class: "portal"
         end
       else
-        link_to "#{image_tag exchange_icon_path('icon-individual.png')} &nbsp; I'm an Employee".html_safe, main_app.family_account_path, class: "portal"
+        link_to "#{image_tag exchange_icon_path('icon-individual.png')} &nbsp; I'm an #{controller == 'employer_profiles' ? 'Employer' : 'Employee'}".html_safe, main_app.family_account_path, class: "portal"
       end
     elsif (controller_path.include?("insured") && current_user.try(:has_consumer_role?)) ||
       (EnrollRegistry.feature_enabled?(:financial_assistance) && controller_path.include?("financial_assistance") && current_user.try(:has_consumer_role?))

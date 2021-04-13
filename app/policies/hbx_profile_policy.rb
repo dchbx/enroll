@@ -90,6 +90,12 @@ class HbxProfilePolicy < ApplicationPolicy
     role.permission.can_send_secure_message
   end
 
+  def can_add_role?
+    role = user_hbx_staff_role
+    return false unless role
+    role.permission.can_add_staff_roles
+  end
+
   def show?
     @user.has_role?(:hbx_staff) ||
       @user.has_role?(:csr) ||

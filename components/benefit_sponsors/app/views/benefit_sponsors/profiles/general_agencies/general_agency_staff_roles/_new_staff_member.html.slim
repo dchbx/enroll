@@ -1,0 +1,53 @@
+.general_agency-staff-registration-container
+  h1.mb-4.heading-text#loaded = l10n("general_agency_staff")
+
+  = form_for @staff_member, as: :staff_member, url: { action: "create_staff_member" }, remote: true, html: { class: "needs-ajax-validation s508", id: 'broker_staff_registration_form', novalidate: true } do |f|
+    div#broker_staff
+    = render partial: './ui-components/bs4/v1/forms/broker_ga_staff_information', locals: { f: f }
+    .row.mt-3.general-agency-search
+      .input-group
+        h6.col-md-3 = l10n("select_your_general_agency")
+        input.col-md-3#general-agency-search-input.form-control.py-2 type="search" placeholder="General Agency Name/NPN"
+        span.input-group-append
+          button.btn.btn-primary.search type="button" onclick="generalAgencySearch(); return false" data-loading-text="Loading..."
+            |
+              #{l10n("search")}
+      .result
+
+      br
+    .row.no-pd
+      .col-md-9.col-sm-9.col-xs-12
+        .row.no-buffer
+          .col-md-4.col-sm-4.col-xs-12.form-group-lg
+            br
+            button.btn.btn-primary[type="submit" disabled='disabled' id= 'general-agency-staff-btn']
+              = l10n("submit_application")
+
+javascript:
+  validateAjaxForm();
+
+  function generalAgencySearch() {
+    var general_agency_search = document.getElementById('general-agency-search-input').value
+    document.getElementById('general-agency-staff-btn').disabled = true;
+    if (general_agency_search != undefined) {
+      $.ajax({
+        url: '/benefit_sponsors/profiles/general_agencies/general_agency_staff_roles/search_general_agency.js',
+        type: "GET",
+        data: {'q': general_agency_search, "general_agency_registration_page": true}
+      });
+    }
+    ;
+  }
+
+  function selectGeneralAgency(element) {
+    var result = document.querySelectorAll('.result');
+    result.forEach(function (result) {
+      var element = result.querySelectorAll('.select-ga')
+      element.forEach(function (ele) {
+        ele.classList.remove("agency-selected");
+      })
+    });
+    document.getElementById('staff_member_profile_id').value = element.dataset.general_agency_profile_id;
+    element.closest(".select-ga").classList.add('agency-selected')
+    document.getElementById('general-agency-staff-btn').disabled = false;
+  }

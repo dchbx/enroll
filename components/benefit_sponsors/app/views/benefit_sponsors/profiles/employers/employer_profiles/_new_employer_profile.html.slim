@@ -1,0 +1,124 @@
+
+= f.hidden_field :profile_type, value: params[:profile_type]
+= f.fields_for :staff_roles, f.object.staff_roles, errors: {}, fieldset: false do |f|
+  = render partial: './ui-components/v1/forms/portals/person_staff_role_information', locals: {f: f}
+
+fieldset.mt-2
+  legend Employer Information
+
+  = f.fields_for :organization, f.object.organization, errors: {}, fieldset: false do |f|
+    .row
+      .col-md-4.mb-2
+        label for="inputLegalName"  Legal Name *
+        = f.text_field :legal_name, class: "form-control", required: true, placeholder: 'LEGAL NAME'
+        .invalid-feedback
+          |
+            Please provide a legal name.
+      .col-md-4.mb-2
+        label for="inputDBA"  DBA
+        = f.text_field :dba, class: "form-control", placeholder: 'DBA'
+      .col-md-4.mb-2
+        label for="inputFEIN"  FEIN *
+        = f.text_field :fein, class: "form-control", placeholder: 'FEIN', minlength:'9', maxlength:'9', onkeypress:'return isNumberKey(event)', required:'true'
+        .invalid-feedback
+          |
+            Please provide a fein.
+
+    = f.fields_for :profile, f.object.profile, errors: {}, fieldset: false do |f_profile|
+      .col-md-4.pl-0
+        label for="inputEntityKind"  Kind *
+        = f.select(:entity_kind, options_for_select(f.object.entity_kind_options.map {|k| [k.to_s.titleize, k.to_s]}, selected: f.object.try(:entity_kind)), { prompt: "Select Entity Kind"}, {:required => true, :class => 'form-control mb-1'} )
+        .invalid-feedback
+          |
+            Please select a entity kind.
+      - if display_sic_field_for_employer?
+        .col-md-4.pl-0
+          label for="inputSIC"  SIC Code *
+          = f_profile.select(:sic_code, grouped_options_for_select(f_profile.object.grouped_sic_code_options, f_profile.object.sic_code), { prompt: "Select Industry Code"}, {:required => true, :class => "form-control"} )
+          .invalid-feedback
+            |
+              Please provide a SIC code.
+        .col-md-1.pl-0
+          a#sicHelperToggle
+            i.fas.fa-question.mt-3.fa-lg style="padding-top:5px"
+      #sicHelperWrapper.hidden.row.row-form-wrapper.no-buffer style="margin-top:90px"
+        = render "benefit_sponsors/profiles/registrations/sic_help" , sicFieldId: 'organization_sic_code'
+
+      br
+      = render partial: './ui-components/v1/forms/office_locations/office_location_fields', locals: {f: f_profile}
+
+      - if display_referred_by_field_for_employer?
+        h4.mt-1 Referred By *
+        = f_profile.select :referred_by, options_for_select(f_profile.object.referred_by_options, selected: f_profile.object.try(:referred_by)), { prompt: "How did you find out about the Massachusetts Health Connector?"}, {:required => true, :class => "form-control", id: "referred-by-select"}
+        .invalid-feedback
+          |
+            Please select referred by.
+        br
+        = f_profile.text_area :referred_reason, :placeholder => "Other (please describe) *", class: "form-control hidden", id: "other-reason-textarea"
+        br
+      h4.mt-1 Please indicate preferred method to receive notices (OPTIONAL)
+      = f_profile.select :contact_method, options_for_select(f_profile.object.contact_method_options, selected: f_profile.object.contact_method[1]), {}, class:'form-control'
+
+      = f.submit "Add Portal", class: "btn btn-primary pull-right mt-2"
+      = link_to 'Cancel', main_app.show_roles_person_path(id: @person_id), class: 'btn btn-outline-primary pull-right mt-2 mr-2'
+
+      input type="hidden" name="employer_id" id="employer_id"
+
+javascript:
+
+  var disableSelectric = true;
+
+  function isApplyingCoverage(element) {
+    var result = document.querySelectorAll('.optional');
+    var ssn = document.getElementById("inputSsn")
+    var gender = document.getElementById("inputGender")
+    var hiredOn = document.getElementById("inputHiredOn")
+    var address1 = document.getElementById("inputAddress1")
+    var city = document.getElementById("inputCity")
+    var state = document.getElementById("inputState")
+    var zip = document.getElementById("inputZip")
+    var kind = document.getElementById("inputKind")
+    var emailAddress = document.getElementById("inputEmailAddress")
+    if (element.value === "true") {
+      result.forEach(function (ele) {
+        ele.classList.remove("hidden");
+      });
+
+      ssn.setAttribute("required", "true");
+      gender.setAttribute("required", "true");
+      hiredOn.setAttribute("required", "true");
+      address1.setAttribute("required", "true");
+      city.setAttribute("required", "true");
+      state.setAttribute("required", "true");
+      zip.setAttribute("required", "true");
+      kind.setAttribute("required", "true");
+      emailAddress.setAttribute("required", "true");
+
+    } else {
+      result.forEach(function (ele) {
+        ele.classList.add("hidden");
+      });
+
+      ssn.required = false;
+      gender.required = false;
+      hiredOn.required = false;
+      address1.required = false;
+      city.required = false;
+      state.required = false;
+      zip.required = false;
+      kind.required = false;
+      emailAddress.required = false;
+    }
+  }
+
+  $("#referred-by-select").on("change", function() {
+    var select_val = $(this).val();
+    if (select_val == 'Other') {
+      $("#other-reason-textarea").removeClass("hidden");
+      $("#other-reason-textarea").prop('required',true);
+    } else {
+      $("#other-reason-textarea").addClass("hidden");
+      $("#other-reason-textarea").prop('required',false);
+      $("#other-reason-textarea").val("");
+    }
+  });
