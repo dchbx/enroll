@@ -103,6 +103,72 @@ describe "match a person in db" do
     DatabaseCleaner.clean
   end
 
+  context "person with a first name, last name, ssn, and different format date params" do
+    let(:db_person_1_dob) { Date.new(1972, 4, 4) }
+    let(:db_person_1) { FactoryBot.create(:person, :with_ssn, dob: db_person_1_dob) }
+    let(:consumer_candidate_us_style_date) do
+      Forms::ConsumerCandidate.new(
+        {
+          dob: db_person_1.dob.to_s, # US style mm/dd/yyyy
+          first_name: db_person_1.first_name,
+          last_name: db_person_1.last_name,
+          ssn: db_person_1.ssn,
+          gender: "m"
+        }
+      )
+    end
+    let(:consumer_candidate_international_style_date) do
+      Forms::ConsumerCandidate.new(
+        {
+          dob: "1972-4-4",
+          first_name: db_person_1.first_name,
+          last_name: db_person_1.last_name,
+          ssn: db_person_1.ssn,
+          gender: "m"
+        }
+      )
+    end
+    let(:consumer_candidate_date_class_date) do
+      Forms::ConsumerCandidate.new(
+        {
+          dob: db_person_1_dob,
+          first_name: db_person_1.first_name,
+          last_name: db_person_1.last_name,
+          ssn: db_person_1.ssn,
+          gender: "m"
+        }
+      )
+    end
+
+    let(:consumer_candidate_no_dob) do
+      Forms::ConsumerCandidate.new(
+        {
+          dob: nil,
+          first_name: db_person_1.first_name,
+          last_name: db_person_1.last_name,
+          ssn: db_person_1.ssn,
+          gender: "m"
+        }
+      )
+    end
+
+    it "returns valid for American style date string" do
+      expect(consumer_candidate_us_style_date.valid?).to eq(true)
+    end
+
+    it "returns valid for international style date string" do
+      expect(consumer_candidate_international_style_date.valid?).to eq(true)
+    end
+
+    it "returns valid for date class date" do
+      expect(consumer_candidate_date_class_date.valid?).to eq(true)
+    end
+
+    it "returns invalid for no dob" do
+      expect(consumer_candidate_no_dob.valid?).to eq(false)
+    end
+  end
+
   context "with a person with a first name, last name, dob and no SSN" do
     let(:db_person) { Person.create!(first_name: "Joe", last_name: "Kramer", dob: "1993-03-30", ssn: '')}
 

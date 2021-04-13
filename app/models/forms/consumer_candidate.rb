@@ -43,7 +43,16 @@ module Forms
     end
 
     def dob=(val)
-      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      # Should check here if mm/dd/yyyy or yyyy-mm-dd
+      if val.nil?
+        @dob = nil
+      elsif val.class == Date
+        @dob = val
+      elsif val.match  /\A(?<mon>\d{2})\/(?<day>\d{2})\/(?<yr>\d{4})\z/
+        @dob = Date.strptime(val, "%m/%d/%Y")
+      else
+        @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      end
     end
 
     def match_person
@@ -120,7 +129,9 @@ module Forms
     # Throw Error/Warning if user age is less than 18
     def age_less_than_18
       if self.dob_check == "false" || self.dob_check.blank?
-        if ::TimeKeeper.date_of_record.year - self.dob.year < 18
+        if self.dob.blank?
+          self.dob_check = false
+        elsif ::TimeKeeper.date_of_record.year - self.dob.year < 18
           errors.add(:base, "Please verify your date of birth. If it's correct, please continue.")
           self.dob_check = true
         else
