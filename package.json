@@ -10,7 +10,7 @@
     "@rails/webpacker": "^4.0.4",
     "@types/node": "^12.0.2",
     "@webcomponents/webcomponentsjs": "^2.2.10",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "bootstrap": "^4.3.1",
     "browserslist": "^4.6.0",
     "html-loader": "^0.5.5",
