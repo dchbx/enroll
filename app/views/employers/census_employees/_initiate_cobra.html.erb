@@ -9,7 +9,7 @@
               <span class="lg fourteen">(Cobra effective date must be within the past 6 months)</span>
             </h5>
             <div class="pull-right" style="margin-top: 2px;">
-              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= [TimeKeeper.date_of_record - 180.days, @census_employee.hired_on].max %>" placeholder="MM/DD/YYYY" type="text" value="<%= @census_employee.suggested_cobra_effective_date %>">
+              <i class="fa fa-calendar fa-lg"></i> <input class="text-center date-picker" data-date-min="<%= @census_employee.suggested_cobra_effective_date %>" data-date-max="<%= @census_employee.suggested_cobra_effective_date %> "placeholder="MM/DD/YYYY" type="text" value="<%= @census_employee.suggested_cobra_effective_date %>">
               <a class="cobra_confirm cobra" data-employee-id="<%= @census_employee.id %>" data-link="<%= employers_employer_profile_census_employee_cobra_path(@employer_profile.id, @census_employee.id) %>" href="#" id="cobra-<%= @census_employee.id %>" onclick="EmployerProfile.submitCobraDate">
                 Initiate COBRA
               </a>
