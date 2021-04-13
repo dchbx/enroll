@@ -194,7 +194,7 @@ RSpec.describe TaxHousehold, type: :model do
     let!(:eligibility_determination3) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household2, source: 'Curam', csr_eligibility_kind: 'csr_73', determined_on: current_date, max_aptc: 200.00) }
     let!(:eligibility_determination4) { FactoryGirl.create(:eligibility_determination, tax_household: tax_household2, source: 'Haven', csr_eligibility_kind: 'csr_100', determined_on: current_date, max_aptc: 200.00) }
     let!(:applicant1) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member1.id) }
-    let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id) }
+    let!(:applicant2) { FactoryGirl.create(:applicant, tax_household_id: tax_household1.id, application: application, family_member_id: family_member2.id, is_ia_eligible: "true") }
     let!(:applicant3) { FactoryGirl.create(:applicant, tax_household_id: tax_household2.id, application: application, family_member_id: family_member3.id) }
     let!(:applicant4) { FactoryGirl.create(:applicant, tax_household_id: tax_household2.id, application: application, family_member_id: family_member4.id) }
 
@@ -349,6 +349,24 @@ RSpec.describe TaxHousehold, type: :model do
         expect(ed1).to eq eligibility_determination1
         ed2 = tax_household2.eligibility_determinations.first
         expect(ed2).to eq eligibility_determination3
+      end
+    end
+
+    context "aptc family members" do
+      it "should return nil family_member is not eligible" do
+        expect(tax_household1.find_aptc_family_members([family_member1])).to eq []
+      end
+
+      it "should return aptc fms" do
+        expect(tax_household1.find_aptc_family_members([family_member2])).to eq [family_member2]
+      end
+
+      it "should return non aptc family_member" do
+        expect(tax_household1.find_non_aptc_fms([family_member1])).to eq [family_member1]
+      end
+
+      it "should return nil " do
+        expect(tax_household1.find_non_aptc_fms([family_member2])).to eq []
       end
     end
   end

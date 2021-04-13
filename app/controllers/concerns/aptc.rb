@@ -1,9 +1,14 @@
 module Aptc
   def get_shopping_tax_households_from_person(person, year)
-    if person.present? && person.is_consumer_role_active?
-      person.primary_family.latest_household.latest_active_tax_households_with_year(year) rescue nil
+    return nil unless person.present? && person.is_consumer_role_active?
+    family = person.primary_family
+    application = family.active_approved_application
+    latest_tax_households = family.active_household.latest_active_tax_households_with_year(year)
+    return nil unless latest_tax_households.present?
+    if !latest_tax_households.map(&:application_id).map(&:present?).include?(false)
+      application.active_determined_tax_households
     else
-      nil
+      latest_tax_households
     end
   end
 

@@ -117,17 +117,31 @@ class TaxHousehold
 
   # to get aptc family members from given family members
   def find_aptc_family_members(family_members)
-    family_members.inject([]) do |array, family_member|
-      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true).present?
-      array.flatten
+    if application_id.present?
+      family_members.inject([]) do |array, family_member|
+        array << family_member if active_applicants.where(family_member_id: family_member.id).and(is_ia_eligible: true).present?
+        array.flatten
+      end
+    else
+      family_members.inject([]) do |array, family_member|
+        array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: true).present?
+        array.flatten
+      end
     end
   end
 
   # to get non aptc fms from given family members
   def find_non_aptc_fms(family_members)
-    family_members.inject([]) do |array, family_member|
-      array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
-      array.flatten
+     if application_id.present?
+      family_members.inject([]) do |array, family_member|
+        array << family_member if active_applicants.where(family_member_id: family_member.id).and(is_ia_eligible: false).present?
+        array.flatten
+      end
+    else
+      family_members.inject([]) do |array, family_member|
+        array << family_member if tax_household_members.where(applicant_id: family_member.id).and(is_ia_eligible: false).present?
+        array.flatten
+      end
     end
   end
 

@@ -4,6 +4,7 @@ RSpec.describe Products::QhpController, :type => :controller do
 
   let(:user) { double("User", person: person) }
   let(:person) { FactoryGirl.create(:person, :with_consumer_role, :with_active_consumer_role)}
+  let!(:family)  {FactoryGirl.create(:family, :with_primary_family_member, person: person)}
   let(:hbx_enrollment){double("HbxEnrollment", is_shop?: true, kind: "employer_sponsored", enrollment_kind: 'open_enrollment', plan: plan, coverage_kind: 'health')}
   let(:plan) { double("Plan") }
   let(:benefit_group){double("BenefitGroup")}
