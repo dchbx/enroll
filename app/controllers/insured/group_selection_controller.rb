@@ -75,7 +75,7 @@ class Insured::GroupSelectionController < ApplicationController
     return redirect_to purchase_insured_families_path(change_plan: @change_plan, terminate: 'terminate') if params[:commit] == "Terminate Plan"
     if (@market_kind == 'shop' || @market_kind == 'fehb') && @employee_role.census_employee.present?
       new_hire_enrollment_period = @employee_role.census_employee.new_hire_enrollment_period
-      if new_hire_enrollment_period.begin > TimeKeeper.date_of_record
+      if new_hire_enrollment_period.begin.to_date > TimeKeeper.date_of_record
         raise "You're not yet eligible under your employer-sponsored benefits. Please return on #{new_hire_enrollment_period.begin.strftime("%m/%d/%Y")} to enroll for coverage."
       end
     end
