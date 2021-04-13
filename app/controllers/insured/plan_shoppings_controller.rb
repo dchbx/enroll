@@ -210,6 +210,7 @@ class Insured::PlanShoppingsController < ApplicationController
     hbx_enrollment_id = params.require(:id)
     @change_plan = params[:change_plan].present? ? params[:change_plan] : ''
     @enrollment_kind = params[:enrollment_kind].present? ? params[:enrollment_kind] : ''
+    set_market_and_coverage_kinds if params[:market_kind].blank?
     if params[:market_kind] == 'shop' || params[:market_kind] == 'fehb'
       show_shop(hbx_enrollment_id)
     elsif params[:market_kind] == 'individual' || params[:market_kind] == 'coverall'
@@ -329,6 +330,18 @@ class Insured::PlanShoppingsController < ApplicationController
   end
 
   private
+
+  def set_market_and_coverage_kinds
+    market_kind = if @hbx_enrollment.is_shop?
+      @hbx_enrollment.fehb_profile.present? ? 'fehb' : 'shop'
+    else
+      @hbx_enrollment.is_coverall? ? 'coverall' : 'individual'
+    end
+    params[:market_kind] ||= market_kind
+    @market_kind = market_kind
+    params[:coverage_kind] ||= @hbx_enrollment.coverage_kind
+    @coverage_kind = @hbx_enrollment.coverage_kind
+  end
 
   def find_hbx_enrollment
     @hbx_enrollment = HbxEnrollment.find(params.require(:id))

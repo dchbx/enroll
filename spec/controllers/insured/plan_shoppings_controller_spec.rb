@@ -574,6 +574,17 @@ RSpec.describe Insured::PlanShoppingsController, :type => :controller, dbclean: 
       end
     end
 
+    context 'when market_kind is blank' do
+      before do
+        allow(hbx_enrollment).to receive(:can_waive_enrollment?).and_return(true)
+        get :show, params: {id: "hbx_id", market_kind: 'shop'}
+      end
+
+      it 'is successful' do
+        expect(response).to have_http_status(:success)
+      end
+    end
+
     context "when not eligible to complete shopping" do
       let(:group_enrollment) {BenefitSponsors::Enrollments::GroupEnrollment.new(product: product, member_enrollments:[member_enrollment], product_cost_total:'')}
 

@@ -109,15 +109,16 @@
       a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.plan_type_title_info")}"
         i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
     ul.list-unstyled
-      - @plan_types.each_with_index do |type, i|
-        li
-          .filter-input-block style="text-align:left"
-            checkbox
-              label
-                input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
-                label for="checkbox-#{10+i}" class="checkbox-custom-label"
+      - if @plan_types.present?
+        - @plan_types.each_with_index do |type, i|
+          li
+            .filter-input-block style="text-align:left"
+              checkbox
+                label
+                  input id="checkbox-#{10+i}" class="plan-type-selection-filter checkbox-custom" name="checkbox-#{10+i}" type="checkbox" data-plan-type="#{type}" onClick="filterPlanType(this)" data-category="planType"
+                  label for="checkbox-#{10+i}" class="checkbox-custom-label"
                   span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.'"#{type}"'_title_info')}"
-                  = l10n("#{type}")
+                    = l10n("#{type}")
   - if offers_nationwide_plans?
     .checkbox-filter-wrapper-uc
       h5
@@ -125,7 +126,7 @@
         a href="#" data-toggle="tooltip" data-container="body" data-placement="right" title="#{l10n("insured.plan_shoppings.network_title_info")}"
           i.fas.fa-question-circle.fa-lg.pl-1 aria-hidden="true"
       ul.list-unstyled
-        - if @market_kind == 'shop' || @market_kind == 'fehb'
+        - if @market_kind == 'shop' || @market_kind == 'fehb' && @networks.present?
           - @networks.each_with_index do |network, i|
             li
               .filter-input-block style="text-align:left"
@@ -135,7 +136,7 @@
                     label for="checkbox-#{15+i}" class="checkbox-custom-label"
                       span data-toggle="tooltip" data-placement="right" data-container="body" title="#{l10n('insured.plan_shoppings.plan_shoppings_'"#{network}"'_title_info')}"
                       = l10n("#{network}")
-        - else
+        - elsif @networks.present?
           - @networks.each_with_index do |network, i|
             li
               .filter-input-block style="text-align:left"
