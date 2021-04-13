@@ -73,11 +73,27 @@ module Forms
 
     def uniq_ssn
       return true if ssn.blank?
+      # same_ssn: this scope could include a person from from the same user account
+      # from when the user was enrolled as an employee somewhere
       same_ssn = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn))
-      if same_ssn.present? && same_ssn.first.try(:user)
-        errors.add(:ssn_taken,
-                  #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
-                  "The social security number you entered is affiliated with another account.")
+      # user_id is passed through as current_user.id in build_person_params
+      # from consumer_roles_controller
+      # We need to make sure that they have a unique ssn, and that a false positive
+      # isn't being returned if a user record existed for when this person was an
+      # employee.
+      # This will allow a user currently signed in as the right user to sign in
+      # Otherwise, it could be giving a false positive that the "same_ssn" person is assigned
+      # to a different user, when in fact it is the current user
+      if same_ssn.present? &&
+        same_ssn.first.try(:user) &&
+        same_ssn.first.try(:user_id)&.to_s != user_id.to_s
+        errors.add(
+          :ssn_taken,
+          #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
+          "The social security number you entered is affiliated with another account."
+        )
+      else
+        return true
       end
     end
 

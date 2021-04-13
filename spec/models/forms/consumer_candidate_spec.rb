@@ -32,6 +32,51 @@ describe Forms::ConsumerCandidate, "asked to match a person", dbclean: :after_ea
       it "return true " do
         expect(subject.uniq_ssn).to eq true
       end
+
+      context "when ssn is not equal to the user currently signed in" do
+        let!(:consumer_role_params) do
+          {
+            :dob => "2012-10-12",
+            :ssn => person.reload.ssn,
+            :first_name => "yo",
+            :last_name => "guy",
+            :gender => "m",
+            :user_id => 20,
+            :is_applying_coverage => false
+          }
+        end
+        let(:consumer_role_candidate) do
+          Forms::ConsumerCandidate.new(consumer_role_params)
+        end
+
+        it "returns an error" do
+          consumer_role_candidate.uniq_ssn
+          expect(consumer_role_candidate.errors[:ssn_taken]).to eq(
+            ["The social security number you entered is affiliated with another account."]
+          )
+        end
+      end
+
+      context "when ssn is equal to the user currently signed in" do
+        let!(:consumer_role_params) do
+          {
+            :dob => "2012-10-12",
+            :ssn => person.reload.ssn,
+            :first_name => "yo",
+            :last_name => "guy",
+            :gender => "m",
+            :user_id => person.user_id.to_s,
+            :is_applying_coverage => false
+          }
+        end
+        let(:consumer_role_candidate) do
+          Forms::ConsumerCandidate.new(consumer_role_params)
+        end
+
+        it "returns true" do
+          expect(consumer_role_candidate.uniq_ssn).to eq(true)
+        end
+      end
     end
 
     context 'when ssn matches with claimed user account' do
