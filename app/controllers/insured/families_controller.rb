@@ -23,7 +23,7 @@ class Insured::FamiliesController < FamiliesController
 
       log("#3717 person_id: #{@person.id}, params: #{params.to_s}, request: #{request.env.inspect}", {:severity => "error"}) if @family.blank?
 
-      @hbx_enrollments = @family.enrollments.non_external.order(effective_on: :desc, submitted_at: :desc, coverage_kind: :desc) || []
+      @hbx_enrollments = @family.enrollments_for_home_page
       @all_hbx_enrollments_for_admin = @hbx_enrollments + HbxEnrollment.family_canceled_enrollments(@family)
       # Sort by effective_on again. The latest enrollment will display at the top.
       @all_hbx_enrollments_for_admin = @all_hbx_enrollments_for_admin.sort_by(&:effective_on).reverse

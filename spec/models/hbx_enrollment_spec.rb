@@ -9,6 +9,45 @@ RSpec.describe HbxEnrollment, type: :model, dbclean: :around_each do
     include_context "setup benefit market with market catalogs and product packages"
     include_context "setup initial benefit application"
 
+    describe "scopes" do
+      context "family_canceled_enrollments" do
+        let!(:test_family) { FactoryBot.create(:family, :with_primary_family_member) }
+        let!(:enrollment_to_include) do
+          FactoryBot.create(
+            :hbx_enrollment,
+            :with_product,
+            family: test_family,
+            household: test_family.households.first,
+            kind: "employer_sponsored",
+            external_enrollment: false,
+          )
+        end
+
+        let!(:enrollment_to_exclude) do
+          test_family.enrollments.create!(
+            household: test_family.households.first,
+            kind: "employer_sponsored",
+            aasm_state: 'coverage_canceled',
+            product_id: nil,
+            external_enrollment: false,
+          )
+        end
+        # Simulates the scope on the families home page
+        let(:hbx_enrollments) do
+          test_family.enrollments_for_home_page
+        end
+        let(:all_hbx_enrollments_for_admin) do
+          hbx_enrollments + HbxEnrollment.family_canceled_enrollments(test_family)
+        end
+
+        it "should not include coverage_canceled without product_id in the scope" do
+          expect(all_hbx_enrollments_for_admin).to include(enrollment_to_include)
+          expect(all_hbx_enrollments_for_admin.length).to eq(1)
+          expect(all_hbx_enrollments_for_admin).to_not include(enrollment_to_exclude)
+        end
+      end
+    end
+
     describe "state transitions" do
       subject { HbxEnrollment.new }
       it "should check for state :actively_renewing" do

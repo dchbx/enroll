@@ -339,7 +339,7 @@ class HbxEnrollment
     where(
       :family_id => family.id,
       :aasm_state => "coverage_canceled",
-      :product_id.nin => [nil]
+      :product_id.nin => [nil] # Exception will be thrown on families home page for any enrollment with nil product_id
     ).order(
       effective_on: :desc, submitted_at: :desc, coverage_kind: :desc
     )
@@ -1451,7 +1451,9 @@ class HbxEnrollment
 
   def self.family_canceled_enrollments(family)
     canceled_enrollments = HbxEnrollment.family_home_page_hidden_enrollments(family)
-    canceled_enrollments.reject{|enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? }
+    # Note: product_id.blank? should be added here as blank rather than a product_present scope elsewhere because some scopes like
+    # waived must render
+    canceled_enrollments.reject{ |enrollment| enrollment.is_shop? && enrollment.sponsored_benefit_id.blank? && enrollment.product_id.blank? }
   end
 
   # TODO: Fix this to properly respect mulitiple possible employee roles for the same employer
