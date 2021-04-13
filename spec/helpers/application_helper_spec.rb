@@ -87,11 +87,23 @@ RSpec.describe ApplicationHelper, :type => :helper do
   end
 
   describe "#display_carrier_logo" do
-    let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
-    let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
 
-    it "should return the named logo" do
-      expect(helper.display_carrier_logo(plan)).to match %r{<img width=\"50\" src=\"/assets/logo/carrier/kaiser-.*\.jpg\" />}
+    context 'Logo is valid' do
+      let(:carrier_profile){ FactoryBot.build(:carrier_profile, legal_name: "Kaiser")}
+      let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "94506DC0350001-01", carrier_profile: carrier_profile)) }
+
+      it "should return the named logo" do
+        expect(helper.display_carrier_logo(plan)).to match %r{<img width=\"50\" src=\"/assets/logo/carrier/kaiser-.*\.jpg\" />}
+      end
+    end
+
+    context 'Logo is not valid valid' do
+      let(:carrier_profile){ nil }
+      let(:plan){ Maybe.new(FactoryBot.build(:plan, hios_id: "", carrier_profile: carrier_profile)) }
+
+      it "should not return image tag" do
+        expect(helper.display_carrier_logo(plan)).to eq ""
+      end
     end
 
   end
