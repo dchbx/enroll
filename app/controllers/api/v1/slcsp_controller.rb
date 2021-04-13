@@ -22,7 +22,9 @@ module Api
 
         raise "SLCSP could not be found" if benefit_coverage_period.nil?
 
-        Plan.find(benefit_coverage_period.slcsp) rescue "SLCSP could not be found"
+        BenefitMarkets::Products::Product.find(benefit_coverage_period.slcsp)
+      rescue StandardError => e
+        render xml: "<errors><error>#{e.message}</error></errors>", :status => :unprocessable_entity
       end
     end
   end
