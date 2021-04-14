@@ -19,52 +19,55 @@ module Operations
       def validate(params)
         return Failure('Missing File') if params[:file].blank?
         return Failure('Missing Year') if params[:year].blank?
-        return Failure('Missing Rating Area Model') if params[:rating_area_model].blank?
         return Failure('Missing Row data begins with') if params[:row_data_begin].blank?
+        params.merge!(rating_area_model: EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item)
         Success(params)
       end
 
       def load_issuer_profiles
         exempt_organizations = ::BenefitSponsors::Organizations::Organization.issuer_profiles
-        exempt_organizations.inject({}) do |result, organization|
+        profiles_hash = exempt_organizations.inject({}) do |result, organization|
           issuer_profile = organization.issuer_profile
           issuer_profile.issuer_hios_ids.each do |issuer_hios_id|
             result[issuer_hios_id] = issuer_profile.id.to_s
           end
+          result
         end
+        Success(profiles_hash)
       end
 
       def load_data(file, rating_area_model)
-        Success() if rating_area_model == 'single'
+        return Success() if rating_area_model == 'single'
 
         result = Roo::Spreadsheet.open(file)
         sheet = result.sheet(0)
         Success(sheet)
       end
 
-      def import_records(sheet, year, row_data_begin, _issuer_profiles_hash, rating_area_model)
+      def import_records(sheet, year, row_data_begin, issuer_profile_hash, rating_area_model)
         state_abbreviation = Settings.aca.state_abbreviation
-        issuer_hios_id = sheet.cell(6,2).to_i.to_s
 
         if rating_area_model == 'single'
           create_service_area_for_single_model(year, state_abbreviation)
           return Success("Created Service Areas")
         end
 
+        issuer_hios_id = sheet.cell(6,2).to_i.to_s
+
         (row_data_begin..sheet.last_row).each do |i|
           serves_entire_state = to_boolean(sheet.cell(i,3))
           if serves_entire_state
-            service_area = ::BenefitMarkets::Locations::ServiceArea.where(active_year: year, issuer_provided_code: sheet.cell(i,1),
+            service_area = ::BenefitMarkets::Locations::ServiceArea.where(active_year: year, issuer_provided_code: sheet.cell(i,1), county_zip_ids: [],
                                                                           covered_states: [state_abbreviation], issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2)).first
             if service_area.present?
               service_area.issuer_hios_id = issuer_hios_id
               service_area.save
             else
-              ::BenefitMarkets::Locations::ServiceArea.create(active_year: year, issuer_provided_code: sheet.cell(i,1), covered_states: [state_abbreviation],
+              ::BenefitMarkets::Locations::ServiceArea.create(active_year: year, issuer_provided_code: sheet.cell(i,1), covered_states: [state_abbreviation], county_zip_ids: [],
                                                               issuer_hios_id: issuer_hios_id, issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2))
             end
           elsif serves_entire_state == false
-            existing_state_wide_areas = ::Locations::ServiceArea.where(
+            existing_state_wide_areas = ::BenefitMarkets::Locations::ServiceArea.where(
               active_year: year,
               issuer_provided_code: sheet.cell(i,1),
               issuer_hios_id: issuer_hios_id,
@@ -73,23 +76,22 @@ module Operations
 
             if existing_state_wide_areas.blank?
               county_name = extract_county_name(sheet.cell(i,4))
-              query_criteria = load_query(rating_area_model, sheet.cell(i,4), county_name, state_abbreviation)
+              query_criteria = load_query(rating_area_model, sheet.cell(i,6), county_name, state_abbreviation)
 
-              records = ::Locations::CountyZip.where(query_criteria)
+              records = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
 
-              service_area = ::Locations::ServiceArea.where(
+              service_area = ::BenefitMarkets::Locations::ServiceArea.where(
                 active_year: year,
                 issuer_provided_code: sheet.cell(i,1),
-                issuer_hios_id: issuer_hios_id
+                issuer_hios_id: issuer_hios_id,
+                issuer_profile_id: issuer_profile_hash[issuer_hios_id]
               ).first
 
               if service_area.blank?
-                ::Locations::ServiceArea.create({ active_year: year, issuer_provided_code: sheet.cell(i,1), issuer_hios_id: issuer_hios_id,
-                                                  issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id)})
+                ::BenefitMarkets::Locations::ServiceArea.create!({ active_year: year, issuer_provided_code: sheet.cell(i,1), issuer_hios_id: issuer_hios_id,
+                                                                   issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id)})
               else
-                service_area.issuer_provided_title = sheet.cell(i,2)
-                service_area.county_zip_ids = records.pluck(:_id)
-                service_area.save
+                service_area.update_attributes(issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id))
               end
             end
           end
@@ -102,7 +104,7 @@ module Operations
           issuer_profile = issuer_organization.issuer_profile
           ::BenefitMarkets::Locations::ServiceArea.find_or_create_by!({
                                                                         active_year: year,
-                                                                        issuer_provided_code: "{state_abbreviation}S001",
+                                                                        issuer_provided_code: "#{state_abbreviation}S001",
                                                                         covered_states: [state_abbreviation],
                                                                         county_zip_ids: [],
                                                                         issuer_profile_id: issuer_profile.id,
@@ -120,14 +122,15 @@ module Operations
         when 'county'
           query_criteria.merge!({ county_name: county_name })
         when 'zipcode'
-          query_criteria.merge!({ zip: extracted_zips })
+          query_criteria.merge!({ :zip.in => extracted_zips }) if extracted_zips.present?
         else
           if extracted_zips.present?
-            query_criteria.merge!({ county_name: county_name, zip: extracted_zips })
+            query_criteria.merge!({ county_name: county_name, :zip.in => extracted_zips })
           else
             query_criteria.merge!({ county_name: county_name })
           end
         end
+        query_criteria
       end
 
       def to_boolean(value)
