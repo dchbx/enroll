@@ -13,6 +13,7 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
     let(:import_timestamp) { DateTime.now }
     let(:file) { 'spec/test_data/plan_data/rating_areas/county_zipcode.xlsx' }
     let(:year) { TimeKeeper.date_of_record.year }
+    let(:setting) { double }
 
     describe 'single geographic rating area' do
       let(:params) do
@@ -24,7 +25,9 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
       end
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'single')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'single'))
       end
 
       it 'should return success' do
@@ -46,7 +49,10 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
 
     describe 'zipcode geographic rating area' do
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'zipcode')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'zipcode'))
+        allow(setting).to receive(:setting).and_return(double(item: nil))
       end
 
       context 'success' do
@@ -118,7 +124,10 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
     describe 'county geographic rating area' do
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'county')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'county'))
+        allow(setting).to receive(:setting).and_return(double(item: nil))
       end
 
       context 'success' do
@@ -190,7 +199,10 @@ RSpec.describe ::Operations::Products::ImportRatingArea, dbclean: :after_each do
     describe 'mixed geographic rating area' do
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'mixed')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'mixed'))
+        allow(setting).to receive(:setting).and_return(double(item: nil))
       end
 
       context 'success' do

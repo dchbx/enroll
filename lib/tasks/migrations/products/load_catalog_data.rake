@@ -1,5 +1,5 @@
-#rake products:load_county_zips([file_path])
-#rake products:load_rating_areas([file_path, year])
+#rake products:load_county_zips[file_path]
+#rake products:load_rating_areas[file_path, year]
 
 namespace :products do
 
@@ -17,7 +17,7 @@ namespace :products do
 
   desc "load rating areas"
   task :load_rating_areas, [:file, :year] => :environment do |t, args|
-    puts ':::: Loading County Zips ::::'
+    puts ':::: Loading Rating Areas ::::'
     result = ::Operations::Products::ImportRatingArea.new.call({ file: args[:file], year: args[:year], import_timestamp: DateTime.now })
 
     if result.success?

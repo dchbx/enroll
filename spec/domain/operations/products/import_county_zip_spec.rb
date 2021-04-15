@@ -34,200 +34,77 @@ RSpec.describe ::Operations::Products::ImportCountyZip, dbclean: :after_each do
       end
     end
 
-    describe 'zipcode geographic rating area' do
-      before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'zipcode')))
-      end
+    ['zipcode', 'county', 'mixed'].each do |rating_model_type|
+      describe "#{rating_model_type} geographic rating area" do
+        let(:setting) { double }
 
-      context 'success' do
-        let(:params) do
-          {
-            file: file,
-            import_timestamp: import_timestamp
-          }
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+          allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+          allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: rating_model_type))
         end
 
-        context 'without existing records' do
-          before do
-            @result = subject.call(params)
+        context 'success' do
+          let(:params) do
+            {
+              file: file,
+              import_timestamp: import_timestamp
+            }
           end
 
-          it 'should return success' do
-            expect(@result.success?).to eq true
+          context 'without existing records' do
+            before do
+              @result = subject.call(params)
+            end
+
+            it 'should return success' do
+              expect(@result.success?).to eq true
+            end
+
+            it 'should create CountyZip objects' do
+              expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(14)
+            end
+
+            it 'should create CountyZip objects with county name' do
+              expect(::BenefitMarkets::Locations::CountyZip.where(county_name: nil).size).to eq 0
+            end
+
+            it 'should create CountyZip objects with zip' do
+              expect(::BenefitMarkets::Locations::CountyZip.where(zip: nil).size).to eq(0)
+            end
           end
 
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(10)
-          end
+          context 'with existing records' do
 
-          it 'should create CountyZip objects without county name' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.pluck(:county_name).uniq).to eq([nil])
-          end
-        end
+            it 'should return success' do
+              result = subject.call(params)
+              expect(result.success?).to eq true
+            end
 
-        context 'with existing records' do
-
-          it 'should return success' do
-            result = subject.call(params)
-            expect(result.success?).to eq true
-          end
-
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, zip: '01001')
-            subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(zip: '01001').size).to eq(1)
-          end
-        end
-      end
-
-      context 'failure' do
-
-        it 'should return missing file' do
-          result = subject.call({ import_timestamp: import_timestamp })
-          expect(result.failure).to eq('Missing File')
-        end
-
-        it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
-          expect(result.failure).to eq('Missing Import TimeStamp')
-        end
-
-        it 'should not create CountyZip object' do
-          subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
-        end
-      end
-    end
-
-    describe 'county geographic rating area' do
-
-      before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'county')))
-      end
-
-      context 'success' do
-        let(:params) do
-          {
-            file: file,
-            import_timestamp: import_timestamp
-          }
-        end
-
-        context 'without existing records' do
-          before do
-            @result = subject.call(params)
-          end
-
-          it 'should return success' do
-            expect(@result.success?).to eq true
-          end
-
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(5)
-          end
-
-          it 'should create CountyZip objects without zipcode' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.pluck(:zip).uniq).to eq([nil])
+            it 'should not create county zip objects if already exists' do
+              FactoryBot.create(:benefit_markets_locations_county_zip, zip: '01001', county_name: 'Hampden')
+              subject.call(params)
+              expect(::BenefitMarkets::Locations::CountyZip.where(zip: '01001', county_name: 'Hampden').size).to eq(1)
+            end
           end
         end
 
-        context 'with existing records' do
+        context 'failure' do
 
-          it 'should return success' do
-            result = subject.call(params)
-            expect(result.success?).to eq true
+          it 'should return missing file' do
+            result = subject.call({ import_timestamp: import_timestamp })
+            expect(result.failure).to eq('Missing File')
           end
 
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Hampden')
-            subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: 'Hampden').size).to eq(1)
-          end
-        end
-      end
-
-      context 'failure' do
-
-        it 'should return missing file' do
-          result = subject.call({ import_timestamp: import_timestamp })
-          expect(result.failure).to eq('Missing File')
-        end
-
-        it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
-          expect(result.failure).to eq('Missing Import TimeStamp')
-        end
-
-        it 'should not create CountyZip object' do
-          subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
-        end
-      end
-    end
-
-    describe 'mixed geographic rating area' do
-
-      before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'mixed')))
-      end
-
-      context 'success' do
-        let(:params) do
-          {
-            file: file,
-            import_timestamp: import_timestamp
-          }
-        end
-
-        context 'without existing records' do
-          before do
-            @result = subject.call(params)
+          it 'should return missing timestamp' do
+            result = subject.call({ file: import_timestamp })
+            expect(result.failure).to eq('Missing Import TimeStamp')
           end
 
-          it 'should return success' do
-            expect(@result.success?).to eq true
+          it 'should not create CountyZip object' do
+            subject.call({ import_timestamp: import_timestamp })
+            expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
           end
-
-          it 'should create CountyZip objects' do
-            expect(::BenefitMarkets::Locations::CountyZip.all.count).to eq(14)
-          end
-
-          it 'should create CountyZip objects with zipcode & county' do
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: nil).size).to eq(0)
-            expect(::BenefitMarkets::Locations::CountyZip.where(zip: nil).size).to eq(0)
-          end
-        end
-
-        context 'with existing records' do
-
-          it 'should return success' do
-            result = subject.call(params)
-            expect(result.success?).to eq true
-          end
-
-          it 'should not create county zip objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_county_zip, county_name: 'Hampden', zip: '01001')
-            subject.call(params)
-            expect(::BenefitMarkets::Locations::CountyZip.where(county_name: 'Hampden', zip: '01001').size).to eq(1)
-          end
-        end
-      end
-
-      context 'failure' do
-
-        it 'should return missing file' do
-          result = subject.call({ import_timestamp: import_timestamp })
-          expect(result.failure).to eq('Missing File')
-        end
-
-        it 'should return missing timestamp' do
-          result = subject.call({ file: import_timestamp })
-          expect(result.failure).to eq('Missing Import TimeStamp')
-        end
-
-        it 'should not create CountyZip object' do
-          subject.call({ import_timestamp: import_timestamp })
-          expect(::BenefitMarkets::Locations::CountyZip.all.count).to be_zero
         end
       end
     end

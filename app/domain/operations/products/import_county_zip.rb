@@ -44,16 +44,7 @@ module Operations
         begin
           (2..sheet.last_row).each do |row_number|
             row_info = sheet.row(row_number)
-            query_criteria = { state: state_abbreviation }
-
-            case geographic_rating_area_model
-            when 'county'
-              query_criteria.merge!({ county_name: row_info[headers['county']].squish! })
-            when 'zipcode'
-              query_criteria.merge!({ zip: row_info[headers["zip"]].squish! })
-            else
-              query_criteria.merge!({ county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].squish! })
-            end
+            query_criteria = { state: state_abbreviation, county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].squish! }
 
             existing_county = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
             next if existing_county.present?
