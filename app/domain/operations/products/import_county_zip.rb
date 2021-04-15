@@ -38,7 +38,7 @@ module Operations
       end
 
       def import_records(headers, sheet, import_timestamp)
-        state_abbreviation = Settings.aca.state_abbreviation
+        state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
         geographic_rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
         return Success("CountyZips not needed") if geographic_rating_area_model == 'single'
         begin
