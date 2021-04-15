@@ -29,6 +29,8 @@ registry:
             item: ""
           - key: :submit_docs_url
             item: ""
+          - key: :geographic_rating_area_model
+            item: "county"
           - key: :site_key
             item: :me
           - key: :state_abbreviation
