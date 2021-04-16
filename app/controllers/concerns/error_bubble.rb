@@ -58,7 +58,7 @@ module ErrorBubble
     phones = person.phones.select {|phone| phone.full_phone_number.present? && !phone.valid?} # rubocop:disable Style/GuardClause: Use a guard clause
     if person.errors.key?(:phones) && phones.present? # rubocop:disable Style/GuardClause: Use a guard clause
       phones.each do |phone|
-        person.errors.add("#{phone.kind} phone: ", "Phone number must have 10 digits")
+        person.errors.add("#{phone.kind} phone:", "Phone number must have 10 digits")
       end
       person.errors.delete(:phones)
     end

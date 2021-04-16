@@ -75,7 +75,7 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
         put :update, params: { person: person_params, id: "test" }
         expect(response).to have_http_status(:success)
         expect(response).to render_template(:edit)
-        expect(person.errors.full_messages).to include 'Phones is invalid'
+        expect(person.errors.full_messages).to include "Home phone: Phone number must have 10 digits"
       end
 
       it "should update existing person with valid phone number" do
