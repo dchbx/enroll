@@ -7,6 +7,8 @@ class ProductBuilder
     @log_path = LOG_PATH
     @qhp_hash = qhp_hash
     @qhp_array = []
+    @rating_area_model = EnrollRegistry[:enroll_app].setting(:geographic_rating_area_model).item
+    @state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     set_issuer_profile_hash
     set_service_areas
     FileUtils.mkdir_p(File.dirname(@log_path)) unless File.directory?(File.dirname(@log_path))
@@ -168,20 +170,20 @@ class ProductBuilder
   end
 
   def mapped_service_area_id
-    if Settings.site.key == :cca
-      @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
+    if @rating_area_model == 'single'
+      @service_area_map[[get_issuer_profile_id.to_s,"#{@state_abbreviation}S001",@qhp.active_year]]
     else
-      @service_area_map[[get_issuer_profile_id.to_s,"#{Settings.site.key.upcase}S001",@qhp.active_year]]
+      @service_area_map[[@qhp.issuer_id,get_issuer_profile_id.to_s,@qhp.service_area_id,@qhp.active_year]]
     end
   end
 
   def set_service_areas
     @service_area_map = {}
     ::BenefitMarkets::Locations::ServiceArea.all.map do |sa|
-      if Settings.site.key == :cca
-        @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
-      else
+      if @rating_area_model == 'single'
         @service_area_map[[sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
+      else
+        @service_area_map[[sa.issuer_hios_id, sa.issuer_profile_id.to_s,sa.issuer_provided_code,sa.active_year]] = sa.id
       end
     end
   end
