@@ -44,7 +44,7 @@ module Operations
         begin
           (2..sheet.last_row).each do |row_number|
             row_info = sheet.row(row_number)
-            query_criteria = { state: state_abbreviation, county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].squish! }
+            query_criteria = { state: state_abbreviation, county_name: row_info[headers['county']].squish!, zip: row_info[headers["zip"]].to_i.to_s.rjust(5, '0') }
 
             existing_county = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
             next if existing_county.present?

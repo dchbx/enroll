@@ -102,7 +102,7 @@ module Operations
             end
           end
         rescue StandardError
-          return Failure({errors: ["Unable to import CountyZips from file"]})
+          return Failure({errors: ["Unable to import Rating Areas from file"]})
         end
         Success('Created Rating Areas for given data')
       end
