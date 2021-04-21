@@ -4,9 +4,8 @@ module Forms
     include ActiveModel::Validations
     include Config::AcaModelConcern
 
-    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
-    attr_accessor :gender, :relationship, :tobacco_use
-    attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage, :age_off_excluded # rubocop:disable Style/AccessorGrouping
+    attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id, :gender, :relationship, :tobacco_use,
+                  :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage, :age_off_excluded
     attr_writer :family
     include ::Forms::PeopleNames
     include ::Forms::ConsumerFields
