@@ -68,8 +68,7 @@ module Operations
 
           location_ids = locations.map do |loc_record|
             query_criteria = {
-              state: state_abbreviation,
-              county_name: loc_record['county_name']
+              state: state_abbreviation
             }
 
             case geographic_rating_area_model
@@ -81,14 +80,14 @@ module Operations
               query_criteria.merge!({ county_name: loc_record['county_name'].squish!, zip: loc_record["zip"].squish! })
             end
 
-            county_zip = ::BenefitMarkets::Locations::CountyZip.where(query_criteria).first
-            county_zip._id
+            county_zips = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
+            county_zips.map(&:_id)
           end
 
           rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
 
           if rating_area.present?
-            rating_area.county_zip_ids = location_ids
+            rating_area.county_zip_ids = location_ids.flatten
             rating_area.save!
           else
             ::BenefitMarkets::Locations::RatingArea.new(
