@@ -64,45 +64,44 @@ module Operations
           return Success("Created Rating areas")
         end
 
-        begin
-          data.each do |rating_area_id, locations|
-            location_ids = locations.map do |loc_record|
-              query_criteria = {
-                state: state_abbreviation,
-                county_name: loc_record['county_name']
-              }
+        data.each do |rating_area_id, locations|
 
-              case geographic_rating_area_model
-              when 'county'
-                query_criteria.merge!({ county_name: loc_record['county_name'].squish! })
-              when 'zipcode'
-                query_criteria.merge!({ zip: loc_record["zip"].squish! })
-              else
-                query_criteria.merge!({ county_name: loc_record['county_name'].squish!, zip: loc_record["zip"].squish! })
-              end
+          location_ids = locations.map do |loc_record|
+            query_criteria = {
+              state: state_abbreviation,
+              county_name: loc_record['county_name']
+            }
 
-              county_zip = ::BenefitMarkets::Locations::CountyZip.where(query_criteria).first
-              county_zip._id
-            end
-
-            rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
-
-            if rating_area.present?
-              rating_area.county_zip_ids = location_ids
-              rating_area.save!
+            case geographic_rating_area_model
+            when 'county'
+              query_criteria.merge!({ county_name: loc_record['county_name'].squish! })
+            when 'zipcode'
+              query_criteria.merge!({ zip: loc_record["zip"].squish! })
             else
-              ::BenefitMarkets::Locations::RatingArea.new(
-                {
-                  created_at: import_timestamp,
-                  active_year: year,
-                  exchange_provided_code: rating_area_id,
-                  county_zip_ids: location_ids
-                }
-              ).save!
+              query_criteria.merge!({ county_name: loc_record['county_name'].squish!, zip: loc_record["zip"].squish! })
             end
+
+            county_zip = ::BenefitMarkets::Locations::CountyZip.where(query_criteria).first
+            county_zip._id
           end
-        rescue StandardError
-          return Failure({errors: ["Unable to import Rating Areas from file"]})
+
+          rating_area = ::BenefitMarkets::Locations::RatingArea.where({active_year: year, exchange_provided_code: rating_area_id }).first
+
+          if rating_area.present?
+            rating_area.county_zip_ids = location_ids
+            rating_area.save!
+          else
+            ::BenefitMarkets::Locations::RatingArea.new(
+              {
+                created_at: import_timestamp,
+                active_year: year,
+                exchange_provided_code: rating_area_id,
+                county_zip_ids: location_ids
+              }
+            ).save!
+          end
+        rescue StandardError => e
+          return Failure({errors: ["Unable to import Rating Areas from file. Error while parsing #{rating_area_id} - #{locations} with error #{e}"]})
         end
         Success('Created Rating Areas for given data')
       end
