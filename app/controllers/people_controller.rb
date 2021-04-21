@@ -383,7 +383,8 @@ private
       :id,
       :consumer_role,
       :is_applying_coverage,
-      :age_off_excluded
+      :age_off_excluded,
+      :tobacco_use
     ]
   end
 

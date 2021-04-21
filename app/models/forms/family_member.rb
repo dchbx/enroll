@@ -5,7 +5,7 @@ module Forms
     include Config::AcaModelConcern
 
     attr_accessor :id, :family_id, :is_consumer_role, :is_resident_role, :vlp_document_id
-    attr_accessor :gender, :relationship
+    attr_accessor :gender, :relationship, :tobacco_use
     attr_accessor :addresses, :is_homeless, :is_temporarily_out_of_state, :same_with_primary, :is_applying_coverage, :age_off_excluded # rubocop:disable Style/AccessorGrouping
     attr_writer :family
     include ::Forms::PeopleNames
@@ -192,7 +192,8 @@ module Forms
         :tribal_id => tribal_id,
         :is_homeless => is_homeless,
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
-        :age_off_excluded => age_off_excluded
+        :age_off_excluded => age_off_excluded,
+        :tobacco_use => tobacco_use
       }
     end
 
@@ -249,7 +250,8 @@ module Forms
         :is_homeless => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_homeless),
         :is_temporarily_out_of_state => has_same_address_with_primary ? '' : found_family_member.try(:person).try(:is_temporarily_out_of_state),
         :addresses => [home_address, mailing_address],
-        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded)
+        :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded),
+        :tobacco_use => found_family_member&.person&.tobacco_use
       })
     end
 

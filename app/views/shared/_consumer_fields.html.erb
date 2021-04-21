@@ -135,6 +135,28 @@
         <%= render partial: 'shared/modal_support_text_household', locals: {key: "is_incarcerated"} %>
       </div>
     </div>
+
+    <div class="row row-form-wrapper no-buffer <%= 'hidden_field' unless ::EnrollRegistry.feature_enabled?(:tobacco_cost) %>" id="naturalized_citizen_container">
+      <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 form-group form-group-lg top-buffer">
+        <label>Is this person a Tobacco user? *</label>
+      </div>
+      <div class="col-lg-3 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :tobacco_use, true, required: true, class: "required floatlabel" %>
+          <%= f.label :tobacco_use, :value => true do %>
+            <span class="yes_no_pair">Yes</span>
+          <% end %>
+        </div>
+      </div>
+      <div class="col-lg-1 col-md-2 col-sm-6 col-xs-6 form-group form-group-lg no-pd">
+        <div class="radio skinned-form-controls skinned-form-controls-mac">
+          <%= f.radio_button :tobacco_use, false, required: true, class: "required floatlabel" %>
+          <%= f.label :tobacco_use, :value => false do %>
+            <span class="yes_no_pair">No</span>
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 <%end%>
 

@@ -86,7 +86,8 @@ class Person
   field :race, type: String
   field :tribal_id, type: String
 
-  field :is_tobacco_user, type: String, default: "unknown"
+  field :is_tobacco_user, type: String, default: "unknown" # deprecated
+  field :tobacco_use, type: Boolean
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
