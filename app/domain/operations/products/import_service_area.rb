@@ -60,8 +60,7 @@ module Operations
             service_area = ::BenefitMarkets::Locations::ServiceArea.where(active_year: year, issuer_provided_code: sheet.cell(i,1), county_zip_ids: [],
                                                                           covered_states: [state_abbreviation], issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2)).first
             if service_area.present?
-              service_area.issuer_hios_id = issuer_hios_id
-              service_area.save
+              service_area.update_attributes(issuer_hios_id: issuer_hios_id)
             else
               ::BenefitMarkets::Locations::ServiceArea.create(active_year: year, issuer_provided_code: sheet.cell(i,1), covered_states: [state_abbreviation], county_zip_ids: [],
                                                               issuer_hios_id: issuer_hios_id, issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2))
@@ -80,21 +79,14 @@ module Operations
 
               records = ::BenefitMarkets::Locations::CountyZip.where(query_criteria)
 
-              service_area = ::BenefitMarkets::Locations::ServiceArea.where(
-                active_year: year,
-                issuer_provided_code: sheet.cell(i,1),
-                issuer_hios_id: issuer_hios_id,
-                issuer_profile_id: issuer_profile_hash[issuer_hios_id]
-              ).first
+              service_area = ::BenefitMarkets::Locations::ServiceArea.where(active_year: year, issuer_provided_code: sheet.cell(i,1),
+                                                                            issuer_hios_id: issuer_hios_id, issuer_profile_id: issuer_profile_hash[issuer_hios_id]).first
 
               if service_area.blank?
                 ::BenefitMarkets::Locations::ServiceArea.create!({ active_year: year, issuer_provided_code: sheet.cell(i,1), issuer_hios_id: issuer_hios_id,
                                                                    issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id)})
               else
-                service_area.issuer_provided_title = sheet.cell(i,2)
-                service_area.county_zip_ids += records.pluck(:_id)
-                service_area.county_zip_ids.uniq!
-                service_area.save!
+                update_existing_service_area(service_area, sheet.cell(i,2), records.pluck(:_id))
               end
             end
           end
@@ -102,6 +94,13 @@ module Operations
           return Failure({errors: ["Unable to import service area from file. Error while parsing row #{i} with error #{e}"]})
         end
         Success('Created Rating Areas for given data')
+      end
+
+      def update_existing_service_area(service_area, issuer_provided_title, county_zip_ids)
+        service_area.issuer_provided_title = issuer_provided_title
+        service_area.county_zip_ids += county_zip_ids
+        service_area.county_zip_ids.uniq!
+        service_area.save!
       end
 
       def create_service_area_for_single_model(year, state_abbreviation)

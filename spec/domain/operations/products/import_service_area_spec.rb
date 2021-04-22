@@ -11,11 +11,12 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
   describe 'clients with geographic service areas' do
 
     let(:import_timestamp) { DateTime.now }
-    let(:cz_file) { 'spec/test_data/plan_data/service_areas/county_zipcode.xlsx' }
+    let(:cz_file) { 'spec/test_data/plan_data/rating_areas/county_zipcode.xlsx' }
     let(:file) { 'spec/test_data/plan_data/service_areas/service_area.xlsx' }
     let(:year) { TimeKeeper.date_of_record.year }
     let(:site) { build(:benefit_sponsors_site, :with_owner_exempt_organization) }
     let!(:issuer_profile) { create(:benefit_sponsors_organizations_issuer_profile, organization: site.owner_organization, issuer_hios_ids: ['12234']) }
+    let(:setting) { double }
 
     describe 'single geographic service area' do
       let(:params) do
@@ -27,7 +28,9 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
       end
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'single')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'single'))
       end
 
       it 'should return success' do
@@ -41,7 +44,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
       end
 
       it 'should not create service area if there is an existing one' do
-        FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "#{Settings.aca.state_abbreviation}S001", issuer_profile_id: issuer_profile.id, issuer_provided_title: issuer_profile.legal_name, county_zip_ids: [])
+        FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "#{Settings.aca.state_abbreviation}S001",
+                                                                   issuer_profile_id: issuer_profile.id, issuer_provided_title: issuer_profile.legal_name, county_zip_ids: [], covered_states: [Settings.aca.state_abbreviation])
         subject.call(params)
         expect(::BenefitMarkets::Locations::ServiceArea.all.count).to eq 1
       end
@@ -49,7 +53,9 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
 
     describe 'zipcode geographic service area' do
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'zipcode')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'zipcode'))
       end
 
       context 'success' do
@@ -73,7 +79,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [])
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [], covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(county_zip_ids: []).count).to eq(1)
           end
@@ -92,7 +99,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ')
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(:county_zip_ids.ne => []).count).to eq(1)
           end
@@ -126,7 +134,9 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
     describe 'county geographic service area' do
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'county')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'county'))
       end
 
       context 'success' do
@@ -150,7 +160,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [])
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [], covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(county_zip_ids: []).count).to eq(1)
           end
@@ -169,7 +180,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ')
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(:county_zip_ids.ne => []).size).to eq(1)
           end
@@ -203,7 +215,9 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
     describe 'mixed geographic service area' do
 
       before :each do
-        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'mixed')))
+        allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(setting)
+        allow(setting).to receive(:setting).with(:state_abbreviation).and_return(double(item: 'DC'))
+        allow(setting).to receive(:setting).with(:geographic_rating_area_model).and_return(double(item: 'mixed'))
       end
 
       context 'success' do
@@ -227,7 +241,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [])
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', county_zip_ids: [], covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(county_zip_ids: []).count).to eq(1)
           end
@@ -246,7 +261,8 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           end
 
           it 'should not create service area objects if already exists' do
-            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234', issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ')
+            FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "MAS002", issuer_hios_id: '12234',
+                                                                       issuer_profile_id: issuer_profile.id, issuer_provided_title: 'Select Care ', covered_states: [Settings.aca.state_abbreviation])
             subject.call(params)
             expect(::BenefitMarkets::Locations::ServiceArea.where(:county_zip_ids.ne => []).size).to eq(1)
           end
