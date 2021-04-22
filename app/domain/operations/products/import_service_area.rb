@@ -91,10 +91,15 @@ module Operations
                 ::BenefitMarkets::Locations::ServiceArea.create!({ active_year: year, issuer_provided_code: sheet.cell(i,1), issuer_hios_id: issuer_hios_id,
                                                                    issuer_profile_id: issuer_profile_hash[issuer_hios_id], issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id)})
               else
-                service_area.update_attributes(issuer_provided_title: sheet.cell(i,2), county_zip_ids: records.pluck(:_id))
+                service_area.issuer_provided_title = sheet.cell(i,2)
+                service_area.county_zip_ids += records.pluck(:_id)
+                service_area.county_zip_ids.uniq!
+                service_area.save!
               end
             end
           end
+        rescue StandardError => e
+          return Failure({errors: ["Unable to import service area from file. Error while parsing row #{i} with error #{e}"]})
         end
         Success('Created Rating Areas for given data')
       end

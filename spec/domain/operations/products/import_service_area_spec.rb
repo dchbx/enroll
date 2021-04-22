@@ -8,16 +8,16 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
     expect(subject.respond_to?(:call)).to be_truthy
   end
 
-  describe 'clients with geographic rating areas' do
+  describe 'clients with geographic service areas' do
 
     let(:import_timestamp) { DateTime.now }
-    let(:cz_file) { 'spec/test_data/plan_data/rating_areas/county_zipcode.xlsx' }
+    let(:cz_file) { 'spec/test_data/plan_data/service_areas/county_zipcode.xlsx' }
     let(:file) { 'spec/test_data/plan_data/service_areas/service_area.xlsx' }
     let(:year) { TimeKeeper.date_of_record.year }
     let(:site) { build(:benefit_sponsors_site, :with_owner_exempt_organization) }
     let!(:issuer_profile) { create(:benefit_sponsors_organizations_issuer_profile, organization: site.owner_organization, issuer_hios_ids: ['12234']) }
 
-    describe 'single geographic rating area' do
+    describe 'single geographic service area' do
       let(:params) do
         {
           file: file,
@@ -35,19 +35,19 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
         expect(result.success?).to eq true
       end
 
-      it 'should create one rating area for each issuer' do
+      it 'should create one service area for each issuer' do
         subject.call(params)
         expect(::BenefitMarkets::Locations::ServiceArea.all.count).to eq 1
       end
 
-      it 'should not create rating area if there is an existing one' do
+      it 'should not create service area if there is an existing one' do
         FactoryBot.create(:benefit_markets_locations_service_area, issuer_provided_code: "#{Settings.aca.state_abbreviation}S001", issuer_profile_id: issuer_profile.id, issuer_provided_title: issuer_profile.legal_name, county_zip_ids: [])
         subject.call(params)
         expect(::BenefitMarkets::Locations::ServiceArea.all.count).to eq 1
       end
     end
 
-    describe 'zipcode geographic rating area' do
+    describe 'zipcode geographic service area' do
       before :each do
         allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'zipcode')))
       end
@@ -116,14 +116,14 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           expect(result.failure).to eq('Missing Row data begins with')
         end
 
-        it 'should not create RatingArea object' do
+        it 'should not create serviceArea object' do
           subject.call({ file: file, row_data_begin: 13 })
           expect(::BenefitMarkets::Locations::ServiceArea.all.count).to be_zero
         end
       end
     end
 
-    describe 'county geographic rating area' do
+    describe 'county geographic service area' do
 
       before :each do
         allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'county')))
@@ -193,14 +193,14 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           expect(result.failure).to eq('Missing Row data begins with')
         end
 
-        it 'should not create RatingArea object' do
+        it 'should not create serviceArea object' do
           subject.call({ import_timestamp: import_timestamp })
           expect(::BenefitMarkets::Locations::ServiceArea.all.count).to be_zero
         end
       end
     end
 
-    describe 'mixed geographic rating area' do
+    describe 'mixed geographic service area' do
 
       before :each do
         allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(setting: double(item: 'mixed')))
@@ -270,7 +270,7 @@ RSpec.describe ::Operations::Products::ImportServiceArea, dbclean: :after_each d
           expect(result.failure).to eq('Missing Row data begins with')
         end
 
-        it 'should not create RatingArea object' do
+        it 'should not create serviceArea object' do
           subject.call({ year: year })
           expect(::BenefitMarkets::Locations::ServiceArea.all.count).to be_zero
         end
