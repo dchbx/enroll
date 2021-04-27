@@ -152,32 +152,47 @@ class BenefitCoveragePeriod
   # @param tax_household [ TaxHousehold ] the tax household members belong to if eligible for financial assistance
   #
   # @return [ Array<Plan> ] the list of eligible products
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil, market=nil)
-    ivl_bgs = []
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
-    benefit_packages.each do |bg|
-      satisfied = true
-      family = hbx_enrollment.family
-      hbx_enrollment_members.map(&:family_member).each do |family_member|
-        consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
-        resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
-        unless resident_role.nil?
-          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family, market_kind: market)
-        else
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment.effective_on,  market_kind: market})
-        end
-        satisfied = false and break unless rule.satisfied?[0]
-      end
-      ivl_bgs << bg if satisfied
-    end
-
-    ivl_bgs = ivl_bgs.uniq
+    subcriber = hbx_enrollment_members.find(&:is_subscriber)
+    family_members = hbx_enrollment_members.map(&:family_member)
+    ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, effective_on: hbx_enrollment.effective_on, market: market}).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
     csr_kind = extract_csr_kind(tax_household, shopping_family_member_ids) if tax_household
     market = market.nil? || market == 'coverall' ? 'individual' : market
-    products = product_factory.new({market_kind: market})
-    products.by_coverage_kind_year_and_csr(coverage_kind, start_on.year, csr_kind: csr_kind).by_product_ids(elected_product_ids).entries
+    product_entries({market: market, coverage_kind: coverage_kind, csr_kind: csr_kind, elected_product_ids: elected_product_ids, subcriber: subcriber, effective_on: hbx_enrollment.effective_on})
+  end
+
+  def get_benefit_packages(**attrs)
+    benefit_packages.inject([]) do |result, bg|
+      satisfied = true
+      attrs[:family_members].each do |family_member|
+        consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
+        resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
+        rule = if resident_role.nil?
+                 InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: attrs[:coverage_kind], family: attrs[:family], new_effective_on: attrs[:effective_on],  market_kind: attrs[:market]})
+               else
+                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: attrs[:coverage_kind], family: attrs[:family], market_kind: attrs[:market])
+               end
+        satisfied = false and break unless rule.satisfied?[0]
+      end
+      result << bg if satisfied
+      result
+    end
+  end
+
+  def product_entries(**attrs)
+    factory = product_factory.new({market_kind: attrs[:market]})
+    elected_products = factory.by_coverage_kind_year_and_csr(attrs[:coverage_kind], start_on.year, csr_kind: attrs[:csr_kind]).by_product_ids(attrs[:elected_product_ids])
+
+    if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
+      elected_products.entries
+    else
+      address = attrs[:subcriber].home_address || attrs[:subcriber].mailing_address
+      service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: attrs[:effective_on]).map(&:id)
+      elected_products.where(:service_area_id.in => service_area_ids).entries
+    end
   end
 
   ## Class methods

@@ -201,9 +201,16 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
     let(:c2) {FactoryBot.create(:consumer_role)}
     let(:r1) {FactoryBot.create(:resident_role)}
     let(:r2) {FactoryBot.create(:resident_role)}
+    let(:address) { FactoryBot.build(:address) }
     let(:family) { FactoryBot.build(:family, :with_primary_family_member_and_dependent)}
-    let(:member1) {double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member:family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members[0].id)}
-    let(:member2) {double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id)}
+    let(:member1) do
+      double(person: double(consumer_role: c1),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: true).first, applicant_id: family.family_members[0].id,
+             is_subscriber: true, home_address: address)
+    end
+    let(:member2) do
+      double(person: double(consumer_role: c2),hbx_enrollment: hbx_enrollment,family_member: family.family_members.where(is_primary_applicant: false).first, applicant_id: family.family_members[1].id,
+             is_subscriber: false, home_address:  address)
+    end
     let(:hbx_enrollment){ HbxEnrollment.new(kind: "individual", product: plan1, effective_on: TimeKeeper.date_of_record, household: family.latest_household, enrollment_signature: true) }
     let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
     let(:plan1) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile)}
@@ -221,28 +228,78 @@ RSpec.describe BenefitCoveragePeriod, type: :model, dbclean: :after_each do
       allow(benefit_coverage_period).to receive(:benefit_packages).and_return [benefit_package1, benefit_package2]
       allow(InsuredEligibleForBenefitRule).to receive(:new).and_return rule
       plan1.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
-      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min"=>Date.new(2018,01,01), "max"=>Date.new(2018,12,31)})
+      plan2.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01', application_period: {"min" => Date.new(2018,0o1,0o1), "max" => Date.new(2018,12,31)})
       plan3.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
       plan4.update_attributes(benefit_market_kind: :aca_individual, metal_level_kind: 'gold', csr_variant_id: '01')
+      allow(EnrollRegistry).to receive(:[]).with(:enroll_app).and_return(double(settings: double(item: 'DC Health Link')))
     end
 
     after do
       TimeKeeper.set_date_of_record_unprotected!(Date.today)
     end
 
-    it "when satisfied" do
-      allow(rule).to receive(:satisfied?).and_return [true, 'ok']
-      plans = [plan1, plan3]
-      elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
-      expect(elected_plans_by_enrollment_members).to include(plan1)
-      expect(elected_plans_by_enrollment_members).to include(plan3)
-      expect(elected_plans_by_enrollment_members).not_to include(plan2)
+    context 'single rating area model' do
+
+      before :each do
+        allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'single')))
+      end
+
+      context 'when satisfied' do
+
+        it 'should return plans' do
+          allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+          elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+          expect(elected_plans_by_enrollment_members).to include(plan1)
+          expect(elected_plans_by_enrollment_members).to include(plan3)
+          expect(elected_plans_by_enrollment_members).not_to include(plan2)
+        end
+      end
+
+      context 'when not satisfied' do
+
+        it 'should not return any plans' do
+          allow(rule).to receive(:satisfied?).and_return [false, 'ok']
+          expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq []
+        end
+      end
     end
 
-    it "when not satisfied" do
-      allow(rule).to receive(:satisfied?).and_return [false, 'ok']
-      plans = []
-      expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq plans
+    ['county', 'zipcode', 'mixed'].each do |rating_type|
+      context "#{rating_type} based rating area model" do
+        # let(:countyzip) { FactoryBot.create(:benefit_markets_locations_county_zip)}
+        # let(:service_area) { FactoryBot.create(:benefit_markets_locations_service_area, covered_states: [], county_zip_ids: [countyzip.id])}
+        # let(:product) { FactoryBot.create(:benefit_markets_products_health_products_health_product, issuer_profile: issuer_profile, service_area_id: service_area.id ) }
+
+        let(:service_area) { ::BenefitMarkets::Locations::ServiceArea.all.first }
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: rating_type)))
+        end
+
+        context 'when satisfied' do
+
+          it 'should return plans' do
+            allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+            elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+            expect(elected_plans_by_enrollment_members.length).to eq(3)
+          end
+
+          it 'should not include plans outside service area' do
+            allow(rule).to receive(:satisfied?).and_return [true, 'ok']
+            allow(::BenefitMarkets::Locations::ServiceArea).to receive(:service_areas_for).and_return([service_area])
+            outside_plan = ::BenefitMarkets::Products::Product.where(:service_area_id.ne => service_area.id).first
+            elected_plans_by_enrollment_members = benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')
+            expect(elected_plans_by_enrollment_members).not_to include(outside_plan)
+          end
+        end
+
+        context 'when not satisfied' do
+
+          it 'should not return any plans' do
+            allow(rule).to receive(:satisfied?).and_return [false, 'ok']
+            expect(benefit_coverage_period.elected_plans_by_enrollment_members([member1, member2], 'health')).to eq []
+          end
+        end
+      end
     end
   end
 end

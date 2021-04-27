@@ -82,33 +82,103 @@ module BenefitMarkets
         service_area.destroy
       end
 
-      it "will return service_area based on exchange when given an address not in that county" do
-        service_area
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
-        if Settings.site.key == :cca
-          expect(service_areas.to_a).not_to include(service_area)
-        else
+      context 'single service area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'single')))
+        end
+
+        it "will return service_area based on exchange when given an address not in that county" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
+          expect(service_areas.to_a).to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that zip code" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
+          expect(service_areas.to_a).to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
           expect(service_areas.to_a).to include(service_area)
         end
       end
 
-      it "will return service_area based on exchange when given an address not in that zip code" do
-        service_area
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
-        if Settings.site.key == :cca
+      context 'county based service area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'county')))
+        end
+
+        it "will return service_area based on exchange when given an address not in that county" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
           expect(service_areas.to_a).not_to include(service_area)
-        else
+        end
+
+        it "will return service_area based on exchange when given an address not in that zip code but in county" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
           expect(service_areas.to_a).to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
+          expect(service_areas.to_a).not_to include(service_area)
         end
       end
 
-      it "will return service_area based on exchange when given an address not in that state" do
-        service_area
-        service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
-        if Settings.site.key == :cca
-          expect(service_areas.to_a).not_to include(service_area)
-        else
+      context 'zipcode based service area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'zipcode')))
+        end
+
+        it "will return service_area based on exchange when given an address not in that county but in zip" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
           expect(service_areas.to_a).to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that zip" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
+          expect(service_areas.to_a).not_to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
+          expect(service_areas.to_a).not_to include(service_area)
+        end
+      end
+
+      context 'mixed service area model' do
+
+        before :each do
+          allow(EnrollRegistry).to receive(:[]).with(:service_area).and_return(double(settings: double(item: 'mixed')))
+        end
+
+        it "will return service_area based on exchange when given an address not in that county" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_county)
+          expect(service_areas.to_a).not_to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that zip code" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_zip)
+          expect(service_areas.to_a).not_to include(service_area)
+        end
+
+        it "will return service_area based on exchange when given an address not in that state" do
+          service_area
+          service_areas = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address_outside_state)
+          expect(service_areas.to_a).not_to include(service_area)
         end
       end
 
