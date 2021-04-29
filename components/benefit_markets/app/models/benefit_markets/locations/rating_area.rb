@@ -31,32 +31,60 @@ module BenefitMarkets
     end
 
     def self.rating_area_for(address, during: TimeKeeper.date_of_record)
-      if EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
-        self.where(
-          "active_year" => during.year
-        ).first
-      else
-        county_name = address.county.blank? ? "" : address.county.titlecase
-        zip_code = address.zip
-        state_abbrev = address.state.blank? ? "" : address.state.upcase
-        
+      model = EnrollRegistry[:enroll_app].settings(:rating_areas).item
+
+      case model
+      when 'single'
+        self.where('active_year' => during.year).first
+      when 'county'
+        county_name = address.county.blank? ? '' : address.county.titlecase
+        state_abbrev = address.state.blank? ? '' : address.state.upcase
+
         county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
-          :zip => zip_code,
           :county_name => county_name,
           :state => state_abbrev
-        ).map(&:id)
-      
-        # TODO FIX
-        # raise "Multiple Rating Areas Returned" if area.count > 1
-        
+        ).map(&:id).uniq
         self.where(
-          "active_year" => during.year,
-          "$or" => [
-            {"county_zip_ids" => { "$in" => county_zip_ids }},
-            {"covered_states" => state_abbrev}
+          'active_year' => during.year,
+          '$or' => [
+            {'county_zip_ids' => { '$in' => county_zip_ids }},
+            {'covered_states' =>  state_abbrev}
+          ]
+        ).first
+      when 'zipcode'
+        zip_code = address.zip
+        state_abbrev = address.state.blank? ? '' : address.state.upcase
+
+        county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
+          :zip => zip_code,
+          :state => state_abbrev
+        ).map(&:id).uniq
+        self.where(
+          'active_year' => during.year,
+          '$or' => [
+            {'county_zip_ids' => { '$in' => county_zip_ids }},
+            {'covered_states' =>  state_abbrev}
+          ]
+        ).first
+      else
+        county_name = address.county.blank? ? '' : address.county.titlecase
+        zip_code = address.zip
+        state_abbrev = address.state.blank? ? '' : address.state.upcase
+
+        county_zip_ids = ::BenefitMarkets::Locations::CountyZip.where(
+          :county_name => county_name,
+          :zip => zip_code,
+          :state => state_abbrev
+        ).map(&:id).uniq
+        self.where(
+          'active_year' => during.year,
+          '$or' => [
+            {'county_zip_ids' => { '$in' => county_zip_ids }},
+            {'covered_states' =>  state_abbrev}
           ]
         ).first
       end
     end
+
   end
 end
