@@ -32,7 +32,7 @@ registry:
           - key: :state_residency
             item: "DC Residency"
           - key: :geographic_rating_area_model
-            item: "single"
+            item: "county"
           - key: :site_key
             item: :dc
           - key: :state_abbreviation
