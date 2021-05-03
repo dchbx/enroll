@@ -26,7 +26,7 @@ namespace :products do
   task :load_rating_areas, [:year] => :environment do |t, args|
     puts ':::: Loading Rating Areas ::::'
 
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcasse}/xls_templates/rating_areas", "**", "*.xlsx"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/rating_areas", "**", "*.xlsx"))
 
     files.each do |file|
       result = ::Operations::Products::ImportRatingArea.new.call({ file: file, year: args[:year], import_timestamp: DateTime.now })
