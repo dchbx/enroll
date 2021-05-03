@@ -1,0 +1,42 @@
+---
+registry:
+  - namespace:
+    - :enroll_app
+    - :aca_individual_market
+    features:
+      - key: :residency_self_attestation
+        item: :residency_attestation
+        is_enabled: true
+        settings:
+          - key: :effective_period
+            item: <%= Date.new(2020,6,6)..Date.new(2021,5,20) %>
+      - key: :verification_sensitive_attributes
+        item: :consumer_role_hub_call
+        is_enabled: true
+        settings:
+          - key: :demographic_attributes
+            item: ['first_name', 'last_name', 'ssn', 'us_citizen', 'naturalized_citizen', 'eligible_immigration_status', 'dob']
+      - key: :special_enrollment_period
+        is_enabled: true
+        settings:
+          - key: :individual_market_monthly_enrollment_due_on
+            item: 20
+          - key: :fifteenth_of_the_month
+            item: 15
+      - key: :aca_individual_assistance_benefits
+        is_enabled: true
+        settings:
+          - key: :default_applied_aptc_percentage
+            item: 0.85
+      - key: :cancel_renewals_for_term
+        item: Operations::Individual::CancelRenewalEnrollment.new
+        is_enabled: true
+      - key: :calculate_monthly_aggregate
+        item: Operations::Individual::CalculateMonthlyAggregate.new
+        is_enabled: false
+        settings:
+          - key: :termination_date
+            item: :end_of_month
+      - key: :apply_aggregate_to_enrollment
+        item: Operations::Individual::ApplyAggregateToEnrollment.new
+        is_enabled: false

@@ -1,0 +1,130 @@
+---
+registry:
+  - namespace:
+      - :css_components
+    features:
+      - key: :selectric_hover
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#487ba2'
+      - key: :qle_carousel
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#007bc4'
+      - key: :ivl_notice_footer
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#333333'
+      - key: :cancel_plan_border
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#003260'
+      - key: :dark_gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#706f6d'
+      - key: :gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#b7b7b7'
+      - key: :orange
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#e72b2d'
+      - key: :href_blue
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#337ab7'
+      - key: :primary_red
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#e72b2d'
+      - key: :primary_table_heading
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#9b9b9b'
+      - key: :primary_button_border
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#9b9b9b'
+      - key: :primary_white
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#ffffff'
+      - key: :primary_green
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#69A30D'
+      - key: :primary_black
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#5C5C5C'
+      - key: primary_light_gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#f2f2f2'
+      - key: :primary_dark_gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#7b7b7b'
+      - key: :background_hover
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#eeeeee'
+      - key: :heading_gray
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#4b7c2b'
+      - key: :brand_success
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#5cb85c'
+      - key: :brand_info
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#006494'
+      - key: :brand_warning
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#f0ad4e'
+      - key: :brand_danger
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#d9534f'
+      - key: :my_portal_links
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#d7d7d7'
+      - key: :background_color
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#333'
+      - key: :border_right
+        is_enabled: true
+        settings:
+          - key: :color
+            item: '#777'

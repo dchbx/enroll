@@ -1,0 +1,315 @@
+---
+registry:
+  - namespace:
+      - :features
+    features:
+      - key: :enroll_app
+        is_enabled: true
+        meta:
+          label: Enroll Application
+          content_type: :boolean
+          default: true
+          description: The Enroll Application enables customers to register and enroll in products, including determining eligibility, shopping for products, calculating premiums, and securely managing their personal information
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :application_name
+            item: "enroll_dc"
+          - key: :copyright_period_start
+            item: "2013"
+          - key: :policies_url
+            item: "https://dchealthlink.com/"
+          - key: :faqs_url
+            item: "https://dchealthlink.com/help"
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"
+          - key: :business_resource_center_url
+            item: "https://dchealthxlink.com/smallbusiness/"
+          - key: :nondiscrimination_notice_url
+            item: "https://www.dchealthlink.com/nondiscrimination"
+          - key: :submit_docs_url
+            item: "https://www.dchealthlink.com/submit-docs"
+          - key: :geographic_rating_area_model
+            item: "county"
+          - key: :site_key
+            item: :dc
+          - key: :state_abbreviation
+            item: "DC"
+          - key: :subdomain
+            item: "dchbx"
+          - key: :domain_name
+            item: "dchealthlink.com"
+          - key: :site_title
+            item: "DC's Online Health Insurance Marketplace"
+          - key: :home_url
+            item: "https://www.dchealthlink.com/"
+          - key: :home_business_url
+            item: "https://www.dchealthlink.com/smallbusiness/overview"
+          - key: :help_url
+            item: "https://www.dchealthlink.com/help"
+          - key: :main_web_address_url
+            item: "https://www.dchealthlink.com/"
+          - key: :invoice_bill_url
+            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+          - key: :payment_pdf_url
+            item: "pdf/employers_paying_your_premiums_online.pdf"
+          - key: :user_sign_in_url
+            item: "https://www.dchealthlink.com/"
+          - key: :website_name
+            item: "www.DCHealthLink.com"
+          - key: :main_web_address
+            item: "www.DCHealthLink.com"
+          - key: :health_care_website
+            item: "www.healthcare.gov"
+          - key: :health_care_website_url
+            item: "https://www.healthcare.gov"
+          - key: :short_name
+            item: "DC Health Link"
+          - key: :byline
+            item: "Welcome to the District's Health Insurance Marketplace"
+          - key: :long_name
+            item: "District of Columbia Health Link"
+          - key: :header_message
+            item: "Welcome to the District's Health Insurance Marketplace"
+          - key: :logo_file_name
+            item: "logo.png"
+          - key: :make_their_premium_payments_online
+            item: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
+          - key: :tab_icon
+            item: "favicon.ico"
+          - key: :mailer_logo_file_name
+            item: "dchealthlink.jpg"
+          - key: :employer_application_deadline_link
+            item: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
+          - key: :s3_prefix
+            item: "dchbx"
+          - key: :broker_quoting_enabled
+            item: false
+          - key: :broker_claim_quoting_enabled
+            item: true
+          - key: :guidance_for_business_owners_url
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
+          - key: :use_default_devise_path
+            item: true
+          - key: :plan_options_title_for_ma
+            item: true
+          - key: :create_routes
+            item: ["/insured/employee/privacy", "/employers/employer_profiles/new", "/insured/consumer_role/privacy"]
+          - key: :sign_in_routes
+            item: ["/families/home"]
+          - key: :shop_find_your_doctor_url
+            item: "https://dc.checkbookhealth.org/dc/"
+          - key: :document_verification_checklist_url
+            item: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
+          - key: :terms_and_conditions_url
+            item: "https://www.dchealthlink.com/terms"
+          - key: :certification_url
+            item: "https://www.dchealthlink.com/brokers/overview"
+          - key: :registration_path
+            item: "https://www.dchealthlink.com/smallbusiness"
+          - key: :broker_registration_path
+            item: "https://enroll.dchealthlink.com/broker_registration"
+          - key: :broker_registration_guide
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/new_broker_registration.pdf"
+          - key: :home_forms_url
+            item: "https://dchealthlink.com/forms"
+          - key: :forms_name
+            item: "DCHealthLink.com/forms"
+          - key: :short_url
+            item: "dchealthlink.com"
+          - key: :forms
+            item: "https://dchealthlink.com/forms#en"
+          - key: :website_url
+            item: "www.healthcare.gov"
+          - key: :healthcare_name
+            item: "www.healthcare.gov"
+          - key: :healthcare_url
+            item: "https://www.healthcare.gov/"
+          - key: :irs_url
+            item: "https://www.irs.gov/"
+          - key: :exchange_hbx_id
+            item: "DC0"
+          - key: :no_reply_email
+            item: "noreply@dchealthlink.com"
+          - key: :mail_address
+            item: "info@dchealthlink.com"
+          - key: :producer_email_address
+            item: 'dchl.producer@dc.gov'
+          - key: :privacy_policy
+            item: "https://dchealthlink.com/"
+          - key: :late_rates_message
+            item: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
+          - key: :faa_enabled
+            item: false
+          - key: :ivl_responsibility_url
+            item: "https://dchealthlink.com/individual-responsibility-requirement"
+          - key: :curam_enabled?
+            item: true
+          - key: :support_for_ie_browser
+            item: true
+          - key: :block_ie_browser
+            item: false
+          - key: :block_ie_browser_after
+            item: Mon, 01 Jun 2020
+          - key: :publisher
+            item: "dchl"
+          - key: :prod_tax_info
+            item: "https://dchealthlink.com/individuals/tax-documents"
+          - key: :staging_tax_info_url
+            item: "https://staging.dchealthlink.com/individuals/tax-documents"
+          - key: :statewide_area
+            item: "DC-Metro"
+          - key: :exchange_name
+            item: "Washington DC Health Benefit Exchange"
+          - key: :social_media
+            item: ''
+          - key: :state_name
+            item: "District of Columbia"
+          - key: :state_long_title
+            item: "the District of Columbia"
+          - key: :state_dmv_link
+            item: "https://dmv.dc.gov/page/proof-dc-residency-certifications"
+          - key: :health_benefit_exchange_authority_phone_number
+            item: '(202) 715-7576'
+          - key: :contact_center_name
+            item: "DC Health Link's Customer Care Center"
+          - key: :contact_center_po_box
+            item: "PO Box 97022"
+          - key: :contact_center_state_and_city
+            item: "Washington, DC"
+          - key: :contact_center_city
+            item: "Washington"
+          - key: :contact_center_county
+            item: 'District of Columbia'
+          - key: :contact_center_zip_code
+            item: "20024" # For DC loading rating areas, the zip uses this zip code 20024 
+          - key: :contact_center_email_address
+            item: "info@dchealthlink.com"
+          - key: :contact_center_short_number
+            item: "1-855-532-5465"
+          - key: :producer_advisory_committee_url
+            item: "http://hbx.dc.gov/sites/default/files/dc/sites/Health%20Benefit%20Exchange%20Authority/publication/attachments/ProducerAdvisoryCommitteeFINALReport.pdf"
+          - key: :mailer_logo_file_name
+            item: "dchealthlink.jpg"
+          - key: :broker_course_administering_organization_number
+            item: '(877) 880-1335'
+          - key: :broker_course_administering_organization
+            item: "NAHU"
+          - key: :broker_course_administering_organization_link
+            item: 'https://nahu.inreachce.com/Details?resultsPage=1&sortBy=&q=dc+broker&searchType=1&groupId=154ae22b-92eb-41f0-854b-3a9cabc20c8e'
+          - key: :privacy_url
+            item: "https://www.dchealthlink.com/privacy"
+          - key: :privacy_act_statement
+            item: "https://www.dchealthlink.com/privacy-act-statement"
+          - key: :site_broker_attestation_link
+            item: "https://hbx.dc.gov/page/dc-health-link-broker-attestations"
+          - key: :rating_areas
+            item: "single"
+          - key: :favicon_tab_icon
+            item: 'image/vnd.microsoft.icon'
+          - key: :header_logo
+            item: "logo.png"
+          - key: :eligibile_immigration_statuses_url
+            item: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
+          - key: :assistance_estimate_url
+            item: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+      - key: :rating_area
+        item: :rating_area
+        is_enabled: false
+        settings:
+          - key: :areas
+            item: ["R-DC001"]
+      - key: :service_area
+        item: :service_area
+        is_enabled: true
+        settings:
+          - key: :service_area_model
+            item: 'single'
+      - key: :site_database_seed
+        item: :site_database_seed
+        is_enabled: true
+        settings:
+          - key: :seed_issuer_profiles
+            item: true
+      - key: :pay_now_functionality
+        item: "kaiser_enabled"
+        is_enabled: true
+        settings:
+        - key: :carriers
+          item: 'Kaiser'
+        - key: :carriers_long_name
+          item: 'Kaiser Permanante'
+        - key: :carriers_registration_website
+          item: "https://healthy.kaiserpermanente.org/new-members/#register-to-kp-org"
+      - key: :agency_staff
+        item: :agency_staff
+        is_enabled: true
+      - key: :send_secure_message_family
+        item: :send_secure_message
+        is_enabled: true
+      - key: :sep_carousel_message
+        item: :sep_carousel
+        is_enabled: true
+        settings:
+          - key: :effective_period
+            item: <%= Date.new(2020,9,18)..Date.new(2021,12,31) %>
+      - key: :special_cover_header
+        item: :special_cover_header
+        is_enabled: false
+        settings: 
+          - key: :filename
+            item: "CoverME_WebsiteHeader_01.jpg"
+      - key: :tobacco_cost
+        item: :tobacco_cost
+        is_enabled: false
+      - key: :counties_import
+        is_enabled: false
+        item: ""
+  - namespace:
+      - :features
+      - :enroll_app
+      - :aca_shop
+    features:
+      - key: :aca_shop_dependent_age_off
+        item: Operations::Shop::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :aca_fehb_dependent_age_off
+        item: Operations::Fehb::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :monthly
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :aca_individual_dependent_age_off
+        item: Operations::Individual::DependentAgeOff.new
+        is_enabled: true
+        settings:
+          - key: :period
+            item: :annual
+          - key: :cut_off_age
+            item: 26
+          - key: :relationship_kinds
+            item: ['child', 'ward', 'foster_child', 'adopted_child']
+      - key: :age_off_relaxed_eligibility
+        item: Operations::AgeOffRelaxedEligibility.new
+        is_enabled: true
+      - key: :display_cost_warning_message
+        is_enabled: false
+      - key: employee_datable_waiver_bulk_actions
+        is_enabled: false
+      - key: :automatic_quote_validation # This needs refactoring, see employer_profile_builder.rb
+        is_enabled: true
+      - key: :validate_effective_date_employer
+        is_enabled: false # Should return true for MA, see employer_profile_builder.rb
+      - key: :hmo_ppo_plan_type # Should be true for MA
+        is_enabled: false

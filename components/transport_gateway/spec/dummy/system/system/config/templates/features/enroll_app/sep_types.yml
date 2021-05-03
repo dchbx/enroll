@@ -1,0 +1,228 @@
+---
+registry:
+  - namespace:
+      - :create_qle
+    features:
+      - key: :sep_types
+        item: Operations::QualifyingLifeEventKind::Persist.new
+        is_enabled: true
+        meta:
+          label: Create Sep Types
+          content_type: :legend
+          default: :''
+          description: 'Create Sep Types'
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :label
+            item: 'Create Sep Types'
+          - key: :start_on
+            item: <%= ENV['start_on'] %>
+            meta:
+              label: Start Date *
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :end_on
+            item: <%= ENV['end_on'] %>
+            meta:
+              label: End Date
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :title
+            item: <%= ENV['title'] %>
+            meta:
+              label: SEP Name *
+              content_type: :text_field
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :tool_tip
+            item: <%= ENV['tool_tip'] %>
+            meta:
+              label: SEP Name Tool Tip
+              content_type: :text_field
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :pre_event_sep_in_days
+            item: <%= ENV['pre_event_sep_in_days'] %>
+            meta:
+              label: Days Eligible Before Event Date *
+              content_type: :number
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :post_event_sep_in_days
+            item: <%= ENV['post_event_sep_in_days'] %>
+            meta:
+              label: Days Eligible After Event Date *
+              content_type: :number
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :market_kind
+            item: <%= ENV[':market_kind'] %>
+            meta:
+              label: Market *
+              content_type: :radio_select
+              enum: [{individual: "Individual"}]
+              default: :individual
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :is_self_attested
+            item: <%= ENV['is_self_attested'] %>
+            meta:
+              label: Self Attestation *
+              content_type: :radio_select
+              default: true
+              enum: [ {'true': 'Self-Service' }, { 'false': 'Admin Only'} ]
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :reason
+            item: <%= ENV['reason'] %>
+            meta:
+              label: SEP Reason *
+              content_type: :select
+              enum: [{adoption: "adoption"}, {birth: "birth"}, {child_age_off: "child age off"}, {contract_violation: "contract violation"}, {court_order: "court order"},
+              {death: "death"}, {divorce: "divorce"}, {domestic_partnership: "domestic partnership"}, {eligibility_change_employer_ineligible: "employer ineligible"},
+              {eligibility_change_immigration_status: "citizenship immigration change"}, {eligibility_change_income: "income change"}, {eligibility_change_medicaid_ineligible: "medicaid ineligible"},
+              {eligibility_documents_provided: "eligibility documents"}, {eligibility_failed_or_documents_not_received_by_due_date: "marketplace ineligible"}, {employee_gaining_medicare: "employee gaining medicare"},
+              {employer_sponsored_coverage_termination: "employer unpaid premium"}, {enrollment_error_or_misconduct_hbx: "enrollment error HBX"}, {enrollment_error_or_misconduct_issuer: "enrollment error carrier"},
+              {enrollment_error_or_misconduct_non_hbx: "enrollment error assister broker"}, {exceptional_circumstances: "exceptional circumstances"}, {exceptional_circumstances_civic_service: "americorps"},
+              {exceptional_circumstances_domestic_abuse: "domestic abuse"}, {exceptional_circumstances_medical_emergency: "medical emergency"}, {exceptional_circumstances_natural_disaster: "natural disaster"},
+              {exceptional_circumstances_system_outage: "system outage"}, {lost_access_to_mec: "lost other mec"}, {lost_hardship_exemption: "lost hardship exemption"},
+              {marriage: "marriage"}, {new_eligibility_family: "drop new eligibility"}, {new_eligibility_member: "drop family new eligibility"}, {new_employment: "new employment"}, {qualified_native_american: "native american"},
+              {relocate: "moved"}]
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :other_reason
+            item:  <%= ENV['other_reason'] %>
+            meta:
+              label: SEP Other Reason *
+              content_type: :text_field
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :effective_on_kinds
+            item: <%= ENV['effective_on_kinds'] %>
+            meta:
+              label: Effective Date Rules *
+              enum: [{date_of_event: Date of Event},
+              {date_of_event_plus_one: Date of event + 1},
+              {first_of_this_month: First of Event Month},
+              {fixed_first_of_next_month: First of Month after Event},
+              {first_of_reporting_month: First of Reporting Month},
+              {first_of_next_month_reporting: First of Month after Reporting},
+              {first_of_month: 15th of the Month},
+              {first_of_next_month_coinciding: First of Next Month (Coinciding)},
+              {first_of_next_month_plan_selection: First of Next Month (Plan Selection)}]
+              content_type: :checkbox_select
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :termination_on_kinds
+            item: <%= ENV['termination_on_kinds'] %>
+            meta:
+              label: Termination On
+              enum: [{end_of_event_month: Last Day of Event Month}, {date_before_event: Day before Event}, {end_of_last_month_of_reporting: Last Day of Month before Reporting}, {end_of_reporting_month: Last Day of Reporting Month}, {end_of_month_before_last: Last Day of Two Months Before Reporting}, {exact_date: Exact Date}]
+              content_type: :checkbox_select
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :coverage_start_on
+            item: <%= ENV['coverage_start_on'] %>
+            meta:
+              label: Eligibility Start Date
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :coverage_end_on
+            item: <%= ENV['coverage_end_on'] %>
+            meta:
+              label: Eligibility End Date
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: false
+              is_visible: true
+          - key: :is_visible
+            item: <%= ENV['is_visible'] %>
+            meta:
+              label: Visibility *
+              content_type: :radio_select
+              default: true
+              enum: [ {'true': 'Customer & Admin' }, { 'false': 'Admin Only'} ]
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :date_options_available
+            item: <%= ENV['date_options_available'] %>
+            meta:
+              label: Date Options Available *
+              content_type: :radio_select
+              default: false
+              enum: [ {'true': 'True' }, { 'false': 'False'} ]
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :event_kind_label
+            item: <%= ENV['event_kind_label'] %>
+            meta:
+              label: Event Date Label *
+              content_type: :text_field
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+          - key: :qle_event_date_kind
+            item: <%= ENV['qle_event_date_kind'] %>
+            meta:
+              label: SEP Eligibility Kind *
+              content_type: :radio_select
+              enum: [ {qle_on: 'Event Date' }, { submitted_at: 'Reported Date'} ]
+              default: :qle_on
+              description: ''
+              is_required: true
+              is_visible: true
+      - key: :expire_sep_type
+        item: Operations::QualifyingLifeEventKind::Transform.new
+        is_enabled: true
+        meta:
+          label: Expire Sep Type
+          content_type: :legend
+          default: :''
+          description: 'Expire Sep Types'
+          is_required: true
+          is_visible: true
+        settings:
+          - key: :end_on
+            item: <%= ENV['end_on'] %>
+            meta:
+              label: ''
+              content_type: :date
+              default: ''
+              description: ''
+              is_required: true
+              is_visible: true
+      - key: :sort_sep_type
+        item: Operations::QualifyingLifeEventKind::Sort.new
+        is_enabled: true
