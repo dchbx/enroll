@@ -1,12 +1,12 @@
 site:
-  key: :me
-  subdomain: "cme"
-  domain_name: "cme.enroll.openhbx.org"
-  site_title: "Maine Cover ME"
-  home_url: "https://cme.enroll.openhbx.org/"
-  home_business_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+  key: :dc
+  subdomain: "dchbx"
+  domain_name: "dchealthlink.com"
+  site_title: "DC's Online Health Insurance Marketplace"
+  home_url: "https://www.dchealthlink.com/"
+  home_business_url: "https://www.dchealthlink.com/smallbusiness/overview"
   # copyright_period_start: "2013"
-  help_url: "https://www.coverme.gov/help/"
+  help_url: "https://www.dchealthlink.com/help"
   # faqs_url: "https://www.dchealthlink.com/Frequently-Asked-Questions"
   # business_resource_center_url: "https://dchealthlink.com/smallbusiness/"
   # nondiscrimination_notice_url: "https://www.dchealthlink.com/nondiscrimination"
@@ -14,31 +14,31 @@ site:
   main_web_address_url: "https://www.dchealthlink.com/"
   invoice_bill_url: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
   payment_pdf_url: "pdf/employers_paying_your_premiums_online.pdf"
-  user_sign_in_url: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
-  website_name: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
-  main_web_address: "https://www.accesshealthct.com/AHCT/LandingPageCTHIX"
+  user_sign_in_url: "https://www.dchealthlink.com/"
+  website_name: "www.DCHealthLink.com"
+  main_web_address: "www.DCHealthLink.com"
   health_care_website: "www.healthcare.gov"
   health_care_website_url: "https://www.healthcare.gov"
-  short_name: "Maine Cover ME"
-  byline: "Maine's Official Health Insurance Marketplace"
-  long_name: "Maine Cover ME"
-  header_message: "Maine's Official Health Insurance Marketplace"
-  logo_file_name: "logo_me.svg"
+  short_name: "DC Health Link"
+  byline: "Welcome to the District's Health Insurance Marketplace"
+  long_name: "District of Columbia Health Link"
+  header_message: "Welcome to the District's Health Insurance Marketplace"
+  logo_file_name: "logo.png"
   make_their_premium_payments_online: "https://www.e-billexpress.com/ebpp/DCHEALTHPAY/"
-  tab_icon: 'data:image/x-icon;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQEAYAAABPYyMiAAAABmJLR0T///////8JWPfcAAAACXBIWXMAAABIAAAASABGyWs+AAAAF0lEQVRIx2NgGAWjYBSMglEwCkbBSAcACBAAAeaR9cIAAAAASUVORK5CYII='
-  mailer_logo_file_name: "logo_me.svg"
+  tab_icon: 'favicon.ico'
+  mailer_logo_file_name: "dchealthlink.jpg"
   employer_application_deadline_link: "https://dchealthlink.com/smallbusiness/employer-coverage-deadlines"
   s3_prefix: "dchbx"
   broker_quoting_enabled: false
   broker_claim_quoting_enabled: true
-  guidance_for_business_owners_url: ""
+  guidance_for_business_owners_url: "https://dchealthlink.com/sites/default/files/v2/forms/Guidance_for_Business_Owners.pdf"
   use_default_devise_path: true
   plan_options_title_for_ma: true
   create_routes: ['/insured/employee/privacy','/employers/employer_profiles/new', '/insured/consumer_role/privacy']
   sign_in_routes: ['/families/home']
   shop_find_your_doctor_url: "https://dc.checkbookhealth.org/dc/"
-  document_verification_checklist_url: "https://www.coverme.gov/help/"
-  terms_and_conditions_url: ""
+  document_verification_checklist_url: "https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist"
+  terms_and_conditions_url: "https://www.dchealthlink.com/terms"
   certification_url: "https://www.dchealthlink.com/brokers/overview"
   registration_path: "https://www.dchealthlink.com/smallbusiness"
   home_forms_url: "https://dchealthlink.com/forms"
@@ -49,73 +49,51 @@ site:
   healthcare_name: "www.healthcare.gov"
   healthcare_url: "https://www.healthcare.gov/"
   irs_url: "https://www.irs.gov/"
-  exchange_hbx_id: "ME0"
-  mail_address: "info@coverme.gov"
-  privacy_policy: "https://www.coverme.gov"
+  exchange_hbx_id: "DC0"
+  mail_address: "info@dchealthlink.com"
+  privacy_policy: "https://dchealthlink.com/"
   late_rates_message: "Due to a delay, premiums for some coverage effective dates are not available yet. Please check again soon to see if this information has been updated. You can also contact Customer Service or your broker if you need help."
   faa_enabled: false # TODO: Remove this after configuring the settings.
-  ivl_responsibility_url: ""
+  ivl_responsibility_url: "https://dchealthlink.com/individual-responsibility-requirement"
   curam_enabled?: true
   support_for_ie_browser: true
   block_ie_browser: false
   block_ie_browser_after: <%= Date.new(2020,6,1) %>
   publisher: "dchl"
-  prod_tax_info: ""
-  staging_tax_info_url: ""
+  prod_tax_info: "https://dchealthlink.com/individuals/tax-documents"
+  staging_tax_info_url: "https://staging.dchealthlink.com/individuals/tax-documents"
   statewide_area: "DC Metro"
-  elligibile_immigration_statuses_url: ""
+  assistance_estimate_url: "https://dc.checkbookhealth.org/hie/dc/2021/index.cfm?page"
+  elligibile_immigration_statuses_url: "https://dchealthlink.com/sites/default/files/v2/forms/Eligible%20Immigration%20Status%20List_0.pdf"
 
-  exchange_name: "Maine Cover ME"
+  exchange_name: "Washington DC Health Benefit Exchange"
   social_media:
     facebook_url: ""
 
 contact_center:
-  state_and_city: "Augusta, ME"
-  name: "Maine Cover ME's Customer Care Center"
-  alt_name: "Maine Cover ME Customer Service"
+  state_and_city: "Washington, DC"
+  name: "DC Health Link's Customer Care Center"
+  alt_name: "DC Health Link Customer Service"
   po_box: "PO Box 97022"
-  phone_number: "1-800-965-7476"
+  phone_number: "1-855-532-5465"
   fax: "1-617-933-3099"
   alt_fax: "617-722-4033"
   tty_number: "711"
-  short_number: "(800) 965-7476"
+  short_number: "(855) 532-5465"
   tty: "771"
   alt_phone_number: "1-855-532-LINK"
   payment_phone_number: "855-532-LINK"
   ivl_number: "1-877-623-6765"
   ivl_phone_number: "1-877-623-6765"
-  email_address: "smallbusiness@coverme.gov"
+  email_address: "info@dchealthlink.com"
   po_box: "PO Box 97022"
-  city: "Augusta"
-  state: "ME"
-  zip_code: "04330"
-  small_business_email: "smallbusiness@coverme.gov"
-  non_discrimination_email: "info@coverme.gov"
+  city: "Washington"
+  state: "DC"
+  zip_code: "20090"
+  small_business_email: "info@dchealthlink.com"
+  non_discrimination_email: "info@dchealthlink.com"
 
-  appeals: "info@coverme.gov"
-  
-  # Voting Info for FA Engine Steps
-  # TOOD: This needs to be updated. These are pulled of Maine government website.
-  # # https://www.maine.gov/sos/cec/elec/voter-info/index.html
-  board_of_elections_entity: "Division of the Secretary of State's Office"
-  board_of_elections_address: ""
-  board_of_elections_email: "cec.elections@maine.gov"
-  board_of_elections_phone_number: "207-624-7650"
-
-  board_of_elections_entity: "DC Board of Elections"
-  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
-  board_of_elections_email: ""
-  board_of_elections_phone_number: "(202) 727-2525"
-
-  board_of_elections_entity: "DC Board of Elections"
-  board_of_eletions_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
-  board_of_elections_email: ""
-  board_of_elections_phone_number: "(202) 727-2525"
-
-  board_of_elections_entity: "DC Board of Elections"
-  board_of_elections_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
-  board_of_elections_email: ""
-  board_of_elections_phone_number: "(202) 727-2525"
+  appeals: "info@dchealthlink.com"
 
   board_of_elections_entity: "DC Board of Elections"
   board_of_elections_address: "1015 Half Street, SE<br>Suite 750<br>Washington, DC 20003<br>"
@@ -123,7 +101,7 @@ contact_center:
   board_of_elections_phone_number: "(202) 727-2525"
 
   mailing_address:
-    name: "Maine Cover ME"
+    name: "DC Health Link"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -131,7 +109,7 @@ contact_center:
     zip_code: "20090"
 
   appeal_center:
-    name: "Maine Cover ME"
+    name: "DC Health Link"
     address_1: "PO Box 97022"
     address_2:
     city: "Washington"
@@ -169,12 +147,12 @@ invoices:
   minimum_invoice_display_year: 2015
 
 aca:
-  state_key : "me"
-  state_name: "Maine"
-  state_abbreviation: "ME"
+  state_key : "dc"
+  state_name: "District of Columbia"
+  state_abbreviation: "DC"
   market_kinds: ["shop", "individual", "fehb"]
 
-  hbx_abbreviation: "Maine Cover ME"
+  hbx_abbreviation: "DC Health Benefit Exchange"
   nationwide_markets: true
   general_agency_enabled: true
   broker_carrier_appointments_enabled: true
@@ -224,7 +202,7 @@ aca:
       end_on: <%= Date.new(2022,01,31) %>
 
   shop_market:
-    valid_employer_attestation_documents_url: 'https://www.coverme.gov/business/business-resource-center/employer-verification-checklist'
+    valid_employer_attestation_documents_url: 'https://www.mahealthconnector.org/business/business-resource-center/employer-verification-checklist'
     small_market_employee_count_maximum: 50
     employer_contribution_percent_minimum: 50
     employer_dental_contribution_percent_minimum: 0
@@ -359,10 +337,7 @@ aca:
   plan_match_tool: true
 
   rating_areas:
-    - R-ME001
-    - R-ME002
-    - R-ME003
-    - R-ME004
+    - R-DC001
 
 notices:
   individual_market:
@@ -428,18 +403,18 @@ aptc_errors:
 #   ShopPlanYearPublishedDueDayOfMonth = ShopOpenEnrollmentBeginDueDayOfMonth
 
 style:
-  primary_orange: '#487ba2'
-  brand_primary: '#487ba2'
-  primary_color:  '#487ba2'
-  primary_notification: '#487ba2'
-  primary_panel: '#487ba2'
-  primary_button: '#F7B319'
-  primary_button_color: '#F7B319'
-  primary_button_disabled: '#487ba2'
-  primary_button_border_disabled: '#487ba2'
-  alternate_header_color: '#487ba2'
-  primary_icon_color: '#487ba2'
-  qle_header_color: '#487ba2'
+  primary_orange: '#333333'
+  brand_primary: '#007bc4'
+  primary_color:  '#007bc4'
+  primary_notification: '#333333'
+  primary_panel: '#69A30D'
+  primary_button: '#e72b2d'
+  primary_button_color: '#286090'
+  primary_button_disabled: '#337ab7'
+  primary_button_border_disabled: '#2e6da4'
+  alternate_header_color: '#333333'
+  primary_icon_color: '#333333'
+  qle_header_color: '#333333'
   primary_header_font: "'Open Sans', serif"
 
 external_applications:

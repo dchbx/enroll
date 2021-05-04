@@ -26,11 +26,11 @@ html {
 }
 
 body {
-  background-color: #f2f2f2 !important;
+  background-color: $primary-light-gray;
   padding-bottom: 70px;
   font-size: 14px;
   line-height: 1.42857143;
-  color: #005e81;
+  color: #333;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -41,7 +41,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .heading-text {
-  color: $dark-blue;
+  color: #333333;
 }
 .sub-text {
   color: $darker-blue;
@@ -80,7 +80,7 @@ h1,h2,h3,h4,h5,h6 {
           line-height: 50px;
           padding: 23px 15px;
           font-weight: 600;
-          color: #487ba2;
+          color: $primary-black;
           &:hover {
             background-color: $background-hover;
             text-decoration: none;
@@ -208,7 +208,7 @@ h1,h2,h3,h4,h5,h6 {
 #footer-uic {
   font-size: 14px;
   color: #ffffff;
-  background-color:#3d5d6f;
+  background-color:#003260;
   padding: 15px;
   position: absolute;
   bottom: 0;
@@ -314,7 +314,7 @@ fieldset[disabled] .btn-default.active {
   border-color: $secondary-button-border;
 }
 .btn-default .badge {
-  color: #005e81;
+  color: #337ab7;
   background-color: $secondary-button-background;
 }
 .fa-trash {
@@ -360,7 +360,7 @@ thead {
     padding-right: 6px;
   }
   ul.progress-wrapper li.complete .vertical-line-progress {
-    background-color: #487ba2;
+    background-color: #007bc4;
   }
   .vertical-line-progress {
     background-color: #cacaca;
@@ -383,17 +383,17 @@ thead {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
-    color: #487ba2;
+    color: #007bc4;
   }
   ul.progress-wrapper li.active {
     padding: 5px 0px;
     list-style: none;
     padding-left: 35px;
     font-weight: bold;
-    color: #487ba2;
+    color: #007bc4;
   }
   ul.progress-wrapper li.complete span.circle-progress {
-    background-color: #487ba2;
+    background-color: #007bc4;
     border: none;
     width: 14px;
     left: 9px;
