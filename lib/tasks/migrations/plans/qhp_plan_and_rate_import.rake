@@ -8,7 +8,7 @@ require Rails.root.join('lib', 'object_builders', 'qhp_rate_builder.rb')
 namespace :xml do
   desc "Import qhp plans from xml files"
   task :plans, [:file] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, "plans", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase, "plans", "**", "*.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017", "**", "*.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/plans/2017/Dental/IVL/Dominion/DominionIVLPlanBenefits7.20.16.xml"))
     # # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", "plans", "**", "Best Life IVL Plan Benefits Template.xml"))
@@ -39,7 +39,7 @@ end
 namespace :xml do
   desc "Import qhp rates from xml files"
   task :rates, [:action] => :environment do |task, args|
-    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", EnrollRegistry[:enroll_app].setting(:state_abbreviation).item, "rates", "**", "*.xml"))
+    files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls", EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase, "rates", "**", "*.xml"))
     # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/rates/2017/Health/United (Shop Only)", "UHIC", "**", "*.xml"))
     # files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/rates/2017/Health/United (Shop Only)/UHIC/UHIC_SHOP_Rate_Tables_2017_v.1.xml"))
     rate_import_hash = files.inject(QhpRateBuilder.new()) do |rate_hash, file|
