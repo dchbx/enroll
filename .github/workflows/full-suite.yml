@@ -179,7 +179,7 @@ jobs:
           echo $root/components/${{ matrix.engine-name }}
           cd $root/components/${{ matrix.engine-name }}
           bundle config path ../../vendor/bundle
-          bundle exec rspec --fail-fast
+          bundle exec rspec
   benefit-sponsors:
     needs: [rubocop, view_linter]
     runs-on: ubuntu-latest
