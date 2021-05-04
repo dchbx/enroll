@@ -53,7 +53,7 @@ module Config::AcaModelConcern
     end
 
     def aca_state_abbreviation
-      @aca_state_abbreviation ||= Settings.aca.state_abbreviation
+      @aca_state_abbreviation ||= EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
     end
 
     def aca_state_name
