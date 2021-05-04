@@ -45,7 +45,7 @@ module Operations
       end
 
       def import_records(sheet, year, row_data_begin, issuer_profile_hash, rating_area_model)
-        state_abbreviation = Settings.aca.state_abbreviation
+        state_abbreviation = EnrollRegistry[:enroll_app].setting(:state_abbreviation).item
 
         if rating_area_model == 'single'
           create_service_area_for_single_model(year, state_abbreviation)
