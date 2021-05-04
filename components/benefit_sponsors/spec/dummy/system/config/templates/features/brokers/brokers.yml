@@ -14,4 +14,4 @@ registry:
           is_visible: true
         settings:
           - key: :carrier_appointments
-            item: {"Aetna Health Inc": => nil, "Aetna Life Insurance Company": => nil, "Carefirst Bluechoice Inc": => nil, "Group Hospitalization and Medical Services Inc": => nil, "Kaiser Foundation": => nil, "Optimum Choice": => nil, "United Health Care Insurance": => nil, "United Health Care Mid Atlantic": => nil} # Should be a hash with the carrier name as a string and the value as nil
+            item: {"Anthem Blue Cross and Blue Shield": nil, "Community Health Options": nil, "Harvard Pilgrim Health Care":  nil, "Northeast Delta Dental": nil, "Renaissance Dental": nil} # Should be a hash with the carrier name as a string and the value as nil

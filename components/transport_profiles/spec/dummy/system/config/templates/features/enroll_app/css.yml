@@ -7,7 +7,7 @@ registry:
         is_enabled: true
         settings:
           - key: :color
-            item: '#007bc4'
+            item: '#487ba2'
       - key: :qle_carousel
         is_enabled: true
         settings:

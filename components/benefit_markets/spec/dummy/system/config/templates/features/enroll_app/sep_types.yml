@@ -75,7 +75,7 @@ registry:
             meta:
               label: Market *
               content_type: :radio_select
-              enum: [{individual: "Individual"}, {shop: "SHOP"}, {fehb: "Congress"}]
+              enum: [{individual: "Individual"}]
               default: :individual
               description: ''
               is_required: true
