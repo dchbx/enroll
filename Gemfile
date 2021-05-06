@@ -120,7 +120,7 @@ gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
 gem 'stimulus_reflex', '~> 3.3'
 group :doc do
-  gem 'sdoc',                   '~> 1.0'
+  gem 'sdoc', '~> 1.1', '>= 1.1.0'
 end
 
 group :development do
