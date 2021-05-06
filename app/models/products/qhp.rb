@@ -148,10 +148,7 @@ class Products::Qhp
     @hios_ids = plans.map(&:hios_id)
     @year = plans.first.present? ? plans.first.active_year : ""
     qcsvs = get_cost_share_variances
-    qcsvs.map do |qcsv|
-      qhp = Products::Qhp.where(standard_component_id: qcsv.hios_plan_and_variant_id.split("-")[0]).first
-      plan_hsa_status[qcsv.product.id.to_s] = qhp.hsa_eligibility
-    end
+    qcsvs.map {|qcsv| plan_hsa_status[qcsv.product.id.to_s] = qcsv.qhp.hsa_eligibility}
 
     plan_hsa_status
   end
