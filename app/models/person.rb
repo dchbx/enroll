@@ -87,7 +87,7 @@ class Person
   field :tribal_id, type: String
 
   field :is_tobacco_user, type: String, default: "unknown"
-  field :tobacco_use, type: Boolean # todo - use above field
+  field :tobacco_use, type: Boolean # TODO: use above field
   field :language_code, type: String
 
   field :no_dc_address, type: Boolean, default: false
