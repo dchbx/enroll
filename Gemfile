@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '2.5.1'
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 5.2.4.6'
 gem 'sidekiq'
 
 #######################################################
@@ -19,7 +19,7 @@ gem 'effective_datatables', path: './project_gems/effective_datatables-2.6.14'
 gem 'prawn', :git => 'https://github.com/prawnpdf/prawn.git', :ref => '8028ca0cd2'
 
 ## Fix this dependency -- bring into project
-# gem 'recurring_select', :git => 'https://github.com/brianweiner/recurring_select'
+# gem 'recurring_select', '>= 2.1.0', :git => 'https://github.com/brianweiner/recurring_select'
 
 ## Fix this dependency -- bring into project
 gem 'simple_calendar', :git => 'https://github.com/harshared/simple_calendar.git'
@@ -52,17 +52,17 @@ gem 'bson',                     '~> 4.3'
 gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
 gem 'mongoid',                  '~> 7.0.2'
 gem 'mongo',                    '~> 2.6'
-gem 'mongo_session_store',      '~> 3.1'
+gem 'mongo_session_store', '~> 3.2', '>= 3.2.0'
 gem 'mongoid-autoinc',          '~> 6.0'
 gem 'mongoid-history',          '~> 0.8'
 # gem 'mongoid-versioning',       '~> 1.2.0'
 gem 'mongoid_userstamp',        '~> 0.4', :path => "./project_gems/mongoid_userstamp-0.4.0"
-gem 'mongoid_rails_migrations', '~> 1.2'
+gem 'mongoid_rails_migrations', '~> 1.2', '>= 1.2.1'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
 gem 'addressable',              '~> 2.3'
-gem 'animate-rails',            '~> 1.0.10'
+gem 'animate-rails', '~> 1.0.10'
 gem 'recurring_select'
 
 gem 'aws-sdk',                  '~> 2.2.4'
@@ -70,28 +70,28 @@ gem 'bcrypt',                   '~> 3.1'
 gem 'bootsnap',                 '>= 1.1', require: false
 gem 'browser',                  '2.7.0'
 gem 'ckeditor',                 '~> 4.2.4'
-gem 'coffee-rails',             '~> 4.2.2'
+gem 'coffee-rails', '~> 4.2.2'
 gem 'combine_pdf',              '~> 1.0'
 gem 'config',                   '~> 2.0'
 gem 'curl',                     '~> 0.0.9'
-gem 'devise',                   '~> 4.5'
-gem 'devise-jwt', "~> 0.5.9"
+gem 'devise', '~> 4.7', '>= 4.7.1'
+gem 'devise-jwt', '~> 0.5.9'
 gem 'jwt', "~> 2.2.1"
 gem 'haml',                     '~> 5.0'
 gem 'httparty',                 '~> 0.16'
 gem 'i18n',                     '~> 1.5'
 gem 'i18n-tasks', '~> 0.9.33'
 gem 'interactor',               '~> 3.0'
-gem 'interactor-rails',         '~> 2.2'
+gem 'interactor-rails', '~> 2.2', '>= 2.2.1'
 gem 'jbuilder',                 '~> 2.7'
-gem 'jquery-rails',             '~> 4.3'
-gem 'kaminari'
+gem 'jquery-rails', '~> 4.3', '>= 4.3.5'
+gem 'kaminari', '>= 0.17.0'
 gem 'kaminari-mongoid'
 gem 'kaminari-actionview'
 gem 'language_list',            '~> 1'
 gem 'mail',                     '~> 2.7'
 gem 'maskedinput-rails',        '~> 1.4'
-gem 'money-rails',              '~> 1.13'
+gem 'money-rails', '~> 1.13', '>= 1.13.3'
 gem 'net-ssh',                  '= 4.2.0'
 gem 'nokogiri',                 '~> 1.10.8'
 gem 'nokogiri-happymapper',     '~> 0.8.0', :require => 'happymapper'
@@ -100,25 +100,25 @@ gem 'pundit',                   '~> 2.0'
 gem "recaptcha",                '~> 4.13', require: 'recaptcha/rails'
 gem 'redcarpet',                '~> 3.4'
 gem 'redis',                    '~> 4.0'
-gem 'redis-rails',              '~> 5.0.2'
+gem 'redis-rails', '~> 5.0.2'
 gem 'resque',                   '~> 2.0'
 gem 'roo',                      '~> 2.1'
 gem 'rubyzip', '>= 1.3.0'
 gem 'ruby-saml',                '~> 1.3'
 gem 'sassc',                    '~> 1.12'
-gem 'sass-rails',               '~> 5'
+gem 'sass-rails', '~> 5', '>= 5.1.0'
 gem 'slim',                     '~> 3.0'
-gem 'slim-rails',               '~> 3.2'
+gem 'slim-rails', '~> 3.2', '>= 3.2.0'
 gem 'symmetric-encryption',     '~> 3.9.1'
 gem 'turbolinks',               '~> 5'
 gem 'uglifier',                 '>= 4'
 gem 'virtus',                   '~> 1.0'
 gem 'wicked_pdf',               '~> 1.1.0'
 gem 'wkhtmltopdf-binary-edge',  '~> 0.12.3.0'
-gem 'webpacker',                '~> 4.0.2'
+gem 'webpacker', '~> 4.0.7'
 gem 'fast_jsonapi'
 gem 'loofah', '~> 2.3.1'
-gem 'stimulus_reflex', '~> 3.3'
+gem 'stimulus_reflex', '~> 3.3', '>= 3.3.0'
 group :doc do
   gem 'sdoc',                   '~> 1.0'
 end
@@ -130,7 +130,7 @@ group :development do
   gem 'rubocop-rspec'
   gem 'rubocop-git'
   # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
-  gem 'web-console',            '>= 3'
+  gem 'web-console', '>= 3.7.0'
   gem 'listen',                 '>= 3.0.5', '< 3.2'
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
@@ -139,20 +139,20 @@ group :development do
 end
 
 group :development, :test do
-  gem 'action-cable-testing'
+  gem 'action-cable-testing', '>= 0.6.1'
   # gem 'bundler-audit',          '~> 0.6'
   gem 'brakeman'
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
   gem 'email_spec',             '~> 2'
-  gem 'factory_bot_rails',      '~> 4.11'
+  gem 'factory_bot_rails', '~> 4.11', '>= 4.11.1'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
   gem 'puma',                   '~> 3.12.4'
-  gem 'rails-controller-testing'
+  gem 'rails-controller-testing', '>= 1.0.4'
   gem 'railroady',              '~> 1.5.3'
-  gem 'rspec-rails'
+  gem 'rspec-rails', '>= 4.0.1'
   gem 'rspec_junit_formatter'
   gem 'stimulus_reflex_testing'
   gem 'yard',                   '~> 0.9.20',  require: false
@@ -160,10 +160,10 @@ group :development, :test do
 end
 
 group :test do
-  gem 'action_mailer_cache_delivery', '~> 0.3'
+  gem 'action_mailer_cache_delivery', '~> 0.3', '>= 0.3.7'
   gem 'capybara',                     '~> 3.12'
   gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
+  gem 'cucumber-rails', '>= 1.8.0', :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
