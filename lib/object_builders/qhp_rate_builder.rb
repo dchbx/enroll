@@ -77,27 +77,22 @@ class QhpRateBuilder
     else
       key = "#{@rate[:plan_id]},#{@rate[:effective_date].to_date.year}"
       rating_area = @rate[:rate_area_id].gsub("Rating Area ", "R-#{Settings.aca.state_abbreviation.upcase}00")
+      attrs = {
+        start_on: @rate[:effective_date],
+        end_on: @rate[:expiration_date],
+        cost: @rate[:primary_enrollee],
+        rating_area: rating_area
+      }
+
+      attrs.merge!({tobacco_cost: @rate[:primary_enrollee_tobacco]}) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+
       if assign_age.zero?
         (14..64).each do |age|
-          @results[key] << {
-            age: age,
-            start_on: @rate[:effective_date],
-            end_on: @rate[:expiration_date],
-            cost: @rate[:primary_enrollee],
-            rating_area: rating_area
-          }
-          @results[key].merge(tobacco_cost: @rate[:primary_enrollee_tobacco]) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+          @results[key] << attrs.merge!({age: age})
           @results[key]
         end
       else
-        @results[key] << {
-          age: assign_age,
-          start_on: @rate[:effective_date],
-          end_on: @rate[:expiration_date],
-          cost: @rate[:primary_enrollee],
-          rating_area: rating_area
-        }
-        @results[key].merge(tobacco_cost: @rate[:primary_enrollee_tobacco]) if ::EnrollRegistry.feature_enabled?(:tobacco_cost)
+        @results[key] << attrs.merge!({age: assign_age})
         @results[key]
       end
     end
