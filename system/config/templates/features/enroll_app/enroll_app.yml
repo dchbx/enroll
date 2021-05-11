@@ -282,7 +282,7 @@ registry:
             item: "CoverME_WebsiteHeader_01.jpg"
       - key: :tobacco_cost
         item: :tobacco_cost
-        is_enabled: true
+        is_enabled: false
       - key: :counties_import
         is_enabled: true
         item: "SHOP_ZipCode_CY2021_FINAL_ME.xlsx"
