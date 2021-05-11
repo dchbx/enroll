@@ -155,7 +155,7 @@ class BenefitCoveragePeriod
   def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
-    subcriber = hbx_enrollment_members.find(&:is_subscriber)
+    subcriber = hbx_enrollment_members.detect(&:is_subscriber)
     family_members = hbx_enrollment_members.map(&:family_member)
     ivl_bgs = get_benefit_packages({family_members: family_members, coverage_kind: coverage_kind, family: hbx_enrollment.family, effective_on: hbx_enrollment.effective_on, market: market}).uniq
     elected_product_ids = ivl_bgs.map(&:benefit_ids).flatten.uniq
@@ -189,7 +189,8 @@ class BenefitCoveragePeriod
     if EnrollRegistry[:service_area].settings(:service_area_model).item == 'single'
       elected_products.entries
     else
-      address = attrs[:subcriber].home_address || attrs[:subcriber].mailing_address
+      person = attrs[:subcriber].family_member.person
+      address = person.home_address || person.mailing_address
       service_area_ids = ::BenefitMarkets::Locations::ServiceArea.service_areas_for(address, during: attrs[:effective_on]).map(&:id)
       elected_products.where(:service_area_id.in => service_area_ids).entries
     end

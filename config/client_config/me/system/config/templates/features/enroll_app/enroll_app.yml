@@ -243,7 +243,7 @@ registry:
         is_enabled: true
         settings:
           - key: :service_area_model
-            item: 'single'
+            item: 'county'
       - key: :site_database_seed
         item: :site_database_seed
         is_enabled: true
