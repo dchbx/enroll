@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 RSpec.describe "app/views/events/shared/_enrollee.xml.haml", dbclean: :after_each do
   let!(:issuer_profile)  { FactoryBot.create(:benefit_sponsors_organizations_issuer_profile) }
@@ -11,14 +13,15 @@ RSpec.describe "app/views/events/shared/_enrollee.xml.haml", dbclean: :after_eac
     family.family_members << [fm]
     fm
   end
-  let!(:hbx_enrollment) { FactoryBot.create(:hbx_enrollment,
-                                            household: family.active_household,
-                                            family: family,
-                                            kind: "individual",
-                                            created_at: Time.now,
-                                            hbx_enrollment_members:[hbx_enrollment_member],
-                                            product_id: product.id
-  )}
+  let!(:hbx_enrollment) do
+    FactoryBot.create(:hbx_enrollment,
+                      household: family.active_household,
+                      family: family,
+                      kind: "individual",
+                      created_at: Time.now,
+                      hbx_enrollment_members: [hbx_enrollment_member],
+                      product_id: product.id)
+  end
   before :each do
     allow(hbx_enrollment).to receive(:premium_for).and_return(0.0)
   end
