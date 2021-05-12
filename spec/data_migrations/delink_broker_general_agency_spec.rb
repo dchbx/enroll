@@ -12,7 +12,7 @@ describe DelinkBrokerGeneralAgency, dbclean: :around_each do
   end
 
   describe "delink general and broker agency" do
-    let(:address) { Address.new(kind: 'primary', address_1: '106 Autumn Hill Way', address_2: '', address_3: '', city: 'Gaithersburg', county: nil, state: 'MD', location_state_code: nil, zip: '20877', country_name: '', full_text: nil) }
+    let(:address) { Address.new(kind: 'primary', address_1: '106 Autumn Hill Way NE', address_2: '', address_3: '', city: 'Gaithersburg', county: nil, state: 'MD', location_state_code: nil, zip: '20877', country_name: '', full_text: nil) }
     let(:phone) { Phone.new(kind: 'work', country_code: '', area_code: '301', number: '9227984', extension: '', primary: nil, full_phone_number: '3019227984') }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let!(:organization){  Organization.new(:legal_name => "Alvin Frager", :fein => "521698168", :dba => "Alvin Frager Insurance", office_locations: [office_location]) }

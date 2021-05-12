@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :benefit_sponsors_locations_address, class: 'BenefitSponsors::Locations::Address' do
 
     kind { 'home' }
-    sequence(:address_1, 1111) { |n| "#{n} Awesome Street" }
+    sequence(:address_1, 1111) { |n| "#{n} Awesome Street NE" }
     sequence(:address_2, 111) { |n| "##{n}" }
     city { 'Boston' }
     state { EnrollRegistry[:enroll_app].setting(:state_abbreviation).item}

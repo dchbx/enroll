@@ -84,7 +84,7 @@ When(/the user clicks on add member button/) do
 end
 
 And(/^the user fills the the add member form/) do
-  expect(page).to have_content('Lives with primary subscriber')
+  expect(page).to have_content('lives with primary subscriber')
   fill_in "dependent[first_name]", :with => "John"
   fill_in "dependent[last_name]", :with => "Doe"
   fill_in "dependent[ssn]", :with => "763434355"

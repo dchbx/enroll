@@ -1,10 +1,34 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 require Rails.root.join('lib', 'object_builders', 'broker_role_builder')
 
 describe BrokerRoleBuilder do
 
   before(:all) do
-    @broker_hash = {:npn=>"1310000", :license_number=>"1310000", :state=>"DC", :name=>{:first_name=>"Pam", :last_name=>"Sahouri", :full_name=>"Pam M. Sahouri"}, :phones=>[{:kind=>"work", :full_phone_number=>"+1-703-000-0500"}], :emails=>[{:kind=>"work", :address=>"benefits@sample.com"}], :addresses=>[{:kind=>"Work", :street=>"8200 Sample", :locality=>"Mclean", :region=>"MD", :code=>"22100", :country=>"USA"}], :exchange_id=>nil, :exchange_status=>"ACTIVE"}
+    @broker_hash = {
+      :npn => "1310000",
+      :license_number => "1310000",
+      :state => "DC",
+      :name => {
+        :first_name => "Pam",
+        :last_name => "Sahouri",
+        :full_name => "Pam M. Sahouri"
+      },
+      :phones => [
+          {
+            :kind => "work",
+            :full_phone_number => "+1-703-000-0500"
+          }
+        ],
+      :emails => [
+          {:kind => "work", :address => "benefits@sample.com"}
+        ],
+      :addresses => [
+          {:kind => "Work", :street => "8200 Sample NE", :locality => "Mclean", :region => "MD", :code => "22100", :country => "USA"}
+        ],
+      :exchange_id => nil, :exchange_status => "ACTIVE"
+    }
     @broker_builder = BrokerRoleBuilder.new(@broker_hash)
     @broker_builder.build
   end

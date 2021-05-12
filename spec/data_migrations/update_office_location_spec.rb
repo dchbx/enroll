@@ -18,7 +18,7 @@ describe UpdateOfficeLocation do
     around do |example|
       ClimateControl.modify org_hbx_id: broker_agency_profile.organization.hbx_id,
                             address_kind: 'primary',
-                            address_1: "123 Main Street",
+                            address_1: "123 Main Street NE",
                             city: "Gotham",
                             state_code: 'DC',
                             zip: "30495" do
@@ -33,7 +33,7 @@ describe UpdateOfficeLocation do
       broker_agency_profile.office_locations.first.reload
 
       office_address = broker_agency_profile.office_locations.first.address.address_1
-      expect(office_address).to eq('123 Main Street')
+      expect(office_address).to eq('123 Main Street NE')
     end
 
     it "should not create a new address if a match does not exist" do

@@ -1,6 +1,6 @@
 <div id="address_info" class="row no-buffer focus_effect personal-info-row">
   <div class="col-md-12 no-pd col-sm-12 col-xs-12">
-    <div class="row row-form-wrapper no-buffer">
+    <!-- <div class="row row-form-wrapper no-buffer">
       <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
         <button class="btn btn-new-address"><%= l10n("new_address_shared")%></button>
       </div>
@@ -20,7 +20,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
 
     <%= f.fields_for :addresses, f.object.addresses, errors: {}, fieldset: true do |address| %>
       <% kind = address.object.kind %>
@@ -30,6 +30,20 @@
       <% if kind != 'home' %>
         <% style="display:none;" %>
       <% end %>
+
+      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+        <div class="col-xs-12 form-group form-group-lg">
+          <% if kind == 'home' %>
+            <div><strong><%=l10n("insured.enter_home_address")%></strong></div>
+            <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
+          <% elsif kind == 'mailing' %>
+            <br>
+            <strong><%=l10n("insured.enter_mailing_address")%></strong><br>
+            <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
+          <% end %>
+        </div>
+      </div>
+
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
         <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
           <%= address.hidden_field :kind %>

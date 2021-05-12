@@ -44,7 +44,7 @@ describe SetCurrentUser do
 
       it "does not update the user" do
         SAVEUSER[:current_user_id] = user2.id
-        org.office_locations.first.address.update_attribute(:address_1, "some new place")
+        org.office_locations.first.address.update_attribute(:address_1, "some new place NE")
         expect(org.updated_by_id).to eq user2.id
       end
     end

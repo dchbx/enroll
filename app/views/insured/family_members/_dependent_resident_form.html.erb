@@ -95,10 +95,17 @@
           <br>
           <%= render 'shared/resident_fields', f: f %>
           <div id="dependent-address">
+            <br>
             <div class="row row-form-wrapper no-buffer">
-              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg top-buffer">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+                <strong>Home address</strong><br>
                 <%= f.check_box :same_with_primary, {}, "true", "false" %>
-                <label for="dependent_same_with_primary"><%=l10n("live_with_primary_subscriber") %></label>
+                <label for="dependent_same_with_primary"><%=l10n("dependent_lives_with_primary_subscriber") %></label>
+              </div>
+            </div>
+            <div class="row row-form-wrapper no-buffer" id="home-info" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
+              <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 form-group form-group-lg">
+                <i class="fa fa-info-circle"></i> <%= l10n('insured.dependent_home_address_info') %>
               </div>
             </div>
             <div id="dependent-home-address-area" style="display: <%= f.object.same_with_primary.present? and f.object.same_with_primary == 'true' ? 'none' : 'block' %>">
@@ -110,6 +117,8 @@
         <%= f.hidden_field :family_id %>
         <div id="remove_confirm" class="hidden"></div>
       </div>
+
+      <%= render partial: 'shared/address_change_confirmation_modal' %>
 
       <div class="clearfix"></div>
       <div id="add_info_buttons_<%= dependent.id %>" style="padding-top: 20px;">
@@ -124,7 +133,7 @@
 
         <%= f.button(id: 'confirm-member', 'data-disable-with' => l10n("please_wait"), class: "btn btn-primary btn-br pull-right mz hidden", onclick: "$('#btn-continue').removeClass('disabled');") do %>    <%= l10n("confirm_member") %><% end %>
 
-        <span class="btn btn-primary btn-br pull-right mz" onclick="PersonValidations.manageRequiredValidations($(this));">
+        <span id='confirm-dependent' class="btn btn-primary btn-br pull-right mz">
           <%= l10n("confirm_member") %>
         </span>
       </div>
@@ -139,5 +148,28 @@
         $("#address_info .address_required").removeAttr('required');
       };
     });
+
+    $(document).on('click', '#confirm-dependent', function(e) {
+      $(".btn-confirmation").removeAttr('disabled');
+
+      var form = $('#new_dependent')[0] || $('#edit_dependent')[0];
+
+      if ( form.checkValidity() && !$("input#dependent_same_with_primary").is(":checked")) {
+        $('#addressChangeConfirmation').modal('show');
+      }
+      else {
+       PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      }
+
+    });
+
+    function confirmChange(event){
+      $(".btn-confirmation").attr('disabled', 'disabled');
+      $('.modal-backdrop').removeClass('modal-backdrop');
+      $('.modal-open').removeClass('modal-open');
+
+      PersonValidations.manageRequiredValidations($('#confirm-dependent'));
+      $('#addressChangeConfirmation').modal('hide');
+    }
   </script>
 </li>

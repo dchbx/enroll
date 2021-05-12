@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
@@ -76,9 +78,9 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       {
         id: org.id, first_name: "updated name", last_name: "updates", accept_new_clients: true, working_hours: true,
         office_locations_attributes: {
-          "0"=> {
-            "address_attributes" => {"kind"=>"primary", "address_1"=>"234 nfgjkhghf", "address_2"=>"", "city"=>"jfhgdfhgjgdf", "state"=>"DC", "zip"=>"35645"},
-            "phone_attributes"=> {"kind"=>"work", "area_code"=>"564", "number"=>"111-1111", "extension"=>"111"}
+          "0" => {
+            "address_attributes" => {"kind" => "primary", "address_1" => "234 Main NE", "address_2" => "", "city" => "jfhgdfhgjgdf", "state" => "DC", "zip" => "35645"},
+            "phone_attributes" => {"kind" => "work", "area_code" => "564", "number" => "111-1111", "extension" => "111"}
           }
         }
       }
@@ -94,8 +96,8 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     it "should update person main phone" do
       broker_agency_profile.primary_broker_role.person.phones[0].update_attributes!(kind: "work")
       post :update, params: {id: broker_agency_profile.id, organization: organization_params}
-       broker_agency_profile.primary_broker_role.person.reload
-       expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
+      broker_agency_profile.primary_broker_role.person.reload
+      expect(broker_agency_profile.primary_broker_role.person.phones[0].extension).to eq "111"
     end
 
     it "should update person record" do
@@ -195,7 +197,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
   describe "get employers",dbclean: :after_each do
     let(:user) { FactoryBot.create(:user, :roles => ['broker_agency_staff'], :person => person)}
-    let(:user1) {FactoryBot.create(:user,:roles=> [], person: broker_role.person)}
+    let(:user1) {FactoryBot.create(:user,:roles => [], person: broker_role.person)}
     let(:person) {broker_agency_staff_role.person}
     let(:person1) {broker_role.person}
     let(:organization) {FactoryBot.create(:organization)}
@@ -208,7 +210,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       sign_in user
       get :employers, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :broker_agency_profile_id=>broker_agency_profile.id}}})
+      orgs = Organization.where({"employer_profile.broker_agency_accounts" => {:$elemMatch => {:is_active => true, :broker_agency_profile_id => broker_agency_profile.id}}})
       expect(assigns(:orgs)).to eq orgs
     end
 
@@ -216,7 +218,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       sign_in user1
       get :employers, params: {id: broker_agency_profile.id}, format: :js, xhr: true
       expect(response).to have_http_status(:success)
-      orgs = Organization.where({"employer_profile.broker_agency_accounts"=>{:$elemMatch=>{:is_active=>true, :writing_agent_id=> broker_role.id }}})
+      orgs = Organization.where({"employer_profile.broker_agency_accounts" => {:$elemMatch => {:is_active => true, :writing_agent_id => broker_role.id }}})
       expect(assigns(:orgs)).to eq orgs
     end
   end
@@ -224,8 +226,8 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
   describe "family_index",dbclean: :after_each do
     before :all do
       org = FactoryBot.create(:organization)
-      @broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization: org,aasm_state:'active')
-      broker_role = FactoryBot.create(:broker_role, broker_agency_profile_id: @broker_agency_profile1.id, aasm_state:'active')
+      @broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization: org,aasm_state: 'active')
+      broker_role = FactoryBot.create(:broker_role, broker_agency_profile_id: @broker_agency_profile1.id, aasm_state: 'active')
       person = broker_role.person
       @current_user = FactoryBot.create(:user, person: person, roles: [:broker])
       families = []
@@ -252,22 +254,22 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
     context "when individual is enabled",dbclean: :after_each do
       before :each do
-        stub_const("BrokerAgencyProfile::MARKET_KINDS",%W[shop individual both])
+        stub_const("BrokerAgencyProfile::MARKET_KINDS",%w[shop individual both])
         DatabaseCleaner.clean
-        org1 = FactoryBot.create(:organization, fein: 100000000 + rand(100000))
-        broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization:org1, market_kind:'individual')
-        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind:'individual', aasm_state:'active')
+        org1 = FactoryBot.create(:organization, fein: rand(100_000_000..100_099_999))
+        broker_agency_profile1 = FactoryBot.create(:broker_agency_profile, organization: org1, market_kind: 'individual')
+        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile1.id, market_kind: 'individual', aasm_state: 'active')
 
-        org2 = FactoryBot.create(:organization, fein: 100000000 + rand(100000))
-        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization:org2, market_kind:'shop')
-        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+        org2 = FactoryBot.create(:organization, fein: rand(100_000_000..100_099_999))
+        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization: org2, market_kind: 'shop')
+        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind: 'shop', aasm_state: 'active')
 
-        org3 = FactoryBot.create(:organization, fein: 100000000 + rand(100000))
-        broker_agency_profile3 = FactoryBot.create(:broker_agency_profile, organization:org3, market_kind:'both')
-        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind:'both', aasm_state:'active')
+        org3 = FactoryBot.create(:organization, fein: rand(100_000_000..100_099_999))
+        broker_agency_profile3 = FactoryBot.create(:broker_agency_profile, organization: org3, market_kind: 'both')
+        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile3.id, market_kind: 'both', aasm_state: 'active')
       end
       context "individual market user",dbclean: :after_each do
-        let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+        let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role: true)}
         let(:user) {FactoryBot.build(:user, person: person, roles: ['consumer'])}
 
         it "selects only 'individual' and 'both' market brokers" do
@@ -275,11 +277,11 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
           controller.instance_variable_set(:@person, person)
           staff = subject.instance_eval{ eligible_brokers }
           staff.each do |staff_person|
-           expect(["individual", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+            expect(["individual", "both"].include?(staff_person.broker_role.market_kind)).to be_truthy
           end
         end
         context "SHOP market user",dbclean: :after_each do
-          let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role:true)}
+          let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false", is_consumer_role: true)}
           let(:user) {FactoryBot.build(:user, person: person, roles: ['employer'])}
 
           it "selects only 'shop' and 'both' market brokers" do
@@ -288,7 +290,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
             staff = subject.instance_eval{ eligible_brokers }
 
             staff.each do |staff_person|
-              expect(["shop", "both"].include? staff_person.broker_role.market_kind).to be_truthy
+              expect(["shop", "both"].include?(staff_person.broker_role.market_kind)).to be_truthy
             end
           end
         end
@@ -297,19 +299,19 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
 
 
     context "SHOP market user",dbclean: :after_each do
-      let(:person) {FactoryBot.build(:person, is_consumer_role:true)}
+      let(:person) {FactoryBot.build(:person, is_consumer_role: true)}
       let(:user) {FactoryBot.build(:user, person: person, roles: ['employer'])}
 
       before :each do
         DatabaseCleaner.clean
-        stub_const("BrokerAgencyProfile::MARKET_KINDS",%W[shop])
+        stub_const("BrokerAgencyProfile::MARKET_KINDS",%w[shop])
 
-        org2 = FactoryBot.create(:organization, fein: 100000000 + rand(100000))
-        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization:org2, market_kind:'shop')
-        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind:'shop', aasm_state:'active')
+        org2 = FactoryBot.create(:organization, fein: rand(100_000_000..100_099_999))
+        broker_agency_profile2 = FactoryBot.create(:broker_agency_profile, organization: org2, market_kind: 'shop')
+        FactoryBot.create(:broker_role, broker_agency_profile_id: broker_agency_profile2.id, market_kind: 'shop', aasm_state: 'active')
       end
       context "SHOP market user",dbclean: :after_each do
-        let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role:true)}
+        let(:person) {FactoryBot.build(:person, us_citizen: "false", indian_tribe_member: "false", eligible_immigration_status: "false",  is_consumer_role: true)}
         let(:user) {FactoryBot.build(:user, person: person, roles: ['employer'])}
 
         it "selects only 'shop' market brokers" do
@@ -318,7 +320,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
           staff = subject.instance_eval{ eligible_brokers }
 
           staff.each do |staff_person|
-            expect(["shop"].include? staff_person.broker_role.market_kind).to be_truthy
+            expect(["shop"].include?(staff_person.broker_role.market_kind)).to be_truthy
           end
         end
       end
@@ -590,7 +592,7 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
       end
 
       expect(queued_job[:args].include?('general_agency_hired_notice')).to be_truthy
-      expect(queued_job[:args].include?("#{general_agency_profile.id.to_s}")).to be_truthy
+      expect(queued_job[:args].include?(general_agency_profile.id.to_s)).to be_truthy
       expect(queued_job[:args].third["employer_profile_id"]).to eq employer_profile.id.to_s
     end
 
@@ -639,12 +641,12 @@ RSpec.describe BrokerAgencies::ProfilesController, dbclean: :after_each do
     end
 
     it "should search for employers in BrokerAgencies with  search string" do
-      get :employer_datatable, params: {id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: 'abcdefgh'}}, xhr: true
+      get :employer_datatable, params: {id: broker_agency_profile.id, :order => {"0" => {"column" => "2", "dir" => "asc"}}, search: {value: 'abcdefgh'}}, xhr: true
       expect(assigns(:employer_profiles).count).to   eq(0)
     end
 
     it "should search for employers in BrokerAgencies with empty search string" do
-      get :employer_datatable, params: {id: broker_agency_profile.id, :order =>{"0"=>{"column"=>"2", "dir"=>"asc"}}, search: {value: ''}}, xhr: true
+      get :employer_datatable, params: {id: broker_agency_profile.id, :order => {"0" => {"column" => "2", "dir" => "asc"}}, search: {value: ''}}, xhr: true
       expect(assigns(:employer_profiles).count).to   eq(2)
     end
   end

@@ -280,8 +280,8 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
     context "PUT update" do
       let(:addresses_attributes) do
-        {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "id" => person.addresses[0].id.to_s},
-         "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "id" => person.addresses[1].id.to_s} }
+        {"0" => {"kind" => "home", "address_1" => "address1_a NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "id" => person.addresses[0].id.to_s},
+         "1" => {"kind" => "mailing", "address_1" => "address1_b NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211", "id" => person.addresses[1].id.to_s} }
       end
       let(:consumer_role_attributes) {consumer_role.attributes.to_hash }
       let(:person_params) do
@@ -328,12 +328,12 @@ if ExchangeTestingConfigurationHelper.individual_market_is_enabled?
 
       context 'Address attributes' do
         let(:valid_addresses_attributes) do
-          {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
-           "1" => {"kind" => "mailing", "address_1" => "address1_b", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
+          {"0" => {"kind" => "home", "address_1" => "address1_a NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211"},
+           "1" => {"kind" => "mailing", "address_1" => "address1_b NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "22211" } }
         end
         let(:invalid_addresses_attributes) do
-          {"0" => {"kind" => "home", "address_1" => "address1_a", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "222"},
-           "1" => {"kind" => "mailing", "address_1" => "test", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
+          {"0" => {"kind" => "home", "address_1" => "address1_a NE", "address_2" => "", "city" => "city1", "state" => "DC", "zip" => "222"},
+           "1" => {"kind" => "mailing", "address_1" => "test NE", "address_2" => "", "city" => "test", "state" => "DC", "zip" => "223"} }
         end
 
         it "should not update existing person with invalid addresses" do

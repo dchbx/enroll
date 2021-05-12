@@ -39,7 +39,7 @@ RSpec.describe Operations::Families::CreateOrUpdateFamilyMember, type: :model, d
      :ssn => '873672163',
      :relationship => 'unrelated',
      :addresses =>
-         [{'address_1' => '123',
+         [{'address_1' => '123 NE',
            'address_2' => '',
            'address_3' => '',
            'county' => '',

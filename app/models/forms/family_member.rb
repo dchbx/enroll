@@ -191,6 +191,7 @@ module Forms
         :tribal_id => tribal_id,
         :is_homeless => is_homeless,
         :is_temporarily_out_of_state => is_temporarily_out_of_state,
+        :is_moving_to_state => is_moving_to_state,
         :age_off_excluded => age_off_excluded,
         :tobacco_use => tobacco_use
       }
@@ -251,6 +252,7 @@ module Forms
         :addresses => [home_address, mailing_address],
         :age_off_excluded => found_family_member.try(:person).try(:age_off_excluded),
         :tobacco_use => found_family_member&.person&.tobacco_use
+        :is_moving_to_state => found_family_member.try(:person).try(:is_moving_to_state)
       })
     end
 

@@ -203,7 +203,8 @@ class Exchanges::ResidentsController < ApplicationController
       :tribal_id,
       :no_dc_address,
       :is_homeless,
-      :is_temporarily_out_of_state
+      :is_temporarily_out_of_state,
+      :is_moving_to_state
     ]
   end
 

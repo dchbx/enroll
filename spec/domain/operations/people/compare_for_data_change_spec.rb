@@ -8,8 +8,8 @@ RSpec.describe ::Operations::People::CompareForDataChange, dbclean: :after_each 
       per = FactoryBot.create(:person, :with_consumer_role, hbx_id: '13cce9fe14b04209b2443330900108d8',
                               dob: (Date.today - 1.years).strftime('%d/%m/%Y'), first_name: 'childfirst',
                               last_name: 'childlast', gender: 'male')
-      per.addresses = [FactoryBot.build(:address, :mailing_kind, address_1: '1 Awesome Street', address_2: '#1', state: 'DC')]
-      per.addresses << FactoryBot.build(:address, address_1: '2 Awesome Street', address_2: '#2', state: 'DC')
+      per.addresses = [FactoryBot.build(:address, :mailing_kind, address_1: '1 Awesome Street NE', address_2: '#1', state: 'DC')]
+      per.addresses << FactoryBot.build(:address, address_1: '2 Awesome Street NE', address_2: '#2', state: 'DC')
       per.emails = [FactoryBot.build(:email, kind: 'work'), FactoryBot.build(:email, kind: 'home')]
       per.phones = [FactoryBot.build(:phone, kind: 'work'), FactoryBot.build(:phone, kind: 'home')]
       per.save!

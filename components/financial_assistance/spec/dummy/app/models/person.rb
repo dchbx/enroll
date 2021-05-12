@@ -70,6 +70,7 @@ class Person
   field :no_dc_address, type: Boolean, default: false
   field :is_homeless, type: Boolean, default: false
   field :is_temporarily_out_of_state, type: Boolean, default: false
+  field :is_moving_to_state, type: Boolean, default: false
 
   field :is_active, type: Boolean, default: true
   field :updated_by, type: String

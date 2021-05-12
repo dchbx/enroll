@@ -100,7 +100,7 @@ Then(/the individual sees form to enter personal information$/) do
   find(IvlPersonalInformation.naturalized_citizen_no_radiobtn).click
   find(IvlPersonalInformation.american_or_alaskan_native_no_radiobtn).click
   find(IvlPersonalInformation.incarcerated_no_radiobtn).click
-  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD"
+  fill_in IvlPersonalInformation.address_line_one, :with => "4900 USAA BLVD NE"
   fill_in IvlPersonalInformation.address_line_two, :with => "212"
   fill_in IvlPersonalInformation.city, :with => "Washington"
   find(IvlPersonalInformation.select_state_dropdown).click
@@ -240,7 +240,7 @@ Then(/Individual resumes enrollment/) do
 end
 
 Then (/Individual sees previously saved address/) do
-  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD', wait: 10)
+  expect(page).to have_field('ADDRESS LINE 1 *', with: '4900 USAA BLVD NE', wait: 10)
   find('.btn', text: 'CONTINUE').click
 end
 

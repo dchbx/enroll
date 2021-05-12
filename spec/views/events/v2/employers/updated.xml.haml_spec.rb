@@ -39,7 +39,7 @@ RSpec.describe "events/v2/employer/updated.haml.erb" , dbclean: :around_each do
     let(:person_broker) {FactoryBot.build(:person,:with_work_email, :with_work_phone)}
     let(:broker) {FactoryBot.build(:broker_role,aasm_state:'active',person:person_broker)}
     let(:rating_area) { create(:rating_area, county_name: employer_profile.organization.primary_office_location.address.county, zip_code: employer_profile.organization.primary_office_location.address.zip)}
-    let(:home_address)  { Address.new(kind: "home", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:home_address)  { Address.new(kind: "home", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002") }
     let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:mailing_address)  { Address.new(kind: "mailing", address_1: "609", city: "Washington", state: "DC", zip: "20002") }
 

@@ -10,7 +10,7 @@ describe EmployerProfile, dbclean: :after_each do
 
   let(:address)  { Address.new(
                                 kind: "primary",
-                                address_1: "609 H St",
+                                address_1: "609 H St NE",
                                 city: "Washington",
                                 state: Settings.aca.state_abbreviation,
                                 county: "ACounty",

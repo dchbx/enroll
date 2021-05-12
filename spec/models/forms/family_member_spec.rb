@@ -241,7 +241,8 @@ describe Forms::FamilyMember, 'with no ssn' do
       :tribal_id => "test",
       :is_homeless => nil,
       :relationship => "spouse",
-      :is_temporarily_out_of_state => false
+      :is_temporarily_out_of_state => false,
+      :is_moving_to_state => false
     }
   }
 
@@ -298,7 +299,8 @@ describe Forms::FamilyMember, "which describes a new family member, and has been
       :tribal_id => "test",
       :is_homeless => nil,
       :is_temporarily_out_of_state => false,
-      :tobacco_use => nil
+      :tobacco_use => nil,
+      :is_moving_to_state => false
     }
   }
 
@@ -373,27 +375,26 @@ end
 describe "checking validations on family member object" do
   let(:family_id) { double }
   let(:family) { double("family", :family_members => []) }
-  let(:member_attributes) {
-    { "first_name"=>"test",
-      "middle_name"=>"",
-      "last_name"=>"fm",
-      "dob"=>"1982-11-11",
-      "ssn"=>"",
-      "no_ssn"=>"1",
-      "gender"=>"male",
-      "relationship"=>"child",
-      "tribal_id"=>"",
-      "ethnicity"=>["", "", "", "", "", "", ""],
-      "is_consumer_role"=>"true",
-      "same_with_primary"=>"true",
-      "is_homeless"=>"false",
-      "is_temporarily_out_of_state"=>"false",
-      "addresses"=>
-      { "0"=>{"kind"=>"home", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""},
-        "1"=>{"kind"=>"mailing", "address_1"=>"", "address_2"=>"", "city"=>"", "state"=>"", "zip"=>""}
-      }
-    }
-  }
+  let(:member_attributes) do
+    { "first_name" => "test",
+      "middle_name" => "",
+      "last_name" => "fm",
+      "dob" => "1982-11-11",
+      "ssn" => "",
+      "no_ssn" => "1",
+      "gender" => "male",
+      "relationship" => "child",
+      "tribal_id" => "",
+      "ethnicity" => ["", "", "", "", "", "", ""],
+      "is_consumer_role" => "true",
+      "same_with_primary" => "true",
+      "is_homeless" => "false",
+      "is_temporarily_out_of_state" => "false",
+      "is_moving_to_state" => "false",
+      "addresses" =>
+      { "0" => {"kind" => "home", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""},
+        "1" => {"kind" => "mailing", "address_1" => "", "address_2" => "", "city" => "", "state" => "", "zip" => ""}}}
+  end
 
   subject { Forms::FamilyMember.new(member_attributes.merge({:family_id => family_id}))}
 
@@ -520,7 +521,10 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
   describe "when updated" do
     it "should update the relationship of the dependent" do
-      allow(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil, :tobacco_use => nil})).and_return(true)
+      allow(person).to receive(:update_attributes).with(person_properties.merge(
+                                                          {:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil,
+                                                           :is_moving_to_state => nil, :age_off_excluded => nil, :tobacco_use => nil}
+                                                        )).and_return(true)
       allow(subject).to receive(:assign_person_address).and_return true
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       expect(family_member).to receive(:update_relationship).with(relationship)
@@ -529,7 +533,7 @@ describe Forms::FamilyMember, "which describes an existing family member" do
 
     it "should update the attributes of the person" do
       allow(subject).to receive(:assign_person_address).and_return true
-      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :age_off_excluded => nil, :tobacco_use => nil}))
+      expect(person).to receive(:update_attributes).with(person_properties.merge({:citizen_status => nil, :no_ssn => "0", :is_homeless => nil, :is_temporarily_out_of_state => nil, :is_moving_to_state => nil, :age_off_excluded => nil, :tobacco_use => nil}))
       allow(family_member).to receive(:update_relationship).with(relationship)
       allow(person).to receive(:consumer_role).and_return FactoryBot.build(:consumer_role)
       subject.update_attributes(update_attributes)

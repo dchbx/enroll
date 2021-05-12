@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe Address, "with proper validations" do
   let(:address_kind) { "home" }
-  let(:address_1) { "1 Clear Crk" }
+  let(:address_1) { "1 Clear Crk NE" }
   let(:city) { "Irvine" }
   let(:state) { "CA" }
   let(:zip) { "20171" }
@@ -112,7 +112,7 @@ end
 describe 'view helpers/presenters' do
   let(:address) {
      Address.new(
-       address_1: "An address line 1",
+       address_1: "An address line 1 NE",
        address_2: "An address line 2",
        city: "A City",
        state: "CA",
@@ -139,12 +139,12 @@ describe 'view helpers/presenters' do
 
   describe "#to_html" do
     it "returns the address with html tags" do
-      expect(address.to_html).to eq "<div>An address line 1</div><div>An address line 2</div><div>A City, CA 21222</div>"
+      expect(address.to_html).to eq "<div>An address line 1 NE</div><div>An address line 2</div><div>A City, CA 21222</div>"
     end
 
     it "retuns address with html tags if no address_2 field is present" do
       address.address_2 = ""
-      expect(address.to_html).to eq "<div>An address line 1</div><div>A City, CA 21222</div>"
+      expect(address.to_html).to eq "<div>An address line 1 NE</div><div>A City, CA 21222</div>"
     end
   end
 end

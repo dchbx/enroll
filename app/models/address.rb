@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Embedded model that stores a location address
 class Address
   include Mongoid::Document
@@ -8,8 +10,11 @@ class Address
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
 
-  KINDS = %W(home work mailing)
-  OFFICE_KINDS = %W(primary mailing branch)
+  KINDS = %w[home work mailing].freeze
+  OFFICE_KINDS = %w[primary mailing branch].freeze
+
+  # Quadrants
+  QUADRANTS = %w[N NORTH S SOUTH E EAST W WEST NE NORTHEAST NW NORTHWEST SE SOUTHEAST SW SOUTHWEST].freeze
 
   # The type of address
   field :kind, type: String
@@ -39,26 +44,43 @@ class Address
   # The name of the country where this address is located
   field :country_name, type: String, default: ""
 
+  # The name of the quadrant where this address is located
+  field :quadrant, type: String, default: ""
+
+  # The name of the quadrant where this address is located
+  field :quadrant, type: String, default: ""
+
   track_history :on => [:fields],
                 :scope => :person,
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   validates_presence_of :address_1, :city, :state, :zip
-  
+
   validates :kind,
-    inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
-    allow_blank: false
+            inclusion: { in: KINDS + OFFICE_KINDS, message: "%{value} is not a valid address kind" },
+            allow_blank: false
 
   validates :zip,
-    format: {
-        :with => /\A\d{5}(-\d{4})?\z/,
-        :message => "should be in the form: 12345 or 12345-1234"
-      }
+            format: {
+              :with => /\A\d{5}(-\d{4})?\z/,
+              :message => "should be in the form: 12345 or 12345-1234"
+            }
+
+  before_validation :detect_quadrant
+  validate :quadrant_check
+
+  def detect_quadrant
+    self.quadrant = QUADRANTS.map { |word| self.address_1&.upcase&.scan(/\b#{word}\b/) }.flatten.first if Settings.aca.validate_quadrant
+  end
+
+  def quadrant_check
+    errors.add(:quadrant, "not present") if Settings.aca.validate_quadrant && Settings.aca.quadrant_state_inclusion.include?(self.state) && Settings.aca.quadrant_zip_codes_exclusions.exclude?(self.zip) && self.quadrant.blank?
+  end
 
   # @note Add support for GIS location
   def location
@@ -89,9 +111,9 @@ class Address
   # @return [ String ] the full address
   def to_html
     if address_2.blank?
-      "<div>#{address_1.strip()}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+      "<div>#{address_1.strip}</div><div>#{city}, #{state} #{zip}</div>".html_safe
     else
-      "<div>#{address_1.strip()}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
+      "<div>#{address_1.strip}</div><div>#{address_2}</div><div>#{city}, #{state} #{zip}</div>".html_safe
     end
   end
 
@@ -102,7 +124,7 @@ class Address
   #
   # @return [ String ] the full address
   def to_s
-    city.present? ? city_delim = city + "," : city_delim = city
+    city_delim = city.present? ? "#{city}," : city
     line3 = [city_delim, state, zip].reject(&:nil? || empty?).join(' ')
     [address_1, address_2, line3].reject(&:nil? || empty?).join('<br/>').html_safe
   end
@@ -118,7 +140,7 @@ class Address
   #
   # @return [ String ] the full address
   def full_address
-    city.present? ? city_delim = city + "," : city_delim = city
+    city_delim = city.present? ? "#{city}," : city
     [address_1, address_2, city_delim, state, zip].reject(&:nil? || empty?).join(' ')
   end
 
@@ -234,11 +256,7 @@ class Address
   # @return [ String ] The four digit zip code extension.
   def zip_extension
     return nil if zip.blank?
-    if zip =~ /-/
-      zip.split("-").last
-    else
-      nil
-    end
+    zip.split("-").last if zip =~ /-/
   end
 
   # Determine if this address is type: "mailing"
@@ -258,7 +276,7 @@ class Address
   #
   # @return [ true, false ] true if home type, false if not home type
   def home?
-    "home" == self.kind.to_s
+    self.kind.to_s == "home"
   end
 
   # Compare passed address with this address

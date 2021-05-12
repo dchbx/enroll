@@ -42,14 +42,14 @@ describe Person, :dbclean => :after_each do
 
   context "after updating an address" do
     subject do
-      person.addresses.create! address_1: '1st St',
+      person.addresses.create! address_1: '1st St NE',
         city: 'Washington',
         state: 'DC',
         zip: '20001',
         kind: 'home'
     end
 
-    include_examples 'tracked history', 'address_1', '2nd St'
+    include_examples 'tracked history', 'address_1', '2nd St NE'
   end
 
   context 'updating a consumer role' do

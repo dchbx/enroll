@@ -27,7 +27,7 @@ module BenefitSponsors
                                   entity_kind: entity_kind
                                 )}
 
-    let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+    let(:address)           { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
     let(:phone  )           { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
     let(:office_location)   { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
     let(:office_locations)  { [office_location] }
@@ -110,7 +110,7 @@ module BenefitSponsors
       let(:tyrell_fein)         { "100001001" }
       let(:wallace_legal_name)  { "Wallace Corporation" }
       let(:wallace_fein)        { "200001001" }
-      let(:address)             { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+      let(:address)             { BenefitSponsors::Locations::Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )             { BenefitSponsors::Locations::Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location)     { BenefitSponsors::Locations::OfficeLocation.new(is_primary: true, address: address, phone: phone) }
       let(:office_locations)    { [office_location] }

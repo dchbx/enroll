@@ -15,7 +15,7 @@ describe Importers::ConversionEmployerUpdate, :dbclean => :after_each do
       contact_first_name: "test1",
       contact_last_name: "test2",
       contact_phone: "8987896788",
-      primary_location_address_1: "444 new stream dr",
+      primary_location_address_1: "444 new stream dr NE",
       primary_location_city: "sterling",
       primary_location_state: "dc",
       primary_location_zip: "99999",

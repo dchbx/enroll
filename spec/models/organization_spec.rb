@@ -233,7 +233,7 @@ RSpec.describe Organization, dbclean: :after_each do
     end
 
     context "binder_paid" do
-      let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+      let(:address)  { Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
       let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       let(:office_location) { OfficeLocation.new(
           is_primary: true,

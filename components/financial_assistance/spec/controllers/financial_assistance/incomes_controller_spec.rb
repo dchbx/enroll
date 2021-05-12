@@ -23,7 +23,7 @@ RSpec.describe FinancialAssistance::IncomesController, dbclean: :after_each, typ
   let!(:valid_other_income_params){ {"kind" => "alimony_and_maintenance", "amount" => "45", "frequency_kind" => "biweekly", "start_on" => "11/01/2017", "end_on" => "11/30/2017"}}
   let!(:valid_income_params){ {"kind" => "capital_gains", "amount" => "34.8", "frequency_kind" => "monthly", "start_on" => "09/04/2017", "end_on" => "09/24/2017", "employer_name" => ""} }
   let!(:invalid_income_params){  {"kind" => "ppp", "amount" => "45.3", "frequency_kind" => "monthly", "start_on" => "09/04/2017", "end_on" => "09/24/2017", "employer_name" => ""} }
-  let(:income_employer_address_params){ {"address_1" => "23 main st", "address_2" => "", "city" => "washington", "state" => "dc", "zip" => "12343"}}
+  let(:income_employer_address_params){ {"address_1" => "23 main st ne", "address_2" => "", "city" => "washington", "state" => "dc", "zip" => "12343"}}
   let(:income_employer_phone_params) {{"full_phone_number" => ""}}
 
   before do

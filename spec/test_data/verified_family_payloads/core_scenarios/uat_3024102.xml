@@ -25,7 +25,7 @@
                <ns0:addresses>
                   <ns0:address>
                      <ns0:type>urn:openhbx:terms:v1:address_type#home</ns0:type>
-                     <ns0:address_line_1>8123 45th ave</ns0:address_line_1>
+                     <ns0:address_line_1>8123 45th ave NE</ns0:address_line_1>
                      <ns0:location_city_name>baltimore</ns0:location_city_name>
                      <ns0:location_state>urn:openhbx:terms:v1:us_state#district_of_columbia</ns0:location_state>
                      <ns0:location_state_code>MD</ns0:location_state_code>
@@ -135,7 +135,7 @@
                <ns0:addresses>
                   <ns0:address>
                      <ns0:type>urn:openhbx:terms:v1:address_type#home</ns0:type>
-                     <ns0:address_line_1>8123 45th ave</ns0:address_line_1>
+                     <ns0:address_line_1>8123 45th ave NE</ns0:address_line_1>
                      <ns0:location_city_name>baltimore</ns0:location_city_name>
                      <ns0:location_state>urn:openhbx:terms:v1:us_state#district_of_columbia</ns0:location_state>
                      <ns0:location_state_code>MD</ns0:location_state_code>
@@ -208,7 +208,7 @@
                <ns0:addresses>
                   <ns0:address>
                      <ns0:type>urn:openhbx:terms:v1:address_type#home</ns0:type>
-                     <ns0:address_line_1>609 h st ne</ns0:address_line_1>
+                     <ns0:address_line_1>609 h st NE</ns0:address_line_1>
                      <ns0:location_city_name>washington</ns0:location_city_name>
                      <ns0:location_state>urn:openhbx:terms:v1:us_state#district_of_columbia</ns0:location_state>
                      <ns0:location_state_code>DC</ns0:location_state_code>

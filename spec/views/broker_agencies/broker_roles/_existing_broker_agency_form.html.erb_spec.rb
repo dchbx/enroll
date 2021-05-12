@@ -38,7 +38,7 @@ RSpec.describe "broker_agencies/broker_roles/_existing_broker_agency_form.html.e
 
     it "should have home address area" do
       expect(rendered).to have_selector('div.personal-info-row')
-      expect(rendered).to have_content('Home Address')
+      expect(rendered).to have_content(/home address/i)
     end
   end
 end

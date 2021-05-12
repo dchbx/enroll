@@ -16,7 +16,7 @@ class DelinkBrokerGeneralAgency < MongoidMigrationTask
       puts "Updated General agency information and deleted old Broker agency profile" unless Rails.env.test?
     end
 
-    address = Address.new(kind: 'primary', address_1: '106 Autumn Hill Way', address_2: '', address_3: '', city: 'Gaithersburg', county: nil, state: 'MD', location_state_code: nil, zip: '20877', country_name: '', full_text: nil)
+    address = Address.new(kind: 'primary', address_1: '106 Autumn Hill Way NE', address_2: '', address_3: '', city: 'Gaithersburg', county: nil, state: 'MD', location_state_code: nil, zip: '20877', country_name: '', full_text: nil)
     phone = Phone.new(kind: 'work', country_code: '', area_code: '301', number: '9227984', extension: '', primary: nil, full_phone_number: '3019227984')
     office_location = OfficeLocation.new(is_primary: true, address: address, phone: phone)
 

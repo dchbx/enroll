@@ -144,7 +144,7 @@ Then(/^.+ should see a form to enter information about employee, address and dep
   find(:xpath, "//div[div/select[@name='census_employee[benefit_group_assignments_attributes][0][benefit_group_id]']]//li[@data-index='1']").click
 
   # Address
-  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac NE"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
 
@@ -777,7 +777,7 @@ Then /^employer should see the address on the roster$/ do
 end
 
 And /^employer populates the address field$/ do
-  fill_in 'census_employee[address_attributes][address_1]', :with => "1026 Potomac"
+  fill_in 'census_employee[address_attributes][address_1]', :with => " NE"
   fill_in 'census_employee[address_attributes][address_2]', :with => "Apt ABC"
   fill_in 'census_employee[address_attributes][city]', :with => "Alpharetta"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]").click

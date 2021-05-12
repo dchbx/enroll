@@ -293,8 +293,8 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
   describe "is_office_location_address_valid?" do
 
     let(:phone) { FactoryBot.build(:phone) }
-    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
-    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address)  { Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002") }
+    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
     let(:office_location1) { OfficeLocation.new(is_primary: true, address: address1, phone: phone)}
 
@@ -317,8 +317,8 @@ describe EventsHelper, "given an address_kind", dbclean: :after_each do
 
     let(:phone) { FactoryBot.build(:phone, kind: 'home') }
     let(:phone1) { FactoryBot.build(:phone, kind: 'phone main main') }
-    let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
-    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002") }
+    let(:address)  { Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002") }
+    let(:address1)  { Address.new(kind: "branch", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002") }
     let(:office_location) { OfficeLocation.new(is_primary: true, address: address, phone: phone)}
     let(:office_location1) { OfficeLocation.new(is_primary: true, address: address1, phone: phone1)}
 

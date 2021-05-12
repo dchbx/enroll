@@ -16,81 +16,85 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
   end
 
   let(:applicant_params) do
-    {:person_hbx_id=>applicant.person_hbx_id,
-     :ssn=>"889984400",
-     :dob=>"09/12/1993",
+    {:person_hbx_id => applicant.person_hbx_id,
+     :ssn => "889984400",
+     :dob => "09/12/1993",
      first_name: 'james',
      last_name: 'bond',
      gender: 'male',
-     :is_applying_coverage=>true,
-     :citizen_status=>"us_citizen",
-     :is_consumer_role=>true,
-     :same_with_primary=>false,
-     :indian_tribe_member=>false,
-     :is_incarcerated=>true,
-     :addresses => [{"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4a'),
-      "address_2"=>"#111",
-      "address_3"=>"",
-      "county"=>"Hampden",
-      "country_name"=>"",
-      "kind"=>"home",
-      "address_1"=>"1111 Awesome Street",
-      "city"=>"Washington",
-      "state"=>"DC",
-      "zip"=>"01001"}],
-    :phones=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4e'),
-       "country_code"=>"",
-       "area_code"=>"202",
-       "number"=>"1111111",
-       "extension"=>"1",
-       "full_phone_number"=>"20211111111",
-       "kind"=>"home"}],
-    :emails=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a52'), "kind"=>"home", "address"=>"example1@example.com"}],
-    :family_member_id=>BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
-    :is_primary_applicant=>true,
-    :is_consent_applicant=>false,
-    :relationship=>"self"}
+     :is_applying_coverage => true,
+     :citizen_status => "us_citizen",
+     :is_consumer_role => true,
+     :same_with_primary => false,
+     :indian_tribe_member => false,
+     :is_incarcerated => true,
+     :addresses => [{"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a4a'),
+                     "address_2" => "#111",
+                     "address_3" => "",
+                     "county" => "Hampden",
+                     "country_name" => "",
+                     "kind" => "home",
+                     "address_1" => "1111 Awesome Street NE",
+                     "city" => "Washington",
+                     "state" => "DC",
+                     "zip" => "01001"}],
+     :phones => [
+      {"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a4e'),
+       "country_code" => "",
+       "area_code" => "202",
+       "number" => "1111111",
+       "extension" => "1",
+       "full_phone_number" => "20211111111",
+       "kind" => "home"}
+],
+     :emails => [
+      {"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a52'), "kind" => "home", "address" => "example1@example.com"}
+],
+     :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
+     :is_primary_applicant => true,
+     :is_consent_applicant => false,
+     :relationship => "self"}
   end
 
   let(:applicant_params_2) do
-    {:person_hbx_id=>"13cce9fe14b04209b2443330900108d8",
-     :ssn=>"705335062",
-     :dob=>"04/04/1972",
+    {:person_hbx_id => "13cce9fe14b04209b2443330900108d8",
+     :ssn => "705335062",
+     :dob => "04/04/1972",
      first_name: 'test',
      last_name: 'bond',
      gender: 'male',
-     :is_applying_coverage=>true,
-     :citizen_status=>"us_citizen",
-     :is_consumer_role=>true,
-     :same_with_primary=>false,
-     :indian_tribe_member=>false,
-     :is_incarcerated=>true,
-     :addresses => [{"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4a'),
-      "address_2"=>"#111",
-      "address_3"=>"",
-      "county"=>"Hampden",
-      "country_name"=>"",
-      "kind"=>"home",
-      "address_1"=>"1111 Awesome Street",
-      "city"=>"Washington",
-      "state"=>"DC",
-      "zip"=>"01001"}],
-    :phones=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a4e'),
-       "country_code"=>"",
-       "area_code"=>"202",
-       "number"=>"1111111",
-       "extension"=>"1",
-       "full_phone_number"=>"20211111111",
-       "kind"=>"home"}],
-    :emails=>[
-      {"_id"=>BSON::ObjectId('5f60c648bb40ee0c3d288a52'), "kind"=>"home", "address"=>"example1@example.com"}],
-    :family_member_id=>BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
-    :is_primary_applicant=>true,
-    :is_consent_applicant=>false,
-    :relationship=>"self"}
+     :is_applying_coverage => true,
+     :citizen_status => "us_citizen",
+     :is_consumer_role => true,
+     :same_with_primary => false,
+     :indian_tribe_member => false,
+     :is_incarcerated => true,
+     :addresses => [{"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a4a'),
+                     "address_2" => "#111",
+                     "address_3" => "",
+                     "county" => "Hampden",
+                     "country_name" => "",
+                     "kind" => "home",
+                     "address_1" => "1111 Awesome Street NE",
+                     "city" => "Washington",
+                     "state" => "DC",
+                     "zip" => "01001"}],
+     :phones => [
+      {"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a4e'),
+       "country_code" => "",
+       "area_code" => "202",
+       "number" => "1111111",
+       "extension" => "1",
+       "full_phone_number" => "20211111111",
+       "kind" => "home"}
+],
+     :emails => [
+      {"_id" => BSON::ObjectId('5f60c648bb40ee0c3d288a52'), "kind" => "home", "address" => "example1@example.com"}
+],
+     :family_member_id => BSON::ObjectId('5f60c648bb40ee0c3d288a83'),
+     :is_primary_applicant => true,
+     :is_consent_applicant => false,
+     :relationship => "self"}
   end
 
   let!(:applicant2) do
@@ -122,6 +126,6 @@ RSpec.describe FinancialAssistance::Operations::Applicant::Delete, dbclean: :aft
     it 'should not delete the applicant' do
       result = subject.call(financial_applicant: applicant_params_2, family_id: family_id)
       expect(result.failure?).to be_truthy
-    end 
+    end
   end
 end

@@ -8,7 +8,7 @@ module BradyBunch
       FactoryBot.build(:address,
         kind: "home",
         address_1:
-        "4222 Clinton Way",
+        "4222 Clinton Way NE",
         address_2: nil,
         city: "Washington",
         state: "DC",
@@ -20,7 +20,7 @@ module BradyBunch
       FactoryBot.build(:address,
         kind: "home",
         address_1:
-        "4222 Clinton Way",
+        "4222 Clinton Way NE",
         address_2: nil,
         city: "Washington",
         state: "DC",

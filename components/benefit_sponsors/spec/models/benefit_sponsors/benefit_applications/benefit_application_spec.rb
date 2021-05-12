@@ -513,7 +513,7 @@ module BenefitSponsors
       # context "#to_plan_year", dbclean: :after_each do
       #   let(:benefit_application)       { BenefitSponsors::BenefitApplications::BenefitApplication.new(params) }
       #   let(:benefit_sponsorship)       { BenefitSponsors::BenefitSponsorships::BenefitSponsorship.new(benefit_market: :aca_shop_cca) }
-      #   let(:address)  { Address.new(kind: "primary", address_1: "609 H St", city: "Washington", state: "DC", zip: "20002", county: "County") }
+      #   let(:address)  { Address.new(kind: "primary", address_1: "609 H St NE", city: "Washington", state: "DC", zip: "20002", county: "County") }
       #   let(:phone  )  { Phone.new(kind: "main", area_code: "202", number: "555-9999") }
       #   let(:office_location) { OfficeLocation.new(
       #       is_primary: true,

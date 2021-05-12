@@ -20,7 +20,7 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
          gender: 'male', is_incarcerated: false,
          person_hbx_id: '23232323',
          same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
-         addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
+         addresses: [kind: 'home', address_1: '123 NE', address_2: '', address_3: '',
                      city: 'was', county: '', state: 'DC', location_state_code: nil,
                      full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
                      modifier_id: nil], phones: [], emails: []}
@@ -68,7 +68,7 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
          gender: 'male', is_incarcerated: false,
          person_hbx_id: '23232323',
          same_with_primary: true, indian_tribe_member: true, citizen_status: 'true',
-         addresses: [kind: 'home', address_1: '123', address_2: '', address_3: '',
+         addresses: [kind: 'home', address_1: '123 NE', address_2: '', address_3: '',
                      city: 'was', county: '', state: 'DC', location_state_code: nil,
                      full_text: nil, zip: '12321', country_name: '', tracking_version: 1,
                      modifier_id: nil], phones: [], emails: []}
@@ -136,8 +136,8 @@ RSpec.describe Operations::People::CreateOrUpdate, type: :model, dbclean: :after
   context "update person with applicant's updates" do
     let!(:person10) do
       per = FactoryBot.create(:person, :with_consumer_role, :with_active_consumer_role, is_incarcerated: false)
-      per.addresses = [FactoryBot.build(:address, :mailing_kind, address_1: '1 Awesome Street', address_2: '#1', state: 'DC')]
-      per.addresses << FactoryBot.build(:address, address_1: '2 Awesome Street', address_2: '#2', state: 'DC')
+      per.addresses = [FactoryBot.build(:address, :mailing_kind, address_1: '1 Awesome Street NE', address_2: '#1', state: 'DC')]
+      per.addresses << FactoryBot.build(:address, address_1: '2 Awesome Street NE', address_2: '#2', state: 'DC')
       per.emails = [FactoryBot.build(:email, kind: 'work', address: 'test@test.com'), FactoryBot.build(:email, kind: 'home', address: 'test10@test.com')]
       per.phones = [FactoryBot.build(:phone, kind: 'work'), FactoryBot.build(:phone, kind: 'home')]
       per.save!

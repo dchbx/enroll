@@ -14,6 +14,7 @@
           <% style="display:none;" %>
         <% end %>
       <% end %>
+      <% if false %>
       <div class="row row-form-wrapper no-buffer <%= div_class %>" style="<%= style %>">
         <div class="col-md-2 col-sm-2 col-xs-12 form-group form-group-lg no-pd">
           <button class="btn btn-new-address">NEW ADDRESS</button>
@@ -46,16 +47,33 @@
           </div>
         <% end %>
       </div>
+      <% end %>
+
       <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
+        <div class="col-xs-12 form-group form-group-lg">
+          <% if kind == 'home' %>
+            <div><strong><%=l10n("insured.enter_home_address")%></strong></div>
+            <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_home_address_info")%>
+          <% elsif kind == 'mailing' %>
+            <br>
+            <strong><%=l10n("insured.enter_mailing_address")%></strong><br>
+            <i class="fa fa-info-circle"></i> <%=l10n("insured.primary_mailing_address_info")%>
+          <% end %>
+        </div>
+      </div>
+
+      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+        <div class="col-xs-12 form-group form-group-lg no-pd">
           <%= address.hidden_field :kind, value: address.object.kind %>
 
           <% required = kind=='home' ? "address_required" : '' %>
 
-          <%= address.text_field :address_1, placeholder: "ADDRESS LINE 1 #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
+          <%= address.text_field :address_1, placeholder: "#{kind.upcase} ADDRESS LINE 1 (NUMBER, STREET, QUADRANT) #{'*' if required.present?}", class: "floatlabel form-control #{required}", required: required.present? %>
         </div>
-        <div class="col-md-6 col-sm-6 col-xs-12 form-group form-group-lg no-pd">
-          <%= address.text_field :address_2, placeholder: "ADDRESS LINE 2", class: "floatlabel form-control" %>
+      </div>
+      <div style="<%= style %>" class="row row-form-wrapper no-buffer address-row <%= div_class %>">
+        <div class="col-xs-12 form-group form-group-lg no-pd">
+          <%= address.text_field :address_2, placeholder: "#{kind.upcase} ADDRESS LINE 2 (APT, UNIT, ETC.)", class: "floatlabel form-control" %>
         </div>
       </div>
 
@@ -78,14 +96,20 @@
       <div style="<%= style %>" class="row no-buffer address-row show <%= div_class %> no-dc-address-reasons">
         <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
           <div class="address_checkbox">
+            <%= f.check_box :is_moving_to_state %>
+            <label for="checkbox"><span><strong><%= l10n('insured.moving_to_dc') %></strong></span> <span><%= l10n('insured.moving_to_dc_extension') %></span></label>
+          </div>
+        </div>
+        <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
+          <div class="address_checkbox">
             <%= f.check_box :is_temporarily_out_of_state %>
-            <label for="checkbox"><span><%= l10n('insured.temp_outside_dc') %></span></label>
+            <label for="checkbox"><span><strong><%= l10n('insured.outside_dc') %></strong></span> <span><%= l10n('insured.outside_dc_extension') %></span></label>
           </div>
         </div>
         <div class="col-md-12 col-sm-12 col-xs-12 form-group form-group-lg no-pd">
           <div class="address_checkbox">
             <%= f.check_box :is_homeless %>
-            <label for="checkbox"><span><%= l10n('insured.homeless_dc') %></span></label>
+            <label for="checkbox"><span><strong><%= l10n('insured.dc_homeless') %></strong></span><span><%= l10n('insured.dc_homeless_extension') %></span></label>
           </div>
         </div>
       </div>

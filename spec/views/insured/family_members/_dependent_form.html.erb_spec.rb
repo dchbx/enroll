@@ -113,11 +113,6 @@ describe "insured/family_members/_dependent_form.html.erb" do
       expect(rendered).not_to match(/Are you a US Citizen or US National/)
     end
 
-    it "should not have dependent-address area" do
-      expect(rendered).not_to have_selector("div#dependent-address")
-      expect(rendered).not_to have_selector("div#dependent-home-address-area")
-    end
-
     it "should have required indicator for fields" do
       ["FIRST NAME", "LAST NAME", "DATE OF BIRTH"].each do |field|
         expect(rendered).to have_selector("input[placeholder='#{field} *']")
@@ -136,8 +131,7 @@ describe "insured/family_members/_dependent_form.html.erb" do
     end
 
     it "should have address info area" do
-      expect(rendered).to have_selector('#address_info')
-      expect(rendered).to match(/Home Address/)
+      expect(rendered).to match(/Home address/)
     end
 
     it "should have age off exclusion field for employee role only" do

@@ -31,6 +31,9 @@ module FinancialAssistance
       # The name of the country where this address is located
       field :country_name, type: String, default: ''
 
+      # The name of the quadrant where this address is located
+      field :quadrant, type: String, default: ""
+
       validates :zip, presence: true
       validates :kind, presence: true
       validates :state, presence: true

@@ -49,7 +49,7 @@ RSpec.describe Transcripts::PersonTranscript, type: :model do
                   "no_dc_address" => false,
                   "addresses" => [{
                     "kind" => "home",
-                    "address_1" => "3312 Gosnell Rd",
+                    "address_1" => "3312 Gosnell Rd ne",
                     "city" => "Vienna",
                     "state" => "VA",
                     "zip" => "22180"

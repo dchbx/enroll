@@ -39,7 +39,7 @@ Given(/^Hbx Admin creates a consumer application$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
   find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
-  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
+  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St NE"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
   fill_in "person_addresses_attributes_0_city", with: "Washington"
   find(:xpath, "//span[@class='label'][contains(., 'SELECT STATE')]", wait: 10).click
@@ -176,7 +176,7 @@ And(/^creates a consumer with SEP$/) do
   find(:xpath, '//label[@for="person_naturalized_citizen_false"]', wait: 10).click
   find(:xpath, '//label[@for="indian_tribe_member_no"]', wait: 10).click
   find(:xpath, '//label[@for="radio_incarcerated_no"]', wait: 10).click
-  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St"
+  fill_in "person_addresses_attributes_0_address_1", with: "123 Main St NE"
   fill_in "person_addresses_attributes_0_address_2", with: "apt 1005"
   # May have to refactor this for the specific state
   fill_in "person_addresses_attributes_0_city", with: "Washington"
