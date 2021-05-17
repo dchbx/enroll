@@ -20,14 +20,21 @@ module Operations
       def validate(id)
         if id&.is_a?(BSON::ObjectId)
           Success(id)
+        elsif id.present?
+          Success(id)
         else
           Failure('family_id is expected in BSON format')
         end
       end
 
       def find_family(family_id)
-        family = Family.find(family_id)
-        Success(family)
+        family =  if id&.is_a?(BSON::ObjectId)
+                    Family.find(family_id)
+                  elsif id.present?
+                    Family.where(hbx_id: family_id).first
+                  end
+
+        family.present? ? Success(family) : Failure("Unable to find Family with ID #{family_id}.")
       rescue StandardError
         Failure("Unable to find Family with ID #{family_id}.")
       end
