@@ -1,5 +1,5 @@
 {
-  "external_app_id": "201868",
+  "hbx_id": "201868",
   "foreign_keys": [],
   "family_members": [
     {
@@ -18,7 +18,7 @@
         },
         "person_demographics": {
           "ssn": "276728793",
-          "no_ssn": "0",
+          "no_ssn": true,
           "gender": "male",
           "dob": "1963-01-01",
           "date_of_death": "2021-05-07",
@@ -36,7 +36,7 @@
         "age_off_excluded": null,
         "is_active": true,
         "is_disabled": false,
-        "person_relationships": "self",
+        "person_relationships": [],
         "consumer_role": {
           "five_year_bar": null,
           "requested_coverage_start_date": "2021-05-07",
@@ -130,7 +130,7 @@
         },
         "person_demographics": {
           "ssn": "276729990",
-          "no_ssn": "0",
+          "no_ssn": true,
           "gender": "female",
           "dob": "1967-01-01",
           "date_of_death": "2021-05-07",
@@ -148,7 +148,7 @@
         "age_off_excluded": null,
         "is_active": true,
         "is_disabled": false,
-        "person_relationships": "spouse",
+        "person_relationships": [],
         "consumer_role": {
           "five_year_bar": null,
           "requested_coverage_start_date": "2021-05-07",
@@ -242,7 +242,7 @@
         },
         "person_demographics": {
           "ssn": "276740252",
-          "no_ssn": "0",
+          "no_ssn": true,
           "gender": "male",
           "dob": "2008-01-01",
           "date_of_death": "2021-05-07",
@@ -260,7 +260,7 @@
         "age_off_excluded": null,
         "is_active": true,
         "is_disabled": false,
-        "person_relationships": "child",
+        "person_relationships": [],
         "consumer_role": {
           "five_year_bar": null,
           "requested_coverage_start_date": "2021-05-07",
