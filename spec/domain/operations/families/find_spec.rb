@@ -21,7 +21,7 @@ RSpec.describe ::Operations::Families::Find, dbclean: :after_each do
       it 'should return failure' do
         result = subject.call(id: '464523234')
         expect(result).to be_a(Dry::Monads::Result::Failure)
-        expect(result.failure).to eq "family_id is expected in BSON format"
+        expect(result.failure).to eq "Unable to find Family with ID 464523234."
       end
     end
   end

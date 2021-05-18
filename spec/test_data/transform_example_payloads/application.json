@@ -1,0 +1,1035 @@
+{
+	"applications": {
+		"201868": {
+            "resultType": "SUCCESS",
+            "links": {
+                "rel": "self",
+                "href": "/applications/201868/versions/1"
+            },
+            "result": {
+                "coverageYear": 2019,
+                "insuranceApplicationIdentifier": 201868,
+                "applicationVersionNumber": 1,
+                "lastModifiedDateTime": "2019-06-28T00:39:59+00:00",
+                "lastModifiedUserId": "DE_Partner:04.PQR.AZ*.006.006, Application:201868",
+                "deletedIndicator": false,
+                "currentVersionIndicator": true,
+                "versionDateTime": "2019-03-07T16:08:53+00:00",
+                "applicationStatus": "SUBMITTED",
+                "comments": "Create New Version",
+                "creatingSystemId": "EDE",
+                "creatingSystemRole": "DIRECT_ENROLLMENT",
+                "applicationSubmissionDateTime": "2019-03-07T16:08:51+00:00",
+                "creationOriginType": "DIRECT_ENROLLMENT",
+                "applicationCreationDateTime": "2019-03-07T16:08:48+00:00",
+                "insuranceApplicationType": "EDE",
+                "submissionOriginType": "DIRECT_ENROLLMENT",
+                "lastConsumerSubmissionDateTime": "2019-03-07T16:08:51+00:00",
+                "creatingDePartner": "04.PQR.AZ*.006.006",
+                "submittingDePartner": "04.PQR.AZ*.006.006",
+                "lastUpdateMetadata": {
+                    "sourceSystemName": "DSH",
+                    "roleId": "CONSUMER_DE",
+                    "useCase": "INITIAL_APP",
+                    "userId": "AB_TEST_05",
+                    "partnerId": "04.PQR.AZ*.006.006"
+                },
+               "attestations": { 
+                    "application": {
+                        "comments": "Create New Version",
+                        "legalAttestations": {
+                            "absentParentAgreementIndicator": true,
+                            "changeInformationAgreementIndicator": true,
+                            "medicaidRequirementAgreementIndicator": true,
+                            "renewEligibilityYearQuantity": 5,
+                            "nonIncarcerationAgreementIndicator": true,
+                            "penaltyOfPerjuryAgreementIndicator": true,
+                            "renewalAgreementIndicator": true,
+                            "terminateCoverageOtherMecFoundAgreementIndicator": true
+                        },
+                        "applicationSignatures": [
+                            {
+                                "applicationSignatureText": "Fatheroevwg pqlvb",
+                                "applicationSignatureType": "APPLICANT",
+                                "applicationSignatureDate": "2019-03-07"
+                            }
+                        ],
+                        "applicationAssistors": [
+                            {
+                                "applicationAssistorType": "NO_ASSISTANCE",
+                                "creationDateTime": "2019-03-07T16:08:49+00:00"
+                            }
+                        ],
+                        "requestingFinancialAssistanceIndicator": true,
+                        "contactMemberIdentifier": "1437478148886635679",
+                        "contactMethod": [
+                            "EMAIL"
+                        ],
+                        "contactInformation": {
+                            "email": "gzowcedrig@yopmail.com",
+                            "primaryPhoneNumber": {
+                                "number": "2025547416",
+                                "ext": "1",
+                                "type": "HOME"
+                            }
+                        },
+                        "spokenLanguageType": "VIETNAMESE",
+                        "writtenLanguageType": "GERMAN",
+                        "coverageState": "NV"
+                    },
+                    "household": {
+                        "familyRelationships": [
+                            [
+                                "1437478148886635679",
+                                "SELF",
+                                "1437478148886635679",
+                                {
+                                    "resideTogetherIndicator": true,
+                                    "caretakerRelativeIndicator": true
+                                }
+                            ],
+                            [
+                                "1437478148886635679",
+                                "SPOUSE",
+                                "1437478148886635680",
+                                {
+                                    "resideTogetherIndicator": true,
+                                    "caretakerRelativeIndicator": true
+                                }
+                            ],
+                            [
+                                "1437478148886635679",
+                                "PARENT",
+                                "1437478148886635681",
+                                {
+                                    "resideTogetherIndicator": true,
+                                    "caretakerRelativeIndicator": true
+                                }
+                            ],
+                            [
+                                "1437478148886635680",
+                                "PARENT",
+                                "1437478148886635681",
+                                {
+                                    "resideTogetherIndicator": true,
+                                    "caretakerRelativeIndicator": true
+                                }
+                            ]
+                        ],
+                        "taxRelationships": [
+                            [
+                                "1437478148886635679",
+                                "TAX_FILER",
+                                "1437478148886635679"
+                            ],
+                            [
+                                "1437478148886635680",
+                                "TAX_FILER",
+                                "1437478148886635681"
+                            ],
+                            [
+                                "1437478148886635680",
+                                "TAX_FILER",
+                                "1437478148886635680"
+                            ],
+                            [
+                                "1437478148886635679",
+                                "TAX_FILER",
+                                "1437478148886635681"
+                            ]
+                        ]
+                    },
+                    "members": {
+                        "1437478148886635679": {
+                            "requestingCoverageIndicator": true,
+                            "demographic": {
+                                "ssn": "276728793",
+                                "birthDate": "1963-01-01",
+                                "name": {
+                                    "firstName": "Fatheroevwg",
+                                    "lastName": "pqlvb"
+                                },
+                                "ethnicity": [
+                                    "NOT_HISPANIC"
+                                ],
+                                "race": [
+                                    "WHITE"
+                                ],
+                                "sex": "MALE",
+                                "maritalStatus": "MARRIED",
+                                "noHomeAddressIndicator": false,
+                                "liveOutsideStateTemporarilyIndicator": false,
+                                "americanIndianAlaskanNativeIndicator": false,
+                                "mailingAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Harrington",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                },
+                                "homeAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Harrington",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                }
+                            },
+                            "income": {
+                                "annualTaxIncome": {
+                                    "incomeAmount": 26550.08,
+                                    "unknownIncomeIndicator": false,
+                                    "variableIncomeIndicator": false
+                                },
+                                "currentIncome": {
+                                    "currentIncome4": {
+                                        "sequenceNumber": 4,
+                                        "incomeAmount": -197.77,
+                                        "incomeSourceType": "ALIMONY_PAYMENT",
+                                        "incomeFrequencyType": "MONTHLY"
+                                    },
+                                    "currentIncome3": {
+                                        "sequenceNumber": 3,
+                                        "incomeAmount": 99.37,
+                                        "incomeSourceType": "JOB",
+                                        "incomeFrequencyType": "WEEKLY",
+                                        "jobIncome": {
+                                            "employerName": "ABCD Inc.1"
+                                        }
+                                    },
+                                    "currentIncome2": {
+                                        "sequenceNumber": 2,
+                                        "incomeAmount": 5159.17,
+                                        "incomeSourceType": "JOB",
+                                        "incomeFrequencyType": "ANNUALLY",
+                                        "jobIncome": {
+                                            "employerName": "ABCD Inc.1"
+                                        }
+                                    },
+                                    "currentIncome1": {
+                                        "sequenceNumber": 1,
+                                        "incomeAmount": 18600.88,
+                                        "incomeSourceType": "JOB",
+                                        "incomeFrequencyType": "ANNUALLY",
+                                        "jobIncome": {
+                                            "employerName": "ABCD Inc.1"
+                                        }
+                                    }
+                                }
+                            },
+                            "family": {
+                                "taxDependentIndicator": false,
+                                "taxFilerIndicator": true,
+                                "taxReturnFilingStatusType": "MARRIED_FILING_JOINTLY",
+                                "claimsDependentIndicator": true,
+                                "claimingTaxFilerNotOnApplicationIndicator": false,
+                                "livesWithCustodialParentNotOnApplicationIndicator": false,
+                                "fosterCareIndicator": false,
+                                "taxFilerNotProvidedIndicator": false,
+                                "parentCaretakerIndicator": true,
+                                "fullTimeStatusIndicator": false,
+                                "studentsParentLivingInExchangeStateIndicator": false,
+                                "parentLivesInStudentStateIndicator": false,
+                                "absentParentIndicator": false,
+                                "resideWithBothParentIndicator": true,
+                                "liveWithParentOrSiblingIndicator": false
+                            },
+                            "lawfulPresence": {
+                                "noAlienNumberIndicator": false,
+                                "citizenshipIndicator": true,
+                                "naturalizedCitizenIndicator": false
+                            },
+                            "insuranceCoverage": {
+                                "enrolledCoverages": [
+                                    {
+                                        "insuranceMarketType": "NONE"
+                                    }
+                                ],
+                                "employerSponsoredCoverageOffers": {
+                                    "escOffer1": {
+                                        "cobraAvailableIndicator": false,
+                                        "doNotKnowLcsopPremiumIndicator": false,
+                                        "lcsopPremium": 500.0,
+                                        "lcsopPremiumFrequencyType": "MONTHLY",
+                                        "employerOffersMinValuePlan": "YES",
+                                        "planToEnrollEscIndicator": false,
+                                        "employer": {
+                                            "name": "ncrbt",
+                                            "employerPhoneNumber": "1234123412"
+                                        },
+                                        "employerWillChangeLcsopPremiumIndicator": false,
+                                        "employerWillNoLongerOfferLcsopIndicator": false,
+                                        "employeeStatus": "WORKING",
+                                        "escEnrolledIndicator": false,
+                                        "newEmployeeLcsopPremiumAmount": 0.0,
+                                        "retireePlanCoverageIndicator": false,
+                                        "waitingPeriodIndicator": false,
+                                        "primaryInsuredMemberIdentifier": "1437478148886635679"
+                                    }
+                                },
+                                "offeredEmployeeCoverage": "NO"
+                            },
+                            "medicaid": {
+                                "medicaidDeniedDueToImmigrationIndicator": false,
+                                "medicaidDeniedIndicator": false,
+                                "enrolledInHealthCoverageIndicator": false
+                            },
+                            "chip": {
+                                "coverageEndedIndicator": false,
+                                "stateHealthBenefitIndicator": false
+                            },
+                            "nonMagi": {
+                                "blindOrDisabledIndicator": false,
+                                "longTermCareIndicator": false
+                            },
+                            "other": {
+                                "changeInCircumstance": {
+                                    "GAINING_LAWFUL_PRESENCE": {
+                                        "changeDate": "2019-02-15",
+                                        "changeRequestDateTime": "2019-03-07T16:08:49+00:00",
+                                        "changeType": "GAINING_LAWFUL_PRESENCE"
+                                    }
+                                },
+                                "incarcerationType": "NOT_INCARCERATED",
+                                "reconcilePtcIndicatorType": "NOT_APPLICABLE"
+                            }
+                        },
+                        "1437478148886635680": {
+                            "requestingCoverageIndicator": true,
+                            "demographic": {
+                                "ssn": "276729990",
+                                "birthDate": "1967-01-01",
+                                "name": {
+                                    "firstName": "Spouserfmkj",
+                                    "lastName": "pqlvb"
+                                },
+                                "sex": "FEMALE",
+                                "maritalStatus": "MARRIED",
+                                "noHomeAddressIndicator": false,
+                                "liveOutsideStateTemporarilyIndicator": false,
+                                "americanIndianAlaskanNativeIndicator": false,
+                                "mailingAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Concord",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                },
+                                "homeAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Concord",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                }
+                            },
+                            "income": {
+                                "annualTaxIncome": {
+                                    "incomeAmount": 26546.0,
+                                    "unknownIncomeIndicator": false,
+                                    "variableIncomeIndicator": false
+                                },
+                                "currentIncome": {
+                                    "currentIncome1": {
+                                        "sequenceNumber": 1,
+                                        "incomeAmount": 26546.0,
+                                        "incomeSourceType": "JOB",
+                                        "incomeFrequencyType": "ANNUALLY",
+                                        "jobIncome": {
+                                            "employerName": "ABCD Inc.1"
+                                        }
+                                    }
+                                }
+                            },
+                            "family": {
+                                "taxDependentIndicator": false,
+                                "taxFilerIndicator": true,
+                                "taxReturnFilingStatusType": "MARRIED_FILING_JOINTLY",
+                                "claimsDependentIndicator": true,
+                                "claimingTaxFilerNotOnApplicationIndicator": false,
+                                "livesWithCustodialParentNotOnApplicationIndicator": false,
+                                "fosterCareIndicator": false,
+                                "taxFilerNotProvidedIndicator": false,
+                                "parentCaretakerIndicator": true,
+                                "pregnancyIndicator": false,
+                                "fullTimeStatusIndicator": false,
+                                "studentsParentLivingInExchangeStateIndicator": false,
+                                "parentLivesInStudentStateIndicator": false,
+                                "absentParentIndicator": false,
+                                "resideWithBothParentIndicator": true,
+                                "liveWithParentOrSiblingIndicator": false
+                            },
+                            "lawfulPresence": {
+                                "noAlienNumberIndicator": false,
+                                "citizenshipIndicator": true,
+                                "naturalizedCitizenIndicator": false
+                            },
+                            "insuranceCoverage": {
+                                "enrolledCoverages": [
+                                    {
+                                        "insuranceMarketType": "TRICARE",
+                                        "insurancePolicyMemberId": "12345678",
+                                        "insurancePolicyNumber": "111111111",
+                                        "insurancePlanName": "McLaren Bronze"
+                                    }
+                                ],
+                                "employerSponsoredCoverageOffers": {
+                                    "escOffer1": {
+                                        "cobraAvailableIndicator": false,
+                                        "doNotKnowLcsopPremiumIndicator": false,
+                                        "lcsopPremium": 500.0,
+                                        "lcsopPremiumFrequencyType": "MONTHLY",
+                                        "employerOffersMinValuePlan": "YES",
+                                        "planToEnrollEscIndicator": false,
+                                        "employer": {
+                                            "name": "ilpjr",
+                                            "employerPhoneNumber": "1234123412"
+                                        },
+                                        "employerWillChangeLcsopPremiumIndicator": false,
+                                        "employerWillNoLongerOfferLcsopIndicator": false,
+                                        "employeeStatus": "WORKING",
+                                        "escEnrolledIndicator": false,
+                                        "newEmployeeLcsopPremiumAmount": 0.0,
+                                        "retireePlanCoverageIndicator": false,
+                                        "waitingPeriodIndicator": false,
+                                        "primaryInsuredMemberIdentifier": "1437478148886635680"
+                                    }
+                                },
+                                "offeredEmployeeCoverage": "NO"
+                            },
+                            "medicaid": {
+                                "medicaidDeniedDueToImmigrationIndicator": false,
+                                "medicaidDeniedIndicator": false,
+                                "enrolledInHealthCoverageIndicator": true,
+                                "insuranceCoverage": [
+                                    {
+                                        "insuranceMarketType": "TRICARE",
+                                        "insurancePolicyMemberId": "12345678",
+                                        "insurancePolicyNumber": "111111111",
+                                        "insurancePlanName": "McLaren Bronze"
+                                    }
+                                ]
+                            },
+                            "chip": {
+                                "coverageEndedIndicator": false,
+                                "stateHealthBenefitIndicator": false
+                            },
+                            "nonMagi": {
+                                "blindOrDisabledIndicator": false,
+                                "longTermCareIndicator": false
+                            },
+                            "other": {
+                                "incarcerationType": "NOT_INCARCERATED",
+                                "reconcilePtcIndicatorType": "NOT_APPLICABLE"
+                            }
+                        },
+                        "1437478148886635681": {
+                            "requestingCoverageIndicator": true,
+                            "demographic": {
+                                "ssn": "276740252",
+                                "birthDate": "2008-01-01",
+                                "name": {
+                                    "firstName": "Sonolsub",
+                                    "lastName": "pqlvb"
+                                },
+                                "sex": "MALE",
+                                "maritalStatus": "UNMARRIED",
+                                "noHomeAddressIndicator": false,
+                                "liveOutsideStateTemporarilyIndicator": false,
+                                "americanIndianAlaskanNativeIndicator": false,
+                                "mailingAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Concord",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                },
+                                "homeAddress": {
+                                    "streetName1": "1227 jkdyfdcrej",
+                                    "cityName": "Concord",
+                                    "stateCode": "NV",
+                                    "zipCode": "89316",
+                                    "countyName": "Eureka",
+                                    "countyFipsCode": "32011"
+                                }
+                            },
+                            "income": {
+                                "annualTaxIncome": {
+                                    "incomeAmount": 0.0,
+                                    "unknownIncomeIndicator": false,
+                                    "variableIncomeIndicator": false
+                                }
+                            },
+                            "family": {
+                                "taxDependentIndicator": true,
+                                "taxFilerIndicator": false,
+                                "taxReturnFilingStatusType": "NOT_SPECIFIED",
+                                "claimsDependentIndicator": false,
+                                "claimingTaxFilerNotOnApplicationIndicator": false,
+                                "livesWithCustodialParentNotOnApplicationIndicator": false,
+                                "fosterCareIndicator": false,
+                                "taxFilerNotProvidedIndicator": false,
+                                "parentCaretakerIndicator": false,
+                                "fullTimeStatusIndicator": false,
+                                "studentsParentLivingInExchangeStateIndicator": false,
+                                "parentLivesInStudentStateIndicator": false,
+                                "absentParentIndicator": false,
+                                "resideWithBothParentIndicator": true,
+                                "liveWithParentOrSiblingIndicator": false
+                            },
+                            "lawfulPresence": {
+                                "noAlienNumberIndicator": false,
+                                "citizenshipIndicator": true,
+                                "naturalizedCitizenIndicator": false
+                            },
+                            "insuranceCoverage": {
+                                "enrolledCoverages": [
+                                    {
+                                        "insuranceMarketType": "NONE"
+                                    }
+                                ],
+                                "employerSponsoredCoverageOffers": {
+                                    "escOffer1": {
+                                        "cobraAvailableIndicator": false,
+                                        "doNotKnowLcsopPremiumIndicator": false,
+                                        "lcsopPremium": 500.0,
+                                        "lcsopPremiumFrequencyType": "MONTHLY",
+                                        "employerOffersMinValuePlan": "YES",
+                                        "planToEnrollEscIndicator": false,
+                                        "employer": {
+                                            "name": "egvvw",
+                                            "employerPhoneNumber": "1234123412"
+                                        },
+                                        "employerWillChangeLcsopPremiumIndicator": false,
+                                        "employerWillNoLongerOfferLcsopIndicator": false,
+                                        "employeeStatus": "WORKING",
+                                        "escEnrolledIndicator": false,
+                                        "newEmployeeLcsopPremiumAmount": 0.0,
+                                        "retireePlanCoverageIndicator": false,
+                                        "waitingPeriodIndicator": false,
+                                        "primaryInsuredMemberIdentifier": "1437478148886635681"
+                                    }
+                                },
+                                "offeredEmployeeCoverage": "NO"
+                            },
+                            "medicaid": {
+                                "medicaidDeniedDueToImmigrationIndicator": false,
+                                "medicaidDeniedIndicator": false,
+                                "enrolledInHealthCoverageIndicator": false
+                            },
+                            "chip": {
+                                "coverageEndedIndicator": false,
+                                "stateHealthBenefitIndicator": false
+                            },
+                            "nonMagi": {
+                                "blindOrDisabledIndicator": false,
+                                "longTermCareIndicator": false
+                            },
+                            "other": {
+                                "incarcerationType": "NOT_INCARCERATED",
+                                "reconcilePtcIndicatorType": "NOT_APPLICABLE"
+                            }
+                        }
+                    }
+                },
+                "computed": {
+                    "members": {
+                        "1437478148886635679": {
+                            "personTrackingNumber": "1437548400634897549",
+                            "indianStatus": "NO",
+                            "indianStatusReason": "178_ATSTD_NOT_INDIAN",
+                            "nonEscMecStatus": "NO",
+                            "nonEscMecStatusReason": "999_N_A",
+                            "qhpStatus": "YES",
+                            "qhpStatusReason": "999_N_A",
+                            "ssnStatus": "YES",
+                            "ssnStatusReason": "999_N_A",
+                            "medicaidLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "medicaidLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "under100FplWithLawfulPresenceDmiIndicator": false,
+                            "aptcStatus": "YES",
+                            "aptcStatusReason": "999_N_A",
+                            "secretaryHardshipExemptionIndicator": false,
+                            "citizenshipStatus": "YES",
+                            "citizenshipStatusReason": "999_N_A",
+                            "citizenshipDataEventStatus": "HUB_CALL_COMPLETED",
+                            "citizenshipDataFoundIndicator": true,
+                            "preliminaryMedicaidStatus": "NO",
+                            "preliminaryMedicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "preliminaryChipStatus": "NO",
+                            "preliminaryChipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "preliminaryAptcStatus": "YES",
+                            "preliminaryAptcStatusReason": "999_N_A",
+                            "preliminaryEmergencyMedicaidStatus": "NO",
+                            "preliminaryEmergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "dependentChildCoveredStatus": "NOT_APPLICABLE",
+                            "dependentChildCoveredStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipStateHealthBenefitStatus": "NOT_APPLICABLE",
+                            "chipStateHealthBenefitStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipWaitingPeriodStatus": "NOT_APPLICABLE",
+                            "chipWaitingPeriodStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "emergencyMedicaidStatus": "NO",
+                            "emergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "unbornChildChipStatus": "NOT_APPLICABLE",
+                            "unbornChildChipStatusReason": "555_N_A_RULE_DOES_NOT_APPLY",
+                            "qhpLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "qhpLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "csrStatus": "NO",
+                            "csrStatusReason": "419_GREATER_THAN_250FPL_AND_NOT_INDIAN",
+                            "csrVariant": "NOT_APPLICABLE",
+                            "medicaidStatus": "NO",
+                            "medicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "chipStatus": "NO",
+                            "chipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "medicaidChipStandard": {
+                                "medicaidStandardPercent": 133,
+                                "medicaidStandardBasisType": "ADULT_GROUP_CATEGORY",
+                                "chipStandardPercent": 0,
+                                "adultGroupCategoryStatus": "YES",
+                                "childCaretakerDeprivedStatus": "NOT_APPLICABLE",
+                                "parentCaretakerCategoryStatus": "YES",
+                                "parentCaretakerChildList": [
+                                    "1437478148886635680",
+                                    "1437478148886635681"
+                                ]
+                            },
+                            "escMecStatus": "NO",
+                            "escMecStatusReason": "999_N_A",
+                            "incarcerationStatus": "NO",
+                            "incarcerationStatusReason": "100_ONLY_SSA_DATA_AVAILABLE_BUT_NOT_COMPATIBLE",
+                            "income": {
+                                "medicaidIncomeStatus": "NO",
+                                "chipIncomeStatus": "NO",
+                                "medicaidChipIncomeStatusReason": "533_ATSTD_ABOVE_MDCAID_STANDARD_CHIP_STANDARD_IS_0_INELGBLE_FOR_MDCAID_CHIP",
+                                "attestedMonthlyIndividualIncomeAmt": 2212.51,
+                                "disregardAdjustAttestedMonthlyMedicaidHouseholdIncomePercent": 250.52,
+                                "adjustAttestedMonthlyMedicaidHouseholdIncomeAmount": 4424.68,
+                                "adjustAttestedAnnualMedicaidHouseholdIncomeAmount": 53096.08,
+                                "attestedAnnualizedAptcIndividualIncomeAmt": 26550.08,
+                                "irsDataStatus": "HUB_CALL_COMPLETED",
+                                "irsDataStatusReason": "999"
+                            },
+                            "medicaidHouseholdComposition": {
+                                "medicaidTaxRoleType": "JOINT_TAX_FILER",
+                                "medicaidHouseHoldStatus": "YES",
+                                "medicaidHouseHoldStatusReason": "999",
+                                "medicaidHouseholdSize": 3,
+                                "medicaidHouseholdMemberIdentifiers": [
+                                    "1437478148886635679",
+                                    "1437478148886635680",
+                                    "1437478148886635681"
+                                ]
+                            },
+                            "medicaidNonMagiReferralStatus": "NO",
+                            "medicaidNonMagiReferralStatusReason": "108_NOT_MEET_REQUIREMENTS_FOR_NON_MAGI_REFERRAL",
+                            "qhpResidency": {
+                                "qhpResidencyStatus": "YES",
+                                "qhpResidencyStatusReason": "999_N_A",
+                                "taxHouseholdResidencyAppliesIndicator": false
+                            },
+                            "medicaidResidencyStatus": "YES",
+                            "medicaidResidencyStatusReason": "999_N_A",
+                            "eligibleSEP": [
+                                {
+                                    "status": "YES",
+                                    "statusReason": "999_N_A",
+                                    "startDate": "2019-02-15",
+                                    "endDate": "2019-04-16",
+                                    "sepType": "LAWFUL_PRESENCE_SEP"
+                                }
+                            ],
+                            "fiveYearBarStatus": "NOT_APPLICABLE",
+                            "fiveYearBarStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "residencyAddress": {
+                                "residencyAddressSourceType": "HOME",
+                                "streetName1": "1227 jkdyfdcrej",
+                                "cityName": "Harrington",
+                                "stateCode": "NV",
+                                "zipCode": "89316",
+                                "countyName": "Eureka",
+                                "countyFipsCode": "32011"
+                            }
+                        },
+                        "1437478148886635680": {
+                            "personTrackingNumber": "1437548400634897550",
+                            "indianStatus": "NO",
+                            "indianStatusReason": "178_ATSTD_NOT_INDIAN",
+                            "nonEscMecStatus": "YES",
+                            "nonEscMecStatusReason": "571_STATUS_SET_BASED_ON_NONESC_MEC_ATTESTATION",
+                            "qhpStatus": "YES",
+                            "qhpStatusReason": "999_N_A",
+                            "ssnStatus": "YES",
+                            "ssnStatusReason": "999_N_A",
+                            "medicaidLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "medicaidLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "under100FplWithLawfulPresenceDmiIndicator": false,
+                            "aptcStatus": "NO",
+                            "aptcStatusReason": "414_NOT_APTC_ELGBLE_ENROLLED_OR_OFFER_FROM_OTHER_MEC",
+                            "secretaryHardshipExemptionIndicator": false,
+                            "citizenshipStatus": "YES",
+                            "citizenshipStatusReason": "999_N_A",
+                            "citizenshipDataEventStatus": "HUB_CALL_COMPLETED",
+                            "citizenshipDataFoundIndicator": true,
+                            "preliminaryMedicaidStatus": "NO",
+                            "preliminaryMedicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "preliminaryChipStatus": "NO",
+                            "preliminaryChipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "preliminaryAptcStatus": "YES",
+                            "preliminaryAptcStatusReason": "999_N_A",
+                            "preliminaryEmergencyMedicaidStatus": "NO",
+                            "preliminaryEmergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "dependentChildCoveredStatus": "NOT_APPLICABLE",
+                            "dependentChildCoveredStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipStateHealthBenefitStatus": "NOT_APPLICABLE",
+                            "chipStateHealthBenefitStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipWaitingPeriodStatus": "NOT_APPLICABLE",
+                            "chipWaitingPeriodStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "emergencyMedicaidStatus": "NO",
+                            "emergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "unbornChildChipStatus": "NOT_APPLICABLE",
+                            "unbornChildChipStatusReason": "555_N_A_RULE_DOES_NOT_APPLY",
+                            "qhpLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "qhpLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "csrStatus": "NO",
+                            "csrStatusReason": "176_APTC_INELGBL_AND_NOT_INDIAN",
+                            "csrVariant": "NOT_APPLICABLE",
+                            "medicaidStatus": "NO",
+                            "medicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "chipStatus": "NO",
+                            "chipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "medicaidChipStandard": {
+                                "medicaidStandardPercent": 133,
+                                "medicaidStandardBasisType": "ADULT_GROUP_CATEGORY",
+                                "chipStandardPercent": 0,
+                                "adultGroupCategoryStatus": "YES",
+                                "childCaretakerDeprivedStatus": "NOT_APPLICABLE",
+                                "parentCaretakerCategoryStatus": "YES",
+                                "parentCaretakerChildList": [
+                                    "1437478148886635681"
+                                ]
+                            },
+                            "escMecStatus": "NO",
+                            "escMecStatusReason": "999_N_A",
+                            "incarcerationStatus": "NO",
+                            "incarcerationStatusReason": "100_ONLY_SSA_DATA_AVAILABLE_BUT_NOT_COMPATIBLE",
+                            "income": {
+                                "medicaidIncomeStatus": "NO",
+                                "chipIncomeStatus": "NO",
+                                "medicaidChipIncomeStatusReason": "533_ATSTD_ABOVE_MDCAID_STANDARD_CHIP_STANDARD_IS_0_INELGBLE_FOR_MDCAID_CHIP",
+                                "attestedMonthlyIndividualIncomeAmt": 2212.17,
+                                "disregardAdjustAttestedMonthlyMedicaidHouseholdIncomePercent": 250.52,
+                                "adjustAttestedMonthlyMedicaidHouseholdIncomeAmount": 4424.68,
+                                "adjustAttestedAnnualMedicaidHouseholdIncomeAmount": 53096.08,
+                                "attestedAnnualizedAptcIndividualIncomeAmt": 26546.0,
+                                "irsDataStatus": "HUB_CALL_COMPLETED",
+                                "irsDataStatusReason": "999"
+                            },
+                            "medicaidHouseholdComposition": {
+                                "medicaidTaxRoleType": "JOINT_TAX_FILER",
+                                "medicaidHouseHoldStatus": "YES",
+                                "medicaidHouseHoldStatusReason": "999",
+                                "medicaidHouseholdSize": 3,
+                                "medicaidHouseholdMemberIdentifiers": [
+                                    "1437478148886635679",
+                                    "1437478148886635680",
+                                    "1437478148886635681"
+                                ]
+                            },
+                            "medicaidNonMagiReferralStatus": "NO",
+                            "medicaidNonMagiReferralStatusReason": "108_NOT_MEET_REQUIREMENTS_FOR_NON_MAGI_REFERRAL",
+                            "qhpResidency": {
+                                "qhpResidencyStatus": "YES",
+                                "qhpResidencyStatusReason": "999_N_A",
+                                "taxHouseholdResidencyAppliesIndicator": false
+                            },
+                            "medicaidResidencyStatus": "YES",
+                            "medicaidResidencyStatusReason": "999_N_A",
+                            "fiveYearBarStatus": "NOT_APPLICABLE",
+                            "fiveYearBarStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "residencyAddress": {
+                                "residencyAddressSourceType": "HOME",
+                                "streetName1": "1227 jkdyfdcrej",
+                                "cityName": "Concord",
+                                "stateCode": "NV",
+                                "zipCode": "89316",
+                                "countyName": "Eureka",
+                                "countyFipsCode": "32011"
+                            }
+                        },
+                        "1437478148886635681": {
+                            "personTrackingNumber": "1437548400634897551",
+                            "indianStatus": "NO",
+                            "indianStatusReason": "178_ATSTD_NOT_INDIAN",
+                            "nonEscMecStatus": "NO",
+                            "nonEscMecStatusReason": "999_N_A",
+                            "qhpStatus": "YES",
+                            "qhpStatusReason": "999_N_A",
+                            "ssnStatus": "YES",
+                            "ssnStatusReason": "999_N_A",
+                            "medicaidLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "medicaidLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "under100FplWithLawfulPresenceDmiIndicator": false,
+                            "aptcStatus": "YES",
+                            "aptcStatusReason": "999_N_A",
+                            "secretaryHardshipExemptionIndicator": false,
+                            "citizenshipStatus": "YES",
+                            "citizenshipStatusReason": "999_N_A",
+                            "citizenshipDataEventStatus": "HUB_CALL_COMPLETED",
+                            "citizenshipDataFoundIndicator": true,
+                            "preliminaryMedicaidStatus": "NO",
+                            "preliminaryMedicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "preliminaryChipStatus": "NO",
+                            "preliminaryChipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "preliminaryAptcStatus": "YES",
+                            "preliminaryAptcStatusReason": "999_N_A",
+                            "preliminaryEmergencyMedicaidStatus": "NO",
+                            "preliminaryEmergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "dependentChildCoveredStatus": "NOT_APPLICABLE",
+                            "dependentChildCoveredStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipStateHealthBenefitStatus": "NOT_APPLICABLE",
+                            "chipStateHealthBenefitStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "chipWaitingPeriodStatus": "NOT_APPLICABLE",
+                            "chipWaitingPeriodStatusReason": "652_NOT_PRELIM_MEDICAID_OR_PRELIM_CHIP_ELIGIBLE",
+                            "emergencyMedicaidStatus": "NO",
+                            "emergencyMedicaidStatusReason": "109_NOT_MEET_REQUIREMENTS_FOR_EMERGENCY_MDCAID",
+                            "unbornChildChipStatus": "NOT_APPLICABLE",
+                            "unbornChildChipStatusReason": "555_N_A_RULE_DOES_NOT_APPLY",
+                            "qhpLawfulPresenceStatus": "NOT_APPLICABLE",
+                            "qhpLawfulPresenceStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "csrStatus": "NO",
+                            "csrStatusReason": "419_GREATER_THAN_250FPL_AND_NOT_INDIAN",
+                            "csrVariant": "NOT_APPLICABLE",
+                            "medicaidStatus": "NO",
+                            "medicaidStatusReason": "106_NOT_ALL_MDCAID_ELGBLT_CRITERIA_MET",
+                            "chipStatus": "NO",
+                            "chipStatusReason": "107_NOT_CHIP_ELGBL",
+                            "medicaidChipStandard": {
+                                "medicaidStandardPercent": 133,
+                                "medicaidStandardBasisType": "CHILD_CATEGORY",
+                                "chipStandardPercent": 200,
+                                "chipStandardBasisType": "OPTNL_TARGETED_LOW_INCOME_CHILD_CATEGORY",
+                                "adultGroupCategoryStatus": "NO",
+                                "childCaretakerDeprivedStatus": "NOT_APPLICABLE",
+                                "parentCaretakerCategoryStatus": "NO",
+                                "parentCaretakerChildList": [
+                                    "1437478148886635679",
+                                    "1437478148886635680"
+                                ]
+                            },
+                            "escMecStatus": "NO",
+                            "escMecStatusReason": "999_N_A",
+                            "incarcerationStatus": "NO",
+                            "incarcerationStatusReason": "100_ONLY_SSA_DATA_AVAILABLE_BUT_NOT_COMPATIBLE",
+                            "income": {
+                                "medicaidIncomeStatus": "NO",
+                                "chipIncomeStatus": "NO",
+                                "medicaidChipIncomeStatusReason": "408_ATSTD_ABOVE_MDCAID_CHIP_STANDARD",
+                                "attestedMonthlyIndividualIncomeAmt": 0.0,
+                                "disregardAdjustAttestedMonthlyMedicaidHouseholdIncomePercent": 250.52,
+                                "adjustAttestedMonthlyMedicaidHouseholdIncomeAmount": 4424.68,
+                                "adjustAttestedAnnualMedicaidHouseholdIncomeAmount": 53096.08,
+                                "attestedAnnualizedAptcIndividualIncomeAmt": 0.0,
+                                "irsDataStatus": "HUB_CALL_COMPLETED",
+                                "irsDataStatusReason": "999"
+                            },
+                            "medicaidHouseholdComposition": {
+                                "medicaidTaxRoleType": "DEPENDENT_ON_PARENT",
+                                "medicaidHouseHoldStatus": "YES",
+                                "medicaidHouseHoldStatusReason": "999",
+                                "medicaidHouseholdSize": 3,
+                                "medicaidHouseholdMemberIdentifiers": [
+                                    "1437478148886635679",
+                                    "1437478148886635680",
+                                    "1437478148886635681"
+                                ]
+                            },
+                            "medicaidNonMagiReferralStatus": "NO",
+                            "medicaidNonMagiReferralStatusReason": "108_NOT_MEET_REQUIREMENTS_FOR_NON_MAGI_REFERRAL",
+                            "qhpResidency": {
+                                "qhpResidencyStatus": "YES",
+                                "qhpResidencyStatusReason": "999_N_A",
+                                "taxHouseholdResidencyAppliesIndicator": false
+                            },
+                            "medicaidResidencyStatus": "YES",
+                            "medicaidResidencyStatusReason": "999_N_A",
+                            "fiveYearBarStatus": "NOT_APPLICABLE",
+                            "fiveYearBarStatusReason": "569_APPLICANT_ATSTD_CITIZEN",
+                            "residencyAddress": {
+                                "residencyAddressSourceType": "HOME",
+                                "streetName1": "1227 jkdyfdcrej",
+                                "cityName": "Concord",
+                                "stateCode": "NV",
+                                "zipCode": "89316",
+                                "countyName": "Eureka",
+                                "countyFipsCode": "32011"
+                            }
+                        }
+                    },
+                    "application": {
+                        "bestSEP": {
+                            "status": "YES",
+                            "statusReason": "999_N_A",
+                            "startDate": "2019-02-15",
+                            "endDate": "2019-04-16",
+                            "sepType": "LAWFUL_PRESENCE_SEP",
+                            "associatedMemberIdentifiers": [
+                                "1437478148886635679"
+                            ]
+                        },
+                        "finalQhpEffectiveStartDate": "2019-04-01",
+                        "finalQhpEffectiveEndDate": "2019-12-31",
+                        "multiTaxHouseholdIndicator": false
+                    },
+                    "taxHouseholds": {
+                        "1437478148886635679": {
+                            "annualIncome": {
+                                "attestedAnnualTaxHouseholdIncomeAmount": 53096.08,
+                                "attestedAnnualTaxHouseholdIncomePercent": 255.52,
+                                "annualIncomeStatus": "YES",
+                                "annualIncomeStatusReason": "564_VERIFIED_BASED_ON_EXTERNAL_INCOME_DATA"
+                            },
+                            "maxAPTC": {
+                                "ptcFplPercentage": 255.52,
+                                "taxHouseholdAnnualIncomeAmount": 53096.08,
+                                "maxAPTCAmount": 1199.0,
+                                "slcspPremiumAmount": 1575.77,
+                                "slcspIdentifier": "45142NV0010002|99298NV0010003"
+                            },
+                            "taxHouseHoldComposition": {
+                                "taxHouseHoldStatus": "YES",
+                                "taxHouseHoldStatusReason": "999_N_A",
+                                "taxHouseholdMemberIdentifiers": [
+                                    "1437478148886635679",
+                                    "1437478148886635680",
+                                    "1437478148886635681"
+                                ]
+                            }
+                        }
+                    },
+                    "variableDeterminations": [
+                        {
+                            "creationDateTime": "2019-06-01T04:44:34+00:00",
+                            "coverageState": "NV"
+                        },
+                        {
+                            "creationDateTime": "2019-06-01T04:44:34+00:00",
+                            "coverageState": "NV"
+                        },
+                        {
+                            "creationDateTime": "2019-03-07T16:09:07+00:00",
+                            "memberVariableDeterminations": [
+                                {
+                                    "1437478148886635680": {
+                                        "catastrophicEligibilityIndicator": false,
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "PLATINUM",
+                                            "GOLD",
+                                            "SILVER",
+                                            "BRONZE"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                },
+                                {
+                                    "1437478148886635679": {
+                                        "catastrophicEligibilityIndicator": false,
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "PLATINUM",
+                                            "GOLD",
+                                            "SILVER",
+                                            "BRONZE"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                },
+                                {
+                                    "1437478148886635681": {
+                                        "catastrophicEligibilityIndicator": true,
+                                        "catastrophicEligibilityReasonType": "AGE",
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "SILVER",
+                                            "PLATINUM",
+                                            "BRONZE",
+                                            "GOLD",
+                                            "CATASTROPHIC"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                }
+                            ],
+                            "coverageState": "NV"
+                        },
+                        {
+                            "creationDateTime": "2019-03-07T16:08:51+00:00",
+                            "memberVariableDeterminations": [
+                                {
+                                    "1437478148886635679": {
+                                        "catastrophicEligibilityIndicator": false,
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "PLATINUM",
+                                            "GOLD",
+                                            "SILVER",
+                                            "BRONZE"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                },
+                                {
+                                    "1437478148886635680": {
+                                        "catastrophicEligibilityIndicator": false,
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "PLATINUM",
+                                            "GOLD",
+                                            "SILVER",
+                                            "BRONZE"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                },
+                                {
+                                    "1437478148886635681": {
+                                        "catastrophicEligibilityIndicator": true,
+                                        "catastrophicEligibilityReasonType": "AGE",
+                                        "planMetalLevelRestrictionRuleType": "ANY_PLAN",
+                                        "currentPlanOnlyIndicator": false,
+                                        "planMetalLevelRestrictionRuleReasonType": "NEW_ENROLLEE_SEP_APP",
+                                        "allowedPlanMetalLevelType": [
+                                            "SILVER",
+                                            "PLATINUM",
+                                            "BRONZE",
+                                            "GOLD",
+                                            "CATASTROPHIC"
+                                        ],
+                                        "lpaIndicator": false
+                                    }
+                                }
+                            ],
+                            "coverageState": "NV"
+                        }
+                    ]
+                },
+                "test": "testing"
+            }
+        }
+	}
+}

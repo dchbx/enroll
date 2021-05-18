@@ -8,8 +8,9 @@ module Operations
     class Find
       send(:include, Dry::Monads[:result, :do])
 
-      def call(id:)
-        family_id = yield validate(id)
+      def call(*args, id: nil)
+        obj_id = id.present? ? id : args.first[:external_app_id]
+        family_id = yield validate(obj_id)
         family    = yield find_family(family_id)
 
         Success(family)
@@ -18,20 +19,18 @@ module Operations
       private
 
       def validate(id)
-        if id&.is_a?(BSON::ObjectId)
-          Success(id)
-        elsif id.present?
+        if id&.is_a?(BSON::ObjectId) || id&.is_a?(String)
           Success(id)
         else
-          Failure('family_id is expected in BSON format')
+          Failure('id is nil or not in BSON format')
         end
       end
 
       def find_family(family_id)
-        family =  if id&.is_a?(BSON::ObjectId)
+        family =  if family_id&.is_a?(BSON::ObjectId)
                     Family.find(family_id)
-                  elsif id.present?
-                    Family.where(hbx_id: family_id).first
+                  elsif family_id.present?
+                    Family.where(ext_app_id: family_id).first
                   end
 
         family.present? ? Success(family) : Failure("Unable to find Family with ID #{family_id}.")

@@ -1,18 +1,22 @@
 # frozen_string_literal: true
 
-# require 'aca_entities/operations/families/process_mcr_application'
+require 'aca_entities'
+require 'aca_entities/operations/families/process_mcr_application'
+require 'aca_entities/ffe/transformers/mcr_to/family'
 
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+# migrate MCR data to enroll
 class MigrateFamily < Mongoid::Migration
   def self.up
-    # input = file
-    ::AcaEntities::Ffe::Transformers::McrTo::Family.call(input, { transform_mode: worker_mode }) do |payload|
-      # Below line is for testing
-      # family_hash = JSON.parse(File.read(Pathname.pwd.join("spec/test_data/family_transform_result.json")))
-
+    ::AcaEntities::Ffe::Transformers::McrTo::Family.call(file_path, { transform_mode: :batch }) do |payload|
       family_hash = Operations::Ffe::TransformApplication.new.call(payload)
-      build_family(family_hash) # for testting, remove this
+      build_family(family_hash)
       build_iap(family_hash['magi_medicaid_applications'].first.merge!("family_id": @family.id, benchmark_product_id: BSON::ObjectId.new, years_to_renew: 5))
     end
+  end
+
+  def self.file_path
+    "spec/test_data/transform_example_payloads/application.json"
   end
 
   def self.build_iap(iap_hash)
@@ -61,9 +65,7 @@ class MigrateFamily < Mongoid::Migration
 
   def self.create_or_update_family_member(person, family, family_member_hash)
     family_member = family.family_members.detect { |fm| fm.person_id.to_s == person.id.to_s }
-    if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
-      return family_member
-    end
+    return family_member if family_member && (family_member_hash.key?(:is_active) ? family_member.is_active == family_member_hash[:is_active] : true)
 
     fm_attr = { "is_primary_applicant": family_member_hash['is_primary_applicant'],
                 "is_consent_applicant": family_member_hash['is_consent_applicant'],
@@ -85,9 +87,7 @@ class MigrateFamily < Mongoid::Migration
   def self.create_or_update_relationship(person, family, relationship_kind)
     primary_person = family.primary_person
     exiting_relationship = primary_person.person_relationships.detect { |rel| rel.relative_id.to_s == person.id.to_s }
-    if exiting_relationship && exiting_relationship.kind == relationship_kind
-      return
-    end
+    return if exiting_relationship && exiting_relationship.kind == relationship_kind
 
     primary_person.ensure_relationship_with(person, relationship_kind)
   end
@@ -189,7 +189,6 @@ class MigrateFamily < Mongoid::Migration
         "has_state_health_benefit": applicant_hash['has_state_health_benefit'],
         "had_prior_insurance": applicant_hash['had_prior_insurance'],
         "age_of_applicant": applicant_hash['age_of_applicant'],
-        "is_self_attested_long_term_care": applicant_hash['is_self_attested_long_term_care'],
         "hours_worked_per_week": applicant_hash['hours_worked_per_week'],
         "indian_tribe_member": true
       }
@@ -229,3 +228,4 @@ class MigrateFamily < Mongoid::Migration
 
   def self.down; end
 end
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength

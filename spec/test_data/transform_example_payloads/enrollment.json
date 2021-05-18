@@ -1,0 +1,181 @@
+{
+  "documentType": "INSURANCE_PLAN_POLICY",
+  "partialDataIndicator": false,
+  "lastModifiedDateTime": "2019-06-28T00:39:44+00:00",
+  "lastModifiedBy": "EE_BATCH_USER",
+  "isCurrentVersion": true,
+  "versionNumber": 2,
+  "versionDateTime": "2019-06-13T15:36:14+00:00",
+  "marketplaceGroupPolicyIdentifier": 107132,
+  "policyTrackingNumber": 367882,
+  "informingApplicationVersionNumber": 1,
+  "supersededIndicator": false,
+  "variableDeterminationIdentifier": 397852,
+  "metalLevelRestrictionAppliedIndicator": false,
+  "applicationSEPTypeName": "LAWFULSEP",
+  "enrollmentApplicationType": "EDE",
+  "associatedProductDivisionReferenceTypeCodeName": "HEALTHCARE",
+  "initiatingTransactionOriginReferenceTypeCodeName": "DIRECT_ENROLLMENT",
+  "benchmarkPolicyPremiumAmount": 1493.94,
+  "maxAPTCAmount": 1406,
+  "issuerHIOSID": 45142,
+  "issuerName": "NOT AVAILABLE",
+  "initiatingExchangeUserIdentifier": "003VA4561237890",
+  "definingSLCSPReference": "45142NV0010002",
+  "userDetail": "CancelPriorYrPendingQHPEnrollments_MGGD11737",
+  "numberOfPoliciesTiedToApplication": 1,
+  "marketplaceGroupPolicyIdentifiersTiedToApplication": [
+    107132
+  ],
+  "definedAssistor": {
+    "definedAssistorReferenceTypeCodeName": "NONErrrrrr"
+  },
+  "directEnrollmentPartner": {
+    "partnerIdentifier": "04.PQR.AZ*.006.006",
+    "partnerType": "WEB_BROKER"
+  },
+  "referencedPaymentTransactionIdentifier": "NV00001224540",
+  "selectedInsurancePlan": "45142NV0010001",
+  "insurancePlanVariantName": "Ambetter Secure Care 1 (2019) with 3 Free PCP Visits",
+  "coverageYear": 2019,
+  "insurancePlanPolicyStartDate": "2019-04-01",
+  "insurancePlanPolicyEndDate": "2019-12-31",
+  "insurancePlanPolicyCreationDateTime": "2019-03-06T22:43:34+00:00",
+  "insurancePolicyStatus": {
+    "insurancePolicyStatusDateTime": "2019-06-13T04:00:00+00:00",
+    "definingInsurancePolicyStatusTypeCodeName": "ACTIVE_OR_TERMINATED",
+    "maintenanceReasons": [
+      {
+        "maintenanceType": "021",
+        "maintenanceTransactionType": "INITIAL"
+      }
+    ]
+  },
+  "insurancePolicyPremium": {
+    "monthlyPolicyPremiumAmount": 1637.36,
+    "exchangeRateAreaReference": "NV004",
+    "ehbPremiumAmount": 1637.36,
+    "allocatedAPTCAmount": 1406,
+    "receivedFromOtherQHPAmount": 0,
+    "appliedAPTCAmount": 1406,
+    "distributedToOtherQHPAmount": 0,
+    "distributedToSADPAmount": 0,
+    "systemElectedAPTCAmount": 0,
+    "individualResponsibleAmount": 231.36
+  },
+  "isActive": false,
+  "definingPlanVariantComponentTypeCodeName": "EXCHANGE_VARIANT_NO_CSR",
+  "insuranceApplicationIdentifier": 2722,
+  "issuerConfirmationIndicator": false,
+  "associatedMetalTierTypeCodeName": "GOLD",
+  "coveredInsuredMembers": [
+    {
+      "personTrackingNumber": "1435241642872678246",
+      "definingMemberMaritalStatusTypeCodeName": "MARRIED",
+      "definingInsurancePolicyStatusTypeCodeName": "CANCELLED",
+      "definingMemberAssociationToSubscriberTypeCodeName": "SPOUSE",
+      "subscriberIndicator": false,
+      "insuredMemberIdentifier": 884912,
+      "identifyingTobaccoUseTypeCodeName": "TOBACCO_NOT_USED",
+      "memberMonthlyPolicyPremiumAmount": 941.15,
+      "memberEhbPremiumAmount": 941.15,
+      "memberAllocatedAPTCAmount": 808.17,
+      "memberIndividualResponsibleAmount": 0,
+      "memberInfo": {
+        "birthDate": "1970-01-01",
+        "firstName": "Spouseejnxc",
+        "lastName": "kbvwh",
+        "gender": "FEMALE",
+        "address": [
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "HOME",
+            "definingAddressCategoryTypeCodeName": "DELIVERY"
+          },
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+            "definingAddressCategoryTypeCodeName": "MAILING"
+          },
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+            "definingAddressCategoryTypeCodeName": "DELIVERY"
+          }
+        ]
+      }
+    },
+    {
+      "personTrackingNumber": "1435241642872678245",
+      "definingMemberMaritalStatusTypeCodeName": "MARRIED",
+      "definingInsurancePolicyStatusTypeCodeName": "CANCELLED",
+      "definingMemberAssociationToSubscriberTypeCodeName": "SELF",
+      "subscriberIndicator": true,
+      "insuredMemberIdentifier": 888679,
+      "identifyingTobaccoUseTypeCodeName": "TOBACCO_NOT_USED",
+      "memberMonthlyPolicyPremiumAmount": 696.21,
+      "memberEhbPremiumAmount": 696.21,
+      "memberAllocatedAPTCAmount": 597.83,
+      "memberIndividualResponsibleAmount": 0,
+      "memberInfo": {
+        "birthDate": "1980-01-01",
+        "firstName": "Husbandlyyjq",
+        "lastName": "kbvwh",
+        "gender": "MALE",
+        "writtenLanguageTypeCodeName": "ENGLISH",
+        "spokenLanguageTypeCodeName": "ENGLISH",
+        "emailAddress": [
+          "qjgihsneoj@yopmail.com"
+        ],
+        "address": [
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "HOME",
+            "definingAddressCategoryTypeCodeName": "DELIVERY"
+          },
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "MAIL",
+            "definingAddressCategoryTypeCodeName": "MAILING"
+          },
+          {
+            "zipPlus4Code": "89316",
+            "streetName1": "324 vfzdptdeef",
+            "cityName": "Springfield",
+            "stateCode": "NV",
+            "countyFipsCode": "32011",
+            "definingAddressRelationshipRoleTypeCodeName": "RESIDENCY",
+            "definingAddressCategoryTypeCodeName": "DELIVERY"
+          }
+        ],
+        "telephone": [
+          {
+            "telephoneNumber": "2025547416",
+            "telephonePriorityTypeCodeName": "PREFERRED",
+            "contactMethodTypeCodeName": "HOME_TELEPHONE"
+          }
+        ]
+      }
+    }
+  ]
+}

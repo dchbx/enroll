@@ -4,7 +4,7 @@ describe "MigrateFamily" do
   if true
 
     before :all do
-      Dir[Rails.root.join('db', 'migrate', '*_create_family.rb')].each do |f|
+      Dir[Rails.root.join('db', 'migrate', '*_migrate_family.rb')].each do |f|
         @path = f
         require f
       end
