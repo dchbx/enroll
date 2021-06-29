@@ -29,13 +29,13 @@ module Operations
         person = values[:person]
         person_db_hash = person.serializable_hash.deep_symbolize_keys
         updated_person_hash = person_db_hash.inject({}) do |db_hash, element_hash|
-                                db_hash[element_hash[0]] = if [:addresses, :emails, :phones].include?(element_hash[0])
-                                                             fetch_array_of_attrs_for_embeded_objects(element_hash[1])
-                                                           else
-                                                             element_hash[1]
-                                                           end
-                                db_hash
-                              end
+          db_hash[element_hash[0]] = if [:addresses, :emails, :phones].include?(element_hash[0])
+                                       fetch_array_of_attrs_for_embeded_objects(element_hash[1])
+                                     else
+                                       element_hash[1]
+                                     end
+          db_hash
+        end
         updated_person_hash.merge!({ssn: person.ssn})
         merged_params = updated_person_hash.merge(incoming_values.to_h.deep_symbolize_keys)
         if any_information_changed?(merged_params, updated_person_hash)

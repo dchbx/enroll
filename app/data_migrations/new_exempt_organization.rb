@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class NewExemptOrganization < MongoidMigrationTask
@@ -21,10 +23,10 @@ class NewExemptOrganization < MongoidMigrationTask
     message += " issuer_hios_ids" if issuer_hios_ids.blank?
 
     if message.present?
-      puts "*"*80 unless Rails.env.test?
-      message+=" cannot be empty."
+      puts "*" * 80 unless Rails.env.test?
+      message += " cannot be empty."
       puts message
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
       return
     end
 
@@ -33,21 +35,21 @@ class NewExemptOrganization < MongoidMigrationTask
     exempt_organiation_params = {
       fein: fein,
       site_id: site.id,
-      legal_name: legal_name,
+      legal_name: legal_name
     }
 
     exempt_organization = BenefitSponsors::Organizations::ExemptOrganization.where(fein: fein).first
     new_exempt_organization = if exempt_organization.present?
-      exempt_organization
-    else
-      BenefitSponsors::Organizations::ExemptOrganization.new(exempt_organiation_params)
-    end
+                                exempt_organization
+                              else
+                                BenefitSponsors::Organizations::ExemptOrganization.new(exempt_organiation_params)
+                              end
 
     issuer_profile = new_exempt_organization.profiles.first
     if issuer_profile.present?
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
       puts "Carrier #{legal_name} already exists with this fein #{fein}." unless Rails.env.test?
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
     else
       office_location = BenefitSponsors::Locations::OfficeLocation.new(
         is_primary: true,
@@ -63,7 +65,7 @@ class NewExemptOrganization < MongoidMigrationTask
         shop_health: shop_health,
         shop_dental: shop_dental,
         issuer_hios_ids: [issuer_hios_ids],
-        office_locations: [office_location],
+        office_locations: [office_location]
       }
 
       new_issuer_profile = BenefitSponsors::Organizations::IssuerProfile.new(issuer_profile_params)
@@ -71,11 +73,10 @@ class NewExemptOrganization < MongoidMigrationTask
       new_exempt_organization.profiles << new_issuer_profile
       new_exempt_organization.save
 
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
       puts "successfully created #{legal_name} carrier." unless Rails.env.test?
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
     end
-
   end
 
 end

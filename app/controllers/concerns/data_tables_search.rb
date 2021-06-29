@@ -1,5 +1,6 @@
-module DataTablesSearch
+# frozen_string_literal: true
 
+module DataTablesSearch
   def sorted_families(order, dt_query, query)
     if order.present?
       order == "asc" ? asc_due_date(query) : desc_due_date(query)
@@ -17,8 +18,8 @@ module DataTablesSearch
                    .skip
                    .take
                    .evaluate.map do |record|
-                      record["_id"]
-                    end
+      record["_id"]
+    end
     get_families(results)
   end
 
@@ -31,8 +32,8 @@ module DataTablesSearch
                    .skip
                    .take
                    .evaluate.map do |record|
-                      record["_id"]
-                    end
+      record["_id"]
+    end
     get_families(results)
   end
 

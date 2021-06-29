@@ -1,9 +1,10 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ReinstatePlanYear < MongoidMigrationTask
 
   def migrate
-
     organizations = Organization.where(fein: ENV['fein'])
     plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
 
@@ -12,7 +13,7 @@ class ReinstatePlanYear < MongoidMigrationTask
       return
     end
 
-    plan_year = organizations.first.employer_profile.plan_years.where(start_on: plan_year_start_on, aasm_state:"terminated").first
+    plan_year = organizations.first.employer_profile.plan_years.where(start_on: plan_year_start_on, aasm_state: "terminated").first
 
     if plan_year.present? && plan_year.may_reinstate_plan_year?
       begin
@@ -27,7 +28,7 @@ class ReinstatePlanYear < MongoidMigrationTask
         if renewing_plan_year.present? && renewing_plan_year.renewing_canceled?
           @renewing_plan_year_start_on = renewing_plan_year.start_on
           renewing_plan_year_py_state = renewing_plan_year.aasm_state
-          renewing_plan_year.update_attributes!(aasm_state:'renewing_draft')
+          renewing_plan_year.update_attributes!(aasm_state: 'renewing_draft')
           renewing_plan_year.workflow_state_transitions << WorkflowStateTransition.new(from_state: renewing_plan_year_py_state,to_state: 'renewing_draft')
           puts "renewal plan year aasm state updated to #{renewing_plan_year.aasm_state}" unless Rails.env.test?
           if ENV['renewing_force_publish'].present? && ENV['renewing_force_publish']
@@ -48,7 +49,6 @@ class ReinstatePlanYear < MongoidMigrationTask
   end
 
   def update_enrollments_for_plan_year(plan_year)
-
     id_list = plan_year.benefit_groups.map(&:id)
     families = Family.where(:"households.hbx_enrollments.benefit_group_id".in => id_list)
     enrollments = families.inject([]) do |enrollments, family|

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DeviseHelper
   def devise_error_messages!
     return "" if resource.errors.empty?
@@ -11,7 +13,7 @@ module DeviseHelper
     <div class="alert alert-error module registration-rules" role="alert">
       <div class="text-center">
         <strong>
-         #{l10n("devise.errors.message")}
+         #{l10n('devise.errors.message')}
         </strong>
       </div>
       <br/>
@@ -21,5 +23,4 @@ module DeviseHelper
 
     html.html_safe
   end
-
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module NavigationHelper
-  def tell_us_about_yourself_active? # rubocop:disable Metrics/CyclomaticComplexity TODO: Remove this
+  def tell_us_about_yourself_active?
     return true if controller_name == "consumer_roles" && ['edit', 'ridp_agreement'].include?(action_name)
     return true if controller_name == "interactive_identity_verifications"
     return true if ["help_paying_coverage", "application_checklist"].include?(action_name)

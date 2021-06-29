@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Autocomplete
   extend ActiveSupport::Concern
 
@@ -10,7 +12,6 @@ module Autocomplete
 
   # callback to populate :autocomplete
   def generate_autocomplete
-
     # Autocomplete will resolve on following attribute value
     # Note: Mongoid will not use index on this attribute
 
@@ -18,7 +19,7 @@ module Autocomplete
     slug = @autocomplete_slug
 
     slug = slug.truncate(45, omission: "", separator: " ") if slug.length > 45
-    write_attribute(:autocomplete, Autocomplete.normalize(slug)) 
+    write_attribute(:autocomplete, Autocomplete.normalize(slug))
   end
 
   # turn strings into autocomplete keys
@@ -29,8 +30,7 @@ module Autocomplete
     s = s.gsub(/[^a-z0-9 ]/, " ")
     s = s.gsub(/ the /, "")
     s = s.squish
-    s = " #{s}"
-    s
+    " #{s}"
   end
 
   def self.search(query)
@@ -38,5 +38,4 @@ module Autocomplete
     return [] if query.blank?
     CensusEmployee.where(autocomplete: /#{query}/).asc(:autocomplete_slug).limit(10)
   end
-
 end

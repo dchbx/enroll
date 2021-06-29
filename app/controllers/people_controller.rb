@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PeopleController < ApplicationController
   include ApplicationHelper
   include ErrorBubble
@@ -14,13 +16,13 @@ class PeopleController < ApplicationController
     start_date = Date.parse('01/10/2013')
     end_date = TimeKeeper.date_of_record
 
-    if start_date <= date_married && date_married <= end_date
+    @qualified_date = if start_date <= date_married && date_married <= end_date
       # Qualifed
-      @qualified_date = true
-    else
+                        true
+                      else
       # Not Qualified
-      @qualified_date = false
-    end
+                        false
+                      end
 
     # else {
     #   var startDate = Date.parse('2013-10-01'), endDate = Date.parse(new Date()), enteredDate = Date.parse(date_value);
@@ -37,7 +39,7 @@ class PeopleController < ApplicationController
     @employee_role.updated_by = current_user.oim_id unless current_user.nil?
 
     # May need person init code here
-    if (@family.update_attributes(@family) && @employee_role.update_attributes(@employee_role))
+    if @family.update_attributes(@family) && @employee_role.update_attributes(@employee_role)
       @person = @employee_role.person
 
       if params[:commit].downcase.include?('continue')
@@ -57,24 +59,21 @@ class PeopleController < ApplicationController
     end
   end
 
-
   # Uses identifying information to return one or more for matches in employer census
-  def match_employer
-  end
+  def match_employer; end
 
-  def link_employer
-  end
+  def link_employer; end
 
   def person_confirm
     @person = Person.find(params[:person_id])
-    if params[:employer_id].to_i != 0
+    if params[:employer_id].to_i == 0
+      @employee = @person
+    else
       @employer = Employer.find(params[:employer_id])
       #@employee = Employer
-      employee_family = Employer.where(:"id" => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
+      employee_family = Employer.where(:id => @employer.id).where(:"employee_families.employee.ssn" => @person.ssn).last.employee_families.last
       @coverage = employee_family.dependents.present? ? "Individual + Family" : "Individual"
       @coverage_flag = "I"
-    else
-      @employee = @person
     end
     respond_to do |format|
       format.js {}
@@ -148,15 +147,13 @@ class PeopleController < ApplicationController
           format.js { flash.now[:error_msg] = "Error in Family Member Addition. #{member.errors.full_messages}" }
         end
       end
+    elsif @dependent.update_attributes(dependent_params)
+      respond_to do |format|
+        format.js { flash.now[:notice] = "Family Member Updated." }
+      end
     else
-      if @dependent.update_attributes(dependent_params)
-        respond_to do |format|
-          format.js { flash.now[:notice] = "Family Member Updated." }
-        end
-      else
-        respond_to do |format|
-          format.js { flash.now[:error_msg] = "Error in Family Member Edit. #{member.errors.full_messages}" }
-        end
+      respond_to do |format|
+        format.js { flash.now[:error_msg] = "Error in Family Member Edit. #{member.errors.full_messages}" }
       end
     end
   end
@@ -166,18 +163,18 @@ class PeopleController < ApplicationController
     @employer = Organization.find(params[:organization_id])
     @family = @person.primary_family
     @dependent = @family.family_members.where(_id: params[:id]).first
-    if !@dependent.nil?
+    if @dependent.nil?
+      @family_member_id = params[:id]
+    else
       @family_member_id = @dependent._id
-      if !@dependent.is_primary_applicant
+      if @dependent.is_primary_applicant
+        @flash = "Primary member can not be deleted"
+      else
         @dependent.destroy
         @person.person_relationships.where(relative_id: @dependent.person_id).destroy_all
         @family.households.first.coverage_households.first.coverage_household_members.where(applicant_id: params[:id]).destroy_all
         @flash = "Family Member Removed"
-      else
-        @flash = "Primary member can not be deleted"
       end
-    else
-      @family_member_id = params[:id]
     end
     respond_to do |format|
       format.js { flash.now[:notice] = @flash }
@@ -208,7 +205,7 @@ class PeopleController < ApplicationController
           @person.consumer_role.check_native_status(@family, native_changed: @native_status_changed)
           @person.consumer_role.check_for_critical_changes(@family, info_changed: @info_changed, is_homeless: person_params["is_homeless"], is_temporarily_out_of_state: person_params["is_temporarily_out_of_state"], dc_status: @dc_status)
         end
-        @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && (!person_params[:is_applying_coverage].nil?)
+        @person.consumer_role.update_attribute(:is_applying_coverage, person_params[:is_applying_coverage]) if @person.consumer_role.present? && !person_params[:is_applying_coverage].nil?
         # if dual role, this will update both ivl and ee
         @person.active_employee_roles.each { |role| role.update_attributes(contact_method: person_params[:consumer_role_attributes][:contact_method]) } if @person.has_multiple_roles?
         if params[:page].eql? "from_registration"
@@ -254,9 +251,9 @@ class PeopleController < ApplicationController
     build_nested_models
   end
 
-   def show
+  def show
     @person = Person.find(params[:id])
-    @employer_profile= EmployerProfile.find_all_by_person(@person).first
+    @employer_profile = EmployerProfile.find_all_by_person(@person).first
 
     build_nested_models
   end
@@ -271,7 +268,7 @@ class PeopleController < ApplicationController
     @benefit_group = @hbx_enrollment.benefit_group
     @reference_plan = @hbx_enrollment.coverage_kind == 'dental' ? @benefit_group.dental_reference_plan : @benefit_group.reference_plan
 
-    @plans = @benefit_group.elected_plans.entries.collect() do |plan|
+    @plans = @benefit_group.elected_plans.entries.collect do |plan|
       PlanCostDecorator.new(plan, @hbx_enrollment, @benefit_group, @reference_plan)
     end
   end
@@ -285,15 +282,14 @@ class PeopleController < ApplicationController
     render partial: 'people/landing_pages/member_address', locals: {person: member}
   end
 
-private
+  private
 
   def safe_find(klass, id)
     # puts "finding #{klass} #{id}"
-    begin
-      klass.find(id)
-    rescue
-      nil
-    end
+
+    klass.find(id)
+  rescue StandardError
+    nil
   end
 
   def find_person(id)
@@ -310,7 +306,7 @@ private
 
   def build_nested_models
     ["home","mobile","work","fax"].each do |kind|
-       @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
+      @person.phones.build(kind: kind) if @person.phones.select{|phone| phone.kind == kind}.blank?
     end
 
     Address::KINDS.each do |kind|
@@ -318,32 +314,26 @@ private
     end
 
     ["home","work"].each do |kind|
-       @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
+      @person.emails.build(kind: kind) if @person.emails.select{|email| email.kind == kind}.blank?
     end
   end
 
   def sanitize_person_params
     if person_params["addresses_attributes"].present?
       person_params["addresses_attributes"].each do |key, address|
-        if address["city"].blank? && address["zip"].blank? && address["address_1"].blank? && address['state']
-          params["person"]["addresses_attributes"].delete("#{key}")
-        end
+        params["person"]["addresses_attributes"].delete(key.to_s) if address["city"].blank? && address["zip"].blank? && address["address_1"].blank? && address['state']
       end
     end
 
     if person_params["phones_attributes"].present?
       person_params["phones_attributes"].each do |key, phone|
-        if phone["full_phone_number"].blank?
-          params["person"]["phones_attributes"].delete("#{key}")
-        end
+        params["person"]["phones_attributes"].delete(key.to_s) if phone["full_phone_number"].blank?
       end
     end
 
     if person_params["emails_attributes"].present?
       person_params["emails_attributes"].each do |key, email|
-        if email["address"].blank?
-          params["person"]["emails_attributes"].delete("#{key}")
-        end
+        params["person"]["emails_attributes"].delete(key.to_s) if email["address"].blank?
       end
     end
   end

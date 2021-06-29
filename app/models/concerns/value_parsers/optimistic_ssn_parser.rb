@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ValueParsers
   # NOTE: This class is designed for optimistic parsing.  Given a value it
   #       assumes that it most likely contains an SSN.  This is useful for
@@ -5,17 +7,17 @@ module ValueParsers
   #       models which validate user input.
   class OptimisticSsnParser
     def self.on(*method_names)
-      new_mod = Module.new do 
+      new_mod = Module.new do
         def self.included(klass)
           ::ValueParsers::OptimisticSsnParser.define_ssn_parse_method(klass)
         end
       end
       method_names.each do |method_name|
-      new_mod.class_eval(<<-RUBYCODE)
+        new_mod.class_eval(<<-RUBYCODE)
         def #{method_name}=(val)
           @#{method_name} = __parse_ssn_value(val)
         end
-      RUBYCODE
+        RUBYCODE
       end
       new_mod
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A time period during which Organizations, including {HbxProfile}, who are eligible for a {BenefitSponsorship}, may offer
 # {BenefitPackage}(s) to participants within a market place. Each {BenefitCoveragePeriod} includes an open enrollment
 # period, during which eligible partipants may enroll.
@@ -31,13 +33,13 @@ class BenefitCoveragePeriod
   validates_presence_of :start_on, :end_on, :open_enrollment_start_on, :open_enrollment_end_on, message: "is invalid"
 
   validates :service_market,
-    inclusion: { in: BenefitSponsorship::SERVICE_MARKET_KINDS, message: "%{value} is not a valid service market" }
+            inclusion: { in: BenefitSponsorship::SERVICE_MARKET_KINDS, message: "%{value} is not a valid service market" }
 
   validate :end_date_follows_start_date
 
   before_save :set_title
 
-  scope :by_date, ->(date) { where({:"start_on".lte => date, :"end_on".gte => date}) }
+  scope :by_date, ->(date) { where({:start_on.lte => date, :end_on.gte => date}) }
 
   # Gets the successor coverage period.
   # @return [BenefitCoveragePeriod, nil] the successor
@@ -54,7 +56,7 @@ class BenefitCoveragePeriod
   # @param new_plan [ Plan ] The reference plan.
   def second_lowest_cost_silver_plan=(new_plan)
     raise ArgumentError, 'expected Plan' unless new_plan.is_a?(BenefitMarkets::Products::Product)
-    raise ArgumentError.new("slcsp metal level must be silver") unless new_plan.metal_level == "silver"
+    raise ArgumentError, "slcsp metal level must be silver" unless new_plan.metal_level == "silver"
     self.slcsp_id = new_plan._id
     self.slcsp = new_plan._id
     @second_lowest_cost_silver_plan = new_plan
@@ -69,8 +71,7 @@ class BenefitCoveragePeriod
   end
 
   # @todo Available products from which this sponsor may offer benefits during this benefit coverage period
-  def benefit_products
-  end
+  def benefit_products; end
 
   # Sets the earliest coverage effective date
   #
@@ -134,11 +135,11 @@ class BenefitCoveragePeriod
   #
   # @return [ Date ] the earliest coverage start effective date
   def earliest_effective_date
-    if TimeKeeper.date_of_record.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
-      effective_date = TimeKeeper.date_of_record.end_of_month + 1.day
-    else
-      effective_date = TimeKeeper.date_of_record.next_month.end_of_month + 1.day
-    end
+    effective_date = if TimeKeeper.date_of_record.day <= HbxProfile::IndividualEnrollmentDueDayOfMonth
+                       TimeKeeper.date_of_record.end_of_month + 1.day
+                     else
+                       TimeKeeper.date_of_record.next_month.end_of_month + 1.day
+                     end
 
     [[effective_date, start_on].max, end_on].min
   end
@@ -152,7 +153,7 @@ class BenefitCoveragePeriod
   # @param tax_household [ TaxHousehold ] the tax household members belong to if eligible for financial assistance
   #
   # @return [ Array<Plan> ] the list of eligible products
-  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household=nil, market=nil)
+  def elected_plans_by_enrollment_members(hbx_enrollment_members, coverage_kind, tax_household = nil, market = nil)
     ivl_bgs = []
     hbx_enrollment = hbx_enrollment_members.first.hbx_enrollment
     shopping_family_member_ids = hbx_enrollment_members.map(&:applicant_id)
@@ -162,11 +163,11 @@ class BenefitCoveragePeriod
       hbx_enrollment_members.map(&:family_member).each do |family_member|
         consumer_role = family_member.person.consumer_role if family_member.person.is_consumer_role_active?
         resident_role = family_member.person.resident_role if family_member.person.is_resident_role_active?
-        unless resident_role.nil?
-          rule = InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family, market_kind: market)
-        else
-          rule = InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment.effective_on,  market_kind: market})
-        end
+        rule = if resident_role.nil?
+                 InsuredEligibleForBenefitRule.new(consumer_role, bg, { coverage_kind: coverage_kind, family: family, new_effective_on: hbx_enrollment.effective_on,  market_kind: market})
+               else
+                 InsuredEligibleForBenefitRule.new(resident_role, bg, coverage_kind: coverage_kind, family: family, market_kind: market)
+               end
         satisfied = false and break unless rule.satisfied?[0]
       end
       ivl_bgs << bg if satisfied
@@ -193,7 +194,7 @@ class BenefitCoveragePeriod
     # @return [ BenefitCoveragePeriod ] the matching HBX benefit coverage period instance
     def find(id)
       organizations = Organization.where("hbx_profile.benefit_sponsorship.benefit_coverage_periods._id" => BSON::ObjectId.from_string(id))
-      organizations.size > 0 ? all.select{ |bcp| bcp.id == id }.first : nil
+      organizations.empty? ? nil : all.select{ |bcp| bcp.id == id }.first
     end
 
     # The HBX benefit coverage period instance that includes this date within its start and end dates
@@ -207,12 +208,11 @@ class BenefitCoveragePeriod
     def find_by_date(date)
       organizations = Organization.where(
         :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.start_on".lte => date,
-        :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.end_on".gte => date)
-      if organizations.size > 0
+        :"hbx_profile.benefit_sponsorship.benefit_coverage_periods.end_on".gte => date
+      )
+      unless organizations.empty?
         bcps = organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods
         bcps.select{ |bcp| bcp.start_on <= date && bcp.end_on >= date }.first
-      else
-        nil
       end
     end
 
@@ -224,7 +224,7 @@ class BenefitCoveragePeriod
     # @return [ Array ] the list of HBX benefit coverage periods
     def all
       organizations = Organization.exists(:"hbx_profile.benefit_sponsorship.benefit_coverage_periods" => true)
-      organizations.size > 0 ? organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods : nil
+      organizations.empty? ? nil : organizations.first.hbx_profile.benefit_sponsorship.benefit_coverage_periods
     end
 
   end
@@ -244,7 +244,7 @@ class BenefitCoveragePeriod
 
   def set_title
     return if title.present?
-    service_market == "shop" ? market_name = "SHOP" : market_name = "Individual"
+    market_name = service_market == "shop" ? "SHOP" : "Individual"
     self.title = "#{market_name} Market Benefits #{start_on.year}"
   end
 

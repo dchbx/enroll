@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencyProfile
   include Mongoid::Document
   include SetCurrentUser
@@ -8,13 +10,13 @@ class BrokerAgencyProfile
 
   embedded_in :organization
 
-  MARKET_KINDS = individual_market_is_enabled? ? %W[individual shop both] : %W[shop]
+  MARKET_KINDS = individual_market_is_enabled? ? %w[individual shop both] : %w[shop]
   ALL_MARKET_KINDS_OPTIONS = {
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both - Individual & Family AND Small Business Marketplaces" => "both"
-  }
-  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |k,v| MARKET_KINDS.include? v }
+  }.freeze
+  MARKET_KINDS_OPTIONS = ALL_MARKET_KINDS_OPTIONS.select { |_k,v| MARKET_KINDS.include? v }
 
   field :entity_kind, type: String
   field :market_kind, type: String
@@ -52,18 +54,18 @@ class BrokerAgencyProfile
   validates_presence_of :market_kind, :entity_kind #, :primary_broker_role_id
 
   validates :corporate_npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: true
+            numericality: {only_integer: true},
+            length: { minimum: 1, maximum: 10 },
+            uniqueness: true,
+            allow_blank: true
 
   validates :market_kind,
-    inclusion: { in: -> (val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
-    allow_blank: false
+            inclusion: { in: ->(_val) { MARKET_KINDS }, message: "%{value} is not a valid market kind" },
+            allow_blank: false
 
   validates :entity_kind,
-    inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
-    allow_blank: false
+            inclusion: { in: Organization::ENTITY_KINDS[0..3], message: "%{value} is not a valid business entity kind" },
+            allow_blank: false
 
   after_initialize :build_nested_models
 
@@ -87,7 +89,7 @@ class BrokerAgencyProfile
   # has_one primary_broker_role
   def primary_broker_role=(new_primary_broker_role = nil)
     if new_primary_broker_role.present?
-      raise ArgumentError.new("expected BrokerRole class") unless new_primary_broker_role.is_a? BrokerRole
+      raise ArgumentError, "expected BrokerRole class" unless new_primary_broker_role.is_a? BrokerRole
       self.primary_broker_role_id = new_primary_broker_role._id
     else
       unset("primary_broker_role_id")
@@ -147,7 +149,7 @@ class BrokerAgencyProfile
 
   def languages
     if languages_spoken.any?
-      return languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
+      languages_spoken.map {|lan| LanguageList::LanguageInfo.find(lan).name if LanguageList::LanguageInfo.find(lan)}.compact.join(",")
     end
   end
 
@@ -158,7 +160,7 @@ class BrokerAgencyProfile
   end
 
   def families
-    linked_active_employees = linked_employees.select{ |person| person.has_active_employee_role? }
+    linked_active_employees = linked_employees.select(&:has_active_employee_role?)
     employee_families = linked_active_employees.map(&:primary_family).to_a
     consumer_families = Family.by_broker_agency_profile_id(self.id).to_a
     families = (consumer_families + employee_families).uniq
@@ -167,7 +169,7 @@ class BrokerAgencyProfile
 
   def default_general_agency_profile=(new_default_general_agency_profile = nil)
     if new_default_general_agency_profile.present?
-      raise ArgumentError.new("expected GeneralAgencyProfile class") unless new_default_general_agency_profile.is_a? GeneralAgencyProfile
+      raise ArgumentError, "expected GeneralAgencyProfile class" unless new_default_general_agency_profile.is_a? GeneralAgencyProfile
       self.default_general_agency_profile_id = new_default_general_agency_profile.id
     else
       unset("default_general_agency_profile_id")
@@ -202,12 +204,12 @@ class BrokerAgencyProfile
     def find(id)
       return nil if id.blank?
       organizations = Organization.where("broker_agency_profile._id" => BSON::ObjectId.from_string(id)).to_a
-      organizations.size > 0 ? organizations.first.broker_agency_profile : nil
+      organizations.empty? ? nil : organizations.first.broker_agency_profile
     end
 
     def get_organization_from_broker_profile_id(id)
       organizations = Organization.where("broker_agency_profile._id" => id).to_a
-      organizations.size > 0 ? organizations.first : nil
+      organizations.empty? ? nil : organizations.first
     end
   end
 
@@ -235,7 +237,7 @@ class BrokerAgencyProfile
     end
   end
 
-private
+  private
 
   def build_nested_models
     build_inbox if inbox.nil?

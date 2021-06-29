@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ScheduledEventService
   extend ActiveSupport::Concern
 

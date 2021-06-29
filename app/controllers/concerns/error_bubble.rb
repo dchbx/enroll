@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ErrorBubble
   def add_document_errors_to_dependent(dependent, document)
     if document.is_a? Array
@@ -20,11 +22,11 @@ module ErrorBubble
   end
 
   def bubble_consumer_role_errors_by_person(person)
-    if person.errors.has_key?(:consumer_role)
+    if person.errors.key?(:consumer_role)
       person.consumer_role.errors.each do |k, v|
         person.errors.add(k, v)
       end
-      if person.consumer_role.errors.has_key?(:vlp_documents)
+      if person.consumer_role.errors.key?(:vlp_documents)
         person.consumer_role.vlp_documents.select{|v| v.errors.any?}.each do |vlp|
           vlp.errors.each do |k, v|
             person.errors.add("#{vlp.subject}: #{k}", v)
@@ -38,7 +40,7 @@ module ErrorBubble
 
   def bubble_address_errors_by_person(person)
     addresses = person.addresses.select {|a| has_any_address_fields_present?(a) && !a.valid?}
-    if person.errors.has_key?(:addresses) && addresses.present?
+    if person.errors.key?(:addresses) && addresses.present?
       addresses.each do |address|
         address.errors.each do |k, v|
           person.errors.add("#{address.kind} address: #{k}", v)

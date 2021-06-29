@@ -1,148 +1,149 @@
-class Employers::BrokerAgencyController < ApplicationController
-  include Acapi::Notifiers
-  include ApplicationHelper
+# frozen_string_literal: true
 
-  before_action :find_employer
-  before_action :find_broker_agency, :except => [:index, :active_broker]
-  before_action :updateable?, only: [:create, :terminate]
+module Employers
+  class BrokerAgencyController < ApplicationController
+    include Acapi::Notifiers
+    include ApplicationHelper
 
-  def index
-    @filter_criteria = params.permit(:q, :working_hours, :languages => [])
-    if @filter_criteria.empty?
-      @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
-      @page_alphabets = page_alphabets(@orgs, "legal_name")
+    before_action :find_employer
+    before_action :find_broker_agency, :except => [:index, :active_broker]
+    before_action :updateable?, only: [:create, :terminate]
 
-      if params[:page].present?
-        @page_alphabet = cur_page_no(@page_alphabets.first)
-        @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(@page_alphabet)}/i)
+    def index
+      @filter_criteria = params.permit(:q, :working_hours, :languages => [])
+      if @filter_criteria.empty?
+        @orgs = Organization.approved_broker_agencies.broker_agencies_by_market_kind(['both', 'shop'])
+        @page_alphabets = page_alphabets(@orgs, "legal_name")
+
+        if params[:page].present?
+          @page_alphabet = cur_page_no(@page_alphabets.first)
+          @organizations = @orgs.where("legal_name" => /^#{Regexp.escape(@page_alphabet)}/i)
+        else
+          @organizations = @orgs.limit(12).to_a
+        end
+        @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
       else
-        @organizations = @orgs.limit(12).to_a
+        results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
+        if results.first.is_a?(Person)
+          @filtered_broker_roles  = results.map(&:broker_role)
+          @broker_agency_profiles = Kaminari.paginate_array(results.map{|broker| broker.broker_role.broker_agency_profile}.uniq).page(params[:organization_page] || 1).per(10)
+        else
+          @broker_agency_profiles = Kaminari.paginate_array(results.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
+        end
       end
-      @broker_agency_profiles = Kaminari.paginate_array(@organizations.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
-    else
-      results = Organization.broker_agencies_with_matching_agency_or_broker(@filter_criteria)
-      if results.first.is_a?(Person)
-        @filtered_broker_roles  = results.map(&:broker_role)
-        @broker_agency_profiles = Kaminari.paginate_array(results.map{|broker| broker.broker_role.broker_agency_profile}.uniq).page(params[:organization_page] || 1).per(10)
-      else
-        @broker_agency_profiles = Kaminari.paginate_array(results.map(&:broker_agency_profile).uniq).page(params[:organization_page] || 1).per(10)
+      respond_to do |format|
+        format.js
       end
     end
-    respond_to do |format|
-      format.js
+
+    def show; end
+
+    def active_broker
+      @broker_agency_account = @employer_profile.active_broker_agency_account
     end
 
-  end
-
-  def show
-  end
-
-  def active_broker
-    @broker_agency_account = @employer_profile.active_broker_agency_account
-  end
-
-  def create
-    authorize EmployerProfile, :updateable?
-    broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
-    broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
-    if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
-      @employer_profile.broker_role_id = broker_role_id
-      @employer_profile.hire_broker_agency(broker_agency_profile)
-      if broker_agency_profile.default_general_agency_profile.present?
-        @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
-        send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
-        broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
+    def create
+      authorize EmployerProfile, :updateable?
+      broker_agency_id = params.permit(:broker_agency_id)[:broker_agency_id]
+      broker_role_id = params.permit(:broker_role_id)[:broker_role_id]
+      if broker_agency_profile = BrokerAgencyProfile.find(broker_agency_id)
+        @employer_profile.broker_role_id = broker_role_id
+        @employer_profile.hire_broker_agency(broker_agency_profile)
+        if broker_agency_profile.default_general_agency_profile.present?
+          @employer_profile.hire_general_agency(broker_agency_profile.default_general_agency_profile, broker_agency_profile.primary_broker_role_id)
+          send_general_agency_assign_msg(broker_agency_profile.default_general_agency_profile, @employer_profile, broker_agency_profile, 'Hire')
+          broker_agency_profile.default_general_agency_profile.general_agency_hired_notice(@employer_profile) # broker hired and broker has default GA assigned
+        end
+        send_broker_assigned_msg(@employer_profile, broker_agency_profile)
+        @employer_profile.save!(validate: false)
+        trigger_notice_observer(broker_agency_profile.primary_broker_role, @employer_profile, "broker_hired_notice_to_broker")
+        @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer")
+        trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
       end
-      send_broker_assigned_msg(@employer_profile, broker_agency_profile)
-      @employer_profile.save!(validate: false)
-      trigger_notice_observer(broker_agency_profile.primary_broker_role, @employer_profile, "broker_hired_notice_to_broker")
-      @employer_profile.trigger_shop_notices("broker_hired_confirmation_to_employer") 
-      trigger_notice_observer(broker_agency_profile, @employer_profile, "broker_agency_hired_confirmation") #broker agency hired confirmation notice to broker agency
-    end
-    flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
-    send_broker_successfully_associated_email broker_role_id
-    redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
-  rescue => e
-    if @employer_profile.errors
-      error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages)
-    end
-    log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
-  end
-
-  def terminate
-    authorize EmployerProfile, :updateable?
-    if params["termination_date"].present?
-      termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
-      @employer_profile.fire_broker_agency(termination_date)
-      @employer_profile.fire_general_agency!(termination_date)
-      @fa = @employer_profile.save!(validate: false)
+      flash[:notice] = "Your broker has been notified of your selection and should contact you shortly. You can always call or email them directly. If this is not the broker you want to use, select 'Change Broker'."
+      send_broker_successfully_associated_email broker_role_id
+      redirect_to employers_employer_profile_path(@employer_profile, tab: 'brokers')
+    rescue StandardError => e
+      error_msg = @employer_profile.plan_years.select{|py| py.errors.present? }.map(&:errors).map(&:full_messages) if @employer_profile.errors
+      log("#4095 #{e.message}; employer_profile: #{@employer_profile.id}; #{error_msg}", {:severity => "error"})
     end
 
-    respond_to do |format|
-      format.js {
-        if params["termination_date"].present? && @fa
+    def terminate
+      authorize EmployerProfile, :updateable?
+      if params["termination_date"].present?
+        termination_date = DateTime.strptime(params["termination_date"], '%m/%d/%Y').try(:to_date)
+        @employer_profile.fire_broker_agency(termination_date)
+        @employer_profile.fire_general_agency!(termination_date)
+        @fa = @employer_profile.save!(validate: false)
+      end
+
+      respond_to do |format|
+        format.js do
+          if params["termination_date"].present? && @fa
+            flash[:notice] = "Broker terminated successfully."
+            render text: true
+          else
+            render text: false
+          end
+        end
+        format.all do
           flash[:notice] = "Broker terminated successfully."
-          render text: true
-        else
-          render text: false
+          if params[:direct_terminate]
+            redirect_to employers_employer_profile_path(@employer_profile, tab: "brokers")
+          else
+            redirect_to employers_employer_profile_path(@employer_profile)
+          end
         end
-      }
-      format.all {
-        flash[:notice] = "Broker terminated successfully."
-        if params[:direct_terminate]
-          redirect_to employers_employer_profile_path(@employer_profile, tab: "brokers")
-        else
-          redirect_to employers_employer_profile_path(@employer_profile)
-        end
-      }
+      end
     end
-  end
 
-  private
+    private
 
-  def updateable?
-    authorize @employer_profile, :updateable?
-  end
-  def send_broker_successfully_associated_email broker_role_id
-    id =BSON::ObjectId.from_string(broker_role_id)
-    @broker_person = Person.where(:'broker_role._id' => id).first
-    body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
+    def updateable?
+      authorize @employer_profile, :updateable?
+    end
 
-    from_provider = HbxProfile.current_hbx
-    message_params = {
-      sender_id: @employer_profile.try(:id),
-      parent_message_id: @broker_person.id,
-      from: @employer_profile.try(:legal_name),
-      to: @broker_person.try(:full_name),
-      body: body,
-      subject: 'You have been select as the Broker'
-    }
+    def send_broker_successfully_associated_email(broker_role_id)
+      id = BSON::ObjectId.from_string(broker_role_id)
+      @broker_person = Person.where(:'broker_role._id' => id).first
+      body = "You have been selected as a broker by #{@employer_profile.try(:legal_name)}"
 
-    create_secure_message(message_params, @broker_person, :inbox)
-  end
+      from_provider = HbxProfile.current_hbx
+      message_params = {
+        sender_id: @employer_profile.try(:id),
+        parent_message_id: @broker_person.id,
+        from: @employer_profile.try(:legal_name),
+        to: @broker_person.try(:full_name),
+        body: body,
+        subject: 'You have been select as the Broker'
+      }
 
-  def send_general_agency_assign_msg(general_agency, employer_profile, broker_agency_profile, status)
-    subject = "You are associated to #{broker_agency_profile.organization.legal_name}- #{general_agency.legal_name} (#{status})"
-    body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
-    secure_message(broker_agency_profile, general_agency, subject, body)
-    secure_message(broker_agency_profile, employer_profile, subject, body)
-  end
+      create_secure_message(message_params, @broker_person, :inbox)
+    end
 
-  def send_broker_assigned_msg(employer_profile, broker_agency_profile)
-    broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on the #{site_short_name}"
-    broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone).to_s}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
-    employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on the #{site_short_name} site."
-    employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone.to_s}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
-    secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
-    secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
-  end
+    def send_general_agency_assign_msg(general_agency, employer_profile, broker_agency_profile, status)
+      subject = "You are associated to #{broker_agency_profile.organization.legal_name}- #{general_agency.legal_name} (#{status})"
+      body = "<br><p>Associated details<br>General Agency : #{general_agency.legal_name}<br>Employer : #{employer_profile.legal_name}<br>Status : #{status}</p>"
+      secure_message(broker_agency_profile, general_agency, subject, body)
+      secure_message(broker_agency_profile, employer_profile, subject, body)
+    end
 
-  def find_employer
-    @employer_profile = EmployerProfile.find(params["employer_profile_id"])
-  end
+    def send_broker_assigned_msg(employer_profile, broker_agency_profile)
+      broker_subject = "#{employer_profile.organization.legal_name} has selected you as the broker on the #{site_short_name}"
+      broker_body = "<br><p>Please contact your new client representative:<br> Employer Name: #{employer_profile.organization.legal_name}<br>Representative: #{employer_profile.staff_roles.first.try(:full_name)}<br>Email: #{employer_profile.staff_roles.first.try(:work_email_or_best)}<br>Phone: #{employer_profile.staff_roles.first.try(:work_phone)}<br>Address: #{employer_profile.organization.primary_office_location.address.full_address}</p>"
+      employer_subject = "You have selected #{broker_agency_profile.primary_broker_role.person.full_name} as your broker on the #{site_short_name} site."
+      employer_body = "<br><p>Your new Broker: #{broker_agency_profile.primary_broker_role.person.full_name}<br> Phone: #{broker_agency_profile.phone}<br>Email: #{broker_agency_profile.primary_broker_role.person.emails.first.address}<br>Address: #{broker_agency_profile.organization.primary_office_location.address.full_address}</p>"
+      secure_message(employer_profile, broker_agency_profile, broker_subject, broker_body)
+      secure_message(broker_agency_profile, employer_profile, employer_subject, employer_body)
+    end
 
-  def find_broker_agency
-    id = params[:id] || params[:broker_agency_id]
-    @broker_agency_profile = BrokerAgencyProfile.find(id)
+    def find_employer
+      @employer_profile = EmployerProfile.find(params["employer_profile_id"])
+    end
+
+    def find_broker_agency
+      id = params[:id] || params[:broker_agency_id]
+      @broker_agency_profile = BrokerAgencyProfile.find(id)
+    end
   end
 end

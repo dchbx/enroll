@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class Comment
   include Mongoid::Document
   include Mongoid::Timestamps
   include Mongoid::Userstamp
 
-  PRIORITY_KINDS = %w(low normal high)
+  PRIORITY_KINDS = %w[low normal high].freeze
 
   embedded_in :commentable, polymorphic: true
 
@@ -29,7 +31,8 @@ class Comment
   end
 
   private
-    def set_priority
-      is_priority = true if high?
-    end
+
+  def set_priority
+    is_priority = true if high?
+  end
 end

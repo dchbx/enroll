@@ -25,7 +25,7 @@ module Operations
       private
 
       def validate(params)
-        if params[:family_id]&.is_a?(BSON::ObjectId)
+        if params[:family_id].is_a?(BSON::ObjectId)
           Success(params[:family_id])
         else
           Failure('family_id is expected in BSON format')
@@ -62,7 +62,6 @@ module Operations
       end
 
       def applicants_attributes(family)
-
         family.active_family_members.inject([]) do |members_array, family_member|
           member_attrs_result = ::Operations::FinancialAssistance::ParseApplicant.new.call({family_member: family_member})
           members_array << member_attrs_result.success if member_attrs_result.success?

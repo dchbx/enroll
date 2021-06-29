@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root,"lib/mongoid_migration_task")
 class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
   def migrate
     new_account_hbx_id = ENV['new_account_hbx_id']
     old_account_hbx_id = ENV['old_account_hbx_id']
     enr_id = ENV['enrollment_hbx_id'].to_s
-    gp = Person.where(hbx_id:new_account_hbx_id).first
-    bp = Person.where(hbx_id:old_account_hbx_id).first
+    gp = Person.where(hbx_id: new_account_hbx_id).first
+    bp = Person.where(hbx_id: old_account_hbx_id).first
     hbx_enrollment = HbxEnrollment.by_hbx_id(enr_id).first
 
     if gp.nil? || bp.nil?
@@ -38,46 +40,44 @@ class MoveEnrollmentBetweenTwoAccount < MongoidMigrationTask
     end
 
 
-    enrollment = HbxEnrollment.new( kind: hbx_enrollment.kind, enrollment_kind: hbx_enrollment.enrollment_kind,
-                                    employee_role_id: employee_role_id, benefit_group_id: hbx_enrollment.benefit_group_id,
-                                    benefit_group_assignment_id: benefit_group_assignment_id, effective_on: hbx_enrollment.effective_on,
-                                    plan_id: hbx_enrollment.plan_id, aasm_state: hbx_enrollment.aasm_state, hbx_id: hbx_enrollment.hbx_id,
-                                    coverage_kind: hbx_enrollment.coverage_kind, elected_amount: hbx_enrollment.elected_amount,
-                                    elected_premium_credit: hbx_enrollment.elected_premium_credit, 
-                                    applied_premium_credit: hbx_enrollment.applied_premium_credit,
-                                    elected_aptc_pct: hbx_enrollment.elected_aptc_pct, 
-                                    applied_aptc_amount: hbx_enrollment.applied_aptc_amount,
-                                    changing: hbx_enrollment.changing, terminated_on: hbx_enrollment.terminated_on,
-                                    terminate_reason: hbx_enrollment.terminate_reason, carrier_profile_id: hbx_enrollment.carrier_profile_id,
-                                    special_enrollment_period_id: hbx_enrollment.special_enrollment_period_id, 
-                                    enrollment_signature: hbx_enrollment.enrollment_signature,
-                                    aasm_state_date: hbx_enrollment.aasm_state_date, submitted_at: hbx_enrollment.submitted_at,
-                                    original_application_type: hbx_enrollment.original_application_type, 
-                                    consumer_role_id: consumer_role_id,
-                                    benefit_package_id: hbx_enrollment.benefit_package_id,
-                                    benefit_coverage_period_id: hbx_enrollment.benefit_coverage_period_id, 
-                                    updated_by: hbx_enrollment.updated_by,
-                                    is_active: hbx_enrollment.is_active, waiver_reason: hbx_enrollment.waiver_reason,
-                                    published_to_bus_at: hbx_enrollment.published_to_bus_at, review_status: hbx_enrollment.review_status,
-                                    special_verification_period: hbx_enrollment.special_verification_period, 
-                                    termination_submitted_on: hbx_enrollment.termination_submitted_on,
-                                    external_enrollment: hbx_enrollment.external_enrollment,
-                                    benefit_sponsorship_id: hbx_enrollment.benefit_sponsorship_id,
-                                    sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id,
-                                    sponsored_benefit_id: hbx_enrollment.sponsored_benefit_id,
-                                    product_id:hbx_enrollment.product_id,
-                                    rating_area_id:hbx_enrollment.rating_area_id,
-                                    issuer_profile_id: hbx_enrollment.issuer_profile_id,
-                                    created_at:hbx_enrollment.created_at,
-                                    family_id: gp.primary_family.id, 
-                                    household_id: gp.primary_family.active_household.id
-                                  )
+    enrollment = HbxEnrollment.new(kind: hbx_enrollment.kind, enrollment_kind: hbx_enrollment.enrollment_kind,
+                                   employee_role_id: employee_role_id, benefit_group_id: hbx_enrollment.benefit_group_id,
+                                   benefit_group_assignment_id: benefit_group_assignment_id, effective_on: hbx_enrollment.effective_on,
+                                   plan_id: hbx_enrollment.plan_id, aasm_state: hbx_enrollment.aasm_state, hbx_id: hbx_enrollment.hbx_id,
+                                   coverage_kind: hbx_enrollment.coverage_kind, elected_amount: hbx_enrollment.elected_amount,
+                                   elected_premium_credit: hbx_enrollment.elected_premium_credit,
+                                   applied_premium_credit: hbx_enrollment.applied_premium_credit,
+                                   elected_aptc_pct: hbx_enrollment.elected_aptc_pct,
+                                   applied_aptc_amount: hbx_enrollment.applied_aptc_amount,
+                                   changing: hbx_enrollment.changing, terminated_on: hbx_enrollment.terminated_on,
+                                   terminate_reason: hbx_enrollment.terminate_reason, carrier_profile_id: hbx_enrollment.carrier_profile_id,
+                                   special_enrollment_period_id: hbx_enrollment.special_enrollment_period_id,
+                                   enrollment_signature: hbx_enrollment.enrollment_signature,
+                                   aasm_state_date: hbx_enrollment.aasm_state_date, submitted_at: hbx_enrollment.submitted_at,
+                                   original_application_type: hbx_enrollment.original_application_type,
+                                   consumer_role_id: consumer_role_id,
+                                   benefit_package_id: hbx_enrollment.benefit_package_id,
+                                   benefit_coverage_period_id: hbx_enrollment.benefit_coverage_period_id,
+                                   updated_by: hbx_enrollment.updated_by,
+                                   is_active: hbx_enrollment.is_active, waiver_reason: hbx_enrollment.waiver_reason,
+                                   published_to_bus_at: hbx_enrollment.published_to_bus_at, review_status: hbx_enrollment.review_status,
+                                   special_verification_period: hbx_enrollment.special_verification_period,
+                                   termination_submitted_on: hbx_enrollment.termination_submitted_on,
+                                   external_enrollment: hbx_enrollment.external_enrollment,
+                                   benefit_sponsorship_id: hbx_enrollment.benefit_sponsorship_id,
+                                   sponsored_benefit_package_id: hbx_enrollment.sponsored_benefit_package_id,
+                                   sponsored_benefit_id: hbx_enrollment.sponsored_benefit_id,
+                                   product_id: hbx_enrollment.product_id,
+                                   rating_area_id: hbx_enrollment.rating_area_id,
+                                   issuer_profile_id: hbx_enrollment.issuer_profile_id,
+                                   created_at: hbx_enrollment.created_at,
+                                   family_id: gp.primary_family.id,
+                                   household_id: gp.primary_family.active_household.id)
 
     family_members = gp.primary_family.active_family_members.select { |fm| Family::IMMEDIATE_FAMILY.include? fm.primary_relationship }
     family_members.each do |fm|
       hem = HbxEnrollmentMember.new(applicant_id: fm.id, is_subscriber: fm.is_primary_applicant,
-                                    eligibility_date: hbx_enrollment.effective_on, coverage_start_on: hbx_enrollment.effective_on
-                                   )
+                                    eligibility_date: hbx_enrollment.effective_on, coverage_start_on: hbx_enrollment.effective_on)
       enrollment.hbx_enrollment_members << hem
     end
 

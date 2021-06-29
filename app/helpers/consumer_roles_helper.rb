@@ -1,14 +1,15 @@
+# frozen_string_literal: true
+
 module ConsumerRolesHelper
   def ethnicity_collection
     [
-      ["White", "Black or African American", "Asian Indian", "Chinese" ],
+      ["White", "Black or African American", "Asian Indian", "Chinese"],
       ["Filipino", "Japanese", "Korean", "Vietnamese", "Other Asian"],
-      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro", ],
+      ["Native Hawaiian", "Samoan", "Guamanian or Chamorro"],
       ["Other Pacific Islander", "American Indian/Alaska Native", "Other"]
-
-    ].inject([]){ |sets, ethnicities|
+    ].inject([]) do |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
+    end
   end
 
   def latino_collection
@@ -16,9 +17,9 @@ module ConsumerRolesHelper
       ["Mexican", "Mexican American"],
       ["Chicano/a", "Puerto Rican"],
       ["Cuban", "Other"]
-    ].inject([]){ |sets, ethnicities|
+    ].inject([]) do |sets, ethnicities|
       sets << ethnicities.map{|e| OpenStruct.new({name: e, value: e})}
-    }
+    end
   end
 
   def find_consumer_role_for_fields(obj)
@@ -72,22 +73,22 @@ module ConsumerRolesHelper
       first_checked = consumer_role.is_applying_coverage
       second_checked = !consumer_role.is_applying_coverage
     end
-    return first_checked, second_checked
+    [first_checked, second_checked]
   end
 
-  def paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
+  def paper_or_phone_type(id_verified, app_verified, admin_user, consumer)
     if admin_user && (app_verified || id_verified)
-      return consumer.admin_bookmark_url
+      consumer.admin_bookmark_url
     elsif id_verified
-      return consumer.admin_bookmark_url
+      consumer.admin_bookmark_url
     end
   end
 
   def in_person_type(id_verified, admin_user, consumer)
     if admin_user && id_verified
-      return consumer.admin_bookmark_url
+      consumer.admin_bookmark_url
     elsif id_verified
-      return consumer.admin_bookmark_url
+      consumer.admin_bookmark_url
     end
   end
 
@@ -98,20 +99,18 @@ module ConsumerRolesHelper
     id_verified = consumer.identity_verified?
     app_verified = consumer.application_verified?
     case app_type
-      when 'Paper'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'In Person'
-        in_person_type(id_verified, admin_user, consumer)
-      when 'Phone'
-        paper_or_phone_type(id_verified, app_verified, admin_user, consumer )
-      when 'Curam'
-        consumer.admin_bookmark_url
-      when 'Mobile'
-        return consumer.admin_bookmark_url
-      else
-        if id_verified
-          return consumer.admin_bookmark_url
-        end
+    when 'Paper'
+      paper_or_phone_type(id_verified, app_verified, admin_user, consumer)
+    when 'In Person'
+      in_person_type(id_verified, admin_user, consumer)
+    when 'Phone'
+      paper_or_phone_type(id_verified, app_verified, admin_user, consumer)
+    when 'Curam'
+      consumer.admin_bookmark_url
+    when 'Mobile'
+      consumer.admin_bookmark_url
+    else
+      return consumer.admin_bookmark_url if id_verified
     end
   end
 end

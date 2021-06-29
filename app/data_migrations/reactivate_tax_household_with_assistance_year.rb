@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ReactivateTaxHouseholdWithAssistanceYear < MongoidMigrationTask
@@ -14,8 +16,8 @@ class ReactivateTaxHouseholdWithAssistanceYear < MongoidMigrationTask
           ed && ed.max_aptc.to_f == max_aptc.to_f && ed.csr_percent_as_integer == csr_percent
         end
 
-        tax_households.sort { |a, b|  a.created_at <=> b.created_at }.last.update_attributes!(effective_ending_on: nil) if tax_households.present?
-      rescue => e
+        tax_households.max { |a, b|  a.created_at <=> b.created_at }.update_attributes!(effective_ending_on: nil) if tax_households.present?
+      rescue StandardError => e
         puts "Could not update tax_household for this reason: #{e}" unless Rails.env.test?
       end
     else

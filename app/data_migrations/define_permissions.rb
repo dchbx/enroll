@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/migration_task")
 
 class DefinePermissions < MigrationTask
@@ -43,16 +45,14 @@ class DefinePermissions < MigrationTask
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: false, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true,  view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
-                          manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true
-                        )
+                          manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true)
     Permission
       .find_or_initialize_by(name: 'super_admin')
       .update_attributes!(modify_family: true, modify_employer: true, revert_application: true, list_enrollments: true,
                           send_broker_agency_message: true, approve_broker: true, approve_ga: true, can_update_ssn: false, can_complete_resident_application: false,
                           can_add_sep: false, can_lock_unlock: true, can_view_username_and_email: false, can_reset_password: false, modify_admin_tabs: true,
                           view_admin_tabs: true, can_extend_open_enrollment: true, view_the_configuration_tab: true, can_submit_time_travel_request: false, view_agency_staff: true,
-                          manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true
-                        )
+                          manage_agency_staff: true, can_send_secure_message: true, can_manage_qles: true, can_access_pay_now: true, can_access_age_off_excluded: true)
       #puts 'Permissions Updated!'
   end
 
@@ -90,34 +90,34 @@ class DefinePermissions < MigrationTask
   def build_test_roles
     User.where(email: /themanda.*dc.gov/).delete_all
     Person.where(last_name: /^amanda\d+$/).delete_all
-    a=10000000
-    u1 = User.create( email: 'themanda.staff@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u2 = User.create( email: 'themanda.readonly@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
-    u3 = User.create( email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u4 = User.create( email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5999999)+a}")
-    u5 = User.create( email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u6 = User.create( email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u7 = User.create( email: 'themanda.csr_tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
-    u8 = User.create( email: 'themanda.super_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5999999)+a}")
+    a = 10_000_000
+    u1 = User.create(email: 'themanda.staff@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    u2 = User.create(email: 'themanda.readonly@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5_999_999) + a}")
+    u3 = User.create(email: 'themanda.csr_supervisor@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    u4 = User.create(email: 'themanda.csr_tier1@dc.gov', password: 'P@55word', password_confirmation: 'P@55word',  oim_id: "ex#{rand(5_999_999) + a}")
+    u5 = User.create(email: 'themanda.csr_tier2@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    u6 = User.create(email: 'developer@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    u7 = User.create(email: 'themanda.csr_tier3@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
+    u8 = User.create(email: 'themanda.super_admin@dc.gov', password: 'P@55word', password_confirmation: 'P@55word', oim_id: "ex#{rand(5_999_999) + a}")
 
     hbx_profile_id = FactoryBot.create(:hbx_profile).id
-    p1 = Person.create( first_name: 'staff', last_name: "amanda#{rand(1000000)}", user: u1)
-    p2 = Person.create( first_name: 'read_only', last_name: "amanda#{rand(1000000)}", user: u2)
-    p3 = Person.create( first_name: 'supervisor', last_name: "amanda#{rand(1000000)}", user: u3)
-    p4 = Person.create( first_name: 'tier1', last_name: "amanda#{rand(1000000)}", user: u4)
-    p5 = Person.create( first_name: 'tier2', last_name: "amanda#{rand(1000000)}", user: u5)
-    p6 = Person.create( first_name: 'developer', last_name: "developer#{rand(1000000)}", user: u6)
-    p7 = Person.create( first_name: 'tier3', last_name: "amanda#{rand(1000000)}", user: u7)
-    p8 = Person.create( first_name: 'super_admin', last_name: "amanda#{rand(1000000)}", user: u8)
+    p1 = Person.create(first_name: 'staff', last_name: "amanda#{rand(1_000_000)}", user: u1)
+    p2 = Person.create(first_name: 'read_only', last_name: "amanda#{rand(1_000_000)}", user: u2)
+    p3 = Person.create(first_name: 'supervisor', last_name: "amanda#{rand(1_000_000)}", user: u3)
+    p4 = Person.create(first_name: 'tier1', last_name: "amanda#{rand(1_000_000)}", user: u4)
+    p5 = Person.create(first_name: 'tier2', last_name: "amanda#{rand(1_000_000)}", user: u5)
+    p6 = Person.create(first_name: 'developer', last_name: "developer#{rand(1_000_000)}", user: u6)
+    p7 = Person.create(first_name: 'tier3', last_name: "amanda#{rand(1_000_000)}", user: u7)
+    p8 = Person.create(first_name: 'super_admin', last_name: "amanda#{rand(1_000_000)}", user: u8)
 
-    HbxStaffRole.create!( person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p6, permission_id: Permission.developer.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)
-    HbxStaffRole.create!( person: p8, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p1, permission_id: Permission.hbx_staff.id, subrole: 'hbx_staff', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p2, permission_id: Permission.hbx_read_only.id, subrole: 'hbx_read_only', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p3, permission_id: Permission.hbx_csr_supervisor.id, subrole: 'hbx_csr_supervisor', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p4, permission_id: Permission.hbx_csr_tier1.id, subrole: 'hbx_csr_tier1', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p5, permission_id: Permission.hbx_csr_tier2.id, subrole: 'hbx_csr_tier2', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p6, permission_id: Permission.developer.id, subrole: 'developer', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p7, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: hbx_profile_id)
+    HbxStaffRole.create!(person: p8, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: hbx_profile_id)
   end
 
   def hbx_admin_can_update_ssn
@@ -230,22 +230,22 @@ class DefinePermissions < MigrationTask
   end
 
   def grant_super_admin_access
-    raise "User Email Argument expected!!"if ENV['user_email'].blank?
+    raise "User Email Argument expected!!" if ENV['user_email'].blank?
     user_emails = ENV['user_email'].split(',')
     hbx_organization = BenefitSponsors::Organizations::Organization.hbx_profiles.first
     users = User.where(:email.in => user_emails)
     users.each do |user|
-      HbxStaffRole.create!( person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
+      HbxStaffRole.create!(person: user.person, permission_id: Permission.super_admin.id, subrole: 'super_admin', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
   end
 
   def grant_hbx_tier3_access
-    raise "User Email Argument expected!!"if ENV['user_email'].blank?
+    raise "User Email Argument expected!!" if ENV['user_email'].blank?
     user_emails = ENV['user_email'].split(',')
     hbx_organization = BenefitSponsors::Organizations::Organization.hbx_profiles.first
     users = User.where(:email.in => user_emails)
     users.each do |user|
-      HbxStaffRole.create!( person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
+      HbxStaffRole.create!(person: user.person, permission_id: Permission.hbx_tier3.id, subrole: 'hbx_tier3', hbx_profile_id: HbxProfile.current_hbx.id, benefit_sponsor_hbx_profile_id: hbx_organization.hbx_profile.id)
     end
   end
 
@@ -293,10 +293,11 @@ class DefinePermissions < MigrationTask
     Permission.hbx_csr_tier1.update_attributes!(can_access_accept_reject_paper_application_documents: true)
     Permission.hbx_csr_tier2.update_attributes!(can_access_accept_reject_paper_application_documents: true)
   end
+
   def hbx_admin_can_transition_family_members
-   Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
-   Permission.super_admin.update_attributes!(can_transition_family_members: true)
-   Permission.hbx_tier3.update_attributes!(can_transition_family_members: true)
+    Permission.hbx_staff.update_attributes!(can_transition_family_members: true)
+    Permission.super_admin.update_attributes!(can_transition_family_members: true)
+    Permission.hbx_tier3.update_attributes!(can_transition_family_members: true)
   end
 
   def hbx_admin_can_delete_identity_application_documents

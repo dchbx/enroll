@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module Factories
   class EmployeeSignup
     def build(consumer_identity, roster_employee, person)
       employee_signup_form = ::Forms::EmployeeSignup({
-        :employee_id => roster_employee.id,
-        :date_of_birth => consumer_identity.date_of_birth,
-        :ssn => consumer_identity.ssn,
-        :user_id => consumer_identity.user_id
-      })
+                                                       :employee_id => roster_employee.id,
+                                                       :date_of_birth => consumer_identity.date_of_birth,
+                                                       :ssn => consumer_identity.ssn,
+                                                       :user_id => consumer_identity.user_id
+                                                     })
       if person.blank?
         populate_identity_properties(employee_signup_form, consumer_identity)
       else
@@ -55,12 +57,8 @@ module Factories
       form.addresses = addresses
     end
 
-    def copy_phones(form, person)
+    def copy_phones(form, person); end
 
-    end
-
-    def copy_emails(form, person)
-      
-    end
+    def copy_emails(form, person); end
   end
 end

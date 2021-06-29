@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CoverageHouseholdMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -27,9 +29,7 @@ class CoverageHouseholdMember
     @family_member = family.family_members.find(family_member_id) if family_member_id.present?
   end
 
-  def applicant=(new_applicant)
-    @applicant = new_applicant
-  end
+  attr_writer :applicant
 
   def applicant
     return @applicant if defined? @applicant

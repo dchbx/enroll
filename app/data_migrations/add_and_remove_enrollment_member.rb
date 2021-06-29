@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class AddAndRemoveEnrollmentMember < MongoidMigrationTask
@@ -16,8 +18,8 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
   end
 
   def fix_enrollment
-    delete_enrollment_member if (@person_to_remove_input && @person_to_remove_input != 'skip')
-    add_enrollment_member if (@person_to_add_input && @person_to_add_input != 'skip' && @family_member_id)
+    delete_enrollment_member if @person_to_remove_input && @person_to_remove_input != 'skip'
+    add_enrollment_member if @person_to_add_input && @person_to_add_input != 'skip' && @family_member_id
     if @enrollment.save!
       puts "Person with hbx_id: #{@person_to_remove_input} was removed from enrollment hbx_id: #{@enrollment_input}" unless Rails.env.test?
       puts "Person with hbx_id: #{@person_to_add_input} was added to enrollment hbx_id: #{@enrollment_input}" unless Rails.env.test?
@@ -25,9 +27,7 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
   end
 
   def delete_enrollment_member
-    if @enrollment.hbx_enrollment_members.select{|em| em.person.hbx_id==@person_to_remove_input}.try(:first).try(:delete)
-      puts "Removed." unless Rails.env.test?
-    end
+    puts "Removed." if @enrollment.hbx_enrollment_members.select{|em| em.person.hbx_id == @person_to_remove_input}.try(:first).try(:delete) && !Rails.env.test?
   end
 
   def add_enrollment_member
@@ -37,9 +37,9 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
 
   def new_member
     HbxEnrollmentMember.new({
-                                applicant_id: @family_member_id,
-                                eligibility_date: @enrollment.subscriber.eligibility_date,
-                                coverage_start_on: @enrollment.subscriber.coverage_start_on
+                              applicant_id: @family_member_id,
+                              eligibility_date: @enrollment.subscriber.eligibility_date,
+                              coverage_start_on: @enrollment.subscriber.coverage_start_on
                             })
   end
 
@@ -59,26 +59,24 @@ class AddAndRemoveEnrollmentMember < MongoidMigrationTask
   end
 
   def admin_input
-    begin
-      input = STDIN.gets.chomp.to_s.strip
-      return input if input == 'skip'
-      Integer(input)
-    rescue
-      print "Wrong input! Hbx_id can have only numeric values. Print one more time: " unless Rails.env.test?
-      retry
-    end
+    input = $stdin.gets.chomp.to_s.strip
+    return input if input == 'skip'
+    Integer(input)
+  rescue StandardError
+    print "Wrong input! Hbx_id can have only numeric values. Print one more time: " unless Rails.env.test?
+    retry
   end
 
   def check_input(input, caller)
     puts "\nIs this correct input: #{input}? Y/N. 'EXIT' - to interrupt the process." unless Rails.env.test?
-    answer = STDIN.gets.chomp.downcase
+    answer = $stdin.gets.chomp.downcase
     case answer
-      when ("y" || "yes")
-        input
-      when ("n" || "no")
-        eval(caller)
-      when "exit"
-        abort("You've interrupted the data fix process.")
+    when ("y" || "yes")
+      input
+    when ("n" || "no")
+      eval(caller)
+    when "exit"
+      abort("You've interrupted the data fix process.")
     end
   end
 

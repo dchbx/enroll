@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CompositeRatingBaseRatesCalculator
   attr_reader :benefit_group, :plan
 
@@ -9,7 +11,7 @@ class CompositeRatingBaseRatesCalculator
   def base_rate
     @denominator ||= create_denominator
     return 0 if create_denominator == 0
-    @base_rate ||= (create_numerator/@denominator).round(2)
+    @base_rate ||= (create_numerator / @denominator).round(2)
   end
 
   def tier_rates
@@ -45,7 +47,7 @@ class CompositeRatingBaseRatesCalculator
   protected
 
   def create_denominator
-    grouped_denominators = selected_enrollment_objects.group_by { |eno| eno.composite_rating_tier }.map { |k, v| [k, v.size] }
+    grouped_denominators = selected_enrollment_objects.group_by(&:composite_rating_tier).map { |k, v| [k, v.size] }
     grouped_denominators.inject(0.00) do |acc, pair|
       crt, en_count = pair
       addition_value = en_count * benefit_group.composite_rating_tier_factor_for(crt, plan)

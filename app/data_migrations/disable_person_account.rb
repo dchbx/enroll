@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
-class DisablePersonAccount< MongoidMigrationTask
+class DisablePersonAccount < MongoidMigrationTask
   def migrate
     hbx_id = ENV['hbx_id']
-    person = Person.where(hbx_id:hbx_id).first
+    person = Person.where(hbx_id: hbx_id).first
     if person.nil?
       puts "No person was found by the given fein"
     else

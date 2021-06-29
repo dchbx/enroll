@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MapDentalPlans < MongoidMigrationTask
@@ -10,9 +12,7 @@ class MapDentalPlans < MongoidMigrationTask
 
     previous_year_plans.each do |old_plan|
       new_plan = Plan.dental_coverage.where(active_year: current_year, hios_id: old_plan.hios_id).first
-      if new_plan.present?
-        old_plan.update_attributes(renewal_plan_id: new_plan.id)
-      end
+      old_plan.update_attributes(renewal_plan_id: new_plan.id) if new_plan.present?
     end
   end
 end

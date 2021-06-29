@@ -40,10 +40,10 @@ module Operations
       def fetch_family_members(filtered_values)
         person = filtered_values[:person]
         members = person.families.inject([]) do |member_array, family|
-                    family_member = family.active_family_members.detect{|a_fm| a_fm.person_id == person.id}
-                    member_array << family_member if family_member
-                    member_array
-                  end
+          family_member = family.active_family_members.detect{|a_fm| a_fm.person_id == person.id}
+          member_array << family_member if family_member
+          member_array
+        end
 
         members.present? ? Success(members) : Failure('No family members associated with this person')
       end

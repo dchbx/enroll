@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CoverageHousehold
   include Mongoid::Document
   include SetCurrentUser
@@ -34,7 +36,7 @@ class CoverageHousehold
 
   # belongs_to writing agent (broker_role)
   def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole class") unless new_writing_agent.is_a? BrokerRole
+    raise ArgumentError, "expected BrokerRole class" unless new_writing_agent.is_a? BrokerRole
     self.new_writing_agent_id = new_writing_agent._id
     @writing_agent = new_writing_agent
   end
@@ -46,7 +48,7 @@ class CoverageHousehold
 
   # belongs_to BrokerAgencyProfile
   def broker_agency_profile=(new_broker_agency)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency.is_a? BrokerAgencyProfile
+    raise ArgumentError, "expected BrokerAgencyProfile" unless new_broker_agency.is_a? BrokerAgencyProfile
     self.broker_agency_id = new_broker_agency._id
     @broker_agency_profile = new_broker_agency
   end
@@ -83,9 +85,7 @@ class CoverageHousehold
   end
 
   def remove_family_member(family_member)
-    coverage_household_members.where(family_member_id: family_member.id).each do |chm|
-      chm.destroy
-    end
+    coverage_household_members.where(family_member_id: family_member.id).each(&:destroy)
 
     # if chm = coverage_household_members.first
     #   chm.reload
@@ -97,7 +97,7 @@ class CoverageHousehold
 
   def remove_coverage_household_member(coverage_household_member_id, family_member_id)
     chm = coverage_household_members.where(id: coverage_household_member_id).and(family_member_id: family_member_id).first
-    chm.destroy if !chm.nil?
+    chm&.destroy
   end
 
   def notify_the_user(member)
@@ -152,28 +152,22 @@ class CoverageHousehold
     found_families = Family.find_all_by_person(consumer_role.person)
     found_families.each do |ff|
       ff.households.each do |hh|
-        hh.coverage_households.each do |ch|
-          ch.evaluate_individual_market_eligiblity
-        end
-        hh.hbx_enrollments.each do |he|
-          he.evaluate_individual_market_eligiblity
-        end
+        hh.coverage_households.each(&:evaluate_individual_market_eligiblity)
+        hh.hbx_enrollments.each(&:evaluate_individual_market_eligiblity)
       end
     end
   end
 
   def evaluate_individual_market_eligiblity
     eligibility_ruleset = ::RuleSet::CoverageHousehold::IndividualMarketVerification.new(self)
-    if eligibility_ruleset.applicable?
-      self.send(eligibility_ruleset.determine_next_state)
-    end
+    self.send(eligibility_ruleset.determine_next_state) if eligibility_ruleset.applicable?
   end
 
   def active_individual_enrollments
     household.hbx_enrollments.select do |he|
       (he.coverage_household_id == self.id.to_s) &&
-         (!he.benefit_sponsored?) &&
-         he.currently_active?
+        !he.benefit_sponsored? &&
+        he.currently_active?
     end
   end
 
@@ -184,20 +178,17 @@ class CoverageHousehold
     end
   end
 
-  def notify_verification_outstanding
-  end
+  def notify_verification_outstanding; end
 
-  def notify_verification_success
-  end
+  def notify_verification_success; end
 
-private
+  private
+
   def presence_of_coverage_household_members
-    if self.coverage_household_members.size == 0 && is_immediate_family
-      self.errors.add(:base, "Should have at least one coverage_household_member")
-    end
+    self.errors.add(:base, "Should have at least one coverage_household_member") if self.coverage_household_members.empty? && is_immediate_family
   end
 
-  def record_transition(*args)
+  def record_transition(*_args)
     workflow_state_transitions << WorkflowStateTransition.new(
       from_state: aasm.from_state,
       to_state: aasm.to_state,

@@ -1,16 +1,17 @@
-class Uis::Bootstrap3ExamplesController < ApplicationController
+# frozen_string_literal: true
 
-  def index
-    @family_data_table = Effective::Datatables::ExampleDatatable.new
+module Uis
+  class Bootstrap3ExamplesController < ApplicationController
+
+    def index
+      @family_data_table = Effective::Datatables::ExampleDatatable.new
+    end
+
+    def getting_started; end
+
+    def components; end
+
+    def show; end
+
   end
-
-  def getting_started
-  end
-
-  def components
-  end
-
-  def show
-  end
-
 end

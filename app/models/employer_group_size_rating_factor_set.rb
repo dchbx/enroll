@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerGroupSizeRatingFactorSet < RatingFactorSet
   validates_numericality_of :max_integer_factor_key, :allow_blank => false
 

@@ -1,16 +1,16 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class ChangeErToApplicantState < MongoidMigrationTask
   def migrate
-    feins=ENV['feins'].split(' ').uniq
+    feins = ENV['feins'].split.uniq
     feins.each do |fein|
       organizations = Organization.where(fein: fein)
       next puts "unable to find employer_profile with fein: #{fein}" if organizations.blank?
 
-      if organizations.size > 1
-        raise 'more than 1 employer found with given fein'
-      end
-      
+      raise 'more than 1 employer found with given fein' if organizations.size > 1
+
       employer_profile = organizations.first.employer_profile
       plan_year = employer_profile.plan_years.where(aasm_state: ENV['plan_year_state'].to_s).first
       next puts "Present fein: #{fein} is found but it has different plan year assm state" if plan_year.nil?

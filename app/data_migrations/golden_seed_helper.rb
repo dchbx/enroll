@@ -200,7 +200,6 @@ module GoldenSeedHelper
     family
   end
 
-  # rubocop:disable Metrics/AbcSize
   def create_and_return_user(case_info_hash = {})
     providers = ["gmail", "yahoo", "hotmail"]
     email = if case_info_hash[:person_attributes]['email']&.include?(".com")
@@ -234,7 +233,6 @@ module GoldenSeedHelper
     puts("Unable to generate user for #{case_info_hash[:primary_person_record].full_name}, email already taken.") unless user_saved == true
     user
   end
-  # rubocop:enable Metrics/AbcSize
 
   def generate_and_return_dependent_record(case_info_hash)
     dependent_person = create_and_return_person(case_info_hash, true)

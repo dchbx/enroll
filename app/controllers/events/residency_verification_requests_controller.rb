@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Events
   class ResidencyVerificationRequestsController < ::ApplicationController
     include Acapi::Notifiers
@@ -6,15 +8,15 @@ module Events
       [ConsumerRole::RESIDENCY_VERIFICATION_REQUEST_EVENT_NAME]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       individual = payload.stringify_keys["person"]
       event_payload = render_to_string "events/residency/verification_request", :formats => ["xml"], :locals => { :individual => individual }
       event_request_record = EventRequest.new({requested_at: Time.now, body: event_payload})
       individual.consumer_role.local_residency_requests << event_request_record
       individual.verification_types.by_name(VerificationType::LOCATION_RESIDENCY).first.add_type_history_element(action: "Local Hub Request",
-                                                                                           modifier: "Enroll App",
-                                                                                           update_reason: "Hub request",
-                                                                                           event_request_record_id: event_request_record.id)
+                                                                                                                 modifier: "Enroll App",
+                                                                                                                 update_reason: "Hub request",
+                                                                                                                 event_request_record_id: event_request_record.id)
       notify("acapi.info.events.residency.verification_request", {:body => event_payload, :individual_id => individual.hbx_id, :retry_deadline => (Time.now + 24.hours).to_i})
     end
 

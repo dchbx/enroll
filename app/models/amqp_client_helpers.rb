@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AmqpClientHelpers
   def with_response_exchange(conn)
     out_chan = conn.create_channel

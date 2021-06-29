@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SamlController < ApplicationController
   skip_before_action :verify_authenticity_token
   include Acapi::Notifiers
@@ -83,7 +85,6 @@ class SamlController < ApplicationController
   # Going to curam during the initial flow is triggered differently.
   # What we do here is set the navigation flag and send to the right location.
   def navigate_to_assistance
-
     if current_user.present?
 
       ::IdpAccountManager.update_navigation_flag(
@@ -96,7 +97,6 @@ class SamlController < ApplicationController
     else
       redirect_to URI.parse(SamlInformation.iam_login_url).to_s
     end
-
   end
 
   def logout

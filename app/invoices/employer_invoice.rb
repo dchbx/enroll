@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerInvoice
   include InvoiceHelper
   include Config::AcaHelper
@@ -6,12 +8,12 @@ class EmployerInvoice
 
   attr_reader :errors
 
-  def initialize(organization,folder_name=nil)
-    @organization= organization
-    @employer_profile= organization.employer_profile
-    @hbx_enrollments=@employer_profile.enrollments_for_billing
+  def initialize(organization,folder_name = nil)
+    @organization = organization
+    @employer_profile = organization.employer_profile
+    @hbx_enrollments = @employer_profile.enrollments_for_billing
     @folder_name = folder_name
-    @errors=[]
+    @errors = []
   end
 
   def pdf_doc
@@ -19,47 +21,36 @@ class EmployerInvoice
   end
 
   def save
-    begin
-      unless File.directory?(invoice_folder_path)
-        FileUtils.mkdir_p(invoice_folder_path)
-      end
-      pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
-      unless fetch_invoices_addendum.blank?
-        join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', fetch_invoices_addendum)]
-      end
-    rescue Exception => e
-      @errors << "Unable to create PDF for #{@organization.hbx_id}."
-      @errors << e.inspect
-    end
+    FileUtils.mkdir_p(invoice_folder_path) unless File.directory?(invoice_folder_path)
+    pdf_doc.render_file(invoice_absolute_file_path) unless File.exist?(invoice_absolute_file_path)
+    join_pdfs [Rails.root.join('tmp', invoice_absolute_file_path), Rails.root.join('lib/pdf_templates', fetch_invoices_addendum)] unless fetch_invoices_addendum.blank?
+  rescue Exception => e
+    @errors << "Unable to create PDF for #{@organization.hbx_id}."
+    @errors << e.inspect
   end
 
-
   def join_pdfs(pdfs)
-    pdf = File.exists?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
+    pdf = File.exist?(pdfs[0]) ? CombinePDF.load(pdfs[0]) : CombinePDF.new
     pdf << CombinePDF.load(pdfs[1])
     pdf.save invoice_absolute_file_path
   end
 
   def save_to_cloud
-    begin
-      Organization.upload_invoice(invoice_absolute_file_path,invoice_file_name)
-    rescue Exception => e
-      @errors << "Unable to upload PDF for. #{@organization.hbx_id}"
-      Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
-    end
+    Organization.upload_invoice(invoice_absolute_file_path,invoice_file_name)
+  rescue Exception => e
+    @errors << "Unable to upload PDF for. #{@organization.hbx_id}"
+    Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
   end
 
   def send_to_print_vendor
-    begin
-      Organization.upload_invoice_to_print_vendor(invoice_absolute_file_path,invoice_file_name)
-    rescue Exception => e
-      @errors << "Unable to send PDF to print vendor for. #{@organization.hbx_id}"
-      Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
-    end
+    Organization.upload_invoice_to_print_vendor(invoice_absolute_file_path,invoice_file_name)
+  rescue Exception => e
+    @errors << "Unable to send PDF to print vendor for. #{@organization.hbx_id}"
+    Rails.logger.warn("Unable to create PDF #{e} #{e.backtrace}")
   end
 
   def send_email_notice
-    unless (@organization.employer_profile.is_new_employer? && @organization.invoices.empty?)
+    unless @organization.employer_profile.is_new_employer? && @organization.invoices.empty?
       subject = "Invoice Now Available"
       body = "Your Renewal invoice is now available in your employer profile under Billing tab. Thank You"
       message_params = {
@@ -83,7 +74,7 @@ class EmployerInvoice
   # should not trigger with plan year is in renewal related states
   # should trigger on conversion employers who has PlanYear::PUBLISHED
   def send_first_invoice_available_notice
-    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && (@organization.invoices.size < 1)
+    if @organization.employer_profile.is_new_employer? && !@organization.employer_profile.is_converting_with_renewal_state? && @organization.invoices.empty?
       plan_year = @organization.employer_profile.plan_years.where(:aasm_state.in => PlanYear::PUBLISHED).first
       observer = Observers::NoticeObserver.new
       observer.deliver(recipient: @organization.employer_profile, event_object: plan_year, notice_event: "initial_employer_invoice_available") if plan_year.present?
@@ -111,7 +102,7 @@ class EmployerInvoice
 
   def create_secure_message(message_params, inbox_provider, folder)
     message = Message.new(message_params)
-    message.folder =  Message::FOLDER_TYPES[folder]
+    message.folder = Message::FOLDER_TYPES[folder]
     msg_box = inbox_provider.inbox
     msg_box.post_message(message)
     msg_box.save
@@ -134,7 +125,7 @@ class EmployerInvoice
   end
 
   def invoice_file_name
-    "#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime("%m%d%Y")}_INVOICE_R.pdf"
+    "#{@organization.hbx_id}_#{TimeKeeper.datetime_of_record.strftime('%m%d%Y')}_INVOICE_R.pdf"
   end
 
 end

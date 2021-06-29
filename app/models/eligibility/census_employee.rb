@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Eligibility
   module CensusEmployee
-
     def coverage_effective_on(package = nil, shop_under_current: false, shop_under_future: false)
       package = possible_benefit_package(shop_under_current: shop_under_current, shop_under_future: shop_under_future) if package.blank? || package.is_conversion? # cautious
       if package.present?

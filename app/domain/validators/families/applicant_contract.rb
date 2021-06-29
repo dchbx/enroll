@@ -89,11 +89,9 @@ module Validators
       end
 
       rule(:is_primary_applicant) do
-        if key? && value
-          if value
-            key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
-            key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
-          end
+        if key? && value && value
+          key.failure(text: "family_member_id should be present") if values[:family_member_id].blank?
+          key.failure(text: "person hbx id should be present") if values[:person_hbx_id].blank?
         end
       end
 

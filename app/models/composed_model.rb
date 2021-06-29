@@ -1,5 +1,6 @@
-module ComposedModel
+# frozen_string_literal: true
 
+module ComposedModel
   def self.included(base)
     base.class_eval do
       extend ComposedModel::ComposedModelClassMethods
@@ -46,18 +47,17 @@ module ComposedModel
           @#{name} = vals.map { |v_attrs| #{klass_name}.new(v_attrs) }
           #{name}_attributes
         end
-        RUBYCODE
-        if do_validation_on_collection
-          class_eval(<<-RUBYCODE) 
+      RUBYCODE
+      if do_validation_on_collection
+        class_eval(<<-RUBYCODE)
           validate :#{name}_validation_steps
 
           def #{name}_validation_steps
             objs_to_validate = #{name}
             validate_collection_and_propagate_errors("#{name}",objs_to_validate)
           end
-            RUBYCODE
-        end
+        RUBYCODE
+      end
     end
-
   end
 end

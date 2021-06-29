@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployeeRole
   include Mongoid::Document
   include SetCurrentUser
@@ -7,7 +9,7 @@ class EmployeeRole
   include BenefitSponsors::Concerns::Observable
   include Mongoid::History::Trackable
 
-  EMPLOYMENT_STATUS_KINDS   = ["active", "full-time", "part-time", "retired", "terminated"]
+  EMPLOYMENT_STATUS_KINDS = ["active", "full-time", "part-time", "retired", "terminated"].freeze
 
   embedded_in :person
 
@@ -28,8 +30,8 @@ class EmployeeRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   delegate :hbx_id, to: :person, allow_nil: true
@@ -41,11 +43,11 @@ class EmployeeRole
   delegate :benefit_package_for_date, to: :census_employee, allow_nil: true
 
   validates_presence_of :dob, :gender, :hired_on
-  validates_presence_of :ssn, :if => Proc.new { |m| !m.person.no_ssn }
+  validates_presence_of :ssn, :if => proc { |m| !m.person.no_ssn }
   # validates_presence_of :employer_profile_id
   # validates_presence_of :benefit_sponsors_employer_profile_id
-  validates_presence_of :employer_profile_id, :if => Proc.new { |m| m.benefit_sponsors_employer_profile_id.blank? }
-  validates_presence_of :benefit_sponsors_employer_profile_id, :if => Proc.new { |m| m.employer_profile_id.blank? }
+  validates_presence_of :employer_profile_id, :if => proc { |m| m.benefit_sponsors_employer_profile_id.blank? }
+  validates_presence_of :benefit_sponsors_employer_profile_id, :if => proc { |m| m.employer_profile_id.blank? }
   scope :active, ->{ where(is_active: true).where(:created_at.ne => nil) }
 
   accepts_nested_attributes_for :person
@@ -61,9 +63,7 @@ class EmployeeRole
     if employee_role.person.present?
       @changed_nested_person_attributes = {}
       %w[ssn dob gender hbx_id].each do |field|
-        if employee_role.person.send("#{field}_changed?")
-          @changed_nested_person_attributes[field] = employee_role.person.send(field)
-        end
+        @changed_nested_person_attributes[field] = employee_role.person.send(field) if employee_role.person.send("#{field}_changed?")
       end
     end
     true
@@ -104,8 +104,8 @@ class EmployeeRole
   end
 
   def employer_profile=(new_employer_profile)
-    raise ArgumentError.new("expected EmployerProfile") unless new_employer_profile.class.to_s.match(/EmployerProfile/)
-    if new_employer_profile.kind_of?(EmployerProfile)
+    raise ArgumentError, "expected EmployerProfile" unless new_employer_profile.class.to_s.match(/EmployerProfile/)
+    if new_employer_profile.is_a?(EmployerProfile)
       self.employer_profile_id = new_employer_profile._id
     else
       self.benefit_sponsors_employer_profile_id = new_employer_profile._id
@@ -115,13 +115,13 @@ class EmployeeRole
 
   def employer_profile
     return @employer_profile if defined? @employer_profile
-    if is_case_old?
-      @employer_profile = EmployerProfile.find(self.employer_profile_id)
-    else
-      @employer_profile =  BenefitSponsors::Organizations::Organization.employer_profiles.where(
-        :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
-      ).first.employer_profile
-    end
+    @employer_profile = if is_case_old?
+                          EmployerProfile.find(self.employer_profile_id)
+                        else
+                          BenefitSponsors::Organizations::Organization.employer_profiles.where(
+                            :"profiles._id" => BSON::ObjectId.from_string(benefit_sponsors_employer_profile_id)
+                          ).first.employer_profile
+                        end
   end
 
   def qle_benefit_package
@@ -134,7 +134,7 @@ class EmployeeRole
 
   def benefit_package(qle: false, shop_under_current: false, shop_under_future: false)
     if qle.present?
-      qle_benefit_package if (qle_benefit_package.present? && !qle_benefit_package.is_conversion?)
+      qle_benefit_package if qle_benefit_package.present? && !qle_benefit_package.is_conversion?
     elsif shop_under_current
       census_employee.published_benefit_group
     elsif shop_under_future
@@ -226,7 +226,7 @@ class EmployeeRole
   end
 
   def new_census_employee=(new_census_employee)
-    raise ArgumentError.new("expected CensusEmployee class") unless new_census_employee.is_a? ::CensusEmployee
+    raise ArgumentError, "expected CensusEmployee class" unless new_census_employee.is_a? ::CensusEmployee
     self.census_employee_id = new_census_employee._id
     @census_employee = new_census_employee
   end
@@ -236,8 +236,8 @@ class EmployeeRole
     @census_employee = ::CensusEmployee.find(self.census_employee_id) unless census_employee_id.blank?
   end
 
-  alias_method :census_employee=, :new_census_employee=
-  alias_method :census_employee, :new_census_employee
+  alias census_employee= new_census_employee=
+  alias census_employee new_census_employee
 
   def is_cobra_status?
     if census_employee.present?
@@ -248,9 +248,7 @@ class EmployeeRole
   end
 
   def coverage_effective_on(current_benefit_group: nil, qle: false)
-    if qle && benefit_package(qle: qle).present?
-      current_benefit_group = benefit_package(qle: qle)
-    end
+    current_benefit_group = benefit_package(qle: qle) if qle && benefit_package(qle: qle).present?
 
     census_employee.coverage_effective_on(current_benefit_group)
   end
@@ -260,7 +258,7 @@ class EmployeeRole
   end
 
   def is_active?
-    census_employee && census_employee.is_active?
+    census_employee&.is_active?
   end
 
   def can_select_coverage?
@@ -291,7 +289,7 @@ class EmployeeRole
     def find(employee_role_id)
       bson_id = BSON::ObjectId.from_string(employee_role_id)
       person = Person.where({"employee_roles._id" => bson_id })
-      person.first.employee_roles.detect { |ee| ee.id == bson_id } unless person.size < 1
+      person.first.employee_roles.detect { |ee| ee.id == bson_id } unless person.empty?
     end
 
     # Deprecated
@@ -327,7 +325,7 @@ class EmployeeRole
     end
   end
 
-private
+  private
 
   def termination_date_must_follow_hire_date
     return if hired_on.nil? || terminated_on.nil?

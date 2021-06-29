@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Enrollments
   module Replicator
     class Reinstatement
@@ -86,11 +88,7 @@ module Enrollments
       end
 
       def can_be_reinstated?
-        if reinstate_under_renewal_py?
-          if !renewal_plan_offered_by_er?(reinstatement_plan)
-            raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})."
-          end
-        end
+        raise "Unable to reinstate enrollment: your Employer Sponsored Benefits no longer offerring the plan (#{reinstatement_plan.name})." if reinstate_under_renewal_py? && !renewal_plan_offered_by_er?(reinstatement_plan)
         true
       end
 
@@ -111,8 +109,8 @@ module Enrollments
         if base_enrollment.may_terminate_coverage? && (reinstate_enrollment.effective_on > base_enrollment.effective_on)
           base_enrollment.terminate_coverage!
           base_enrollment.update_attributes!(terminated_on: reinstate_enrollment.effective_on - 1.day)
-        else
-          base_enrollment.cancel_coverage! if base_enrollment.may_cancel_coverage?
+        elsif base_enrollment.may_cancel_coverage?
+          base_enrollment.cancel_coverage!
         end
 
         @reinstate_enrollment = reinstated_enrollment
@@ -174,10 +172,10 @@ module Enrollments
                       end
         enr_members.inject([]) do |members, hbx_enrollment_member|
           members << HbxEnrollmentMember.new({
-                                                 applicant_id: hbx_enrollment_member.applicant_id,
-                                                 eligibility_date: new_effective_date,
-                                                 coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
-                                                 is_subscriber: hbx_enrollment_member.is_subscriber
+                                               applicant_id: hbx_enrollment_member.applicant_id,
+                                               eligibility_date: new_effective_date,
+                                               coverage_start_on: member_coverage_start_date(hbx_enrollment_member),
+                                               is_subscriber: hbx_enrollment_member.is_subscriber
                                              })
         end
       end

@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class RemoveOrganization < MongoidMigrationTask
 
   def migrate
     organizations = Organization.where(fein: ENV['fein'])
-    if organizations.size !=1
+    if organizations.size != 1
       puts 'Issues with fein'
       return
     end

@@ -49,7 +49,6 @@ module Operations
         person.save!
 
         Success(vlp_document)
-
       rescue StandardError => e
         Failure(person.errors.messages)
       end

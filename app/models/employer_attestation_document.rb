@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerAttestationDocument < Document
   include Mongoid::Document
   include SetCurrentUser
@@ -9,7 +11,7 @@ class EmployerAttestationDocument < Document
     "Document Not Required DOR-1 Form",
     "DOR-1 Form DoesNot Match Bussiness",
     "Other Reason"
-  ]
+  ].freeze
 
   field :aasm_state, type: String, default: "submitted"
   field :reason_for_rejection, type: String
@@ -58,7 +60,7 @@ class EmployerAttestationDocument < Document
   end
 
   def submit_review(params)
-    if submitted? && employer_attestation.editable? 
+    if submitted? && employer_attestation.editable?
       case params[:status].to_sym
       when :rejected
         self.reject! if self.may_reject?

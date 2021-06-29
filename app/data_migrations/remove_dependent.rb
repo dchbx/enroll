@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require File.join(Rails.root, "lib", "remove_family_member")
 

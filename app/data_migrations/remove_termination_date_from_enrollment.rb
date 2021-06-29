@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class RemoveTerminationDateFromEnrollment < MongoidMigrationTask
@@ -9,10 +11,10 @@ class RemoveTerminationDateFromEnrollment < MongoidMigrationTask
     else
       enrollment.unset(:terminated_on)
       state = enrollment.aasm_state
-      if enrollment.update_attributes(aasm_state:"coverage_selected")
+      if enrollment.update_attributes(aasm_state: "coverage_selected")
         enrollment.workflow_state_transitions << WorkflowStateTransition.new(
-            from_state: state,
-            to_state: "coverage_selected"
+          from_state: state,
+          to_state: "coverage_selected"
         )
       end
     end

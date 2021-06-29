@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class LoadIssuerProfiles < MongoidMigrationTask
@@ -10,7 +12,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
     require data_filename
     site = BenefitSponsors::Site.all.where(site_key: site_key.to_sym).first
 
-    puts "*"*80 unless Rails.env.test?
+    puts "*" * 80 unless Rails.env.test?
     ISSUER_PROFILE_DATA.each do |issuer_profile|
 
       fein = issuer_profile[:fein]
@@ -31,10 +33,10 @@ class LoadIssuerProfiles < MongoidMigrationTask
 
       exempt_organization = BenefitSponsors::Organizations::ExemptOrganization.where(:"profiles.hbx_carrier_id" => hbx_carrier_id).first
       new_exempt_organization = if exempt_organization.present?
-        exempt_organization
-      else
-        BenefitSponsors::Organizations::ExemptOrganization.new(exempt_organiation_params)
-      end
+                                  exempt_organization
+                                else
+                                  BenefitSponsors::Organizations::ExemptOrganization.new(exempt_organiation_params)
+                                end
 
       issuer_profile = new_exempt_organization.profiles.first
       if issuer_profile.present?
@@ -54,7 +56,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
           shop_health: shop_health,
           shop_dental: shop_dental,
           issuer_hios_ids: issuer_hios_ids,
-          office_locations: [office_location],
+          office_locations: [office_location]
         }
 
         new_issuer_profile = BenefitSponsors::Organizations::IssuerProfile.new(issuer_profile_params)
@@ -65,7 +67,7 @@ class LoadIssuerProfiles < MongoidMigrationTask
         puts "Successfully created #{legal_name} carrier with hbx_carrier_id #{hbx_carrier_id}" unless Rails.env.test?
       end
     end
-    puts "*"*80 unless Rails.env.test?
+    puts "*" * 80 unless Rails.env.test?
   end
 
 end

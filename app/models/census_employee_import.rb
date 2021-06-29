@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CensusEmployeeImport
   extend ActiveModel::Naming
   include ActiveModel::Conversion
@@ -12,11 +14,11 @@ class CensusEmployeeImport
   TEMPLATE_DATE_CELL = 7
   TEMPLATE_VERSION_CELL = 13
 
-  MEMBER_RELATIONSHIP_KINDS = %w(employee spouse domestic_partner child)
+  MEMBER_RELATIONSHIP_KINDS = %w[employee spouse domestic_partner child].freeze
 
   EmployeeTerminationMap = Struct.new(:employee, :termination_date)
 
-  CENSUS_MEMBER_RECORD = %w(
+  CENSUS_MEMBER_RECORD = %w[
       employer_assigned_family_id
       employee_relationship
       last_name
@@ -39,7 +41,7 @@ class CensusEmployeeImport
       state
       zip
       newly_designated
-    )
+    ].freeze
 
   CENSUS_MEMBER_RECORD_TITLES = [
       "Family ID #(to match family members to the EE & each household gets a unique number)",
@@ -63,7 +65,7 @@ class CensusEmployeeImport
       "City(Optional)",
       "State(Optional)",
       "Zip(Optional)"
-  ]
+  ].freeze
 
   def initialize(attributes = {})
     @terminate_queue = {}
@@ -74,14 +76,12 @@ class CensusEmployeeImport
   end
 
   def check_relationships
-    return true if (@sheet.nil? || @column_header_row.nil?)
+    return true if @sheet.nil? || @column_header_row.nil?
 
     (4..@sheet.last_row).each_with_index.map do |i, index|
       row = Hash[[@column_header_row, @roster.row(i)].transpose]
       record = parse_row(row)
-      if record[:employee_relationship].nil?
-        self.errors.add :base, "Row #{index + 4}: Relationship is required"
-      end
+      self.errors.add :base, "Row #{index + 4}: Relationship is required" if record[:employee_relationship].nil?
     end
   end
 
@@ -92,9 +92,7 @@ class CensusEmployeeImport
   def imported_census_employees
     @imported_census_employees ||= load_imported_census_employees
     @imported_census_employees.each do |census_employee|
-      if census_employee.is_a? CensusEmployee
-        census_employee.errors.add :base, "Email is required" if census_employee.email.blank?
-      end
+      census_employee.errors.add :base, "Email is required" if census_employee.is_a? CensusEmployee && census_employee.email.blank?
     end
     @imported_census_employees
   end
@@ -111,9 +109,7 @@ class CensusEmployeeImport
     @column_header_row = @sheet.row(2)
     # label_header_row  = @sheet.row(3)
 
-    unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
-      raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template."
-    end
+    raise "Unrecognized Employee Census spreadsheet format. Contact #{Settings.site.short_name} for current template." unless header_valid?(sheet_header_row) && column_header_valid?(@column_header_row)
 
     census_employees = []
     (4..@sheet.last_row).each_with_index.map do |i, index|
@@ -131,25 +127,22 @@ class CensusEmployeeImport
           @last_ee_member = census_employee
           @last_ee_member_record = record
         end
-      else #add or edit census_member logic
-        if record[:employee_relationship].nil?
-          self.errors.add :base, "Row #{index + 4}: Relationship is required"
-          break
-        else
-          census_employee = add_or_update_census_member(record)
-        end
+      elsif record[:employee_relationship].nil? #add or edit census_member logic
+        self.errors.add :base, "Row #{index + 4}: Relationship is required"
+        break
+      else
+        census_employee = add_or_update_census_member(record)
       end
 
-      if record[:newly_designated] == '1'
+      case record[:newly_designated]
+      when '1'
         begin
           census_employee.newly_designate
         rescue Exception => e
-          self.errors.add :base, "employee can't transition to newly designate state #{e.to_s}"
+          self.errors.add :base, "employee can't transition to newly designate state #{e}"
         end
-      elsif record[:newly_designated] == '0'
-        if census_employee.may_rebase_new_designee?
-          census_employee.rebase_new_designee
-        end
+      when '0'
+        census_employee.rebase_new_designee if census_employee.may_rebase_new_designee?
       end
 
       census_employee ||= nil
@@ -168,7 +161,7 @@ class CensusEmployeeImport
       @last_ee_member_record = record
     else
       # Process dependent
-      return nil if (@last_ee_member_record.nil? || @last_ee_member.nil?)
+      return nil if @last_ee_member_record.nil? || @last_ee_member.nil?
       if record[:employer_assigned_family_id] == @last_ee_member_record[:employer_assigned_family_id]
         census_dependent = @last_ee_member.census_dependents.detect do |dependent|
           (dependent.ssn == record[:ssn]) && (dependent.dob == record[:dob])
@@ -197,11 +190,11 @@ class CensusEmployeeImport
     member.dob = record[:dob] if record[:dob]
     member.hired_on = record[:hire_date] if record[:hire_date]
     # is_business_owner blank or false based on it checkbox value will be set
-    if ["0",""].include? record[:is_business_owner].to_s
-      member.is_business_owner = false
-    else
-      member.is_business_owner = true
-    end
+    member.is_business_owner = if ["0",""].include? record[:is_business_owner].to_s
+                                 false
+                               else
+                                 true
+                               end
     member.gender = record[:gender].to_s if record[:gender]
     member.email = Email.new({address: record[:email].to_s, kind: "home"}) if record[:email]
     member.employee_relationship = record[:employee_relationship].to_s if record[:employee_relationship]
@@ -252,39 +245,39 @@ class CensusEmployeeImport
     zip = parse_text(row["zip"])
     newly_designated = parse_boolean(row["newly_designated"])
     {
-        employer_assigned_family_id: employer_assigned_family_id,
-        employee_relationship: employee_relationship,
-        last_name: last_name,
-        first_name: first_name,
-        middle_name: middle_name,
-        name_sfx: name_sfx,
-        email: email,
-        ssn: ssn,
-        dob: dob,
-        gender: gender,
-        hire_date: hire_date,
-        termination_date: termination_date,
-        is_business_owner: is_business_owner,
-        benefit_group: benefit_group,
-        plan_year: plan_year,
-        kind: kind,
-        address_1: address_1,
-        address_2: address_2,
-        city: city,
-        state: state,
-        zip: zip,
-        newly_designated: newly_designated
+      employer_assigned_family_id: employer_assigned_family_id,
+      employee_relationship: employee_relationship,
+      last_name: last_name,
+      first_name: first_name,
+      middle_name: middle_name,
+      name_sfx: name_sfx,
+      email: email,
+      ssn: ssn,
+      dob: dob,
+      gender: gender,
+      hire_date: hire_date,
+      termination_date: termination_date,
+      is_business_owner: is_business_owner,
+      benefit_group: benefit_group,
+      plan_year: plan_year,
+      kind: kind,
+      address_1: address_1,
+      address_2: address_2,
+      city: city,
+      state: state,
+      zip: zip,
+      newly_designated: newly_designated
     }
   end
 
   def header_valid?(sheet_header_row)
-    if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
-      template_date = sheet_header_row[TEMPLATE_DATE_CELL]
-    else
-      template_date = Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y")
-    end
+    template_date = if sheet_header_row[TEMPLATE_DATE_CELL].is_a? Date
+                      sheet_header_row[TEMPLATE_DATE_CELL]
+                    else
+                      Date.strptime(sheet_header_row[TEMPLATE_DATE_CELL], "%m/%d/%Y")
+                    end
     template_date == TEMPLATE_DATE &&
-    sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
+      sheet_header_row[TEMPLATE_VERSION_CELL] == TEMPLATE_VERSION
   end
 
   def column_header_valid?(column_header_row)
@@ -295,22 +288,18 @@ class CensusEmployeeImport
   def parse_relationship(cell)
     # defined? @last_employer_assigned_family_id ?
     return nil if cell.blank?
-    field_map = case parse_text(cell).downcase
-                  when "employee"
-                    "self"
-                  when "spouse"
-                    "spouse"
-                  when "domestic partner"
-                    "domestic_partner"
-                  when "child"
-                    "child_under_26"
-                  when "disabled child"
-                    "disabled_child_26_and_over"
-                  else
-                    nil
-                end
-
-    field_map
+    case parse_text(cell).downcase
+    when "employee"
+      "self"
+    when "spouse"
+      "spouse"
+    when "domestic partner"
+      "domestic_partner"
+    when "child"
+      "child_under_26"
+    when "disabled child"
+      "disabled_child_26_and_over"
+    end
   end
 
   def parse_text(cell)
@@ -319,8 +308,20 @@ class CensusEmployeeImport
 
   def parse_date(cell)
     return nil if cell.blank?
-    return DateTime.strptime(cell, "%m/%d/%Y") rescue raise ImportErrorValue, cell if cell.class == String
-    return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y") rescue raise ImportErrorDate, cell if cell.class == String
+    if cell.instance_of?(String)
+      begin
+        return DateTime.strptime(cell, "%m/%d/%Y")
+      rescue StandardError
+        raise ImportErrorValue, cell
+      end
+    end
+    if cell.instance_of?(String)
+      begin
+        return cell.to_s.sanitize_value.to_time.strftime("%m-%d-%Y")
+      rescue StandardError
+        raise ImportErrorDate, cell
+      end
+    end
     # return cell.sanitize_value.to_date.to_s(:db) rescue raise ImportErrorValue, cell if cell.class == String
 
     cell.blank? ? nil : cell
@@ -331,26 +332,48 @@ class CensusEmployeeImport
   end
 
   def parse_boolean(cell)
-    cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+    if cell.blank?
+      nil
+    else
+      cell.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+    end
   end
 
   def self.parse_boolean(cell)
-    cell.blank? ? nil : cell.match(/(true|t|yes|y|1)$/i) != nil ? "1" : "0"
+    if cell.blank?
+      nil
+    else
+      cell.match(/(true|t|yes|y|1)$/i).nil? ? "0" : "1"
+    end
   end
 
   def self.parse_number(cell)
-    cell.blank? ? nil : (Float(cell) rescue raise ImportErrorValue, cell)
+    if cell.blank?
+      nil
+    else
+      begin
+        Float(cell)
+      rescue StandardError
+        raise ImportErrorValue, cell
+      end
+    end
   end
 
   def self.parse_integer(cell)
-    cell.blank? ? nil : (Integer(cell) rescue raise ImportErrorValue, cell)
+    if cell.blank?
+      nil
+    else
+      begin
+        Integer(cell)
+      rescue StandardError
+        raise ImportErrorValue, cell
+      end
+    end
   end
 
   def save
     if imported_census_employees.compact.map(&:valid?).all? && (imported_census_employees.exclude? nil)
-      if self.errors.present? || !self.valid?
-        return false
-      end
+      return false if self.errors.present? || !self.valid?
 
       imported_census_employees.compact.each(&:save!)
       terminate_employees if @terminate_queue.present?
@@ -371,14 +394,14 @@ class CensusEmployeeImport
 
   def open_spreadsheet
     case File.extname(file.original_filename)
-      when ".csv" then
-        Csv.new(file.path, nil, :ignore)
-      when ".xls" then
-        Excel.new(file.path, nil, :ignore)
-      when ".xlsx" then
-        Excelx.new(file.path, nil, :ignore)
-      else
-        raise "Unknown file type: #{file.original_filename}"
+    when ".csv"
+      Csv.new(file.path, nil, :ignore)
+    when ".xls"
+      Excel.new(file.path, nil, :ignore)
+    when ".xlsx"
+      Excelx.new(file.path, nil, :ignore)
+    else
+      raise "Unknown file type: #{file.original_filename}"
     end
   end
 
@@ -391,24 +414,25 @@ class CensusEmployeeImport
   end
 
   def terminate_employees
-    @terminate_queue.each do |row, employee_termination_map|
-       employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
+    @terminate_queue.each do |_row, employee_termination_map|
+      employee_termination_map.employee.terminate_employment(employee_termination_map.termination_date)
     end
   end
-
 
   def is_employee_terminable?(employee)
     #this logic may become more sophisticated in future
     employee.may_terminate_employee_role?
   end
 
-  alias_method :count, :length
+  alias count length
 
   private
+
   def sanitize_value(value)
     value = value.to_s.split('.')[0] if value.is_a? Float
-    value.to_s.gsub(/[[:cntrl:]]|^[\p{Space}]+|[\p{Space}]+$/, '')
+    value.to_s.gsub(/[[:cntrl:]]|^\p{Space}+|\p{Space}+$/, '')
   end
+
   def prepend_zeros(number, n)
     (n - number.to_s.size).times { number.prepend('0') }
     number
@@ -416,8 +440,8 @@ class CensusEmployeeImport
 
 end
 
-class ImportErrorValue < Exception;
+class ImportErrorValue < RuntimeError
 end
 
-class ImportErrorDate < Exception;
+class ImportErrorDate < RuntimeError
 end

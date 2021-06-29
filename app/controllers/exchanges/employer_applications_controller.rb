@@ -39,7 +39,7 @@ module Exchanges
       @service = BenefitSponsors::Services::BenefitApplicationActionService.new(@application, { transmit_to_carrier: transmit_to_carrier })
       result, _application, errors = @service.cancel_application
       if errors.present?
-        flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|memo, error| '#{memo}<li>#{error}</li>'}.html_safe}"
+        flash[:error] = "#{@benefit_sponsorship.organization.legal_name}'s Application could not be canceled due to #{errors.inject(''){|_memo, _error| "#{memo}<li>#{error}</li>"}.html_safe}"
       else
         flash[:notice] = "#{@benefit_sponsorship.organization.legal_name}'s Application canceled successfully."
       end

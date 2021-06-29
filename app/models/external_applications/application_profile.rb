@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ExternalApplications
   class ApplicationProfile
     attr_reader :name, :url, :policy_class
@@ -13,7 +15,7 @@ module ExternalApplications
     end
 
     def self.find_by_application_name(app_name)
-      external_apps = load_external_applications()
+      external_apps = load_external_applications
       external_apps.detect do |ea|
         ea.name == app_name.strip
       end

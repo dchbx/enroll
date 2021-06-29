@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateSuperGroup < MongoidMigrationTask
@@ -12,10 +14,10 @@ class UpdateSuperGroup < MongoidMigrationTask
     message += " super_group_id" if super_group_id.blank?
 
     if message.present?
-      puts "*"*80 unless Rails.env.test?
-      message+=" cannot be empty."
+      puts "*" * 80 unless Rails.env.test?
+      message += " cannot be empty."
       puts message
-      puts "*"*80 unless Rails.env.test?
+      puts "*" * 80 unless Rails.env.test?
       return
     end
 

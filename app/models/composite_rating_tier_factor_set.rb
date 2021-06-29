@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CompositeRatingTierFactorSet < RatingFactorSet
   validate :only_valid_tier_names
 
@@ -15,8 +17,6 @@ class CompositeRatingTierFactorSet < RatingFactorSet
     invalid_entries = rating_factor_entries.any? do |rfe|
       !CompositeRatingTier::NAMES.include?(rfe.factor_key)
     end
-    if invalid_entries
-      errors.add(:rating_factor_entries, "Contain invalid tier names.")
-    end
+    errors.add(:rating_factor_entries, "Contain invalid tier names.") if invalid_entries
   end
 end

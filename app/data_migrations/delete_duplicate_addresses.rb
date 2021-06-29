@@ -12,21 +12,19 @@ class DeleteDuplicateAddresses < MongoidMigrationTask
   end
 
   def migrate
-    begin
-      hbx_id = ENV['person_hbx_id']
-      person = Person.all.by_hbx_id(hbx_id).first
+    hbx_id = ENV['person_hbx_id']
+    person = Person.all.by_hbx_id(hbx_id).first
 
-      if person.nil?
-        puts "Unable to find any person record with the given hbx_id: #{hbx_id}" unless Rails.env.test?
-        return
-      end
-
-      fetch_duplicate_address_ids(person).each do |address_id|
-        address = person.addresses.find(address_id.to_s)
-        address.delete
-      end
-    rescue StandardError => e
-      puts e.message unless Rails.env.test?
+    if person.nil?
+      puts "Unable to find any person record with the given hbx_id: #{hbx_id}" unless Rails.env.test?
+      return
     end
+
+    fetch_duplicate_address_ids(person).each do |address_id|
+      address = person.addresses.find(address_id.to_s)
+      address.delete
+    end
+  rescue StandardError => e
+    puts e.message unless Rails.env.test?
   end
 end

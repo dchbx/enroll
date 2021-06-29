@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 

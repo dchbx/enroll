@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FindOrCreateInsuredPerson
   include Interactor
 
@@ -8,12 +10,13 @@ class FindOrCreateInsuredPerson
       dob: context.dob,
       last_name: context.last_name,
       first_name: context.first_name
-      )
-    person, is_new = nil, nil
+    )
+    person = nil
+    is_new = nil
     case people.count
     when 1
       person = people.first
-      user.save if user
+      user&.save
       person.user = user if user
       if person.ssn.nil?
         #matched on last_name and dob
@@ -22,12 +25,13 @@ class FindOrCreateInsuredPerson
       end
       person.save
       user = person.user if context.role_type == User::ROLES[:consumer]
-      person, is_new = person, false
+      person = person
+      is_new = false
     when 0
       return if context.ssn.present? && Person.where(encrypted_ssn: Person.encrypt_ssn(context.ssn)).present?
       if user.try(:person).try(:present?)
-        if user.person.first_name.downcase == context.first_name.downcase and
-          user.person.last_name.downcase == context.last_name.downcase # if user enters lowercase during matching.
+        if (user.person.first_name.downcase == context.first_name.downcase) &&
+           (user.person.last_name.downcase == context.last_name.downcase) # if user enters lowercase during matching.
           person = user.person
           person.update(name_sfx: context.name_sfx,
                         middle_name: context.middle_name,
@@ -42,7 +46,7 @@ class FindOrCreateInsuredPerson
           return
         end
       else
-        person, is_new = Person.create(
+        person = Person.create(
           user: user,
           name_pfx: context.name_pfx,
           first_name: context.first_name,
@@ -52,7 +56,9 @@ class FindOrCreateInsuredPerson
           ssn: context.ssn,
           no_ssn: context.no_ssn,
           dob: context.dob,
-          gender: context.gender), true
+          gender: context.gender
+        )
+        is_new = true
       end
     else
       # what am I doing here?  More than one person had the same SSN?
@@ -63,11 +69,9 @@ class FindOrCreateInsuredPerson
     if user.present?
       user.roles << context.role_type unless user.roles.include?(context.role_type)
       user.save
-      unless person.emails.any?
-        if user.email.present?
-          person.emails.build(kind: "home", address: user.email)
-          person.save
-        end
+      if person.emails.none? && user.email.present?
+        person.emails.build(kind: "home", address: user.email)
+        person.save
       end
     end
     context.person = person

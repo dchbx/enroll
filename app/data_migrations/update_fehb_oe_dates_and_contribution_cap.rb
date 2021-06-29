@@ -6,7 +6,7 @@ class UpdateFehbOeDatesAndContributionCap < MongoidMigrationTask
 
   def migrate
     action = ENV['action'].to_s
-    feins = ENV['feins'].split(' ').uniq
+    feins = ENV['feins'].split.uniq
     feins.each do |fein|
       organization = BenefitSponsors::Organizations::Organization.where(fein: fein).first
       effective_on = DateTime.strptime(ENV['effective_on'], "%m/%d/%Y")
@@ -19,8 +19,6 @@ class UpdateFehbOeDatesAndContributionCap < MongoidMigrationTask
         update_contribution_cap(benefit_application)
       when 'begin_open_enrollment'
         begin_open_enrollment(benefit_application)
-      else
-
       end
     end
   end

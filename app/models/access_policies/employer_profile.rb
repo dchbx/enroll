@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessPolicies
   class EmployerProfile
     attr_accessor :user
@@ -10,11 +12,9 @@ module AccessPolicies
       return true if user.has_hbx_staff_role? || is_broker_for_employer?(employer.id) || is_general_agency_staff_for_employer?(employer.id)
       person = user.person
 
-      if person.employer_staff_roles.active.length > 0
+      unless person.employer_staff_roles.active.empty?
         ep_ids = user.person.employer_staff_roles.map(&:employer_profile_id).map(&:to_s)
-        if !ep_ids.include?(employer.id.to_s)
-          controller.redirect_to_first_allowed
-        end
+        controller.redirect_to_first_allowed unless ep_ids.include?(employer.id.to_s)
         return true
       end
       controller.redirect_to_new
@@ -22,11 +22,7 @@ module AccessPolicies
 
     def authorize_index(broker_agency_id, controller)
       return true if user.has_hbx_staff_role?
-      if user.has_broker_role? || user.has_broker_agency_staff_role?
-        if !broker_agency_id.blank?
-          return
-        end
-      end
+      return if (user.has_broker_role? || user.has_broker_agency_staff_role?) && !broker_agency_id.blank?
       controller.redirect_to_new
     end
 
@@ -54,9 +50,7 @@ module AccessPolicies
       return false if ga_id.nil? || employer_id.nil?
       plan_design_organizations = SponsoredBenefits::Organizations::PlanDesignOrganization.find_by_sponsor(employer_id)
       plan_design_organizations.each do |a|
-        if a.general_agency_profile.present?
-          return true if a.general_agency_profile.id == ga_id
-        end
+        return true if a.general_agency_profile.present? && (a.general_agency_profile.id == ga_id)
       end
     end
   end

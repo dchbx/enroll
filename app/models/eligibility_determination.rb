@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EligibilityDetermination
   include Mongoid::Document
   include SetCurrentUser
@@ -7,9 +9,9 @@ class EligibilityDetermination
   embedded_in :tax_household
   after_create :apply_aptc_aggregate
 
-  SOURCE_KINDS = %w[Curam Admin Renewals Faa].freeze # TODO change "Renewals" source kind
+  SOURCE_KINDS = %w[Curam Admin Renewals Faa].freeze # TODO: change "Renewals" source kind
 
-  CSR_KINDS = %w(csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited)
+  CSR_KINDS = %w[csr_100 csr_94 csr_87 csr_73 csr_0 csr_limited].freeze
 
   CSR_PERCENT_VALUES = %w[100 94 87 73 0 -1].freeze
 
@@ -17,12 +19,12 @@ class EligibilityDetermination
   #   limited: "03", # limited?
   CSR_KIND_TO_PLAN_VARIANT_MAP = {
     'csr_100' => '02',
-      "csr_94"  => "06",
-      "csr_87"  => "05",
-      "csr_73"  => "04",
+    "csr_94" => "06",
+    "csr_87" => "05",
+    "csr_73" => "04",
     'csr_0' => '01',
     'csr_limited' => '03'
-  }
+  }.freeze
 
   CSR_KIND_TO_PLAN_VARIANT_MAP.default = "01"
 
@@ -62,18 +64,18 @@ class EligibilityDetermination
                          message: "%{value} is not a valid source kind" }
 
   validates :premium_credit_strategy_kind,
-    allow_blank: false,
-    inclusion: {
-      in: BenefitPackage::PREMIUM_CREDIT_STRATEGY_KINDS,
-      message: "%{value} is not a valid premium credit strategy kind"
-    }
+            allow_blank: false,
+            inclusion: {
+              in: BenefitPackage::PREMIUM_CREDIT_STRATEGY_KINDS,
+              message: "%{value} is not a valid premium credit strategy kind"
+            }
 
   validates :csr_eligibility_kind,
-    allow_blank: false,
-    inclusion: {
-      in: CSR_KINDS,
-      message: "%{value} is not a valid cost sharing eligibility kind"
-    }
+            allow_blank: false,
+            inclusion: {
+              in: CSR_KINDS,
+              message: "%{value} is not a valid cost sharing eligibility kind"
+            }
 
   def csr_percent_as_integer=(new_csr_percent)
     super
@@ -111,7 +113,7 @@ class EligibilityDetermination
 
   def csr_percent=(value)
     value ||= 0 #to handle value = nil
-    raise "value out of range" if (value < 0 || value > 1)
+    raise "value out of range" if value < 0 || value > 1
     self.csr_percent_as_integer = Rational(value) * Rational(100)
   end
 
@@ -123,8 +125,8 @@ class EligibilityDetermination
     family = Family.where(:"households.tax_households.eligibility_determinations._id" => id).first
 
     if family.present?
-      ed = family.households.flat_map() do |household|
-        household.tax_households.flat_map() do |tax_household|
+      ed = family.households.flat_map do |household|
+        household.tax_households.flat_map do |tax_household|
           tax_household.eligibility_determinations.detect { |ed| ed.id == id }
         end
       end
@@ -132,15 +134,14 @@ class EligibilityDetermination
     end
   end
 
-private
+  private
+
   def set_premium_credit_strategy
-    self.premium_credit_strategy_kind ||= max_aptc > 0 ? self.premium_credit_strategy_kind = "allocated_lump_sum_credit" : self.premium_credit_strategy_kind = "unassisted"
+    self.premium_credit_strategy_kind ||= self.premium_credit_strategy_kind = (max_aptc > 0 ? "allocated_lump_sum_credit" : "unassisted")
   end
 
   def set_determined_at
-    if tax_household && tax_household.submitted_at.present?
-      self.determined_at ||= tax_household.submitted_at
-    end
+    self.determined_at ||= tax_household.submitted_at if tax_household && tax_household.submitted_at.present?
   end
 
   def apply_aptc_aggregate

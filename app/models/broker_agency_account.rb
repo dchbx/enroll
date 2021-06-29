@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencyAccount
   include Mongoid::Document
   include SetCurrentUser
@@ -22,13 +24,13 @@ class BrokerAgencyAccount
 
   validates_presence_of :start_on, :broker_agency_profile_id, :is_active
 
-  default_scope   ->{ where(:is_active => true) }
+  default_scope ->{ where(:is_active => true) }
 
 
   # belongs_to broker_agency_profile
   def broker_agency_profile=(new_broker_agency_profile)
-    pp new_broker_agency_profile if !new_broker_agency_profile.is_a?(BrokerAgencyProfile)
-    raise ArgumentError.new("expected BrokerAgencyProfile") unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
+    pp new_broker_agency_profile unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
+    raise ArgumentError, "expected BrokerAgencyProfile" unless new_broker_agency_profile.is_a?(BrokerAgencyProfile)
     self.broker_agency_profile_id = new_broker_agency_profile._id
     @broker_agency_profile = new_broker_agency_profile
   end
@@ -44,15 +46,13 @@ class BrokerAgencyAccount
     end
   end
 
-
   def legal_name
     broker_agency_profile.present? ? broker_agency_profile.legal_name : ""
   end
 
-
   # belongs_to writing agent (broker)
   def writing_agent=(new_writing_agent)
-    raise ArgumentError.new("expected BrokerRole") unless new_writing_agent.is_a?(BrokerRole)
+    raise ArgumentError, "expected BrokerRole" unless new_writing_agent.is_a?(BrokerRole)
     self.writing_agent_id = new_writing_agent._id
     @writing_agent = new_writing_agent
   end

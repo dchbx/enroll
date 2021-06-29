@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateReviewStatus < MongoidMigrationTask
@@ -10,11 +12,11 @@ class UpdateReviewStatus < MongoidMigrationTask
     families_to_check.each do |family|
       enrollments = family.active_household.hbx_enrollments
       enrollments.each do |enrollment|
-        begin
-          enrollment.update_attributes!(:review_status => "incomplete") unless enrollment.review_status
-        rescue
-          $stderr.puts "Issue migrating enrollment: enrollment #{enrollment.id}, family #{family.id}"
-        end
+
+        enrollment.update_attributes!(:review_status => "incomplete") unless enrollment.review_status
+      rescue StandardError
+        warn "Issue migrating enrollment: enrollment #{enrollment.id}, family #{family.id}"
+
       end
     end
   end

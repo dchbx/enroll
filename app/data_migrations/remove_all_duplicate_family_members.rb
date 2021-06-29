@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
@@ -32,23 +34,23 @@ class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
       end
     end
     # Return as mongo collection so we can query
-    @family.family_members.where(:"_id".in => authority_family_member_ids)
+    @family.family_members.where(:_id.in => authority_family_member_ids)
   end
 
   def output_message
     unless Rails.env.test?
       @family.reload
-      puts("Total family members: " + @family.family_members.count.to_s)
+      puts("Total family members: #{@family.family_members.count}")
       puts("Total coverage household members per coverage household member:")
       @family.active_household.coverage_households.each_with_index do |coverage_household, index|
-        puts("Coverage household " + index.to_s + ": " + coverage_household.coverage_household_members.count.to_s)
+        puts("Coverage household #{index}: #{coverage_household.coverage_household_members.count}")
       end
       puts("Total tax household members per coverage household member:")
       @family.active_household.tax_households.each_with_index do |tax_household, index|
-        puts("Tax household " + index.to_s + ": " + tax_household.tax_household_members.count.to_s)
+        puts("Tax household #{index}: #{tax_household.tax_household_members.count}")
       end
-      @family.hbx_enrollments.each_with_index do |enrollment, index|
-        puts("Enrollment with hbx_id " + enrollment.hbx_id.to_s + " has " + enrollment.hbx_enrollment_members.count.to_s + " HBX enrollment members.")
+      @family.hbx_enrollments.each_with_index do |enrollment, _index|
+        puts("Enrollment with hbx_id #{enrollment.hbx_id} has #{enrollment.hbx_enrollment_members.count} HBX enrollment members.")
       end
     end
   end
@@ -79,9 +81,7 @@ class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
   def destroy_unnecessary_shopping_enrollments
     shopping_enrollments = @family.hbx_enrollments.where(aasm_state: "shopping")
     return if shopping_enrollments.blank?
-    shopping_enrollments.each do |shopping_enrollment|
-      shopping_enrollment.destroy
-    end
+    shopping_enrollments.each(&:destroy)
   end
 
   # Make sure that any family members destroyed are not "authority" members attached to an enrollment
@@ -118,7 +118,7 @@ class RemoveAllDuplicateFamilyMembers < MongoidMigrationTask
       end
       output_message
     end
-    rescue StandardError => e
-      puts(e.message) unless Rails.env.test?
+  rescue StandardError => e
+    puts(e.message) unless Rails.env.test?
   end
 end

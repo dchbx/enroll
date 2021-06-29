@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 module VerificationHelper
   include DocumentsVerificationStatus
 
   def doc_status_label(doc)
     case doc.status
-      when "not submitted"
-        "warning"
-      when "downloaded"
-        "default"
-      when "verified"
-        "success"
-      else
-        "danger"
+    when "not submitted"
+      "warning"
+    when "downloaded"
+      "default"
+    when "verified"
+      "success"
+    else
+      "danger"
     end
   end
 
@@ -38,35 +40,35 @@ module VerificationHelper
 
   def verification_type_class(status)
     case status
-      when "verified"
-        "success"
-      when "review"
-        "warning"
-      when "outstanding"
-        "danger"
-      when "curam"
-        "default"
-      when "attested"
-        "default"
-      when "valid"
-        "success"
-      when "pending"
-        "info"
-      when "expired"
-        "default"
-      when "unverified"
-        "default"
+    when "verified"
+      "success"
+    when "review"
+      "warning"
+    when "outstanding"
+      "danger"
+    when "curam"
+      "default"
+    when "attested"
+      "default"
+    when "valid"
+      "success"
+    when "pending"
+      "info"
+    when "expired"
+      "default"
+    when "unverified"
+      "default"
     end
   end
 
   def ridp_type_class(type, person)
     case ridp_type_status(type, person)
-      when 'valid'
-        'success'
-      when 'in review'
-        'warning'
-      when 'outstanding'
-        'danger'
+    when 'valid'
+      'success'
+    when 'in review'
+      'warning'
+    when 'outstanding'
+      'danger'
     end
   end
 
@@ -75,7 +77,7 @@ module VerificationHelper
   end
 
   def enrollment_group_unverified?(person)
-    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select{|type| type.is_type_outstanding?}.any?
+    person.primary_family.contingent_enrolled_active_family_members.flat_map(&:person).flat_map(&:consumer_role).flat_map(&:verification_types).select(&:is_type_outstanding?).any?
   end
 
   def verification_needed?(person)
@@ -89,7 +91,7 @@ module VerificationHelper
 
   def is_not_verified?(family_member, v_type)
     return true if family_member.blank?
-    !(["na", "verified", "attested", "expired"].include?(v_type.validation_status))
+    !["na", "verified", "attested", "expired"].include?(v_type.validation_status)
   end
 
   def can_show_due_date?(person)
@@ -101,11 +103,11 @@ module VerificationHelper
   end
 
   def member_has_uploaded_docs(member)
-    true if member.person.consumer_role.try(:vlp_documents).any? { |doc| doc.identifier }
+    true if member.person.consumer_role.try(:vlp_documents).any?(&:identifier)
   end
 
   def member_has_uploaded_paper_applications(member)
-    true if member.person.resident_role.try(:paper_applications).any? { |doc| doc.identifier }
+    true if member.person.resident_role.try(:paper_applications).any?(&:identifier)
   end
 
   def docs_uploaded_for_all_types(member)
@@ -115,7 +117,7 @@ module VerificationHelper
   end
 
   def documents_count(family)
-    family.family_members.map(&:person).flat_map(&:consumer_role).flat_map(&:vlp_documents).select{|doc| doc.identifier}.count
+    family.family_members.map(&:person).flat_map(&:consumer_role).flat_map(&:vlp_documents).select(&:identifier).count
   end
 
   def get_person_v_type_status(people)
@@ -133,14 +135,12 @@ module VerificationHelper
   end
 
   def hbx_enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
-    end
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete" if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
   end
 
   #use this method to send docs to review for family member level
   def all_docs_rejected(person)
-    person.try(:consumer_role).try(:vlp_documents).select{|doc| doc.identifier}.all?{|doc| doc.status == "rejected"}
+    person.try(:consumer_role).try(:vlp_documents).select(&:identifier).all?{|doc| doc.status == "rejected"}
   end
 
   def no_enrollments
@@ -148,9 +148,7 @@ module VerificationHelper
   end
 
   def enrollment_incomplete
-    if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
-      @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete"
-    end
+    @person.primary_family.active_household.hbx_enrollments.verification_needed.first.review_status == "incomplete" if @person.primary_family.active_household.hbx_enrollments.verification_needed.any?
   end
 
   def all_family_members_verified
@@ -183,12 +181,12 @@ module VerificationHelper
 
   # returns vlp_documents array for verification type
   def documents_list(person, v_type)
-    person.consumer_role.vlp_documents.select{|doc| doc.identifier && doc.verification_type == v_type } if person.consumer_role
+    person.consumer_role&.vlp_documents&.select{|doc| doc.identifier && doc.verification_type == v_type }
   end
 
   # returns ridp_documents array for ridp verification type
   def ridp_documents_list(person, ridp_type)
-    person.consumer_role.ridp_documents.select{|doc| doc.identifier && doc.ridp_verification_type == ridp_type } if person.consumer_role
+    person.consumer_role&.ridp_documents&.select{|doc| doc.identifier && doc.ridp_verification_type == ridp_type }
   end
 
   def admin_actions(v_type, f_member)
@@ -196,7 +194,7 @@ module VerificationHelper
   end
 
   def mod_attr(attr, val)
-      attr.to_s + " => " + val.to_s
+    "#{attr} => #{val}"
   end
 
   def ridp_admin_actions(ridp_type, person)
@@ -215,14 +213,14 @@ module VerificationHelper
 
   def build_reject_reason_list(v_type)
     case v_type
-      when "Citizenship"
-        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
-      when "Immigration status"
-        ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
-      when "Income" #will be implemented later
-        ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
-      else
-        ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    when "Citizenship"
+      ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    when "Immigration status"
+      ::VlpDocument::CITIZEN_IMMIGR_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    when "Income" #will be implemented later
+      ::VlpDocument::INCOME_TYPE_ADD_REASONS + ::VlpDocument::ALL_TYPES_REJECT_REASONS
+    else
+      ::VlpDocument::ALL_TYPES_REJECT_REASONS
     end
   end
 
@@ -248,9 +246,9 @@ module VerificationHelper
   end
 
   def show_residency_request(person, record)
-    raw_request = person.consumer_role.local_residency_requests.select{
-        |request| request.id == BSON::ObjectId.from_string(record.event_request_record_id)
-    }
+    raw_request = person.consumer_role.local_residency_requests.select do |request|
+      request.id == BSON::ObjectId.from_string(record.event_request_record_id)
+    end
     raw_request.any? ? Nokogiri::XML(raw_request.first.body) : "no request record"
   end
 
@@ -261,9 +259,9 @@ module VerificationHelper
   end
 
   def show_residency_response(person, record)
-    raw_response = person.consumer_role.local_residency_responses.select{
-        |response| response.id == BSON::ObjectId.from_string(record.event_response_record_id)
-    }
+    raw_response = person.consumer_role.local_residency_responses.select do |response|
+      response.id == BSON::ObjectId.from_string(record.event_response_record_id)
+    end
     raw_response.any? ? Nokogiri::XML(raw_response.first.body) : "no response record"
   end
 
@@ -290,7 +288,7 @@ module VerificationHelper
     person.consumer_role && person.is_consumer_role_active? && (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_consumer_role_active?)
   end
 
-  def has_active_resident_dependent?(person,dependent)
+  def has_active_resident_dependent?(_person,dependent)
     (dependent.try(:family_member).try(:person).nil? || dependent.try(:family_member).try(:person).is_resident_role_active?)
   end
 

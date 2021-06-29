@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BenefitSponsorship
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -8,7 +10,7 @@ class BenefitSponsorship
   # person/roles can determine which sponsor in a class has a relationship (offer products)
   # which benefit packages should be offered to person/roles
 
-  SERVICE_MARKET_KINDS = %w(shop individual coverall)
+  SERVICE_MARKET_KINDS = %w[shop individual coverall].freeze
 
   field :service_markets, type: Array, default: []
   validates_presence_of :service_markets
@@ -32,7 +34,7 @@ class BenefitSponsorship
   end
 
   def earliest_effective_date
-    current_benefit_period.earliest_effective_date if current_benefit_period
+    current_benefit_period&.earliest_effective_date
   end
 
   def benefit_coverage_period_by_effective_date(effective_date)
@@ -52,11 +54,11 @@ class BenefitSponsorship
 
   def self.find(id)
     orgs = Organization.where("hbx_profile.benefit_sponsorship._id" => BSON::ObjectId.from_string(id))
-    orgs.size > 0 ? orgs.first.hbx_profile.benefit_sponsorship : nil
+    orgs.empty? ? nil : orgs.first.hbx_profile.benefit_sponsorship
   end
 
   def current_benefit_period
-    if renewal_benefit_coverage_period && renewal_benefit_coverage_period.open_enrollment_contains?(TimeKeeper.date_of_record)
+    if renewal_benefit_coverage_period&.open_enrollment_contains?(TimeKeeper.date_of_record)
       renewal_benefit_coverage_period
     else
       current_benefit_coverage_period
@@ -89,7 +91,6 @@ class BenefitSponsorship
 
   class << self
     def advance_day(new_date)
-
       hbx_sponsors = Organization.exists("hbx_profile.benefit_sponsorship": true).reduce([]) { |memo, org| memo << org.hbx_profile }
 
       hbx_sponsors.each do |hbx_sponsor|

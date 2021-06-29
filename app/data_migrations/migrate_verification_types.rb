@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 # rubocop:disable Metrics/BlockNesting
 class MigrateVerificationTypes < MongoidMigrationTask
   def get_people(offset, limit)
-    Person.where(:"consumer_role" => {"$exists" => true}).offset(offset).limit(limit)
+    Person.where(:consumer_role => {"$exists" => true}).offset(offset).limit(limit)
   end
 
   def local_residency
@@ -13,17 +15,17 @@ class MigrateVerificationTypes < MongoidMigrationTask
   def migrate
     run_size = 500
     offset = 0
-    while offset < Person.count do
+    while offset < Person.count
       people = get_people(offset, run_size)
       people.each do |person|
-        begin
-          ensure_verification_types(person)
-          puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
-        rescue
-          $stderr.puts "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
-        end
+
+        ensure_verification_types(person)
+        puts "Person HBX_ID: #{person.hbx_id} verification_types where moved" unless Rails.env.test?
+      rescue StandardError
+        warn "Issue :ensure_verification_types: person #{person.id}, HBX id  #{person.hbx_id}"
+
       end
-      offset = offset + run_size
+      offset += run_size
     end
   end
 
@@ -31,12 +33,12 @@ class MigrateVerificationTypes < MongoidMigrationTask
     live_types = []
     live_types << local_residency
     live_types << 'Social Security Number' if person.ssn
-    live_types << 'American Indian Status' if !(person.tribal_id.nil? || person.tribal_id.empty?)
-    if person.us_citizen
-      live_types << 'Citizenship'
-    else
-      live_types << 'Immigration status'
-    end
+    live_types << 'American Indian Status' unless person.tribal_id.nil? || person.tribal_id.empty?
+    live_types << if person.us_citizen
+                    'Citizenship'
+                  else
+                    'Immigration status'
+                  end
     person.verification_types.delete_all
     live_types.each do |type|
       add_new_verification_type(person, type)
@@ -45,14 +47,15 @@ class MigrateVerificationTypes < MongoidMigrationTask
 
   def add_new_verification_type(person, type)
     person.verification_types << VerificationType.new(
-        :type_name => type,
-        :validation_status => assign_verification_type_status(type, person),
-        :update_reason => type_update_reason(person, type),
-        :rejected => type_rejected(person, type),
-        :due_date => due_date(person, type),
-        :due_date_type => due_date_type(person, type),
-        :type_history_elements => create_type_history_elements(person, type),
-        :vlp_documents => create_vlp_documents(person, type))
+      :type_name => type,
+      :validation_status => assign_verification_type_status(type, person),
+      :update_reason => type_update_reason(person, type),
+      :rejected => type_rejected(person, type),
+      :due_date => due_date(person, type),
+      :due_date_type => due_date_type(person, type),
+      :type_history_elements => create_type_history_elements(person, type),
+      :vlp_documents => create_vlp_documents(person, type)
+    )
   end
 
   def create_vlp_documents(person, type)
@@ -82,12 +85,12 @@ class MigrateVerificationTypes < MongoidMigrationTask
   end
 
   def due_date(person, type)
-    sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
+    sv = person.consumer_role.special_verifications.where(verification_type: type).order_by(:created_at.desc).first
     sv.due_date if sv.present?
   end
 
   def due_date_type(person, type)
-    sv=person.consumer_role.special_verifications.where(verification_type: type).order_by(:"created_at".desc).first
+    sv = person.consumer_role.special_verifications.where(verification_type: type).order_by(:created_at.desc).first
     sv.type if sv.present?
   end
 
@@ -121,10 +124,9 @@ class MigrateVerificationTypes < MongoidMigrationTask
     end
   end
 
-
   def assign_verification_type_status(type, person)
     consumer = person.consumer_role
-    if (consumer.vlp_authority == "curam" && consumer.fully_verified?)
+    if consumer.vlp_authority == "curam" && consumer.fully_verified?
       "curam"
     else
       case type

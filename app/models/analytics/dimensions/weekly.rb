@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module Analytics
-  class Dimensions::Weekly
-    include Mongoid::Document
+  module Dimensions
+    class Weekly
+      include Mongoid::Document
 
       field :title, type: String
       field :site,  type: String, default: "dchbx"
@@ -27,19 +30,17 @@ module Analytics
         week_day  = new_date.wday
 
         # Use the Mongoid increment (inc) function
-        inc(("d" + week_day.to_s).to_sym => 1)
+        inc("d#{week_day}".to_sym => 1)
         self
       end
 
-    private
-      def pre_allocate_document
-        if week.blank?
-          self.week = date.cweek
-        end
+      private
 
-        if year.blank?
-          self.year = date.year
-        end
+      def pre_allocate_document
+        self.week = date.cweek if week.blank?
+
+        self.year = date.year if year.blank?
       end
+    end
   end
 end

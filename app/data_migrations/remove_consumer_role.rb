@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 require "csv"
 
@@ -25,37 +27,37 @@ class RemoveConsumerRole < MongoidMigrationTask
 
     people.each do |person|
       person.primary_family && person.primary_family.active_household.hbx_enrollments.each do |enrollment|
-        begin
-          results << ["************************"] unless Rails.env.test?
-          results << ["Beginning for hbx enrollment: #{enrollment.hbx_id}"] unless Rails.env.test?
-          # first fix any enrollments - mark all individual enrollments as coverall
-          if enrollment.kind == "individual"
-            results << ["Updating kind to coverall for hbx enrollment #{enrollment.id}"] unless Rails.env.test?
-            enrollment.kind = "coverall"
 
-            #need to associate enrollment with the resident role of the person
-            enrollment.resident_role = person.resident_role if person.resident_role.present?
+        results << ["************************"] unless Rails.env.test?
+        results << ["Beginning for hbx enrollment: #{enrollment.hbx_id}"] unless Rails.env.test?
+        # first fix any enrollments - mark all individual enrollments as coverall
+        if enrollment.kind == "individual"
+          results << ["Updating kind to coverall for hbx enrollment #{enrollment.id}"] unless Rails.env.test?
+          enrollment.kind = "coverall"
 
-            # check for all members on enrollment to remove all consumer roles
-            if enrollment.hbx_enrollment_members.size > 1
-              enrollment.hbx_enrollment_members.each do |member|
-                if member.person.consumer_role.present?
-                  results << ["Removing consumer role: #{member.person.consumer_role.id}"] unless Rails.env.test?
-                  member.person.consumer_role.destroy
-                end
+          #need to associate enrollment with the resident role of the person
+          enrollment.resident_role = person.resident_role if person.resident_role.present?
+
+          # check for all members on enrollment to remove all consumer roles
+          if enrollment.hbx_enrollment_members.size > 1
+            enrollment.hbx_enrollment_members.each do |member|
+              if member.person.consumer_role.present?
+                results << ["Removing consumer role: #{member.person.consumer_role.id}"] unless Rails.env.test?
+                member.person.consumer_role.destroy
               end
             end
-            #need to remove reference to disassociated consumer role
-            enrollment.consumer_role_id = nil
-            enrollment.save!
           end
-        rescue Exception => e
-          puts e.backtrace
+          #need to remove reference to disassociated consumer role
+          enrollment.consumer_role_id = nil
+          enrollment.save!
         end
+      rescue Exception => e
+        puts e.backtrace
+
       end
       # this is necesary for enrollments with a single family member on the enrollment
       person.consumer_role.destroy if person.consumer_role.present?
-      results <<  ["removed consumer role for Person: #{person.hbx_id}"] unless Rails.env.test?
+      results << ["removed consumer role for Person: #{person.hbx_id}"] unless Rails.env.test?
 
       # this is just to show to the developer that the task is running successfully
       puts "removed consumer role for Person: #{person.hbx_id}" unless Rails.env.test?

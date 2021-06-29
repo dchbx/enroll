@@ -1,3 +1,6 @@
-module Employers::CensusEmployeesHelper
+# frozen_string_literal: true
 
+module Employers
+  module CensusEmployeesHelper
+  end
 end

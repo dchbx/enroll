@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class PlanYearEnrollFactory
 
@@ -9,34 +11,28 @@ module Factories
     end
 
     def enroll
-      published_plan_years = @employer_profile.plan_years.where(:"start_on" => start_on).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
+      published_plan_years = @employer_profile.plan_years.where(:start_on => start_on).any_of([PlanYear.published.selector, PlanYear.renewing_published_state.selector])
 
-      if published_plan_years.size == 0
-        raise PlanYearPublishFactoryError, "Found zero Renewal/Published Plan Years for Employer #{@employer_profile.legal_name}"
-      end
+      raise PlanYearPublishFactoryError, "Found zero Renewal/Published Plan Years for Employer #{@employer_profile.legal_name}" if published_plan_years.empty?
 
-      if published_plan_years.size > 1
-        raise PlanYearPublishFactoryError, "Found more than one Renewal/Published Plan Years for Employer #{@employer_profile.legal_name}"
-      end
+      raise PlanYearPublishFactoryError, "Found more than one Renewal/Published Plan Years for Employer #{@employer_profile.legal_name}" if published_plan_years.size > 1
 
       @end_on = published_plan_years.first.end_on
 
       @count = 0
       @employer_profile.census_employees.each do |census_employee|
-        begin
-          census_employee.is_active? ? begin_employee_coverage(census_employee) : terminate_employee_coverage(census_employee)
-          puts "Processed #{census_employee.full_name}"
-        rescue Exception => e
-          puts "Exception #{e.inspect} occured for #{census_employee.full_name}"
-        end
+
+        census_employee.is_active? ? begin_employee_coverage(census_employee) : terminate_employee_coverage(census_employee)
+        puts "Processed #{census_employee.full_name}"
+      rescue Exception => e
+        puts "Exception #{e.inspect} occured for #{census_employee.full_name}"
+
       end
 
       puts "Processed #{@employer_profile.census_employees.count} census employees, skipped #{@count} census employee records"
 
       published_plan_years.each{ |plan_year| plan_year.activate! if plan_year.may_activate? }
-      @employer_profile.plan_years.published.where(:start_on => (start_on - 1.year)).each do |plan_year|
-        plan_year.expire!
-      end
+      @employer_profile.plan_years.published.where(:start_on => (start_on - 1.year)).each(&:expire!)
 
       benefit_groups = published_plan_years.first.benefit_groups
 
@@ -88,7 +84,7 @@ module Factories
       renewing_enrollments = current_enrollments.renewing + current_enrollments.where(:aasm_state.in => ["renewing_waived"])
 
       if enrolled_enrollments.size > 1 || renewing_enrollments.size > 1
-        @count += 1 
+        @count += 1
         raise PlanYearPublishFactoryError, "More than one #{TimeKeeper.date_of_record.year} coverage found!!"
       end
 
@@ -145,36 +141,28 @@ module Factories
       @count = 0
 
       person = match_person(census_employee)
-      if person.blank?
-        return false
-      end
+      return false if person.blank?
 
       family = person.primary_family
-      if family.blank?
-        return false
-      end
+      return false if family.blank?
 
       enrollments = family.active_household.hbx_enrollments.where(effective_on: (@start_on..@end_on)).shop_market
       return false if enrollments.renewing.any?
 
       active_assignment = census_employee.active_benefit_group_assignment
-      if active_assignment.blank?
-        active_assignment = census_employee.benefit_group_assignments.detect{|assignment| @benefit_group_ids.include?(assignment.benefit_group_id) }
-      end
+      active_assignment = census_employee.benefit_group_assignments.detect{|assignment| @benefit_group_ids.include?(assignment.benefit_group_id) } if active_assignment.blank?
 
       if enrollments.enrolled.any?
         active_assignment.begin_benefit
         return false
       end
 
-      if enrollments.waived.any?
-        if active_assignment.present?
-          active_assignment.waive_benefit
-          return true
-        end
+      if enrollments.waived.any? && active_assignment.present?
+        active_assignment.waive_benefit
+        return true
       end
-      
-      return false
+
+      false
     end
 
     private
@@ -182,11 +170,11 @@ module Factories
     def match_person(census_employee)
       if census_employee.employee_role.blank?
         employee_relationship = Forms::EmployeeCandidate.new({
-          first_name: census_employee.first_name,
-          last_name: census_employee.last_name,
-          ssn: census_employee.ssn,
-          dob: census_employee.dob.strftime("%Y-%m-%d")
-        })
+                                                               first_name: census_employee.first_name,
+                                                               last_name: census_employee.last_name,
+                                                               ssn: census_employee.ssn,
+                                                               dob: census_employee.dob.strftime("%Y-%m-%d")
+                                                             })
 
         person = employee_relationship.match_person
         # if person.blank?
@@ -202,9 +190,9 @@ module Factories
         person = census_employee.employee_role.person
       end
 
-      return person
+      person
     end
-    
+
     # Question: Can we cancel other 2016 shop enrollments if any?
     def cancel_renewals(family)
       shop_enrollments = family.active_household.hbx_enrollments.shop_market.current_year
@@ -217,7 +205,7 @@ module Factories
     end
 
     def expire_previous_year_enrollments(family)
-      prev_year_enrollments = family.active_household.hbx_enrollments.where(:"effective_on".lt => @start_on).shop_market
+      prev_year_enrollments = family.active_household.hbx_enrollments.where(:effective_on.lt => @start_on).shop_market
       prev_year_enrollments.enrolled.each do |hbx_enrollment|
         hbx_enrollment.expire_coverage! if hbx_enrollment.may_expire_coverage?
         benefit_group_assignment = hbx_enrollment.benefit_group_assignment
@@ -226,7 +214,7 @@ module Factories
       end
     end
   end
-   
+
   class PlanYearPublishFactoryError < StandardError; end
 end
 

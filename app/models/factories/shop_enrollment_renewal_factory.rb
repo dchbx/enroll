@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class ShopEnrollmentRenewalFactory
     include EnrollmentRenewalBuilder
@@ -57,21 +59,21 @@ module Factories
     end
 
     def active_enrollments
-      current_enrollments.where(:aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending'])).order(:"submitted_at".desc)
+      current_enrollments.where(:aasm_state.in => (HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending'])).order(:submitted_at.desc)
     end
 
     def is_coverage_active?
       (HbxEnrollment::ENROLLED_STATUSES - ['coverage_termination_pending']).include?(enrollment.aasm_state)
     end
 
-    private 
+    private
 
     def enrollments_by_plan_year(plan_year)
       family.active_household.hbx_enrollments.where({
-        :benefit_group_id.in => plan_year.benefit_groups.pluck(:_id), 
-        :coverage_kind => enrollment.coverage_kind,
-        :kind => enrollment.kind
-      })
+                                                      :benefit_group_id.in => plan_year.benefit_groups.pluck(:_id),
+                                                      :coverage_kind => enrollment.coverage_kind,
+                                                      :kind => enrollment.kind
+                                                    })
     end
 
     def set_instance_variables
@@ -85,7 +87,7 @@ module Factories
       end
 
       if @census_employee.present?
-        @employer = @census_employee.employer_profile 
+        @employer = @census_employee.employer_profile
         @renewing_plan_year = @employer.renewing_published_plan_year
       end
 
@@ -93,8 +95,11 @@ module Factories
     end
 
     def renewal_assignment
-      assignment = renewing_plan_year.active? ? census_employee.active_benefit_group_assignment 
-           : census_employee.renewal_benefit_group_assignment
+      assignment = if renewing_plan_year.active?
+                     census_employee.active_benefit_group_assignment
+                   else
+                     census_employee.renewal_benefit_group_assignment
+                   end
 
       (assignment.present? && renewing_plan_year.benefit_groups.pluck(:_id).include?(assignment.benefit_group_id)) ? assignment : nil
     end
@@ -122,17 +127,11 @@ module Factories
     end
 
     def validate_employer
-      if renewing_plan_year.blank?
-        raise ShopEnrollmentRenewalFactoryError, "Renewing Plan year missing under employer #{employer.legal_name}"
-      end
+      raise ShopEnrollmentRenewalFactoryError, "Renewing Plan year missing under employer #{employer.legal_name}" if renewing_plan_year.blank?
 
-      if !['renewing_enrolling', 'renewing_enrolled'].include?(renewing_plan_year.aasm_state)
-        raise ShopEnrollmentRenewalFactoryError, "Renewing Plan year OE not yet started under employer #{employer.legal_name}"
-      end
+      raise ShopEnrollmentRenewalFactoryError, "Renewing Plan year OE not yet started under employer #{employer.legal_name}" unless ['renewing_enrolling', 'renewing_enrolled'].include?(renewing_plan_year.aasm_state)
 
-      if employer.active_plan_year.blank?
-        raise ShopEnrollmentRenewalFactoryError, "Active Plan year missing under employer #{employer.legal_name}"
-      end
+      raise ShopEnrollmentRenewalFactoryError, "Active Plan year missing under employer #{employer.legal_name}" if employer.active_plan_year.blank?
     end
   end
 

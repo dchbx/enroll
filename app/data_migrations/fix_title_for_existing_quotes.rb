@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixTitleForExistingQuotes < MongoidMigrationTask
@@ -35,19 +37,19 @@ class FixTitleForExistingQuotes < MongoidMigrationTask
         benefit_group_id: "$_id.benefit_group_id"
       }}
     ]).each do |record|
-      begin
-        sponsorship = plan_design_proposal(record['plan_design_proposal_id']).profile.benefit_sponsorships.first
-        application = sponsorship.benefit_applications.where(:id => record['benefit_application_id']).first
-        benefit_group = application.benefit_groups.where(:id => record['benefit_group_id']).first
-        title = "Benefit Group Created for: #{plan_design_organization(record['plan_design_proposal_id']).legal_name} by #{plan_design_organization(record['plan_design_proposal_id']).broker_agency_profile.legal_name}"
-        if benefit_group.update_attributes(title: title)
-          puts "Success: Title updated for Benefit Group Id:#{record['benefit_group_id']} belongs to #{plan_design_organization(record['plan_design_proposal_id']).legal_name}" unless Rails.env.test?
-        else
-          puts "Failure: Update Failed for benefit_group: #{record['benefit_group_id']} for PlanDesignOrganization: #{plan_design_organization(record['plan_design_proposal_id']).legal_name} with Errors: #{benefit_group.errors.full_messages}"
-        end
-      rescue Exception => e
-        puts "Error: Failed for benefit group id: #{record['benefit_group_id']} for plan_design_proposal_id: #{record['plan_design_proposal_id']}: #{e}"
+
+      sponsorship = plan_design_proposal(record['plan_design_proposal_id']).profile.benefit_sponsorships.first
+      application = sponsorship.benefit_applications.where(:id => record['benefit_application_id']).first
+      benefit_group = application.benefit_groups.where(:id => record['benefit_group_id']).first
+      title = "Benefit Group Created for: #{plan_design_organization(record['plan_design_proposal_id']).legal_name} by #{plan_design_organization(record['plan_design_proposal_id']).broker_agency_profile.legal_name}"
+      if benefit_group.update_attributes(title: title)
+        puts "Success: Title updated for Benefit Group Id:#{record['benefit_group_id']} belongs to #{plan_design_organization(record['plan_design_proposal_id']).legal_name}" unless Rails.env.test?
+      else
+        puts "Failure: Update Failed for benefit_group: #{record['benefit_group_id']} for PlanDesignOrganization: #{plan_design_organization(record['plan_design_proposal_id']).legal_name} with Errors: #{benefit_group.errors.full_messages}"
       end
+    rescue Exception => e
+      puts "Error: Failed for benefit group id: #{record['benefit_group_id']} for plan_design_proposal_id: #{record['plan_design_proposal_id']}: #{e}"
+
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class HbxAdminController < ApplicationController
   $months_array = Date::ABBR_MONTHNAMES.compact
 
@@ -5,7 +7,7 @@ class HbxAdminController < ApplicationController
   before_action :validate_aptc, only: [:update_aptc_csr, :calculate_aptc_csr]
 
   def edit_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    raise NotAuthorizedError unless current_user.has_hbx_staff_role?
 
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
     @household_members = Admin::Aptc.build_household_members(@current_year, @family)
@@ -16,14 +18,14 @@ class HbxAdminController < ApplicationController
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
     @max_aptc = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = @active_tax_household_for_current_year.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
-    @year_options = Admin::Aptc::years_with_tax_household(@family)
+    @year_options = Admin::Aptc.years_with_tax_household(@family)
     respond_to do |format|
-      format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
+      format.js { render(@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")}
     end
   end
 
   def update_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    raise NotAuthorizedError unless current_user.has_hbx_staff_role?
 
     if @aptc_errors.blank?
       if @family.present? #&& TimeKeeper.date_of_record.year == year
@@ -42,7 +44,7 @@ class HbxAdminController < ApplicationController
 
   # For AJAX Calculations.
   def calculate_aptc_csr
-    raise NotAuthorizedError if !current_user.has_hbx_staff_role?
+    raise NotAuthorizedError unless current_user.has_hbx_staff_role?
 
     @enrollments_info = Admin::Aptc.build_enrollments_data(@current_year, @family, @hbxs, params[:applied_aptcs_array], params[:max_aptc].to_f, params[:csr_percentage].to_i, params[:memeber_ids])
     @slcsp_value = Admin::Aptc.calculate_slcsp_value(@current_year, @family)
@@ -50,11 +52,11 @@ class HbxAdminController < ApplicationController
     @current_aptc_applied_hash =  Admin::Aptc.build_current_aptc_applied_hash(@hbxs, params[:applied_aptcs_array])
     @plan_premium_for_enrollments = Admin::Aptc.build_plan_premium_hash_for_enrollments(@hbxs)
     @active_tax_household_for_current_year = @family.active_household.latest_active_tax_household_with_year(@current_year)
-    @max_aptc = ( params[:max_aptc]=="NaN" ? params[:max_aptc] : '%.2f' % params[:max_aptc] ) || @family.active_household.tax_households.tax_household_with_year(@current_year).last.try(:latest_eligibility_determination).try(:max_aptc) || 0
+    @max_aptc = (params[:max_aptc] == "NaN" ? params[:max_aptc] : '%.2f' % params[:max_aptc]) || @family.active_household.tax_households.tax_household_with_year(@current_year).last.try(:latest_eligibility_determination).try(:max_aptc) || 0
     @csr_percent_as_integer = params[:csr_percentage] || @family.active_household.tax_households.tax_household_with_year(@current_year).last.try(:latest_eligibility_determination).try(:csr_percent_as_integer) || 0
-    @year_options = Admin::Aptc::years_with_tax_household(@family)
+    @year_options = Admin::Aptc.years_with_tax_household(@family)
     respond_to do |format|
-      format.js { render (@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")} if @aptc_errors.blank?
+      format.js { render(@hbxs.blank? ? "edit_aptc_csr_no_enrollment" : "edit_aptc_csr_active_enrollment")} if @aptc_errors.blank?
       format.js { render "household_header"} if @aptc_errors.present?
     end
   end
@@ -65,7 +67,7 @@ class HbxAdminController < ApplicationController
     attr = params[:person] || params
     @person = Person.find(attr[:person_id])
     @family = Family.find(attr[:family_id])
-    @current_year = (attr[:current_year] || attr[:year] || Admin::Aptc.years_with_tax_household(@family).sort.last).to_i
+    @current_year = (attr[:current_year] || attr[:year] || Admin::Aptc.years_with_tax_household(@family).max).to_i
     @hbxs = @family.active_household.hbx_enrollments.enrolled_and_renewing.by_year(@current_year).by_coverage_kind('health')
     @household_info = Admin::Aptc.build_household_level_aptc_csr_data(@current_year, @family, @hbxs, attr[:max_aptc].to_f, attr[:csr_percentage])
   end

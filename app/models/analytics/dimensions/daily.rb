@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Analytics
   module Dimensions
     class Daily
@@ -25,22 +27,19 @@ module Analytics
         hour    = time_stamp.hour
         minute  = time_stamp.min
 
-        hours_of_day.inc(("h" + hour.to_s).to_sym => 1)
-        minutes_of_hours.where("hour" => hour.to_s).first.inc(("m" + minute.to_s).to_sym => 1)
+        hours_of_day.inc("h#{hour}".to_sym => 1)
+        minutes_of_hours.where("hour" => hour.to_s).first.inc("m#{minute}".to_sym => 1)
         self
       end
 
-    private
+      private
+
       def pre_allocate_document
         self.build_hours_of_day unless hours_of_day.present?
 
-        if week_day.blank?
-          self.week_day = date.wday
-        end
+        self.week_day = date.wday if week_day.blank?
 
-        if minutes_of_hours.size == 0 
-          (0..23).map { |i| self.minutes_of_hours << Analytics::Dimensions::MinutesOfHour.new(hour: i) }
-        end
+        (0..23).map { |i| self.minutes_of_hours << Analytics::Dimensions::MinutesOfHour.new(hour: i) } if minutes_of_hours.empty?
       end
 
     end

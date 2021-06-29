@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class BenefitGroupAssignment
   include Mongoid::Document
   include Mongoid::Timestamps
   include AASM
 
-  RENEWING = %w(coverage_renewing)
+  RENEWING = %w[coverage_renewing].freeze
 
   embedded_in :census_employee
 
@@ -26,8 +28,8 @@ class BenefitGroupAssignment
   embeds_many :workflow_state_transitions, as: :transitional
 
   validates_presence_of :start_on
-  validates_presence_of :benefit_group_id, :if => Proc.new {|obj| obj.benefit_package_id.blank? }
-  validates_presence_of :benefit_package_id, :if => Proc.new {|obj| obj.benefit_group_id.blank? }
+  validates_presence_of :benefit_group_id, :if => proc {|obj| obj.benefit_package_id.blank? }
+  validates_presence_of :benefit_package_id, :if => proc {|obj| obj.benefit_group_id.blank? }
   validate :date_guards, :model_integrity
 
   scope :renewing,       -> { any_in(aasm_state: RENEWING) }
@@ -70,7 +72,7 @@ class BenefitGroupAssignment
   }
 
   scope :by_benefit_package,     ->(benefit_package) { where(:benefit_package_id => benefit_package.id) }
-  scope :by_benefit_package_and_assignment_on,->(benefit_package, effective_on) {
+  scope :by_benefit_package_and_assignment_on,lambda { |benefit_package, effective_on|
     where(:start_on.lte => effective_on, :end_on.gte => effective_on, :benefit_package_id => benefit_package.id)
   }
 
@@ -166,20 +168,18 @@ class BenefitGroupAssignment
       self.benefit_group_id = new_benefit_group._id
       return @benefit_group = new_benefit_group
     end
-    self.benefit_package=(new_benefit_group)
+    self.benefit_package = (new_benefit_group)
   end
 
   def benefit_group
     return @benefit_group if defined? @benefit_group
     warn "[Deprecated] Instead use benefit_package" unless Rails.env.test?
-    if is_case_old?
-      return @benefit_group = BenefitGroup.find(self.benefit_group_id)
-    end
+    return @benefit_group = BenefitGroup.find(self.benefit_group_id) if is_case_old?
     benefit_package
   end
 
   def benefit_package=(new_benefit_package)
-    raise ArgumentError.new("expected BenefitPackage") unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
+    raise ArgumentError, "expected BenefitPackage" unless new_benefit_package.is_a? BenefitSponsors::BenefitPackages::BenefitPackage
     self.benefit_package_id = new_benefit_package._id
     @benefit_package = new_benefit_package
   end
@@ -191,19 +191,18 @@ class BenefitGroupAssignment
   end
 
   def hbx_enrollment=(new_hbx_enrollment)
-    raise ArgumentError.new("expected HbxEnrollment") unless new_hbx_enrollment.is_a? HbxEnrollment
+    raise ArgumentError, "expected HbxEnrollment" unless new_hbx_enrollment.is_a? HbxEnrollment
     self.hbx_enrollment_id = new_hbx_enrollment._id
     @hbx_enrollment = new_hbx_enrollment
   end
 
   def covered_families
-    Family.where(:"_id".in => HbxEnrollment.where(
+    Family.where(:_id.in => HbxEnrollment.where(
       :"$or" => [
         {:benefit_group_assignment_id => BSON::ObjectId.from_string(self.id)},
         {:family_id => census_employee&.family&.id}
       ]
-    ).pluck(:family_id)
-  )
+    ).pluck(:family_id))
   end
 
   def hbx_enrollments
@@ -220,8 +219,8 @@ class BenefitGroupAssignment
   # Deprecated
   def latest_hbx_enrollments_for_cobra
     families = Family.where({
-      "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
-      })
+                              "households.hbx_enrollments.benefit_group_assignment_id" => BSON::ObjectId.from_string(self.id)
+                            })
 
     hbx_enrollments = families.inject([]) do |enrollments, family|
       family.households.each do |household|
@@ -316,17 +315,11 @@ class BenefitGroupAssignment
 
   def update_status_from_enrollment(hbx_enrollment)
     if hbx_enrollment.coverage_kind == 'health'
-      if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
-        change_state_without_event(:coverage_selected)
-      end
+      change_state_without_event(:coverage_selected) if HbxEnrollment::ENROLLED_STATUSES.include?(hbx_enrollment.aasm_state)
 
-      if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
-        change_state_without_event(:coverage_renewing)
-      end
+      change_state_without_event(:coverage_renewing) if HbxEnrollment::RENEWAL_STATUSES.include?(hbx_enrollment.aasm_state)
 
-      if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
-        change_state_without_event(:coverage_waived)
-      end
+      change_state_without_event(:coverage_waived) if HbxEnrollment::WAIVED_STATUSES.include?(hbx_enrollment.aasm_state)
     end
   end
 
@@ -345,7 +338,7 @@ class BenefitGroupAssignment
     state :coverage_renewing
     state :coverage_expired
 
-    #FIXME create new hbx_enrollment need to create a new benefitgroup_assignment
+    #FIXME: create new hbx_enrollment need to create a new benefitgroup_assignment
     #then we will not need from coverage_terminated to coverage_selected
     event :select_coverage, :after => :record_transition do
       transitions from: [:initialized, :coverage_waived, :coverage_terminated, :coverage_renewing], to: :coverage_selected
@@ -356,7 +349,7 @@ class BenefitGroupAssignment
     end
 
     event :renew_coverage, :after => :record_transition do
-      transitions from: :initialized , to: :coverage_renewing
+      transitions from: :initialized, to: :coverage_renewing
     end
 
     event :terminate_coverage, :after => :record_transition do
@@ -366,7 +359,7 @@ class BenefitGroupAssignment
     end
 
     event :expire_coverage, :after => :record_transition do
-      transitions from: [:coverage_selected, :coverage_renewing], to: :coverage_expired, :guard  => :can_be_expired?
+      transitions from: [:coverage_selected, :coverage_renewing], to: :coverage_expired, :guard => :can_be_expired?
     end
 
     event :delink_coverage, :after => :record_transition do
@@ -424,9 +417,7 @@ class BenefitGroupAssignment
   end
 
   def propogate_delink
-    if hbx_enrollment.present?
-      hbx_enrollment.terminate_coverage! if hbx_enrollment.may_terminate_coverage?
-    end
+    hbx_enrollment.terminate_coverage! if hbx_enrollment.present? && hbx_enrollment.may_terminate_coverage?
     # self.hbx_enrollment_id = nil
   end
 
@@ -437,8 +428,8 @@ class BenefitGroupAssignment
     # which references the aasm_state, but if thats depracated, not sure hbx_enrollment can be checked any longer. CensusEmployee model has an instance method
     # called create_benefit_package_assignment(new_benefit_package, start_on) which creates a BGA without hbx enrollment.
     # self.errors.add(:hbx_enrollment, "hbx_enrollment required") if hbx_enrollment.blank?
-    if hbx_enrollment.present?
-      self.errors.add(:hbx_enrollment, "benefit group missmatch") unless hbx_enrollment.sponsored_benefit_package_id == benefit_package_id
+    if hbx_enrollment.present? && hbx_enrollment.sponsored_benefit_package_id != benefit_package_id
+      self.errors.add(:hbx_enrollment, "benefit group missmatch")
       # TODO: Re-enable this after enrollment propagation issues resolved.
       #       Right now this is causing issues when linking census employee under Enrollment Factory.
       # self.errors.add(:hbx_enrollment, "employee_role missmatch") if hbx_enrollment.employee_role_id != census_employee.employee_role_id and census_employee.employee_role_linked?

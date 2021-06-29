@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class TriggerShopNotices < MongoidMigrationTask
@@ -20,17 +22,15 @@ class TriggerShopNotices < MongoidMigrationTask
   end
 
   def trigger_employer_notice
-    begin
-      @ids_list.each do |fein|
-        organization = Organization.where(fein: fein).first
-        if organization.present?
-          ShopNoticesNotifierJob.perform_later(organization.employer_profile.id.to_s, @event)
-          puts "Notice of #{@event} delivered to #{organization.legal_name}" unless Rails.env.test?
-        end
+    @ids_list.each do |fein|
+      organization = Organization.where(fein: fein).first
+      if organization.present?
+        ShopNoticesNotifierJob.perform_later(organization.employer_profile.id.to_s, @event)
+        puts "Notice of #{@event} delivered to #{organization.legal_name}" unless Rails.env.test?
       end
-    rescue Exception => e
-      Rails.logger.error { "Unable to deliver #{@event} notice for #{organization.legal_name} due to #{e}" } unless Rails.env.test?
     end
+  rescue Exception => e
+    Rails.logger.error { "Unable to deliver #{@event} notice for #{organization.legal_name} due to #{e}" } unless Rails.env.test?
   end
 
   def trigger_employee_notice
@@ -47,13 +47,9 @@ class TriggerShopNotices < MongoidMigrationTask
     # end
   end
 
-  def trigger_broker_notice
+  def trigger_broker_notice; end
 
-  end
-
-  def trigger_general_agency_notice
-
-  end
+  def trigger_general_agency_notice; end
 end
 
 

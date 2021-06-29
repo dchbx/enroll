@@ -47,9 +47,10 @@ module EventsHelper
   end
 
   def office_location_address_kind(kind)
-    if kind == "primary"
+    case kind
+    when "primary"
       "work"
-    elsif kind == "branch"
+    when "branch"
       "work"
     else
       kind
@@ -66,11 +67,11 @@ module EventsHelper
 
   def transaction_id
     @transaction_id ||= begin
-                          ran = Random.new
-                          current_time = Time.now.utc
-                          reference_number_base = current_time.strftime("%Y%m%d%H%M%S") + current_time.usec.to_s[0..2]
-                          reference_number_base + sprintf("%05i",ran.rand(65535))
-                        end
+      ran = Random.new
+      current_time = Time.now.utc
+      reference_number_base = current_time.strftime("%Y%m%d%H%M%S") + current_time.usec.to_s[0..2]
+      reference_number_base + format("%05i",ran.rand(65_535))
+    end
   end
 
   def employer_plan_years(employer, benefit_application_id)

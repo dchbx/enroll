@@ -1,17 +1,21 @@
-class Employers::InboxesController < InboxesController
+# frozen_string_literal: true
 
-  def new
-    @inbox_to_name = params["to"]
-    @inbox_provider_name = 'HBXAdmin'
-    super
-  end
+module Employers
+  class InboxesController < InboxesController
 
-  def find_inbox_provider
-    @inbox_provider = EmployerProfile.find(params["id"])
-    @inbox_provider_name = @inbox_provider.legal_name
-  end
+    def new
+      @inbox_to_name = params["to"]
+      @inbox_provider_name = 'HBXAdmin'
+      super
+    end
 
-  def successful_save_path
-    exchanges_hbx_profiles_root_path
+    def find_inbox_provider
+      @inbox_provider = EmployerProfile.find(params["id"])
+      @inbox_provider_name = @inbox_provider.legal_name
+    end
+
+    def successful_save_path
+      exchanges_hbx_profiles_root_path
+    end
   end
 end

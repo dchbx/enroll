@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateBrokerAgencyProfile < MongoidMigrationTask
 
   def migrate
     action = ENV['action'].to_s
-    @logger = Logger.new(STDOUT)
+    @logger = Logger.new($stdout)
     legal_name = ENV['legal_name'].to_s
 
     service = BenefitSponsors::Services::UpdateBrokerAgencyService.new({legal_name: legal_name})
@@ -24,7 +26,7 @@ class UpdateBrokerAgencyProfile < MongoidMigrationTask
       @logger.info "Updated person broker agency staff roles"
 
     when "update_start_date"
-      org_hbx_ids = ENV['hbx_ids'].to_s.split(" ")
+      org_hbx_ids = ENV['hbx_ids'].to_s.split
       start_date = DateTime.strptime(ENV['new_date'].to_s, "%m/%d/%Y")
       @logger.info "Trying to update start date on current person broker agency"
       service.update_broker_assignment_date({hbx_ids: org_hbx_ids, start_date: start_date})

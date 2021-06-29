@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class EmployerEnrollFactory
 
@@ -36,19 +38,19 @@ module Factories
     end
 
     def end
-      expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:"end_on".lt => (@date || TimeKeeper.date_of_record))
+      expiring_plan_years = @employer_profile.plan_years.published_or_renewing_published.where(:end_on.lt => (@date || TimeKeeper.date_of_record))
       expiring_plan_years.each do |expiring_plan_year|
         expiring_plan_year.hbx_enrollments.each do |enrollment|
-          begin
-            enrollment.expire_coverage! if enrollment.may_expire_coverage?
-            if !enrollment.benefit_group_assignment_id.blank?
-              assignment = enrollment.benefit_group_assignment
-              assignment.expire_coverage! if assignment.may_expire_coverage?
-              assignment.update_attributes(is_active: false) if assignment.is_active?
-            end
-          rescue Exception => e
-            @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
+
+          enrollment.expire_coverage! if enrollment.may_expire_coverage?
+          unless enrollment.benefit_group_assignment_id.blank?
+            assignment = enrollment.benefit_group_assignment
+            assignment.expire_coverage! if assignment.may_expire_coverage?
+            assignment.update_attributes(is_active: false) if assignment.is_active?
           end
+        rescue Exception => e
+          @logger.debug "Exception #{e.inspect} occured for #{census_employee.full_name}"
+
         end
         expiring_plan_year.expire! if expiring_plan_year.may_expire?
       end
@@ -59,41 +61,39 @@ module Factories
     def begin_coverage_for_employees(current_plan_year)
       id_list = current_plan_year.benefit_groups.collect(&:_id).uniq
 
-      families = Family.where(:"_id".in => HbxEnrollment.where(:aasm_state.in => enrollment_statuses,
-        :benefit_group_id.in => id_list,
-        :effective_on => current_plan_year.start_on,
-        ).pluck(:family_id))
+      families = Family.where(:_id.in => HbxEnrollment.where(:aasm_state.in => enrollment_statuses,
+                                                             :benefit_group_id.in => id_list,
+                                                             :effective_on => current_plan_year.start_on).pluck(:family_id))
 
       families.each do |family|
-        enrollments = family.hbx_enrollments.select do |e| 
+        enrollments = family.hbx_enrollments.select do |e|
           enrollment_statuses.include?(e.aasm_state) && e.effective_on == current_plan_year.start_on && id_list.include?(e.benefit_group_id)
         end
 
         HbxEnrollment::COVERAGE_KINDS.each do |coverage_kind|
           enrollments_by_kind = enrollments.select{|e| e.coverage_kind == coverage_kind }
-            next if enrollments_by_kind.blank?
+          next if enrollments_by_kind.blank?
 
-            enrollment = enrollments_by_kind.first
-            if enrollments_by_kind.size > 1
-              enrollment = enrollments_by_kind.sort_by(&:created_at).last
-              enrollments_by_kind.each do |e|
-                next if e.hbx_id == enrollment.hbx_id
-                e.cancel_coverage! if e.may_cancel_coverage?
-              end
+          enrollment = enrollments_by_kind.first
+          if enrollments_by_kind.size > 1
+            enrollment = enrollments_by_kind.max_by(&:created_at)
+            enrollments_by_kind.each do |e|
+              next if e.hbx_id == enrollment.hbx_id
+              e.cancel_coverage! if e.may_cancel_coverage?
             end
-            if enrollment.benefit_group_assignment_id.blank?
-              @logger.debug "Benefit group assignment missing for Enrollment: #{enrollment.hbx_id}."
-              next
-            end
-            benefit_group_assignment = enrollment.benefit_group_assignment
-            benefit_group_assignment.hbx_enrollment = enrollment
-            if enrollment.may_begin_coverage?
-              enrollment.begin_coverage!
-              if enrollment.is_coverage_waived?
-                benefit_group_assignment.waive_benefit
-              else
-                benefit_group_assignment.begin_benefit
-              end
+          end
+          if enrollment.benefit_group_assignment_id.blank?
+            @logger.debug "Benefit group assignment missing for Enrollment: #{enrollment.hbx_id}."
+            next
+          end
+          benefit_group_assignment = enrollment.benefit_group_assignment
+          benefit_group_assignment.hbx_enrollment = enrollment
+          next unless enrollment.may_begin_coverage?
+          enrollment.begin_coverage!
+          if enrollment.is_coverage_waived?
+            benefit_group_assignment.waive_benefit
+          else
+            benefit_group_assignment.begin_benefit
           end
         end
       end
@@ -102,5 +102,5 @@ module Factories
     def enrollment_statuses
       HbxEnrollment::ENROLLED_AND_RENEWAL_STATUSES + HbxEnrollment::WAIVED_STATUSES
     end
-  end 
+  end
 end

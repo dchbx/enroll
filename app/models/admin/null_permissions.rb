@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   # Null object implementation of Permission
   class NullPermission

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ShopNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 

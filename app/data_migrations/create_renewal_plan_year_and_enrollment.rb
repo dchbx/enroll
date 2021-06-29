@@ -7,7 +7,7 @@ class CreateRenewalPlanYearAndEnrollment < MongoidMigrationTask
   def migrate
     if ENV['action'].to_s == "trigger_renewal_py_for_employers"
       trigger_renewal_py_for_employers
-       return
+      return
     end
 
     if ENV['action'].to_s == "trigger_passive_renewals_for_employers"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerAgencyStaffRole
   include Mongoid::Document
   include SetCurrentUser
@@ -18,22 +20,23 @@ class BrokerAgencyStaffRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   associated_with_one :broker_agency_profile, :benefit_sponsors_broker_agency_profile_id, "BenefitSponsors::Organizations::BrokerAgencyProfile"
 
-  validates_presence_of :benefit_sponsors_broker_agency_profile_id, :if => Proc.new { |m| m.broker_agency_profile_id.blank? }
-  validates_presence_of :broker_agency_profile_id, :if => Proc.new { |m| m.benefit_sponsors_broker_agency_profile_id.blank? }
+  validates_presence_of :benefit_sponsors_broker_agency_profile_id, :if => proc { |m| m.broker_agency_profile_id.blank? }
+  validates_presence_of :broker_agency_profile_id, :if => proc { |m| m.benefit_sponsors_broker_agency_profile_id.blank? }
 
   accepts_nested_attributes_for :person, :workflow_state_transitions
 
   # after_initialize :initial_transition
 
-  before_create :set_profile_id, :if => Proc.new { |m| m.broker_agency_profile.is_a?(BrokerAgencyProfile) }
+  before_create :set_profile_id, :if => proc { |m| m.broker_agency_profile.is_a?(BrokerAgencyProfile) }
 
-  def set_profile_id # adding this for depricated association of broker_agency_profile in main app to fix specs
+# adding this for depricated association of broker_agency_profile in main app to fix specs
+  def set_profile_id
     self.broker_agency_profile_id = benefit_sponsors_broker_agency_profile_id if  benefit_sponsors_broker_agency_profile_id.present?
   end
 
@@ -43,15 +46,15 @@ class BrokerAgencyStaffRole
     state :broker_agency_declined
     state :broker_agency_terminated
 
-    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do 
+    event :broker_agency_accept, :after => [:record_transition, :send_invitation] do
       transitions from: :broker_agency_pending, to: :active
     end
 
-    event :broker_agency_decline, :after => :record_transition do 
+    event :broker_agency_decline, :after => :record_transition do
       transitions from: :broker_agency_pending, to: :broker_agency_declined
     end
 
-    event :broker_agency_terminate, :after => :record_transition do 
+    event :broker_agency_terminate, :after => :record_transition do
       transitions from: :active, to: :broker_agency_terminated
       transitions from: :broker_agency_pending, to: :broker_agency_terminated
     end
@@ -107,14 +110,14 @@ class BrokerAgencyStaffRole
 
   ## Class methods
   class << self
-    
+
     def find(id)
       return nil if id.blank?
       people = Person.where("broker_agency_staff_roles._id" => BSON::ObjectId.from_string(id))
       people.any? ? people[0].broker_agency_staff_roles.detect{|x| x.id.to_s == id.to_s} : nil
     end
   end
-  
+
   private
 
   def latest_transition_time

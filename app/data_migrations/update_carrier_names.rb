@@ -1,8 +1,9 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateCarrierNames < MongoidMigrationTask
   def migrate
-
     org_hash = {
       "237442369" => "Fallon Health",
       "042864973" => "Health New England",
@@ -14,6 +15,5 @@ class UpdateCarrierNames < MongoidMigrationTask
       org = Organization.where(fein: fein).last
       org.update_attributes(legal_name: legal_name) if org.present?
     end
-
   end
 end

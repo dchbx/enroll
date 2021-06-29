@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UsersController < ApplicationController
   before_action :confirm_existing_password, only: [:change_password]
   before_action :set_user, except: [:confirm_lock, :unsupported_browser, :index, :show]
@@ -78,7 +80,7 @@ class UsersController < ApplicationController
       begin
         @user.modifier = current_user
         @user.save!
-      rescue => e
+      rescue StandardError => e
         @errors = @user.errors.messages
       end
     end
@@ -88,8 +90,7 @@ class UsersController < ApplicationController
     end
   end
 
-  def edit
-  end
+  def edit; end
 
   def update
     @user.update_attributes(email_update_params)
@@ -114,11 +115,11 @@ class UsersController < ApplicationController
   end
 
   def validate_email
-     @error = if params[:user][:email].blank?
+    @error = if params[:user][:email].blank?
                'Please enter a valid email'
              elsif params[:user].present? && !@user.update_attributes(email_update_params)
-                @user.errors.full_messages.join.gsub('(optional) ', '')
-              end
+               @user.errors.full_messages.join.gsub('(optional) ', '')
+             end
   end
 
   def user

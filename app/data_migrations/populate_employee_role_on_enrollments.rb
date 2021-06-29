@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class PopulateEmployeeRoleOnEnrollments < MongoidMigrationTask
@@ -10,9 +12,7 @@ class PopulateEmployeeRoleOnEnrollments < MongoidMigrationTask
     counter = 0
     families(effective_on).each do |family|
       counter += 1
-      if counter % 100 == 0
-        puts "processed #{counter} families"
-      end
+      puts "processed #{counter} families" if counter % 100 == 0
       family.active_household.hbx_enrollments.where(query(effective_on)).each do |enrollment|
         set_employee_role(enrollment, family)
       end

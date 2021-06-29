@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
-class TriggerBrokerInvitationUrl< MongoidMigrationTask
+class TriggerBrokerInvitationUrl < MongoidMigrationTask
   def migrate
     npn = ENV['broker_npn']
     broker_role = BrokerRole.by_npn(npn).first if npn.present?

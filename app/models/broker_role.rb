@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrokerRole
   include Mongoid::Document
   include SetCurrentUser
@@ -6,7 +8,7 @@ class BrokerRole
   include Acapi::Notifiers
   include Mongoid::History::Trackable
 
-  PROVIDER_KINDS = %W[broker assister]
+  PROVIDER_KINDS = %w[broker assister].freeze
   BROKER_UPDATED_EVENT_NAME = "acapi.info.events.broker.updated"
 
   BROKER_ROLE_STATUS_TYPES = ['applicant', 'certified', 'pending', 'decertified', 'denied', 'extended', 'all'].freeze
@@ -15,7 +17,7 @@ class BrokerRole
     "Individual & Family Marketplace ONLY" => "individual",
     "Small Business Marketplace ONLY" => "shop",
     "Both – Individual & Family AND Small Business Marketplaces" => "both"
-  }
+  }.freeze
 
   embedded_in :person
 
@@ -41,8 +43,8 @@ class BrokerRole
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   embeds_many :workflow_state_transitions, as: :transitional
@@ -57,14 +59,14 @@ class BrokerRole
   validates_presence_of :npn, :provider_kind
 
   validates :npn,
-    numericality: {only_integer: true},
-    length: { minimum: 1, maximum: 10 },
-    uniqueness: true,
-    allow_blank: false
+            numericality: {only_integer: true},
+            length: { minimum: 1, maximum: 10 },
+            uniqueness: true,
+            allow_blank: false
 
   validates :provider_kind,
-    allow_blank: false,
-    inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
+            allow_blank: false,
+            inclusion: { in: PROVIDER_KINDS, message: "%{value} is not a valid provider kind" }
 
   scope :active,    ->{ any_in(aasm_state: ["applicant", "active", "broker_agency_pending"]) }
   scope :inactive,  ->{ any_in(aasm_state: ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"]) }
@@ -102,18 +104,16 @@ class BrokerRole
       if new_broker_agency.nil?
         self.benefit_sponsors_broker_agency_profile_id = nil
       else
-        raise ArgumentError.new("expected BenefitSponsors::Organizations::BrokerAgencyProfile class") unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
+        raise ArgumentError, "expected BenefitSponsors::Organizations::BrokerAgencyProfile class" unless new_broker_agency.is_a? BenefitSponsors::Organizations::BrokerAgencyProfile
         self.benefit_sponsors_broker_agency_profile_id = new_broker_agency._id
         @broker_agency_profile = new_broker_agency
       end
+    elsif new_broker_agency.nil?
+      self.broker_agency_profile_id = nil
     else
-      if new_broker_agency.nil?
-        self.broker_agency_profile_id = nil
-      else
-        raise ArgumentError.new("expected BrokerAgencyProfile class") unless new_broker_agency.is_a? BrokerAgencyProfile
-        self.broker_agency_profile_id = new_broker_agency._id
-        @broker_agency_profile = new_broker_agency
-      end
+      raise ArgumentError, "expected BrokerAgencyProfile class" unless new_broker_agency.is_a? BrokerAgencyProfile
+      self.broker_agency_profile_id = new_broker_agency._id
+      @broker_agency_profile = new_broker_agency
     end
   end
 
@@ -121,8 +121,8 @@ class BrokerRole
     return @broker_agency_profile if defined? @broker_agency_profile
     if self.benefit_sponsors_broker_agency_profile_id.nil?
       @broker_agency_profile = BrokerAgencyProfile.find(broker_agency_profile_id) if has_broker_agency_profile?
-    else
-      @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile if has_broker_agency_profile?
+    elsif has_broker_agency_profile?
+      @broker_agency_profile = BenefitSponsors::Organizations::Organization.where(:"profiles._id" => benefit_sponsors_broker_agency_profile_id).first.broker_agency_profile
     end
   end
 
@@ -131,7 +131,7 @@ class BrokerRole
   end
 
   def can_update_carrier_appointments?
-   active?
+    active?
   end
 
   def address=(new_address)
@@ -193,12 +193,12 @@ class BrokerRole
     end
 
     def find_by_broker_agency_profile(broker_agency_profile)
-      raise ArgumentError.new("expected BrokerAgencyProfile") unless broker_agency_profile.is_a?(BrokerAgencyProfile) || broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
+      raise ArgumentError, "expected BrokerAgencyProfile" unless broker_agency_profile.is_a?(BrokerAgencyProfile) || broker_agency_profile.is_a?(BenefitSponsors::Organizations::BrokerAgencyProfile)
       if broker_agency_profile.is_a?(BrokerAgencyProfile)
-        people = (Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id))
+        people = Person.where("broker_role.broker_agency_profile_id" => broker_agency_profile.id)
         people.collect(&:broker_role)
       else
-        people = (Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id))
+        people = Person.where("broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)
         people.collect(&:broker_role)
       end
     end
@@ -206,11 +206,11 @@ class BrokerRole
     def find_candidates_by_broker_agency_profile(broker_agency_profile)
       if broker_agency_profile.is_a? BrokerAgencyProfile
         people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
-                              .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
+                       .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
         people.collect(&:broker_role)
       else
         people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
-                              .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
+                       .any_in(:"broker_role.aasm_state" => ["applicant", "broker_agency_pending"])
         people.collect(&:broker_role)
       end
     end
@@ -218,11 +218,11 @@ class BrokerRole
     def find_active_by_broker_agency_profile(broker_agency_profile)
       if broker_agency_profile.is_a? BrokerAgencyProfile
         people = Person.and(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id,
-                            :"broker_role.aasm_state"  => "active")
+                            :"broker_role.aasm_state" => "active")
         people.collect(&:broker_role)
       else
         people = Person.and(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id,
-                            :"broker_role.aasm_state"  => "active")
+                            :"broker_role.aasm_state" => "active")
         people.collect(&:broker_role)
       end
     end
@@ -230,11 +230,11 @@ class BrokerRole
     def find_inactive_by_broker_agency_profile(broker_agency_profile)
       if broker_agency_profile.is_a? BrokerAgencyProfile
         people = Person.where(:"broker_role.broker_agency_profile_id" => broker_agency_profile.id)\
-                            .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
+                       .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
         people.collect(&:broker_role)
       else
         people = Person.where(:"broker_role.benefit_sponsors_broker_agency_profile_id" => broker_agency_profile.id)\
-                            .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
+                       .any_in(:"broker_role.aasm_state" => ["denied", "decertified", "broker_agency_declined", "broker_agency_terminated"])
         people.collect(&:broker_role)
       end
     end
@@ -254,7 +254,7 @@ class BrokerRole
 
     def agencies_with_matching_broker(search_str)
       broker_role_ids = brokers_matching_search_criteria(search_str).map(&:broker_role).map(&:id)
-      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect{|b|b.benefit_sponsors_broker_agency_profile_id}.present?
+      if brokers_matching_search_criteria(search_str).map(&:broker_role).detect(&:benefit_sponsors_broker_agency_profile_id).present?
         Person.collection.raw_aggregate([
                                             {"$match" => {"broker_role.aasm_state" => "active", "broker_role._id" => { "$in" => broker_role_ids}}},
                                             {"$group" => {"_id" => "$broker_role.benefit_sponsors_broker_agency_profile_id"}}
@@ -288,7 +288,7 @@ class BrokerRole
       transitions from: :applicant, to: :broker_agency_pending
     end
 
-    event :pending , :after =>[:record_transition, :notify_updated, :notify_broker_pending] do
+    event :pending, :after => [:record_transition, :notify_updated, :notify_broker_pending] do
       transitions from: :applicant, to: :broker_agency_pending, :guard => :is_primary_broker?
       transitions from: :broker_agency_pending, to: :broker_agency_pending, :guard => :is_primary_broker?
     end
@@ -336,7 +336,7 @@ class BrokerRole
   end
 
   def notify_updated
-    notify(BROKER_UPDATED_EVENT_NAME, { :broker_id => self.npn } )
+    notify(BROKER_UPDATED_EVENT_NAME, { :broker_id => self.npn })
   end
 
 
@@ -348,11 +348,11 @@ class BrokerRole
   end
 
   def initial_transition
-    return if workflow_state_transitions.size > 0
+    return unless workflow_state_transitions.empty?
     self.workflow_state_transitions << WorkflowStateTransition.new(
       from_state: nil,
       to_state: aasm.to_state || "applicant"
-      )
+    )
   end
 
   def record_transition
@@ -364,9 +364,7 @@ class BrokerRole
   end
 
   def send_invitation
-    if active?
-      Invitation.invite_broker!(self)
-    end
+    Invitation.invite_broker!(self) if active?
   end
 
   def notify_broker_denial
@@ -375,7 +373,7 @@ class BrokerRole
 
   def notify_broker_pending
     unchecked_carriers = self.carrier_appointments.select { |k,v| k if v != "true"}
-    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present?  || !self.training
+    UserMailer.broker_pending_notification(self,unchecked_carriers).deliver_now if unchecked_carriers.present? || !self.training
   end
 
   def applicant?
@@ -395,18 +393,19 @@ class BrokerRole
   end
 
   def latest_transition_time
-    if self.workflow_state_transitions.any?
-      self.workflow_state_transitions.first.transition_at
-    end
+    self.workflow_state_transitions.first.transition_at if self.workflow_state_transitions.any?
   end
 
   def current_state
-    aasm_state.gsub(/\_/,' ').camelcase
+    aasm_state.gsub(/_/,' ').camelcase
   end
 
   def remove_broker_assignments
-    @orgs = self.benefit_sponsors_broker_agency_profile_id.present? ?
-     (BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_role(id).map(&:organization)) : (Organization.by_broker_role(id))
+    @orgs = if self.benefit_sponsors_broker_agency_profile_id.present?
+              BenefitSponsors::BenefitSponsorships::BenefitSponsorship.by_broker_role(id).map(&:organization)
+            else
+              Organization.by_broker_role(id)
+            end
     @employers = @orgs.map(&:employer_profile)
     # Remove broker from employers
     @employers.each do |e|
@@ -417,10 +416,7 @@ class BrokerRole
     # Remove broker from families
     if has_broker_agency_profile?
       families = self.broker_agency_profile.families
-      families.each do |f|
-        f.terminate_broker_agency
-      end
+      families.each(&:terminate_broker_agency)
     end
-    
   end
 end

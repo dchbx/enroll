@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Factories
   class FamilyTranscriptError < StandardError; end
 
@@ -30,7 +32,7 @@ module Factories
 
       # TODO: Once all is clear with the people, they must be persisted to construct the family
 
-      local_people.each { |person| person.save }
+      local_people.each(&:save)
 
       # TODO: identify primary_family_member
       local_family = find_or_build_family(local_people)
@@ -40,15 +42,13 @@ module Factories
       end
 
       { family: family.local_family({
-            family_members: [local_family.family_members],
-            irs_groups: [local_family.irs_groups],
-            households: [local_family.households({
-                            hbx_enrollments: [local_family_enrollments]
-                          })
-                      ]
-          }),
-        people: [local_people]
-      }
+                                      family_members: [local_family.family_members],
+                                      irs_groups: [local_family.irs_groups],
+                                      households: [local_family.households({
+                                                                             hbx_enrollments: [local_family_enrollments]
+                                                                           })]
+                                    }),
+        people: [local_people]}
     end
 
     def process_people(transcript_people)
@@ -59,7 +59,6 @@ module Factories
 
     def audit_family(family_transcript)
       local_family = find_or_build_local(family_transcript)
-
     end
 
     def find_or_build_person(transcript_person)
@@ -70,36 +69,30 @@ module Factories
       # Support citizenship and VLP status override?  Use Ruleset?
     end
 
-    def find_or_build_family(transcript_primary_member)
-
-    end
+    def find_or_build_family(transcript_primary_member); end
 
     def build_consumer_role(transcript_consumer)
       # Support citizenship and VLP status override
     end
 
-    def build_employee_role(transcript_employee, transcript_employer)
-    end
+    def build_employee_role(transcript_employee, transcript_employer); end
 
-    def find_or_build_hbx_enrollment(transcript_family, transcript_hbx_enrollment)
+    def find_or_build_hbx_enrollment(_transcript_family, _transcript_hbx_enrollment)
       enrollment = match_hbx_enrollment(hbx_enrollment)
 
       make_employer_sponsored_enrollment
       make_individual_enrollment
     end
 
-  private
+    private
 
-    def match_family(family)
-    end
+    def match_family(family); end
 
     def match_person(transcript_person)
       Person.match_existing_person(transcript_person)
     end
 
-    def match_hbx_enrollment(hbx_enrollment)
-
-    end
+    def match_hbx_enrollment(hbx_enrollment); end
 
     # This code pulled from Interactors::FindOfCreateInsuredPerson
     def update_person
@@ -116,16 +109,13 @@ module Factories
       # person, is_new = person, false
     end
 
-
     def with_logging(description, the_object)
-      begin
-        @logger.debug("Starting #{description}")
-        yield(the_object)
-        @logger.debug("Completed #{description}")
-      rescue
-        @logger.error("#{description} failed!!")
-        raise
-      end
+      @logger.debug("Starting #{description}")
+      yield(the_object)
+      @logger.debug("Completed #{description}")
+    rescue StandardError
+      @logger.error("#{description} failed!!")
+      raise
     end
 
 

@@ -1,15 +1,15 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CancelPlanYear < MongoidMigrationTask
   def migrate
-    feins=ENV['feins'].split(' ').uniq
+    feins = ENV['feins'].split.uniq
     feins.each do |fein|
       organizations = Organization.where(fein: fein)
       next puts "unable to find employer_profile with fein: #{fein}" if organizations.blank?
 
-      if organizations.size > 1
-        raise 'more than 1 employer found with given fein'
-      end
+      raise 'more than 1 employer found with given fein' if organizations.size > 1
       plan_year_start_on = Date.strptime(ENV['plan_year_start_on'].to_s, "%m/%d/%Y")
       plan_year = organizations.first.employer_profile.plan_years.where(:start_on => plan_year_start_on, :aasm_state => ENV['plan_year_state'].to_s).first
       next puts "Present fein: #{fein} is found but it has different plan year assm state" if plan_year.nil?
@@ -30,7 +30,7 @@ class CancelPlanYear < MongoidMigrationTask
     end
   end
 
-  def all_enrollments(benefit_groups=[])
+  def all_enrollments(benefit_groups = [])
     id_lists = benefit_groups.collect(&:_id).uniq
     families = Family.all_enrollments_by_benefit_group_ids(id_lists)
     families.inject([]) do |enrollments, family|

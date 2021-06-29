@@ -32,10 +32,10 @@ module Operations
         benchmark_plan_id = values[:benchmark_product_id]
         values[:eligibility_determinations].each do |faa_ed|
           th = family.active_household.tax_households.build(hbx_assigned_id: faa_ed["hbx_assigned_id"],
-                                                       effective_starting_on: faa_ed["effective_starting_on"],
-                                                       is_eligibility_determined: faa_ed["is_eligibility_determined"])
+                                                            effective_starting_on: faa_ed["effective_starting_on"],
+                                                            is_eligibility_determined: faa_ed["is_eligibility_determined"])
           applicants = values[:applicants].select{|app| app["eligibility_determination_id"] == faa_ed["_id"]}
-          applicants.each do |applicant| #todo select instead
+          applicants.each do |applicant| #TODO: select instead
             create_tax_household_members(family, th, applicant)
           end
 

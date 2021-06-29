@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class EmploymentRelationship
     include ActiveModel::Model
@@ -9,7 +11,7 @@ module Forms
     def census_employee
       ::CensusEmployee.find(census_employee_id)
     end
-    
+
 
   end
 end

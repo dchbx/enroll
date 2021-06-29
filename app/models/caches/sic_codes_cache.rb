@@ -1,11 +1,11 @@
+# frozen_string_literal: true
+
 module Caches
   class SicCodesCache
 
     def self.load
       self.grouped_sic_codes
     end
-
-    private
 
     def self.grouped_sic_codes
       @@grouped_sic_codes ||= {}

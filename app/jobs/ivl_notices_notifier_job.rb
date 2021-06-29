@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IvlNoticesNotifierJob < ActiveJob::Base
   queue_as :default
 
@@ -14,7 +16,6 @@ class IvlNoticesNotifierJob < ActiveJob::Base
       options: options,
       mpi_indicator: notice_trigger.mpi_indicator
     }.merge(notice_trigger.notice_trigger_element_group.notice_peferences)).deliver
-
   end
 
   def notice_class(notice_type)

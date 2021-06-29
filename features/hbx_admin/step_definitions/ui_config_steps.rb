@@ -10,6 +10,6 @@ Then(/^they should see the Issuers tab$/) do
     expect(page).to have_content("Issuers")
   end
 
-  Then(/^they should not see the Issuers tab$/) do
+Then(/^they should not see the Issuers tab$/) do
     expect(page).to_not have_content("Issuers")
-  end
+end

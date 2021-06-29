@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RecaptchaConcern
   extend ActiveSupport::Concern
 
@@ -16,12 +18,10 @@ module RecaptchaConcern
           respond_with_navigational(resource) { render :new }
         end
       when 'Users::SessionsController'
-        if User.login_captcha_required?(params[:user][:login])
-          unless verify_recaptcha
-            self.resource = resource_class.new
-            resource.login = params[:user][:login]
-            respond_with_navigational(resource) { render :new }
-          end
+        if User.login_captcha_required?(params[:user][:login]) && !verify_recaptcha
+          self.resource = resource_class.new
+          resource.login = params[:user][:login]
+          respond_with_navigational(resource) { render :new }
         end
       end
     end

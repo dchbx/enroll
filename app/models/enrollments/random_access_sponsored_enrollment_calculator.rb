@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Enrollments
   # Used when bulk-reporting enrollment calculations but the order in which
   # enrollments will be placed or grouped can not be predicted.
@@ -10,7 +12,7 @@ module Enrollments
       def is_disabled?
         is_disabled
       end
-  
+
       def is_primary_member?
         is_primary_member
       end
@@ -27,7 +29,7 @@ module Enrollments
       @family_member_person_cache = family_member_person_cache
       @relationship_cache = rel_cache
       @rating_area_cache = rating_area_cache
-      @sponsored_benefit = if sponsored_benefit_cache.has_key?(@original_enrollment.sponsored_benefit_id)
+      @sponsored_benefit = if sponsored_benefit_cache.key?(@original_enrollment.sponsored_benefit_id)
                              sponsored_benefit_cache[@original_enrollment.sponsored_benefit_id]
                            else
                              @original_enrollment.sponsored_benefit
@@ -39,13 +41,13 @@ module Enrollments
       @contribution_calculator = @sponsored_benefit.contribution_calculator
       @sponsor_contribution = @sponsored_benefit.sponsor_contribution
     end
-  
+
     def groups_for_products(products)
       @groups_for_products ||= calculate_groups_for_products(products)
     end
-  
+
     protected
-  
+
     def calculate_groups_for_products(products)
       products.map do |product|
         member_group_with_product = @member_group.clone_for_coverage(product)
@@ -59,28 +61,26 @@ module Enrollments
       group_enrollment_members = []
       previous_enrollment = @original_enrollment.parent_enrollment
       previous_product = nil
-      if previous_enrollment
-        previous_product = PreviousProductSlug.new(previous_enrollment.product_id)
-      end
+      previous_product = PreviousProductSlug.new(previous_enrollment.product_id) if previous_enrollment
 
       subscriber = @original_enrollment.hbx_enrollment_members.detect(&:is_subscriber?)
 
-      rating_area = if @rating_area_cache.has_key?(@original_enrollment.rating_area_id)
-        @rating_area_cache[@original_enrollment.rating_area_id]
-      else
-        @original_enrollment.rating_area
-      end
+      rating_area = if @rating_area_cache.key?(@original_enrollment.rating_area_id)
+                      @rating_area_cache[@original_enrollment.rating_area_id]
+                    else
+                      @original_enrollment.rating_area
+                    end
 
       @original_enrollment.hbx_enrollment_members.each do |hem|
-        person = if @family_member_person_cache.has_key?(hem.applicant_id)
+        person = if @family_member_person_cache.key?(hem.applicant_id)
                    @family_member_person_cache[hem.applicant_id]
                  else
-                  hem.person
+                   hem.person
                  end
 
         rel_value = if hem.is_subscriber?
                       "self"
-                    elsif @relationship_cache.has_key?([hem.applicant_id, subscriber.applicant_id])
+                    elsif @relationship_cache.key?([hem.applicant_id, subscriber.applicant_id])
                       @relationship_cache[[hem.applicant_id, subscriber.applicant_id]]
                     else
                       hem.primary_relationship
@@ -94,9 +94,9 @@ module Enrollments
         )
         roster_members << roster_member
         group_enrollment_member = BenefitSponsors::Enrollments::MemberEnrollment.new({
-          member_id: hem.id,
-          coverage_eligibility_on: hem.coverage_start_on
-        })
+                                                                                       member_id: hem.id,
+                                                                                       coverage_eligibility_on: hem.coverage_start_on
+                                                                                     })
         group_enrollment_members << group_enrollment_member
       end
       group_enrollment = BenefitSponsors::Enrollments::GroupEnrollment.new(
@@ -112,6 +112,6 @@ module Enrollments
         group_id: @original_enrollment.id,
         group_enrollment: group_enrollment
       )
-    end  
+    end
   end
 end

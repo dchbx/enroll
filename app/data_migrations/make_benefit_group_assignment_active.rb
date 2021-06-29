@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class MakeBenefitGroupAssignmentActive < MongoidMigrationTask
 
   def migrate
-    census_employee = CensusEmployee.where(id:ENV['ce_id']).first
+    census_employee = CensusEmployee.where(id: ENV['ce_id']).first
     if census_employee.present?
       bga = census_employee.benefit_group_assignments.last
       if bga.present?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Announcement
   include Mongoid::Document
   include SetCurrentUser
@@ -38,7 +40,7 @@ class Announcement
 
   before_validation :update_audiences
   def update_audiences
-    self.audiences = audiences.select {|audience| audience.present? } if audiences.present?
+    self.audiences = audiences.select(&:present?) if audiences.present?
   end
 
   before_validation :update_content
@@ -57,22 +59,21 @@ class Announcement
       AUDIENCE_KINDS
     end
 
-    def get_announcements_by_portal(portal_path="", person=nil)
+    def get_announcements_by_portal(portal_path = "", person = nil)
       announcements = []
 
-      case
-      when portal_path.include?("employers/employer_profiles")
+      if portal_path.include?("employers/employer_profiles")
         announcements.concat(Announcement.current_msg_for_employer)
-      when portal_path.include?("families/home")
-        announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
-        announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("employee")
-        announcements.concat(Announcement.current_msg_for_employee) if person && person.has_active_employee_role?
-      when portal_path.include?("consumer")
-        announcements.concat(Announcement.current_msg_for_ivl) if person && person.is_consumer_role_active?
-      when portal_path.include?("broker_agencies")
+      elsif portal_path.include?("families/home")
+        announcements.concat(Announcement.current_msg_for_employee) if person&.has_active_employee_role?
+        announcements.concat(Announcement.current_msg_for_ivl) if person&.is_consumer_role_active?
+      elsif portal_path.include?("employee")
+        announcements.concat(Announcement.current_msg_for_employee) if person&.has_active_employee_role?
+      elsif portal_path.include?("consumer")
+        announcements.concat(Announcement.current_msg_for_ivl) if person&.is_consumer_role_active?
+      elsif portal_path.include?("broker_agencies")
         announcements.concat(Announcement.current_msg_for_broker)
-      when portal_path.include?("general_agencies")
+      elsif portal_path.include?("general_agencies")
         announcements.concat(Announcement.current_msg_for_ga)
       end
 

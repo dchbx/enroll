@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FamilySearch
   class FamilySearchMember < ::FamilyMember
     include Mongoid::Document

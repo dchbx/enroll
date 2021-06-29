@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FamiliesController < ApplicationController
   include Acapi::Notifiers
 
@@ -12,7 +14,6 @@ class FamiliesController < ApplicationController
     # page_no = page_string.blank? ? nil : page_string.to_i
     # @families = Family.search(@q).exists(employer_profile: true).page page_no
     @families = Family.all
-
   end
 
   def show
@@ -53,7 +54,8 @@ class FamiliesController < ApplicationController
     end
   end
 
-private
+  private
+
   # Use callbacks to share common setup or constraints between actions.
   def set_family
     set_current_person
@@ -74,8 +76,6 @@ private
   end
 
   def check_hbx_staff_role
-    unless current_user.has_hbx_staff_role?
-      redirect_to root_path, :flash => { :error => "You must be an HBX staff member" }
-    end
+    redirect_to root_path, :flash => { :error => "You must be an HBX staff member" } unless current_user.has_hbx_staff_role?
   end
 end

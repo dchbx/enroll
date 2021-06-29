@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixHbxEnrollments < MongoidMigrationTask
@@ -9,8 +11,8 @@ class FixHbxEnrollments < MongoidMigrationTask
 
   def get_enrollments(family)
     family.households.flat_map(&:hbx_enrollments).select do |hbx_en|
-      (!hbx_en.is_shop?) && (!["coverage_canceled", "shopping", "inactive", "coverage_expired", "auto_renewing"].include?(hbx_en.aasm_state)) &&
-          (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
+      !hbx_en.is_shop? && !["coverage_canceled", "shopping", "inactive", "coverage_expired", "auto_renewing"].include?(hbx_en.aasm_state) &&
+        (hbx_en.terminated_on.blank? || hbx_en.terminated_on >= TimeKeeper.date_of_record)
     end
   end
 
@@ -20,9 +22,7 @@ class FixHbxEnrollments < MongoidMigrationTask
 
   def fix_enrollment(enrollment)
     members = get_members(enrollment)
-    if members.compact.present? && enrollment.present?
-      return enrollment.update_attributes!(is_any_enrollment_member_outstanding: true) if members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?)
-    end
+    return enrollment.update_attributes!(is_any_enrollment_member_outstanding: true) if members.compact.present? && enrollment.present? && (members.any?(&:verification_outstanding?) || members.any?(&:verification_period_ended?))
   end
 
   def migrate

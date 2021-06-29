@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UploadNoticeToEmployerAccount < MongoidMigrationTask
@@ -7,7 +9,7 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
     raise "Please enter the notice title" if ENV['notice_name'].blank?
     raise "Please specify file path" if ENV['file_path'].blank?
 
-    notice_path = "#{ENV['file_path']}"
+    notice_path = (ENV['file_path']).to_s
     notice_subject = ENV['notice_name']
     notice_title = ENV['notice_name'].titleize.gsub(/\s*/, '')
 
@@ -34,18 +36,18 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
 
   def upload_to_amazonS3(notice_path)
     Aws::S3Storage.save(notice_path, 'notices')
-  rescue => e
+  rescue StandardError => e
     raise "Unable to upload to amazon due to #{e}"
   end
 
   def create_recipient_document(employer_profile, doc_uri, notice_title)
     notice = employer_profile.documents.build({
-      title: notice_title, 
-      creator: "hbx_staff",
-      subject: "notice",
-      identifier: doc_uri,
-      format: "application/pdf"
-    })
+                                                title: notice_title,
+                                                creator: "hbx_staff",
+                                                subject: "notice",
+                                                identifier: doc_uri,
+                                                format: "application/pdf"
+                                              })
 
     if notice.save
       notice
@@ -55,10 +57,11 @@ class UploadNoticeToEmployerAccount < MongoidMigrationTask
   end
 
   def create_secure_inbox_message(recipient, notice, notice_subject)
-    body = "<br>You can download the notice by clicking this link " +
-            "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s, 
-              recipient.id, 'documents', notice.id )}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,'')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
-    message = recipient.inbox.messages.build({ subject: notice_subject, body: body, from: "#{Settings.site.short_name}" })
+    body = "<br>You can download the notice by clicking this link " \
+           "<a href=" + "#{Rails.application.routes.url_helpers.authorized_document_download_path(recipient.class.to_s,
+                                                                                                  recipient.id, 'documents', notice.id)}?content_type=#{notice.format}&filename=#{notice.title.gsub(/[^0-9a-z]/i,
+                                                                                                                                                                                                    '')}.pdf&disposition=inline" + " target='_blank'>" + notice.title + "</a>"
+    message = recipient.inbox.messages.build({ subject: notice_subject, body: body, from: Settings.site.short_name.to_s })
     message.save!
   end
 end

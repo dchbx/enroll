@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmployerAttestation
   include Mongoid::Document
   include SetCurrentUser
@@ -21,7 +23,7 @@ class EmployerAttestation
     state :approved
     state :denied
 
-    event :submit, :after => :record_transition do 
+    event :submit, :after => :record_transition do
       transitions from: [:submitted, :pending, :unsubmitted], to: :submitted
     end
 
@@ -34,7 +36,7 @@ class EmployerAttestation
     end
 
     event :deny, :after => :record_transition do
-      transitions from: [:submitted, :pending], to: :denied#, :after => :ban_profile
+      transitions from: [:submitted, :pending], to: :denied #, :after => :ban_profile
     end
 
     event :revert, :after => :record_transition do
@@ -47,7 +49,7 @@ class EmployerAttestation
   end
 
   def is_eligible?
-   under_review? || approved?
+    under_review? || approved?
   end
 
   def has_documents?

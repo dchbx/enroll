@@ -19,7 +19,7 @@ module Operations
       private
 
       def validate(params)
-        if params[:family_id]&.is_a?(BSON::ObjectId) && params[:date].present?
+        if params[:family_id].is_a?(BSON::ObjectId) && params[:date].present?
           Success(params)
         else
           Failure('family_id is expected in BSON format and date in required')

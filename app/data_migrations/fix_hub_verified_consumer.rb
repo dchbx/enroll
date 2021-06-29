@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class FixHubVerifiedConsumer < MongoidMigrationTask
@@ -15,15 +17,13 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
 
   def update_verification_type(person, v_type)
     v_type.update_attributes(:validation_status => "valid", :update_reason => "data_fix_hub_response")
-    if ["Citizenship", "Immigration status"].include? v_type.type_name
-      person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr)
-    end
+    person.consumer_role.lawful_presence_determination.authorize!(person.consumer_role.verification_attr) if ["Citizenship", "Immigration status"].include? v_type.type_name
 
     if person.all_types_verified? && !person.consumer_role.fully_verified?
       begin
         person.consumer_role.verify_ivl_by_admin
         puts "Person state verified person: #{person.id}" unless Rails.env.test?
-      rescue => e
+      rescue StandardError => e
         puts "Issue migrating person #{person.id}" unless Rails.env.test?
       end
     end
@@ -45,7 +45,10 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
 
   def parse_dhs(response)
     return [vlp_resp_to_hash(response)[:lawful_presence_indeterminate][:response_code].split("_").join(" "), "not lawfully present"] if vlp_resp_to_hash(response)[:lawful_presence_indeterminate].present?
-    return ["lawfully present", vlp_resp_to_hash(response)[:lawful_presence_determination][:legal_status]] if vlp_resp_to_hash(response)[:lawful_presence_determination].present? && vlp_resp_to_hash(response)[:lawful_presence_determination][:response_code].eql?("lawfully_present")
+    if vlp_resp_to_hash(response)[:lawful_presence_determination].present? && vlp_resp_to_hash(response)[:lawful_presence_determination][:response_code].eql?("lawfully_present")
+      return ["lawfully present",
+              vlp_resp_to_hash(response)[:lawful_presence_determination][:legal_status]]
+    end
     ["not lawfully present", "not lawfully present"] if vlp_resp_to_hash(response)[:lawful_presence_determination].present? && vlp_resp_to_hash(response)[:lawful_presence_determination][:response_code].eql?("not_lawfully_present")
   end
 
@@ -67,9 +70,9 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
 
   def get_people
     Person.where({'$or' => [
-        {"consumer_role.aasm_state"=>"verification_outstanding"},
+        {"consumer_role.aasm_state" => "verification_outstanding"},
         {'$and' => [
-            {"consumer_role.aasm_state"=>{'$in' => ["fully_verified", "sci_verified"]}},
+            {"consumer_role.aasm_state" => {'$in' => ["fully_verified", "sci_verified"]}},
             { '$or' => [
                 {"consumer_role.lawful_presence_determination.ssa_responses" => {'$exists' => true}},
                 {"consumer_role.lawful_presence_determination.vlp_responses" => {'$exists' => true}}
@@ -87,10 +90,10 @@ class FixHubVerifiedConsumer < MongoidMigrationTask
   end
 
   def ssa_response(person)
-    person.consumer_role.lawful_presence_determination.ssa_responses.sort_by(&:received_at).last
+    person.consumer_role.lawful_presence_determination.ssa_responses.max_by(&:received_at)
   end
 
   def dhs_response(person)
-    person.consumer_role.lawful_presence_determination.vlp_responses.sort_by(&:received_at).last.try(:body)
+    person.consumer_role.lawful_presence_determination.vlp_responses.max_by(&:received_at).try(:body)
   end
 end

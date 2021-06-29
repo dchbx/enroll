@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarrierProfile
   include Mongoid::Document
   include Config::AcaModelConcern
@@ -37,7 +39,7 @@ class CarrierProfile
 
   def associated_carrier_profile=(new_associated_carrier_profile)
     if new_associated_carrier_profile.present?
-      raise ArgumentError.new("expected CarrierProfile") unless new_associated_carrier_profile.is_a? CarrierProfile
+      raise ArgumentError, "expected CarrierProfile" unless new_associated_carrier_profile.is_a? CarrierProfile
       self.associated_carrier_profile_id = new_associated_carrier_profile._id
       new_associated_carrier_profile
     else
@@ -66,24 +68,24 @@ class CarrierProfile
     end
 
     def carriers_for(employer_profile)
-      servicing_hios_ids = employer_profile.service_areas.collect { |service_area| service_area.issuer_hios_id }.uniq
+      servicing_hios_ids = employer_profile.service_areas.collect(&:issuer_hios_id).uniq
       self.all.reject { |cp| (cp.issuer_hios_ids & servicing_hios_ids).empty? }
     end
 
     def carrier_profile_service_area_pairs_for(employer_profile, start_on)
-     hios_carrier_id_mapping = Organization.where("carrier_profile" => {"$exists" => true}).inject({}) do |acc, org|
+      hios_carrier_id_mapping = Organization.where("carrier_profile" => {"$exists" => true}).inject({}) do |acc, org|
 
-       cp = org.carrier_profile
+        cp = org.carrier_profile
 
-       cp.issuer_hios_ids.each do |ihid|
-         acc[ihid] = cp.id
-       end
-       acc
-     end
-     employer_profile.service_areas_available_on(DateTime.new(start_on.to_i)).map do |service_area|
-       [hios_carrier_id_mapping[service_area.issuer_hios_id], service_area.service_area_id]
-     end.uniq
-   end
+        cp.issuer_hios_ids.each do |ihid|
+          acc[ihid] = cp.id
+        end
+        acc
+      end
+      employer_profile.service_areas_available_on(DateTime.new(start_on.to_i)).map do |service_area|
+        [hios_carrier_id_mapping[service_area.issuer_hios_id], service_area.service_area_id]
+      end.uniq
+    end
 
     def first
       all.first
@@ -95,12 +97,12 @@ class CarrierProfile
 
     def find(id)
       organizations = Organization.where("carrier_profile._id" => BSON::ObjectId.from_string(id.to_s)).to_a
-      organizations.size > 0 ? organizations.first.carrier_profile : nil
+      organizations.empty? ? nil : organizations.first.carrier_profile
     end
 
     def find_by_legal_name(name)
       organizations = Organization.where("legal_name" => name).to_a
-      organizations.size > 0 ? organizations.first.carrier_profile._id : ""
+      organizations.empty? ? "" : organizations.first.carrier_profile._id
     end
   end
 

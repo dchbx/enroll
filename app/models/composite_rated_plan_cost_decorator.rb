@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CompositeRatedPlanCostDecorator < SimpleDelegator
   def initialize(plan, benefit_group, composite_rating_tier, cobra_status)
     super(plan)
@@ -14,19 +16,19 @@ class CompositeRatedPlanCostDecorator < SimpleDelegator
   def employer_contribution_for(member)
     member_family_size = member.family.family_members.count
     return contribution_for_subscriber(member_family_size) if member.is_subscriber?
-    return total_employer_contribution - (member_family_size - 1) * contribution_for_subscriber(member_family_size)
+    total_employer_contribution - (member_family_size - 1) * contribution_for_subscriber(member_family_size)
   end
 
   def employee_cost_for(member)
     member_family_size = member.family.family_members.count
     return cost_for_subscriber(member_family_size) if member.is_subscriber?
-    return total_employee_cost - (member_family_size - 1) * cost_for_subscriber(member_family_size)
+    total_employee_cost - (member_family_size - 1) * cost_for_subscriber(member_family_size)
   end
 
   def premium_for(member)
     member_family_size = member.family.family_members.count
     return premium_for_subscriber(member_family_size) if member.is_subscriber?
-    return total_premium - (member_family_size - 1) * premium_for_subscriber(member_family_size)
+    total_premium - (member_family_size - 1) * premium_for_subscriber(member_family_size)
   end
 
   def premium_for_subscriber(member_family_size)
@@ -88,7 +90,7 @@ class CompositeRatedPlanCostDecorator < SimpleDelegator
       "grandchild" => nil,
       "unrelated" => nil,
       "great_grandparent" => nil,
-      "great_grandchild" => nil,
+      "great_grandchild" => nil
     }[person_relationship]
   end
 

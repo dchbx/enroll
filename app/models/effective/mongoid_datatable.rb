@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Effective
   class MongoidDatatable < Effective::Datatable
     def global_search_method
@@ -6,7 +8,7 @@ module Effective
 
     protected
 
-    def table_tool 
+    def table_tool
       @table_tool ||= MongoidDatatableTool.new(self, table_columns.reject { |_, col| col[:array_column] })
     end
 

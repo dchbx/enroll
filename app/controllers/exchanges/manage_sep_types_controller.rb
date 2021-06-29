@@ -131,11 +131,11 @@ module Exchanges
           "updated_by",
           "publish",
           "other_reason",
-          effective_on_kinds: []
+          {effective_on_kinds: []}
         ]
       )
 
-      forms_params.merge!({_id: params[:id]}) if params.dig(:id)
+      forms_params.merge!({_id: params[:id]}) if params[:id]
       forms_params.to_h
     end
 

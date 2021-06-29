@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AuthorizationConcern
   extend ActiveSupport::Concern
 
@@ -6,7 +8,7 @@ module AuthorizationConcern
     # :confirmable, :lockable, :timeoutable and :omniauthable
     devise :database_authenticatable, :registerable, :lockable,
            :recoverable, :jwt_authenticatable, :rememberable, :trackable, :timeoutable, :authentication_keys => {email: false, login: true},
-           jwt_revocation_strategy: self
+                                                                                        jwt_revocation_strategy: self
 
     ## Database authenticatable
     field :email,              type: String, default: ""
@@ -44,7 +46,7 @@ module AuthorizationConcern
     validates_presence_of     :password, if: :password_required?
     validates_confirmation_of :password, if: :password_required?
     validates_length_of       :password, within: Devise.password_length, allow_blank: true
-    validates_format_of :email, with: Devise::email_regexp , allow_blank: true, :message => "is invalid"
+    validates_format_of :email, with: Devise.email_regexp, allow_blank: true, :message => "is invalid"
 
     scope :locked, ->{ where(:locked_at.ne => nil) }
     scope :unlocked, ->{ where(locked_at: nil) }
@@ -73,7 +75,7 @@ module AuthorizationConcern
     end
 
     def self.jwt_revoked?(payload, user)
-      !user.whitelisted_jwts.where(payload.slice('jti', 'aud')).any? do |jwt|
+      user.whitelisted_jwts.where(payload.slice('jti', 'aud')).none? do |jwt|
         Time.now > Time.at(jwt.exp.to_i)
       end
     end
@@ -82,14 +84,12 @@ module AuthorizationConcern
       WhitelistedJwt.where({:user_id => self.id}).delete_all
     end
 
-    def self.revoke_jwt(payload, user)
+    def self.revoke_jwt(_payload, user)
       WhitelistedJwt.where({:user_id => user.id}).delete_all
     end
 
     def ensure_authentication_token
-      if authentication_token.blank?
-        self.authentication_token = generate_authentication_token
-      end
+      self.authentication_token = generate_authentication_token if authentication_token.blank?
       true
     end
 
@@ -117,21 +117,21 @@ module AuthorizationConcern
     end
 
     def password_complexity
-      if password.present? and not password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
+      if password.present? && !password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d ]).+$/)
         errors.add :password, "Your password must include at least 1 lowercase letter, 1 uppercase letter, 1 number, and 1 character that’s not a number, letter, or space."
-      elsif password.present? and password.match(/#{::Regexp.escape(oim_id)}/i)
+      elsif password.present? && password.match(/#{::Regexp.escape(oim_id)}/i)
         errors.add :password, "Password cannot contain username"
-      elsif password.present? and password_repeated_chars_limit(password)
+      elsif password.present? && password_repeated_chars_limit(password)
         errors.add :password, "Password cannot repeat any character more than #{MAX_SAME_CHAR_LIMIT} times"
-      elsif password.present? and password.match(/(.)\1\1/)
+      elsif password.present? && password.match(/(.)\1\1/)
         errors.add :password, "Password must not repeat consecutive characters more than once"
-      elsif password.present? and !password.match(/(.*?[a-zA-Z]){4,}/)
+      elsif password.present? && !password.match(/(.*?[a-zA-Z]){4,}/)
         errors.add :password, "Password must have at least 4 alphabetical characters"
       end
     end
 
     def password_repeated_chars_limit(password)
-      return true if password.chars.group_by(&:chr).map{ |k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
+      return true if password.chars.group_by(&:chr).map{ |_k,v| v.size}.max > MAX_SAME_CHAR_LIMIT
       false
     end
 
@@ -155,7 +155,7 @@ module AuthorizationConcern
 
     def generate_valid_password
       password = Devise.friendly_token.first(16)
-      password = password + "aA1!"
+      password += "aA1!"
       password = password.squeeze
       if password_invalid?(password)
         password = generate_valid_password
@@ -168,7 +168,7 @@ module AuthorizationConcern
       where(authentication_token: token).first
     end
 
-    def send_reset_password_instructions(attributes={})
+    def send_reset_password_instructions(attributes = {})
       recoverable = find_or_initialize_with_errors(reset_password_keys, attributes, :not_found)
       if !recoverable.approved?
         recoverable.errors[:base] << I18n.t("devise.failure.not_approved")
@@ -179,19 +179,17 @@ module AuthorizationConcern
     end
 
     def login_captcha_required?(login)
-      begin
-        logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
-      rescue => e
-        true
-      end
+      logins_before_captcha <= self.or({oim_id: login}, {email: login}).first.failed_attempts
+    rescue StandardError => e
+      true
     end
 
     def logins_before_captcha
       4
     end
 
-    def has_answered_question? security_question_id
-       where(:'security_question_responses.security_question_id' => security_question_id).any?
+    def has_answered_question?(security_question_id)
+      where(:'security_question_responses.security_question_id' => security_question_id).any?
     end
   end
 end

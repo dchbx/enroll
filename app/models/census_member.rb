@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CensusMember
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -8,7 +10,7 @@ class CensusMember
 
   validates_with Validations::DateRangeValidator
 
-  GENDER_KINDS = %W(male female)
+  GENDER_KINDS = %w[male female].freeze
 
   field :first_name, type: String
   field :middle_name, type: String
@@ -31,8 +33,8 @@ class CensusMember
   accepts_nested_attributes_for :email, allow_destroy: true
 
   validates :gender,
-  allow_blank: false,
-  inclusion: { in: GENDER_KINDS, message: "must be selected" }
+            allow_blank: false,
+            inclusion: { in: GENDER_KINDS, message: "must be selected" }
 
 
   validates_presence_of :first_name, :last_name, :employee_relationship, :dob
@@ -42,7 +44,11 @@ class CensusMember
   end
 
   def date_of_birth=(val)
-    self.dob = Date.strptime(val, "%Y-%m-%d").to_date rescue nil
+    self.dob = begin
+      Date.strptime(val, "%Y-%m-%d").to_date
+    rescue StandardError
+      nil
+    end
   end
 
   def gender=(val)

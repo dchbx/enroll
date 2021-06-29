@@ -1,9 +1,9 @@
-class DeviseCustomMailer < Devise::Mailer   
+# frozen_string_literal: true
+
+class DeviseCustomMailer < Devise::Mailer
   helper :application
   include Devise::Controllers::UrlHelpers
   default template_path: 'devise/mailer'
 
-  if Rails.env.production?
-    self.delivery_method = :soa_mailer
-  end
+  self.delivery_method = :soa_mailer if Rails.env.production?
 end

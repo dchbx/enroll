@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Events
   class VlpVerificationRequestsController < ::ApplicationController
     include Acapi::Notifiers
@@ -6,7 +8,7 @@ module Events
       [LawfulPresenceDetermination::VLP_VERIFICATION_REQUEST_EVENT_NAME]
     end
 
-    def call(event_name, e_start, e_end, msg_id, payload)
+    def call(_event_name, _e_start, _e_end, _msg_id, payload)
       individual = payload.stringify_keys["person"]
       coverage_start_date = payload.stringify_keys["coverage_start_date"]
       event_payload = render_to_string "events/lawful_presence/vlp_verification_request", :formats => ["xml"], :locals => { :individual => individual, :coverage_start_date => coverage_start_date }

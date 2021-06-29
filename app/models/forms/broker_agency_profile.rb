@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'date'
 module Forms
   class BrokerAgencyProfile < ::Forms::OrganizationSignup
@@ -5,17 +7,13 @@ module Forms
     include ActiveModel::Validations
     include Validations::Email
 
-    attr_accessor :broker_agency_profile
-    attr_accessor :market_kind, :languages_spoken
-    attr_accessor :working_hours, :accept_new_clients, :home_page
-    attr_accessor :broker_applicant_type, :email
-    attr_accessor :ach_record
+    attr_accessor :broker_agency_profile, :market_kind, :languages_spoken, :working_hours, :accept_new_clients, :home_page, :broker_applicant_type, :email, :ach_record
 
     include NpnField
 
     validates :market_kind,
-      inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
-      allow_blank: false
+              inclusion: { in: ::BrokerAgencyProfile::MARKET_KINDS, message: "%{value} is not a valid practice area" },
+              allow_blank: false
 
     validates :email, :email => true, :allow_blank => false
 
@@ -28,7 +26,7 @@ module Forms
 
     def initialize(attrs = {})
       self.fein = Organization.generate_fein
-      self.is_fake_fein=true
+      self.is_fake_fein = true
       self.ach_record = attrs[:ach_record] || {}
       super(attrs)
     end
@@ -39,9 +37,9 @@ module Forms
 
     def add_broker_role
       person.broker_role = ::BrokerRole.new({
-        :provider_kind => 'broker',
-        :npn => self.npn
-      })
+                                              :provider_kind => 'broker',
+                                              :npn => self.npn
+                                            })
     end
 
     def ach_record=(attrs)
@@ -53,14 +51,12 @@ module Forms
       unless @ach_record.valid?
         errors = @ach_record.errors
         errors.each do |key, val|
-          unless key == :routing_number
-            self.errors.add('ach_record', val)
-          end
+          self.errors.add('ach_record', val) unless key == :routing_number
         end
       end
     end
 
-    def save(current_user=nil)
+    def save(_current_user = nil)
       return false unless valid?
 
       begin
@@ -82,7 +78,7 @@ module Forms
       self.broker_agency_profile.ach_routing_number = @ach_record.routing_number
       self.broker_agency_profile.ach_account_number = @ach_record.account_number
       self.broker_agency_profile.save!
-      person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id , market_kind:  market_kind })
+      person.broker_role.update_attributes({ broker_agency_profile_id: broker_agency_profile.id, market_kind:  market_kind })
       UserMailer.broker_application_confirmation(person).deliver_now
       # person.update_attributes({ broker_agency_staff_roles: [::BrokerAgencyStaffRole.new(:broker_agency_profile => broker_agency_profile)]})
       true
@@ -93,21 +89,19 @@ module Forms
         first_name: regex_for(first_name),
         last_name: regex_for(last_name),
         dob: dob
-        )
+      )
 
-      if matched_people.count > 1
-        raise TooManyMatchingPeople.new
-      end
+      raise TooManyMatchingPeople if matched_people.count > 1
 
-      if matched_people.count == 1
-        self.person = matched_people.first
-      else
-        self.person = Person.new({
-          first_name: first_name,
-          last_name: last_name,
-          dob: dob
-          })
-      end
+      self.person = if matched_people.count == 1
+                      matched_people.first
+                    else
+                      Person.new({
+                                   first_name: first_name,
+                                   last_name: last_name,
+                                   dob: dob
+                                 })
+                    end
 
       self.person.add_work_email(email)
       # since we can have multiple office_locations each will have separate phone numbers
@@ -120,12 +114,13 @@ module Forms
       existing_org = Organization.where(:fein => self.fein)
       if existing_org.present? && !existing_org.first.broker_agency_profile.present?
         new_broker_agency_profile = ::BrokerAgencyProfile.new({
-            :entity_kind => entity_kind,
-            :home_page => home_page,
-            :market_kind => market_kind,
-            :languages_spoken => languages_spoken,
-            :working_hours => working_hours,
-            :accept_new_clients => accept_new_clients})
+                                                                :entity_kind => entity_kind,
+                                                                :home_page => home_page,
+                                                                :market_kind => market_kind,
+                                                                :languages_spoken => languages_spoken,
+                                                                :working_hours => working_hours,
+                                                                :accept_new_clients => accept_new_clients
+                                                              })
         existing_org = existing_org.first
         existing_org.update_attributes!(broker_agency_profile: new_broker_agency_profile)
         existing_org
@@ -136,13 +131,13 @@ module Forms
           :dba => dba,
           :is_fake_fein => is_fake_fein,
           :broker_agency_profile => ::BrokerAgencyProfile.new({
-            :entity_kind => entity_kind,
-            :home_page => home_page,
-            :market_kind => market_kind,
-            :languages_spoken => languages_spoken,
-            :working_hours => working_hours,
-            :accept_new_clients => accept_new_clients
-          }),
+                                                                :entity_kind => entity_kind,
+                                                                :home_page => home_page,
+                                                                :market_kind => market_kind,
+                                                                :languages_spoken => languages_spoken,
+                                                                :working_hours => working_hours,
+                                                                :accept_new_clients => accept_new_clients
+                                                              }),
           :office_locations => office_locations
         )
       end
@@ -154,28 +149,28 @@ module Forms
       broker_role = broker_agency_profile.primary_broker_role
       person = broker_role.try(:person)
       record = self.new({
-        id: organization.id,
-        legal_name: organization.legal_name,
-        dba: organization.dba,
-        fein: organization.fein,
-        home_page: organization.home_page,
-        first_name: person.first_name,
-        last_name: person.last_name,
-        dob: person.dob.try(:strftime, '%Y-%m-%d'),
-        email: person.emails.first.address,
-        npn: broker_role.try(:npn),
-        entity_kind: broker_agency_profile.entity_kind,
-        market_kind: broker_agency_profile.market_kind,
-        languages_spoken: broker_agency_profile.languages_spoken,
-        working_hours: broker_agency_profile.working_hours,
-        accept_new_clients: broker_agency_profile.accept_new_clients,
-        ach_record: {
-          routing_number: broker_agency_profile.ach_routing_number,
-          routing_number_confirmation: broker_agency_profile.ach_routing_number,
-          account_number: broker_agency_profile.ach_account_number,
-        },
-        office_locations: organization.office_locations
-      })
+                          id: organization.id,
+                          legal_name: organization.legal_name,
+                          dba: organization.dba,
+                          fein: organization.fein,
+                          home_page: organization.home_page,
+                          first_name: person.first_name,
+                          last_name: person.last_name,
+                          dob: person.dob.try(:strftime, '%Y-%m-%d'),
+                          email: person.emails.first.address,
+                          npn: broker_role.try(:npn),
+                          entity_kind: broker_agency_profile.entity_kind,
+                          market_kind: broker_agency_profile.market_kind,
+                          languages_spoken: broker_agency_profile.languages_spoken,
+                          working_hours: broker_agency_profile.working_hours,
+                          accept_new_clients: broker_agency_profile.accept_new_clients,
+                          ach_record: {
+                            routing_number: broker_agency_profile.ach_routing_number,
+                            routing_number_confirmation: broker_agency_profile.ach_routing_number,
+                            account_number: broker_agency_profile.ach_account_number
+                          },
+                          office_locations: organization.office_locations
+                        })
     end
 
     def assign_attributes(atts)
@@ -195,8 +190,8 @@ module Forms
         person.update_attributes(extract_person_params)
         person.emails.find_by(kind: 'work').update(address: attr[:email])
       end
-    rescue
-      return false
+    rescue StandardError
+      false
     end
 
     def extract_person_params
@@ -231,16 +226,12 @@ module Forms
     end
 
     def validate_duplicate_npn
-      if Person.where("broker_role.npn" => npn).any?
-        errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.")
-      end
+      errors.add(:base, "NPN has already been claimed by another broker. Please contact HBX-Customer Service - Call (855) 532-5465.") if Person.where("broker_role.npn" => npn).any?
     end
 
     def check_existing_organization
       existing_org = Organization.where(:fein => self.fein)
-      if existing_org.present? && existing_org.first.broker_agency_profile.present?
-        raise OrganizationAlreadyMatched.new
-      end
+      raise OrganizationAlreadyMatched if existing_org.present? && existing_org.first.broker_agency_profile.present?
     end
   end
 end

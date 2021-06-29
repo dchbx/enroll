@@ -1,19 +1,16 @@
+# frozen_string_literal: true
+
 module Eligibility
   module BenefitGroup
-
     def eligible_on(date_of_hire)
       if effective_on_kind == "date_of_hire"
         date_of_hire
+      elsif effective_on_offset == 1
+        date_of_hire.end_of_month + 1.day
+      elsif (date_of_hire + effective_on_offset.days).day == 1
+        (date_of_hire + effective_on_offset.days)
       else
-        if effective_on_offset == 1
-          date_of_hire.end_of_month + 1.day
-        else
-          if (date_of_hire + effective_on_offset.days).day == 1
-            (date_of_hire + effective_on_offset.days)
-          else
-            (date_of_hire + effective_on_offset.days).end_of_month + 1.day
-          end
-        end
+        (date_of_hire + effective_on_offset.days).end_of_month + 1.day
       end
     end
 
@@ -44,7 +41,7 @@ module Eligibility
     end
 
     ## Conversion employees are not allowed to buy coverage through off-exchange plan year
-    def valid_plan_year    
+    def valid_plan_year
       if employer_profile.is_conversion?
         plan_year.is_conversion ? plan_year.employer_profile.renewing_plan_year : plan_year
       else

@@ -1,63 +1,52 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class UpdateUserOrPersonRecords < MongoidMigrationTask
   def migrate
-    begin
-      action = ENV['action'].to_s
-      email = ENV['user_email'] || ENV['person_email'].to_s
-      user_name = ENV['user_name'].to_s
-      headless_user = ENV['headless_user'].to_s
-      find_user_by = ENV['find_user_by'] || ENV['hbx_id'].to_s
-      dob = Date.strptime(ENV['dob'].to_s, "%d/%m/%Y") if ENV['dob'].present?
+    action = ENV['action'].to_s
+    email = ENV['user_email'] || ENV['person_email'].to_s
+    user_name = ENV['user_name'].to_s
+    headless_user = ENV['headless_user'].to_s
+    find_user_by = ENV['find_user_by'] || ENV['hbx_id'].to_s
+    dob = Date.strptime(ENV['dob'].to_s, "%d/%m/%Y") if ENV['dob'].present?
 
-      record = case find_user_by
-               when "email"
-                 find_user_from_email(email)
-               when "#{ENV['hbx_id']}"
-                 find_person(find_user_by)
-               else
-                 find_user_by_user_name(user_name)
-               end
+    record = case find_user_by
+             when "email"
+               find_user_from_email(email)
+             when (ENV['hbx_id']).to_s
+               find_person(find_user_by)
+             else
+               find_user_by_user_name(user_name)
+             end
 
 
-      if record.size != 1
-        puts "No user record (or) found more than 1 user record with e-mail/username you entered" unless Rails.env.test?
-        return
-      end
-
-      if action.blank? && headless_user.casecmp("yes") != 0
-        puts "Please give input. Check your query" unless Rails.env.test?
-        return
-      end
-
-      if action.casecmp("update_username") == 0
-        user = record.first.user
-        update_oim_id(user, user_name) if user
-      end
-
-      if action.casecmp("update_email") == 0
-        update_email(record.first, email)
-      end
-
-      if action.casecmp("update_person_home_email") == 0
-        update_person_home_email(record.first, email)
-      end
-
-      if action.casecmp("update_person_work_email") == 0
-        update_person_work_email(record.first, email)
-      end
-
-      if action.casecmp("person_dob") == 0
-        update_person_dob(record.first, dob)
-      end
-
-      if headless_user.casecmp("yes") == 0
-        handle_headless_user(record.first)
-      end
-
-    rescue => e
-      puts "#{e}"
+    if record.size != 1
+      puts "No user record (or) found more than 1 user record with e-mail/username you entered" unless Rails.env.test?
+      return
     end
+
+    if action.blank? && headless_user.casecmp("yes") != 0
+      puts "Please give input. Check your query" unless Rails.env.test?
+      return
+    end
+
+    if action.casecmp("update_username") == 0
+      user = record.first.user
+      update_oim_id(user, user_name) if user
+    end
+
+    update_email(record.first, email) if action.casecmp("update_email") == 0
+
+    update_person_home_email(record.first, email) if action.casecmp("update_person_home_email") == 0
+
+    update_person_work_email(record.first, email) if action.casecmp("update_person_work_email") == 0
+
+    update_person_dob(record.first, dob) if action.casecmp("person_dob") == 0
+
+    handle_headless_user(record.first) if headless_user.casecmp("yes") == 0
+  rescue StandardError => e
+    puts e.to_s
   end
 
   def find_user_from_email(email)
@@ -73,19 +62,19 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
   end
 
   def update_oim_id(user, user_name)
-    user = user.user if user.class == Person
+    user = user.user if user.instance_of?(Person)
     ENV['new_user_name'].present? ? user.update_attributes!(oim_id: ENV['new_user_name'].to_s) : user.update_attributes!(oim_id: user_name)
     puts "Successfully updated username with #{user.oim_id}" unless Rails.env.test?
   end
 
   def update_email(user, email)
-    user = user.user if user.class == Person
+    user = user.user if user.instance_of?(Person)
     ENV['new_user_email'].present? ? user.update_attributes!(email: ENV['new_user_email'].to_s) : user.update_attributes!(email: email)
     puts "Successfully updated email with #{user.email}" unless Rails.env.test?
   end
 
   def update_person_home_email(person, address)
-    person = person.person if person.class == User
+    person = person.person if person.instance_of?(User)
     email = person.emails.detect { |email| email.kind == "home"}
     if email.blank?
       create_email(__method__.to_s.split('_')[2], address, person)
@@ -96,7 +85,7 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
   end
 
   def update_person_work_email(person, address)
-    person = person.person if person.class == User
+    person = person.person if person.instance_of?(User)
     email = person.emails.detect { |email| email.kind == "work"}
     if email.blank?
       create_email(__method__.to_s.split('_')[2], address, person)
@@ -107,7 +96,7 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
   end
 
   def update_person_dob(person, dob)
-    person = person.person if person.class == User
+    person = person.person if person.instance_of?(User)
     if TimeKeeper.date_of_record - 110.years > dob
       puts "No kidding!! seriously more than 110 years old!!" unless Rails.env.test?
       return
@@ -120,12 +109,12 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
 
     attrs = {:ssn => person.ssn, dob: dob, last_name: person.last_name, first_name: person.first_name }
 
-    if Person.match_by_id_info(attrs).size > 0
-      puts "This may effect the person match!! Assign this ticket to Dev" unless Rails.env.test?
-      return
-    else
+    if Person.match_by_id_info(attrs).empty?
       person.update_attributes!(dob: dob)
       puts "Succesfully updated dob on person record" unless Rails.env.test?
+    else
+      puts "This may effect the person match!! Assign this ticket to Dev" unless Rails.env.test?
+      nil
     end
   end
 
@@ -140,8 +129,8 @@ class UpdateUserOrPersonRecords < MongoidMigrationTask
 
   def create_email(kind, address, person)
     puts "No Existing #{kind.capitalize} Email Record Found. Do you want to create a new #{kind.capitalize} Email?(y/n)" unless Rails.env.test?
-    result = STDIN.gets.chomp();
-    if result == "yes" || result == "y"
+    result = $stdin.gets.chomp
+    if ["yes", "y"].include?(result)
       person.emails << Email.new(kind: kind, address: address)
       person.save!
       puts "Succesfully created #{kind.capitalize} Email" unless Rails.env.test?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 # frozen_string_literal: true
@@ -145,7 +147,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
       end
     end
   end
- 
+
   def non_detail_active_bg_ids(active_bg_ids)
     active_enrollment_count = 0
     enrollments = HbxEnrollment.where({
@@ -315,7 +317,7 @@ class ForcePublishBenAppReports < MongoidMigrationTask
     elsif current_year_state.nil? && ["coverage_selected", "coverage_enrolled"].include?(prev_year_state)
       "Enrollment plan was changed either for current year or previous year" unless rp_id == cp_id
     else
-      return ''
+      ''
     end
   end
 end

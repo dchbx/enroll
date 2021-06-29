@@ -1,16 +1,22 @@
-class Api::V1::ApiBaseController < ActionController::Base
-  respond_to :json
+# frozen_string_literal: true
 
-  include Pundit
+module Api
+  module V1
+    class ApiBaseController < ActionController::Base
+      respond_to :json
 
-  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  rescue_from Mongoid::Errors::DocumentNotFound, with: :record_find_failure
+      include Pundit
 
-  def user_not_authorized(exception)
-    render file: 'public/403.html', status: 403
-  end
+      rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+      rescue_from Mongoid::Errors::DocumentNotFound, with: :record_find_failure
 
-  def record_find_failure(exception)
-    render file: 'public/404.html', status: 404
+      def user_not_authorized(_exception)
+        render file: 'public/403.html', status: 403
+      end
+
+      def record_find_failure(_exception)
+        render file: 'public/404.html', status: 404
+      end
+    end
   end
 end

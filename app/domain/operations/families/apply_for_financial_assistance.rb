@@ -18,7 +18,7 @@ module Operations
       def find_family(family_id)
         family = Family.find(family_id)
         Success(family)
-      rescue
+      rescue StandardError
         Failure('Cannot find family')
       end
 

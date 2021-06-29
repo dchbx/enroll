@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessPolicies
   class EmployeeRole
     attr_accessor :user
@@ -8,10 +10,10 @@ module AccessPolicies
 
     def authorize_employee_role(employee_role, controller)
       return true if user.has_hbx_staff_role? || user.has_csr_subrole? || is_broker_for_employer?(employee_role.employer_profile_id) || is_general_agency_staff_for_employer?(employee_role.employer_profile_id)
-      if !(user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s)
-        controller.redirect_to_check_employee_role
+      if user.person.employee_roles.map(&:id).map(&:to_s).include? employee_role.id.to_s
+        true
       else
-        return true
+        controller.redirect_to_check_employee_role
       end
     end
 
@@ -26,11 +28,15 @@ module AccessPolicies
       end
       employers.map(&:id).map(&:to_s).include?(employer_id.to_s)
     end
-    
+
     def is_general_agency_staff_for_employer?(employer_id)
       person = user.person
       if person.general_agency_staff_roles.present?
-        person.general_agency_staff_roles.last.general_agency_profile.employer_clients.map(&:_id).include?(employer_id) rescue false
+        begin
+          person.general_agency_staff_roles.last.general_agency_profile.employer_clients.map(&:_id).include?(employer_id)
+        rescue StandardError
+          false
+        end
       else
         false
       end

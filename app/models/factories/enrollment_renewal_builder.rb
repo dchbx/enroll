@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 module Factories
   module EnrollmentRenewalBuilder
-
     def generate_passive_renewal(options = {})
       if renewal_plan_offered_by_er?(enrollment)
         renewal_enrollment = family.active_household.hbx_enrollments.new
@@ -27,11 +28,10 @@ module Factories
     end
 
     def assign_common_attributes(active_enrollment, renewal_enrollment)
-      common_attributes = %w(coverage_household_id coverage_kind changing broker_agency_profile_id
-          writing_agent_id original_application_type kind special_enrollment_period_id
-        )
+      common_attributes = %w[coverage_household_id coverage_kind changing broker_agency_profile_id
+                             writing_agent_id original_application_type kind special_enrollment_period_id]
       common_attributes.each do |attr|
-         renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
+        renewal_enrollment.send("#{attr}=", active_enrollment.send(attr))
       end
 
       renewal_enrollment.plan_id = active_enrollment.plan.renewal_plan_id if active_enrollment.plan.present?
@@ -74,14 +74,14 @@ module Factories
     # clone enrollment members if relationship offered in renewal plan year and active in current hbxenrollment
     def clone_enrollment_members(active_enrollment, renewal_enrollment)
       hbx_enrollment_members = active_enrollment.hbx_enrollment_members
-      hbx_enrollment_members.reject!{|member| !is_relationship_offered_and_member_covered?(member,renewal_enrollment) }
+      hbx_enrollment_members.select!{|member| is_relationship_offered_and_member_covered?(member,renewal_enrollment) }
       hbx_enrollment_members.inject([]) do |members, hbx_enrollment_member|
         members << HbxEnrollmentMember.new({
-          applicant_id: hbx_enrollment_member.applicant_id,
-          eligibility_date: @plan_year_start_on,
-          coverage_start_on: @plan_year_start_on,
-          is_subscriber: hbx_enrollment_member.is_subscriber
-        })
+                                             applicant_id: hbx_enrollment_member.applicant_id,
+                                             eligibility_date: @plan_year_start_on,
+                                             coverage_start_on: @plan_year_start_on,
+                                             is_subscriber: hbx_enrollment_member.is_subscriber
+                                           })
       end
     end
 
@@ -103,7 +103,7 @@ module Factories
     end
 
     # Validate enrollment membership against benefit package-covered relationships
-    def family_eligibility(active_enrollment, renewal_enrollment)
+    def family_eligibility(_active_enrollment, renewal_enrollment)
       coverage_household.coverage_household_members.each do |coverage_member|
         enrollment_member = HbxEnrollmentMember.new_from(coverage_household_member: coverage_member)
         enrollment_member.eligibility_date = enrollment.effective_on
@@ -115,7 +115,7 @@ module Factories
     end
 
     def renew_waived_enrollment
-      renewal_enrollment = family.hbx_enrollments.new(family:family,household: family.active_household)
+      renewal_enrollment = family.hbx_enrollments.new(family: family,household: family.active_household)
 
       renewal_enrollment.coverage_kind = enrollment.try(:coverage_kind) || coverage_kind || "health"
       renewal_enrollment.enrollment_kind = "open_enrollment"
@@ -132,22 +132,22 @@ module Factories
         raise ShopEnrollmentRenewalFactoryError, message
       end
 
-      renewal_enrollment.update_attributes(benefit_group_assignment_id:benefit_group_assignment.id,
-                                           benefit_group_id:benefit_group_assignment.benefit_group_id,
+      renewal_enrollment.update_attributes(benefit_group_assignment_id: benefit_group_assignment.id,
+                                           benefit_group_id: benefit_group_assignment.benefit_group_id,
                                            effective_on: benefit_group_assignment.benefit_group.start_on,
                                            employee_role_id: @census_employee.employee_role_id,
                                            waiver_reason: (enrollment.try(:waiver_reason) || "I do not have other coverage"))
 
       renewal_enrollment.renew_waived
-      renewal_enrollment.update_attributes(submitted_at:TimeKeeper.datetime_of_record)
+      renewal_enrollment.update_attributes(submitted_at: TimeKeeper.datetime_of_record)
 
       if renewal_enrollment.save
-        return
+        nil
       else
         message = "Unable to save waived renewal enrollment: #{renewal_enrollment.inspect}, \n" \
           "Error(s): \n #{renewal_enrollment.errors.map{|k,v| "#{k} = #{v}"}.join(" & \n")} \n"
 
-          Rails.logger.error { message }
+        Rails.logger.error { message }
 
         raise ShopEnrollmentRenewalFactoryError, message
       end

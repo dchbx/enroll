@@ -1,25 +1,25 @@
-module SepAll
+# frozen_string_literal: true
 
+module SepAll
   def calculateDates
     @family = Family.find(params[:person]) if params[:person].present?
 
-    if params[:effective_kind] == '15th of month'
+    case params[:effective_kind]
+    when '15th of month'
       params[:effective_kind] = 'first of month'
-    elsif params[:effective_kind] == 'End of Month'
+    when 'End of Month'
       params[:effective_kind] = 'first of next month'
-    elsif params[:effective_kind] == 'First of month after event'
+    when 'First of month after event'
       params[:effective_kind] = 'fixed first of next month'
-    else
-      #Do Nothing
     end
 
     qle = QualifyingLifeEventKind.find(params[:id]) if params[:id].present?
 
-    if qle.reason == 'covid-19'
-      @eff_kind = params[:effective_kind]
-    else
-      @eff_kind = params[:effective_kind].split.join("_").downcase
-    end
+    @eff_kind = if qle.reason == 'covid-19'
+                  params[:effective_kind]
+                else
+                  params[:effective_kind].split.join("_").downcase
+                end
 
     special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: @eff_kind)
     special_enrollment_period.qualifying_life_event_kind = qle
@@ -39,19 +39,21 @@ module SepAll
     if @qle.reason == 'covid-19'
       qle_on = TimeKeeper.date_of_record
       @effective_kinds = @qle.effective_on_kinds.map do |t|
-        if t == 'first_of_this_month'
+        case t
+        when 'first_of_this_month'
           [qle_on.beginning_of_month.to_s, t]
-        elsif t == 'fixed_first_of_next_month'
+        when 'fixed_first_of_next_month'
           [(qle_on.end_of_month + 1.day).to_s, t]
         end
       end
     else
       @effective_kinds = @qle.effective_on_kinds.map do |t|
-        if t == 'first_of_month'
+        case t
+        when 'first_of_month'
           fifteen_day_rule
-        elsif t == 'first_of_next_month'
+        when 'first_of_next_month'
           end_month_rule
-        elsif t == 'fixed_first_of_next_month'
+        when 'fixed_first_of_next_month'
           next_month_event_rule
         else
           t.humanize
@@ -77,9 +79,7 @@ module SepAll
     @qle_ivl = QualifyingLifeEventKind.qualifying_life_events_for(consumer_role || resident_role, true)
     @qle_shop = QualifyingLifeEventKind.qualifying_life_events_for(employee_roles.first, true)
 
-    if employee_roles.present?
-      @qle = @qle_shop if consumer_role.blank?
-    end
+    @qle = @qle_shop if employee_roles.present? && consumer_role.blank?
 
     @qle = @qle_ivl  if consumer_role.present?
     @qle ||= @qle_ivl
@@ -96,8 +96,8 @@ module SepAll
     else
       person_ids = Person.search(dt_query.search_string).pluck(:id)
       families_dt = all_families.where({
-      "family_members.person_id" => {"$in" => person_ids}
-      })
+                                         "family_members.person_id" => {"$in" => person_ids}
+                                       })
     end
 
     @draw = dt_query.draw
@@ -119,8 +119,8 @@ module SepAll
       else
         person_ids = Person.search(dt_query.search_string).pluck(:id)
         families_dt = all_families_in_ivl.where({
-        "family_members.person_id" => {"$in" => person_ids}
-        })
+                                                  "family_members.person_id" => {"$in" => person_ids}
+                                                })
       end
 
       @draw = dt_query.draw
@@ -143,8 +143,8 @@ module SepAll
       else
         person_ids = Person.search(dt_query.search_string).pluck(:id)
         families_dt = all_families_in_shop.where({
-        "family_members.person_id" => {"$in" => person_ids}
-        })
+                                                   "family_members.person_id" => {"$in" => person_ids}
+                                                 })
       end
 
       @draw = dt_query.draw
@@ -159,7 +159,7 @@ module SepAll
   def createSep
     qle = QualifyingLifeEventKind.find(sep_params[:qle_id])
     @family = Family.find(sep_params[:person])
-    @name = sep_params[:firstName] + " " + sep_params[:lastName]
+    @name = "#{sep_params[:firstName]} #{sep_params[:lastName]}"
     special_enrollment_period = @family.special_enrollment_periods.new(effective_on_kind: sep_params[:effective_on_kind].downcase)
     special_enrollment_period.qualifying_life_event_kind = qle
     special_enrollment_period.qle_on = Date.strptime(sep_params[:event_date], "%m/%d/%Y") if sep_params[:event_date].present?
@@ -170,42 +170,37 @@ module SepAll
     special_enrollment_period.comments << Comment.new(content: sep_params[:admin_comment], user: current_user.email) if sep_params[:admin_comment].present?
     special_enrollment_period.csl_num = sep_params[:csl_num] if sep_params[:csl_num].present?
     special_enrollment_period.next_poss_effective_date = Date.strptime(sep_params[:next_poss_effective_date], "%m/%d/%Y") if sep_params[:next_poss_effective_date].present?
-    date_arr = Array.new
+    date_arr = []
     date_arr.push(Date.strptime(sep_params[:option1_date], "%m/%d/%Y").to_s) if sep_params[:option1_date].present?
     date_arr.push(Date.strptime(sep_params[:option2_date], "%m/%d/%Y").to_s) if sep_params[:option2_date].present?
     date_arr.push(Date.strptime(sep_params[:option3_date], "%m/%d/%Y").to_s) if sep_params[:option3_date].present?
-    special_enrollment_period.optional_effective_on = date_arr if date_arr.length > 0
+    special_enrollment_period.optional_effective_on = date_arr unless date_arr.empty?
     special_enrollment_period.market_kind = qle.market_kind == "individual" ? "ivl" : qle.market_kind
     special_enrollment_period.admin_flag = true
-    
-    if special_enrollment_period.save
-      @message_for_partial = "SEP Added for #{@name}"
-    else
-      @message_for_partial = "SEP not saved. (Error: " + special_enrollment_period.errors.full_messages.join(", ") + ")"
-    end
+
+    @message_for_partial = if special_enrollment_period.save
+                             "SEP Added for #{@name}"
+                           else
+                             "SEP not saved. (Error: #{special_enrollment_period.errors.full_messages.join(', ')})"
+                           end
   end
 
-  def sortData(families, state, returnData=nil)
+  def sortData(families, state, returnData = nil)
     init_arr = []
-    if (state == 'both')
-      families.each do|f| 
-        if f.primary_applicant.person.consumer_role.present? || f.primary_applicant.person.active_employee_roles.present?        
-          init_arr.push(f)
-        end
+    case state
+    when 'both'
+      families.each do |f|
+        init_arr.push(f) if f.primary_applicant.person.consumer_role.present? || f.primary_applicant.person.active_employee_roles.present?
       end
-    elsif (state == 'ivl')
-      families.each do|f|
-        if f.primary_applicant.person.consumer_role.present? 
-          init_arr.push(f)
-        end
+    when 'ivl'
+      families.each do |f|
+        init_arr.push(f) if f.primary_applicant.person.consumer_role.present?
       end
     else
-      families.each do|f|
-        if f.primary_applicant.person.active_employee_roles.present?
-          init_arr.push(f)
-        end
+      families.each do |f|
+        init_arr.push(f) if f.primary_applicant.person.active_employee_roles.present?
       end
     end
-   returnData == 'yes' ? init_arr : init_arr.length;
+    returnData == 'yes' ? init_arr : init_arr.length
   end
 end

@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 module Factories
   class MatchedEmployee
     def build(consumer_identity, roster_employee, person)
       person_form = person
-      if !person_form
-        person_form = Person.new({ 
-          :date_of_birth => consumer_identity.date_of_birth,
-          :ssn => consumer_identity.ssn
-        })
+      unless person_form
+        person_form = Person.new({
+                                   :date_of_birth => consumer_identity.date_of_birth,
+                                   :ssn => consumer_identity.ssn
+                                 })
         build_address_from_employee(person_form, roster_employee)
       end
       person_form.user_id = consumer_identity.user_id
@@ -34,7 +36,6 @@ module Factories
     end
 
     def build_nested_models(person)
-
       ["home","mobile","work","fax"].each do |kind|
         person.phones.build(kind: kind) if person.phones.select{|phone| phone.kind == kind}.blank?
       end
@@ -66,12 +67,12 @@ module Factories
         # attributes unless we tell it don't do that.
         ca = census_employee.address
         person_form.address.new({
-          :address_1 => ca.address_1,
-          :address_2 => ca.address_2,
-          :city => ca.city,
-          :state => ca.state,
-          :zip => ca.zip
-        })
+                                  :address_1 => ca.address_1,
+                                  :address_2 => ca.address_2,
+                                  :city => ca.city,
+                                  :state => ca.state,
+                                  :zip => ca.zip
+                                })
       end
     end
   end

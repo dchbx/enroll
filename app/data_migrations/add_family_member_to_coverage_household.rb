@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class AddFamilyMemberToCoverageHousehold < MongoidMigrationTask
@@ -5,8 +7,16 @@ class AddFamilyMemberToCoverageHousehold < MongoidMigrationTask
     dependent_hbx_id = ENV['dependent_hbx_id'].to_s
     primary_hbx_id = ENV['primary_hbx_id'].to_s
 
-    person = Person.by_hbx_id(primary_hbx_id).first rescue nil
-    dependent = Person.by_hbx_id(dependent_hbx_id).first rescue nil
+    person = begin
+      Person.by_hbx_id(primary_hbx_id).first
+    rescue StandardError
+      nil
+    end
+    dependent = begin
+      Person.by_hbx_id(dependent_hbx_id).first
+    rescue StandardError
+      nil
+    end
 
     if person.present? && dependent.present?
       if person.primary_family.present?

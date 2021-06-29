@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CuramUser
   include Mongoid::Document
 
@@ -26,9 +28,7 @@ class CuramUser
   end
 
   def self.encrypt_ssn(val)
-    if val.blank?
-      return nil
-    end
+    return nil if val.blank?
     ssn_val = val.to_s.gsub(/\D/, '')
     SymmetricEncryption.encrypt(ssn_val)
   end
@@ -37,7 +37,7 @@ class CuramUser
     SymmetricEncryption.decrypt(val)
   end
 
-  def self.match_ssn ssn
+  def self.match_ssn(ssn)
     CuramUser.where(encrypted_ssn: self.encrypt_ssn(ssn)).exists?
   end
 
@@ -65,11 +65,7 @@ class CuramUser
 
   def ssn
     ssn_val = read_attribute(:encrypted_ssn)
-    if !ssn_val.blank?
-      CuramUser.decrypt_ssn(ssn_val)
-    else
-      nil
-    end
+    CuramUser.decrypt_ssn(ssn_val) unless ssn_val.blank?
   end
 
   def self.name_in_curam_list(fname, lname)

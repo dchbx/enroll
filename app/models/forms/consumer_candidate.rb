@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Forms
   class ConsumerCandidate
     include Acapi::Notifiers
@@ -6,11 +8,7 @@ module Forms
 
     include PeopleNames
     include SsnField
-    attr_accessor :gender
-    attr_accessor :user_id
-    attr_accessor :no_ssn
-    attr_accessor :dob_check #hidden input filed for one time DOB warning
-    attr_accessor :is_applying_coverage
+    attr_accessor :gender, :user_id, :no_ssn, :dob_check, :is_applying_coverage #hidden input filed for one time DOB warning
 
     validates_presence_of :first_name, :allow_blank => nil
     validates_presence_of :last_name, :allow_blank => nil
@@ -33,9 +31,7 @@ module Forms
     def ssn_or_checkbox
       return unless is_applying_coverage? # Override SSN/Checkbox validations if is_applying_coverage is "false"
 
-      if ssn.blank? && no_ssn == "0"
-        errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'")
-      end
+      errors.add(:base, "Enter a valid social security number or select 'I don't have an SSN'") if ssn.blank? && no_ssn == "0"
     end
 
     def is_applying_coverage?
@@ -43,30 +39,34 @@ module Forms
     end
 
     def dob=(val)
-      @dob = Date.strptime(val, "%Y-%m-%d") rescue nil
+      @dob = begin
+        Date.strptime(val, "%Y-%m-%d")
+      rescue StandardError
+        nil
+      end
     end
 
     def match_person
-      if !ssn.blank?
-        Person.where({
-                       :dob => dob,
-                       :encrypted_ssn => Person.encrypt_ssn(ssn)
-                   }).first || match_ssn_employer_person
-      else
+      if ssn.blank?
         Person.where({
                        :dob => dob,
                        :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                       :first_name => /^#{first_name}$/i
+                     }).first
+      else
+        Person.where({
+                       :dob => dob,
+                       :encrypted_ssn => Person.encrypt_ssn(ssn)
+                     }).first || match_ssn_employer_person
       end
     end
 
     def match_ssn_employer_person
       potential_person = Person.where({
-                       :dob => dob,
-                       :last_name => /^#{last_name}$/i,
-                       :first_name => /^#{first_name}$/i,
-                   }).first
+                                        :dob => dob,
+                                        :last_name => /^#{last_name}$/i,
+                                        :first_name => /^#{first_name}$/i
+                                      }).first
       return potential_person if potential_person.present? && potential_person.employer_staff_roles?
       nil
     end
@@ -77,7 +77,7 @@ module Forms
       if same_ssn.present? && same_ssn.first.try(:user)
         errors.add(:ssn_taken,
                   #{}"This Social Security Number has been taken on another account.  If this is your correct SSN, and you don’t already have an account, please contact #{HbxProfile::CallCenterName} at #{HbxProfile::CallCenterPhoneNumber}.")
-                  "The social security number you entered is affiliated with another account.")
+                   "The social security number you entered is affiliated with another account.")
       end
     end
 
@@ -87,33 +87,29 @@ module Forms
       person_with_ssn_dob = Person.where(encrypted_ssn: Person.encrypt_ssn(ssn), dob: dob).first
       if person_with_ssn != person_with_ssn_dob
         errors.add(:base,
-          "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
+                   "This Social Security Number and Date-of-Birth is invalid in our records.  Please verify the entry, and if correct, contact the DC Customer help center at #{Settings.contact_center.phone_number}.")
         log("ERROR: unable to match or create Person record, SSN exists with different DOB", {:severity => "error"})
       end
     end
 
     def does_not_match_a_different_users_person
       matched_person = match_person
-      if matched_person.present?
-        if matched_person.user.present?
-          if matched_person.user.id.to_s != self.user_id.to_s
-            errors.add(
-                :base,
-                "#{first_name} #{last_name} is already affiliated with another account."
-            )
-          end
-        end
+      if matched_person.present? && matched_person.user.present? && (matched_person.user.id.to_s != self.user_id.to_s)
+        errors.add(
+          :base,
+          "#{first_name} #{last_name} is already affiliated with another account."
+        )
       end
       true
     end
 
     def dob_not_in_future
-
       if self.dob && self.dob > ::TimeKeeper.date_of_record
         errors.add(
-            :dob,
-            "#{dob} can't be in the future.")
-        self.dob=""
+          :dob,
+          "#{dob} can't be in the future."
+        )
+        self.dob = ""
       end
     end
 

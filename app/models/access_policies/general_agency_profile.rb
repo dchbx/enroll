@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AccessPolicies
   class GeneralAgencyProfile
     attr_accessor :user
@@ -7,16 +9,22 @@ module AccessPolicies
     end
 
     def authorize_new(controller)
-      general_agency_profile_id = user.person.general_agency_staff_roles.last.general_agency_profile_id rescue nil
-      if user.has_general_agency_staff_role? && general_agency_profile_id.present?
-        controller.redirect_to_show(general_agency_profile_id)
+      general_agency_profile_id = begin
+        user.person.general_agency_staff_roles.last.general_agency_profile_id
+      rescue StandardError
+        nil
       end
+      controller.redirect_to_show(general_agency_profile_id) if user.has_general_agency_staff_role? && general_agency_profile_id.present?
     end
 
     def authorize_index(controller)
       return true if user.has_hbx_staff_role? || user.has_csr_role? || user.has_broker_role?
 
-      general_agency_profile_id = user.person.general_agency_staff_roles.last.general_agency_profile_id rescue nil
+      general_agency_profile_id = begin
+        user.person.general_agency_staff_roles.last.general_agency_profile_id
+      rescue StandardError
+        nil
+      end
       if user.has_general_agency_staff_role? && general_agency_profile_id.present?
         controller.redirect_to_show(general_agency_profile_id)
       else

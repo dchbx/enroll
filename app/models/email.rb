@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Email
   include Mongoid::Document
   include Mongoid::Timestamps
@@ -9,7 +11,7 @@ class Email
   embedded_in :office_location
   embedded_in :census_member, class_name: "CensusMember"
 
-  KINDS = %W(home work)
+  KINDS = %w[home work].freeze
 
   field :kind, type: String
   field :address, type: String
@@ -19,8 +21,8 @@ class Email
                 :modifier_field => :modifier,
                 :modifier_field_optional => true,
                 :version_field => :tracking_version,
-                :track_create  => true,    # track document creation, default is false
-                :track_update  => true,    # track document updates, default is true
+                :track_create => true,    # track document creation, default is false
+                :track_update => true,    # track document updates, default is true
                 :track_destroy => true
 
   validates :address, :email => true, :allow_blank => false
@@ -28,7 +30,7 @@ class Email
   validates_inclusion_of :kind, in: KINDS, message: "%{value} is not a valid email type"
 
   validates :address,
-    presence: true
+            presence: true
 
   def blank?
     address.blank?

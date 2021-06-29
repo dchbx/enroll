@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
@@ -8,9 +9,7 @@ class RemoveBenefitPackage < MongoidMigrationTask
     id = ENV['id']
     existing_bg_id = ENV['existing_bg_id']
     new_name_for_bg = ENV['new_name_for_bg'].humanize
-    if organizations.size !=1
-      raise 'Issues with fein'
-    end
+    raise 'Issues with fein' if organizations.size != 1
     if id.present?
       organizations.first.employer_profile.plan_years.where(aasm_state: state).first.benefit_groups.where(_id: id).first.benefit_group_assignments.to_a.each do |bga|
         if bga.hbx_enrollments.present?

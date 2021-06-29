@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WelcomeController < ApplicationController
   layout 'bootstrap_4'
   skip_before_action :require_login
@@ -8,8 +10,7 @@ class WelcomeController < ApplicationController
     render json: nil, status: :ok
   end
 
-  def index
-  end
+  def index; end
 
   def form_template
     # created for generic form template access at '/templates/form-template'

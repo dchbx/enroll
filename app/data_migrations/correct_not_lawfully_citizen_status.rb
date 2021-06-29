@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class CorrectNotLawfullyCitizenStatus < MongoidMigrationTask
 
   def get_families
-    people_ids =   Person.where({ :"consumer_role" => {"$exists" => true},
-                                  :"consumer_role.aasm_state"=> {'$nin' => ['unverified', 'fully_verified']},
-                                  :"consumer_role.lawful_presence_determination.citizen_status" => {'$in' => ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION} }).map(&:id)
+    people_ids = Person.where({ :consumer_role => {"$exists" => true},
+                                :"consumer_role.aasm_state" => {'$nin' => ['unverified', 'fully_verified']},
+                                :"consumer_role.lawful_presence_determination.citizen_status" => {'$in' => ConsumerRole::INELIGIBLE_CITIZEN_VERIFICATION} }).map(&:id)
     Family.where("family_members.person_id" => {"$in" => people_ids})
   end
 
@@ -16,7 +18,6 @@ class CorrectNotLawfullyCitizenStatus < MongoidMigrationTask
   def get_members(enrollment)
     enrollment.hbx_enrollment_members.flat_map(&:person)
   end
-
 
   def update_citizen_status_not_lawfully_present(enrollment)
     people = get_members(enrollment)
@@ -36,14 +37,14 @@ class CorrectNotLawfullyCitizenStatus < MongoidMigrationTask
   def migrate
     families = get_families
     families.each do |family|
-      begin
+
       enrollments = get_enrollments(family)
       enrollments.each do |enrollment|
         update_citizen_status_not_lawfully_present(enrollment)
       end
-      rescue => e
-        puts "Issue migrating, #{e}"
-      end
+    rescue StandardError => e
+      puts "Issue migrating, #{e}"
+
     end
   end
 

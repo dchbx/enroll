@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class TerminateCensusEmployee < MongoidMigrationTask
@@ -6,7 +8,9 @@ class TerminateCensusEmployee < MongoidMigrationTask
   # then terminate their employee roles.
   def migrate
     count = 0
-    censusemployee=CensusEmployee.where(:"aasm_state".in =>['employee_termination_pending','employee_role_linked']).select{ |censusemployee| (censusemployee.employment_terminated_on.present? && censusemployee.employment_terminated_on.strftime('%Y-%m-%d') < TimeKeeper.date_of_record.strftime('%Y-%m-%d'))}
+    censusemployee = CensusEmployee.where(:aasm_state.in => ['employee_termination_pending','employee_role_linked']).select do |censusemployee|
+      (censusemployee.employment_terminated_on.present? && censusemployee.employment_terminated_on.strftime('%Y-%m-%d') < TimeKeeper.date_of_record.strftime('%Y-%m-%d'))
+    end
     if censusemployee.present?
       censusemployee.each do |employee|
         employee.terminate_employee_role! if employee.may_terminate_employee_role?

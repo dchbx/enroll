@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require File.join(Rails.root, "lib/mongoid_migration_task")
 
 class SetActiveBenefitGroupAssignment < MongoidMigrationTask
 
   def find_employers
     Organization.where(:"employer_profile.plan_years" => {
-      :$elemMatch => {:start_on.gte => Date.new(2016,6,1), :start_on.lte => Date.new(2016,8,1), :aasm_state => 'active'}
-      })
+                         :$elemMatch => {:start_on.gte => Date.new(2016,6,1), :start_on.lte => Date.new(2016,8,1), :aasm_state => 'active'}
+                       })
   end
 
   def find_assignments_for_benefit_groups(census_employee, bg_ids)
@@ -19,7 +21,7 @@ class SetActiveBenefitGroupAssignment < MongoidMigrationTask
       employer = org.employer_profile
       active_plan_year = employer.active_plan_year
       next unless active_plan_year
-      
+
       bg_ids = active_plan_year.benefit_groups.map(&:id)
       employer.census_employees.non_terminated.each do |census_employee|
 
