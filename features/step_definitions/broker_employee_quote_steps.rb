@@ -337,3 +337,49 @@ end
 When(/^the broker clicks Dental Features$/) do
   find('.interaction-click-control-dental-features-and-cost-criteria').click
 end
+
+And(/^prospect employer exist$/) do
+  find(BrokerHomePage.employers_tab).click
+  find(BrokerEmployersPage.add_prospect_employer_btn).click
+  fill_in BrokerAddProspectEmployerPage.legal_name, with: 'emp1'
+  fill_in BrokerAddProspectEmployerPage.dba, with: '101010'
+  find(BrokerAddProspectEmployerPage.entity_kind_dropdown).click
+  find(BrokerAddProspectEmployerPage.select_c_corporation).click
+  fill_in BrokerAddProspectEmployerPage.address_1, with: '1818 exp st'
+  fill_in BrokerAddProspectEmployerPage.city, with: 'Washington'
+  fill_in BrokerAddProspectEmployerPage.zip, with: '20002'
+  fill_in BrokerAddProspectEmployerPage.area_code, with: '202'
+  fill_in BrokerAddProspectEmployerPage.number, with: '5551212'
+  find(BrokerAddProspectEmployerPage.confirm_btn).click
+end
+
+And(/^Primary broker clicks Actions dropdown and clicks Create Quote$/) do
+ find(BrokerEmployersPage.actions_dropdown).click
+ expect(page).to have_css('.btn.btn-xs', text: 'Create Quote')
+ find(BrokerEmployersPage.create_quote).click
+end
+
+And(/^Primary broker clicks on Select Health Benefits button$/) do
+  find(BrokerCreateQuotePage.select_health_benefits_btn).click
+end
+
+And(/^Primary broker selects plan offerings by metal level and enters (.*) for employee and deps$/) do |int|
+  wait_for_ajax(2, 2)
+  find(BrokerHealthBenefitsPage.by_meta_level_tab).click
+  wait_for_ajax(2, 2)
+  expect(page).to have_content("Gold")
+  choose(BrokerHealthBenefitsPage.gold_radiobtn)
+  wait_for_ajax(2, 2)
+  fill_in BrokerHealthBenefitsPage.employer_employee_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_spouse_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_domestic_partner_contribution, with: int.to_i
+  fill_in BrokerHealthBenefitsPage.employer_child_under_26_contribution, with: int.to_i
+end
+
+And (/^Primary broker publishes the quote$/) do
+  wait_for_ajax(3, 2)
+  find(BrokerHealthBenefitsPage.select_refrence_plan).click
+  wait_for_ajax(3, 2)
+  find(BrokerHealthBenefitsPage.publish_quote_btn).click
+  expect(page).to have_content("Quote Published")
+end
