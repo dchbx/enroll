@@ -6,7 +6,7 @@ namespace :load_rate_reference do
     if EnrollRegistry[:enroll_app].settings(:rating_areas).item == 'single'
       Rake::Task['load_rate_reference:dc_rating_areas'].invoke
     else
-      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcasse}/xls_templates/rating_areas", "**", "*.xlsx"))
+      files = Dir.glob(File.join(Rails.root, "db/seedfiles/plan_xmls/#{EnrollRegistry[:enroll_app].setting(:state_abbreviation).item.downcase}/xls_templates/rating_areas", "**", "*.xlsx"))
 
       puts "*"*80 unless Rails.env.test?
       files.each do |file|
