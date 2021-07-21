@@ -49,7 +49,7 @@ gem 'ui_helpers',         path: "components/ui_helpers"
 
 ## MongoDB gem dependencies
 gem 'bson',                     '~> 4.3'
-gem 'carrierwave-mongoid',      '~> 1.2',  :require => 'carrierwave/mongoid'
+gem 'carrierwave-mongoid', '~> 1.3', '>= 1.3.0', :require => 'carrierwave/mongoid'
 gem 'mongoid',                  '~> 7.0.2'
 gem 'mongo',                    '~> 2.6'
 gem 'mongo_session_store',      '~> 3.1'
@@ -61,7 +61,7 @@ gem 'mongoid_rails_migrations', '~> 1.2'
 
 ## General gems
 gem 'aasm',                     '~> 4.8'
-gem 'addressable',              '~> 2.3'
+gem 'addressable', '~> 2.8', '>= 2.8.0'
 gem 'animate-rails',            '~> 1.0.10'
 gem 'recurring_select'
 
@@ -145,7 +145,7 @@ group :development, :test do
   gem 'capistrano',             '~> 3.1'
   gem 'capistrano-rails',       '1.4'
   gem 'climate_control',        '~> 0.2.0'
-  gem 'email_spec',             '~> 2'
+  gem 'email_spec', '~> 2', '>= 2.2.0'
   gem 'factory_bot_rails',      '~> 4.11'
   gem 'forgery',                '~> 0.7.0'
   gem 'parallel_tests',         '~> 2.26.2'
@@ -161,9 +161,9 @@ end
 
 group :test do
   gem 'action_mailer_cache_delivery', '~> 0.3'
-  gem 'capybara',                     '~> 3.12'
-  gem 'capybara-screenshot',          '~> 1.0.18'
-  gem 'cucumber-rails',               :require => false
+  gem 'capybara', '~> 3.31', '>= 3.31.0'
+  gem 'capybara-screenshot', '~> 1.0.24'
+  gem 'cucumber-rails', '>= 1.8.0', :require => false
   gem 'fakeredis',                    '~> 0.7.0', :require => 'fakeredis/rspec'
   gem 'mongoid-rspec',                '~> 4'
   gem 'rspec-instafail',              '~> 1'
@@ -175,7 +175,7 @@ group :test do
   gem 'warden',                       '~> 1.2.7'
   gem 'watir',                        '~> 6.10.3'
   gem 'webdrivers', '~> 3.0'
-  gem 'webmock',                      '~> 3.0.1'
+  gem 'webmock', '~> 3.0.1'
 end
 
 group :production do
